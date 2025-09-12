@@ -1,0 +1,15 @@
+/* ==========================================================================
+   VALYANMED - MAIN APPLICATION STYLES
+   Medical Clinic Management System
+   ========================================================================== */
+
+/* Import all CSS modules */
+@import url('css/global.css');
+@import url('css/components.css');
+@import url('css/utilities.css');
+
+/* Import page-specific styles */
+@import url('css/pages/home.css');
+@import url('css/pages/patients.css');
+@import url('css/pages/simple.css');
+@import url('css/pages/users.css');

@@ -1,0 +1,178 @@
+@page "/consultatii"
+
+<PageTitle>Consulta?ii - ValyanMed</PageTitle>
+
+<FluentStack Orientation="Orientation.Vertical" VerticalGap="20">
+    <!-- Header Actions -->
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="margin: 0; color: var(--accent-foreground-rest);">Program?ri ?i Consulta?ii</h2>
+        <FluentButton Appearance="Appearance.Accent" @onclick="AddNewAppointment">
+            <span class="icon" style="margin-right:8px;">???</span>
+            Programare Nou?
+        </FluentButton>
+    </div>
+
+    <!-- Date Navigation -->
+    <FluentCard>
+        <div style="padding: 20px;">
+            <FluentGrid Spacing="3">
+                <FluentGridItem xs="12" md="4">
+                    <FluentDatePicker Label="Selecteaz? Data" style="width: 100%;" />
+                </FluentGridItem>
+                <FluentGridItem xs="12" md="4">
+                    <div style="display: flex; gap: 10px; align-items: end; height: 100%;">
+                        <FluentButton Appearance="Appearance.Stealth" @onclick="PreviousDay">
+                            <span class="icon" style="margin-right:6px;">?</span>
+                            Ziua Anterioar?
+                        </FluentButton>
+                        <FluentButton Appearance="Appearance.Stealth" @onclick="NextDay">
+                            Ziua Urm?toare
+                            <span class="icon" style="margin-left:6px;">?</span>
+                        </FluentButton>
+                    </div>
+                </FluentGridItem>
+                <FluentGridItem xs="12" md="4">
+                    <div style="text-align: right; padding: 10px 0;">
+                        <strong>@selectedDate.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("ro-RO"))</strong>
+                    </div>
+                </FluentGridItem>
+            </FluentGrid>
+        </div>
+    </FluentCard>
+
+    <!-- Appointments Timeline -->
+    <FluentCard>
+        <div style="padding: 20px;">
+            <h3 style="margin-top: 0; margin-bottom: 20px; color: var(--accent-foreground-rest);">
+                Program Consulta?ii - @selectedDate.ToString("dd.MM.yyyy")
+            </h3>
+            
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="12">
+                @foreach (var appointment in GetAppointmentsForDate(selectedDate))
+                {
+                    <div style="display: flex; gap: 15px; padding: 15px; border-radius: 8px; border-left: 4px solid @GetStatusColor(appointment.Status); background: var(--neutral-layer-2);">
+                        <div style="min-width: 80px; font-weight: 600; color: var(--accent-foreground-rest);">
+                            @appointment.Time.ToString("HH:mm")
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 500; margin-bottom: 4px;">@appointment.PatientName</div>
+                            <div style="font-size: 14px; color: var(--neutral-foreground-rest); margin-bottom: 4px;">@appointment.Type</div>
+                            <div style="font-size: 12px; color: var(--neutral-foreground-rest);">
+                                <span class="icon" style="margin-right:6px;">??</span> @appointment.PatientPhone
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <FluentBadge Appearance="@GetStatusAppearance(appointment.Status)">
+                                @GetStatusText(appointment.Status)
+                            </FluentBadge>
+                            <FluentButton Appearance="Appearance.Stealth" @onclick="@(() => ViewAppointment(appointment.Id))">
+                                <span class="icon">???</span>
+                            </FluentButton>
+                            <FluentButton Appearance="Appearance.Stealth" @onclick="@(() => EditAppointment(appointment.Id))">
+                                <span class="icon">??</span>
+                            </FluentButton>
+                        </div>
+                    </div>
+                }
+                
+                @if (!GetAppointmentsForDate(selectedDate).Any())
+                {
+                    <div style="text-align: center; padding: 40px; color: var(--neutral-foreground-rest);">
+                        <div class="icon" style="font-size:48px; margin-bottom:15px;">??</div>
+                        <div>Nu exist? program?ri pentru aceast? dat?</div>
+                    </div>
+                }
+            </FluentStack>
+        </div>
+    </FluentCard>
+</FluentStack>
+
+@code {
+    private DateTime selectedDate = DateTime.Today;
+
+    private List<Appointment> allAppointments = new()
+    {
+        new() { Id = 1, PatientName = "Maria Popescu", PatientPhone = "0721-123-456", Type = "Consulta?ie General?", Time = DateTime.Today.AddHours(9), Status = AppointmentStatus.Programata },
+        new() { Id = 2, PatientName = "Ion Ionescu", PatientPhone = "0722-654-321", Type = "Control", Time = DateTime.Today.AddHours(10).AddMinutes(30), Status = AppointmentStatus.InDesfasurare },
+        new() { Id = 3, PatientName = "Ana Georgescu", PatientPhone = "0723-789-012", Type = "Consulta?ie Specializat?", Time = DateTime.Today.AddHours(14), Status = AppointmentStatus.Finalizata },
+        new() { Id = 4, PatientName = "Mihai Marinescu", PatientPhone = "0724-345-678", Type = "Investiga?ii", Time = DateTime.Today.AddHours(16), Status = AppointmentStatus.Programata }
+    };
+
+    private List<Appointment> GetAppointmentsForDate(DateTime date)
+    {
+        return allAppointments
+            .Where(a => a.Time.Date == date.Date)
+            .OrderBy(a => a.Time)
+            .ToList();
+    }
+
+    private void PreviousDay()
+    {
+        selectedDate = selectedDate.AddDays(-1);
+    }
+
+    private void NextDay()
+    {
+        selectedDate = selectedDate.AddDays(1);
+    }
+
+    private void AddNewAppointment()
+    {
+        // TODO: Navigate to add appointment page or open modal
+    }
+
+    private void ViewAppointment(int appointmentId)
+    {
+        // TODO: Navigate to appointment details page
+    }
+
+    private void EditAppointment(int appointmentId)
+    {
+        // TODO: Navigate to edit appointment page or open modal
+    }
+
+    private string GetStatusColor(AppointmentStatus status) => status switch
+    {
+        AppointmentStatus.Programata => "var(--accent-fill-rest)",
+        AppointmentStatus.InDesfasurare => "var(--success-fill-rest)",
+        AppointmentStatus.Finalizata => "var(--success-fill-rest)",
+        AppointmentStatus.Anulata => "var(--error-fill-rest)",
+        _ => "var(--neutral-fill-rest)"
+    };
+
+    private Appearance GetStatusAppearance(AppointmentStatus status) => status switch
+    {
+        AppointmentStatus.Programata => Appearance.Accent,
+        AppointmentStatus.InDesfasurare => Appearance.Neutral,
+        AppointmentStatus.Finalizata => Appearance.Neutral,
+        AppointmentStatus.Anulata => Appearance.Neutral,
+        _ => Appearance.Neutral
+    };
+
+    private string GetStatusText(AppointmentStatus status) => status switch
+    {
+        AppointmentStatus.Programata => "Programat?",
+        AppointmentStatus.InDesfasurare => "În desf??urare",
+        AppointmentStatus.Finalizata => "Finalizat?",
+        AppointmentStatus.Anulata => "Anulat?",
+        _ => "Necunoscut?"
+    };
+
+    public class Appointment
+    {
+        public int Id { get; set; }
+        public string PatientName { get; set; } = string.Empty;
+        public string PatientPhone { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public DateTime Time { get; set; }
+        public AppointmentStatus Status { get; set; }
+    }
+
+    public enum AppointmentStatus
+    {
+        Programata,
+        InDesfasurare,
+        Finalizata,
+        Anulata
+    }
+}

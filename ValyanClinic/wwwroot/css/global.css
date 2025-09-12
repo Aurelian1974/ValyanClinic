@@ -1,0 +1,259 @@
+/* ==========================================================================
+   GLOBAL STYLES - ValyanMed Medical Application
+   ========================================================================== */
+
+/* CSS Variables pentru culori albastre */
+:root {
+    /* Primary Blue Palette */
+    --blue-50: #f0f9ff;
+    --blue-100: #e0f2fe;
+    --blue-200: #bae6fd;
+    --blue-300: #7dd3fc;
+    --blue-400: #38bdf8;
+    --blue-500: #0ea5e9;
+    --blue-600: #0284c7;
+    --blue-700: #0369a1;
+    --blue-800: #075985;
+    --blue-900: #0c4a6e;
+    
+    /* Gradient Definitions */
+    --blue-gradient-light: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+    --blue-gradient-medium: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+    --blue-gradient-header: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%);
+    --blue-gradient-sidebar: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    
+    /* Neutral Colors */
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    /* Semantic Colors */
+    --success-50: #f0fdf4;
+    --success-500: #22c55e;
+    --success-600: #16a34a;
+    
+    --warning-50: #fefbeb;
+    --warning-500: #eab308;
+    --warning-600: #ca8a04;
+    
+    --error-50: #fef2f2;
+    --error-500: #ef4444;
+    --error-600: #dc2626;
+    
+    /* Layout Variables */
+    --sidebar-width: 260px;
+    --header-height: 64px;
+    --border-radius-sm: 6px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 8px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Typography */
+    --font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
+}
+
+/* ==========================================================================
+   RESET & BASE STYLES
+   ========================================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--gray-800);
+    background: var(--blue-50);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   LAYOUT COMPONENTS
+   ========================================================================== */
+
+/* App Layout Container */
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+    background: var(--blue-gradient-light);
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-left: var(--sidebar-width);
+    min-width: 0;
+    transition: margin-left var(--transition-slow);
+}
+
+/* Page Content */
+.page-content {
+    padding: 20px;
+    flex: 1;
+    overflow-x: auto;
+    background: var(--blue-50);
+    min-height: calc(100vh - var(--header-height));
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+/* Desktop Responsive */
+@media (max-width: 1024px) {
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .page-content {
+        padding: 16px;
+    }
+}
+
+/* Very Small Screens */
+@media (max-width: 480px) {
+    .page-content {
+        padding: 12px;
+    }
+}
+
+/* ==========================================================================
+   TYPOGRAPHY
+   ========================================================================== */
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 1rem 0;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--blue-800);
+}
+
+h1 { font-size: var(--font-size-3xl); }
+h2 { font-size: var(--font-size-2xl); }
+h3 { font-size: var(--font-size-xl); }
+h4 { font-size: var(--font-size-lg); }
+h5 { font-size: var(--font-size-base); }
+h6 { font-size: var(--font-size-sm); }
+
+p {
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+}
+
+a {
+    color: var(--blue-600);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--blue-700);
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   FOCUS STYLES
+   ========================================================================== */
+
+h1:focus {
+    outline: none;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--blue-500);
+    outline-offset: 2px;
+    border-radius: var(--border-radius-sm);
+}
+
+/* ==========================================================================
+   FORM VALIDATION STYLES
+   ========================================================================== */
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid var(--success-500);
+}
+
+.invalid {
+    outline: 1px solid var(--error-500);
+}
+
+.validation-message {
+    color: var(--error-600);
+    font-size: var(--font-size-sm);
+    margin-top: 0.25rem;
+}
+
+/* ==========================================================================
+   BLAZOR ERROR BOUNDARY
+   ========================================================================== */
+
+.blazor-error-boundary {
+    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI6My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, var(--error-600);
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: white;
+    border-radius: var(--border-radius-md);
+    margin: 1rem 0;
+}
+
+.blazor-error-boundary::after {
+    content: "An error has occurred.";
+}
+
+/* ==========================================================================
+   FORM ENHANCEMENTS
+   ========================================================================== */
+
+.darker-border-checkbox.form-check-input {
+    border-color: var(--gray-400);
+}
+
+.form-floating > .form-control-plaintext::placeholder, 
+.form-floating > .form-control::placeholder {
+    color: var(--gray-500);
+    text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, 
+.form-floating > .form-control:focus::placeholder {
+    text-align: start;
+}
