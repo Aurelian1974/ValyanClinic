@@ -296,8 +296,8 @@
 
     <!-- User Detail Modal -->
     <SfDialog @ref="UserDetailModal" 
-              Width="900px" 
-              Height="600px"
+              Width="800px" 
+              Height="650px"
               IsModal="true" 
               Visible="@IsModalVisible"
               ShowCloseIcon="true"
@@ -318,79 +318,118 @@
             <Content>
                 @if (SelectedUser != null)
                 {
-                    <div class="user-detail-modal-container">
-                        <div class="detail-content-modal">
-                            <div class="detail-section-modal">
+                    <div class="add-edit-user-container">
+                        <div class="form-sections">
+                            <!-- Personal Information Section -->
+                            <div class="form-section">
                                 <h4><i class="fas fa-id-card"></i> Informatii Personale</h4>
-                                <div class="detail-grid-modal">
-                                    <div class="detail-item-modal">
-                                        <label>ID Utilizator:</label>
-                                        <span>@SelectedUser.Id</span>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Nume</label>
+                                        <div class="form-value">@SelectedUser.FirstName</div>
                                     </div>
-                                    <div class="detail-item-modal">
-                                        <label>Email:</label>
-                                        <span>@SelectedUser.Email</span>
+                                    
+                                    <div class="form-group">
+                                        <label>Prenume</label>
+                                        <div class="form-value">@SelectedUser.LastName</div>
                                     </div>
-                                    <div class="detail-item-modal">
-                                        <label>Username:</label>
-                                        <span>@SelectedUser.Username</span>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <div class="form-value">@SelectedUser.Email</div>
                                     </div>
-                                    <div class="detail-item-modal">
-                                        <label>Telefon:</label>
-                                        <span>@(SelectedUser.Phone ?? "Nu este specificat")</span>
+                                    
+                                    <div class="form-group">
+                                        <label>Telefon</label>
+                                        <div class="form-value">@(SelectedUser.Phone ?? "Nu este specificat")</div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="detail-section-modal">
+                            <!-- Account Information Section -->
+                            <div class="form-section">
+                                <h4><i class="fas fa-user-cog"></i> Informatii Cont</h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Username</label>
+                                        <div class="form-value">@SelectedUser.Username</div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Rol in Sistem</label>
+                                        <div class="form-value">
+                                            <span class="role-badge role-@SelectedUser.Role.ToString().ToLower()">
+                                                @GetRoleDisplayName(SelectedUser.Role)
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Status</label>
+                                        <div class="form-value">
+                                            <span class="status-badge status-@SelectedUser.Status.ToString().ToLower()">
+                                                @GetStatusDisplayName(SelectedUser.Status)
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>ID Utilizator</label>
+                                        <div class="form-value">#@SelectedUser.Id</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Organizational Information Section -->
+                            <div class="form-section">
                                 <h4><i class="fas fa-building"></i> Informatii Organizationale</h4>
-                                <div class="detail-grid-modal">
-                                    <div class="detail-item-modal">
-                                        <label>Departament:</label>
-                                        <span>@(SelectedUser.Department ?? "Nu este specificat")</span>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Departament</label>
+                                        <div class="form-value">@(SelectedUser.Department ?? "Nu este specificat")</div>
                                     </div>
-                                    <div class="detail-item-modal">
-                                        <label>Functia:</label>
-                                        <span>@(SelectedUser.JobTitle ?? "Nu este specificata")</span>
-                                    </div>
-                                    <div class="detail-item-modal">
-                                        <label>Rol in sistem:</label>
-                                        <span class="role-badge role-@SelectedUser.Role.ToString().ToLower()">
-                                            @GetRoleDisplayName(SelectedUser.Role)
-                                        </span>
-                                    </div>
-                                    <div class="detail-item-modal">
-                                        <label>Status:</label>
-                                        <span class="status-badge status-@SelectedUser.Status.ToString().ToLower()">
-                                            @GetStatusDisplayName(SelectedUser.Status)
-                                        </span>
+                                    
+                                    <div class="form-group">
+                                        <label>Functia</label>
+                                        <div class="form-value">@(SelectedUser.JobTitle ?? "Nu este specificata")</div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="detail-section-modal">
+                            <!-- Additional Information Section - Similar to form sections -->
+                            <div class="form-section">
                                 <h4><i class="fas fa-calendar-alt"></i> Informatii Temporale</h4>
-                                <div class="detail-grid-modal">
-                                    <div class="detail-item-modal">
-                                        <label>Data crearii:</label>
-                                        <span>@SelectedUser.CreatedDate.ToString("dd.MM.yyyy HH:mm")</span>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Data crearii</label>
+                                        <div class="form-value">@SelectedUser.CreatedDate.ToString("dd.MM.yyyy HH:mm")</div>
                                     </div>
-                                    <div class="detail-item-modal">
-                                        <label>Ultima autentificare:</label>
-                                        <span>@(SelectedUser.LastLoginDate?.ToString("dd.MM.yyyy HH:mm") ?? "Niciodata")</span>
+                                    
+                                    <div class="form-group">
+                                        <label>Ultima autentificare</label>
+                                        <div class="form-value">@(SelectedUser.LastLoginDate?.ToString("dd.MM.yyyy HH:mm") ?? "Niciodata")</div>
                                     </div>
-                                    <div class="detail-item-modal">
-                                        <label>Activitate recenta:</label>
-                                        <span>@GetActivityStatus(SelectedUser.LastLoginDate)</span>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Activitate recenta</label>
+                                        <div class="form-value">@GetActivityStatus(SelectedUser.LastLoginDate)</div>
                                     </div>
-                                    <div class="detail-item-modal">
-                                        <label>Vechime in sistem:</label>
-                                        <span>@GetSystemAge(SelectedUser.CreatedDate)</span>
+                                    
+                                    <div class="form-group">
+                                        <label>Vechime in sistem</label>
+                                        <div class="form-value">@GetSystemAge(SelectedUser.CreatedDate)</div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="detail-section-modal">
+                            <!-- Permissions Section -->
+                            <div class="form-section">
                                 <h4><i class="fas fa-shield-alt"></i> Permisiuni si Securitate</h4>
                                 <div class="detail-permissions-modal">
                                     <div class="permission-item-modal">
