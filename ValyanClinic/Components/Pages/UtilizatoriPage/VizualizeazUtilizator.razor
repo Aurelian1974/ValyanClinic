@@ -1,0 +1,191 @@
+@using ValyanClinic.Domain.Models
+@using ValyanClinic.Domain.Enums
+@using ValyanClinic.Application.Services
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Notifications
+@rendermode InteractiveServer
+
+<div class="view-user-modal-content">
+    @if (HasError)
+    {
+        <div class="view-user-alert view-user-alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            @ErrorMessage
+        </div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="view-user-loading-container">
+            <div class="view-user-loading-indicator">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Se încarc?...</span>
+            </div>
+        </div>
+    }
+    else if (User != null)
+    {
+        <div class="view-user-details-container">
+            <div class="view-user-details-sections">
+                @* Personal Information Section *@
+                <div class="view-user-details-section">
+                    <h3 class="view-user-section-title">
+                        <i class="fas fa-id-card"></i>
+                        Informa?ii Personale
+                    </h3>
+                    
+                    <div class="view-user-details-grid">
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Nume</label>
+                            <span class="view-user-detail-value">@User.FirstName</span>
+                        </div>
+                        
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Prenume</label>
+                            <span class="view-user-detail-value">@User.LastName</span>
+                        </div>
+                        
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Email</label>
+                            <span class="view-user-detail-value">@User.Email</span>
+                        </div>
+                        
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Telefon</label>
+                            <span class="view-user-detail-value">@(User.Phone ?? "Nu este specificat")</span>
+                        </div>
+                    </div>
+                </div>
+                
+                @* Account Information Section *@
+                <div class="view-user-details-section">
+                    <h3 class="view-user-section-title">
+                        <i class="fas fa-user-cog"></i>
+                        Informa?ii Cont
+                    </h3>
+                    
+                    <div class="view-user-details-grid">
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Username</label>
+                            <span class="view-user-detail-value">@User.Username</span>
+                        </div>
+                        
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Rol în Sistem</label>
+                            <span class="view-user-detail-value">
+                                <span class="view-user-role-badge role-@User.Role.ToString().ToLower()">
+                                    @GetRoleDisplayName(User.Role)
+                                </span>
+                            </span>
+                        </div>
+                        
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Status</label>
+                            <span class="view-user-detail-value">
+                                <span class="view-user-status-badge status-@User.Status.ToString().ToLower()">
+                                    @GetStatusDisplayName(User.Status)
+                                </span>
+                            </span>
+                        </div>
+                        
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">ID Utilizator</label>
+                            <span class="view-user-detail-value">#@User.Id</span>
+                        </div>
+                    </div>
+                </div>
+                
+                @* Organizational Information Section *@
+                <div class="view-user-details-section">
+                    <h3 class="view-user-section-title">
+                        <i class="fas fa-building"></i>
+                        Informa?ii Organiza?ionale
+                    </h3>
+                    
+                    <div class="view-user-details-grid">
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Departament</label>
+                            <span class="view-user-detail-value">@(User.Department ?? "Nu este specificat")</span>
+                        </div>
+                        
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Func?ia</label>
+                            <span class="view-user-detail-value">@(User.JobTitle ?? "Nu este specificat?")</span>
+                        </div>
+                    </div>
+                </div>
+                
+                @* Temporal Information Section *@
+                <div class="view-user-details-section">
+                    <h3 class="view-user-section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Informa?ii Temporale
+                    </h3>
+                    
+                    <div class="view-user-details-grid">
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Data cre?rii</label>
+                            <span class="view-user-detail-value">@User.CreatedDate.ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
+                        
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Ultima autentificare</label>
+                            <span class="view-user-detail-value">@(User.LastLoginDate?.ToString("dd.MM.yyyy HH:mm") ?? "Niciodat?")</span>
+                        </div>
+                        
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Activitate recent?</label>
+                            <span class="view-user-detail-value">@GetActivityStatus(User.LastLoginDate)</span>
+                        </div>
+                        
+                        <div class="view-user-detail-item">
+                            <label class="view-user-detail-label">Vechime în sistem</label>
+                            <span class="view-user-detail-value">@GetSystemAge(User.CreatedDate)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                @* Permissions Section *@
+                <div class="view-user-details-section">
+                    <h3 class="view-user-section-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Permisiuni ?i Securitate
+                    </h3>
+                    
+                    <div class="view-user-permissions-list">
+                        <div class="view-user-permission-item">
+                            <i class="fas fa-check-circle view-user-text-success"></i>
+                            <span>Acces la modulul utilizatori</span>
+                        </div>
+                        <div class="view-user-permission-item">
+                            <i class="fas fa-check-circle view-user-text-success"></i>
+                            <span>Acces la rapoarte</span>
+                        </div>
+                        @if (User.Role == UserRole.Administrator)
+                        {
+                            <div class="view-user-permission-item">
+                                <i class="fas fa-check-circle view-user-text-success"></i>
+                                <span>Acces la administrare sistem</span>
+                            </div>
+                            <div class="view-user-permission-item">
+                                <i class="fas fa-check-circle view-user-text-success"></i>
+                                <span>Gestionare utilizatori</span>
+                            </div>
+                        }
+                        @if (User.Role == UserRole.Doctor)
+                        {
+                            <div class="view-user-permission-item">
+                                <i class="fas fa-check-circle view-user-text-success"></i>
+                                <span>Acces la fi?e medicale</span>
+                            </div>
+                            <div class="view-user-permission-item">
+                                <i class="fas fa-check-circle view-user-text-success"></i>
+                                <span>Prescriere medicamente</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

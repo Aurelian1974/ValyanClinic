@@ -13,6 +13,7 @@ public class UtilizatoriState
     public bool IsAddEditModalVisible { get; set; } = false;
     public bool IsEditMode { get; set; } = false;
     public User? SelectedUser { get; set; } = null;
+    public User? SelectedUserForEdit { get; set; } = null; // Utilizatorul original pentru editare
     public User EditingUser { get; set; } = new();
 
     // Loading State

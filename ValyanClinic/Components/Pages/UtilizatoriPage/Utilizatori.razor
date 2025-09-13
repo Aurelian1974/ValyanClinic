@@ -29,7 +29,7 @@
         </div>
     }
 
-    @* Page Header *@
+    @* Page Header - RESTORED TO BEAUTIFUL ORIGINAL *@
     <div class="users-page-header">
         <div class="header-content">
             <div class="header-text">
@@ -45,17 +45,17 @@
             <div class="users-header-actions">
                 <button class="btn btn-outline-primary" @onclick="ShowAddUserModal">
                     <i class="fas fa-plus"></i>
-                    <span class="btn-text">Adauga Utilizator</span>
+                    <span class="btn-text">Adaug? Utilizator</span>
                 </button>
                 <button class="btn btn-outline-secondary" @onclick="RefreshData">
                     <i class="fas fa-sync-alt"></i>
-                    <span class="btn-text">Actualizeaza</span>
+                    <span class="btn-text">Actualizeaz?</span>
                 </button>
             </div>
         </div>
     </div>
 
-    @* Statistics Cards - COMPACTED *@
+    @* Statistics Cards - RESTORED TO ALL 8 BEAUTIFUL CARDS *@
     @if (!_state.IsLoading)
     {
         <div class="users-stats-grid">
@@ -72,7 +72,7 @@
     @* Toast Notification *@
     <SfToast @ref="ToastRef" Title="ValyanMed" Target="body" NewestOnTop="true" ShowProgressBar="true"></SfToast>
 
-    @* Advanced Filter Panel *@
+    @* Advanced Filter Panel - RESTORED TO FULL BEAUTIFUL VERSION *@
     <div class="users-advanced-filter-panel">
         <div class="filter-panel-header">
             <h3>
@@ -135,9 +135,9 @@
                 @* Second row - C?utare text, Perioada activitate *@
                 <div class="filter-row">
                     <div class="filter-group">
-                        <label class="filter-label">Cautare text:</label>
+                        <label class="filter-label">C?utare text:</label>
                         <SfTextBox @bind-Value="@_state.GlobalSearchText" 
-                                  Placeholder="Cauta in nume, email, username..."
+                                  Placeholder="Caut? în nume, email, username..."
                                   Width="250px"
                                   ShowClearButton="true">
                             <TextBoxEvents ValueChange="OnGlobalSearchChanged" />
@@ -149,7 +149,7 @@
                         <SfDropDownList TItem="string" TValue="string" 
                                        DataSource="@_models.ActivityPeriodOptions" 
                                        @bind-Value="@_state.SelectedActivityPeriod"
-                                       Placeholder="Orice perioada"
+                                       Placeholder="Orice perioad?"
                                        Width="180px">
                             <DropDownListEvents TItem="string" TValue="string" ValueChange="OnActivityPeriodChanged" />
                         </SfDropDownList>
@@ -162,15 +162,15 @@
                 <div class="filter-actions">
                     <button class="btn btn-primary btn-sm" @onclick="ApplyAdvancedFilters">
                         <i class="fas fa-check"></i>
-                        <span>Aplica Filtrele</span>
+                        <span>Aplic? Filtrele</span>
                     </button>
                     <button class="btn btn-secondary btn-sm" @onclick="ClearAdvancedFilters">
                         <i class="fas fa-times"></i>
-                        <span>Curata Filtrele</span>
+                        <span>Cur??? Filtrele</span>
                     </button>
                     <button class="btn btn-info btn-sm" @onclick="ExportFilteredData">
                         <i class="fas fa-download"></i>
-                        <span>Exporta Rezultate</span>
+                        <span>Export? Rezultate</span>
                     </button>
                 </div>
                 
@@ -185,7 +185,7 @@
                         {
                             <span class="filtered-indicator">
                                 <i class="fas fa-filter"></i>
-                                Filtrare activa
+                                Filtrare activ?
                             </span>
                         }
                     </div>
@@ -215,7 +215,6 @@
                     AllowSelection="true"
                     AllowReordering="true"
                     AllowResizing="true"
-                    Height="600"
                     ShowColumnMenu="true">
                 
                 @* Grid Events *@
@@ -251,17 +250,17 @@
                     </GridGroupColumns>
                 </GridGroupSettings>
 
-                @* Columns Definition *@
+                @* Columns Definition - OPTIMIZED FOR SCREEN WIDTH *@
                 <GridColumns>
-                    <GridColumn Field="@nameof(User.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" 
+                    <GridColumn Field="@nameof(User.Id)" HeaderText="ID" Width="50" TextAlign="TextAlign.Center" 
                                IsPrimaryKey="true" AllowFiltering="true" AllowReordering="false"></GridColumn>
-                    <GridColumn Field="@nameof(User.FirstName)" HeaderText="Nume" Width="150" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.LastName)" HeaderText="Prenume" Width="150" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.Email)" HeaderText="Email" Width="200" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.Username)" HeaderText="Username" Width="120" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.Phone)" HeaderText="Telefon" Width="120" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(User.FirstName)" HeaderText="Nume" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(User.LastName)" HeaderText="Prenume" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(User.Email)" HeaderText="Email" Width="160" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(User.Username)" HeaderText="Username" Width="90" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(User.Phone)" HeaderText="Telefon" Width="90" AllowFiltering="true" AllowReordering="true"></GridColumn>
                                
-                    <GridColumn Field="@nameof(User.Role)" HeaderText="Rol" Width="120" AllowFiltering="true" AllowReordering="true">
+                    <GridColumn Field="@nameof(User.Role)" HeaderText="Rol" Width="90" AllowFiltering="true" AllowReordering="true">
                         <Template>
                             @{                                               
                                 var user = context as User;
@@ -270,10 +269,10 @@
                         </Template>
                     </GridColumn>
                                
-                    <GridColumn Field="@nameof(User.Department)" HeaderText="Departament" Width="140" 
+                    <GridColumn Field="@nameof(User.Department)" HeaderText="Departament" Width="100" 
                                AllowFiltering="true" AllowReordering="true"></GridColumn>
                                
-                    <GridColumn Field="@nameof(User.Status)" HeaderText="Status" Width="100" 
+                    <GridColumn Field="@nameof(User.Status)" HeaderText="Status" Width="70" 
                                AllowFiltering="true" AllowReordering="true">
                         <Template>
                             @{                                               
@@ -285,29 +284,29 @@
                         </Template>
                     </GridColumn>
                                
-                    <GridColumn Field="@nameof(User.JobTitle)" HeaderText="Functie" Width="140" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.CreatedDate)" HeaderText="Data Crearii" Width="120" 
+                    <GridColumn Field="@nameof(User.JobTitle)" HeaderText="Func?ie" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(User.CreatedDate)" HeaderText="Data Cre?rii" Width="90" 
                                Format="dd.MM.yyyy" Type="ColumnType.Date" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.LastLoginDate)" HeaderText="Ultima Autentificare" Width="140" 
-                               Format="dd.MM.yyyy HH:mm" Type="ColumnType.DateTime" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(User.LastLoginDate)" HeaderText="Ultima Autent." Width="100" 
+                               Format="dd.MM.yyyy" Type="ColumnType.DateTime" AllowFiltering="true" AllowReordering="true"></GridColumn>
                                
                     @* Actions Column - FROZEN RIGHT *@
-                    <GridColumn HeaderText="Actiuni" Width="120" AllowFiltering="false" AllowSorting="false"
-                               Freeze="FreezeDirection.Right" AllowReordering="false" TextAlign="TextAlign.Center">
+                    <GridColumn HeaderText="Ac?iuni" Width="90" AllowFiltering="false" AllowSorting="false"
+                               IsFrozen = "true" Freeze="FreezeDirection.Right" AllowReordering="false" TextAlign="TextAlign.Center">
                         <Template>
                             @{
                                 var user = context as User;
                                 <div class="action-buttons">
                                     <button class="btn-action btn-view" @onclick="() => ShowUserDetailModal(user!)" 
-                                            title="Vizualizeaza detaliile utilizatorului" aria-label="Vizualizeaza">
+                                            title="Vizualizeaz? detaliile utilizatorului" aria-label="Vizualizeaz?">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <button class="btn-action btn-edit" @onclick="() => EditUser(user!)" 
-                                            title="Modifica utilizatorul" aria-label="Modifica">
+                                            title="Modific? utilizatorul" aria-label="Modific?">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button class="btn-action btn-delete" @onclick="() => DeleteUser(user!)" 
-                                            title="Sterge utilizatorul" aria-label="Sterge">
+                                            title="?terge utilizatorul" aria-label="?terge">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -319,10 +318,10 @@
         </div>
     }
 
-    @* User Detail Modal *@
+    @* User Detail Modal - USING SEPARATE COMPONENT *@
     <SfDialog @ref="UserDetailModal" 
-              Width="800px" 
-              Height="650px"
+              Width="900px" 
+              Height="700px"
               IsModal="true" 
               Visible="@_state.IsModalVisible"
               ShowCloseIcon="true"
@@ -336,180 +335,33 @@
                     <i class="fas fa-user-circle modal-header-icon"></i>
                     <div>
                         <h3 class="modal-header-title">@_state.SelectedUser?.FullName</h3>
-                        <p class="modal-header-subtitle">@_state.SelectedUser?.JobTitle - @(_state.SelectedUser != null ? GetRoleDisplayName(_state.SelectedUser.Role) : "")</p>
+                        <p class="modal-header-subtitle">Detalii utilizator</p>
                     </div>
                 </div>
             </Header>
             <Content>
                 @if (_state.SelectedUser != null)
                 {
-                    <div class="add-edit-user-container">
-                        <div class="form-sections">
-                            @* Personal Information Section *@
-                            <div class="form-section">
-                                <h4><i class="fas fa-id-card"></i> Informatii Personale</h4>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Nume</label>
-                                        <div class="form-value">@_state.SelectedUser.FirstName</div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label>Prenume</label>
-                                        <div class="form-value">@_state.SelectedUser.LastName</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Email</label>
-                                        <div class="form-value">@_state.SelectedUser.Email</div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label>Telefon</label>
-                                        <div class="form-value">@(_state.SelectedUser.Phone ?? "Nu este specificat")</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            @* Account Information Section *@
-                            <div class="form-section">
-                                <h4><i class="fas fa-user-cog"></i> Informatii Cont</h4>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Username</label>
-                                        <div class="form-value">@_state.SelectedUser.Username</div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label>Rol in Sistem</label>
-                                        <div class="form-value">
-                                            <span class="role-badge role-@_state.SelectedUser.Role.ToString().ToLower()">
-                                                @GetRoleDisplayName(_state.SelectedUser.Role)
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Status</label>
-                                        <div class="form-value">
-                                            <span class="status-badge status-@_state.SelectedUser.Status.ToString().ToLower()">
-                                                @GetStatusDisplayName(_state.SelectedUser.Status)
-                                            </span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label>ID Utilizator</label>
-                                        <div class="form-value">#@_state.SelectedUser.Id</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            @* Organizational Information Section *@
-                            <div class="form-section">
-                                <h4><i class="fas fa-building"></i> Informatii Organizationale</h4>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Departament</label>
-                                        <div class="form-value">@(_state.SelectedUser.Department ?? "Nu este specificat")</div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label>Functia</label>
-                                        <div class="form-value">@(_state.SelectedUser.JobTitle ?? "Nu este specificata")</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            @* Additional Information Section *@
-                            <div class="form-section">
-                                <h4><i class="fas fa-calendar-alt"></i> Informatii Temporale</h4>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Data crearii</label>
-                                        <div class="form-value">@_state.SelectedUser.CreatedDate.ToString("dd.MM.yyyy HH:mm")</div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label>Ultima autentificare</label>
-                                        <div class="form-value">@(_state.SelectedUser.LastLoginDate?.ToString("dd.MM.yyyy HH:mm") ?? "Niciodata")</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Activitate recenta</label>
-                                        <div class="form-value">@GetActivityStatus(_state.SelectedUser.LastLoginDate)</div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label>Vechime in sistem</label>
-                                        <div class="form-value">@GetSystemAge(_state.SelectedUser.CreatedDate)</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            @* Permissions Section *@
-                            <div class="form-section">
-                                <h4><i class="fas fa-shield-alt"></i> Permisiuni si Securitate</h4>
-                                <div class="detail-permissions-modal">
-                                    <div class="permission-item-modal">
-                                        <i class="fas fa-check-circle text-success"></i>
-                                        <span>Acces la modulul utilizatori</span>
-                                    </div>
-                                    <div class="permission-item-modal">
-                                        <i class="fas fa-check-circle text-success"></i>
-                                        <span>Acces la rapoarte</span>
-                                    </div>
-                                    @if (_state.SelectedUser.Role == UserRole.Administrator)
-                                    {
-                                        <div class="permission-item-modal">
-                                            <i class="fas fa-check-circle text-success"></i>
-                                            <span>Acces la administrare sistem</span>
-                                        </div>
-                                        <div class="permission-item-modal">
-                                            <i class="fas fa-check-circle text-success"></i>
-                                            <span>Gestionare utilizatori</span>
-                                        </div>
-                                    }
-                                    @if (_state.SelectedUser.Role == UserRole.Doctor)
-                                    {
-                                        <div class="permission-item-modal">
-                                            <i class="fas fa-check-circle text-success"></i>
-                                            <span>Acces la fise medicale</span>
-                                        </div>
-                                        <div class="permission-item-modal">
-                                            <i class="fas fa-check-circle text-success"></i>
-                                            <span>Prescriere medicamente</span>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <VizualizeazUtilizator UserId="@_state.SelectedUser.Id" />
                 }
             </Content>
             <FooterTemplate>
                 <div class="modal-footer-actions">
                     <button class="btn btn-primary" @onclick="EditUserFromModal">
-                        <i class="fas fa-edit"></i> Editeaza Utilizatorul
+                        <i class="fas fa-edit"></i> Editeaz? Utilizatorul
                     </button>
                     <button class="btn btn-secondary" @onclick="CloseUserDetailModal">
-                        <i class="fas fa-times"></i> Inchide
+                        <i class="fas fa-times"></i> Închide
                     </button>
                 </div>
             </FooterTemplate>
         </DialogTemplates>
     </SfDialog>
 
-    @* Add/Edit User Modal *@
+    @* Add/Edit User Modal - USING SEPARATE COMPONENT *@
     <SfDialog @ref="AddEditUserModal" 
-              Width="800px" 
-              Height="650px"
+              Width="900px" 
+              Height="700px"
               IsModal="true" 
               Visible="@_state.IsAddEditModalVisible"
               ShowCloseIcon="true"
@@ -528,146 +380,41 @@
                 </div>
             </Header>
             <Content>
-                <div class="add-edit-user-container">
-                    <EditForm Model="@_state.EditingUser" OnValidSubmit="SaveUser" Id="addEditForm">
-                        <DataAnnotationsValidator />
-                        
-                        <div class="form-sections">
-                            @* Personal Information Section *@
-                            <div class="form-section">
-                                <h4><i class="fas fa-id-card"></i> Informatii Personale</h4>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="firstName">Nume <span class="required">*</span></label>
-                                        <SfTextBox @bind-Value="_state.EditingUser.FirstName" 
-                                                  Placeholder="Introduceti numele"
-                                                  FloatLabelType="FloatLabelType.Never">
-                                        </SfTextBox>
-                                        <ValidationMessage For="@(() => _state.EditingUser.FirstName)" class="validation-error" />
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="lastName">Prenume <span class="required">*</span></label>
-                                        <SfTextBox @bind-Value="_state.EditingUser.LastName" 
-                                                  Placeholder="Introduceti prenumele"
-                                                  FloatLabelType="FloatLabelType.Never">
-                                        </SfTextBox>
-                                        <ValidationMessage For="@(() => _state.EditingUser.LastName)" class="validation-error" />
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="email">Email <span class="required">*</span></label>
-                                        <SfTextBox @bind-Value="_state.EditingUser.Email" 
-                                                  Placeholder="utilizator@valyanmed.ro"
-                                                  FloatLabelType="FloatLabelType.Never">
-                                        </SfTextBox>
-                                        <ValidationMessage For="@(() => _state.EditingUser.Email)" class="validation-error" />
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="phone">Telefon</label>
-                                        <SfTextBox @bind-Value="_state.EditingUser.Phone" 
-                                                  Placeholder="0723456789"
-                                                  FloatLabelType="FloatLabelType.Never">
-                                        </SfTextBox>
-                                        <ValidationMessage For="@(() => _state.EditingUser.Phone)" class="validation-error" />
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            @* Account Information Section *@
-                            <div class="form-section">
-                                <h4><i class="fas fa-user-cog"></i> Informatii Cont</h4>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="username">Username <span class="required">*</span></label>
-                                        <SfTextBox @bind-Value="_state.EditingUser.Username" 
-                                                  Placeholder="username_utilizator"
-                                                  FloatLabelType="FloatLabelType.Never">
-                                        </SfTextBox>
-                                        <ValidationMessage For="@(() => _state.EditingUser.Username)" class="validation-error" />
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="role">Rol in Sistem <span class="required">*</span></label>
-                                        <SfDropDownList TItem="UserRole" TValue="UserRole" 
-                                                       @bind-Value="_state.EditingUser.Role"
-                                                       DataSource="@_models.AllRoles"
-                                                       Placeholder="Selecteaza rolul"
-                                                       FloatLabelType="FloatLabelType.Never">
-                                            <DropDownListTemplates TItem="UserRole">
-                                                <ItemTemplate Context="roleContext">
-                                                    @GetRoleDisplayName(roleContext)
-                                                </ItemTemplate>
-                                            </DropDownListTemplates>
-                                        </SfDropDownList>
-                                        <ValidationMessage For="@(() => _state.EditingUser.Role)" class="validation-error" />
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="status">Status</label>
-                                        <SfDropDownList TItem="UserStatus" TValue="UserStatus" 
-                                                       @bind-Value="_state.EditingUser.Status"
-                                                       DataSource="@_models.AllStatuses"
-                                                       Placeholder="Selecteaza statusul"
-                                                       FloatLabelType="FloatLabelType.Never">
-                                            <DropDownListTemplates TItem="UserStatus">
-                                                <ItemTemplate Context="statusContext">
-                                                    @GetStatusDisplayName(statusContext)
-                                                </ItemTemplate>
-                                            </DropDownListTemplates>
-                                        </SfDropDownList>
-                                    </div>
-                                    <div class="form-group">
-                                        @* Empty div to maintain grid layout *@
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            @* Organizational Information Section *@
-                            <div class="form-section">
-                                <h4><i class="fas fa-building"></i> Informatii Organizationale</h4>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="department">Departament</label>
-                                        <SfDropDownList TItem="string" TValue="string" 
-                                                       @bind-Value="_state.EditingUser.Department"
-                                                       DataSource="@_models.DepartmentOptions"
-                                                       Placeholder="Selecteaza departamentul"
-                                                       AllowFiltering="true"
-                                                       FloatLabelType="FloatLabelType.Never">
-                                        </SfDropDownList>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="jobTitle">Functia</label>
-                                        <SfTextBox @bind-Value="_state.EditingUser.JobTitle" 
-                                                  Placeholder="ex: Medic Specialist, Asistent Medical"
-                                                  FloatLabelType="FloatLabelType.Never">
-                                        </SfTextBox>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </EditForm>
-                </div>
+                @if (_state.IsEditMode && _state.EditingUser != null)
+                {
+                    <AdaugaEditezUtilizator UserId="@_state.EditingUser.Id" 
+                                           EditingUser="@_state.EditingUser"
+                                           OnSave="@SaveUser" 
+                                           OnCancel="@CloseAddEditModal" />
+                }
+                else
+                {
+                    <AdaugaEditezUtilizator OnSave="@SaveUser" 
+                                           OnCancel="@CloseAddEditModal" />
+                }
             </Content>
             <FooterTemplate>
                 <div class="modal-footer-actions">
-                    <button type="submit" form="addEditForm" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" @onclick="OnFormSubmit" disabled="@_state.IsLoading">
                         <i class="fas fa-save"></i>
-                        @(_state.IsEditMode ? "Actualizeaza Utilizatorul" : "Creaza Utilizatorul")
+                        @(_state.IsEditMode ? "Actualizeaz? Utilizatorul" : "Creeaz? Utilizatorul")
                     </button>
-                    <button type="button" class="btn btn-secondary" @onclick="CloseAddEditModal">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAddEditModal" disabled="@_state.IsLoading">
                         <i class="fas fa-times"></i>
-                        Anuleaza
+                        Anuleaz?
                     </button>
                 </div>
             </FooterTemplate>
         </DialogTemplates>
     </SfDialog>
+
+    @* JavaScript functions for opening pages in new windows *@
+    <script>
+        window.openUserWindow = function(url, title, width = 900, height = 700) {
+            const left = (screen.width / 2) - (width / 2);
+            const top = (screen.height / 2) - (height / 2);
+            const options = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,status=no`;
+            window.open(url, title, options);
+        };
+    </script>
 </div>

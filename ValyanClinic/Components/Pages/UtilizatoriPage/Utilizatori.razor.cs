@@ -198,7 +198,7 @@ public partial class Utilizatori : ComponentBase
 
     #endregion
 
-    #region User Detail Modal
+    #region User Detail Modal - RESTORED WITH SEPARATE COMPONENT
 
     private async Task ShowUserDetailModal(User user)
     {
@@ -209,12 +209,12 @@ public partial class Utilizatori : ComponentBase
             _state.IsModalVisible = true;
             StateHasChanged();
 
-            await ShowToast("Detalii", $"Afisare detalii pentru {user.FullName}", "e-toast-info");
+            await ShowToast("Detalii", $"Afi?are detalii pentru {user.FullName}", "e-toast-info");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"ERROR: Error showing user detail modal: {ex.Message}");
-            await ShowToast("Eroare", "Eroare la afisarea detaliilor", "e-toast-danger");
+            await ShowToast("Eroare", "Eroare la afi?area detaliilor", "e-toast-danger");
         }
     }
 
@@ -255,7 +255,7 @@ public partial class Utilizatori : ComponentBase
 
     #endregion
 
-    #region Add/Edit User Modal
+    #region Add/Edit User Modal - RESTORED WITH SEPARATE COMPONENT
 
     private void InitializeFormOptions()
     {
@@ -272,12 +272,12 @@ public partial class Utilizatori : ComponentBase
             _state.IsAddEditModalVisible = true;
             StateHasChanged();
 
-            await ShowToast("Nou utilizator", "Completeaza formularul pentru a adauga un utilizator nou", "e-toast-info");
+            await ShowToast("Nou utilizator", "Completeaz? formularul pentru a ad?uga un utilizator nou", "e-toast-info");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"ERROR: Error showing add user modal: {ex.Message}");
-            await ShowToast("Eroare", "Eroare la deschiderea formularului de adaugare", "e-toast-danger");
+            await ShowToast("Eroare", "Eroare la deschiderea formularului de ad?ugare", "e-toast-danger");
         }
     }
 
@@ -287,10 +287,11 @@ public partial class Utilizatori : ComponentBase
         {
             _state.IsEditMode = true;
             _state.EditingUser = _models.CloneUser(user);
+            _state.SelectedUserForEdit = user; // P?str?m utilizatorul original pentru referin??
             _state.IsAddEditModalVisible = true;
             StateHasChanged();
 
-            await ShowToast("Editare utilizator", $"Modificati informatiile pentru {user.FullName}", "e-toast-info");
+            await ShowToast("Editare utilizator", $"Modifica?i informa?iile pentru {user.FullName}", "e-toast-info");
         }
         catch (Exception ex)
         {
@@ -330,24 +331,41 @@ public partial class Utilizatori : ComponentBase
     {
         try
         {
+            _state.IsLoading = true;
+            StateHasChanged();
+
             if (_state.IsEditMode)
             {
-                await ShowToast("Actualizare", $"Utilizatorul {_state.EditingUser.FullName} a fost actualizat cu succes", "e-toast-success");
                 // TODO: Implement actual update logic
+                await ShowToast("Actualizare", $"Utilizatorul {_state.EditingUser.FullName} a fost actualizat cu succes", "e-toast-success");
             }
             else
             {
+                // TODO: Implement actual create logic  
                 await ShowToast("Creare", $"Utilizatorul {_state.EditingUser.FullName} a fost creat cu succes", "e-toast-success");
-                // TODO: Implement actual create logic
             }
 
+            await Task.Delay(1000); // Simulate processing time
             await CloseAddEditModal();
+            await LoadUsers(); // Refresh the grid
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error saving user: {ex.Message}");
             await ShowToast("Eroare", $"Eroare la salvarea utilizatorului: {ex.Message}", "e-toast-danger");
         }
+        finally
+        {
+            _state.IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    // Metod? pentru a fi apelat? de butonul submit din footer
+    private async Task OnFormSubmit()
+    {
+        // Trigger form validation and submit from the child component
+        await JSRuntime.InvokeVoidAsync("document.getElementById('addEditUserForm').requestSubmit");
     }
 
     #endregion
