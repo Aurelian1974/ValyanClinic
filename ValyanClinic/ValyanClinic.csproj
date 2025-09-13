@@ -4,15 +4,26 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <OutputEncoding>UTF-8</OutputEncoding>
+    <Charset>UTF-8</Charset>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.12.1" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.12.1" />
     <PackageReference Include="Syncfusion.Blazor.Grid" Version="31.1.17" />
     <PackageReference Include="Syncfusion.Blazor.Notifications" Version="31.1.17" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="31.1.17" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" />
+  </ItemGroup>
+
+  <!-- REFACTORED: Add references to Domain and Application layers -->
+  <ItemGroup>
+    <ProjectReference Include="..\ValyanClinic.Domain\ValyanClinic.Domain.csproj" />
+    <ProjectReference Include="..\ValyanClinic.Application\ValyanClinic.Application.csproj" />
+    <ProjectReference Include="..\ValyanClinic.Infrastructure\ValyanClinic.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

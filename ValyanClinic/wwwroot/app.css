@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* ==========================================================================
    VALYANMED - MAIN APPLICATION STYLES
    Medical Clinic Management System
@@ -13,3 +14,4 @@
 @import url('css/pages/patients.css');
 @import url('css/pages/simple.css');
 @import url('css/pages/users.css');
+@import url('css/pages/login.css');

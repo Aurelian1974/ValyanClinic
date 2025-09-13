@@ -1,6 +1,25 @@
 ﻿<Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        @* Check if user is trying to access login page *@
+        @if (routeData.PageType.Name == "Login")
+        {
+            <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.EmptyLayout)" />
+        }
+        else
+        {
+            @* For all other pages, use main layout *@
+            <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        }
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <PageTitle>Pagina nu a fost găsită</PageTitle>
+        <LayoutView Layout="@typeof(Layout.MainLayout)">
+            <div style="text-align: center; padding: 2rem;">
+                <h1>404 - Pagina nu a fost găsită</h1>
+                <p>Ne pare rău, pagina solicitată nu există.</p>
+                <a href="/" class="btn btn-primary">Înapoi la Acasă</a>
+            </div>
+        </LayoutView>
+    </NotFound>
 </Router>

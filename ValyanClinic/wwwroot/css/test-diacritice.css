@@ -1,0 +1,21 @@
+@charset "UTF-8";
+
+/* Test pentru diacriticele române?ti */
+.test-diacritice {
+    /* Toate diacriticele române?ti: ? â î ? ? ? Â Î ? ? */
+    content: "Test: ?âî?? ?ÂÎ??";
+}
+
+/* Mesaje test în român? */
+.test-mesaje::before {
+    content: "Bine a?i venit! Introduce?i datele de autentificare.";
+}
+
+.test-titluri::after {
+    content: "Parol? • Nume utilizator • ?ine-m? minte";
+}
+
+/* Verificare encoding UTF-8 */
+.utf8-test::before {
+    content: "UTF-8 Test: ?âî?? „ghilimele române?ti" – liniu?? lung?";
+}

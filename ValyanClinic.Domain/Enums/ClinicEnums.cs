@@ -25,15 +25,6 @@ public enum AppointmentType
     Vaccination = 5
 }
 
-public enum UserRole
-{
-    Administrator = 1,
-    Doctor = 2,
-    Nurse = 3,
-    Receptionist = 4,
-    Patient = 5
-}
-
 public enum MedicalRecordType
 {
     Consultation = 1,
