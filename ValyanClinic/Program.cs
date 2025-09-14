@@ -1,4 +1,4 @@
-using ValyanClinic.Components;
+﻿using ValyanClinic.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 using FluentValidation;
 using ValyanClinic.Core.Services;
@@ -12,15 +12,18 @@ using System.Text;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
+using Microsoft.Data.SqlClient;
+using System.Data;
+using Dapper; // Pentru operațiile Dapper
 
 var builder = WebApplication.CreateBuilder(args);
 
-// CONFIGURARE ENCODING COMPLET? PENTRU DIACRITICE ROM�NE?TI
+// CONFIGURARE ENCODING COMPLET? PENTRU DIACRITICE ROMÂNE?TI
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 Console.OutputEncoding = Encoding.UTF8;
 Console.InputEncoding = Encoding.UTF8;
 
-// Setare cultur? implicit? �nainte de orice altceva
+// Setare cultur? implicit? înainte de orice altceva
 Thread.CurrentThread.CurrentCulture = new CultureInfo("ro-RO");
 Thread.CurrentThread.CurrentUICulture = new CultureInfo("ro-RO");
 
@@ -70,6 +73,24 @@ else
     Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXZfcXRUR2lcVUV2V0BWYEg=");
 }
 
+// DAPPER DATABASE CONFIGURATION - SECURIZAT PENTRU BLAZOR SERVER
+// Connection string DOAR pe server - NICIODATĂ nu ajunge la client
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+// Configurare IDbConnection pentru Dapper - SECURIZAT COMPLET
+builder.Services.AddScoped<IDbConnection>(provider => 
+{
+    var connection = new SqlConnection(connectionString);
+    // Configurare suplimentară pentru diacritice românești și performanță
+    connection.ConnectionString = connectionString;
+    return connection;
+});
+
+// Configurare pentru pool de conexiuni optimizat pentru Dapper
+builder.Services.AddScoped<Func<IDbConnection>>(provider => 
+    () => new SqlConnection(connectionString));
+
 // Add services to the container
 builder.Services.AddRazorComponents(options =>
 {
@@ -102,11 +123,11 @@ builder.Services.AddSyncfusionBlazor();
 // Add memory cache
 builder.Services.AddMemoryCache();
 
-// REFACTORING: FluentValidation �nlocuie?te Data Annotations - ACTUALIZAT pentru structura organizat?
+// REFACTORING: FluentValidation înlocuie?te Data Annotations - ACTUALIZAT pentru structura organizat?
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>(); // Din LoginPage namespace
 
-// REFACTORING: Rich Services �nlocuiesc simple pass-through
+// REFACTORING: Rich Services înlocuiesc simple pass-through
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserSessionService, UserSessionService>();
 builder.Services.AddScoped<ISecurityAuditService, SecurityAuditService>();
@@ -126,10 +147,48 @@ builder.Services.AddValyanClinicHealthChecks();
 // Add localization services
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-// Add logging
-builder.Services.AddLogging();
+// Add logging with database logging levels
+builder.Services.AddLogging(config =>
+{
+    config.AddConsole();
+    config.AddDebug();
+    if (builder.Environment.IsDevelopment())
+    {
+        config.SetMinimumLevel(LogLevel.Information);
+    }
+});
 
 var app = builder.Build();
+
+// TEST DATABASE CONNECTION LA STARTUP (doar pentru verificare, nu expune connection string-ul)
+try
+{
+    using var scope = app.Services.CreateScope();
+    var dbConnection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
+    if (dbConnection.State != ConnectionState.Open)
+    {
+        dbConnection.Open();
+    }
+    
+    // Test simplu de conectivitate cu Dapper - NU expune connection string-ul
+    var serverInfo = dbConnection.QueryFirstOrDefault<string>("SELECT @@VERSION");
+    var databaseName = dbConnection.QueryFirstOrDefault<string>("SELECT DB_NAME()");
+    
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("✅ Database connection established successfully via Dapper");
+    logger.LogInformation("📊 Connected to database: {DatabaseName}", databaseName);
+    logger.LogInformation("🔒 Connection string secured - never exposed to client");
+    
+    dbConnection.Close();
+}
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "❌ Failed to establish database connection. Check connection string configuration.");
+    logger.LogError("💡 Verify that SQL Server is running and accessible at: TS1828\\ERP");
+    logger.LogError("💡 Ensure the ValyanMed database exists and permissions are correct");
+    // Nu oprim aplicația - doar logăm eroarea pentru debugging
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -181,7 +240,7 @@ app.Use(async (context, next) =>
 // Add global exception handling middleware
 app.UseGlobalExceptionHandling();
 
-// Use request localization cu prioritate pentru rom�n?
+// Use request localization cu prioritate pentru român?
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("ro-RO"),

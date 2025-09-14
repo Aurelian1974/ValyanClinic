@@ -1,186 +1,194 @@
-@using ValyanClinic.Domain.Models
+﻿@using ValyanClinic.Domain.Models
 @using ValyanClinic.Domain.Enums
 @using ValyanClinic.Application.Services
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Notifications
 @rendermode InteractiveServer
 
+<link href="~/css/pages/view-user-syncfusion.css" rel="stylesheet" />
+
 <div class="view-user-modal-content">
     @if (HasError)
     {
-        <div class="view-user-alert view-user-alert-danger">
-            <i class="fas fa-exclamation-triangle me-2"></i>
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
             @ErrorMessage
         </div>
     }
 
     @if (IsLoading)
     {
-        <div class="view-user-loading-container">
-            <div class="view-user-loading-indicator">
+        <div class="loading-container">
+            <div class="loading-indicator">
                 <i class="fas fa-spinner fa-spin"></i>
-                <span>Se �ncarc?...</span>
+                <span>Se încarcă...</span>
             </div>
         </div>
     }
     else if (User != null)
     {
-        <div class="view-user-details-container">
-            <div class="view-user-details-sections">
-                @* Personal Information Section *@
-                <div class="view-user-details-section">
-                    <h3 class="view-user-section-title">
-                        <i class="fas fa-id-card"></i>
-                        Informa?ii Personale
-                    </h3>
-                    
-                    <div class="view-user-details-grid">
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Nume</label>
-                            <span class="view-user-detail-value">@User.FirstName</span>
+        <div class="user-details-dashboard">
+            @* Personal Information Section *@
+            <div class="detail-card">
+                <div class="card-header">
+                    <i class="fas fa-id-card"></i>
+                    <h3>Informații Personale</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Nume</label>
+                            <span class="field-value">@User.FirstName</span>
                         </div>
-                        
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Prenume</label>
-                            <span class="view-user-detail-value">@User.LastName</span>
+                        <div class="form-field">
+                            <label>Prenume</label>
+                            <span class="field-value">@User.LastName</span>
                         </div>
-                        
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Email</label>
-                            <span class="view-user-detail-value">@User.Email</span>
+                        <div class="form-field full-width">
+                            <label>Email</label>
+                            <span class="field-value">@User.Email</span>
                         </div>
-                        
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Telefon</label>
-                            <span class="view-user-detail-value">@(User.Phone ?? "Nu este specificat")</span>
+                        <div class="form-field">
+                            <label>Telefon</label>
+                            <span class="field-value">@(User.Phone ?? "Nu este specificat")</span>
                         </div>
                     </div>
                 </div>
-                
-                @* Account Information Section *@
-                <div class="view-user-details-section">
-                    <h3 class="view-user-section-title">
-                        <i class="fas fa-user-cog"></i>
-                        Informa?ii Cont
-                    </h3>
-                    
-                    <div class="view-user-details-grid">
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Username</label>
-                            <span class="view-user-detail-value">@User.Username</span>
+            </div>
+
+            @* Account Information Section *@
+            <div class="detail-card">
+                <div class="card-header">
+                    <i class="fas fa-user-cog"></i>
+                    <h3>Informații Cont</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Username</label>
+                            <span class="field-value">@User.Username</span>
                         </div>
-                        
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Rol �n Sistem</label>
-                            <span class="view-user-detail-value">
-                                <span class="view-user-role-badge role-@User.Role.ToString().ToLower()">
-                                    @GetRoleDisplayName(User.Role)
-                                </span>
-                            </span>
+                        <div class="form-field">
+                            <label>ID Utilizator</label>
+                            <span class="field-value">#@User.Id</span>
                         </div>
-                        
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Status</label>
-                            <span class="view-user-detail-value">
-                                <span class="view-user-status-badge status-@User.Status.ToString().ToLower()">
-                                    @GetStatusDisplayName(User.Status)
-                                </span>
-                            </span>
+                        <div class="form-field">
+                            <label>Rol în Sistem</label>
+                            <SfBadge CssClass="@($"role-badge role-{User.Role.ToString().ToLower()}")">
+                                @GetRoleDisplayName(User.Role)
+                            </SfBadge>
                         </div>
-                        
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">ID Utilizator</label>
-                            <span class="view-user-detail-value">#@User.Id</span>
+                        <div class="form-field">
+                            <label>Status</label>
+                            <SfBadge CssClass="@($"status-badge status-{User.Status.ToString().ToLower()}")">
+                                @GetStatusDisplayName(User.Status)
+                            </SfBadge>
                         </div>
                     </div>
                 </div>
-                
-                @* Organizational Information Section *@
-                <div class="view-user-details-section">
-                    <h3 class="view-user-section-title">
-                        <i class="fas fa-building"></i>
-                        Informa?ii Organiza?ionale
-                    </h3>
-                    
-                    <div class="view-user-details-grid">
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Departament</label>
-                            <span class="view-user-detail-value">@(User.Department ?? "Nu este specificat")</span>
+            </div>
+
+            @* Organizational Information Section *@
+            <div class="detail-card">
+                <div class="card-header">
+                    <i class="fas fa-building"></i>
+                    <h3>Informații Organizaționale</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Departament</label>
+                            <span class="field-value">@(User.Department ?? "Nu este specificat")</span>
                         </div>
-                        
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Func?ia</label>
-                            <span class="view-user-detail-value">@(User.JobTitle ?? "Nu este specificat?")</span>
+                        <div class="form-field">
+                            <label>Funcția</label>
+                            <span class="field-value">@(User.JobTitle ?? "Nu este specificată")</span>
                         </div>
                     </div>
                 </div>
-                
-                @* Temporal Information Section *@
-                <div class="view-user-details-section">
-                    <h3 class="view-user-section-title">
-                        <i class="fas fa-calendar-alt"></i>
-                        Informa?ii Temporale
-                    </h3>
-                    
-                    <div class="view-user-details-grid">
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Data cre?rii</label>
-                            <span class="view-user-detail-value">@User.CreatedDate.ToString("dd.MM.yyyy HH:mm")</span>
+            </div>
+
+            @* Temporal Information Section *@
+            <div class="detail-card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>Informații Temporale</h3>
+                </div>
+                <div class="card-content">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Data creării</label>
+                            <span class="field-value">@User.CreatedDate.ToString("dd.MM.yyyy HH:mm")</span>
                         </div>
-                        
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Ultima autentificare</label>
-                            <span class="view-user-detail-value">@(User.LastLoginDate?.ToString("dd.MM.yyyy HH:mm") ?? "Niciodat?")</span>
+                        <div class="form-field">
+                            <label>Ultima autentificare</label>
+                            <span class="field-value">@(User.LastLoginDate?.ToString("dd.MM.yyyy HH:mm") ?? "Niciodată")</span>
                         </div>
-                        
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Activitate recent?</label>
-                            <span class="view-user-detail-value">@GetActivityStatus(User.LastLoginDate)</span>
+                        <div class="form-field full-width">
+                            <label>Activitate recentă</label>
+                            <span class="field-value activity-status">@GetActivityStatus(User.LastLoginDate)</span>
                         </div>
-                        
-                        <div class="view-user-detail-item">
-                            <label class="view-user-detail-label">Vechime �n sistem</label>
-                            <span class="view-user-detail-value">@GetSystemAge(User.CreatedDate)</span>
+                        <div class="form-field">
+                            <label>Vechime în sistem</label>
+                            <span class="field-value">@GetSystemAge(User.CreatedDate)</span>
                         </div>
                     </div>
                 </div>
-                
-                @* Permissions Section *@
-                <div class="view-user-details-section">
-                    <h3 class="view-user-section-title">
-                        <i class="fas fa-shield-alt"></i>
-                        Permisiuni ?i Securitate
-                    </h3>
-                    
-                    <div class="view-user-permissions-list">
-                        <div class="view-user-permission-item">
-                            <i class="fas fa-check-circle view-user-text-success"></i>
-                            <span>Acces la modulul utilizatori</span>
+            </div>
+
+            @* Permissions Section - Full Width *@
+            <div class="detail-card permissions-card">
+                <div class="card-header">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Permisiuni și Securitate</h3>
+                </div>
+                <div class="card-content">
+                    <div class="permissions-grid">
+                        <div class="permission-item">
+                            <SfButton IsPrimary="true" CssClass="permission-button success">
+                                <i class="fas fa-check-circle"></i>
+                                Acces Modul Utilizatori
+                            </SfButton>
                         </div>
-                        <div class="view-user-permission-item">
-                            <i class="fas fa-check-circle view-user-text-success"></i>
-                            <span>Acces la rapoarte</span>
+
+                        <div class="permission-item">
+                            <SfButton IsPrimary="true" CssClass="permission-button success">
+                                <i class="fas fa-chart-bar"></i>
+                                Acces Rapoarte
+                            </SfButton>
                         </div>
+
                         @if (User.Role == UserRole.Administrator)
                         {
-                            <div class="view-user-permission-item">
-                                <i class="fas fa-check-circle view-user-text-success"></i>
-                                <span>Acces la administrare sistem</span>
+                            <div class="permission-item">
+                                <SfButton IsPrimary="true" CssClass="permission-button admin">
+                                    <i class="fas fa-crown"></i>
+                                    Administrare Sistem
+                                </SfButton>
                             </div>
-                            <div class="view-user-permission-item">
-                                <i class="fas fa-check-circle view-user-text-success"></i>
-                                <span>Gestionare utilizatori</span>
+
+                            <div class="permission-item">
+                                <SfButton IsPrimary="true" CssClass="permission-button admin">
+                                    <i class="fas fa-users-cog"></i>
+                                    Gestionare Utilizatori
+                                </SfButton>
                             </div>
                         }
+
                         @if (User.Role == UserRole.Doctor)
                         {
-                            <div class="view-user-permission-item">
-                                <i class="fas fa-check-circle view-user-text-success"></i>
-                                <span>Acces la fi?e medicale</span>
+                            <div class="permission-item">
+                                <SfButton IsPrimary="true" CssClass="permission-button medical">
+                                    <i class="fas fa-file-medical"></i>
+                                    Fișe Medicale
+                                </SfButton>
                             </div>
-                            <div class="view-user-permission-item">
-                                <i class="fas fa-check-circle view-user-text-success"></i>
-                                <span>Prescriere medicamente</span>
+
+                            <div class="permission-item">
+                                <SfButton IsPrimary="true" CssClass="permission-button medical">
+                                    <i class="fas fa-prescription-bottle"></i>
+                                    Prescriere Medicamente
+                                </SfButton>
                             </div>
                         }
                     </div>

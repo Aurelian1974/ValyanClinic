@@ -1,0 +1,501 @@
+/* ==========================================================================
+   ADD/EDIT USER PAGE - DYNAMIC PREMIUM DESIGN WITH ROMANIAN DIACRITICS SUPPORT
+   ========================================================================== */
+
+/* ROMANIAN DIACRITICS FONT SUPPORT */
+@supports (font-family: 'Segoe UI') {
+    html body .add-edit-user-modal-content {
+        font-family: 'Segoe UI', 'Inter', system-ui, sans-serif !important;
+    }
+}
+
+@supports not (font-family: 'Segoe UI') {
+    html body .add-edit-user-modal-content {
+        font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif !important;
+    }
+}
+
+/* CHARSET AND ENCODING DECLARATIONS */
+@charset "UTF-8";
+
+/* FORCE PRIORITY OVER ALL GLOBAL AND COMPONENT STYLES */
+html body .add-edit-user-modal-content {
+    padding: 20px !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    min-height: 100% !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    /* Romanian text rendering optimizations */
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    font-feature-settings: "liga" 1, "kern" 1 !important;
+}
+
+/* Add subtle pattern overlay to background */
+html body .add-edit-user-modal-content::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+}
+
+/* Loading and Error States - DYNAMIC WITH ROMANIAN SUPPORT */
+html body .add-edit-user-loading-container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 200px !important;
+    background: none !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+html body .add-edit-user-loading-indicator {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 16px !important;
+    color: white !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    padding: 32px !important;
+    border-radius: 16px !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3) !important;
+    /* Romanian text support */
+    text-rendering: optimizeLegibility !important;
+}
+
+html body .add-edit-user-loading-indicator i {
+    font-size: 36px !important;
+    color: white !important;
+    animation: pulse 2s ease-in-out infinite !important;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+html body .add-edit-user-alert {
+    background: rgba(239, 68, 68, 0.95) !important;
+    color: white !important;
+    padding: 16px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4) !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px) !important;
+    position: relative !important;
+    z-index: 1 !important;
+    /* Romanian text support */
+    text-rendering: optimizeLegibility !important;
+}
+
+/* Form Container - DYNAMIC */
+html body .add-edit-user-form-container {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+}
+
+/* Form Sections Container - DYNAMIC HEIGHTS */
+html body .add-edit-user-form-sections {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+    padding-right: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+}
+
+/* Form Sections - DYNAMIC WHITE CARDS */
+html body .add-edit-user-form-section {
+    background: white !important;
+    border-radius: 16px !important;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 2px 12px rgba(0, 0, 0, 0.08) !important;
+    overflow: visible !important;
+    position: relative !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    backdrop-filter: blur(20px) !important;
+    min-height: auto !important;
+    height: auto !important;
+}
+
+html body .add-edit-user-form-section::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 4px !important;
+    z-index: 1 !important;
+    display: block !important;
+}
+
+html body .add-edit-user-form-section:nth-child(1)::before {
+    background: linear-gradient(90deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%) !important;
+}
+
+html body .add-edit-user-form-section:nth-child(2)::before {
+    background: linear-gradient(90deg, #4ecdc4 0%, #45b7d1 50%, #667eea 100%) !important;
+}
+
+html body .add-edit-user-form-section:nth-child(3)::before {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #ff6b6b 100%) !important;
+}
+
+html body .add-edit-user-form-section:hover {
+    transform: translateY(-4px) scale(1.005) !important;
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Section Titles - DYNAMIC HEIGHT WITH ROMANIAN SUPPORT */
+html body .add-edit-user-section-title {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    padding: 18px 22px !important;
+    margin: 0 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    z-index: 2 !important;
+    min-height: auto !important;
+    height: auto !important;
+    /* Romanian text optimizations */
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    font-feature-settings: "liga" 1, "kern" 1 !important;
+}
+
+html body .add-edit-user-section-title::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%) !important;
+    transition: left 0.6s ease !important;
+    z-index: 1 !important;
+}
+
+html body .add-edit-user-section-title:hover::before {
+    left: 100% !important;
+}
+
+html body .add-edit-user-section-title i {
+    font-size: 18px !important;
+    background: rgba(255, 255, 255, 0.25) !important;
+    padding: 10px !important;
+    border-radius: 10px !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    z-index: 2 !important;
+    position: relative !important;
+    color: white !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Form Rows - DYNAMIC GRID */
+html body .add-edit-user-form-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+    padding: 20px !important;
+    margin: 0 !important;
+    background: white !important;
+    min-height: auto !important;
+    height: auto !important;
+}
+
+html body .add-edit-user-form-row:last-child {
+    padding-bottom: 20px !important;
+}
+
+/* Form Groups - DYNAMIC */
+html body .add-edit-user-form-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    min-height: auto !important;
+    height: auto !important;
+}
+
+/* Form Labels - ROMANIAN DIACRITICS SUPPORT */
+html body .add-edit-user-form-label {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #667eea !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.6px !important;
+    margin: 0 0 4px 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    font-family: inherit !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    /* Romanian text optimizations */
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    font-feature-settings: "liga" 1, "kern" 1 !important;
+}
+
+html body .add-edit-user-required {
+    color: #ef4444 !important;
+    margin-left: 4px !important;
+    font-weight: 700 !important;
+}
+
+/* Syncfusion Input Styling - ROMANIAN CHARACTERS SUPPORT */
+html body .add-edit-user-modal-content .e-input-group,
+html body .add-edit-user-modal-content .e-ddl {
+    border: 2px solid #e5e7eb !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08) !important;
+    min-height: 42px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+}
+
+html body .add-edit-user-modal-content .e-input-group::before,
+html body .add-edit-user-modal-content .e-ddl::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.08) 50%, transparent 100%) !important;
+    transition: left 0.5s ease !important;
+    z-index: 0 !important;
+}
+
+html body .add-edit-user-modal-content .e-input-group:hover::before,
+html body .add-edit-user-modal-content .e-ddl:hover::before {
+    left: 100% !important;
+}
+
+html body .add-edit-user-modal-content .e-input-group:hover,
+html body .add-edit-user-modal-content .e-ddl:hover {
+    border-color: #667eea !important;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15) !important;
+    transform: translateY(-1px) !important;
+}
+
+html body .add-edit-user-modal-content .e-input-group:focus-within,
+html body .add-edit-user-modal-content .e-input-group.e-input-focus,
+html body .add-edit-user-modal-content .e-ddl.e-input-focus {
+    border-color: #667eea !important;
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.15) !important,
+        0 6px 20px rgba(102, 126, 234, 0.2) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* INPUT FIELDS WITH ROMANIAN DIACRITICS SUPPORT */
+html body .add-edit-user-modal-content .e-input,
+html body .add-edit-user-modal-content .e-ddl .e-ddl-icon,
+html body .add-edit-user-modal-content .e-ddl .e-input-value {
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+    color: #1f2937 !important;
+    background: transparent !important;
+    font-weight: 500 !important;
+    z-index: 1 !important;
+    position: relative !important;
+    border: none !important;
+    font-family: inherit !important;
+    line-height: 1.4 !important;
+    min-height: auto !important;
+    height: auto !important;
+    /* Romanian text rendering optimizations */
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    font-feature-settings: "liga" 1, "kern" 1 !important;
+    /* Ensure UTF-8 encoding */
+    unicode-bidi: embed !important;
+    direction: ltr !important;
+}
+
+html body .add-edit-user-modal-content .e-input::placeholder {
+    color: #9ca3af !important;
+    font-weight: 400 !important;
+    font-style: italic !important;
+    /* Romanian placeholder support */
+    text-rendering: optimizeLegibility !important;
+}
+
+/* Dropdown Specific Styling - ROMANIAN TEXT SUPPORT */
+html body .add-edit-user-modal-content .e-ddl .e-ddl-icon {
+    color: #6b7280 !important;
+    font-size: 16px !important;
+    transition: all 0.25s ease !important;
+    padding: 12px 14px !important;
+    right: 0 !important;
+}
+
+html body .add-edit-user-modal-content .e-ddl.e-input-focus .e-ddl-icon,
+html body .add-edit-user-modal-content .e-ddl:hover .e-ddl-icon {
+    color: #667eea !important;
+    transform: rotate(180deg) scale(1.1) !important;
+}
+
+/* Make sure dropdown text with Romanian characters is visible */
+html body .add-edit-user-modal-content .e-ddl .e-input-value {
+    padding-right: 40px !important;
+    /* Romanian text in dropdowns */
+    text-rendering: optimizeLegibility !important;
+    font-feature-settings: "liga" 1, "kern" 1 !important;
+}
+
+/* Validation Messages - ROMANIAN SUPPORT */
+html body .add-edit-user-validation-error {
+    color: #ef4444 !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    margin-top: 4px !important;
+    padding: 4px 8px !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    /* Romanian error messages */
+    text-rendering: optimizeLegibility !important;
+    font-feature-settings: "liga" 1, "kern" 1 !important;
+}
+
+/* Form Animation */
+html body .add-edit-user-form-section {
+    animation: slideInUp 0.5s ease-out !important;
+    animation-fill-mode: both !important;
+}
+
+html body .add-edit-user-form-section:nth-child(1) { animation-delay: 0.1s !important; }
+html body .add-edit-user-form-section:nth-child(2) { animation-delay: 0.15s !important; }
+html body .add-edit-user-form-section:nth-child(3) { animation-delay: 0.2s !important; }
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(30px) !important;
+        opacity: 0 !important;
+    }
+    to {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+    }
+}
+
+/* Responsive Design - DYNAMIC */
+@media (max-width: 768px) {
+    html body .add-edit-user-modal-content {
+        padding: 16px !important;
+    }
+
+    html body .add-edit-user-form-sections {
+        gap: 16px !important;
+    }
+
+    html body .add-edit-user-form-row {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        padding: 18px !important;
+    }
+
+    html body .add-edit-user-section-title {
+        padding: 16px 20px !important;
+        font-size: 14px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    html body .add-edit-user-modal-content {
+        padding: 14px !important;
+    }
+
+    html body .add-edit-user-form-row {
+        padding: 16px !important;
+    }
+
+    html body .add-edit-user-section-title {
+        padding: 14px 18px !important;
+        font-size: 13px !important;
+    }
+
+    html body .add-edit-user-modal-content .e-input,
+    html body .add-edit-user-modal-content .e-ddl .e-input-value {
+        font-size: 13px !important;
+        padding: 10px 12px !important;
+    }
+
+    html body .add-edit-user-modal-content .e-input-group,
+    html body .add-edit-user-modal-content .e-ddl {
+        min-height: 40px !important;
+    }
+}
+
+/* ROMANIAN CHARACTERS SPECIFIC OPTIMIZATIONS */
+html body .add-edit-user-modal-content *:lang(ro) {
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* ENSURE PROPER FONT LOADING FOR ROMANIAN DIACRITICS */
+@font-face {
+    font-family: 'RomanianOptimized';
+    src: local('Segoe UI'), local('Inter'), local('system-ui');
+    unicode-range: U+0100-024F, U+0218-021B, U+1E00-1EFF;
+}
+
+html body .add-edit-user-modal-content {
+    font-family: 'RomanianOptimized', 'Segoe UI', 'Inter', system-ui, sans-serif !important;
+}

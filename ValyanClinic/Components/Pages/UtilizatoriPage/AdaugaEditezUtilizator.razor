@@ -7,11 +7,13 @@
 @using Syncfusion.Blazor.Notifications
 @rendermode InteractiveServer
 
+<link href="~/css/pages/add-edit-user-syncfusion.css" rel="stylesheet" />
+
 <div class="add-edit-user-modal-content">
     @if (HasError)
     {
         <div class="add-edit-user-alert add-edit-user-alert-danger">
-            <i class="fas fa-exclamation-triangle me-2"></i>
+            <i class="fas fa-exclamation-triangle"></i>
             @ErrorMessage
         </div>
     }

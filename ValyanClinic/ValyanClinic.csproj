@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	  <FileEncoding>UTF-8</FileEncoding>
     <OutputEncoding>UTF-8</OutputEncoding>
     <Charset>UTF-8</Charset>
   </PropertyGroup>

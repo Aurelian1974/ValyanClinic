@@ -19,6 +19,9 @@ public partial class VizualizeazUtilizator : ComponentBase
     private bool HasError { get; set; }
     private string ErrorMessage { get; set; } = string.Empty;
 
+    // Syncfusion Dashboard Layout spacing
+    private double[] cellSpacing { get; set; } = new double[] { 10, 10 };
+
     private SfToast? ToastRef;
 
     protected override async Task OnInitializedAsync()

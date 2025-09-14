@@ -10,6 +10,10 @@
     <meta name="accept-charset" content="UTF-8" />
     <base href="/" />
     
+    <!-- Romanian language and encoding declarations -->
+    <meta http-equiv="Content-Language" content="ro-RO" />
+    <meta name="language" content="Romanian" />
+    
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -29,8 +33,16 @@
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["ValyanClinic.styles.css"]" />
     
+    <!-- Romanian diacritics font preload -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Error handling for async operations -->
     <script>
+        // Set proper charset for JavaScript
+        document.charset = "UTF-8";
+        document.characterSet = "UTF-8";
+        
         window.addEventListener('error', function(e) {
             console.warn('Global error caught:', e.message);
         });
