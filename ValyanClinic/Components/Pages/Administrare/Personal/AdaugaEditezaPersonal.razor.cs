@@ -52,12 +52,6 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
     private bool _confirmDataAccuracy = false;
     #endregion
 
-    #region Validation Results
-    private CNPValidationResult? _cnpValidationResult;
-    private CodeValidationResult? _codeValidationResult;
-    private Dictionary<string, ValidationState> _fieldValidationStates = new();
-    #endregion
-
     #region Data Sources for Dropdowns
     private List<string> _cityOptions = new();
     private List<string> _judeteOptions = new();
@@ -125,8 +119,6 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
             };
         }
 
-        // Initialize field validation states
-        _fieldValidationStates.Clear();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -265,26 +257,37 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
 
     private bool CanProceedToNextStep()
     {
-        return _currentStep switch
-        {
-            1 => ValidateStep1(),
-            2 => ValidateStep2(),
-            3 => ValidateStep3(),
-            4 => ValidateStep4(),
-            5 => ValidateStep5(),
-            _ => false
-        };
+        // Permite navigarea înainte doar dacă nu suntem la ultimul pas
+        return _currentStep < _totalSteps;
+    }
+
+    private bool CanGoToPreviousStep()
+    {
+        // Permite navigarea înapoi doar dacă nu suntem la primul pas
+        return _currentStep > 1;
     }
 
     private bool CanSubmitForm()
     {
-        return ValidateStep1() && ValidateStep2() && ValidateStep3() && ValidateStep4() && ValidateStep5();
+        // Validare completă doar pentru submit final
+        var hasNume = !string.IsNullOrWhiteSpace(_personalModel.Nume);
+        var hasPrenume = !string.IsNullOrWhiteSpace(_personalModel.Prenume);
+        var hasCNP = !string.IsNullOrWhiteSpace(_personalModel.CNP);
+        var hasCodAngajat = !string.IsNullOrWhiteSpace(_personalModel.Cod_Angajat);
+        var hasDepartament = _personalModel.Departament.HasValue;
+        var hasFunctia = !string.IsNullOrWhiteSpace(_personalModel.Functia);
+        
+        // Doar câmpurile cu adevărat obligatorii pentru salvare
+        return hasNume && hasPrenume && hasCNP && hasCodAngajat && hasDepartament && hasFunctia;
     }
 
     private async Task NextStep()
     {
-        if (CanProceedToNextStep())
+        // Navighează la pasul următor doar dacă nu suntem la ultimul pas
+        if (_currentStep < _totalSteps)
         {
+            await ClearAllToasts();
+            
             _currentStep++;
             await SaveDraft();
             await InvokeAsync(StateHasChanged);
@@ -293,8 +296,11 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
 
     private async Task PreviousStep()
     {
+        // Navighează la pasul anterior doar dacă nu suntem la primul pas
         if (_currentStep > 1)
         {
+            await ClearAllToasts();
+            
             _currentStep--;
             await InvokeAsync(StateHasChanged);
         }
@@ -304,122 +310,42 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
     #region Validation Logic
     private bool ValidateStep1()
     {
-        // Verifică că toate câmpurile obligatorii sunt completate
-        var hasNume = !string.IsNullOrWhiteSpace(_personalModel.Nume);
-        var hasPrenume = !string.IsNullOrWhiteSpace(_personalModel.Prenume);
-        var hasCNP = !string.IsNullOrWhiteSpace(_personalModel.CNP) && _personalModel.CNP.Length == 13;
-        var hasCodAngajat = !string.IsNullOrWhiteSpace(_personalModel.Cod_Angajat);
-        
-        // Pentru început, să acceptăm validările de bază fără să aștepte validările async
-        // Validările async CNP și Cod vor rula în background, dar nu blochează progresul
-        var basicValidation = hasNume && hasPrenume && hasCNP && hasCodAngajat;
-        
-        return basicValidation;
+        // Permite navigarea liberă - validarea se va face doar la salvarea finală
+        return true;
     }
 
     private bool ValidateStep2()
     {
-        // Implement Step 2 validation (Contact info)
-        return true; // Placeholder
+        // Permite navigarea liberă
+        return true;
     }
 
     private bool ValidateStep3()
     {
-        // Implement Step 3 validation (Address info)
-        return true; // Placeholder
+        // Permite navigarea liberă
+        return true;
     }
 
     private bool ValidateStep4()
     {
-        // Implement Step 4 validation (Professional info)
-        return true; // Placeholder
+        // Permite navigarea liberă
+        return true;
     }
 
     private bool ValidateStep5()
     {
-        // Implement Step 5 validation (Documents)
-        return true; // Placeholder
+        // Permite navigarea liberă
+        return true;
     }
 
     private string GetFieldCssClass(string fieldName)
     {
-        if (_fieldValidationStates.TryGetValue(fieldName, out var state))
-        {
-            return state switch
-            {
-                ValidationState.Valid => "field-valid",
-                ValidationState.Invalid => "field-invalid",
-                ValidationState.Validating => "field-validating",
-                _ => ""
-            };
-        }
+        // CSS simplu fără stări de validare complexe
         return "";
     }
     #endregion
 
     #region Field Change Handlers
-    private async Task OnFieldChanged(string fieldName, string? value)
-    {
-        _fieldValidationStates[fieldName] = ValidationState.Validating;
-        await InvokeAsync(StateHasChanged);
-
-        // Simulate validation delay
-        await Task.Delay(300);
-
-        var isValid = !string.IsNullOrWhiteSpace(value) && value.Length >= 2;
-        _fieldValidationStates[fieldName] = isValid ? ValidationState.Valid : ValidationState.Invalid;
-
-        // Forțează recalcularea validării pas pentru a activa/dezactiva butonul
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task OnCNPChanged(string? cnp)
-    {
-        if (string.IsNullOrWhiteSpace(cnp))
-        {
-            _cnpValidationResult = null;
-            return;
-        }
-
-        _fieldValidationStates[nameof(_personalModel.CNP)] = ValidationState.Validating;
-        await InvokeAsync(StateHasChanged);
-
-        // Validate CNP format and extract information
-        var validationResult = await ValidateCNP(cnp);
-        _cnpValidationResult = validationResult;
-        
-        if (validationResult.IsValid && validationResult.BirthDate.HasValue)
-        {
-            _personalModel.Data_Nasterii = validationResult.BirthDate.Value;
-        }
-
-        _fieldValidationStates[nameof(_personalModel.CNP)] = validationResult.IsValid 
-            ? ValidationState.Valid : ValidationState.Invalid;
-
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task OnEmployeeCodeChanged(string? code)
-    {
-        if (string.IsNullOrWhiteSpace(code))
-        {
-            _codeValidationResult = null;
-            return;
-        }
-
-        _fieldValidationStates[nameof(_personalModel.Cod_Angajat)] = ValidationState.Validating;
-        await InvokeAsync(StateHasChanged);
-
-        // Check if code is unique
-        var validationResult = await ValidateEmployeeCode(code);
-        _codeValidationResult = validationResult;
-
-        _fieldValidationStates[nameof(_personalModel.Cod_Angajat)] = validationResult.IsValid 
-            ? ValidationState.Valid : ValidationState.Invalid;
-
-        await InvokeAsync(StateHasChanged);
-    }
-
     private async Task OnBirthDateChanged(DateTime? birthDate)
     {
         if (birthDate.HasValue)
@@ -471,11 +397,9 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
     #region Form Submission
     private async Task HandleStepSubmit()
     {
-        // This handles form submission for current step
-        if (CanProceedToNextStep())
-        {
-            await NextStep();
-        }
+        // Această metodă se apelează la submit-ul formularului - nu navighează automat
+        // Navigarea se face explicit prin butoanele NextStep/PreviousStep
+        await SaveDraft();
     }
 
     private async Task HandleFinalSubmit()
@@ -500,145 +424,30 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
 
     private async Task HandleCancel()
     {
+        // Închide toate toasturile înainte de anulare
+        await ClearAllToasts();
         await OnCancel.InvokeAsync();
     }
     #endregion
 
-    #region Validation Methods
-    private async Task<CNPValidationResult> ValidateCNP(string cnp)
+    #region Toast Management
+    
+    private async Task ClearAllToasts()
     {
-        // Implement comprehensive CNP validation
-        if (string.IsNullOrWhiteSpace(cnp) || cnp.Length != 13)
-        {
-            return new CNPValidationResult
-            {
-                IsValid = false,
-                ErrorMessage = "CNP-ul trebuie să aibă exact 13 cifre"
-            };
-        }
-
-        if (!Regex.IsMatch(cnp, @"^\d{13}$"))
-        {
-            return new CNPValidationResult
-            {
-                IsValid = false,
-                ErrorMessage = "CNP-ul poate conține doar cifre"
-            };
-        }
-
-        // Extract and validate components
-        var sex = int.Parse(cnp.Substring(0, 1));
-        var year = int.Parse(cnp.Substring(1, 2));
-        var month = int.Parse(cnp.Substring(3, 2));
-        var day = int.Parse(cnp.Substring(5, 2));
-
-        // Determine full year based on sex digit
-        var fullYear = sex switch
-        {
-            1 or 2 => 1900 + year,
-            3 or 4 => 1800 + year,
-            5 or 6 => 2000 + year,
-            _ => 0
-        };
-
-        if (fullYear == 0 || month < 1 || month > 12 || day < 1 || day > 31)
-        {
-            return new CNPValidationResult
-            {
-                IsValid = false,
-                ErrorMessage = "CNP conține date invalide"
-            };
-        }
-
         try
         {
-            var birthDate = new DateTime(fullYear, month, day);
-            var sexText = (sex % 2 == 1) ? "Masculin" : "Feminin";
-            var age = CalculateAge(birthDate);
-
-            // Check if CNP already exists (simulate async call)
-            await Task.Delay(500);
-            var cnpExists = await CheckCNPExists(cnp);
-            
-            if (cnpExists && (!IsEditMode || EditingPersonal?.CNP != cnp))
+            if (_toastRef != null)
             {
-                return new CNPValidationResult
-                {
-                    IsValid = false,
-                    ErrorMessage = "Acest CNP este deja înregistrat în sistem"
-                };
+                // Use Hide method for each toast instead of HideAllAsync (which doesn't exist)
+                await _toastRef.HideAsync("All");
             }
-
-            return new CNPValidationResult
-            {
-                IsValid = true,
-                BirthDate = birthDate,
-                ParsedInfo = $"{sexText}, {age} ani, născut la {birthDate:dd.MM.yyyy}"
-            };
         }
-        catch
+        catch (Exception ex)
         {
-            return new CNPValidationResult
-            {
-                IsValid = false,
-                ErrorMessage = "Data nașterii din CNP este invalidă"
-            };
+            Logger.LogError(ex, "Error clearing toasts");
         }
     }
-
-    private async Task<CodeValidationResult> ValidateEmployeeCode(string code)
-    {
-        if (string.IsNullOrWhiteSpace(code))
-        {
-            return new CodeValidationResult
-            {
-                IsValid = false,
-                Message = "Codul angajatului este obligatoriu"
-            };
-        }
-
-        if (code.Length < 3)
-        {
-            return new CodeValidationResult
-            {
-                IsValid = false,
-                Message = "Codul trebuie să aibă cel puțin 3 caractere"
-            };
-        }
-
-        // Simulate async validation
-        await Task.Delay(300);
-        var codeExists = await CheckEmployeeCodeExists(code);
-
-        if (codeExists && (!IsEditMode || EditingPersonal?.Cod_Angajat != code))
-        {
-            return new CodeValidationResult
-            {
-                IsValid = false,
-                Message = "Acest cod de angajat este deja folosit"
-            };
-        }
-
-        return new CodeValidationResult
-        {
-            IsValid = true,
-            Message = "Cod disponibil"
-        };
-    }
-
-    private async Task<bool> CheckCNPExists(string cnp)
-    {
-        // Simulate database check
-        await Task.Delay(200);
-        return false; // Placeholder
-    }
-
-    private async Task<bool> CheckEmployeeCodeExists(string code)
-    {
-        // Simulate database check
-        await Task.Delay(200);
-        return false; // Placeholder
-    }
+    
     #endregion
 
     #region Utility Methods
@@ -710,41 +519,71 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
     #region Toast Notifications
     private async Task ShowSuccessToast(string title, string message)
     {
-        var toastModel = new ToastModel
+        try
         {
-            Title = title,
-            Content = message,
-            CssClass = "e-toast-success",
-            Icon = "fas fa-check-circle",
-            Timeout = 3000
-        };
-        await _toastRef.ShowAsync(toastModel);
+            if (_toastRef != null)
+            {
+                var toastModel = new ToastModel
+                {
+                    Title = title,
+                    Content = message,
+                    CssClass = "e-toast-success",
+                    Icon = "fas fa-check-circle",
+                    Timeout = 2000 // Reduced timeout
+                };
+                await _toastRef.ShowAsync(toastModel);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error showing success toast");
+        }
     }
 
     private async Task ShowErrorToast(string title, string message)
     {
-        var toastModel = new ToastModel
+        try
         {
-            Title = title,
-            Content = message,
-            CssClass = "e-toast-error",
-            Icon = "fas fa-exclamation-circle",
-            Timeout = 5000
-        };
-        await _toastRef.ShowAsync(toastModel);
+            if (_toastRef != null)
+            {
+                var toastModel = new ToastModel
+                {
+                    Title = title,
+                    Content = message,
+                    CssClass = "e-toast-error",
+                    Icon = "fas fa-exclamation-circle",
+                    Timeout = 4000 // Reduced timeout
+                };
+                await _toastRef.ShowAsync(toastModel);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error showing error toast");
+        }
     }
 
     private async Task ShowWarningToast(string title, string message)
     {
-        var toastModel = new ToastModel
+        try
         {
-            Title = title,
-            Content = message,
-            CssClass = "e-toast-warning",
-            Icon = "fas fa-exclamation-triangle",
-            Timeout = 4000
-        };
-        await _toastRef.ShowAsync(toastModel);
+            if (_toastRef != null)
+            {
+                var toastModel = new ToastModel
+                {
+                    Title = title,
+                    Content = message,
+                    CssClass = "e-toast-warning",
+                    Icon = "fas fa-exclamation-triangle",
+                    Timeout = 3000 // Reduced timeout
+                };
+                await _toastRef.ShowAsync(toastModel);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error showing warning toast");
+        }
     }
     #endregion
 }

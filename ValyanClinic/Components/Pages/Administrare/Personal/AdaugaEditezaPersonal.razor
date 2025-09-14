@@ -137,20 +137,6 @@
                                                     Width="100%">
                                     </SfMaskedTextBox>
                                     <ValidationMessage For="@(() => _personalModel.CNP)" />
-                                    @if (_cnpValidationResult != null)
-                                    {
-                                        <div class="field-info cnp-info @(_cnpValidationResult.IsValid ? "valid" : "invalid")">
-                                            <i class="fas fa-@(_cnpValidationResult.IsValid ? "check-circle" : "exclamation-circle")"></i>
-                                            @if (_cnpValidationResult.IsValid)
-                                            {
-                                                <span>CNP valid - @_cnpValidationResult.ParsedInfo</span>
-                                            }
-                                            else
-                                            {
-                                                <span>@_cnpValidationResult.ErrorMessage</span>
-                                            }
-                                        </div>
-                                    }
                                 </div>
 
                                 <div class="form-field">
@@ -162,13 +148,6 @@
                                               Width="100%">
                                     </SfTextBox>
                                     <ValidationMessage For="@(() => _personalModel.Cod_Angajat)" />
-                                    @if (_codeValidationResult != null)
-                                    {
-                                        <div class="field-info code-info @(_codeValidationResult.IsValid ? "valid" : "invalid")">
-                                            <i class="fas fa-@(_codeValidationResult.IsValid ? "check-circle" : "exclamation-circle")"></i>
-                                            <span>@_codeValidationResult.Message</span>
-                                        </div>
-                                    }
                                 </div>
                             </div>
                         </div>
@@ -621,7 +600,7 @@
                                 <div class="form-field full-width">
                                     <label class="field-label">Responsabilități Principale</label>
                                     <SfTextBox @bind-Value="@_personalModel.Responsabilitati" 
-                                              Placeholder="Descrieți principalele responsabilități și atribuții..."
+                                              Placeholder="Descrieți principalele responsabilități și atribții..."
                                               Multiline="true"
                                               FloatLabelType="FloatLabelType.Auto"
                                               Width="100%">
@@ -860,7 +839,7 @@
             <!-- Step Navigation -->
             <div class="form-navigation">
                 <div class="nav-buttons">
-                    @if (_currentStep > 1)
+                    @if (CanGoToPreviousStep())
                     {
                         <SfButton CssClass="btn-nav btn-prev" @onclick="PreviousStep">
                             <i class="fas fa-chevron-left"></i>
@@ -880,9 +859,9 @@
                         </SfButton>
                     </div>
 
-                    @if (_currentStep < _totalSteps)
+                    @if (CanProceedToNextStep())
                     {
-                        <SfButton CssClass="btn-nav btn-next" @onclick="NextStep" disabled="@(!CanProceedToNextStep())">
+                        <SfButton CssClass="btn-nav btn-next" @onclick="NextStep">
                             Continuă
                             <i class="fas fa-chevron-right"></i>
                         </SfButton>
@@ -900,7 +879,7 @@
     </div>
 </div>
 
-<!-- Toast Notifications -->
-<SfToast @ref="_toastRef" Title="ValyanMed" Target=".advanced-personal-form-container" 
+<!-- Toast Notifications - FIXED: Target set to body instead of container -->
+<SfToast @ref="_toastRef" Title="ValyanMed" Target="body" 
          NewestOnTop="true" ShowProgressBar="true" CssClass="personal-toast-container">
 </SfToast>
