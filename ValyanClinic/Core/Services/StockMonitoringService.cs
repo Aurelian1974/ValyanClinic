@@ -1,4 +1,4 @@
-using ValyanClinic.Core.Exceptions;
+﻿using ValyanClinic.Core.Exceptions;
 
 namespace ValyanClinic.Core.Services;
 
@@ -13,7 +13,7 @@ public class StockMonitoringBackgroundService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<StockMonitoringBackgroundService> _logger;
-    private readonly TimeSpan _checkInterval = TimeSpan.FromHours(6); // Check every 6 hours
+    private readonly TimeSpan _checkInterval = TimeSpan.FromHours(24); // CHANGED: Check daily instead of every 6 hours
 
     public StockMonitoringBackgroundService(
         IServiceProvider serviceProvider,
@@ -25,7 +25,10 @@ public class StockMonitoringBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Stock Monitoring Background Service started");
+        _logger.LogInformation("Stock Monitoring Background Service started - checking every 24 hours");
+
+        // WAIT 1 HOUR ON STARTUP TO AVOID SPAM DURING DEVELOPMENT
+        await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -42,7 +45,7 @@ public class StockMonitoringBackgroundService : BackgroundService
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in Stock Monitoring Background Service");
-                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken); // Wait 5 minutes on error
+                await Task.Delay(TimeSpan.FromHours(1), stoppingToken); // INCREASED: Wait 1 hour on error
             }
         }
     }
@@ -55,7 +58,7 @@ public class StockMonitoringBackgroundService : BackgroundService
         try
         {
             await stockService.CheckLowStockAsync();
-            _logger.LogInformation("Stock check completed successfully");
+            _logger.LogDebug("Stock check completed successfully"); // CHANGED: Debug instead of Information
         }
         catch (Exception ex)
         {
@@ -74,6 +77,9 @@ public class StockMonitoringBackgroundService : BackgroundService
 public class StockMonitoringService : IStockMonitoringService
 {
     private readonly ILogger<StockMonitoringService> _logger;
+    private static DateTime _lastAlertTime = DateTime.MinValue; // ADDED: Track last alert time
+    private static readonly Dictionary<string, DateTime> _lastAlertsByMedication = new(); // ADDED: Track per medication
+    
     // TODO: Add repository dependencies when implemented
     // private readonly IMedicationRepository _medicationRepository;
     // private readonly INotificationService _notificationService;
@@ -87,19 +93,44 @@ public class StockMonitoringService : IStockMonitoringService
     {
         try
         {
+            // RATE LIMITING: Don't spam alerts more than once per hour
+            if (DateTime.UtcNow - _lastAlertTime < TimeSpan.FromHours(1))
+            {
+                _logger.LogDebug("Stock monitoring skipped - alerts recently sent");
+                return;
+            }
+
             // TODO: Replace with actual repository call
             var lowStockItems = await GetSimulatedLowStockItemsAsync();
 
+            var newAlertsCount = 0;
             foreach (var item in lowStockItems)
             {
+                // PER-MEDICATION RATE LIMITING: Only alert once per day per medication
+                if (_lastAlertsByMedication.TryGetValue(item.MedicationName, out var lastAlert) &&
+                    DateTime.UtcNow - lastAlert < TimeSpan.FromDays(1))
+                {
+                    continue; // Skip this medication, already alerted recently
+                }
+
                 _logger.LogWarning("Low stock alert: {MedicationName} has only {Quantity} units left", 
                     item.MedicationName, item.CurrentStock);
 
-                // TODO: Send notifications
                 await ProcessLowStockAlertAsync(item);
+                
+                _lastAlertsByMedication[item.MedicationName] = DateTime.UtcNow;
+                newAlertsCount++;
             }
 
-            _logger.LogInformation("Stock monitoring completed. Found {Count} low stock items", lowStockItems.Count);
+            if (newAlertsCount > 0)
+            {
+                _logger.LogInformation("Stock monitoring completed. Sent {Count} new alerts", newAlertsCount);
+                _lastAlertTime = DateTime.UtcNow;
+            }
+            else
+            {
+                _logger.LogDebug("Stock monitoring completed. No new alerts sent (rate limited)");
+            }
         }
         catch (Exception ex)
         {
@@ -126,7 +157,7 @@ public class StockMonitoringService : IStockMonitoringService
     {
         try
         {
-            _logger.LogInformation("Processing stock update for medication {MedicationId}: new quantity {Quantity}", 
+            _logger.LogDebug("Processing stock update for medication {MedicationId}: new quantity {Quantity}", 
                 medicationId, newQuantity);
 
             // Business Logic: Check if stock is below threshold
@@ -162,13 +193,13 @@ public class StockMonitoringService : IStockMonitoringService
             switch (alert.AlertLevel)
             {
                 case AlertLevel.Critical:
-                    _logger.LogCritical("CRITICAL: {MedicationName} has only {Stock} units left!", 
+                    _logger.LogError("CRITICAL STOCK: {MedicationName} has only {Stock} units left! Immediate action required.", 
                         alert.MedicationName, alert.CurrentStock);
                     // TODO: Send immediate notification to pharmacy manager
                     break;
                     
                 case AlertLevel.Warning:
-                    _logger.LogWarning("WARNING: {MedicationName} is running low ({Stock} units)", 
+                    _logger.LogWarning("LOW STOCK: {MedicationName} is running low ({Stock} units)", 
                         alert.MedicationName, alert.CurrentStock);
                     // TODO: Send notification to pharmacy staff
                     break;
@@ -187,6 +218,7 @@ public class StockMonitoringService : IStockMonitoringService
     {
         await Task.Delay(100); // Simulate database call
 
+        // DEVELOPMENT MODE: Return fewer items to reduce log spam
         return new List<LowStockAlert>
         {
             new()
@@ -200,15 +232,6 @@ public class StockMonitoringService : IStockMonitoringService
             },
             new()
             {
-                MedicationId = 2,
-                MedicationName = "Ibuprofen 400mg",
-                CurrentStock = 8,
-                MinimumThreshold = 15,
-                AlertLevel = AlertLevel.Warning,
-                CreatedAt = DateTime.UtcNow.AddHours(-2)
-            },
-            new()
-            {
                 MedicationId = 3,
                 MedicationName = "Amoxicilina 500mg",
                 CurrentStock = 1,
@@ -216,6 +239,7 @@ public class StockMonitoringService : IStockMonitoringService
                 AlertLevel = AlertLevel.Critical,
                 CreatedAt = DateTime.UtcNow.AddMinutes(-30)
             }
+            // REMOVED Ibuprofen to reduce log volume during development
         };
     }
 }

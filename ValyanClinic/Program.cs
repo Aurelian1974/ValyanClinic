@@ -5,293 +5,338 @@ using ValyanClinic.Core.Services;
 using ValyanClinic.Core.HealthChecks;
 using ValyanClinic.Core.Middleware;
 using ValyanClinic.Application.Services;
-using ValyanClinic.Components.Pages.LoginPage; // ACTUALIZAT pentru noua structur?
+using ValyanClinic.Components.Pages.LoginPage;
 using ValyanClinic.Domain.Models;
 using Syncfusion.Blazor;
 using System.Text;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Options;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using Dapper; // Pentru operațiile Dapper
+using Dapper;
+using Serilog;
+using Serilog.Events;
 
-var builder = WebApplication.CreateBuilder(args);
+// BOOTSTRAP LOGGER MINIMAL - PENTRU DEBUGGING
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-// CONFIGURARE ENCODING COMPLET? PENTRU DIACRITICE ROMÂNE?TI
-Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-Console.OutputEncoding = Encoding.UTF8;
-Console.InputEncoding = Encoding.UTF8;
-
-// Setare cultur? implicit? înainte de orice altceva
-Thread.CurrentThread.CurrentCulture = new CultureInfo("ro-RO");
-Thread.CurrentThread.CurrentUICulture = new CultureInfo("ro-RO");
-
-// Configure web encoding
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
-});
-
-// Configure localization with UTF-8 support
-builder.Services.Configure<RequestLocalizationOptions>(options =>
-{
-    var supportedCultures = new[] { "ro-RO", "en-US" };
-    options.SetDefaultCulture("ro-RO")
-           .AddSupportedCultures(supportedCultures)
-           .AddSupportedUICultures(supportedCultures);
-    
-    options.DefaultRequestCulture = new RequestCulture("ro-RO", "ro-RO");
-    
-    options.RequestCultureProviders = new List<IRequestCultureProvider>
-    {
-        new QueryStringRequestCultureProvider(),
-        new CookieRequestCultureProvider(),
-        new AcceptLanguageHeaderRequestCultureProvider()
-    };
-});
-
-// Set default culture to Romanian with UTF-8
-var culture = new CultureInfo("ro-RO");
-culture.DateTimeFormat.ShortDatePattern = "dd.MM.yyyy";
-culture.DateTimeFormat.LongDatePattern = "dd MMMM yyyy";
-culture.NumberFormat.NumberDecimalSeparator = ",";
-culture.NumberFormat.NumberGroupSeparator = ".";
-
-CultureInfo.DefaultThreadCurrentCulture = culture;
-CultureInfo.DefaultThreadCurrentUICulture = culture;
-
-// Register Syncfusion license from configuration
-var syncfusionLicense = builder.Configuration["Syncfusion:LicenseKey"];
-if (!string.IsNullOrEmpty(syncfusionLicense))
-{
-    Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicense);
-}
-else
-{
-    // Fallback to direct license if not in config
-    Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXZfcXRUR2lcVUV2V0BWYEg=");
-}
-
-// DAPPER DATABASE CONFIGURATION - SECURIZAT PENTRU BLAZOR SERVER
-// Connection string DOAR pe server - NICIODATĂ nu ajunge la client
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-// Configurare IDbConnection pentru Dapper - SECURIZAT COMPLET
-builder.Services.AddScoped<IDbConnection>(provider => 
-{
-    var connection = new SqlConnection(connectionString);
-    // Configurare suplimentară pentru diacritice românești și performanță
-    connection.ConnectionString = connectionString;
-    return connection;
-});
-
-// Configurare pentru pool de conexiuni optimizat pentru Dapper
-builder.Services.AddScoped<Func<IDbConnection>>(provider => 
-    () => new SqlConnection(connectionString));
-
-// Add services to the container
-builder.Services.AddRazorComponents(options =>
-{
-    options.DetailedErrors = builder.Environment.IsDevelopment();
-})
-.AddInteractiveServerComponents();
-
-// Add Controllers cu UTF-8 support
-builder.Services.AddControllers(options =>
-{
-    options.RespectBrowserAcceptHeader = true;
-})
-.ConfigureApiBehaviorOptions(options =>
-{
-    // Configur?ri pentru UTF-8
-});
-
-// Configure JSON cu UTF-8
-builder.Services.ConfigureHttpJsonOptions(options =>
-{
-    options.SerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-});
-
-// Add Fluent UI services
-builder.Services.AddFluentUIComponents();
-
-// Add Syncfusion Blazor services
-builder.Services.AddSyncfusionBlazor();
-
-// Add memory cache
-builder.Services.AddMemoryCache();
-
-// REFACTORING: FluentValidation înlocuie?te Data Annotations - ACTUALIZAT pentru structura organizat?
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>(); // Din LoginPage namespace
-
-// REFACTORING: Rich Services înlocuiesc simple pass-through
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IUserSessionService, UserSessionService>();
-builder.Services.AddScoped<ISecurityAuditService, SecurityAuditService>();
-
-// Add existing services
-builder.Services.AddScoped<ICacheService, MemoryCacheService>();
-builder.Services.AddScoped<IStockMonitoringService, StockMonitoringService>();
-builder.Services.AddScoped<IUserManagementService, UserManagementService>();
-builder.Services.AddScoped<IUserService, UserService>();
-
-// Add background services
-builder.Services.AddHostedService<StockMonitoringBackgroundService>();
-
-// Add health checks
-builder.Services.AddValyanClinicHealthChecks();
-
-// Add localization services
-builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-
-// Add logging with database logging levels
-builder.Services.AddLogging(config =>
-{
-    config.AddConsole();
-    config.AddDebug();
-    if (builder.Environment.IsDevelopment())
-    {
-        config.SetMinimumLevel(LogLevel.Information);
-    }
-});
-
-var app = builder.Build();
-
-// TEST DATABASE CONNECTION LA STARTUP (doar pentru verificare, nu expune connection string-ul)
 try
 {
-    using var scope = app.Services.CreateScope();
-    var dbConnection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
-    if (dbConnection.State != ConnectionState.Open)
+    Log.Information("🚀 Starting ValyanClinic application");
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    // TESTARE PROGRESIVĂ SERILOG
+    try
     {
-        dbConnection.Open();
+        Log.Information("📝 Configuring Serilog from appsettings");
+        
+        // CONFIGURARE SERILOG COMPLET DIN APPSETTINGS
+        builder.Host.UseSerilog((context, configuration) => 
+            configuration.ReadFrom.Configuration(context.Configuration));
+            
+        Log.Information("✅ Serilog configured successfully");
     }
-    
-    // Test simplu de conectivitate cu Dapper - NU expune connection string-ul
-    var serverInfo = dbConnection.QueryFirstOrDefault<string>("SELECT @@VERSION");
-    var databaseName = dbConnection.QueryFirstOrDefault<string>("SELECT DB_NAME()");
-    
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogInformation("✅ Database connection established successfully via Dapper");
-    logger.LogInformation("📊 Connected to database: {DatabaseName}", databaseName);
-    logger.LogInformation("🔒 Connection string secured - never exposed to client");
-    
-    dbConnection.Close();
+    catch (Exception ex)
+    {
+        Log.Error(ex, "❌ Failed to configure Serilog from appsettings");
+        // Continuă cu bootstrap logger
+    }
+
+    // CONFIGURARE ENCODING COMPLET? PENTRU DIACRITICE ROMÂNE?TI
+    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+    Console.OutputEncoding = Encoding.UTF8;
+    Console.InputEncoding = Encoding.UTF8;
+
+    // Setare cultur? implicit? înainte de orice altceva
+    Thread.CurrentThread.CurrentCulture = new CultureInfo("ro-RO");
+    Thread.CurrentThread.CurrentUICulture = new CultureInfo("ro-RO");
+
+    // Configure web encoding
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
+    });
+
+    // Configure localization with UTF-8 support
+    builder.Services.Configure<RequestLocalizationOptions>(options =>
+    {
+        var supportedCultures = new[] { "ro-RO", "en-US" };
+        options.SetDefaultCulture("ro-RO")
+               .AddSupportedCultures(supportedCultures)
+               .AddSupportedUICultures(supportedCultures);
+        
+        options.DefaultRequestCulture = new RequestCulture("ro-RO", "ro-RO");
+        
+        options.RequestCultureProviders = new List<IRequestCultureProvider>
+        {
+            new QueryStringRequestCultureProvider(),
+            new CookieRequestCultureProvider(),
+            new AcceptLanguageHeaderRequestCultureProvider()
+        };
+    });
+
+    // Set default culture to Romanian with UTF-8
+    var culture = new CultureInfo("ro-RO");
+    culture.DateTimeFormat.ShortDatePattern = "dd.MM.yyyy";
+    culture.DateTimeFormat.LongDatePattern = "dd MMMM yyyy";
+    culture.NumberFormat.NumberDecimalSeparator = ",";
+    culture.NumberFormat.NumberGroupSeparator = ".";
+
+    CultureInfo.DefaultThreadCurrentCulture = culture;
+    CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+    Log.Information("✅ Culture and encoding configured");
+
+    // Register Syncfusion license from configuration
+    var syncfusionLicense = builder.Configuration["Syncfusion:LicenseKey"];
+    if (!string.IsNullOrEmpty(syncfusionLicense))
+    {
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicense);
+        Log.Information("✅ Syncfusion license registered from configuration");
+    }
+    else
+    {
+        // Fallback to direct license if not in config
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXZfcXRUR2lcVUV2V0BWYEg=");
+        Log.Warning("⚠️ Using fallback Syncfusion license");
+    }
+
+    // DAPPER DATABASE CONFIGURATION
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+    Log.Information("🔗 Configuring database connection");
+
+    // Configurare IDbConnection pentru Dapper
+    builder.Services.AddScoped<IDbConnection>(provider => 
+    {
+        var connection = new SqlConnection(connectionString);
+        connection.ConnectionString = connectionString;
+        return connection;
+    });
+
+    // Configurare pentru pool de conexiuni optimizat pentru Dapper
+    builder.Services.AddScoped<Func<IDbConnection>>(provider => 
+        () => new SqlConnection(connectionString));
+
+    // Add services to the container
+    builder.Services.AddRazorComponents(options =>
+    {
+        options.DetailedErrors = builder.Environment.IsDevelopment();
+    })
+    .AddInteractiveServerComponents();
+
+    // Add Controllers cu UTF-8 support
+    builder.Services.AddControllers(options =>
+    {
+        options.RespectBrowserAcceptHeader = true;
+    })
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        // Configur?ri pentru UTF-8
+    });
+
+    // Configure JSON cu UTF-8
+    builder.Services.ConfigureHttpJsonOptions(options =>
+    {
+        options.SerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+    });
+
+    // Add Fluent UI services
+    builder.Services.AddFluentUIComponents();
+
+    // Add Syncfusion Blazor services
+    builder.Services.AddSyncfusionBlazor();
+
+    // Add memory cache
+    builder.Services.AddMemoryCache();
+
+    Log.Information("✅ UI Components and cache configured");
+
+    // FluentValidation
+    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+    builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
+
+    // Rich Services
+    builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+    builder.Services.AddScoped<IUserSessionService, UserSessionService>();
+    builder.Services.AddScoped<ISecurityAuditService, SecurityAuditService>();
+
+    // Personal Management Services
+    builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.IPersonalRepository, ValyanClinic.Infrastructure.Repositories.PersonalRepository>();
+    builder.Services.AddScoped<ValyanClinic.Application.Services.IPersonalService, ValyanClinic.Application.Services.PersonalService>();
+
+    // Existing services
+    builder.Services.AddScoped<ICacheService, MemoryCacheService>();
+    builder.Services.AddScoped<IStockMonitoringService, StockMonitoringService>();
+    builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+    builder.Services.AddScoped<IUserService, UserService>();
+
+    // Background services
+    builder.Services.AddHostedService<StockMonitoringBackgroundService>();
+
+    Log.Information("✅ Application services configured");
+
+    // Health checks
+    builder.Services.AddValyanClinicHealthChecks();
+
+    // Localization services
+    builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+    Log.Information("✅ All services registered successfully");
+
+    var app = builder.Build();
+
+    Log.Information("✅ Application built successfully");
+
+    // ADD SERILOG REQUEST LOGGING - DOAR DACĂ SERILOG E CONFIGURAT CORECT
+    try
+    {
+        app.UseSerilogRequestLogging(options =>
+        {
+            options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+            options.GetLevel = (httpContext, elapsed, ex) => ex != null
+                ? LogEventLevel.Error 
+                : httpContext.Response.StatusCode > 499 
+                    ? LogEventLevel.Error 
+                    : LogEventLevel.Information;
+        });
+        Log.Information("✅ Serilog request logging configured");
+    }
+    catch (Exception ex)
+    {
+        Log.Warning(ex, "⚠️ Could not configure Serilog request logging");
+    }
+
+    // TEST DATABASE CONNECTION LA STARTUP
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var dbConnection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
+        if (dbConnection.State != ConnectionState.Open)
+        {
+            dbConnection.Open();
+        }
+        
+        var serverInfo = dbConnection.QueryFirstOrDefault<string>("SELECT @@VERSION");
+        var databaseName = dbConnection.QueryFirstOrDefault<string>("SELECT DB_NAME()");
+        
+        Log.Information("✅ Database connection established successfully via Dapper");
+        Log.Information("📊 Connected to database: {DatabaseName}", databaseName);
+        Log.Information("🔒 Connection string secured - never exposed to client");
+        
+        dbConnection.Close();
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "❌ Failed to establish database connection");
+        Log.Error("💡 Verify that SQL Server is running and accessible at: TS1828\\ERP");
+        Log.Error("💡 Ensure the ValyanMed database exists and permissions are correct");
+    }
+
+    // Configure the HTTP request pipeline.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Error", createScopeForErrors: true);
+        app.UseHsts();
+    }
+    else
+    {
+        app.UseDeveloperExceptionPage();
+    }
+
+    // UTF-8 Middleware
+    app.Use(async (context, next) =>
+    {
+        context.Response.OnStarting(() =>
+        {
+            var response = context.Response;
+            
+            if (!response.HasStarted && !string.IsNullOrEmpty(response.ContentType))
+            {
+                if (!response.ContentType.Contains("charset", StringComparison.OrdinalIgnoreCase))
+                {
+                    response.ContentType += "; charset=UTF-8";
+                }
+            }
+            else if (!response.HasStarted && string.IsNullOrEmpty(response.ContentType))
+            {
+                response.ContentType = "text/html; charset=UTF-8";
+            }
+            
+            response.Headers.Append("Content-Language", "ro-RO");
+            
+            return Task.CompletedTask;
+        });
+        
+        await next();
+    });
+
+    // Global exception handling middleware
+    app.UseGlobalExceptionHandling();
+
+    // Request localization
+    app.UseRequestLocalization(new RequestLocalizationOptions
+    {
+        DefaultRequestCulture = new RequestCulture("ro-RO"),
+        SupportedCultures = new List<CultureInfo> { new CultureInfo("ro-RO"), new CultureInfo("en-US") },
+        SupportedUICultures = new List<CultureInfo> { new CultureInfo("ro-RO"), new CultureInfo("en-US") }
+    });
+
+    // Health checks endpoints
+    app.UseValyanClinicHealthChecks();
+
+    app.UseHttpsRedirection();
+    app.UseAntiforgery();
+
+    // Static files
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = ctx =>
+        {
+            var path = ctx.File.Name.ToLowerInvariant();
+            var response = ctx.Context.Response;
+            
+            if (path.EndsWith(".css"))
+            {
+                response.Headers.ContentType = "text/css; charset=UTF-8";
+            }
+            else if (path.EndsWith(".js"))
+            {
+                response.Headers.ContentType = "application/javascript; charset=UTF-8";
+            }
+            else if (path.EndsWith(".html") || path.EndsWith(".htm"))
+            {
+                response.Headers.ContentType = "text/html; charset=UTF-8";
+            }
+            else if (path.EndsWith(".json"))
+            {
+                response.Headers.ContentType = "application/json; charset=UTF-8";
+            }
+        }
+    });
+
+    // Map routes
+    app.MapControllers();
+    app.MapStaticAssets();
+    app.MapRazorComponents<App>()
+        .AddInteractiveServerRenderMode();
+
+    Log.Information("🌟 ValyanClinic application configured successfully");
+    Log.Information("🌐 Listening on: https://localhost:7164 and http://localhost:5007");
+
+    app.Run();
 }
 catch (Exception ex)
 {
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "❌ Failed to establish database connection. Check connection string configuration.");
-    logger.LogError("💡 Verify that SQL Server is running and accessible at: TS1828\\ERP");
-    logger.LogError("💡 Ensure the ValyanMed database exists and permissions are correct");
-    // Nu oprim aplicația - doar logăm eroarea pentru debugging
+    Log.Fatal(ex, "💥 Application terminated unexpectedly");
 }
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+finally
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    app.UseHsts();
+    Log.Information("🏁 ValyanClinic application shutdown complete");
+    await Log.CloseAndFlushAsync();
 }
-else
-{
-    app.UseDeveloperExceptionPage();
-}
-
-// MIDDLEWARE CRITICI PENTRU UTF-8 - PRIMUL MIDDLEWARE
-app.Use(async (context, next) =>
-{
-    // FOR?EAZ? UTF-8 pentru toate r?spunsurile
-    context.Response.OnStarting(() =>
-    {
-        var response = context.Response;
-        
-        // Seteaz? charset=UTF-8 pentru toate tipurile de con?inut
-        if (!response.HasStarted && !string.IsNullOrEmpty(response.ContentType))
-        {
-            if (!response.ContentType.Contains("charset", StringComparison.OrdinalIgnoreCase))
-            {
-                response.ContentType += "; charset=UTF-8";
-            }
-            else if (response.ContentType.Contains("charset", StringComparison.OrdinalIgnoreCase) && 
-                     !response.ContentType.Contains("UTF-8", StringComparison.OrdinalIgnoreCase))
-            {
-                response.ContentType = response.ContentType.Replace("charset=iso-8859-1", "charset=UTF-8", StringComparison.OrdinalIgnoreCase);
-                response.ContentType = response.ContentType.Replace("charset=windows-1252", "charset=UTF-8", StringComparison.OrdinalIgnoreCase);
-            }
-        }
-        else if (!response.HasStarted && string.IsNullOrEmpty(response.ContentType))
-        {
-            response.ContentType = "text/html; charset=UTF-8";
-        }
-        
-        // Adaug? header-e suplimentare pentru UTF-8
-        response.Headers.Append("Content-Language", "ro-RO");
-        
-        return Task.CompletedTask;
-    });
-    
-    await next();
-});
-
-// Add global exception handling middleware
-app.UseGlobalExceptionHandling();
-
-// Use request localization cu prioritate pentru român?
-app.UseRequestLocalization(new RequestLocalizationOptions
-{
-    DefaultRequestCulture = new RequestCulture("ro-RO"),
-    SupportedCultures = new List<CultureInfo> { new CultureInfo("ro-RO"), new CultureInfo("en-US") },
-    SupportedUICultures = new List<CultureInfo> { new CultureInfo("ro-RO"), new CultureInfo("en-US") }
-});
-
-// Add health checks endpoints
-app.UseValyanClinicHealthChecks();
-
-app.UseHttpsRedirection();
-app.UseAntiforgery();
-
-// Configure static files cu UTF-8 FOR?AT
-app.UseStaticFiles(new StaticFileOptions
-{
-    OnPrepareResponse = ctx =>
-    {
-        var path = ctx.File.Name.ToLowerInvariant();
-        var response = ctx.Context.Response;
-        
-        // FOR?EAZ? UTF-8 pentru toate fi?ierele text
-        if (path.EndsWith(".css"))
-        {
-            response.Headers.ContentType = "text/css; charset=UTF-8";
-        }
-        else if (path.EndsWith(".js"))
-        {
-            response.Headers.ContentType = "application/javascript; charset=UTF-8";
-        }
-        else if (path.EndsWith(".html") || path.EndsWith(".htm"))
-        {
-            response.Headers.ContentType = "text/html; charset=UTF-8";
-        }
-        else if (path.EndsWith(".json"))
-        {
-            response.Headers.ContentType = "application/json; charset=UTF-8";
-        }
-        
-        // Adaug? cache control pentru a evita problemele de cache
-        response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.Headers.Append("Pragma", "no-cache");
-        response.Headers.Append("Expires", "0");
-    }
-});
-
-// Map API controllers
-app.MapControllers();
-
-app.MapStaticAssets();
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
-app.Run();

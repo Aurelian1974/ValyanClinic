@@ -2,11 +2,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ValyanClinic.Domain\ValyanClinic.Domain.csproj" />
+    <ProjectReference Include="..\ValyanClinic.Infrastructure\ValyanClinic.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
   </ItemGroup>
 
   <PropertyGroup>

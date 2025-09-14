@@ -1,8 +1,8 @@
-﻿@page "/parinte5/copil1"
-@page "/utilizatori"
+﻿@page "/administrare/personal"
+@rendermode InteractiveServer
+@using ValyanClinic.Application.Services
 @using ValyanClinic.Domain.Models
 @using ValyanClinic.Domain.Enums
-@using ValyanClinic.Application.Services
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Inputs
@@ -13,11 +13,11 @@
 @using GridSelectionMode = Syncfusion.Blazor.Grids.SelectionMode
 @using GridSortDirection = Syncfusion.Blazor.Grids.SortDirection
 @using GridFilterType = Syncfusion.Blazor.Grids.FilterType
-@rendermode InteractiveServer
+@using PersonalModel = ValyanClinic.Domain.Models.Personal
 
-<PageTitle>Gestionare Utilizatori - ValyanMed</PageTitle>
+<PageTitle>Administrare Personal - ValyanMed</PageTitle>
 
-<div class="users-page-container">
+<div class="personal-page-container">
     
     @* Error Display *@
     @if (_state.HasError)
@@ -29,41 +29,70 @@
         </div>
     }
 
-    @* Page Header - RESTORED TO BEAUTIFUL ORIGINAL *@
-    <div class="users-page-header">
+    @* Page Header - UPDATED WITH KEBAB MENU *@
+    <div class="personal-page-header">
         <div class="header-content">
             <div class="header-text">
-                <h1 class="users-page-title">
+                <h1 class="personal-page-title">
                     <i class="fas fa-users"></i>
-                    Gestionare Utilizatori
+                    Administrare Personal
                 </h1>
-                <p class="users-page-subtitle">
-                    Administreaz? utilizatorii sistemului ValyanMed - adaug?, editeaz? ?i gestioneaz? permisiunile
+                <p class="personal-page-subtitle">
+                    Gestioneaza personalul clinicii - functii administrative si de suport
                 </p>
             </div>
             
-            <div class="users-header-actions">
-                <button class="btn btn-outline-primary" @onclick="ShowAddUserModal">
+            <div class="personal-header-actions">
+                <button class="btn btn-outline-primary" @onclick="ShowAddPersonalModal">
                     <i class="fas fa-plus"></i>
-                    <span class="btn-text">Adaug? Utilizator</span>
+                    <span class="btn-text">Adauga Personal</span>
                 </button>
                 <button class="btn btn-outline-secondary" @onclick="RefreshData">
                     <i class="fas fa-sync-alt"></i>
-                    <span class="btn-text">Actualizeaz?</span>
+                    <span class="btn-text">Actualizeaza</span>
                 </button>
+                
+                @* Kebab Menu Button *@
+                <div class="kebab-menu-container">
+                    <button class="btn btn-outline-secondary kebab-menu-btn" @onclick="ToggleKebabMenu">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    
+                    @if (_state.ShowKebabMenu)
+                    {
+                        <div class="kebab-menu-dropdown" @onclick:stopPropagation="true">
+                            <button class="kebab-menu-item" @onclick="() => ToggleStatistics()">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Statistici</span>
+                                @if (_state.ShowStatistics)
+                                {
+                                    <i class="fas fa-check kebab-check"></i>
+                                }
+                            </button>
+                            <button class="kebab-menu-item" @onclick="() => ToggleAdvancedFilters()">
+                                <i class="fas fa-filter"></i>
+                                <span>Filtrare Avansata</span>
+                                @if (_state.ShowAdvancedFilters)
+                                {
+                                    <i class="fas fa-check kebab-check"></i>
+                                }
+                            </button>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
 
-    @* Statistics Cards - RESTORED TO ALL 8 BEAUTIFUL CARDS *@
-    @if (!_state.IsLoading)
+    @* Statistics Cards - CONDITIONAL DISPLAY *@
+    @if (!_state.IsLoading && _state.ShowStatistics)
     {
-        <div class="users-stats-grid">
-            @foreach (var stat in _models.UserStatistics)
+        <div class="personal-stats-grid">
+            @foreach (var stat in _models.PersonalStatistics)
             {
-                <div class="users-stat-card">
-                    <div class="users-stat-number">@stat.Value</div>
-                    <div class="users-stat-label">@stat.Label</div>
+                <div class="personal-stat-card">
+                    <div class="personal-stat-number">@stat.Value</div>
+                    <div class="personal-stat-label">@stat.Label</div>
                 </div>
             }
         </div>
@@ -72,41 +101,41 @@
     @* Toast Notification *@
     <SfToast @ref="ToastRef" Title="ValyanMed" Target="body" NewestOnTop="true" ShowProgressBar="true"></SfToast>
 
-    @* Advanced Filter Panel - RESTORED TO FULL BEAUTIFUL VERSION *@
-    <div class="users-advanced-filter-panel">
-        <div class="filter-panel-header">
-            <h3>
-                <i class="fas fa-filter"></i>
-                Filtrare Avansat?
-            </h3>
-            <button class="btn btn-secondary btn-sm" @onclick="ToggleFilterPanel">
-                <i class="fas @(_state.ShowAdvancedFilters ? "fa-chevron-up" : "fa-chevron-down")"></i>
-                <span>@(_state.ShowAdvancedFilters ? "Ascunde Filtrele" : "Arat? Filtrele")</span>
-            </button>
-        </div>
-        
-        @if (_state.ShowAdvancedFilters)
-        {
+    @* Advanced Filter Panel - CONDITIONAL DISPLAY *@
+    @if (_state.ShowAdvancedFilters)
+    {
+        <div class="personal-advanced-filter-panel">
+            <div class="filter-panel-header">
+                <h3>
+                    <i class="fas fa-filter"></i>
+                    Filtrare Avansata
+                </h3>
+                <button class="btn btn-secondary btn-sm" @onclick="() => ToggleAdvancedFilters()">
+                    <i class="fas fa-chevron-up"></i>
+                    <span>Ascunde Filtrele</span>
+                </button>
+            </div>
+            
             <div class="filter-panel-content">
-                @* First row - Rol, Status, Departament *@
+                @* First row - Departament, Status, Search *@
                 <div class="filter-row">
                     <div class="filter-group">
-                        <label class="filter-label">Rol:</label>
-                        <SfDropDownList TItem="UtilizatoriModels.FilterOption<UserRole?>" TValue="UserRole?" 
-                                       DataSource="@_models.RoleFilterOptions" 
-                                       @bind-Value="@_state.SelectedRoleFilter"
-                                       Placeholder="Toate rolurile"
+                        <label class="filter-label">Departament:</label>
+                        <SfDropDownList TItem="PersonalModels.FilterOption<Departament?>" TValue="Departament?" 
+                                       DataSource="@_models.DepartmentFilterOptions" 
+                                       @bind-Value="@_state.SelectedDepartmentFilter"
+                                       Placeholder="Toate departamentele"
                                        AllowFiltering="true"
                                        PopupHeight="200px"
-                                       Width="150px">
+                                       Width="180px">
                             <DropDownListFieldSettings Text="Text" Value="Value" />
-                            <DropDownListEvents TItem="UtilizatoriModels.FilterOption<UserRole?>" TValue="UserRole?" ValueChange="OnRoleFilterChanged" />
+                            <DropDownListEvents TItem="PersonalModels.FilterOption<Departament?>" TValue="Departament?" ValueChange="OnDepartmentFilterChanged" />
                         </SfDropDownList>
                     </div>
                     
                     <div class="filter-group">
                         <label class="filter-label">Status:</label>
-                        <SfDropDownList TItem="UtilizatoriModels.FilterOption<UserStatus?>" TValue="UserStatus?" 
+                        <SfDropDownList TItem="PersonalModels.FilterOption<StatusAngajat?>" TValue="StatusAngajat?" 
                                        DataSource="@_models.StatusFilterOptions" 
                                        @bind-Value="@_state.SelectedStatusFilter"
                                        Placeholder="Toate statusurile"
@@ -114,63 +143,51 @@
                                        PopupHeight="200px"
                                        Width="150px">
                             <DropDownListFieldSettings Text="Text" Value="Value" />
-                            <DropDownListEvents TItem="UtilizatoriModels.FilterOption<UserStatus?>" TValue="UserStatus?" ValueChange="OnStatusFilterChanged" />
+                            <DropDownListEvents TItem="PersonalModels.FilterOption<StatusAngajat?>" TValue="StatusAngajat?" ValueChange="OnStatusFilterChanged" />
                         </SfDropDownList>
                     </div>
                     
                     <div class="filter-group">
-                        <label class="filter-label">Departament:</label>
-                        <SfDropDownList TItem="string" TValue="string" 
-                                       DataSource="@_models.DepartmentFilterOptions" 
-                                       @bind-Value="@_state.SelectedDepartmentFilter"
-                                       Placeholder="Toate departamentele"
-                                       AllowFiltering="true"
-                                       PopupHeight="200px"
-                                       Width="180px">
-                            <DropDownListEvents TItem="string" TValue="string" ValueChange="OnDepartmentFilterChanged" />
-                        </SfDropDownList>
+                        <label class="filter-label">Cautare text:</label>
+                        <SfTextBox @bind-Value="@_state.SearchText" 
+                                  Placeholder="Cauta in nume, prenume, email..."
+                                  Width="250px"
+                                  ShowClearButton="true">
+                            <TextBoxEvents ValueChange="OnSearchTextChanged" />
+                        </SfTextBox>
                     </div>
                 </div>
                 
-                @* Second row - C?utare text, Perioada activitate *@
+                @* Second row - Additional filters *@
                 <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label">C?utare text:</label>
-                        <SfTextBox @bind-Value="@_state.GlobalSearchText" 
-                                  Placeholder="Caut? în nume, email, username..."
-                                  Width="250px"
-                                  ShowClearButton="true">
-                            <TextBoxEvents ValueChange="OnGlobalSearchChanged" />
-                        </SfTextBox>
-                    </div>
-                    
                     <div class="filter-group">
                         <label class="filter-label">Perioada activitate:</label>
                         <SfDropDownList TItem="string" TValue="string" 
                                        DataSource="@_models.ActivityPeriodOptions" 
                                        @bind-Value="@_state.SelectedActivityPeriod"
-                                       Placeholder="Orice perioad?"
+                                       Placeholder="Orice perioada"
                                        Width="180px">
                             <DropDownListEvents TItem="string" TValue="string" ValueChange="OnActivityPeriodChanged" />
                         </SfDropDownList>
                     </div>
                     
-                    @* Empty space to maintain layout balance *@
+                    @* Empty spaces for layout balance *@
+                    <div class="filter-group"></div>
                     <div class="filter-group"></div>
                 </div>
                 
                 <div class="filter-actions">
                     <button class="btn btn-primary btn-sm" @onclick="ApplyAdvancedFilters">
                         <i class="fas fa-check"></i>
-                        <span>Aplic? Filtrele</span>
+                        <span>Aplica Filtrele</span>
                     </button>
                     <button class="btn btn-secondary btn-sm" @onclick="ClearAdvancedFilters">
                         <i class="fas fa-times"></i>
-                        <span>Cur??? Filtrele</span>
+                        <span>Curata Filtrele</span>
                     </button>
                     <button class="btn btn-info btn-sm" @onclick="ExportFilteredData">
                         <i class="fas fa-download"></i>
-                        <span>Export? Rezultate</span>
+                        <span>Exporta Rezultate</span>
                     </button>
                 </div>
                 
@@ -179,35 +196,35 @@
                     <div class="results-info">
                         <span class="results-count">
                             <i class="fas fa-search"></i>
-                            Rezultate: <strong>@_models.FilteredUsers.Count</strong> din <strong>@_models.Users.Count</strong> utilizatori
+                            Rezultate: <strong>@_models.FilteredPersonal.Count</strong> din <strong>@_models.Personal.Count</strong> angajati
                         </span>
                         @if (_state.IsAnyFilterActive)
                         {
                             <span class="filtered-indicator">
                                 <i class="fas fa-filter"></i>
-                                Filtrare activ?
+                                Filtrare activa
                             </span>
                         }
                     </div>
                 </div>
             </div>
-        }
-    </div>
+        </div>
+    }
 
-    @* Main DataGrid *@
+    @* Main DataGrid - SIMILAR CU UTILIZATORI *@
     @if (_state.IsLoading)
     {
-        <div class="users-grid-container">
+        <div class="personal-grid-container">
             <div class="loading-indicator text-center p-5">
                 <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
-                <div class="mt-3">Se incarca utilizatorii...</div>
+                <div class="mt-3">Se incarca personalul...</div>
             </div>
         </div>
     }
     else
     {
-        <div class="users-grid-container">
-            <SfGrid @ref="GridRef" DataSource="@_models.FilteredUsers" 
+        <div class="personal-grid-container">
+            <SfGrid @ref="GridRef" DataSource="@_models.FilteredPersonal" 
                     AllowPaging="true" 
                     AllowSorting="true" 
                     AllowFiltering="true"
@@ -218,7 +235,7 @@
                     ShowColumnMenu="true">
                 
                 @* Grid Events *@
-                <GridEvents TValue="User" 
+                <GridEvents TValue="PersonalModel" 
                            RowSelected="RowSelected"
                            RowDeselected="RowDeselected">
                 </GridEvents>
@@ -227,12 +244,12 @@
                 <GridSelectionSettings Type="GridSelectionType.Multiple" Mode="GridSelectionMode.Row"></GridSelectionSettings>
 
                 @* Page Settings *@
-                <GridPageSettings PageSize="20" PageSizes="@_models.PageSizes"></GridPageSettings>
+                <GridPageSettings PageSize="10" PageSizes="@_models.PageSizes"></GridPageSettings>
 
                 @* Sort Settings *@
                 <GridSortSettings AllowUnsort="true">
                     <GridSortColumns>
-                        <GridSortColumn Field="LastName" Direction="GridSortDirection.Ascending"></GridSortColumn>
+                        <GridSortColumn Field="Nume" Direction="GridSortDirection.Ascending"></GridSortColumn>
                     </GridSortColumns>
                 </GridSortSettings>
 
@@ -246,67 +263,62 @@
                 @* Group Settings *@
                 <GridGroupSettings ShowDropArea="true" ShowToggleButton="true" ShowGroupedColumn="true">
                     <GridGroupColumns>
-                        <GridGroupColumn Field="Department"></GridGroupColumn>
+                        <GridGroupColumn Field="Departament"></GridGroupColumn>
                     </GridGroupColumns>
                 </GridGroupSettings>
 
                 @* Columns Definition - OPTIMIZED FOR SCREEN WIDTH *@
                 <GridColumns>
-                    <GridColumn Field="@nameof(User.Id)" HeaderText="ID" Width="50" TextAlign="TextAlign.Center" 
-                               IsPrimaryKey="true" AllowFiltering="true" AllowReordering="false"></GridColumn>
-                    <GridColumn Field="@nameof(User.FirstName)" HeaderText="Nume" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.LastName)" HeaderText="Prenume" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.Email)" HeaderText="Email" Width="160" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.Username)" HeaderText="Username" Width="90" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.Phone)" HeaderText="Telefon" Width="90" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(PersonalModel.Cod_Angajat)" HeaderText="Cod" Width="80" TextAlign="TextAlign.Center" 
+                               IsPrimaryKey="false" AllowFiltering="true" AllowReordering="false"></GridColumn>
+                    <GridColumn Field="@nameof(PersonalModel.Nume)" HeaderText="Nume" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(PersonalModel.Prenume)" HeaderText="Prenume" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(PersonalModel.Email_Personal)" HeaderText="Email" Width="160" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(PersonalModel.Telefon_Personal)" HeaderText="Telefon" Width="90" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(PersonalModel.Functia)" HeaderText="Functia" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
                                
-                    <GridColumn Field="@nameof(User.Role)" HeaderText="Rol" Width="90" AllowFiltering="true" AllowReordering="true">
+                    <GridColumn Field="@nameof(PersonalModel.Departament)" HeaderText="Departament" Width="100" 
+                               AllowFiltering="true" AllowReordering="true">
                         <Template>
                             @{                                               
-                                var user = context as User;
-                                <span>@GetRoleDisplayName(user!.Role)</span>
+                                var personal = context as PersonalModel;
+                                <span>@GetDepartamentDisplay(personal!.Departament)</span>
                             }
                         </Template>
                     </GridColumn>
                                
-                    <GridColumn Field="@nameof(User.Department)" HeaderText="Departament" Width="100" 
-                               AllowFiltering="true" AllowReordering="true"></GridColumn>
-                               
-                    <GridColumn Field="@nameof(User.Status)" HeaderText="Status" Width="70" 
+                    <GridColumn Field="@nameof(PersonalModel.Status_Angajat)" HeaderText="Status" Width="70" 
                                AllowFiltering="true" AllowReordering="true">
                         <Template>
                             @{                                               
-                                var user = context as User;
-                                <span class="status-badge status-@user!.Status.ToString().ToLower()">
-                                    @GetStatusDisplayName(user.Status)
+                                var personal = context as PersonalModel;
+                                <span class="status-badge status-@personal!.Status_Angajat.ToString().ToLower()">
+                                    @GetStatusDisplay(personal.Status_Angajat)
                                 </span>
                             }
                         </Template>
                     </GridColumn>
                                
-                    <GridColumn Field="@nameof(User.JobTitle)" HeaderText="Func?ie" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.CreatedDate)" HeaderText="Data Cre?rii" Width="90" 
+                    <GridColumn Field="@nameof(PersonalModel.Data_Crearii)" HeaderText="Data Crearii" Width="90" 
                                Format="dd.MM.yyyy" Type="ColumnType.Date" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.LastLoginDate)" HeaderText="Ultima Autent." Width="100" 
-                               Format="dd.MM.yyyy" Type="ColumnType.DateTime" AllowFiltering="true" AllowReordering="true"></GridColumn>
                                
                     @* Actions Column - FROZEN RIGHT *@
                     <GridColumn HeaderText="Actiuni" Width="120" AllowFiltering="false" AllowSorting="false"
                                IsFrozen = "true" Freeze="FreezeDirection.Right" AllowReordering="false">
                         <Template>
                             @{
-                                var user = context as User;
+                                var personal = context as PersonalModel;
                                 <div class="action-buttons">
-                                    <button class="btn-action btn-view" @onclick="() => ShowUserDetailModal(user!)" 
-                                            title="Vizualizeaz? detaliile utilizatorului" aria-label="Vizualizeaz?">
+                                    <button class="btn-action btn-view" @onclick="() => ShowPersonalDetailModal(personal!)" 
+                                            title="Vizualizeaza detaliile personalului" aria-label="Vizualizeaza">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button class="btn-action btn-edit" @onclick="() => EditUser(user!)" 
-                                            title="Modific? utilizatorul" aria-label="Modific?">
+                                    <button class="btn-action btn-edit" @onclick="() => EditPersonal(personal!)" 
+                                            title="Modifica personalul" aria-label="Modifica">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn-action btn-delete" @onclick="() => DeleteUser(user!)" 
-                                            title="?terge utilizatorul" aria-label="?terge">
+                                    <button class="btn-action btn-delete" @onclick="() => DeletePersonal(personal!)" 
+                                            title="Sterge personalul" aria-label="Sterge">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -318,15 +330,15 @@
         </div>
     }
 
-    @* User Detail Modal - USING SEPARATE COMPONENT *@
-    <SfDialog @ref="UserDetailModal" 
+    @* Personal Detail Modal - USING SEPARATE COMPONENT *@
+    <SfDialog @ref="PersonalDetailModal" 
               Width="900px" 
               Height="700px"
               IsModal="true" 
               Visible="@_state.IsModalVisible"
               ShowCloseIcon="true"
               AllowDragging="true"
-              CssClass="user-dialog detail-dialog"
+              CssClass="personal-dialog detail-dialog"
               AnimationSettings="@DialogAnimation">
         <DialogEvents Closed="OnModalClosed" />
         <DialogTemplates>
@@ -334,39 +346,39 @@
                 <div class="modal-header-content">
                     <i class="fas fa-user-circle modal-header-icon"></i>
                     <div>
-                        <h3 class="modal-header-title">@_state.SelectedUser?.FullName</h3>
-                        <p class="modal-header-subtitle">Detalii utilizator</p>
+                        <h3 class="modal-header-title">@_state.SelectedPersonal?.NumeComplet</h3>
+                        <p class="modal-header-subtitle">Detalii personal</p>
                     </div>
                 </div>
             </Header>
             <Content>
-                @if (_state.SelectedUser != null)
+                @if (_state.SelectedPersonal != null)
                 {
-                    <VizualizeazUtilizator UserId="@_state.SelectedUser.Id" />
+                    <VizualizeazaPersonal PersonalData="@_state.SelectedPersonal" />
                 }
             </Content>
             <FooterTemplate>
                 <div class="modal-footer-actions">
-                    <button class="btn btn-primary" @onclick="EditUserFromModal">
-                        <i class="fas fa-edit"></i> Editeaz? Utilizatorul
+                    <button class="btn btn-primary" @onclick="EditPersonalFromModal">
+                        <i class="fas fa-edit"></i> Editeaza Personal
                     </button>
-                    <button class="btn btn-secondary" @onclick="CloseUserDetailModal">
-                        <i class="fas fa-times"></i> Închide
+                    <button class="btn btn-secondary" @onclick="ClosePersonalDetailModal">
+                        <i class="fas fa-times"></i> Inchide
                     </button>
                 </div>
             </FooterTemplate>
         </DialogTemplates>
     </SfDialog>
 
-    @* Add/Edit User Modal - USING SEPARATE COMPONENT *@
-    <SfDialog @ref="AddEditUserModal" 
+    @* Add/Edit Personal Modal - USING SEPARATE COMPONENT *@
+    <SfDialog @ref="AddEditPersonalModal" 
               Width="900px" 
               Height="700px"
               IsModal="true" 
               Visible="@_state.IsAddEditModalVisible"
               ShowCloseIcon="true"
               AllowDragging="true"
-              CssClass="user-dialog edit-dialog"
+              CssClass="personal-dialog edit-dialog"
               AnimationSettings="@DialogAnimation">
         <DialogEvents Closed="OnAddEditModalClosed" />
         <DialogTemplates>
@@ -380,41 +392,31 @@
                 </div>
             </Header>
             <Content>
-                @if (_state.IsEditMode && _state.EditingUser != null)
+                @if (_state.IsEditMode && _state.EditingPersonal != null)
                 {
-                    <AdaugaEditezUtilizator UserId="@_state.EditingUser.Id" 
-                                           EditingUser="@_state.EditingUser"
-                                           OnSave="@SaveUser" 
-                                           OnCancel="@CloseAddEditModal" />
+                    <AdaugaEditezaPersonal PersonalId="@_state.EditingPersonal.Id_Personal" 
+                                          EditingPersonal="@_state.EditingPersonal"
+                                          OnSave="@SavePersonal" 
+                                          OnCancel="@CloseAddEditModal" />
                 }
                 else
                 {
-                    <AdaugaEditezUtilizator OnSave="@SaveUser" 
-                                           OnCancel="@CloseAddEditModal" />
+                    <AdaugaEditezaPersonal OnSave="@SavePersonal" 
+                                          OnCancel="@CloseAddEditModal" />
                 }
             </Content>
             <FooterTemplate>
                 <div class="modal-footer-actions">
                     <button type="button" class="btn btn-primary" @onclick="OnFormSubmit" disabled="@_state.IsLoading">
                         <i class="fas fa-save"></i>
-                        @(_state.IsEditMode ? "Actualizeaz? Utilizatorul" : "Creeaz? Utilizatorul")
+                        @(_state.IsEditMode ? "Actualizeaza Personalul" : "Creeaza Personalul")
                     </button>
                     <button type="button" class="btn btn-secondary" @onclick="CloseAddEditModal" disabled="@_state.IsLoading">
                         <i class="fas fa-times"></i>
-                        Anuleaz?
+                        Anuleaza
                     </button>
                 </div>
             </FooterTemplate>
         </DialogTemplates>
     </SfDialog>
-
-    @* JavaScript functions for opening pages in new windows *@
-    <script>
-        window.openUserWindow = function(url, title, width = 900, height = 700) {
-            const left = (screen.width / 2) - (width / 2);
-            const top = (screen.height / 2) - (height / 2);
-            const options = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,status=no`;
-            window.open(url, title, options);
-        };
-    </script>
 </div>

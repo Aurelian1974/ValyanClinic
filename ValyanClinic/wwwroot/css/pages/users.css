@@ -337,7 +337,7 @@
   flex-direction: column;
 }
 
-/* Grid Syncfusion - DIMENSIUNI NORMALE */
+/* Grid Syncfusion - NATURAL SIZING */
 .users-grid-container .e-grid {
   height: 100% !important;
   border: none !important;
@@ -356,6 +356,10 @@
   font-weight: 600 !important;
   font-size: 13px !important;
   padding: 10px 8px !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .users-grid-container .e-grid .e-gridcontent {
@@ -371,6 +375,7 @@
 .users-grid-container .e-grid .e-rowcell {
   font-size: 13px !important;
   padding: 8px !important;
+  vertical-align: middle !important;
 }
 
 .users-grid-container .e-grid .e-gridpager {
@@ -381,31 +386,36 @@
   min-height: 40px !important;
 }
 
-/* Action buttons - DIMENSIUNI NORMALE */
+/* Action buttons - LEFT ALIGNED BUT VISUALLY BALANCED */
 .action-buttons {
   display: flex;
   gap: 4px;
-  justify-content: center;
+  justify-content: flex-start; /* LEFT align to prevent Grid auto-sizing */
   align-items: center;
   width: 100%;
-  min-width: 90px;
+  max-width: 120px;
+  padding: 0 8px; /* INCREASED left padding for visual balance */
+  box-sizing: border-box;
 }
 
 .btn-action {
-  width: 28px;
-  height: 28px;
+  width: 28px; /* CONSISTENT with Personal page */
+  height: 28px; /* CONSISTENT with Personal page */
   border-radius: 6px;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 12px;
+  font-size: 11px; /* REDUCED for better fit */
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* CONSISTENT shadow */
+  flex-shrink: 0; /* PREVENT shrinking */
 }
 
 .btn-action:hover {
   transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .btn-view {
@@ -413,14 +423,26 @@
   color: white;
 }
 
+.btn-view:hover {
+  background: #2563eb;
+}
+
 .btn-edit {
   background: #f59e0b;
   color: white;
 }
 
+.btn-edit:hover {
+  background: #d97706;
+}
+
 .btn-delete {
   background: #ef4444;
   color: white;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
 }
 
 /* Status badges */

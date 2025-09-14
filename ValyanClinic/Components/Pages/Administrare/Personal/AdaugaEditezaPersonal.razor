@@ -1,0 +1,906 @@
+﻿@using ValyanClinic.Domain.Models
+@using ValyanClinic.Domain.Enums
+@using ValyanClinic.Application.Services
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Notifications
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+@using PersonalModel = ValyanClinic.Domain.Models.Personal
+@using DropDownFilterType = Syncfusion.Blazor.DropDowns
+
+<link href="~/css/pages/add-edit-personal-advanced.css" rel="stylesheet" />
+
+<div class="advanced-personal-form-container">
+    <!-- Progress Indicator -->
+    <div class="form-progress-container">
+        <div class="progress-indicator">
+            @for (int i = 1; i <= _totalSteps; i++)
+            {
+                <div class="progress-step @(i <= _currentStep ? "completed" : "") @(i == _currentStep ? "active" : "")">
+                    <div class="step-circle">
+                        @if (i < _currentStep)
+                        {
+                            <i class="fas fa-check"></i>
+                        }
+                        else
+                        {
+                            <span>@i</span>
+                        }
+                    </div>
+                    <div class="step-label">@GetStepLabel(i)</div>
+                </div>
+                @if (i < _totalSteps)
+                {
+                    <div class="progress-line @(i < _currentStep ? "completed" : "")"></div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Form Header -->
+    <div class="form-header">
+        <h2 class="form-title">
+            <i class="fas fa-@(IsEditMode ? "user-edit" : "user-plus")"></i>
+            @(IsEditMode ? "Editează Personal" : "Adaugă Personal Nou")
+        </h2>
+        <p class="form-subtitle">
+            Pasul @_currentStep din @_totalSteps: @GetStepDescription(_currentStep)
+        </p>
+    </div>
+
+    <!-- Error Display -->
+    @if (_validationErrors.Any())
+    {
+        <div class="validation-summary">
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Te rugăm să coretezi următoarele erori:</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach (var error in _validationErrors)
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+
+    <!-- Auto-save Indicator -->
+    <div class="autosave-indicator @(_isAutoSaving ? "saving" : _lastAutoSave.HasValue ? "saved" : "")">
+        @if (_isAutoSaving)
+        {
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Se salvează draft...</span>
+        }
+        else if (_lastAutoSave.HasValue)
+        {
+            <i class="fas fa-check-circle"></i>
+            <span>Draft salvat la @_lastAutoSave.Value.ToString("HH:mm")</span>
+        }
+    </div>
+
+    <!-- Form Content -->
+    <div class="form-content-container">
+        <EditForm Model="@_personalModel" OnValidSubmit="HandleStepSubmit">
+            <DataAnnotationsValidator />
+
+            <!-- Step 1: Informații Personale -->
+            @if (_currentStep == 1)
+            {
+                <div class="form-step-content" data-step="1">
+                    <div class="step-header">
+                        <i class="fas fa-id-card step-icon"></i>
+                        <h3>Informații Personale de Bază</h3>
+                        <p>Completează datele de identificare ale persoanei</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-section">
+                            <h4 class="section-title">Date de Identificare</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label required">Nume</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Nume" 
+                                              Placeholder="Introduceți numele"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              CssClass="@GetFieldCssClass(nameof(_personalModel.Nume))"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <ValidationMessage For="@(() => _personalModel.Nume)" />
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label required">Prenume</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Prenume" 
+                                              Placeholder="Introduceți prenumele"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              CssClass="@GetFieldCssClass(nameof(_personalModel.Prenume))"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <ValidationMessage For="@(() => _personalModel.Prenume)" />
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label required">CNP</label>
+                                    <SfMaskedTextBox @bind-Value="@_personalModel.CNP" 
+                                                    Mask="0000000000000"
+                                                    Placeholder="Introduceți CNP-ul"
+                                                    FloatLabelType="FloatLabelType.Auto"
+                                                    CssClass="@GetFieldCssClass(nameof(_personalModel.CNP))"
+                                                    Width="100%">
+                                    </SfMaskedTextBox>
+                                    <ValidationMessage For="@(() => _personalModel.CNP)" />
+                                    @if (_cnpValidationResult != null)
+                                    {
+                                        <div class="field-info cnp-info @(_cnpValidationResult.IsValid ? "valid" : "invalid")">
+                                            <i class="fas fa-@(_cnpValidationResult.IsValid ? "check-circle" : "exclamation-circle")"></i>
+                                            @if (_cnpValidationResult.IsValid)
+                                            {
+                                                <span>CNP valid - @_cnpValidationResult.ParsedInfo</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@_cnpValidationResult.ErrorMessage</span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label required">Cod Angajat</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Cod_Angajat" 
+                                              Placeholder="Ex: EMP001"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              CssClass="@GetFieldCssClass(nameof(_personalModel.Cod_Angajat))"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <ValidationMessage For="@(() => _personalModel.Cod_Angajat)" />
+                                    @if (_codeValidationResult != null)
+                                    {
+                                        <div class="field-info code-info @(_codeValidationResult.IsValid ? "valid" : "invalid")">
+                                            <i class="fas fa-@(_codeValidationResult.IsValid ? "check-circle" : "exclamation-circle")"></i>
+                                            <span>@_codeValidationResult.Message</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-title">Date Personale</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label required">Data Nașterii</label>
+                                    <SfDatePicker @bind-Value="@_personalModel.Data_Nasterii" 
+                                                 FloatLabelType="FloatLabelType.Auto"
+                                                 Format="dd.MM.yyyy"
+                                                 Max="@DateTime.Today.AddYears(-16)"
+                                                 Min="@DateTime.Today.AddYears(-70)"
+                                                 Width="100%">
+                                    </SfDatePicker>
+                                    <ValidationMessage For="@(() => _personalModel.Data_Nasterii)" />
+                                    @if (_personalModel.Data_Nasterii != default)
+                                    {
+                                        <div class="field-info age-info">
+                                            <i class="fas fa-birthday-cake"></i>
+                                            <span>Vârsta: @CalculateAge(_personalModel.Data_Nasterii) ani</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Locul Nașterii</label>
+                                    <SfComboBox @bind-Value="@_personalModel.Locul_Nasterii" 
+                                               DataSource="@_cityOptions"
+                                               Placeholder="Selectați sau introduceți orașul"
+                                               AllowFiltering="true"
+                                               AllowCustom="true"
+                                               Width="100%">
+                                    </SfComboBox>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Stare Civilă</label>
+                                    <SfDropDownList @bind-Value="@_personalModel.Stare_Civila" 
+                                                   DataSource="@_stareCivilaOptions"
+                                                   Placeholder="Selectați starea civilă"
+                                                   Width="100%">
+                                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Nume Anterior</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Nume_Anterior" 
+                                              Placeholder="Dacă se aplică"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Completați doar dacă persoana și-a schimbat numele</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Naționalitate</label>
+                                    <SfComboBox @bind-Value="@_personalModel.Nationalitate" 
+                                               DataSource="@_nationalityOptions"
+                                               Placeholder="Selectați naționalitatea"
+                                               AllowFiltering="true"
+                                               Width="100%">
+                                    </SfComboBox>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Cetățenie</label>
+                                    <SfComboBox @bind-Value="@_personalModel.Cetatenie" 
+                                               DataSource="@_citizenshipOptions"
+                                               Placeholder="Selectați cetățenia"
+                                               AllowFiltering="true"
+                                               Width="100%">
+                                    </SfComboBox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Step 2: Informații Contact -->
+            @if (_currentStep == 2)
+            {
+                <div class="form-step-content" data-step="2">
+                    <div class="step-header">
+                        <i class="fas fa-address-book step-icon"></i>
+                        <h3>Informații de Contact</h3>
+                        <p>Adaugă datele de contact (telefon, email) pentru comunicare</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-section">
+                            <h4 class="section-title">Contact Personal</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Telefon Personal</label>
+                                    <SfMaskedTextBox @bind-Value="@_personalModel.Telefon_Personal" 
+                                                    Mask="0000-000-000"
+                                                    Placeholder="Ex: 0723-456-789"
+                                                    FloatLabelType="FloatLabelType.Auto"
+                                                    Width="100%">
+                                    </SfMaskedTextBox>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Format: 0xxx-xxx-xxx pentru numere românești</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Email Personal</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Email_Personal" 
+                                              Placeholder="Ex: nume@gmail.com"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Email-ul personal pentru comunicare directă</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-title">Contact de Serviciu</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Telefon de Serviciu</label>
+                                    <SfMaskedTextBox @bind-Value="@_personalModel.Telefon_Serviciu" 
+                                                    Mask="0000-000-000"
+                                                    Placeholder="Ex: 0321-123-456"
+                                                    FloatLabelType="FloatLabelType.Auto"
+                                                    Width="100%">
+                                    </SfMaskedTextBox>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Numărul de la locul de muncă (opțional)</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Email de Serviciu</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Email_Serviciu" 
+                                              Placeholder="Ex: nume@valyanmed.ro"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Email-ul oficial pentru comunicare profesională</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-title">Preferințe Comunicare</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Metoda Preferată de Contact</label>
+                                    <SfDropDownList TValue="string" TItem="DropdownOption<string>"
+                                                   DataSource="@_contactMethods" 
+                                                   Placeholder="Selectați metoda preferată"
+                                                   Width="100%">
+                                        <DropDownListFieldSettings Text="Display" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Program Disponibilitate</label>
+                                    <SfDropDownList TValue="string" TItem="DropdownOption<string>"
+                                                   DataSource="@_availabilityHours" 
+                                                   Placeholder="Când putem să vă contactăm"
+                                                   Width="100%">
+                                        <DropDownListFieldSettings Text="Display" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field full-width">
+                                    <label class="field-label">Observații Contact</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Observatii_Contact" 
+                                              Placeholder="Ex: Disponibil doar după ora 18:00, nu sunați în weekend"
+                                              Multiline="true"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Instrucțiuni speciale pentru contactarea acestei persoane</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Step 3: Informații Adresă -->
+            @if (_currentStep == 3)
+            {
+                <div class="form-step-content" data-step="3">
+                    <div class="step-header">
+                        <i class="fas fa-home step-icon"></i>
+                        <h3>Informații Adresă</h3>
+                        <p>Introduceți adresa de domiciliu și reședință</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-section">
+                            <h4 class="section-title">Adresa de Domiciliu</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label required">Județ</label>
+                                    <SfComboBox @bind-Value="@_personalModel.Judet_Domiciliu" 
+                                               DataSource="@_judeteOptions"
+                                               Placeholder="Selectați județul"
+                                               AllowFiltering="true"
+                                               AllowCustom="true"
+                                               Width="100%">
+                                    </SfComboBox>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label required">Oraș/Localitate</label>
+                                    <SfComboBox @bind-Value="@_personalModel.Oras_Domiciliu" 
+                                               DataSource="@_cityOptions"
+                                               Placeholder="Selectați orașul"
+                                               AllowFiltering="true"
+                                               AllowCustom="true"
+                                               Width="100%">
+                                    </SfComboBox>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field full-width">
+                                    <label class="field-label required">Adresa Completă</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Adresa_Domiciliu" 
+                                              Placeholder="Strada, numărul, bl., sc., et., ap."
+                                              Multiline="true"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Ex: Str. Mihai Eminescu nr. 15, bl. A2, sc. 1, et. 3, ap. 12</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Cod Poștal</label>
+                                    <SfMaskedTextBox @bind-Value="@_personalModel.Cod_Postal_Domiciliu" 
+                                                    Mask="000000"
+                                                    Placeholder="Ex: 010203"
+                                                    FloatLabelType="FloatLabelType.Auto"
+                                                    Width="100%">
+                                    </SfMaskedTextBox>
+                                </div>
+
+                                <div class="form-field">
+                                    <div class="checkbox-field">
+                                        <SfCheckBox @bind-Checked="@_sameAsHome" Label="Adresa de reședință este aceeași"></SfCheckBox>
+                                        <div class="field-help">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>Bifează dacă locuiești la aceeași adresă</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (!_sameAsHome)
+                        {
+                            <div class="form-section">
+                                <h4 class="section-title">Adresa de Reședință</h4>
+                                
+                                <div class="form-row">
+                                    <div class="form-field">
+                                        <label class="field-label">Județ</label>
+                                        <SfComboBox @bind-Value="@_personalModel.Judet_Resedinta" 
+                                                   DataSource="@_judeteOptions"
+                                                   Placeholder="Selectați județul"
+                                                   AllowFiltering="true"
+                                                   AllowCustom="true"
+                                                   Width="100%">
+                                        </SfComboBox>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label class="field-label">Oraș/Localitate</label>
+                                        <SfComboBox @bind-Value="@_personalModel.Oras_Resedinta" 
+                                                   DataSource="@_cityOptions"
+                                                   Placeholder="Selectați orașul"
+                                                   AllowFiltering="true"
+                                                   AllowCustom="true"
+                                                   Width="100%">
+                                        </SfComboBox>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-field full-width">
+                                        <label class="field-label">Adresa Completă</label>
+                                        <SfTextBox @bind-Value="@_personalModel.Adresa_Resedinta" 
+                                                  Placeholder="Strada, numărul, bl., sc., et., ap."
+                                                  Multiline="true"
+                                                  FloatLabelType="FloatLabelType.Auto"
+                                                  Width="100%">
+                                        </SfTextBox>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-field">
+                                        <label class="field-label">Cod Poștal</label>
+                                        <SfMaskedTextBox @bind-Value="@_personalModel.Cod_Postal_Resedinta" 
+                                                        Mask="000000"
+                                                        Placeholder="Ex: 010203"
+                                                        FloatLabelType="FloatLabelType.Auto"
+                                                        Width="100%">
+                                        </SfMaskedTextBox>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <!-- Spațiu pentru layout -->
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Step 4: Informații Profesionale -->
+            @if (_currentStep == 4)
+            {
+                <div class="form-step-content" data-step="4">
+                    <div class="step-header">
+                        <i class="fas fa-briefcase step-icon"></i>
+                        <h3>Informații Profesionale</h3>
+                        <p>Setează informațiile despre rolul și responsabilitățile profesionale</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-section">
+                            <h4 class="section-title">Poziția în Organizație</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label required">Departament</label>
+                                    <SfDropDownList TValue="Departament?" TItem="DropdownOption<Departament>"
+                                                   @bind-Value="@_personalModel.Departament"
+                                                   DataSource="@_departmentOptions" 
+                                                   Placeholder="Selectați departamentul"
+                                                   Width="100%">
+                                        <DropDownListFieldSettings Text="Display" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label required">Funcția</label>
+                                    <SfComboBox @bind-Value="@_personalModel.Functia" 
+                                               DataSource="@_jobTitleOptions"
+                                               Placeholder="Funcția ocupată"
+                                               AllowFiltering="true"
+                                               AllowCustom="true"
+                                               Width="100%">
+                                    </SfComboBox>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Data Angajării</label>
+                                    <SfDatePicker @bind-Value="@_personalModel.Data_Angajarii" 
+                                                 FloatLabelType="FloatLabelType.Auto"
+                                                 Format="dd.MM.yyyy"
+                                                 Max="@DateTime.Today"
+                                                 Width="100%">
+                                    </SfDatePicker>
+                                    @if (_personalModel.Data_Angajarii.HasValue)
+                                    {
+                                        var yearsWorked = (DateTime.Today - _personalModel.Data_Angajarii.Value).Days / 365;
+                                        <div class="field-info age-info">
+                                            <i class="fas fa-calendar"></i>
+                                            <span>Vechime: @yearsWorked ani</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Tipul Contractului</label>
+                                    <SfDropDownList TValue="string" TItem="DropdownOption<string>"
+                                                   @bind-Value="@_personalModel.Tip_Contract"
+                                                   DataSource="@_contractTypes" 
+                                                   Placeholder="Selectați tipul"
+                                                   Width="100%">
+                                        <DropDownListFieldSettings Text="Display" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-title">Detalii Poziție</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Nivel Experiență</label>
+                                    <SfDropDownList TValue="string" TItem="DropdownOption<string>"
+                                                   @bind-Value="@_personalModel.Nivel_Experienta"
+                                                   DataSource="@_experienceLevels" 
+                                                   Placeholder="Selectați nivelul"
+                                                   Width="100%">
+                                        <DropDownListFieldSettings Text="Display" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Program de Lucru</label>
+                                    <SfDropDownList TValue="string" TItem="DropdownOption<string>"
+                                                   @bind-Value="@_personalModel.Program_Lucru"
+                                                   DataSource="@_workSchedules" 
+                                                   Placeholder="Selectați programul"
+                                                   Width="100%">
+                                        <DropDownListFieldSettings Text="Display" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field full-width">
+                                    <label class="field-label">Responsabilități Principale</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Responsabilitati" 
+                                              Placeholder="Descrieți principalele responsabilități și atribuții..."
+                                              Multiline="true"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Ex: Gestionarea pacienților, întocmirea rapoartelor, supervizarea echipei</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-title">Competențe și Calificări</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Studii</label>
+                                    <SfDropDownList TValue="string" TItem="DropdownOption<string>"
+                                                   @bind-Value="@_personalModel.Studii"
+                                                   DataSource="@_educationLevels" 
+                                                   Placeholder="Nivelul de studii"
+                                                   Width="100%">
+                                        <DropDownListFieldSettings Text="Display" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Specializarea</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Specializarea" 
+                                              Placeholder="Ex: Medicină Generală, Asistență Medicală"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field full-width">
+                                    <label class="field-label">Competențe Cheie</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Competente" 
+                                              Placeholder="Ex: Comunicare, Lucru în echipă, Organizare, Software medical..."
+                                              Multiline="true"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Listează competențele principale separate prin virgulă</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Step 5: Informații Documente -->
+            @if (_currentStep == 5)
+            {
+                <div class="form-step-content" data-step="5">
+                    <div class="step-header">
+                        <i class="fas fa-file-alt step-icon"></i>
+                        <h3>Documente și Identificare</h3>
+                        <p>Informații despre documentele de identitate și alte acte</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-section">
+                            <h4 class="section-title">Buletin de Identitate / Carte de Identitate</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Seria</label>
+                                    <SfMaskedTextBox @bind-Value="@_personalModel.Serie_CI" 
+                                                    Mask="AA"
+                                                    Placeholder="Ex: RT"
+                                                    FloatLabelType="FloatLabelType.Auto"
+                                                    Width="100%">
+                                    </SfMaskedTextBox>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Numărul</label>
+                                    <SfMaskedTextBox @bind-Value="@_personalModel.Numar_CI" 
+                                                    Mask="000000"
+                                                    Placeholder="Ex: 123456"
+                                                    FloatLabelType="FloatLabelType.Auto"
+                                                    Width="100%">
+                                    </SfMaskedTextBox>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Eliberat de</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Eliberat_CI_De" 
+                                              Placeholder="Ex: SPCLEP București"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Data Eliberării</label>
+                                    <SfDatePicker @bind-Value="@_personalModel.Data_Eliberare_CI" 
+                                                 FloatLabelType="FloatLabelType.Auto"
+                                                 Format="dd.MM.yyyy"
+                                                 Max="@DateTime.Today"
+                                                 Width="100%">
+                                    </SfDatePicker>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Valabil până la</label>
+                                    <SfDatePicker @bind-Value="@_personalModel.Valabil_CI_Pana" 
+                                                 FloatLabelType="FloatLabelType.Auto"
+                                                 Format="dd.MM.yyyy"
+                                                 Min="@DateTime.Today"
+                                                 Width="100%">
+                                    </SfDatePicker>
+                                    @if (_personalModel.Valabil_CI_Pana.HasValue)
+                                    {
+                                        var daysUntilExpiry = (_personalModel.Valabil_CI_Pana.Value - DateTime.Today).Days;
+                                        var cssClass = daysUntilExpiry < 30 ? "field-warning" : daysUntilExpiry < 90 ? "field-info" : "field-success";
+                                        var icon = daysUntilExpiry < 30 ? "exclamation-triangle" : daysUntilExpiry < 90 ? "info-circle" : "check-circle";
+                                        var message = daysUntilExpiry < 30 ? $"⚠️ Expiră în {daysUntilExpiry} zile!" : 
+                                                     daysUntilExpiry < 90 ? $"ℹ️ Expiră în {daysUntilExpiry} zile" : 
+                                                     $"✅ Valid încă {daysUntilExpiry} zile";
+                                        
+                                        <div class="field-info @cssClass">
+                                            <i class="fas fa-@icon"></i>
+                                            <span>@message</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="form-field">
+                                    <!-- Spațiu pentru layout -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-title">Alte Documente</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Pașaport</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Pasaport" 
+                                              Placeholder="Ex: 12345678"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Permis de Conducere</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Permis_Conducere" 
+                                              Placeholder="Ex: RO123456789"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label class="field-label">Cod Fiscal (CIF)</label>
+                                    <SfMaskedTextBox @bind-Value="@_personalModel.Cod_Fiscal" 
+                                                    Mask="0000000000"
+                                                    Placeholder="Doar pentru PFA/SRL"
+                                                    FloatLabelType="FloatLabelType.Auto"
+                                                    Width="100%">
+                                    </SfMaskedTextBox>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="field-label">Card European de Sănătate</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Card_European_Sanatate" 
+                                              Placeholder="Numărul cardului CEAS"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-title">Observații și Note</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-field full-width">
+                                    <label class="field-label">Observații Generale</label>
+                                    <SfTextBox @bind-Value="@_personalModel.Observatii" 
+                                              Placeholder="Notează orice informații suplimentare relevante..."
+                                              Multiline="true"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              Width="100%">
+                                    </SfTextBox>
+                                    <div class="field-help">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Ex: Alergii, restricții medicale, preferințe speciale, etc.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <div class="checkbox-field">
+                                        <SfCheckBox @bind-Checked="@_acceptDataProcessing" Label="Accept procesarea datelor personale conform GDPR"></SfCheckBox>
+                                        <div class="field-help">
+                                            <i class="fas fa-shield-alt"></i>
+                                            <span>Datele vor fi folosite conform politicii de confidențialitate</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-field">
+                                    <div class="checkbox-field">
+                                        <SfCheckBox @bind-Checked="@_confirmDataAccuracy" Label="Confirm că toate datele introduse sunt corecte"></SfCheckBox>
+                                        <div class="field-help">
+                                            <i class="fas fa-check-circle"></i>
+                                            <span>Voi actualiza datele în caz de modificări</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Step Navigation -->
+            <div class="form-navigation">
+                <div class="nav-buttons">
+                    @if (_currentStep > 1)
+                    {
+                        <SfButton CssClass="btn-nav btn-prev" @onclick="PreviousStep">
+                            <i class="fas fa-chevron-left"></i>
+                            Înapoi
+                        </SfButton>
+                    }
+
+                    <div class="nav-center">
+                        <SfButton CssClass="btn-nav btn-save-draft" @onclick="SaveDraft" disabled="@_isAutoSaving">
+                            <i class="fas fa-@(_isAutoSaving ? "spinner fa-spin" : "save")"></i>
+                            Salvează Draft
+                        </SfButton>
+
+                        <SfButton CssClass="btn-nav btn-cancel" @onclick="HandleCancel">
+                            <i class="fas fa-times"></i>
+                            Anulează
+                        </SfButton>
+                    </div>
+
+                    @if (_currentStep < _totalSteps)
+                    {
+                        <SfButton CssClass="btn-nav btn-next" @onclick="NextStep" disabled="@(!CanProceedToNextStep())">
+                            Continuă
+                            <i class="fas fa-chevron-right"></i>
+                        </SfButton>
+                    }
+                    else
+                    {
+                        <SfButton CssClass="btn-nav btn-submit" @onclick="HandleFinalSubmit" disabled="@(!CanSubmitForm())">
+                            <i class="fas fa-check"></i>
+                            @(IsEditMode ? "Actualizează" : "Creează") Personal
+                        </SfButton>
+                    }
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+<!-- Toast Notifications -->
+<SfToast @ref="_toastRef" Title="ValyanMed" Target=".advanced-personal-form-container" 
+         NewestOnTop="true" ShowProgressBar="true" CssClass="personal-toast-container">
+</SfToast>

@@ -1,4 +1,4 @@
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 @implements IDisposable
 @inject NavigationManager Navigation
 
@@ -20,7 +20,7 @@
     <aside class="sidebar @(isSidebarOpen ? "open" : "")" role="navigation" aria-label="Main navigation">
         <div class="sidebar-header">
             <div class="sidebar-title">ValyanMed</div>
-            <button class="sidebar-close" @onclick="CloseSidebar" aria-label="Close navigation menu">�</button>
+            <button class="sidebar-close" @onclick="CloseSidebar" aria-label="Close navigation menu">×</button>
         </div>
         <nav class="sidebar-nav">
             @foreach (var parent in Menu)
@@ -88,14 +88,14 @@
                 <ErrorContent>
                     <div class="error-container">
                         <div class="error-message">
-                            <span class="error-icon">??</span>
+                            <span class="error-icon">⚠️</span>
                             <div>
-                                <strong>A ap?rut o eroare nea?teptat?</strong>
-                                <div>V? rug?m s? re�mprosp?ta?i pagina sau s? contacta?i suportul tehnic.</div>
+                                <strong>A apărut o eroare neașteptată</strong>
+                                <div>Vă rugăm să reîmprospătați pagina sau să contactați suportul tehnic.</div>
                             </div>
                         </div>
                         <button class="btn-secondary" @onclick="RefreshPage">
-                            Re�mprosp?teaz? pagina
+                            Reîmprospătează pagina
                         </button>
                     </div>
                 </ErrorContent>
@@ -160,6 +160,14 @@
                     Children =
                     {
                         new MenuItem("Utilizatori", "/utilizatori"),
+                        new MenuItem("Administrare Personal")
+                        {
+                            Children =
+                            {
+                                new MenuItem("Administrare Personal", "/administrare/personal"),
+                                new MenuItem("Administrare Personal Medical", "/administrare/personal-medical"),
+                            }
+                        },
                         new MenuItem("Setari Clinica", "/parinte5/copil2"),
                         new MenuItem("Backup & Securitate", "/parinte5/copil3"),
                     }
