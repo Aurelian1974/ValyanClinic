@@ -12,7 +12,7 @@
 @using PersonalModel = ValyanClinic.Domain.Models.Personal
 @using DropDownFilterType = Syncfusion.Blazor.DropDowns
 
-<link href="~/css/pages/add-edit-personal-advanced.css" rel="stylesheet" />
+<!-- Removed complex styles that might cause loading issues -->
 
 <div class="advanced-personal-form-container">
     <!-- Progress Indicator -->
@@ -88,6 +88,20 @@
         <EditForm Model="@_personalModel" OnValidSubmit="HandleStepSubmit">
             <DataAnnotationsValidator />
 
+            <!-- Test Toast Button - DOAR PENTRU DEBUG -->
+            @*
+
+            @if (System.Diagnostics.Debugger.IsAttached)
+            {
+                <div style="position: fixed; top: 10px; left: 10px; z-index: 99999; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 5px;">
+                    <button type="button" @onclick="@(() => ShowSuccessToast("Test", "Toast de test pentru verificare"))" style="color: white; background: green; border: none; padding: 5px 10px; margin: 2px; border-radius: 3px;">Test Success</button>
+                    <button type="button" @onclick="@(() => ShowErrorToast("Test Error", "Toast de eroare pentru test"))" style="color: white; background: red; border: none; padding: 5px 10px; margin: 2px; border-radius: 3px;">Test Error</button>
+                    <button type="button" @onclick="@(() => ShowWarningToast("Test Warning", "Toast de warning pentru test"))" style="color: white; background: orange; border: none; padding: 5px 10px; margin: 2px; border-radius: 3px;">Test Warning</button>
+                </div>
+            }
+
+            *@
+
             <!-- Step 1: Informații Personale -->
             @if (_currentStep == 1)
             {
@@ -129,14 +143,23 @@
                             <div class="form-row">
                                 <div class="form-field">
                                     <label class="field-label required">CNP</label>
-                                    <SfMaskedTextBox @bind-Value="@_personalModel.CNP" 
-                                                    Mask="0000000000000"
-                                                    Placeholder="Introduceți CNP-ul"
-                                                    FloatLabelType="FloatLabelType.Auto"
-                                                    CssClass="@GetFieldCssClass(nameof(_personalModel.CNP))"
-                                                    Width="100%">
-                                    </SfMaskedTextBox>
+                                    <SfTextBox @bind-Value="@_personalModel.CNP" 
+                                              Placeholder="Introduceți CNP-ul (13 cifre)"
+                                              FloatLabelType="FloatLabelType.Auto"
+                                              CssClass="@GetFieldCssClass(nameof(_personalModel.CNP))"
+                                              Width="100%"
+                                              MaxLength="13">
+                                    </SfTextBox>
                                     <ValidationMessage For="@(() => _personalModel.CNP)" />
+                                    @if (!string.IsNullOrEmpty(_personalModel.CNP) && _personalModel.CNP.Length == 13)
+                                    {
+                                        <div class="field-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span style="color: @(_personalModel.CNP.All(char.IsDigit) ? "green" : "red")">
+                                                CNP: @(_personalModel.CNP.All(char.IsDigit) ? "✓ Format valid" : "✗ Doar cifre permise")
+                                            </span>
+                                        </div>
+                                    }
                                 </div>
 
                                 <div class="form-field">
@@ -367,7 +390,7 @@
                     <div class="step-header">
                         <i class="fas fa-home step-icon"></i>
                         <h3>Informații Adresă</h3>
-                        <p>Introduceți adresa de domiciliu și reședință</p>
+                        <p>Introduceți adresa de domicilio și reședință</p>
                     </div>
 
                     <div class="form-grid">
@@ -879,7 +902,4 @@
     </div>
 </div>
 
-<!-- Toast Notifications - FIXED: Target set to body instead of container -->
-<SfToast @ref="_toastRef" Title="ValyanMed" Target="body" 
-         NewestOnTop="true" ShowProgressBar="true" CssClass="personal-toast-container">
-</SfToast>
+<!-- Toast notifications removed -->

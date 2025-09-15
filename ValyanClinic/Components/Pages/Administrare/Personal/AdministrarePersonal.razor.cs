@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Microsoft.Extensions.Logging;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Popups;
@@ -20,6 +21,7 @@ public partial class AdministrarePersonal : ComponentBase
 {
     [Inject] private IPersonalService PersonalService { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+    [Inject] private ILogger<AdministrarePersonal> Logger { get; set; } = default!;
 
     // Component References
     private SfGrid<PersonalModel>? GridRef;
@@ -45,16 +47,16 @@ public partial class AdministrarePersonal : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("DEBUG: AdministrarePersonal component initializing...");
+        Logger.LogDebug("DEBUG: AdministrarePersonal component initializing...");
         try
         {
             await LoadInitialData();
             InitializeFilterOptions();
-            Console.WriteLine("DEBUG: AdministrarePersonal component initialization complete");
+            Logger.LogDebug("DEBUG: AdministrarePersonal component initialization complete");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR: AdministrarePersonal initialization failed: {ex.Message}");
+            Logger.LogError(ex, "ERROR: AdministrarePersonal initialization failed");
             _state.SetError("Eroare la incarcarea datelor initiale");
         }
     }
@@ -86,13 +88,13 @@ public partial class AdministrarePersonal : ComponentBase
             // Load dropdown options
             _state.DropdownOptions = await PersonalService.GetDropdownOptionsAsync();
 
-            Console.WriteLine($"DEBUG: Loaded {personalData.Data.Count()} personal records with statistics");
+            Logger.LogDebug("DEBUG: Loaded {RecordCount} personal records with statistics", personalData.Data.Count());
             _state.SetError(null);
         }
         catch (Exception ex)
         {
             var errorMessage = "Nu s-au putut incarca datele personalului";
-            Console.WriteLine($"Error loading personal data: {ex.Message}");
+            Logger.LogError(ex, "Error loading personal data");
             _state.SetError(errorMessage);
             await ShowToast("Eroare", errorMessage, "e-toast-danger");
         }
@@ -168,7 +170,7 @@ public partial class AdministrarePersonal : ComponentBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error applying filters: {ex.Message}");
+            Logger.LogError(ex, "Error applying filters");
             await ShowToast("Eroare", "Eroare la aplicarea filtrelor", "e-toast-danger");
         }
     }
@@ -198,7 +200,7 @@ public partial class AdministrarePersonal : ComponentBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Export error: {ex.Message}");
+            Logger.LogError(ex, "Export error");
             await ShowToast("Eroare Export", "Eroare la exportul datelor", "e-toast-danger");
         }
     }
@@ -211,7 +213,7 @@ public partial class AdministrarePersonal : ComponentBase
     {
         try
         {
-            Console.WriteLine($"DEBUG: Opening modal for personal {personal.NumeComplet}");
+            Logger.LogDebug("DEBUG: Opening modal for personal {PersonalName}", personal.NumeComplet);
             _state.SelectedPersonal = personal;
             _state.IsModalVisible = true;
             StateHasChanged();
@@ -220,7 +222,7 @@ public partial class AdministrarePersonal : ComponentBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR: Error showing personal detail modal: {ex.Message}");
+            Logger.LogError(ex, "ERROR: Error showing personal detail modal");
             await ShowToast("Eroare", "Eroare la afisarea detaliilor", "e-toast-danger");
         }
     }
@@ -235,7 +237,7 @@ public partial class AdministrarePersonal : ComponentBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error closing modal: {ex.Message}");
+            Logger.LogError(ex, "Error closing modal");
             _state.IsModalVisible = false;
             _state.SelectedPersonal = null;
             StateHasChanged();
@@ -260,6 +262,14 @@ public partial class AdministrarePersonal : ComponentBase
         StateHasChanged();
     }
 
+    private void OnAddEditModalClosed()
+    {
+        _state.IsAddEditModalVisible = false;
+        _state.EditingPersonal = null;
+        _state.IsEditMode = false;
+        StateHasChanged();
+    }
+
     #endregion
 
     #region Add/Edit Personal Modal
@@ -268,17 +278,22 @@ public partial class AdministrarePersonal : ComponentBase
     {
         try
         {
-            Console.WriteLine("DEBUG: Opening Add Personal Modal");
+            Logger.LogDebug("DEBUG ShowAddPersonalModal: Starting to show add personal modal");
             _state.IsEditMode = false;
             _state.EditingPersonal = _models.CreateNewPersonal();
             _state.IsAddEditModalVisible = true;
+            
+            Logger.LogDebug("DEBUG ShowAddPersonalModal: Modal configuration - IsEditMode: {IsEditMode}, PersonalId: {PersonalId}, IsAddEditModalVisible: {IsModalVisible}", 
+                _state.IsEditMode, _state.EditingPersonal.Id_Personal, _state.IsAddEditModalVisible);
+            
             StateHasChanged();
 
             await ShowToast("Personal nou", "Completeaza formularul pentru a adauga personal nou", "e-toast-info");
+            Logger.LogDebug("DEBUG ShowAddPersonalModal: Modal opened successfully");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR: Error showing add personal modal: {ex.Message}");
+            Logger.LogError(ex, "ERROR ShowAddPersonalModal: Error showing add personal modal");
             await ShowToast("Eroare", "Eroare la deschiderea formularului de adaugare", "e-toast-danger");
         }
     }
@@ -287,17 +302,23 @@ public partial class AdministrarePersonal : ComponentBase
     {
         try
         {
+            Logger.LogDebug("DEBUG ShowEditPersonalModal: Starting to show edit modal for {PersonalName}", personal.NumeComplet);
             _state.IsEditMode = true;
             _state.EditingPersonal = _models.ClonePersonal(personal);
-            _state.SelectedPersonalForEdit = personal; // P?str?m personalul original pentru referin??
+            _state.SelectedPersonalForEdit = personal; // Păstrăm personalul original pentru referință
             _state.IsAddEditModalVisible = true;
+            
+            Logger.LogDebug("DEBUG ShowEditPersonalModal: Modal configuration - IsEditMode: {IsEditMode}, EditingPersonalId: {EditingPersonalId}, SelectedPersonalForEditId: {SelectedPersonalId}, IsAddEditModalVisible: {IsModalVisible}", 
+                _state.IsEditMode, _state.EditingPersonal.Id_Personal, personal.Id_Personal, _state.IsAddEditModalVisible);
+            
             StateHasChanged();
 
             await ShowToast("Editare personal", $"Modificati informatiile pentru {personal.NumeComplet}", "e-toast-info");
+            Logger.LogDebug("DEBUG ShowEditPersonalModal: Edit modal opened successfully");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error showing edit personal modal: {ex.Message}");
+            Logger.LogError(ex, "ERROR ShowEditPersonalModal: Error showing edit personal modal");
             await ShowToast("Eroare", "Eroare la deschiderea formularului de editare", "e-toast-danger");
         }
     }
@@ -313,7 +334,7 @@ public partial class AdministrarePersonal : ComponentBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error closing add/edit modal: {ex.Message}");
+            Logger.LogError(ex, "Error closing add/edit modal");
             _state.IsAddEditModalVisible = false;
             _state.EditingPersonal = null;
             _state.IsEditMode = false;
@@ -321,60 +342,127 @@ public partial class AdministrarePersonal : ComponentBase
         }
     }
 
-    private void OnAddEditModalClosed()
-    {
-        _state.IsAddEditModalVisible = false;
-        _state.EditingPersonal = null;
-        _state.IsEditMode = false;
-        StateHasChanged();
-    }
-
-    private async Task SavePersonal()
+    private async Task SavePersonal(PersonalModel personalModel)
     {
         try
         {
             _state.SetLoading(true);
             StateHasChanged();
 
+            Logger.LogDebug("DEBUG SavePersonal: Starting save process for {PersonalName}", personalModel.NumeComplet);
+            Logger.LogInformation("Starting save process for {PersonalName}", personalModel.NumeComplet);
+            Logger.LogDebug("DEBUG SavePersonal: Save details - IsEditMode: {IsEditMode}, PersonalId: {PersonalId}, CNP: {CNP}, Departament: {Departament}, Functia: {Functia}", 
+                _state.IsEditMode, personalModel.Id_Personal, personalModel.CNP, personalModel.Departament, personalModel.Functia);
+
+            ValyanClinic.Application.Services.PersonalResult result;
+            
             if (_state.IsEditMode && _state.EditingPersonal != null)
             {
-                // TODO: Implement actual update logic
-                await ShowToast("Actualizare", $"Personalul {_state.EditingPersonal.NumeComplet} a fost actualizat cu succes", "e-toast-success");
+                // Update existing personal
+                Logger.LogDebug("DEBUG SavePersonal: Updating existing personal {PersonalName}", personalModel.NumeComplet);
+                Logger.LogInformation("Updating existing personal {PersonalName} with ID {PersonalId}", 
+                    personalModel.NumeComplet, personalModel.Id_Personal);
+                Logger.LogDebug("DEBUG SavePersonal: Original personal ID = {OriginalPersonalId}, Calling PersonalService.UpdatePersonalAsync...", 
+                    _state.EditingPersonal.Id_Personal);
+                
+                result = await PersonalService.UpdatePersonalAsync(personalModel, "current_user");
+                
+                Logger.LogDebug("DEBUG SavePersonal: UpdatePersonalAsync returned - IsSuccess: {IsSuccess}, ErrorMessage: {ErrorMessage}", 
+                    result.IsSuccess, result.ErrorMessage ?? "NULL");
+                Logger.LogInformation("UpdatePersonalAsync returned. IsSuccess = {IsSuccess}", result.IsSuccess);
+                
+                if (result.IsSuccess)
+                {
+                    Logger.LogDebug("DEBUG SavePersonal: Update successful!");
+                    Logger.LogInformation("Personal {PersonalName} updated successfully", personalModel.NumeComplet);
+                    await ShowToast("Actualizare reușită", $"Personalul {personalModel.NumeComplet} a fost actualizat cu succes", "e-toast-success");
+                }
+                else
+                {
+                    Logger.LogError("ERROR SavePersonal: Update failed with error: {Error}", result.ErrorMessage);
+                    Logger.LogError("Failed to update personal {PersonalName}: {Error}", 
+                        personalModel.NumeComplet, result.ErrorMessage);
+                    await ShowToast("Eroare actualizare", result.ErrorMessage ?? "Eroare necunoscută la actualizare", "e-toast-danger");
+                    return;
+                }
             }
-            else if (_state.EditingPersonal != null)
+            else
             {
-                // TODO: Implement actual create logic  
-                await ShowToast("Creare", $"Personalul {_state.EditingPersonal.NumeComplet} a fost creat cu succes", "e-toast-success");
+                // Create new personal
+                Logger.LogDebug("DEBUG SavePersonal: Creating new personal {PersonalName}", personalModel.NumeComplet);
+                Logger.LogInformation("Creating new personal {PersonalName} with ID {PersonalId}", 
+                    personalModel.NumeComplet, personalModel.Id_Personal);
+                Logger.LogDebug("DEBUG SavePersonal: New personal ID = {NewPersonalId}, Calling PersonalService.CreatePersonalAsync...", 
+                    personalModel.Id_Personal);
+                
+                result = await PersonalService.CreatePersonalAsync(personalModel, "current_user");
+                
+                Logger.LogDebug("DEBUG SavePersonal: CreatePersonalAsync returned - IsSuccess: {IsSuccess}, ErrorMessage: {ErrorMessage}", 
+                    result.IsSuccess, result.ErrorMessage ?? "NULL");
+                Logger.LogInformation("CreatePersonalAsync returned. IsSuccess = {IsSuccess}", result.IsSuccess);
+                
+                if (result.IsSuccess)
+                {
+                    Logger.LogDebug("DEBUG SavePersonal: Create successful!");
+                    Logger.LogInformation("Personal {PersonalName} created successfully", personalModel.NumeComplet);
+                    await ShowToast("Creare reușită", $"Personalul {personalModel.NumeComplet} a fost creat cu succes", "e-toast-success");
+                }
+                else
+                {
+                    Logger.LogError("ERROR SavePersonal: Create failed with error: {Error}", result.ErrorMessage);
+                    Logger.LogError("Failed to create personal {PersonalName}: {Error}", 
+                        personalModel.NumeComplet, result.ErrorMessage);
+                    await ShowToast("Eroare creare", result.ErrorMessage ?? "Eroare necunoscută la creare", "e-toast-danger");
+                    return;
+                }
             }
 
-            await Task.Delay(1000); // Simulate processing time
+            Logger.LogDebug("DEBUG SavePersonal: Closing modal and refreshing data...");
+            Logger.LogInformation("Save process completed successfully for {PersonalName}", personalModel.NumeComplet);
+            // Close modal and refresh data
             await CloseAddEditModal();
-            await LoadInitialData(); // Refresh the grid
+            await LoadInitialData(); // Refresh the grid with new data
+            Logger.LogDebug("DEBUG SavePersonal: Save process completed successfully!");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error saving personal: {ex.Message}");
+            Logger.LogError(ex, "ERROR SavePersonal: Exception occurred while saving personal {PersonalName}", personalModel?.NumeComplet ?? "Unknown");
             await ShowToast("Eroare", $"Eroare la salvarea personalului: {ex.Message}", "e-toast-danger");
         }
         finally
         {
             _state.SetLoading(false);
             StateHasChanged();
+            Logger.LogDebug("DEBUG SavePersonal: Finally block - Loading set to false");
         }
     }
 
-    // Metod? pentru a fi apelat? de butonul submit din footer
+    // Metoda pentru a fi apelată de butonul submit din footer
     private async Task OnFormSubmit()
     {
         try
         {
-            // În loc să căutăm un form specific, să deleghum salvarea direct la componenta AdaugaEditezaPersonal
-            // Componenta copil va gestiona propria validare și submit
-            await SavePersonal();
+            Logger.LogDebug("DEBUG OnFormSubmit: Form submit triggered from footer button");
+            Logger.LogDebug("DEBUG OnFormSubmit: _state.EditingPersonal is {IsNotNull}, _state.IsEditMode = {IsEditMode}", 
+                _state.EditingPersonal != null ? "NOT NULL" : "NULL", _state.IsEditMode);
+            
+            if (_state.EditingPersonal != null)
+            {
+                Logger.LogDebug("DEBUG OnFormSubmit: EditingPersonal details - ID: {Id}, NumeComplet: {NumeComplet}, CNP: {CNP}, Departament: {Departament}, Calling SavePersonal...", 
+                    _state.EditingPersonal.Id_Personal, _state.EditingPersonal.NumeComplet, _state.EditingPersonal.CNP, _state.EditingPersonal.Departament);
+                
+                await SavePersonal(_state.EditingPersonal);
+                Logger.LogDebug("DEBUG OnFormSubmit: SavePersonal completed");
+            }
+            else
+            {
+                Logger.LogError("ERROR OnFormSubmit: EditingPersonal is null - cannot save!");
+                await ShowToast("Eroare", "Nu există date pentru salvare", "e-toast-danger");
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in OnFormSubmit: {ex.Message}");
+            Logger.LogError(ex, "ERROR OnFormSubmit: Exception in OnFormSubmit");
             await ShowToast("Eroare", "Eroare la trimiterea formularului", "e-toast-danger");
         }
     }
@@ -391,7 +479,7 @@ public partial class AdministrarePersonal : ComponentBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error editing personal: {ex.Message}");
+            Logger.LogError(ex, "Error editing personal");
             await ShowToast("Eroare", "Eroare la editarea personalului", "e-toast-danger");
         }
     }
@@ -411,7 +499,7 @@ public partial class AdministrarePersonal : ComponentBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error deleting personal: {ex.Message}");
+            Logger.LogError(ex, "Error deleting personal");
             await ShowToast("Eroare", "Eroare la stergerea personalului", "e-toast-danger");
         }
     }
@@ -548,13 +636,33 @@ public partial class AdministrarePersonal : ComponentBase
         {
             try
             {
-                // Enhanced JavaScript call with proper error handling
-                await JSRuntime.InvokeVoidAsync("window.addClickEventListener", 
-                    DotNetObjectReference.Create(this));
+                // Check if the JavaScript function exists before calling it
+                var functionExists = await JSRuntime.InvokeAsync<bool>("eval", "typeof window.addClickEventListener === 'function'");
+                
+                if (functionExists)
+                {
+                    await JSRuntime.InvokeVoidAsync("window.addClickEventListener", 
+                        DotNetObjectReference.Create(this));
+                }
+                else
+                {
+                    // Try again after a short delay to allow scripts to load
+                    await Task.Delay(100);
+                    try
+                    {
+                        await JSRuntime.InvokeVoidAsync("window.addClickEventListener", 
+                            DotNetObjectReference.Create(this));
+                    }
+                    catch (Exception retryEx)
+                    {
+                        Logger.LogDebug("JavaScript helper functions not available yet: {Error}", retryEx.Message);
+                        // Kebab menu will still work without outside click functionality
+                    }
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Could not add click event listener: {ex.Message}");
+                Logger.LogDebug("JavaScript helper functions not ready: {Error}", ex.Message);
                 // Non-critical error - kebab menu will still work, just won't close on outside click
             }
         }

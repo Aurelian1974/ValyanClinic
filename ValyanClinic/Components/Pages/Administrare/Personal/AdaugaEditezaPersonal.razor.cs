@@ -36,7 +36,6 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
     private int _currentStep = 1;
     private int _totalSteps = 5;
     private List<string> _validationErrors = new();
-    private SfToast _toastRef = default!;
     
     // Auto-save functionality
     private Timer? _autoSaveTimer;
@@ -80,7 +79,6 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error initializing AdaugaEditezaPersonal component");
-            await ShowErrorToast("Eroare la inițializarea formularului", ex.Message);
         }
     }
 
@@ -101,12 +99,22 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
     #region Initialization
     private async Task InitializeFormData()
     {
+        await JSRuntime.InvokeVoidAsync("console.log", "[INIT_FORM] === INITIALIZING FORM DATA ===");
+        
         if (IsEditMode && EditingPersonal != null)
         {
+            await JSRuntime.InvokeVoidAsync("console.log", $"[INIT_FORM] EDIT MODE - EditingPersonal CNP: '{EditingPersonal.CNP}'");
+            await JSRuntime.InvokeVoidAsync("console.log", $"[INIT_FORM] EDIT MODE - EditingPersonal ID: '{EditingPersonal.Id_Personal}'");
+            
             _personalModel = PersonalFormModel.FromPersonal(EditingPersonal);
+            
+            await JSRuntime.InvokeVoidAsync("console.log", $"[INIT_FORM] AFTER FromPersonal - _personalModel CNP: '{_personalModel.CNP}'");
+            await JSRuntime.InvokeVoidAsync("console.log", $"[INIT_FORM] AFTER FromPersonal - _personalModel ID: '{_personalModel.Id_Personal}'");
         }
         else
         {
+            await JSRuntime.InvokeVoidAsync("console.log", "[INIT_FORM] CREATE MODE - Creating new PersonalFormModel");
+            
             _personalModel = new PersonalFormModel
             {
                 Id_Personal = Guid.NewGuid(),
@@ -117,9 +125,12 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
                 Nationalitate = "Română",
                 Cetatenie = "Română"
             };
+            
+            await JSRuntime.InvokeVoidAsync("console.log", $"[INIT_FORM] CREATE MODE - New _personalModel ID: '{_personalModel.Id_Personal}'");
         }
 
         await InvokeAsync(StateHasChanged);
+        await JSRuntime.InvokeVoidAsync("console.log", "[INIT_FORM] === FORM DATA INITIALIZED ===");
     }
 
     private async Task LoadDropdownData()
@@ -286,8 +297,6 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
         // Navighează la pasul următor doar dacă nu suntem la ultimul pas
         if (_currentStep < _totalSteps)
         {
-            await ClearAllToasts();
-            
             _currentStep++;
             await SaveDraft();
             await InvokeAsync(StateHasChanged);
@@ -299,8 +308,6 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
         // Navighează la pasul anterior doar dacă nu suntem la primul pas
         if (_currentStep > 1)
         {
-            await ClearAllToasts();
-            
             _currentStep--;
             await InvokeAsync(StateHasChanged);
         }
@@ -353,7 +360,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
             var age = CalculateAge(birthDate.Value);
             if (age < 16 || age > 70)
             {
-                await ShowWarningToast("Vârstă neobișnuită", $"Persoana are {age} ani. Verificați data nașterii.");
+                Logger.LogWarning("Unusual age detected: {Age} years", age);
             }
         }
         await InvokeAsync(StateHasChanged);
@@ -389,8 +396,11 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
 
     private async Task SaveDraft()
     {
-        await AutoSave();
-        await ShowSuccessToast("Draft salvat", "Progresul a fost salvat cu succes.");
+        if (!_isAutoSaving)
+        {
+            await AutoSave();
+            // Nu mai afișăm toast pentru draft manual - doar pentru auto-save
+        }
     }
     #endregion
 
@@ -404,50 +414,114 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
 
     private async Task HandleFinalSubmit()
     {
+        Logger.LogDebug("DEBUG HandleFinalSubmit: Starting final submit process");
+        
+        // DEBUGGING CNP ÎNAINTE ȘI DUPĂ CONVERSIE
+        await JSRuntime.InvokeVoidAsync("console.log", $"[HANDLE_SUBMIT] PersonalFormModel CNP: '{_personalModel.CNP}'");
+        await JSRuntime.InvokeVoidAsync("console.log", $"[HANDLE_SUBMIT] PersonalFormModel Id: '{_personalModel.Id_Personal}'");
+        
+        // ADAUGĂ TEST CNP LOCAL PENTRU DEBUGGING
+        await TestCNPValidationLocal(_personalModel.CNP);
+        
         if (!CanSubmitForm())
         {
-            await ShowErrorToast("Formular incomplet", "Te rugăm să completezi toate câmpurile obligatorii.");
+            Logger.LogWarning("DEBUG HandleFinalSubmit: Form validation failed - CanSubmitForm returned false");
+            Logger.LogWarning("Form validation failed - missing required fields");
+            
+            // Log what fields are missing
+            Logger.LogDebug("DEBUG HandleFinalSubmit: Field validation - Nume: {Nume}, Prenume: {Prenume}, CNP: {CNP}, Cod_Angajat: {Cod_Angajat}, Departament: {Departament}, Functia: {Functia}", 
+                _personalModel.Nume, _personalModel.Prenume, _personalModel.CNP, _personalModel.Cod_Angajat, _personalModel.Departament, _personalModel.Functia);
+            
             return;
         }
 
         try
         {
+            Logger.LogDebug("DEBUG HandleFinalSubmit: Form validation passed, converting to PersonalModel");
+            
             var personalModel = _personalModel.ToPersonal();
+            
+            await JSRuntime.InvokeVoidAsync("console.log", $"[HANDLE_SUBMIT] PersonalModel CNP: '{personalModel.CNP}'");
+            await JSRuntime.InvokeVoidAsync("console.log", $"[HANDLE_SUBMIT] PersonalModel Id: '{personalModel.Id_Personal}'");
+            
+            Logger.LogDebug("DEBUG HandleFinalSubmit: PersonalModel created successfully - NumeComplet: {NumeComplet}, Id_Personal: {Id_Personal}, CNP: {CNP}, Departament: {Departament}", 
+                personalModel.NumeComplet, personalModel.Id_Personal, personalModel.CNP, personalModel.Departament);
+            
+            Logger.LogDebug("DEBUG HandleFinalSubmit: Calling OnSave.InvokeAsync...");
+            Logger.LogInformation("Calling OnSave callback with personal data: {PersonalName}", personalModel.NumeComplet);
+            
             await OnSave.InvokeAsync(personalModel);
+            Logger.LogDebug("DEBUG HandleFinalSubmit: OnSave.InvokeAsync completed successfully");
         }
         catch (Exception ex)
         {
+            Logger.LogError(ex, "ERROR HandleFinalSubmit: Exception occurred");
             Logger.LogError(ex, "Error submitting form");
-            await ShowErrorToast("Eroare la salvare", ex.Message);
+        }
+    }
+
+    private async Task TestCNPValidationLocal(string cnp)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Testing CNP validation for: '{cnp}'");
+            
+            if (string.IsNullOrWhiteSpace(cnp))
+            {
+                await JSRuntime.InvokeVoidAsync("console.log", "[FRONTEND] CNP is null or empty");
+                return;
+            }
+
+            var cleanCnp = cnp.Replace(" ", "").Replace("-", "");
+            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Cleaned CNP: '{cleanCnp}', Length: {cleanCnp.Length}");
+
+            if (cleanCnp.Length != 13)
+            {
+                await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Invalid length: {cleanCnp.Length}");
+                return;
+            }
+
+            if (!cleanCnp.All(char.IsDigit))
+            {
+                await JSRuntime.InvokeVoidAsync("console.log", "[FRONTEND] Contains non-digit characters");
+                return;
+            }
+
+            var weights = new[] { 2, 7, 9, 1, 4, 6, 3, 5, 8, 2, 7, 9 };
+            var sum = 0;
+
+            await JSRuntime.InvokeVoidAsync("console.log", "[FRONTEND] Starting calculation:");
+            for (int i = 0; i < 12; i++)
+            {
+                var digit = int.Parse(cleanCnp[i].ToString());
+                var weight = weights[i];
+                var product = digit * weight;
+                sum += product;
+                await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Position {i + 1}: {digit} × {weight} = {product}, Sum: {sum}");
+            }
+
+            var remainder = sum % 11;
+            var checkDigit = remainder == 10 ? 1 : remainder;
+            var actualLastDigit = int.Parse(cleanCnp[12].ToString());
+
+            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Total sum: {sum}");
+            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Remainder: {remainder}");
+            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Check digit: {checkDigit}");
+            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Actual last digit: {actualLastDigit}");
+
+            var isValid = checkDigit == actualLastDigit;
+            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] CNP is {(isValid ? "VALID" : "INVALID")}");
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Exception: {ex.Message}");
         }
     }
 
     private async Task HandleCancel()
     {
-        // Închide toate toasturile înainte de anulare
-        await ClearAllToasts();
         await OnCancel.InvokeAsync();
     }
-    #endregion
-
-    #region Toast Management
-    
-    private async Task ClearAllToasts()
-    {
-        try
-        {
-            if (_toastRef != null)
-            {
-                // Use Hide method for each toast instead of HideAllAsync (which doesn't exist)
-                await _toastRef.HideAsync("All");
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error clearing toasts");
-        }
-    }
-    
     #endregion
 
     #region Utility Methods
@@ -515,77 +589,6 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
         };
     }
     #endregion
-
-    #region Toast Notifications
-    private async Task ShowSuccessToast(string title, string message)
-    {
-        try
-        {
-            if (_toastRef != null)
-            {
-                var toastModel = new ToastModel
-                {
-                    Title = title,
-                    Content = message,
-                    CssClass = "e-toast-success",
-                    Icon = "fas fa-check-circle",
-                    Timeout = 2000 // Reduced timeout
-                };
-                await _toastRef.ShowAsync(toastModel);
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error showing success toast");
-        }
-    }
-
-    private async Task ShowErrorToast(string title, string message)
-    {
-        try
-        {
-            if (_toastRef != null)
-            {
-                var toastModel = new ToastModel
-                {
-                    Title = title,
-                    Content = message,
-                    CssClass = "e-toast-error",
-                    Icon = "fas fa-exclamation-circle",
-                    Timeout = 4000 // Reduced timeout
-                };
-                await _toastRef.ShowAsync(toastModel);
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error showing error toast");
-        }
-    }
-
-    private async Task ShowWarningToast(string title, string message)
-    {
-        try
-        {
-            if (_toastRef != null)
-            {
-                var toastModel = new ToastModel
-                {
-                    Title = title,
-                    Content = message,
-                    CssClass = "e-toast-warning",
-                    Icon = "fas fa-exclamation-triangle",
-                    Timeout = 3000 // Reduced timeout
-                };
-                await _toastRef.ShowAsync(toastModel);
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error showing warning toast");
-        }
-    }
-    #endregion
 }
 
 #region Supporting Classes and Enums
@@ -636,7 +639,8 @@ public class PersonalFormModel
     public string Prenume { get; set; } = "";
 
     [Required(ErrorMessage = "CNP-ul este obligatoriu")]
-    [StringLength(13, MinimumLength = 13, ErrorMessage = "CNP-ul trebuie să aibă exact 13 cifre")]
+    // TEMPORAR COMENTAT PENTRU DEBUGGING
+    // [StringLength(13, MinimumLength = 13, ErrorMessage = "CNP-ul trebuie să aibă exact 13 cifre")]
     public string CNP { get; set; } = "";
 
     [Required(ErrorMessage = "Codul angajatului este obligatoriu")]
@@ -746,7 +750,11 @@ public class PersonalFormModel
 
     public PersonalModel ToPersonal()
     {
-        return new PersonalModel
+        System.Diagnostics.Debug.WriteLine($"[TO_PERSONAL] Converting PersonalFormModel to PersonalModel");
+        System.Diagnostics.Debug.WriteLine($"[TO_PERSONAL] Input CNP: '{CNP}'");
+        System.Diagnostics.Debug.WriteLine($"[TO_PERSONAL] Input Id_Personal: '{Id_Personal}'");
+        
+        var result = new PersonalModel
         {
             Id_Personal = Id_Personal,
             Nume = Nume,
@@ -784,7 +792,7 @@ public class PersonalFormModel
             Functia = Functia,
             
             // Documents
-            Serie_CI = Serie_CI,
+           Serie_CI = Serie_CI,
             Numar_CI = Numar_CI,
             Eliberat_CI_De = Eliberat_CI_De,
             Data_Eliberare_CI = Data_Eliberare_CI,
@@ -792,6 +800,11 @@ public class PersonalFormModel
             
             Observatii = Observatii
         };
+        
+        System.Diagnostics.Debug.WriteLine($"[TO_PERSONAL] Output CNP: '{result.CNP}'");
+        System.Diagnostics.Debug.WriteLine($"[TO_PERSONAL] Output Id_Personal: '{result.Id_Personal}'");
+        
+        return result;
     }
 }
 #endregion

@@ -46,12 +46,14 @@ try
         // Continuă cu bootstrap logger
     }
 
-    // CONFIGURARE ENCODING COMPLET? PENTRU DIACRITICE ROMÂNE?TI
+    // CONFIGURARE ENCODING COMPLET PENTRU DIACRITICE ROMÂNEȘTI
     Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+    // Păstrăm Console encoding pentru suportul UTF-8 în output
     Console.OutputEncoding = Encoding.UTF8;
     Console.InputEncoding = Encoding.UTF8;
+    Log.Information("✅ Console encoding configured for UTF-8 support");
 
-    // Setare cultur? implicit? înainte de orice altceva
+    // Setare cultură implicită înainte de orice altceva
     Thread.CurrentThread.CurrentCulture = new CultureInfo("ro-RO");
     Thread.CurrentThread.CurrentUICulture = new CultureInfo("ro-RO");
 
@@ -137,7 +139,7 @@ try
     })
     .ConfigureApiBehaviorOptions(options =>
     {
-        // Configur?ri pentru UTF-8
+        // Configurări pentru UTF-8
     });
 
     // Configure JSON cu UTF-8
@@ -178,6 +180,9 @@ try
 
     // Background services
     builder.Services.AddHostedService<StockMonitoringBackgroundService>();
+    
+    // OPTIONAL: Add Log Cleanup as Hosted Service (commented out to use callback approach)
+    // builder.Services.AddHostedService<ValyanClinic.Services.LogCleanupHostedService>();
 
     Log.Information("✅ Application services configured");
 
@@ -186,6 +191,9 @@ try
 
     // Localization services
     builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+    // Register Application Log Preservation Service (renamed from LogCleanupService)
+    builder.Services.AddSingleton<LogCleanupService>();
 
     Log.Information("✅ All services registered successfully");
 
@@ -326,6 +334,37 @@ try
     app.MapRazorComponents<App>()
         .AddInteractiveServerRenderMode();
 
+    // CONFIGURE LOG CLEANUP ON SHUTDOWN
+    var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+    var logCleanupService = app.Services.GetRequiredService<LogCleanupService>();
+    
+    // Register shutdown callbacks
+    lifetime.ApplicationStopping.Register(() =>
+    {
+        Log.Information("📊 Application stopping - preparing log preservation");
+        try
+        {
+            logCleanupService.PrepareForShutdown();
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Warning: Error preparing log preservation");
+        }
+    });
+    
+    lifetime.ApplicationStopped.Register(() =>
+    {
+        try
+        {
+            logCleanupService.CleanupLogsOnShutdown();
+            Log.Information("✅ Log files preserved successfully on shutdown");
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Warning: Error preserving logs");
+        }
+    });
+
     Log.Information("🌟 ValyanClinic application configured successfully");
     Log.Information("🌐 Listening on: https://localhost:7164 and http://localhost:5007");
 
@@ -339,4 +378,102 @@ finally
 {
     Log.Information("🏁 ValyanClinic application shutdown complete");
     await Log.CloseAndFlushAsync();
+}
+
+/// <summary>
+/// Service pentru păstrarea fișierelor de log la shutdown - NU MAI ȘTERGE LOG-URILE
+/// </summary>
+public class LogCleanupService
+{
+    private readonly ILogger<LogCleanupService> _logger;
+    private readonly string _logsDirectory;
+    private bool _shutdownPrepared = false;
+
+    public LogCleanupService(ILogger<LogCleanupService> logger, IWebHostEnvironment environment)
+    {
+        _logger = logger;
+        _logsDirectory = Path.Combine(environment.ContentRootPath, "Logs");
+    }
+
+    public void PrepareForShutdown()
+    {
+        _logger.LogInformation("🔄 Preparing log preservation - flushing all pending logs");
+        
+        try
+        {
+            // Flush Serilog to ensure all logs are written
+            Log.CloseAndFlush();
+            _shutdownPrepared = true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error flushing logs during shutdown preparation");
+        }
+    }
+
+    public void CleanupLogsOnShutdown()
+    {
+        if (!_shutdownPrepared)
+        {
+            _logger.LogWarning("Warning: Shutdown not properly prepared, logs will be preserved anyway");
+        }
+
+        try
+        {
+            if (!Directory.Exists(_logsDirectory))
+            {
+                _logger.LogWarning("Logs directory does not exist: {LogsDirectory}", _logsDirectory);
+                return;
+            }
+
+            _logger.LogInformation("📊 Preserving logs in directory: {LogsDirectory}", _logsDirectory);
+
+            // Get all log files - DOAR PENTRU RAPORTARE, NU PENTRU ȘTERGERE
+            var logFiles = Directory.GetFiles(_logsDirectory, "*.log", SearchOption.AllDirectories);
+            var preservedCount = 0;
+            var totalSize = 0L;
+
+            foreach (var logFile in logFiles)
+            {
+                try
+                {
+                    var fileInfo = new FileInfo(logFile);
+                    totalSize += fileInfo.Length;
+                    preservedCount++;
+                    _logger.LogInformation("✅ Preserved log file: {FileName} ({Size})", 
+                        Path.GetFileName(logFile), FormatBytes(fileInfo.Length));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning("⚠️ Could not read info for {FileName}: {Error}", 
+                        Path.GetFileName(logFile), ex.Message);
+                }
+            }
+
+            _logger.LogInformation("🎯 Log preservation summary: {PreservedCount} files preserved, total size: {TotalSize}", 
+                preservedCount, FormatBytes(totalSize));
+            _logger.LogInformation("💡 All logs have been preserved for debugging and analysis purposes");
+            _logger.LogInformation("📍 Log directory: {LogDirectory}", _logsDirectory);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ General error during log preservation check");
+        }
+    }
+
+    private static string FormatBytes(long bytes)
+    {
+        const int scale = 1024;
+        string[] orders = { "GB", "MB", "KB", "Bytes" };
+        long max = (long)Math.Pow(scale, orders.Length - 1);
+
+        foreach (string order in orders)
+        {
+            if (bytes > max)
+                return string.Format("{0:##.##} {1}", decimal.Divide(bytes, max), order);
+
+            max /= scale;
+        }
+        return "0 Bytes";
+    }
 }

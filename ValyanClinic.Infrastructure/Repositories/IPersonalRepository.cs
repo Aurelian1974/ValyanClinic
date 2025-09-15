@@ -37,4 +37,7 @@ public interface IPersonalRepository
     Task<IEnumerable<(string Value, string Text)>> GetFunctiiAsync();
     
     Task<IEnumerable<(string Value, string Text)>> GetJudeteAsync();
+    
+    // Test method for debugging database connectivity issues
+    Task<bool> TestDatabaseConnectionAsync();
 }
