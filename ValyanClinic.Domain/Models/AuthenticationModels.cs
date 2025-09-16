@@ -81,8 +81,8 @@ public class UserSession
     public UserStatus Status { get; init; } = UserStatus.Active;
 
     // Domain Logic Methods - în loc de simple properties
-    public string GetRoleDisplayName() => Role.GetDisplayName();
-    public string GetStatusDisplayName() => Status.GetDisplayName();
+    public string GetRoleDisplayName() => ((Enum)Role).GetDisplayName();
+    public string GetStatusDisplayName() => ((Enum)Status).GetDisplayName();
     
     public bool IsAdmin => Role == UserRole.Administrator;
     public bool IsDoctor => Role == UserRole.Doctor;
@@ -204,21 +204,4 @@ public class DemoUser
         LoginTime = DateTime.Now,
         Status = Status
     };
-}
-
-/// <summary>
-/// Extension methods pentru Enums
-/// </summary>
-public static class EnumExtensions
-{
-    public static string GetDisplayName(this Enum enumValue)
-    {
-        var displayAttribute = enumValue.GetType()
-            .GetMember(enumValue.ToString())
-            .FirstOrDefault()
-            ?.GetCustomAttributes(typeof(DisplayAttribute), false)
-            .FirstOrDefault() as DisplayAttribute;
-
-        return displayAttribute?.Name ?? enumValue.ToString();
-    }
 }

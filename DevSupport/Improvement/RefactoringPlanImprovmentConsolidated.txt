@@ -36,8 +36,6 @@ După verificarea completă a documentelor, iată lista finală ordonată după 
 
 🟡 IMPORTANTE - Arhitectură
 11.	CSS Reorganizare - Max 2 culori
-•	Eliminare patient-list.css (500+ linii)
-•	Doar radzen-theme.css cu 2 culori
 12.	Rich Services Implementation
 •	Services cu business logic, nu doar forwarding
 •	Validări, calcule, domain events

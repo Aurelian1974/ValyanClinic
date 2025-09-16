@@ -312,14 +312,14 @@ public class SecurityAuditService : ISecurityAuditService
     {
         await Task.CompletedTask;
         _logger.LogInformation("Successful login: {Username} ({Role}) at {Timestamp}", 
-            username, role.GetDisplayName(), DateTime.Now);
+            username, ((Enum)role).GetDisplayName(), DateTime.Now);
     }
 
     public async Task LogFailedLoginAsync(string username, LoginFailureReason reason)
     {
         await Task.CompletedTask;
         _logger.LogWarning("Failed login: {Username} - {Reason} at {Timestamp}", 
-            username, reason.GetDisplayName(), DateTime.Now);
+            username, ((Enum)reason).GetDisplayName(), DateTime.Now);
     }
 
     public async Task LogValidationFailureAsync(string username, List<string> errors)

@@ -1,22 +1,10 @@
 ﻿using ValyanClinic.Components;
-using Microsoft.FluentUI.AspNetCore.Components;
-using FluentValidation;
-using ValyanClinic.Core.Services;
-using ValyanClinic.Core.HealthChecks;
-using ValyanClinic.Core.Middleware;
 using ValyanClinic.Application.Services;
-using ValyanClinic.Components.Pages.LoginPage;
-using ValyanClinic.Domain.Models;
-using Syncfusion.Blazor;
-using System.Text;
-using System.Globalization;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.Data.SqlClient;
-using System.Data;
-using Dapper;
-using Serilog;
-using Serilog.Events;
+using ValyanClinic.Infrastructure.Extensions;
+using ValyanClinic.Core.Extensions;
 using ValyanClinic.Application.Extensions;
+using ValyanClinic.Application.Middleware; // ADĂUGAT pentru middleware excepții
+using Syncfusion.Blazor;
 
 // BOOTSTRAP LOGGER MINIMAL - PENTRU DEBUGGING
 Log.Logger = new LoggerConfiguration()

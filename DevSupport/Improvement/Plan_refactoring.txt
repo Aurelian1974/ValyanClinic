@@ -147,15 +147,10 @@ PersonalState.cs        // State management
 PersonalModels.cs       // Page-specific models
 PersonalValidators.cs   // Validations
 
-3. FARA DIACRITICE IN UI - IMPLEMENTAT
---------------------------------------
-- Toate textele din interfata sunt fara diacritice
-- Nu mai folosim a, a, i, s, t in UI
-- Folosim doar a, a, i, s, t pentru compatibilitate
-- Font rendering optimizat pentru caractere simple
 
-4. FARA MULTE culori in UI maxim 2 culori in acelasi timp
-5. FARA CSS-uri stufoase doar strictul necesar, ce nu poate sa faca Radzen, fara overide-uri
+
+3. FARA MULTE culori in UI maxim 2 culori in acelasi timp
+4. FARA CSS-uri stufoase doar strictul necesar, ce nu poate sa faca Syncfusion, fara overide-uri
 
 🚀 FUNCTIONALITATI NOI
 ---------------------
