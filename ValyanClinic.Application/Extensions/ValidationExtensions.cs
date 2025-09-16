@@ -8,16 +8,16 @@ using ValyanClinic.Domain.Entities;
 namespace ValyanClinic.Application.Extensions;
 
 /// <summary>
-/// Extension methods pentru înregistrarea validatorilor FluentValidation
+/// Extension methods pentru inregistrarea validatorilor FluentValidation
 /// </summary>
 public static class ValidationExtensions
 {
     /// <summary>
-    /// Înregistrează toate validatorii FluentValidation în DI container
+    /// Inregistreaza toate validatorii FluentValidation in DI container
     /// </summary>
     public static IServiceCollection AddFluentValidationServices(this IServiceCollection services)
     {
-        // === ÎNREGISTRARE VALIDATION SERVICE ===
+        // === INREGISTRARE VALIDATION SERVICE ===
         services.AddScoped<IValidationService, ValidationService>();
 
         // === VALIDATORI PENTRU DOMAIN MODELS ===
@@ -48,7 +48,7 @@ public static class ValidationExtensions
 
         // === CONFIGURARE FLUENT VALIDATION ===
         
-        // Adaugă FluentValidation cu detectare automată
+        // Adauga FluentValidation cu detectare automata
         services.AddValidatorsFromAssembly(typeof(PersonalValidator).Assembly, ServiceLifetime.Scoped);
         services.AddValidatorsFromAssembly(typeof(ValidationService).Assembly, ServiceLifetime.Scoped);
 
@@ -56,32 +56,32 @@ public static class ValidationExtensions
     }
 
     /// <summary>
-    /// Configurează opțiunile FluentValidation pentru întreaga aplicație
+    /// Configureaza optiunile FluentValidation pentru intreaga aplicatie
     /// </summary>
     public static IServiceCollection ConfigureFluentValidation(this IServiceCollection services)
     {
         ValidatorOptions.Global.LanguageManager.Enabled = false; // Folosim mesaje custom
-        ValidatorOptions.Global.DefaultRuleLevelCascadeMode = CascadeMode.Stop; // Oprește la prima eroare per regulă
-        ValidatorOptions.Global.DefaultClassLevelCascadeMode = CascadeMode.Continue; // Continuă cu următoarea proprietate
+        ValidatorOptions.Global.DefaultRuleLevelCascadeMode = CascadeMode.Stop; // Opreste la prima eroare per regula
+        ValidatorOptions.Global.DefaultClassLevelCascadeMode = CascadeMode.Continue; // Continua cu urmatoarea proprietate
 
         return services;
     }
 
     /// <summary>
-    /// Adaugă validatori custom specifici pentru entități complexe
+    /// Adauga validatori custom specifici pentru entitati complexe
     /// </summary>
     public static IServiceCollection AddCustomValidators(this IServiceCollection services)
     {
-        // === VALIDATORI PENTRU OPERAȚIUNI DE BUSINESS ===
+        // === VALIDATORI PENTRU OPERATIUNI DE BUSINESS ===
         
         // Exemple pentru validatori de business logic
         // services.AddScoped<AppointmentBusinessValidator>();
         // services.AddScoped<MedicalRecordBusinessValidator>();
         // services.AddScoped<PrescriptionBusinessValidator>();
 
-        // === VALIDATORI PENTRU DTO-URI ȘI VIEW MODELS ===
+        // === VALIDATORI PENTRU DTO-URI SI VIEW MODELS ===
         
-        // Când vom avea DTO-uri specifice, le vom adăuga aici
+        // Cand vom avea DTO-uri specifice, le vom adauga aici
         // services.AddScoped<IValidator<PersonalDto>, PersonalDtoValidator>();
         // services.AddScoped<IValidator<UserDto>, UserDtoValidator>();
 
@@ -89,7 +89,7 @@ public static class ValidationExtensions
     }
 
     /// <summary>
-    /// Extension method pentru configurarea completă a validării
+    /// Extension method pentru configurarea completa a validarii
     /// </summary>
     public static IServiceCollection AddValyanClinicValidation(this IServiceCollection services)
     {
@@ -101,12 +101,12 @@ public static class ValidationExtensions
 }
 
 /// <summary>
-/// Helper class pentru obținerea rapidă a validatorilor
+/// Helper class pentru obtinerea rapida a validatorilor
 /// </summary>
 public static class ValidatorHelper
 {
     /// <summary>
-    /// Obține validatorul pentru un tip specificat
+    /// Obtine validatorul pentru un tip specificat
     /// </summary>
     public static IValidator<T>? GetValidator<T>(IServiceProvider serviceProvider) where T : class
     {
@@ -114,7 +114,7 @@ public static class ValidatorHelper
     }
 
     /// <summary>
-    /// Obține validatorul de creare pentru un tip specificat
+    /// Obtine validatorul de creare pentru un tip specificat
     /// </summary>
     public static IValidator<T>? GetCreateValidator<T>(IServiceProvider serviceProvider) where T : class
     {
@@ -128,7 +128,7 @@ public static class ValidatorHelper
     }
 
     /// <summary>
-    /// Obține validatorul de actualizare pentru un tip specificat
+    /// Obtine validatorul de actualizare pentru un tip specificat
     /// </summary>
     public static IValidator<T>? GetUpdateValidator<T>(IServiceProvider serviceProvider) where T : class
     {
@@ -142,7 +142,7 @@ public static class ValidatorHelper
     }
 
     /// <summary>
-    /// Validează rapid un obiect și returnează rezultatul
+    /// Valideaza rapid un obiect si returneaza rezultatul
     /// </summary>
     public static async Task<ValidationResult> QuickValidateAsync<T>(this T entity, IServiceProvider serviceProvider) where T : class
     {
@@ -151,7 +151,7 @@ public static class ValidatorHelper
     }
 
     /// <summary>
-    /// Validează rapid un obiect pentru creare
+    /// Valideaza rapid un obiect pentru creare
     /// </summary>
     public static async Task<ValidationResult> QuickValidateForCreateAsync<T>(this T entity, IServiceProvider serviceProvider) where T : class
     {
@@ -160,7 +160,7 @@ public static class ValidatorHelper
     }
 
     /// <summary>
-    /// Validează rapid un obiect pentru actualizare
+    /// Valideaza rapid un obiect pentru actualizare
     /// </summary>
     public static async Task<ValidationResult> QuickValidateForUpdateAsync<T>(this T entity, IServiceProvider serviceProvider) where T : class
     {

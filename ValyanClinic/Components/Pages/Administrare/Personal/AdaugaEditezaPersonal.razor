@@ -11,7 +11,7 @@
 
 <div class="personal-form-container">
     <div class="form-header">
-        <h2>@(IsEditMode ? "Editează Personal" : "Adaugă Personal Nou")</h2>
+        <h2>@(IsEditMode ? "Editeaza Personal" : "Adauga Personal Nou")</h2>
     </div>
 
     @if (validationErrors.Any())
@@ -27,7 +27,7 @@
     }
 
     <EditForm Model="@personalFormModel" OnValidSubmit="HandleSubmit">
-        <!-- Secțiunea: Date de Identificare -->
+        <!-- Sectiunea: Date de Identificare -->
         <div class="form-section">
             <h3>Date de Identificare</h3>
             <div class="form-grid">
@@ -35,7 +35,7 @@
                     <label for="nume">Nume *</label>
                     <SfTextBox @bind-Value="@personalFormModel.Nume" 
                               ID="nume" 
-                              Placeholder="Introduceți numele" 
+                              Placeholder="Introduceti numele" 
                               Width="100%"
                               MaxLength="100">
                     </SfTextBox>
@@ -54,7 +54,7 @@
                     <label for="prenume">Prenume *</label>
                     <SfTextBox @bind-Value="@personalFormModel.Prenume" 
                               ID="prenume" 
-                              Placeholder="Introduceți prenumele" 
+                              Placeholder="Introduceti prenumele" 
                               Width="100%"
                               MaxLength="100">
                     </SfTextBox>
@@ -73,7 +73,7 @@
                     <label for="nume-anterior">Nume Anterior</label>
                     <SfTextBox @bind-Value="@personalFormModel.Nume_Anterior" 
                               ID="nume-anterior" 
-                              Placeholder="Pentru femei căsătorite" 
+                              Placeholder="Pentru femei casatorite" 
                               Width="100%"
                               MaxLength="100">
                     </SfTextBox>
@@ -92,7 +92,7 @@
                     <label for="cnp">CNP *</label>
                     <SfTextBox @bind-Value="@personalFormModel.CNP" 
                               ID="cnp" 
-                              Placeholder="Introduceți CNP-ul (13 cifre)" 
+                              Placeholder="Introduceti CNP-ul (13 cifre)" 
                               Width="100%"
                               MaxLength="13">
                     </SfTextBox>
@@ -127,7 +127,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="data-nasterii">Data Nașterii *</label>
+                    <label for="data-nasterii">Data Nasterii *</label>
                     <SfDatePicker @bind-Value="@personalFormModel.Data_Nasterii" 
                                  ID="data-nasterii" 
                                  Format="dd/MM/yyyy" 
@@ -145,10 +145,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="locul-nasterii">Locul Nașterii</label>
+                    <label for="locul-nasterii">Locul Nasterii</label>
                     <SfTextBox @bind-Value="@personalFormModel.Locul_Nasterii" 
                               ID="locul-nasterii" 
-                              Placeholder="Ex: București, România" 
+                              Placeholder="Ex: Bucuresti, Romania" 
                               Width="100%"
                               MaxLength="200">
                     </SfTextBox>
@@ -164,10 +164,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="nationalitate">Naționalitate</label>
+                    <label for="nationalitate">Nationalitate</label>
                     <SfTextBox @bind-Value="@personalFormModel.Nationalitate" 
                               ID="nationalitate" 
-                              Placeholder="Ex: Română" 
+                              Placeholder="Ex: Romana" 
                               Width="100%"
                               MaxLength="50">
                     </SfTextBox>
@@ -183,10 +183,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="cetatenie">Cetățenie</label>
+                    <label for="cetatenie">Cetatenie</label>
                     <SfTextBox @bind-Value="@personalFormModel.Cetatenie" 
                               ID="cetatenie" 
-                              Placeholder="Ex: Română" 
+                              Placeholder="Ex: Romana" 
                               Width="100%"
                               MaxLength="50">
                     </SfTextBox>
@@ -202,7 +202,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="stare-civila">Stare Civilă</label>
+                    <label for="stare-civila">Stare Civila</label>
                     <SfDropDownList @bind-Value="@personalFormModel.Stare_Civila" 
                                    ID="stare-civila" 
                                    DataSource="@stareCivilaOptions" 
@@ -223,9 +223,9 @@
             </div>
         </div>
 
-        <!-- Secțiunea: Informații de Contact -->
+        <!-- Sectiunea: Informatii de Contact -->
         <div class="form-section">
-            <h3>Informații de Contact</h3>
+            <h3>Informatii de Contact</h3>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="telefon-personal">Telefon Personal</label>
@@ -305,7 +305,7 @@
             </div>
         </div>
 
-        <!-- Secțiunea: Adresa de Domiciliu -->
+        <!-- Sectiunea: Adresa de Domiciliu -->
         <div class="form-section">
             <h3>Adresa de Domiciliu</h3>
             <div class="form-grid">
@@ -329,7 +329,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="judet-domiciliu">Județ Domiciliu *</label>
+                    <label for="judet-domiciliu">Judet Domiciliu *</label>
                     <SfDropDownList @bind-Value="@personalFormModel.Judet_Domiciliu" 
                                    ID="judet-domiciliu" 
                                    DataSource="@judeteOptions" 
@@ -349,10 +349,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="oras-domiciliu">Oraș Domiciliu *</label>
+                    <label for="oras-domiciliu">Oras Domiciliu *</label>
                     <SfTextBox @bind-Value="@personalFormModel.Oras_Domiciliu" 
                               ID="oras-domiciliu" 
-                              Placeholder="Ex: București" 
+                              Placeholder="Ex: Bucuresti" 
                               Width="100%"
                               MaxLength="100">
                     </SfTextBox>
@@ -368,7 +368,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="cod-postal-domiciliu">Cod Poștal Domiciliu</label>
+                    <label for="cod-postal-domiciliu">Cod Postal Domiciliu</label>
                     <SfTextBox @bind-Value="@personalFormModel.Cod_Postal_Domiciliu" 
                               ID="cod-postal-domiciliu" 
                               Placeholder="Ex: 012345" 
@@ -388,15 +388,15 @@
             </div>
         </div>
 
-        <!-- Secțiunea: Adresa de Reședință -->
+        <!-- Sectiunea: Adresa de Resedinta -->
         <div class="form-section">
-            <h3>Adresa de Reședință (dacă diferă de domiciliu)</h3>
+            <h3>Adresa de Resedinta (daca difera de domiciliu)</h3>
             <div class="form-grid">
                 <div class="form-group full-width">
-                    <label for="adresa-resedinta">Adresa Reședință</label>
+                    <label for="adresa-resedinta">Adresa Resedinta</label>
                     <SfTextBox @bind-Value="@personalFormModel.Adresa_Resedinta" 
                               ID="adresa-resedinta" 
-                              Placeholder="Completați doar dacă diferă de domiciliu" 
+                              Placeholder="Completati doar daca difera de domiciliu" 
                               Width="100%"
                               Multiline="true">
                     </SfTextBox>
@@ -412,7 +412,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="judet-resedinta">Județ Reședință</label>
+                    <label for="judet-resedinta">Judet Resedinta</label>
                     <SfDropDownList @bind-Value="@personalFormModel.Judet_Resedinta" 
                                    ID="judet-resedinta" 
                                    DataSource="@judeteOptions" 
@@ -432,7 +432,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="oras-resedinta">Oraș Reședință</label>
+                    <label for="oras-resedinta">Oras Resedinta</label>
                     <SfTextBox @bind-Value="@personalFormModel.Oras_Resedinta" 
                               ID="oras-resedinta" 
                               Placeholder="Ex: Cluj-Napoca" 
@@ -451,7 +451,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="cod-postal-resedinta">Cod Poștal Reședință</label>
+                    <label for="cod-postal-resedinta">Cod Postal Resedinta</label>
                     <SfTextBox @bind-Value="@personalFormModel.Cod_Postal_Resedinta" 
                               ID="cod-postal-resedinta" 
                               Placeholder="Ex: 400001" 
@@ -471,12 +471,12 @@
             </div>
         </div>
 
-        <!-- Secțiunea: Date Profesionale -->
+        <!-- Sectiunea: Date Profesionale -->
         <div class="form-section">
             <h3>Date Profesionale</h3>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="functia">Funcția *</label>
+                    <label for="functia">Functia *</label>
                     <SfTextBox @bind-Value="@personalFormModel.Functia" 
                               ID="functia" 
                               Placeholder="Ex: Manager, Specialist, Asistent medical" 
@@ -535,7 +535,7 @@
             </div>
         </div>
 
-        <!-- Secțiunea: Documente de Identitate -->
+        <!-- Sectiunea: Documente de Identitate -->
         <div class="form-section">
             <h3>Documente de Identitate</h3>
             <div class="form-grid">
@@ -559,7 +559,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="numar-ci">Număr CI</label>
+                    <label for="numar-ci">Numar CI</label>
                     <SfTextBox @bind-Value="@personalFormModel.Numar_CI" 
                               ID="numar-ci" 
                               Placeholder="Ex: 123456" 
@@ -581,7 +581,7 @@
                     <label for="eliberat-ci-de">Eliberat CI De</label>
                     <SfTextBox @bind-Value="@personalFormModel.Eliberat_CI_De" 
                               ID="eliberat-ci-de" 
-                              Placeholder="Ex: SPCLEP București" 
+                              Placeholder="Ex: SPCLEP Bucuresti" 
                               Width="100%"
                               MaxLength="100">
                     </SfTextBox>
@@ -615,7 +615,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="valabil-ci-pana">Valid CI Până</label>
+                    <label for="valabil-ci-pana">Valid CI Pana</label>
                     <SfDatePicker @bind-Value="@personalFormModel.Valabil_CI_Pana" 
                                  ID="valabil-ci-pana" 
                                  Format="dd/MM/yyyy" 
@@ -634,15 +634,15 @@
             </div>
         </div>
 
-        <!-- Secțiunea: Observații -->
+        <!-- Sectiunea: Observatii -->
         <div class="form-section">
-            <h3>Observații</h3>
+            <h3>Observatii</h3>
             <div class="form-grid">
                 <div class="form-group full-width">
-                    <label for="observatii">Observații</label>
+                    <label for="observatii">Observatii</label>
                     <SfTextBox @bind-Value="@personalFormModel.Observatii" 
                               ID="observatii" 
-                              Placeholder="Observații generale despre angajat..." 
+                              Placeholder="Observatii generale despre angajat..." 
                               Width="100%"
                               Multiline="true">
                     </SfTextBox>
@@ -661,10 +661,10 @@
 
         <div class="form-buttons">
             <SfButton CssClass="e-primary" IsPrimary="true" disabled="@isSubmitting">
-                @(IsEditMode ? "Actualizează" : "Adaugă") Personal
+                @(IsEditMode ? "Actualizeaza" : "Adauga") Personal
             </SfButton>
             <SfButton CssClass="e-outline" @onclick="HandleCancel">
-                Anulează
+                Anuleaza
             </SfButton>
         </div>
     </EditForm>

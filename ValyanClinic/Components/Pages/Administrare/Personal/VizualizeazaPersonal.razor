@@ -22,7 +22,7 @@
         <div class="loading-container">
             <div class="loading-indicator">
                 <i class="fas fa-spinner fa-spin"></i>
-                <span>Se încarcă...</span>
+                <span>Se incarca...</span>
             </div>
         </div>
     }
@@ -33,7 +33,7 @@
             <div class="detail-card">
                 <div class="card-header">
                     <i class="fas fa-id-card"></i>
-                    <h3>Informații Personale</h3>
+                    <h3>Informatii Personale</h3>
                 </div>
                 <div class="card-content">
                     <div class="form-grid">
@@ -50,23 +50,23 @@
                             <span class="field-value">@PersonalData.CNP</span>
                         </div>
                         <div class="form-field">
-                            <label>Data Nașterii</label>
+                            <label>Data Nasterii</label>
                             <span class="field-value">@PersonalData.Data_Nasterii.ToString("dd.MM.yyyy") (@PersonalData.Varsta ani)</span>
                         </div>
                         <div class="form-field">
-                            <label>Locul Nașterii</label>
+                            <label>Locul Nasterii</label>
                             <span class="field-value">@(PersonalData.Locul_Nasterii ?? "Nu este specificat")</span>
                         </div>
                         <div class="form-field">
-                            <label>Stare Civilă</label>
+                            <label>Stare Civila</label>
                             <span class="field-value">@GetStareCivilaDisplay(PersonalData.Stare_Civila)</span>
                         </div>
                         <div class="form-field">
-                            <label>Naționalitate</label>
+                            <label>Nationalitate</label>
                             <span class="field-value">@PersonalData.Nationalitate</span>
                         </div>
                         <div class="form-field">
-                            <label>Cetățenie</label>
+                            <label>Cetatenie</label>
                             <span class="field-value">@PersonalData.Cetatenie</span>
                         </div>
                     </div>
@@ -77,7 +77,7 @@
             <div class="detail-card">
                 <div class="card-header">
                     <i class="fas fa-briefcase"></i>
-                    <h3>Informații Profesionale</h3>
+                    <h3>Informatii Profesionale</h3>
                 </div>
                 <div class="card-content">
                     <div class="form-grid">
@@ -86,7 +86,7 @@
                             <span class="field-value">@PersonalData.Cod_Angajat</span>
                         </div>
                         <div class="form-field">
-                            <label>Funcția</label>
+                            <label>Functia</label>
                             <span class="field-value">@PersonalData.Functia</span>
                         </div>
                         <div class="form-field">
@@ -107,7 +107,7 @@
             <div class="detail-card">
                 <div class="card-header">
                     <i class="fas fa-address-book"></i>
-                    <h3>Informații Contact</h3>
+                    <h3>Informatii Contact</h3>
                 </div>
                 <div class="card-content">
                     <div class="form-grid">
@@ -171,7 +171,7 @@
             <div class="detail-card">
                 <div class="card-header">
                     <i class="fas fa-map-marker-alt"></i>
-                    <h3>Informații Adresă</h3>
+                    <h3>Informatii Adresa</h3>
                 </div>
                 <div class="card-content">
                     <div class="form-grid">
@@ -180,17 +180,17 @@
                             <span class="field-value">@PersonalData.Adresa_Domiciliu</span>
                         </div>
                         <div class="form-field">
-                            <label>Județul</label>
+                            <label>Judetul</label>
                             <span class="field-value">@PersonalData.Judet_Domiciliu</span>
                         </div>
                         <div class="form-field">
-                            <label>Orașul</label>
+                            <label>Orasul</label>
                             <span class="field-value">@PersonalData.Oras_Domiciliu</span>
                         </div>
                         @if (!string.IsNullOrEmpty(PersonalData.Cod_Postal_Domiciliu))
                         {
                             <div class="form-field">
-                                <label>Cod Poștal</label>
+                                <label>Cod Postal</label>
                                 <span class="field-value">@PersonalData.Cod_Postal_Domiciliu</span>
                             </div>
                         }
@@ -199,19 +199,19 @@
                     @if (!string.IsNullOrEmpty(PersonalData.Adresa_Resedinta))
                     {
                         <div class="address-separator">
-                            <span>Adresa Reședință (dacă diferă)</span>
+                            <span>Adresa Resedinta (daca difera)</span>
                         </div>
                         <div class="form-grid">
                             <div class="form-field full-width">
-                                <label>Adresa Reședință</label>
+                                <label>Adresa Resedinta</label>
                                 <span class="field-value">@PersonalData.Adresa_Resedinta</span>
                             </div>
                             <div class="form-field">
-                                <label>Județul</label>
+                                <label>Judetul</label>
                                 <span class="field-value">@(PersonalData.Judet_Resedinta ?? "Nu este specificat")</span>
                             </div>
                             <div class="form-field">
-                                <label>Orașul</label>
+                                <label>Orasul</label>
                                 <span class="field-value">@(PersonalData.Oras_Resedinta ?? "Nu este specificat")</span>
                             </div>
                         </div>
@@ -231,10 +231,10 @@
                         <div class="form-grid">
                             <div class="form-field">
                                 <label>Serie CI</label>
-                                <span class="field-value">@(PersonalData.Serie_CI ?? "Nu este specificată")</span>
+                                <span class="field-value">@(PersonalData.Serie_CI ?? "Nu este specificata")</span>
                             </div>
                             <div class="form-field">
-                                <label>Număr CI</label>
+                                <label>Numar CI</label>
                                 <span class="field-value">@(PersonalData.Numar_CI ?? "Nu este specificat")</span>
                             </div>
                             <div class="form-field">
@@ -242,13 +242,13 @@
                                 <span class="field-value">@(PersonalData.Eliberat_CI_De ?? "Nu este specificat")</span>
                             </div>
                             <div class="form-field">
-                                <label>Data Eliberării</label>
-                                <span class="field-value">@(PersonalData.Data_Eliberare_CI?.ToString("dd.MM.yyyy") ?? "Nu este specificată")</span>
+                                <label>Data Eliberarii</label>
+                                <span class="field-value">@(PersonalData.Data_Eliberare_CI?.ToString("dd.MM.yyyy") ?? "Nu este specificata")</span>
                             </div>
                             @if (PersonalData.Valabil_CI_Pana.HasValue)
                             {
                                 <div class="form-field full-width">
-                                    <label>Valabil până la</label>
+                                    <label>Valabil pana la</label>
                                     <span class="field-value document-validity">
                                         @PersonalData.Valabil_CI_Pana.Value.ToString("dd.MM.yyyy")
                                         @if (PersonalData.Valabil_CI_Pana.Value < DateTime.Now)
@@ -257,7 +257,7 @@
                                         }
                                         else if (PersonalData.Valabil_CI_Pana.Value < DateTime.Now.AddMonths(6))
                                         {
-                                            <span class="validity-badge warning">Expiră în 6 luni</span>
+                                            <span class="validity-badge warning">Expira in 6 luni</span>
                                         }
                                         else
                                         {
@@ -275,16 +275,16 @@
             <div class="detail-card">
                 <div class="card-header">
                     <i class="fas fa-calendar-alt"></i>
-                    <h3>Informații Temporale</h3>
+                    <h3>Informatii Temporale</h3>
                 </div>
                 <div class="card-content">
                     <div class="form-grid">
                         <div class="form-field">
-                            <label>Data angajării</label>
+                            <label>Data angajarii</label>
                             <span class="field-value">@PersonalData.Data_Crearii.ToString("dd.MM.yyyy HH:mm")</span>
                         </div>
                         <div class="form-field">
-                            <label>Vechime în sistem</label>
+                            <label>Vechime in sistem</label>
                             <span class="field-value">@GetSystemAge(PersonalData.Data_Crearii)</span>
                         </div>
                         <div class="form-field">
@@ -305,7 +305,7 @@
                 <div class="detail-card observations-card">
                     <div class="card-header">
                         <i class="fas fa-sticky-note"></i>
-                        <h3>Observații</h3>
+                        <h3>Observatii</h3>
                     </div>
                     <div class="card-content">
                         <div class="observations-content">

@@ -448,13 +448,13 @@ public static class BusinessExceptionExtensions
         // Adaugă proprietăți specifice bazate pe tipul excepției
         additionalInfo = ex switch
         {
-            ValidationException validationEx => new { validationErrors = validationEx.ValidationErrors },
-            ConflictException conflictEx => new { conflictType = conflictEx.ConflictType, conflictingValue = conflictEx.ConflictingValue },
-            BusinessRuleException businessRuleEx => new { violatedRules = businessRuleEx.ViolatedRules },
-            ResourceInUseException resourceEx => new { resourceType = resourceEx.ResourceType, resourceId = resourceEx.ResourceId, dependencies = resourceEx.Dependencies },
-            UnauthorizedException unauthorizedEx => new { attemptedAction = unauthorizedEx.AttemptedAction, userId = unauthorizedEx.UserId },
-            ExternalServiceException externalEx => new { serviceName = externalEx.ServiceName, externalErrorCode = externalEx.ExternalErrorCode },
-            _ => null
+            ValidationException validationEx => (object)new { validationErrors = validationEx.ValidationErrors },
+            ConflictException conflictEx => (object)new { conflictType = conflictEx.ConflictType, conflictingValue = conflictEx.ConflictingValue },
+            BusinessRuleException businessRuleEx => (object)new { violatedRules = businessRuleEx.ViolatedRules },
+            ResourceInUseException resourceEx => (object)new { resourceType = resourceEx.ResourceType, resourceId = resourceEx.ResourceId, dependencies = resourceEx.Dependencies },
+            UnauthorizedException unauthorizedEx => (object)new { attemptedAction = unauthorizedEx.AttemptedAction, userId = unauthorizedEx.UserId },
+            ExternalServiceException externalEx => (object)new { serviceName = externalEx.ServiceName, externalErrorCode = externalEx.ExternalErrorCode },
+            _ => (object?)null
         }
     };
 }

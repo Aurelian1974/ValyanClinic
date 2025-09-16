@@ -34,7 +34,7 @@ public partial class VizualizeazaPersonal : ComponentBase
             catch (Exception ex)
             {
                 HasError = true;
-                ErrorMessage = $"Eroare la încărcarea datelor: {ex.Message}";
+                ErrorMessage = $"Eroare la încarcarea datelor: {ex.Message}";
             }
             finally
             {
@@ -58,7 +58,7 @@ public partial class VizualizeazaPersonal : ComponentBase
             catch (Exception ex)
             {
                 HasError = true;
-                ErrorMessage = $"Eroare la încărcarea datelor: {ex.Message}";
+                ErrorMessage = $"Eroare la încarcarea datelor: {ex.Message}";
             }
             finally
             {
@@ -74,12 +74,12 @@ public partial class VizualizeazaPersonal : ComponentBase
     {
         return stareCivila switch
         {
-            StareCivila.Necasatorit => "Necăsătorit/ă",
-            StareCivila.Casatorit => "Căsătorit/ă",
-            StareCivila.Divortat => "Divorțat/ă",
-            StareCivila.Vaduv => "Văduvă/Văduv",
-            StareCivila.UniuneConsensuala => "Uniune Consensuală",
-            _ => "Nu este specificată"
+            StareCivila.Necasatorit => "Necasatorit/a",
+            StareCivila.Casatorit => "Casatorit/a",
+            StareCivila.Divortat => "Divortat/a",
+            StareCivila.Vaduv => "Vaduva/Vaduv",
+            StareCivila.UniuneConsensuala => "Uniune Consensuala",
+            _ => "Nu este specificata"
         };
     }
 
@@ -87,18 +87,18 @@ public partial class VizualizeazaPersonal : ComponentBase
     {
         return departament switch
         {
-            Departament.Administratie => "Administrație",
+            Departament.Administratie => "Administratie",
             Departament.Financiar => "Financiar",
             Departament.IT => "IT",
-            Departament.Intretinere => "Întreținere",
-            Departament.Logistica => "Logistică",
+            Departament.Intretinere => "Intretinere",
+            Departament.Logistica => "Logistica",
             Departament.Marketing => "Marketing",
-            Departament.Receptie => "Recepție",
+            Departament.Receptie => "Receptie",
             Departament.ResurseUmane => "Resurse Umane",
             Departament.Securitate => "Securitate",
             Departament.Transport => "Transport",
             Departament.Juridic => "Juridic",
-            Departament.RelatiiClienti => "Relații Clienți",
+            Departament.RelatiiClienti => "Relatii Clienti",
             Departament.Calitate => "Calitate",
             Departament.CallCenter => "Call Center",
             _ => "Nu este specificat"
@@ -132,7 +132,7 @@ public partial class VizualizeazaPersonal : ComponentBase
         else if (age.TotalDays < 365)
         {
             var months = (int)(age.TotalDays / 30);
-            return $"{months} {(months == 1 ? "lună" : "luni")}";
+            return $"{months} {(months == 1 ? "luna" : "luni")}";
         }
         else
         {

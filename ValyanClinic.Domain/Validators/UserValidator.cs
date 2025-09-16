@@ -6,7 +6,7 @@ namespace ValyanClinic.Domain.Validators;
 
 /// <summary>
 /// Validator FluentValidation pentru modelul User
-/// Implementează toate regulile de business pentru utilizatorii sistemului
+/// Implementeaza toate regulile de business pentru utilizatorii sistemului
 /// </summary>
 public class UserValidator : AbstractValidator<User>
 {
@@ -18,17 +18,17 @@ public class UserValidator : AbstractValidator<User>
             .NotEmpty()
             .WithMessage("Prenumele este obligatoriu")
             .Length(2, 50)
-            .WithMessage("Prenumele trebuie să aibă între 2 și 50 de caractere")
+            .WithMessage("Prenumele trebuie sa aiba intre 2 si 50 de caractere")
             .Matches(@"^[A-ZÀ-ÿa-z\s\-']+$")
-            .WithMessage("Prenumele poate conține doar litere, spații, cratime și apostrofuri");
+            .WithMessage("Prenumele poate contine doar litere, spatii, cratime si apostrofuri");
 
         RuleFor(x => x.LastName)
             .NotEmpty()
             .WithMessage("Numele este obligatoriu")
             .Length(2, 50)
-            .WithMessage("Numele trebuie să aibă între 2 și 50 de caractere")
+            .WithMessage("Numele trebuie sa aiba intre 2 si 50 de caractere")
             .Matches(@"^[A-ZÀ-ÿa-z\s\-']+$")
-            .WithMessage("Numele poate conține doar litere, spații, cratime și apostrofuri");
+            .WithMessage("Numele poate contine doar litere, spatii, cratime si apostrofuri");
 
         // === REGULI PENTRU AUTENTIFICARE ===
         
@@ -38,17 +38,17 @@ public class UserValidator : AbstractValidator<User>
             .EmailAddress()
             .WithMessage("Formatul email-ului nu este valid")
             .Must(BeValidBusinessEmail)
-            .WithMessage("Email-ul trebuie să fie de la un domeniu profesional");
+            .WithMessage("Email-ul trebuie sa fie de la un domeniu profesional");
 
         RuleFor(x => x.Username)
             .NotEmpty()
             .WithMessage("Numele de utilizator este obligatoriu")
             .Length(3, 30)
-            .WithMessage("Numele de utilizator trebuie să aibă între 3 și 30 de caractere")
+            .WithMessage("Numele de utilizator trebuie sa aiba intre 3 si 30 de caractere")
             .Matches(@"^[a-zA-Z0-9._-]+$")
-            .WithMessage("Numele de utilizator poate conține doar litere, cifre, puncte, cratime și underscore")
+            .WithMessage("Numele de utilizator poate contine doar litere, cifre, puncte, cratime si underscore")
             .Must(BeValidUsername)
-            .WithMessage("Numele de utilizator nu poate începe sau termina cu caractere speciale");
+            .WithMessage("Numele de utilizator nu poate incepe sau termina cu caractere speciale");
 
         // === REGULI PENTRU CONTACT ===
         
@@ -57,63 +57,63 @@ public class UserValidator : AbstractValidator<User>
             .WithMessage("Formatul telefonului nu este valid (ex: 0722123456 sau +40722123456)")
             .When(x => !string.IsNullOrEmpty(x.Phone));
 
-        // === REGULI PENTRU ROLURI ȘI STATUS ===
+        // === REGULI PENTRU ROLURI SI STATUS ===
         
         RuleFor(x => x.Role)
             .IsInEnum()
             .WithMessage("Rolul selectat nu este valid")
             .Must(BeValidRoleForSystem)
-            .WithMessage("Rolul specificat nu este permis în acest sistem");
+            .WithMessage("Rolul specificat nu este permis in acest sistem");
 
         RuleFor(x => x.Status)
             .IsInEnum()
             .WithMessage("Statusul selectat nu este valid");
 
-        // === REGULI PENTRU INFORMAȚII PROFESIONALE ===
+        // === REGULI PENTRU INFORMATII PROFESIONALE ===
         
         RuleFor(x => x.Department)
             .Length(2, 100)
-            .WithMessage("Departamentul trebuie să aibă între 2 și 100 de caractere")
+            .WithMessage("Departamentul trebuie sa aiba intre 2 si 100 de caractere")
             .When(x => !string.IsNullOrEmpty(x.Department));
 
         RuleFor(x => x.JobTitle)
             .Length(2, 100)
-            .WithMessage("Funcția trebuie să aibă între 2 și 100 de caractere")
+            .WithMessage("Functia trebuie sa aiba intre 2 si 100 de caractere")
             .When(x => !string.IsNullOrEmpty(x.JobTitle));
 
         // === REGULI PENTRU METADATA ===
         
         RuleFor(x => x.CreatedDate)
             .NotEmpty()
-            .WithMessage("Data creării este obligatorie")
+            .WithMessage("Data crearii este obligatorie")
             .LessThanOrEqualTo(DateTime.Now)
-            .WithMessage("Data creării nu poate fi în viitor");
+            .WithMessage("Data crearii nu poate fi in viitor");
 
         RuleFor(x => x.LastLoginDate)
             .LessThanOrEqualTo(DateTime.Now)
-            .WithMessage("Data ultimei autentificări nu poate fi în viitor")
+            .WithMessage("Data ultimei autentificari nu poate fi in viitor")
             .GreaterThanOrEqualTo(x => x.CreatedDate)
-            .WithMessage("Data ultimei autentificări nu poate fi anterioară datei creării")
+            .WithMessage("Data ultimei autentificari nu poate fi anterioara datei crearii")
             .When(x => x.LastLoginDate.HasValue);
 
         // === REGULI COMPLEXE DE BUSINESS ===
         
-        // Verificare consistență rol-departament
+        // Verificare consistenta rol-departament
         RuleFor(x => x)
             .Must(HaveConsistentRoleDepartment)
-            .WithMessage("Combinația rol-departament nu este validă")
+            .WithMessage("Combinatia rol-departament nu este valida")
             .WithName("RolDepartament");
 
-        // Verificare că doctorii au informații complete
+        // Verificare ca doctorii au informatii complete
         RuleFor(x => x)
             .Must(HaveCompleteInformationForDoctors)
-            .WithMessage("Doctorii trebuie să aibă toate informațiile complete (departament și funcție)")
+            .WithMessage("Doctorii trebuie sa aiba toate informatiile complete (departament si functie)")
             .WithName("InformatiiDoctor")
             .When(x => x.Role == UserRole.Doctor);
     }
 
     /// <summary>
-    /// Verifică dacă email-ul aparține unui domeniu profesional acceptat
+    /// Verifica daca email-ul apartine unui domeniu profesional acceptat
     /// </summary>
     private bool BeValidBusinessEmail(string email)
     {
@@ -133,21 +133,21 @@ public class UserValidator : AbstractValidator<User>
     }
 
     /// <summary>
-    /// Verifică dacă username-ul are formatul corect
+    /// Verifica daca username-ul are formatul corect
     /// </summary>
     private bool BeValidUsername(string username)
     {
         if (string.IsNullOrEmpty(username))
             return false;
 
-        // Nu poate începe sau termina cu caractere speciale
+        // Nu poate incepe sau termina cu caractere speciale
         return !username.StartsWith(".") && !username.EndsWith(".") &&
                !username.StartsWith("_") && !username.EndsWith("_") &&
                !username.StartsWith("-") && !username.EndsWith("-");
     }
 
     /// <summary>
-    /// Verifică dacă rolul este valid pentru acest sistem
+    /// Verifica daca rolul este valid pentru acest sistem
     /// </summary>
     private bool BeValidRoleForSystem(UserRole role)
     {
@@ -156,29 +156,29 @@ public class UserValidator : AbstractValidator<User>
     }
 
     /// <summary>
-    /// Verifică consistența între rol și departament
+    /// Verifica consistenta intre rol si departament
     /// </summary>
     private bool HaveConsistentRoleDepartment(User user)
     {
-        // Pentru anumite roluri, departamentul trebuie să fie specific
+        // Pentru anumite roluri, departamentul trebuie sa fie specific
         switch (user.Role)
         {
             case UserRole.Doctor:
-                // Doctorii trebuie să aibă un departament medical specificat
+                // Doctorii trebuie sa aiba un departament medical specificat
                 return !string.IsNullOrEmpty(user.Department) && 
                        IsMedicalDepartment(user.Department);
                 
             case UserRole.Nurse:
-                // Asistentele trebuie să aibă un departament medical specificat
+                // Asistentele trebuie sa aiba un departament medical specificat
                 return !string.IsNullOrEmpty(user.Department) && 
                        IsMedicalDepartment(user.Department);
                 
             case UserRole.Administrator:
-                // Administratorii pot fi în orice departament
+                // Administratorii pot fi in orice departament
                 return true;
                 
             case UserRole.Manager:
-                // Managerii trebuie să aibă un departament specificat
+                // Managerii trebuie sa aiba un departament specificat
                 return !string.IsNullOrEmpty(user.Department);
                 
             default:
@@ -187,7 +187,7 @@ public class UserValidator : AbstractValidator<User>
     }
 
     /// <summary>
-    /// Verifică dacă departamentul este unul medical
+    /// Verifica daca departamentul este unul medical
     /// </summary>
     private bool IsMedicalDepartment(string department)
     {
@@ -206,14 +206,14 @@ public class UserValidator : AbstractValidator<User>
     }
 
     /// <summary>
-    /// Verifică dacă doctorii au informații complete
+    /// Verifica daca doctorii au informatii complete
     /// </summary>
     private bool HaveCompleteInformationForDoctors(User user)
     {
         if (user.Role != UserRole.Doctor)
             return true;
 
-        // Doctorii trebuie să aibă departament și funcție
+        // Doctorii trebuie sa aiba departament si functie
         return !string.IsNullOrEmpty(user.Department) && 
                !string.IsNullOrEmpty(user.JobTitle);
     }
@@ -228,27 +228,27 @@ public class UserCreateValidator : UserValidator
     {
         // Reguli suplimentare pentru crearea unui nou utilizator
         
-        // ID-ul nu trebuie să fie setat manual (se generează automat)
+        // ID-ul nu trebuie sa fie setat manual (se genereaza automat)
         RuleFor(x => x.Id)
             .Equal(0)
-            .WithMessage("ID-ul se generează automat și nu trebuie specificat");
+            .WithMessage("ID-ul se genereaza automat si nu trebuie specificat");
 
-        // Data creării trebuie să fie aproape de momentul curent
+        // Data crearii trebuie sa fie aproape de momentul curent
         RuleFor(x => x.CreatedDate)
             .GreaterThan(DateTime.Now.AddMinutes(-5))
-            .WithMessage("Data creării trebuie să fie aproape de momentul curent")
+            .WithMessage("Data crearii trebuie sa fie aproape de momentul curent")
             .LessThanOrEqualTo(DateTime.Now.AddMinutes(1))
-            .WithMessage("Data creării nu poate fi în viitor");
+            .WithMessage("Data crearii nu poate fi in viitor");
 
-        // Pentru utilizatori noi, LastLoginDate trebuie să fie null
+        // Pentru utilizatori noi, LastLoginDate trebuie sa fie null
         RuleFor(x => x.LastLoginDate)
             .Null()
-            .WithMessage("Utilizatorii noi nu pot avea data ultimei autentificări setată");
+            .WithMessage("Utilizatorii noi nu pot avea data ultimei autentificari setata");
 
-        // Statusul pentru utilizatori noi trebuie să fie Active
+        // Statusul pentru utilizatori noi trebuie sa fie Active
         RuleFor(x => x.Status)
             .Equal(UserStatus.Active)
-            .WithMessage("Utilizatorii noi trebuie să aibă statusul Activ");
+            .WithMessage("Utilizatorii noi trebuie sa aiba statusul Activ");
     }
 }
 
@@ -261,22 +261,22 @@ public class UserUpdateValidator : UserValidator
     {
         // Reguli suplimentare pentru actualizarea unui utilizator
         
-        // ID-ul trebuie să existe și să fie valid
+        // ID-ul trebuie sa existe si sa fie valid
         RuleFor(x => x.Id)
             .GreaterThan(0)
-            .WithMessage("ID-ul utilizatorului trebuie să fie valid pentru actualizare");
+            .WithMessage("ID-ul utilizatorului trebuie sa fie valid pentru actualizare");
 
-        // Data creării nu se poate modifica
+        // Data crearii nu se poate modifica
         RuleFor(x => x.CreatedDate)
             .NotEmpty()
-            .WithMessage("Data creării trebuie să existe pentru actualizare")
+            .WithMessage("Data crearii trebuie sa existe pentru actualizare")
             .LessThan(DateTime.Now.AddDays(-1))
-            .WithMessage("Data creării pare să fi fost modificată - nu este permis");
+            .WithMessage("Data crearii pare sa fi fost modificata - nu este permis");
 
-        // Dacă este setat LastLoginDate, trebuie să fie după CreatedDate
+        // Daca este setat LastLoginDate, trebuie sa fie dupa CreatedDate
         RuleFor(x => x.LastLoginDate)
             .GreaterThan(x => x.CreatedDate)
-            .WithMessage("Data ultimei autentificări trebuie să fie după data creării")
+            .WithMessage("Data ultimei autentificari trebuie sa fie dupa data crearii")
             .When(x => x.LastLoginDate.HasValue);
     }
 }

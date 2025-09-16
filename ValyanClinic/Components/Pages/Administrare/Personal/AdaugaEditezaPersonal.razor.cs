@@ -47,14 +47,14 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         }
         else
         {
-            Logger.LogInformation("Adăugare personal nou");
+            Logger.LogInformation("Adaugare personal nou");
             personalFormModel = new PersonalFormModel
             {
                 Id_Personal = Guid.NewGuid(),
                 Data_Nasterii = DateTime.Today.AddYears(-30),
                 Status_Angajat = StatusAngajat.Activ,
-                Nationalitate = "Română",
-                Cetatenie = "Română"
+                Nationalitate = "Romana",
+                Cetatenie = "Romana"
             };
         }
     }
@@ -131,7 +131,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error submitting personal form");
-            validationErrors = [new ValidationError { ErrorMessage = "A apărut o eroare la salvarea datelor" }];
+            validationErrors = [new ValidationError { ErrorMessage = "A aparut o eroare la salvarea datelor" }];
         }
         finally
         {
@@ -146,7 +146,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Validează un câmp specific în timp real
+    /// Valideaza un camp specific in timp real
     /// </summary>
     private async Task ValidateFieldAsync(string propertyName)
     {
@@ -155,10 +155,10 @@ public partial class AdaugaEditezaPersonal : ComponentBase
             var personalModel = personalFormModel.ToPersonal();
             var result = await ValidationService.ValidateAsync(personalModel);
             
-            // Elimină erorile vechi pentru această proprietate
+            // Elimina erorile vechi pentru aceasta proprietate
             validationErrors.RemoveAll(e => e.PropertyName == propertyName);
             
-            // Adaugă erorile noi pentru această proprietate
+            // Adauga erorile noi pentru aceasta proprietate
             var propertyErrors = result.GetErrorsForProperty(propertyName);
             validationErrors.AddRange(propertyErrors);
             
@@ -171,7 +171,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Obține erorile pentru un câmp specific
+    /// Obtine erorile pentru un camp specific
     /// </summary>
     private List<string> GetFieldErrors(string propertyName)
     {
@@ -182,7 +182,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Verifică dacă un câmp are erori
+    /// Verifica daca un camp are erori
     /// </summary>
     private bool HasFieldErrors(string propertyName)
     {
@@ -190,7 +190,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Obține clasa CSS pentru un câmp în funcție de starea de validare
+    /// Obtine clasa CSS pentru un camp in functie de starea de validare
     /// </summary>
     private string GetFieldCssClass(string propertyName)
     {
@@ -239,45 +239,45 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         {
             new() { Text = "Alba", Value = "Alba" },
             new() { Text = "Arad", Value = "Arad" },
-            new() { Text = "Argeș", Value = "Argeș" },
-            new() { Text = "Bacău", Value = "Bacău" },
+            new() { Text = "Arges", Value = "Arges" },
+            new() { Text = "Bacau", Value = "Bacau" },
             new() { Text = "Bihor", Value = "Bihor" },
-            new() { Text = "Bistrița-Năsăud", Value = "Bistrița-Năsăud" },
-            new() { Text = "Botoșani", Value = "Botoșani" },
-            new() { Text = "Brașov", Value = "Brașov" },
-            new() { Text = "Brăila", Value = "Brăila" },
-            new() { Text = "București", Value = "București" },
-            new() { Text = "Buzău", Value = "Buzău" },
-            new() { Text = "Caraș-Severin", Value = "Caraș-Severin" },
-            new() { Text = "Călărași", Value = "Călărași" },
+            new() { Text = "Bistrita-Nasaud", Value = "Bistrita-Nasaud" },
+            new() { Text = "Botosani", Value = "Botosani" },
+            new() { Text = "Brasov", Value = "Brasov" },
+            new() { Text = "Braila", Value = "Braila" },
+            new() { Text = "Bucuresti", Value = "Bucuresti" },
+            new() { Text = "Buzau", Value = "Buzau" },
+            new() { Text = "Caras-Severin", Value = "Caras-Severin" },
+            new() { Text = "Calarasi", Value = "Calarasi" },
             new() { Text = "Cluj", Value = "Cluj" },
-            new() { Text = "Constanța", Value = "Constanța" },
+            new() { Text = "Constanta", Value = "Constanta" },
             new() { Text = "Covasna", Value = "Covasna" },
-            new() { Text = "Dâmbovița", Value = "Dâmbovița" },
+            new() { Text = "Dambovita", Value = "Dambovita" },
             new() { Text = "Dolj", Value = "Dolj" },
-            new() { Text = "Galați", Value = "Galați" },
+            new() { Text = "Galati", Value = "Galati" },
             new() { Text = "Giurgiu", Value = "Giurgiu" },
             new() { Text = "Gorj", Value = "Gorj" },
             new() { Text = "Harghita", Value = "Harghita" },
             new() { Text = "Hunedoara", Value = "Hunedoara" },
-            new() { Text = "Ialomița", Value = "Ialomița" },
-            new() { Text = "Iași", Value = "Iași" },
+            new() { Text = "Ialomita", Value = "Ialomita" },
+            new() { Text = "Iasi", Value = "Iasi" },
             new() { Text = "Ilfov", Value = "Ilfov" },
-            new() { Text = "Maramureș", Value = "Maramureș" },
-            new() { Text = "Mehedinți", Value = "Mehedinți" },
-            new() { Text = "Mureș", Value = "Mureș" },
-            new() { Text = "Neamț", Value = "Neamț" },
+            new() { Text = "Maramures", Value = "Maramures" },
+            new() { Text = "Mehedinti", Value = "Mehedinti" },
+            new() { Text = "Mures", Value = "Mures" },
+            new() { Text = "Neamt", Value = "Neamt" },
             new() { Text = "Olt", Value = "Olt" },
             new() { Text = "Prahova", Value = "Prahova" },
-            new() { Text = "Sălaj", Value = "Sălaj" },
+            new() { Text = "Salaj", Value = "Salaj" },
             new() { Text = "Satu Mare", Value = "Satu Mare" },
             new() { Text = "Sibiu", Value = "Sibiu" },
             new() { Text = "Suceava", Value = "Suceava" },
             new() { Text = "Teleorman", Value = "Teleorman" },
-            new() { Text = "Timiș", Value = "Timiș" },
+            new() { Text = "Timis", Value = "Timis" },
             new() { Text = "Tulcea", Value = "Tulcea" },
             new() { Text = "Vaslui", Value = "Vaslui" },
-            new() { Text = "Vâlcea", Value = "Vâlcea" },
+            new() { Text = "Valcea", Value = "Valcea" },
             new() { Text = "Vrancea", Value = "Vrancea" }
         };
     }
@@ -296,14 +296,14 @@ public class PersonalFormModel
     public string Cod_Angajat { get; set; } = "";
     public string CNP { get; set; } = "";
     
-    // Date Personale De Bază
+    // Date Personale De Baza
     public string Nume { get; set; } = "";
     public string Prenume { get; set; } = "";
     public string? Nume_Anterior { get; set; }
     public DateTime Data_Nasterii { get; set; }
-    public string? Locul_Nasterii { get; set; }  // CORECTAT numele proprietății
-    public string Nationalitate { get; set; } = "Română";
-    public string Cetatenie { get; set; } = "Română";
+    public string? Locul_Nasterii { get; set; }
+    public string Nationalitate { get; set; } = "Romana";
+    public string Cetatenie { get; set; } = "Romana";
     
     // Contact
     public string? Telefon_Personal { get; set; }
@@ -341,7 +341,7 @@ public class PersonalFormModel
     public StatusAngajat Status_Angajat { get; set; } = StatusAngajat.Activ;
     public string? Observatii { get; set; }
     
-    // Audit fields - pentru păstrarea valorilor la editare
+    // Audit fields - pentru pastrarea valorilor la editare
     public DateTime Data_Crearii { get; set; }
     public DateTime Data_Ultimei_Modificari { get; set; }
     public string? Creat_De { get; set; }
@@ -358,7 +358,7 @@ public class PersonalFormModel
             Prenume = personal.Prenume,
             Nume_Anterior = personal.Nume_Anterior,
             Data_Nasterii = personal.Data_Nasterii,
-            Locul_Nasterii = personal.Locul_Nasterii, // CORECTAT - folosește Locul_Nasterii nu Locul_Nasterei
+            Locul_Nasterii = personal.Locul_Nasterii,
             Nationalitate = personal.Nationalitate,
             Cetatenie = personal.Cetatenie,
             Telefon_Personal = personal.Telefon_Personal,
@@ -383,7 +383,7 @@ public class PersonalFormModel
             Valabil_CI_Pana = personal.Valabil_CI_Pana,
             Status_Angajat = personal.Status_Angajat,
             Observatii = personal.Observatii,
-            // Păstrează valorile originale pentru audit
+            // Pastreaza valorile originale pentru audit
             Creat_De = personal.Creat_De,
             Modificat_De = personal.Modificat_De,
             Data_Crearii = personal.Data_Crearii,
@@ -393,7 +393,7 @@ public class PersonalFormModel
 
     public PersonalModel ToPersonal()
     {
-        var now = DateTime.Now; // CORECTAT: folosește ora locală în loc de UTC
+        var now = DateTime.Now; // CORECTAT: foloseste ora locala in loc de UTC
         var isNewRecord = Id_Personal == Guid.Empty || Data_Crearii == default;
         
         return new PersonalModel
@@ -431,11 +431,11 @@ public class PersonalFormModel
             Status_Angajat = Status_Angajat,
             Observatii = Observatii,
             
-            // Audit fields - tratare diferită pentru creare vs editare, cu ora locală
+            // Audit fields - tratare diferita pentru creare vs editare, cu ora locala
             Data_Crearii = isNewRecord ? now : Data_Crearii,
             Data_Ultimei_Modificari = now,
             Creat_De = isNewRecord ? "SYSTEM" : (Creat_De ?? "SYSTEM"),
-            Modificat_De = "SYSTEM" // TODO: Înlocuiți cu utilizatorul autentificat
+            Modificat_De = "SYSTEM" // TODO: Inlocuiti cu utilizatorul autentificat
         };
     }
 }
