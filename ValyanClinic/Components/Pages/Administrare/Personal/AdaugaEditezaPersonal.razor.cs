@@ -1,520 +1,142 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using ValyanClinic.Domain.Models;
 using ValyanClinic.Domain.Enums;
 using ValyanClinic.Application.Services;
-using Syncfusion.Blazor.Notifications;
-using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
+using ValyanClinic.Application.Validators;
+using ValyanClinic.Components.Shared.Validation;
 using PersonalModel = ValyanClinic.Domain.Models.Personal;
+using System.ComponentModel.DataAnnotations;
 
 namespace ValyanClinic.Components.Pages.Administrare.Personal;
 
-/// <summary>
-/// Complex multi-step form for adding/editing Personal with advanced validation
-/// Features: Auto-save, real-time validation, progressive disclosure, smart suggestions
-/// </summary>
-public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
+public partial class AdaugaEditezaPersonal : ComponentBase
 {
-    #region Injected Services
     [Inject] private IPersonalService PersonalService { get; set; } = default!;
+    [Inject] private IValidationService ValidationService { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private ILogger<AdaugaEditezaPersonal> Logger { get; set; } = default!;
-    #endregion
+    [Inject] private IServiceProvider ServiceProvider { get; set; } = default!;
 
-    #region Parameters
-    [Parameter] public Guid? PersonalId { get; set; }
     [Parameter] public PersonalModel? EditingPersonal { get; set; }
     [Parameter] public EventCallback<PersonalModel> OnSave { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
-    #endregion
 
-    #region Form State
-    private PersonalFormModel _personalModel = new();
+    private PersonalFormModel personalFormModel = new();
+    private List<ValidationError> validationErrors = new();
+    
+    // Dropdown options
+    private List<DropdownOption<Departament>> departmentOptions = new();
+    private List<DropdownOption<StareCivila>> stareCivilaOptions = new();
+    private List<DropdownOption<StatusAngajat>> statusAngajatOptions = new();
+    private List<DropdownOption<string>> judeteOptions = new();
+    
+    private bool isSubmitting = false;
+    private FluentValidationHelper<PersonalModel>? validationHelper;
+
     private bool IsEditMode => EditingPersonal != null;
-    private int _currentStep = 1;
-    private int _totalSteps = 5;
-    private List<string> _validationErrors = new();
-    
-    // Auto-save functionality
-    private Timer? _autoSaveTimer;
-    private bool _isAutoSaving = false;
-    private DateTime? _lastAutoSave;
-    private readonly int _autoSaveIntervalMs = 30000; // 30 seconds
-    
-    // Step 3 - Address
-    private bool _sameAsHome = true;
-    
-    // Step 5 - Documents
-    private bool _acceptDataProcessing = false;
-    private bool _confirmDataAccuracy = false;
-    #endregion
 
-    #region Data Sources for Dropdowns
-    private List<string> _cityOptions = new();
-    private List<string> _judeteOptions = new();
-    private List<string> _nationalityOptions = new();
-    private List<string> _citizenshipOptions = new();
-    private List<DropdownOption<StareCivila?>> _stareCivilaOptions = new();
-    private List<DropdownOption<Departament>> _departmentOptions = new();
-    private List<string> _jobTitleOptions = new();
-    private List<DropdownOption<string>> _contactMethods = new();
-    private List<DropdownOption<string>> _availabilityHours = new();
-    private List<DropdownOption<string>> _contractTypes = new();
-    private List<DropdownOption<string>> _experienceLevels = new();
-    private List<DropdownOption<string>> _workSchedules = new();
-    private List<DropdownOption<string>> _educationLevels = new();
-    #endregion
-
-    #region Lifecycle Methods
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            await InitializeFormData();
-            await LoadDropdownData();
-            InitializeAutoSave();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error initializing AdaugaEditezaPersonal component");
-        }
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (EditingPersonal != null && _personalModel.Id_Personal != EditingPersonal.Id_Personal)
-        {
-            await InitializeFormData();
-        }
-    }
-
-    public void Dispose()
-    {
-        _autoSaveTimer?.Dispose();
-    }
-    #endregion
-
-    #region Initialization
-    private async Task InitializeFormData()
-    {
-        await JSRuntime.InvokeVoidAsync("console.log", "[INIT_FORM] === INITIALIZING FORM DATA ===");
+        await LoadDropdownOptions();
         
         if (IsEditMode && EditingPersonal != null)
         {
-            await JSRuntime.InvokeVoidAsync("console.log", $"[INIT_FORM] EDIT MODE - EditingPersonal CNP: '{EditingPersonal.CNP}'");
-            await JSRuntime.InvokeVoidAsync("console.log", $"[INIT_FORM] EDIT MODE - EditingPersonal ID: '{EditingPersonal.Id_Personal}'");
-            
-            _personalModel = PersonalFormModel.FromPersonal(EditingPersonal);
-            
-            await JSRuntime.InvokeVoidAsync("console.log", $"[INIT_FORM] AFTER FromPersonal - _personalModel CNP: '{_personalModel.CNP}'");
-            await JSRuntime.InvokeVoidAsync("console.log", $"[INIT_FORM] AFTER FromPersonal - _personalModel ID: '{_personalModel.Id_Personal}'");
+            Logger.LogInformation("Editare personal - CNP: {CNP}", EditingPersonal.CNP);
+            personalFormModel = PersonalFormModel.FromPersonal(EditingPersonal);
         }
         else
         {
-            await JSRuntime.InvokeVoidAsync("console.log", "[INIT_FORM] CREATE MODE - Creating new PersonalFormModel");
-            
-            _personalModel = new PersonalFormModel
+            Logger.LogInformation("Adăugare personal nou");
+            personalFormModel = new PersonalFormModel
             {
                 Id_Personal = Guid.NewGuid(),
-                Status_Angajat = StatusAngajat.Activ,
                 Data_Nasterii = DateTime.Today.AddYears(-30),
-                Data_Crearii = DateTime.Now,
-                Data_Ultimei_Modificari = DateTime.Now,
+                Status_Angajat = StatusAngajat.Activ,
                 Nationalitate = "Română",
                 Cetatenie = "Română"
             };
-            
-            await JSRuntime.InvokeVoidAsync("console.log", $"[INIT_FORM] CREATE MODE - New _personalModel ID: '{_personalModel.Id_Personal}'");
         }
-
-        await InvokeAsync(StateHasChanged);
-        await JSRuntime.InvokeVoidAsync("console.log", "[INIT_FORM] === FORM DATA INITIALIZED ===");
     }
 
-    private async Task LoadDropdownData()
+    private async Task LoadDropdownOptions()
     {
         try
         {
-            // Load Romanian cities
-            _cityOptions = GetRomanianCities();
-            
-            // Load Romanian counties
-            _judeteOptions = GetRomanianCounties();
-            
-            // Load nationalities and citizenships
-            _nationalityOptions = GetNationalities();
-            _citizenshipOptions = GetCitizenships();
-            
-            // Load marital status options
-            _stareCivilaOptions = new List<DropdownOption<StareCivila?>>
-            {
-                new("", "Selectați starea civilă", null),
-                new("Necăsătorit/ă", "Necăsătorit/ă", StareCivila.Necasatorit),
-                new("Căsătorit/ă", "Căsătorit/ă", StareCivila.Casatorit),
-                new("Divorțat/ă", "Divorțat/ă", StareCivila.Divortat),
-                new("Văduvă/Văduv", "Văduvă/Văduv", StareCivila.Vaduv),
-                new("Uniune Consensuală", "Uniune Consensuală", StareCivila.UniuneConsensuala)
-            };
-
-            // Load departments
-            _departmentOptions = Enum.GetValues<Departament>()
-                .Select(d => new DropdownOption<Departament>(d.ToString(), GetDepartmentDisplayName(d), d))
+            // Load department options
+            departmentOptions = Enum.GetValues<Departament>()
+                .Select(d => new DropdownOption<Departament> 
+                { 
+                    Text = GetDepartmentDisplayName(d), 
+                    Value = d 
+                })
                 .ToList();
 
-            // Load job titles
-            _jobTitleOptions = GetJobTitles();
+            // Load stare civila options
+            stareCivilaOptions = Enum.GetValues<StareCivila>()
+                .Select(s => new DropdownOption<StareCivila>
+                {
+                    Text = GetStareCivilaDisplayName(s),
+                    Value = s
+                })
+                .ToList();
 
-            // Load contact methods
-            _contactMethods = new List<DropdownOption<string>>
-            {
-                new("telefon", "Telefon", "telefon"),
-                new("email", "Email", "email"),
-                new("sms", "SMS", "sms"),
-                new("whatsapp", "WhatsApp", "whatsapp")
-            };
+            // Load status angajat options
+            statusAngajatOptions = Enum.GetValues<StatusAngajat>()
+                .Select(s => new DropdownOption<StatusAngajat>
+                {
+                    Text = GetStatusAngajatDisplayName(s),
+                    Value = s
+                })
+                .ToList();
 
-            // Load availability hours
-            _availabilityHours = new List<DropdownOption<string>>
-            {
-                new("oricand", "Oricând", "oricand"),
-                new("program", "În programul de lucru (9-17)", "program"),
-                new("seara", "Doar seara (după 18:00)", "seara"),
-                new("weekend", "Doar weekendul", "weekend"),
-                new("urgente", "Doar în caz de urgență", "urgente")
-            };
-
-            // Load contract types
-            _contractTypes = new List<DropdownOption<string>>
-            {
-                new("cim", "Contract Individual de Muncă", "cim"),
-                new("csd", "Contract de Servicii cu Drepturi", "csd"),
-                new("pfa", "Persoană Fizică Autorizată", "pfa"),
-                new("srl", "SRL (Întreprindere)", "srl"),
-                new("colaborare", "Contract de Colaborare", "colaborare")
-            };
-
-            // Load experience levels
-            _experienceLevels = new List<DropdownOption<string>>
-            {
-                new("entry", "Entry Level (0-2 ani)", "entry"),
-                new("junior", "Junior (2-5 ani)", "junior"),
-                new("mid", "Mid Level (5-8 ani)", "mid"),
-                new("senior", "Senior (8+ ani)", "senior"),
-                new("expert", "Expert/Specialist", "expert")
-            };
-
-            // Load work schedules
-            _workSchedules = new List<DropdownOption<string>>
-            {
-                new("full", "Full-time (8h/zi)", "full"),
-                new("part", "Part-time", "part"),
-                new("tura", "Program în ture", "tura"),
-                new("flexibil", "Program flexibil", "flexibil"),
-                new("garda", "Gărzi medicale", "garda")
-            };
-
-            // Load education levels
-            _educationLevels = new List<DropdownOption<string>>
-            {
-                new("liceu", "Liceu", "liceu"),
-                new("facultate", "Facultate", "facultate"),
-                new("master", "Master", "master"),
-                new("doctorat", "Doctorat", "doctorat"),
-                new("postdoc", "Post-doctorat", "postdoc")
-            };
-
-            await InvokeAsync(StateHasChanged);
+            // Load judete options (simplified list - in production this would come from a service)
+            judeteOptions = GetJudeteRomania();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error loading dropdown data");
+            Logger.LogError(ex, "Error loading dropdown options");
         }
     }
 
-    private void InitializeAutoSave()
+    private async Task HandleSubmit()
     {
-        _autoSaveTimer = new Timer(async _ => await AutoSave(), null, _autoSaveIntervalMs, _autoSaveIntervalMs);
-    }
-    #endregion
-
-    #region Step Navigation
-    private string GetStepLabel(int step)
-    {
-        return step switch
-        {
-            1 => "Personal",
-            2 => "Contact",
-            3 => "Adresă",
-            4 => "Profesional",
-            5 => "Documente",
-            _ => $"Pas {step}"
-        };
-    }
-
-    private string GetStepDescription(int step)
-    {
-        return step switch
-        {
-            1 => "Completează informațiile personale de bază",
-            2 => "Adaugă datele de contact (telefon, email)",
-            3 => "Introduceți adresa de domiciliu și reședință",
-            4 => "Setează informațiile profesionale",
-            5 => "Încarcă documentele de identitate",
-            _ => "Completează informațiile necesare"
-        };
-    }
-
-    private bool CanProceedToNextStep()
-    {
-        // Permite navigarea înainte doar dacă nu suntem la ultimul pas
-        return _currentStep < _totalSteps;
-    }
-
-    private bool CanGoToPreviousStep()
-    {
-        // Permite navigarea înapoi doar dacă nu suntem la primul pas
-        return _currentStep > 1;
-    }
-
-    private bool CanSubmitForm()
-    {
-        // Validare completă doar pentru submit final
-        var hasNume = !string.IsNullOrWhiteSpace(_personalModel.Nume);
-        var hasPrenume = !string.IsNullOrWhiteSpace(_personalModel.Prenume);
-        var hasCNP = !string.IsNullOrWhiteSpace(_personalModel.CNP);
-        var hasCodAngajat = !string.IsNullOrWhiteSpace(_personalModel.Cod_Angajat);
-        var hasDepartament = _personalModel.Departament.HasValue;
-        var hasFunctia = !string.IsNullOrWhiteSpace(_personalModel.Functia);
+        validationErrors.Clear();
+        isSubmitting = true;
         
-        // Doar câmpurile cu adevărat obligatorii pentru salvare
-        return hasNume && hasPrenume && hasCNP && hasCodAngajat && hasDepartament && hasFunctia;
-    }
-
-    private async Task NextStep()
-    {
-        // Navighează la pasul următor doar dacă nu suntem la ultimul pas
-        if (_currentStep < _totalSteps)
-        {
-            _currentStep++;
-            await SaveDraft();
-            await InvokeAsync(StateHasChanged);
-        }
-    }
-
-    private async Task PreviousStep()
-    {
-        // Navighează la pasul anterior doar dacă nu suntem la primul pas
-        if (_currentStep > 1)
-        {
-            _currentStep--;
-            await InvokeAsync(StateHasChanged);
-        }
-    }
-    #endregion
-
-    #region Validation Logic
-    private bool ValidateStep1()
-    {
-        // Permite navigarea liberă - validarea se va face doar la salvarea finală
-        return true;
-    }
-
-    private bool ValidateStep2()
-    {
-        // Permite navigarea liberă
-        return true;
-    }
-
-    private bool ValidateStep3()
-    {
-        // Permite navigarea liberă
-        return true;
-    }
-
-    private bool ValidateStep4()
-    {
-        // Permite navigarea liberă
-        return true;
-    }
-
-    private bool ValidateStep5()
-    {
-        // Permite navigarea liberă
-        return true;
-    }
-
-    private string GetFieldCssClass(string fieldName)
-    {
-        // CSS simplu fără stări de validare complexe
-        return "";
-    }
-    #endregion
-
-    #region Field Change Handlers
-    private async Task OnBirthDateChanged(DateTime? birthDate)
-    {
-        if (birthDate.HasValue)
-        {
-            var age = CalculateAge(birthDate.Value);
-            if (age < 16 || age > 70)
-            {
-                Logger.LogWarning("Unusual age detected: {Age} years", age);
-            }
-        }
-        await InvokeAsync(StateHasChanged);
-    }
-    #endregion
-
-    #region Auto-save and Draft Management
-    private async Task AutoSave()
-    {
-        if (_isAutoSaving || _personalModel == null) return;
-
         try
         {
-            _isAutoSaving = true;
-            await InvokeAsync(StateHasChanged);
+            Logger.LogInformation("Submitting personal form with CNP: {CNP}", personalFormModel.CNP);
+            
+            var personalModel = personalFormModel.ToPersonal();
+            
+            // Validare FluentValidation
+            var validationResult = IsEditMode 
+                ? await ValidationService.ValidateForUpdateAsync(personalModel)
+                : await ValidationService.ValidateForCreateAsync(personalModel);
 
-            // Simulate auto-save to temporary storage
-            await Task.Delay(1000);
+            if (!validationResult.IsValid)
+            {
+                validationErrors = validationResult.Errors;
+                Logger.LogWarning("Validation failed with {ErrorCount} errors", validationErrors.Count);
+                StateHasChanged();
+                return;
+            }
 
-            _lastAutoSave = DateTime.Now;
-            await InvokeAsync(StateHasChanged);
+            Logger.LogInformation("Validation passed, proceeding to save personal: {PersonalName}", 
+                personalModel.NumeComplet);
+
+            await OnSave.InvokeAsync(personalModel);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error during auto-save");
+            Logger.LogError(ex, "Error submitting personal form");
+            validationErrors = [new ValidationError { ErrorMessage = "A apărut o eroare la salvarea datelor" }];
         }
         finally
         {
-            _isAutoSaving = false;
-            await InvokeAsync(StateHasChanged);
-        }
-    }
-
-    private async Task SaveDraft()
-    {
-        if (!_isAutoSaving)
-        {
-            await AutoSave();
-            // Nu mai afișăm toast pentru draft manual - doar pentru auto-save
-        }
-    }
-    #endregion
-
-    #region Form Submission
-    private async Task HandleStepSubmit()
-    {
-        // Această metodă se apelează la submit-ul formularului - nu navighează automat
-        // Navigarea se face explicit prin butoanele NextStep/PreviousStep
-        await SaveDraft();
-    }
-
-    private async Task HandleFinalSubmit()
-    {
-        Logger.LogDebug("DEBUG HandleFinalSubmit: Starting final submit process");
-        
-        // DEBUGGING CNP ÎNAINTE ȘI DUPĂ CONVERSIE
-        await JSRuntime.InvokeVoidAsync("console.log", $"[HANDLE_SUBMIT] PersonalFormModel CNP: '{_personalModel.CNP}'");
-        await JSRuntime.InvokeVoidAsync("console.log", $"[HANDLE_SUBMIT] PersonalFormModel Id: '{_personalModel.Id_Personal}'");
-        
-        // ADAUGĂ TEST CNP LOCAL PENTRU DEBUGGING
-        await TestCNPValidationLocal(_personalModel.CNP);
-        
-        if (!CanSubmitForm())
-        {
-            Logger.LogWarning("DEBUG HandleFinalSubmit: Form validation failed - CanSubmitForm returned false");
-            Logger.LogWarning("Form validation failed - missing required fields");
-            
-            // Log what fields are missing
-            Logger.LogDebug("DEBUG HandleFinalSubmit: Field validation - Nume: {Nume}, Prenume: {Prenume}, CNP: {CNP}, Cod_Angajat: {Cod_Angajat}, Departament: {Departament}, Functia: {Functia}", 
-                _personalModel.Nume, _personalModel.Prenume, _personalModel.CNP, _personalModel.Cod_Angajat, _personalModel.Departament, _personalModel.Functia);
-            
-            return;
-        }
-
-        try
-        {
-            Logger.LogDebug("DEBUG HandleFinalSubmit: Form validation passed, converting to PersonalModel");
-            
-            var personalModel = _personalModel.ToPersonal();
-            
-            await JSRuntime.InvokeVoidAsync("console.log", $"[HANDLE_SUBMIT] PersonalModel CNP: '{personalModel.CNP}'");
-            await JSRuntime.InvokeVoidAsync("console.log", $"[HANDLE_SUBMIT] PersonalModel Id: '{personalModel.Id_Personal}'");
-            
-            Logger.LogDebug("DEBUG HandleFinalSubmit: PersonalModel created successfully - NumeComplet: {NumeComplet}, Id_Personal: {Id_Personal}, CNP: {CNP}, Departament: {Departament}", 
-                personalModel.NumeComplet, personalModel.Id_Personal, personalModel.CNP, personalModel.Departament);
-            
-            Logger.LogDebug("DEBUG HandleFinalSubmit: Calling OnSave.InvokeAsync...");
-            Logger.LogInformation("Calling OnSave callback with personal data: {PersonalName}", personalModel.NumeComplet);
-            
-            await OnSave.InvokeAsync(personalModel);
-            Logger.LogDebug("DEBUG HandleFinalSubmit: OnSave.InvokeAsync completed successfully");
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "ERROR HandleFinalSubmit: Exception occurred");
-            Logger.LogError(ex, "Error submitting form");
-        }
-    }
-
-    private async Task TestCNPValidationLocal(string cnp)
-    {
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Testing CNP validation for: '{cnp}'");
-            
-            if (string.IsNullOrWhiteSpace(cnp))
-            {
-                await JSRuntime.InvokeVoidAsync("console.log", "[FRONTEND] CNP is null or empty");
-                return;
-            }
-
-            var cleanCnp = cnp.Replace(" ", "").Replace("-", "");
-            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Cleaned CNP: '{cleanCnp}', Length: {cleanCnp.Length}");
-
-            if (cleanCnp.Length != 13)
-            {
-                await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Invalid length: {cleanCnp.Length}");
-                return;
-            }
-
-            if (!cleanCnp.All(char.IsDigit))
-            {
-                await JSRuntime.InvokeVoidAsync("console.log", "[FRONTEND] Contains non-digit characters");
-                return;
-            }
-
-            var weights = new[] { 2, 7, 9, 1, 4, 6, 3, 5, 8, 2, 7, 9 };
-            var sum = 0;
-
-            await JSRuntime.InvokeVoidAsync("console.log", "[FRONTEND] Starting calculation:");
-            for (int i = 0; i < 12; i++)
-            {
-                var digit = int.Parse(cleanCnp[i].ToString());
-                var weight = weights[i];
-                var product = digit * weight;
-                sum += product;
-                await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Position {i + 1}: {digit} × {weight} = {product}, Sum: {sum}");
-            }
-
-            var remainder = sum % 11;
-            var checkDigit = remainder == 10 ? 1 : remainder;
-            var actualLastDigit = int.Parse(cleanCnp[12].ToString());
-
-            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Total sum: {sum}");
-            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Remainder: {remainder}");
-            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Check digit: {checkDigit}");
-            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Actual last digit: {actualLastDigit}");
-
-            var isValid = checkDigit == actualLastDigit;
-            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] CNP is {(isValid ? "VALID" : "INVALID")}");
-        }
-        catch (Exception ex)
-        {
-            await JSRuntime.InvokeVoidAsync("console.log", $"[FRONTEND] Exception: {ex.Message}");
+            isSubmitting = false;
+            StateHasChanged();
         }
     }
 
@@ -522,208 +144,227 @@ public partial class AdaugaEditezaPersonal : ComponentBase, IDisposable
     {
         await OnCancel.InvokeAsync();
     }
-    #endregion
 
-    #region Utility Methods
-    private int CalculateAge(DateTime birthDate)
+    /// <summary>
+    /// Validează un câmp specific în timp real
+    /// </summary>
+    private async Task ValidateFieldAsync(string propertyName)
     {
-        var today = DateTime.Today;
-        var age = today.Year - birthDate.Year;
-        if (birthDate.Date > today.AddYears(-age)) age--;
-        return age;
-    }
-
-    private List<string> GetRomanianCities()
-    {
-        return new List<string>
+        try
         {
-            "București", "Cluj-Napoca", "Timișoara", "Iași", "Constanța", "Craiova", "Brașov", "Galați", 
-            "Ploiești", "Oradea", "Braila", "Arad", "Pitești", "Sibiu", "Bacău", "Târgu Mureș",
-            "Baia Mare", "Buzău", "Botoșani", "Satu Mare", "Râmnicu Vâlcea", "Drobeta-Turnu Severin",
-            "Suceava", "Piatra Neamț", "Tulcea", "Târgoviște", "Focșani", "Bistrita", "Reșița", "Alba Iulia"
-        };
-    }
-
-    private List<string> GetRomanianCounties()
-    {
-        return new List<string>
+            var personalModel = personalFormModel.ToPersonal();
+            var result = await ValidationService.ValidateAsync(personalModel);
+            
+            // Elimină erorile vechi pentru această proprietate
+            validationErrors.RemoveAll(e => e.PropertyName == propertyName);
+            
+            // Adaugă erorile noi pentru această proprietate
+            var propertyErrors = result.GetErrorsForProperty(propertyName);
+            validationErrors.AddRange(propertyErrors);
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
         {
-            "Alba", "Arad", "Argeș", "Bacău", "Bihor", "Bistrița-Năsăud", "Botoșani", "Brașov",
-            "Brăila", "Buzău", "Caraș-Severin", "Călărași", "Cluj", "Constanța", "Covasna", "Dâmbovița",
-            "Dolj", "Galați", "Giurgiu", "Gorj", "Harghita", "Hunedoara", "Ialomița", "Iași",
-            "Ilfov", "Maramureș", "Mehedinți", "Mureș", "Neamț", "Olt", "Prahova", "Satu Mare",
-            "Sălaj", "Sibiu", "Suceava", "Teleorman", "Timiș", "Tulcea", "Vaslui", "Vâlcea", "Vrancea",
-            "București"
-        };
+            Logger.LogError(ex, "Error validating field: {FieldName}", propertyName);
+        }
     }
 
-    private List<string> GetNationalities()
+    /// <summary>
+    /// Obține erorile pentru un câmp specific
+    /// </summary>
+    private List<string> GetFieldErrors(string propertyName)
     {
-        return new List<string> { "Română", "Maghiară", "Germană", "Romă", "Ucraineană", "Rusă", "Bulgară", "Sârbă", "Italiană", "Franceză" };
+        return validationErrors
+            .Where(e => e.PropertyName.Equals(propertyName, StringComparison.OrdinalIgnoreCase))
+            .Select(e => e.ErrorMessage)
+            .ToList();
     }
 
-    private List<string> GetCitizenships()
+    /// <summary>
+    /// Verifică dacă un câmp are erori
+    /// </summary>
+    private bool HasFieldErrors(string propertyName)
     {
-        return new List<string> { "Română", "Maghiară", "Germană", "Italiană", "Franceză", "Spaniolă", "Britanică", "Americană" };
+        return validationErrors.Any(e => e.PropertyName.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
     }
 
-    private List<string> GetJobTitles()
+    /// <summary>
+    /// Obține clasa CSS pentru un câmp în funcție de starea de validare
+    /// </summary>
+    private string GetFieldCssClass(string propertyName)
     {
-        return new List<string>
+        var baseClass = "form-control";
+        if (HasFieldErrors(propertyName))
         {
-            "Director General", "Director Adjunct", "Manager", "Șef Departament", "Specialist",
-            "Expert", "Consultant", "Asistent", "Operator", "Tehnician", "Secretar", "Receptioner"
-        };
+            return $"{baseClass} is-invalid";
+        }
+        return baseClass;
     }
 
+    // Display name helpers
     private string GetDepartmentDisplayName(Departament department)
     {
-        return department switch
+        var displayAttribute = typeof(Departament)
+            .GetField(department.ToString())?
+            .GetCustomAttributes(typeof(DisplayAttribute), false)
+            .FirstOrDefault() as DisplayAttribute;
+
+        return displayAttribute?.Name ?? department.ToString();
+    }
+
+    private string GetStareCivilaDisplayName(StareCivila stare)
+    {
+        var displayAttribute = typeof(StareCivila)
+            .GetField(stare.ToString())?
+            .GetCustomAttributes(typeof(DisplayAttribute), false)
+            .FirstOrDefault() as DisplayAttribute;
+
+        return displayAttribute?.Name ?? stare.ToString();
+    }
+
+    private string GetStatusAngajatDisplayName(StatusAngajat status)
+    {
+        var displayAttribute = typeof(StatusAngajat)
+            .GetField(status.ToString())?
+            .GetCustomAttributes(typeof(DisplayAttribute), false)
+            .FirstOrDefault() as DisplayAttribute;
+
+        return displayAttribute?.Name ?? status.ToString();
+    }
+
+    private List<DropdownOption<string>> GetJudeteRomania()
+    {
+        return new List<DropdownOption<string>>
         {
-            Departament.Administratie => "Administrație",
-            Departament.Financiar => "Financiar",
-            Departament.IT => "IT",
-            Departament.Intretinere => "Întreținere",
-            Departament.Logistica => "Logistică",
-            _ => department.ToString()
+            new() { Text = "Alba", Value = "Alba" },
+            new() { Text = "Arad", Value = "Arad" },
+            new() { Text = "Argeș", Value = "Argeș" },
+            new() { Text = "Bacău", Value = "Bacău" },
+            new() { Text = "Bihor", Value = "Bihor" },
+            new() { Text = "Bistrița-Năsăud", Value = "Bistrița-Năsăud" },
+            new() { Text = "Botoșani", Value = "Botoșani" },
+            new() { Text = "Brașov", Value = "Brașov" },
+            new() { Text = "Brăila", Value = "Brăila" },
+            new() { Text = "București", Value = "București" },
+            new() { Text = "Buzău", Value = "Buzău" },
+            new() { Text = "Caraș-Severin", Value = "Caraș-Severin" },
+            new() { Text = "Călărași", Value = "Călărași" },
+            new() { Text = "Cluj", Value = "Cluj" },
+            new() { Text = "Constanța", Value = "Constanța" },
+            new() { Text = "Covasna", Value = "Covasna" },
+            new() { Text = "Dâmbovița", Value = "Dâmbovița" },
+            new() { Text = "Dolj", Value = "Dolj" },
+            new() { Text = "Galați", Value = "Galați" },
+            new() { Text = "Giurgiu", Value = "Giurgiu" },
+            new() { Text = "Gorj", Value = "Gorj" },
+            new() { Text = "Harghita", Value = "Harghita" },
+            new() { Text = "Hunedoara", Value = "Hunedoara" },
+            new() { Text = "Ialomița", Value = "Ialomița" },
+            new() { Text = "Iași", Value = "Iași" },
+            new() { Text = "Ilfov", Value = "Ilfov" },
+            new() { Text = "Maramureș", Value = "Maramureș" },
+            new() { Text = "Mehedinți", Value = "Mehedinți" },
+            new() { Text = "Mureș", Value = "Mureș" },
+            new() { Text = "Neamț", Value = "Neamț" },
+            new() { Text = "Olt", Value = "Olt" },
+            new() { Text = "Prahova", Value = "Prahova" },
+            new() { Text = "Sălaj", Value = "Sălaj" },
+            new() { Text = "Satu Mare", Value = "Satu Mare" },
+            new() { Text = "Sibiu", Value = "Sibiu" },
+            new() { Text = "Suceava", Value = "Suceava" },
+            new() { Text = "Teleorman", Value = "Teleorman" },
+            new() { Text = "Timiș", Value = "Timiș" },
+            new() { Text = "Tulcea", Value = "Tulcea" },
+            new() { Text = "Vaslui", Value = "Vaslui" },
+            new() { Text = "Vâlcea", Value = "Vâlcea" },
+            new() { Text = "Vrancea", Value = "Vrancea" }
         };
     }
-    #endregion
-}
-
-#region Supporting Classes and Enums
-public enum ValidationState
-{
-    None,
-    Validating,
-    Valid,
-    Invalid
-}
-
-public class CNPValidationResult
-{
-    public bool IsValid { get; set; }
-    public string ErrorMessage { get; set; } = "";
-    public DateTime? BirthDate { get; set; }
-    public string ParsedInfo { get; set; } = "";
-}
-
-public class CodeValidationResult
-{
-    public bool IsValid { get; set; }
-    public string Message { get; set; } = "";
 }
 
 public class DropdownOption<T>
 {
-    public string Text { get; set; }
-    public string Display { get; set; }
-    public T Value { get; set; }
-
-    public DropdownOption(string text, string display, T value)
-    {
-        Text = text;
-        Display = display;
-        Value = value;
-    }
+    public string Text { get; set; } = "";
+    public T Value { get; set; } = default!;
 }
 
 public class PersonalFormModel
 {
-    [Required(ErrorMessage = "Numele este obligatoriu")]
-    [StringLength(50, MinimumLength = 2, ErrorMessage = "Numele trebuie să aibă între 2 și 50 de caractere")]
-    public string Nume { get; set; } = "";
-
-    [Required(ErrorMessage = "Prenumele este obligatoriu")]
-    [StringLength(50, MinimumLength = 2, ErrorMessage = "Prenumele trebuie să aibă între 2 și 50 de caractere")]
-    public string Prenume { get; set; } = "";
-
-    [Required(ErrorMessage = "CNP-ul este obligatoriu")]
-    // TEMPORAR COMENTAT PENTRU DEBUGGING
-    // [StringLength(13, MinimumLength = 13, ErrorMessage = "CNP-ul trebuie să aibă exact 13 cifre")]
-    public string CNP { get; set; } = "";
-
-    [Required(ErrorMessage = "Codul angajatului este obligatoriu")]
-    public string Cod_Angajat { get; set; } = "";
-
+    // Identificatori Unici
     public Guid Id_Personal { get; set; }
-    public DateTime Data_Nasterii { get; set; }
-    public string? Locul_Nasterii { get; set; }
-    public StareCivila? Stare_Civila { get; set; }
-    public string? Nume_Anterior { get; set; }
-    public string Nationalitate { get; set; } = "";
-    public string Cetatenie { get; set; } = "";
-    public StatusAngajat Status_Angajat { get; set; }
-    public DateTime Data_Crearii { get; set; }
-    public DateTime Data_Ultimei_Modificari { get; set; }
+    public string Cod_Angajat { get; set; } = "";
+    public string CNP { get; set; } = "";
     
-    // Contact Information
+    // Date Personale De Bază
+    public string Nume { get; set; } = "";
+    public string Prenume { get; set; } = "";
+    public string? Nume_Anterior { get; set; }
+    public DateTime Data_Nasterii { get; set; }
+    public string? Locul_Nasterii { get; set; }  // CORECTAT numele proprietății
+    public string Nationalitate { get; set; } = "Română";
+    public string Cetatenie { get; set; } = "Română";
+    
+    // Contact
     public string? Telefon_Personal { get; set; }
     public string? Telefon_Serviciu { get; set; }
     public string? Email_Personal { get; set; }
     public string? Email_Serviciu { get; set; }
-    public string? Observatii_Contact { get; set; }
     
-    // Address Information
-    public string? Adresa_Domiciliu { get; set; }
-    public string? Judet_Domiciliu { get; set; }
-    public string? Oras_Domiciliu { get; set; }
+    // Adresa Domiciliu
+    public string Adresa_Domiciliu { get; set; } = "";
+    public string Judet_Domiciliu { get; set; } = "";
+    public string Oras_Domiciliu { get; set; } = "";
     public string? Cod_Postal_Domiciliu { get; set; }
+    
+    // Adresa Resedinta (Daca Difera)
     public string? Adresa_Resedinta { get; set; }
     public string? Judet_Resedinta { get; set; }
     public string? Oras_Resedinta { get; set; }
     public string? Cod_Postal_Resedinta { get; set; }
     
-    // Professional Information
-    public Departament? Departament { get; set; }
-    public string? Functia { get; set; }
-    public DateTime? Data_Angajarii { get; set; }
-    public string? Tip_Contract { get; set; }
-    public string? Nivel_Experienta { get; set; }
-    public string? Program_Lucru { get; set; }
-    public string? Responsabilitati { get; set; }
-    public string? Studii { get; set; }
-    public string? Specializarea { get; set; }
-    public string? Competente { get; set; }
+    // Stare Civila Si Familie
+    public StareCivila? Stare_Civila { get; set; }
     
-    // Document Information
+    // Date Profesionale
+    public string Functia { get; set; } = "";
+    public Departament? Departament { get; set; }
+    
+    // Date Administrative
     public string? Serie_CI { get; set; }
     public string? Numar_CI { get; set; }
     public string? Eliberat_CI_De { get; set; }
     public DateTime? Data_Eliberare_CI { get; set; }
     public DateTime? Valabil_CI_Pana { get; set; }
-    public string? Pasaport { get; set; }
-    public string? Permis_Conducere { get; set; }
-    public string? Cod_Fiscal { get; set; }
-    public string? Card_European_Sanatate { get; set; }
+    
+    // Status Si Metadata
+    public StatusAngajat Status_Angajat { get; set; } = StatusAngajat.Activ;
     public string? Observatii { get; set; }
+    
+    // Audit fields - pentru păstrarea valorilor la editare
+    public DateTime Data_Crearii { get; set; }
+    public DateTime Data_Ultimei_Modificari { get; set; }
+    public string? Creat_De { get; set; }
+    public string? Modificat_De { get; set; }
 
     public static PersonalFormModel FromPersonal(PersonalModel personal)
     {
         return new PersonalFormModel
         {
             Id_Personal = personal.Id_Personal,
+            Cod_Angajat = personal.Cod_Angajat,
+            CNP = personal.CNP,
             Nume = personal.Nume,
             Prenume = personal.Prenume,
-            CNP = personal.CNP,
-            Cod_Angajat = personal.Cod_Angajat,
-            Data_Nasterii = personal.Data_Nasterii,
-            Locul_Nasterii = personal.Locul_Nasterii,
-            Stare_Civila = personal.Stare_Civila,
             Nume_Anterior = personal.Nume_Anterior,
+            Data_Nasterii = personal.Data_Nasterii,
+            Locul_Nasterii = personal.Locul_Nasterii, // CORECTAT - folosește Locul_Nasterii nu Locul_Nasterei
             Nationalitate = personal.Nationalitate,
             Cetatenie = personal.Cetatenie,
-            Status_Angajat = personal.Status_Angajat,
-            Data_Crearii = personal.Data_Crearii,
-            Data_Ultimei_Modificari = personal.Data_Ultimei_Modificari,
-            
-            // Contact
             Telefon_Personal = personal.Telefon_Personal,
             Telefon_Serviciu = personal.Telefon_Serviciu,
             Email_Personal = personal.Email_Personal,
             Email_Serviciu = personal.Email_Serviciu,
-            
-            // Address
             Adresa_Domiciliu = personal.Adresa_Domiciliu,
             Judet_Domiciliu = personal.Judet_Domiciliu,
             Oras_Domiciliu = personal.Oras_Domiciliu,
@@ -732,52 +373,45 @@ public class PersonalFormModel
             Judet_Resedinta = personal.Judet_Resedinta,
             Oras_Resedinta = personal.Oras_Resedinta,
             Cod_Postal_Resedinta = personal.Cod_Postal_Resedinta,
-            
-            // Professional
-            Departament = personal.Departament,
+            Stare_Civila = personal.Stare_Civila,
             Functia = personal.Functia,
-            
-            // Documents
+            Departament = personal.Departament,
             Serie_CI = personal.Serie_CI,
             Numar_CI = personal.Numar_CI,
             Eliberat_CI_De = personal.Eliberat_CI_De,
             Data_Eliberare_CI = personal.Data_Eliberare_CI,
             Valabil_CI_Pana = personal.Valabil_CI_Pana,
-            
-            Observatii = personal.Observatii
+            Status_Angajat = personal.Status_Angajat,
+            Observatii = personal.Observatii,
+            // Păstrează valorile originale pentru audit
+            Creat_De = personal.Creat_De,
+            Modificat_De = personal.Modificat_De,
+            Data_Crearii = personal.Data_Crearii,
+            Data_Ultimei_Modificari = personal.Data_Ultimei_Modificari
         };
     }
 
     public PersonalModel ToPersonal()
     {
-        System.Diagnostics.Debug.WriteLine($"[TO_PERSONAL] Converting PersonalFormModel to PersonalModel");
-        System.Diagnostics.Debug.WriteLine($"[TO_PERSONAL] Input CNP: '{CNP}'");
-        System.Diagnostics.Debug.WriteLine($"[TO_PERSONAL] Input Id_Personal: '{Id_Personal}'");
+        var now = DateTime.Now; // CORECTAT: folosește ora locală în loc de UTC
+        var isNewRecord = Id_Personal == Guid.Empty || Data_Crearii == default;
         
-        var result = new PersonalModel
+        return new PersonalModel
         {
             Id_Personal = Id_Personal,
+            Cod_Angajat = Cod_Angajat,
+            CNP = CNP,
             Nume = Nume,
             Prenume = Prenume,
-            CNP = CNP,
-            Cod_Angajat = Cod_Angajat,
+            Nume_Anterior = Nume_Anterior,
             Data_Nasterii = Data_Nasterii,
             Locul_Nasterii = Locul_Nasterii,
-            Stare_Civila = Stare_Civila,
-            Nume_Anterior = Nume_Anterior,
             Nationalitate = Nationalitate,
             Cetatenie = Cetatenie,
-            Status_Angajat = Status_Angajat,
-            Data_Crearii = Data_Crearii,
-            Data_Ultimei_Modificari = DateTime.Now,
-            
-            // Contact
             Telefon_Personal = Telefon_Personal,
             Telefon_Serviciu = Telefon_Serviciu,
             Email_Personal = Email_Personal,
             Email_Serviciu = Email_Serviciu,
-            
-            // Address
             Adresa_Domiciliu = Adresa_Domiciliu,
             Judet_Domiciliu = Judet_Domiciliu,
             Oras_Domiciliu = Oras_Domiciliu,
@@ -786,25 +420,22 @@ public class PersonalFormModel
             Judet_Resedinta = Judet_Resedinta,
             Oras_Resedinta = Oras_Resedinta,
             Cod_Postal_Resedinta = Cod_Postal_Resedinta,
-            
-            // Professional
-            Departament = Departament,
+            Stare_Civila = Stare_Civila,
             Functia = Functia,
-            
-            // Documents
-           Serie_CI = Serie_CI,
+            Departament = Departament,
+            Serie_CI = Serie_CI,
             Numar_CI = Numar_CI,
             Eliberat_CI_De = Eliberat_CI_De,
             Data_Eliberare_CI = Data_Eliberare_CI,
             Valabil_CI_Pana = Valabil_CI_Pana,
+            Status_Angajat = Status_Angajat,
+            Observatii = Observatii,
             
-            Observatii = Observatii
+            // Audit fields - tratare diferită pentru creare vs editare, cu ora locală
+            Data_Crearii = isNewRecord ? now : Data_Crearii,
+            Data_Ultimei_Modificari = now,
+            Creat_De = isNewRecord ? "SYSTEM" : (Creat_De ?? "SYSTEM"),
+            Modificat_De = "SYSTEM" // TODO: Înlocuiți cu utilizatorul autentificat
         };
-        
-        System.Diagnostics.Debug.WriteLine($"[TO_PERSONAL] Output CNP: '{result.CNP}'");
-        System.Diagnostics.Debug.WriteLine($"[TO_PERSONAL] Output Id_Personal: '{result.Id_Personal}'");
-        
-        return result;
     }
 }
-#endregion

@@ -1,5 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-using ValyanClinic.Domain.Enums;
+﻿using ValyanClinic.Domain.Enums;
 
 namespace ValyanClinic.Domain.Models;
 
@@ -16,7 +15,7 @@ public class User
     public UserStatus Status { get; set; }
     public string? Department { get; set; }
     public string? JobTitle { get; set; }
-    public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public DateTime CreatedDate { get; set; } = DateTime.Now; // CONSISTENT: folosește ora locală
     public DateTime? LastLoginDate { get; set; }
     
     // Domain Properties - business logic in model

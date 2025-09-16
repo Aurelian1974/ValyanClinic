@@ -16,6 +16,7 @@ using System.Data;
 using Dapper;
 using Serilog;
 using Serilog.Events;
+using ValyanClinic.Application.Extensions;
 
 // BOOTSTRAP LOGGER MINIMAL - PENTRU DEBUGGING
 Log.Logger = new LoggerConfiguration()
@@ -159,10 +160,9 @@ try
 
     Log.Information("✅ UI Components and cache configured");
 
-    // FluentValidation
-    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-    builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
-
+    // === CONFIGURARE FLUENTVALIDATION ===
+    builder.Services.AddValyanClinicValidation();
+    
     // Rich Services
     builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
     builder.Services.AddScoped<IUserSessionService, UserSessionService>();

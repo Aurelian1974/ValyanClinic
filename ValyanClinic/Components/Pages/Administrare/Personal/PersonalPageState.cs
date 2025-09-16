@@ -90,10 +90,10 @@ public class PersonalPageState
     }
 
     // Modal management
-    public string GetModalTitle() => IsEditMode ? "Editeaza Personal" : "Adauga Personal Nou";
+    public string GetModalTitle() => IsEditMode ? "Editează Personal" : "Adaugă Personal Nou";
     public string GetModalSubtitle() => IsEditMode 
-        ? $"Modifica informatiile pentru {EditingPersonal?.NumeComplet}"
-        : "Completeaza formularul pentru a adauga personal nou";
+        ? $"Modifică informațiile pentru {EditingPersonal?.NumeComplet}"
+        : "Completează formularul pentru a adăuga personal nou";
 }
 
 /// <summary>

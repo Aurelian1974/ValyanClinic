@@ -213,13 +213,13 @@ public class AdminController : ControllerBase
                 Status_Angajat = ValyanClinic.Domain.Enums.StatusAngajat.Activ
             };
 
-            _logger.LogDebug("DEBUG TestPersonalSave: Testing personal save with data: {CodAngajat}, {CNP}, {Nume}, {Prenume}, {Departament}", 
-                testPersonal.Cod_Angajat, testPersonal.CNP, testPersonal.Nume, testPersonal.Prenume, testPersonal.Departament);
+            _logger.LogInformation("Testing personal save with data: {CodAngajat}, {CNP}, {Nume}, {Prenume}", 
+                testPersonal.Cod_Angajat, testPersonal.CNP, testPersonal.Nume, testPersonal.Prenume);
 
             var result = await personalService.CreatePersonalAsync(testPersonal, "TEST_USER");
             
-            _logger.LogDebug("DEBUG TestPersonalSave: PersonalService.CreatePersonalAsync returned - IsSuccess: {IsSuccess}, ErrorMessage: {ErrorMessage}, Personal: {Personal}", 
-                result.IsSuccess, result.ErrorMessage ?? "NULL", result.Data?.NumeComplet ?? "NULL");
+            _logger.LogInformation("PersonalService.CreatePersonalAsync returned - IsSuccess: {IsSuccess}, ErrorMessage: {ErrorMessage}", 
+                result.IsSuccess, result.ErrorMessage ?? "NULL");
 
             if (result.IsSuccess)
             {
@@ -227,11 +227,11 @@ public class AdminController : ControllerBase
                 try
                 {
                     await personalService.DeletePersonalAsync(result.Data!.Id_Personal, "TEST_USER");
-                    _logger.LogDebug("DEBUG TestPersonalSave: Test data cleaned up successfully");
+                    _logger.LogInformation("Test data cleaned up successfully");
                 }
                 catch (Exception cleanupEx)
                 {
-                    _logger.LogWarning("WARNING TestPersonalSave: Could not cleanup test data: {Error}", cleanupEx.Message);
+                    _logger.LogWarning("Could not cleanup test data: {Error}", cleanupEx.Message);
                 }
             }
             
@@ -247,7 +247,7 @@ public class AdminController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "ERROR TestPersonalSave: Exception occurred");
+            _logger.LogError(ex, "Error during personal save test");
             return StatusCode(500, new { message = "Error during personal save test", error = ex.Message });
         }
     }
@@ -278,7 +278,7 @@ public class AdminController : ControllerBase
             
             if (personalToUpdate == null)
             {
-                _logger.LogDebug("DEBUG TestPersonalUpdate: No existing personal found with 'Badea', creating test data first");
+                _logger.LogInformation("No existing personal found with 'Badea', creating test data first");
                 
                 // Create test personal first
                 var testPersonal = new ValyanClinic.Domain.Models.Personal
@@ -306,31 +306,30 @@ public class AdminController : ControllerBase
                 }
                 
                 personalToUpdate = createResult.Data;
-                _logger.LogDebug("DEBUG TestPersonalUpdate: Created test personal: {PersonalName}", personalToUpdate?.NumeComplet);
+                _logger.LogInformation("Created test personal: {PersonalName}", personalToUpdate?.NumeComplet);
             }
 
-            _logger.LogDebug("DEBUG TestPersonalUpdate: Testing update on personal - Id: {Id}, Name: {Name}, Departament: {Departament}", 
-                personalToUpdate!.Id_Personal, personalToUpdate.NumeComplet, personalToUpdate.Departament);
+            _logger.LogInformation("Testing update on personal - Id: {Id}, Name: {Name}", 
+                personalToUpdate!.Id_Personal, personalToUpdate.NumeComplet);
 
             // Make some changes to test update
             personalToUpdate.Observatii = $"Updated via API test at {DateTime.Now:yyyy-MM-dd HH:mm:ss}";
             personalToUpdate.Email_Personal = "test.update@valyanmed.ro";
             personalToUpdate.Departament = ValyanClinic.Domain.Enums.Departament.Administratie;
 
-            _logger.LogDebug("DEBUG TestPersonalUpdate: Calling PersonalService.UpdatePersonalAsync...");
+            _logger.LogInformation("Calling PersonalService.UpdatePersonalAsync...");
             var updateResult = await personalService.UpdatePersonalAsync(personalToUpdate, "TEST_USER");
             
-            _logger.LogDebug("DEBUG TestPersonalUpdate: PersonalService.UpdatePersonalAsync returned - IsSuccess: {IsSuccess}, ErrorMessage: {ErrorMessage}, Personal: {Personal}", 
-                updateResult.IsSuccess, updateResult.ErrorMessage ?? "NULL", updateResult.Data?.NumeComplet ?? "NULL");
+            _logger.LogInformation("PersonalService.UpdatePersonalAsync returned - IsSuccess: {IsSuccess}, ErrorMessage: {ErrorMessage}", 
+                updateResult.IsSuccess, updateResult.ErrorMessage ?? "NULL");
 
             if (updateResult.IsSuccess && updateResult.Data != null)
             {
-                _logger.LogDebug("DEBUG TestPersonalUpdate: Update successful! - Observatii: {Observatii}, Email: {Email}, Departament: {Departament}", 
-                    updateResult.Data.Observatii, updateResult.Data.Email_Personal, updateResult.Data.Departament);
+                _logger.LogInformation("Update successful! Personal: {Personal}", updateResult.Data.NumeComplet);
             }
             else
             {
-                _logger.LogError("ERROR TestPersonalUpdate: Update failed! Error details: {ErrorDetails}", 
+                _logger.LogError("Update failed! Error details: {ErrorDetails}", 
                     updateResult.ErrorMessage ?? "No error message provided");
             }
             
@@ -347,7 +346,7 @@ public class AdminController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "ERROR TestPersonalUpdate: Exception occurred");
+            _logger.LogError(ex, "Error during personal update test");
             return StatusCode(500, new { message = "Error during personal update test", error = ex.Message });
         }
     }

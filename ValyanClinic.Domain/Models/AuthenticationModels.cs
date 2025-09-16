@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+Ôªøusing System.ComponentModel.DataAnnotations;
 using ValyanClinic.Domain.Enums;
 
 namespace ValyanClinic.Domain.Models;
@@ -16,7 +16,7 @@ public class LoginRequest
 
 /// <summary>
 /// Result Pattern pentru opera?ii Login
-/// Œnlocuie?te simple pass-through cu rich domain logic
+/// √énlocuie?te simple pass-through cu rich domain logic
 /// </summary>
 public class LoginResult
 {
@@ -59,7 +59,7 @@ public enum LoginFailureReason
     [Display(Name = "Eroare validare")]
     ValidationError,
     
-    [Display(Name = "Prea multe Óncerc?ri")]
+    [Display(Name = "Prea multe √Æncerc?ri")]
     TooManyAttempts,
     
     [Display(Name = "Eroare sistem")]
@@ -67,7 +67,7 @@ public enum LoginFailureReason
 }
 
 /// <summary>
-/// User session model Ómbun?t??it cu Domain Logic
+/// User session model √Æmbun?t??it cu Domain Logic
 /// </summary>
 public class UserSession
 {
@@ -80,7 +80,7 @@ public class UserSession
     public string? AvatarUrl { get; init; }
     public UserStatus Status { get; init; } = UserStatus.Active;
 
-    // Domain Logic Methods - Ón loc de simple properties
+    // Domain Logic Methods - √Æn loc de simple properties
     public string GetRoleDisplayName() => Role.GetDisplayName();
     public string GetStatusDisplayName() => Status.GetDisplayName();
     
@@ -119,7 +119,7 @@ public class UserSession
 }
 
 /// <summary>
-/// Demo users pentru testing - cu enums Ón loc de magic strings
+/// Demo users pentru testing - cu enums √Æn loc de magic strings
 /// </summary>
 public static class DemoUsers
 {
@@ -128,7 +128,7 @@ public static class DemoUsers
         new()
         {
             Username = "admin",
-            Password = "admin123",
+            Password = "Admin123!",
             FullName = "Administrator Sistem",
             Email = "admin@valyanmed.ro",
             Role = UserRole.Administrator,
@@ -162,7 +162,7 @@ public static class DemoUsers
             FullName = "Elena Vasile",
             Email = "elena.vasile@valyanmed.ro",
             Role = UserRole.Receptionist,
-            Department = "Recep?ie",
+            Department = "Recep»õie",
             Status = UserStatus.Active
         },
         new()

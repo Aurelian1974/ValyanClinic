@@ -1,4 +1,4 @@
-using ValyanClinic.Application.DTOs;
+﻿using ValyanClinic.Application.DTOs;
 using ValyanClinic.Application.Interfaces;
 using ValyanClinic.Domain.Entities;
 
@@ -121,6 +121,6 @@ public class PatientService : IPatientService
         patient.Allergies = dto.Allergies;
         patient.MedicalHistory = dto.MedicalHistory;
         patient.Notes = dto.Notes;
-        patient.UpdatedAt = DateTime.UtcNow;
+        patient.UpdatedAt = DateTime.Now; // CORECTAT: folosește ora locală în loc de UtcNow
     }
 }

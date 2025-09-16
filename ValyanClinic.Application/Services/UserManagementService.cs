@@ -1,4 +1,4 @@
-using ValyanClinic.Application.Models;
+﻿using ValyanClinic.Application.Models;
 using ValyanClinic.Domain.Models;
 using ValyanClinic.Domain.Enums;
 
@@ -272,24 +272,11 @@ public class UserManagementService : IUserManagementService
     {
         await Task.Delay(10);
         
+        // FluentValidation va gestiona aceste validări
+        // Păstrez doar business logic validation care nu poate fi în validators
         var errors = new List<string>();
         
-        if (string.IsNullOrWhiteSpace(request.FirstName))
-            errors.Add("Numele este obligatoriu.");
-            
-        if (string.IsNullOrWhiteSpace(request.LastName))
-            errors.Add("Prenumele este obligatoriu.");
-            
-        if (string.IsNullOrWhiteSpace(request.Email))
-            errors.Add("Email-ul este obligatoriu.");
-        else if (!IsValidEmail(request.Email))
-            errors.Add("Format email invalid.");
-            
-        if (string.IsNullOrWhiteSpace(request.Username))
-            errors.Add("Numele de utilizator este obligatoriu.");
-        else if (request.Username.Length < 3)
-            errors.Add("Numele de utilizator trebuie sa aiba minim 3 caractere.");
-            
+        // Business rule: verificare unicitate (nu poate fi în FluentValidation fără acces la service)
         if (!await IsUsernameAvailableAsync(request.Username))
             errors.Add("Numele de utilizator este deja folosit.");
             
@@ -351,19 +338,6 @@ public class UserManagementService : IUserManagementService
     }
     
     // Private helper methods
-    private static bool IsValidEmail(string email)
-    {
-        try
-        {
-            var addr = new System.Net.Mail.MailAddress(email);
-            return addr.Address == email;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-    
     private async Task SendWelcomeEmailAsync(User user)
     {
         await Task.Delay(10);

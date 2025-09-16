@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using ValyanClinic.Core.Services;
 
@@ -24,7 +24,7 @@ public class DatabaseHealthCheck : IHealthCheck
             // TODO: Replace with actual database connection check
             await SimulateDatabaseCheckAsync(cancellationToken);
 
-            _logger.LogDebug("Database health check passed");
+            _logger.LogInformation("Database health check passed");
             return HealthCheckResult.Healthy("Database connection is working");
         }
         catch (OperationCanceledException)
@@ -87,7 +87,7 @@ public class CacheHealthCheck : IHealthCheck
             // Cleanup
             await _cacheService.RemoveAsync(testKey);
 
-            _logger.LogDebug("Cache health check passed");
+            _logger.LogInformation("Cache health check passed");
             return HealthCheckResult.Healthy("Cache is working correctly");
         }
         catch (Exception ex)
@@ -135,7 +135,7 @@ public class StockMonitoringHealthCheck : IHealthCheck
                     data: data);
             }
 
-            _logger.LogDebug("Stock monitoring health check passed");
+            _logger.LogInformation("Stock monitoring health check passed");
             return HealthCheckResult.Healthy("Stock monitoring is working", data);
         }
         catch (Exception ex)
@@ -186,7 +186,7 @@ public class SystemResourcesHealthCheck : IHealthCheck
                     data: data));
             }
 
-            _logger.LogDebug("System resources health check passed");
+            _logger.LogInformation("System resources health check passed");
             return Task.FromResult(HealthCheckResult.Healthy("System resources are normal", data));
         }
         catch (Exception ex)

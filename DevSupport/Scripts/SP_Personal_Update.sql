@@ -88,7 +88,7 @@ BEGIN
             Valabil_CI_Pana = @Valabil_CI_Pana,
             Status_Angajat = @Status_Angajat,
             Observatii = @Observatii,
-            Data_Ultimei_Modificari = GETUTCDATE(),
+            Data_Ultimei_Modificari = GETDATE(), -- CORECTAT: folose?te ora local? în loc de UTC
             Modificat_De = @Modificat_De
         WHERE Id_Personal = @Id_Personal;
         

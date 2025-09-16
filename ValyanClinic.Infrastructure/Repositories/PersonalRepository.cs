@@ -93,104 +93,30 @@ public class PersonalRepository : IPersonalRepository
     {
         try
         {
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: ENTRY");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: Personal details:");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Id_Personal: {personal.Id_Personal}");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Nume: '{personal.Nume}'");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Prenume: '{personal.Prenume}'");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - CNP: '{personal.CNP}'");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Cod_Angajat: '{personal.Cod_Angajat}'");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Departament: {personal.Departament}");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Functia: '{personal.Functia}'");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Status_Angajat: {personal.Status_Angajat}");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - CreatDe: '{creatDe}'");
-            
             _logger.LogInformation("Creating new personal: {Nume} {Prenume}", personal.Nume, personal.Prenume);
 
-            Console.WriteLine("DEBUG PersonalRepository.CreateAsync: Ensuring connection is open...");
             await EnsureConnectionOpenAsync();
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: Connection state: {_connection.State}");
 
-            // VERIFICARE EXPLICIT A STORED PROCEDURE-ULUI
-            try
-            {
-                Console.WriteLine("DEBUG PersonalRepository.CreateAsync: Testing stored procedure existence with simple call...");
-                var testCall = await _connection.QueryAsync(
-                    "SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_NAME = 'sp_Personal_Create'"
-                );
-                Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: sp_Personal_Create found: {testCall.Any()}");
-                
-                if (!testCall.Any())
-                {
-                    Console.WriteLine("ERROR PersonalRepository.CreateAsync: sp_Personal_Create does not exist!");
-                    throw new InvalidOperationException("Stored procedure sp_Personal_Create does not exist in database");
-                }
-            }
-            catch (Exception spCheckEx)
-            {
-                Console.WriteLine($"ERROR PersonalRepository.CreateAsync: Error checking stored procedure: {spCheckEx.Message}");
-                throw;
-            }
-
-            Console.WriteLine("DEBUG PersonalRepository.CreateAsync: Mapping personal to parameters...");
             var parameters = MapPersonalToParameters(personal);
             parameters.Add("@Id_Personal", personal.Id_Personal == Guid.Empty ? null : personal.Id_Personal);
             parameters.Add("@Creat_De", creatDe);
 
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: Parameters prepared. Total count: {parameters.ParameterNames?.Count() ?? 0}");
-            foreach (var paramName in parameters.ParameterNames ?? Enumerable.Empty<string>())
-            {
-                var value = parameters.Get<object>(paramName);
-                Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - @{paramName} = '{value ?? "NULL"}'");
-            }
-
-            Console.WriteLine("DEBUG PersonalRepository.CreateAsync: Calling stored procedure 'sp_Personal_Create'...");
-            
-            // ADAUGĂ TIMEOUT ȘI ERROR HANDLING EXPLICIT
             var result = await _connection.QueryFirstAsync<PersonalDto>(
                 "sp_Personal_Create",
                 parameters,
                 commandType: CommandType.StoredProcedure,
                 commandTimeout: 120); // 2 minute timeout
 
-            Console.WriteLine("DEBUG PersonalRepository.CreateAsync: Stored procedure executed successfully");
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: Result is null: {result == null}");
-            
-            if (result != null)
-            {
-                Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: Result details:");
-                Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Id_Personal: {result.Id_Personal}");
-                Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Nume: '{result.Nume}'");
-                Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Prenume: '{result.Prenume}'");
-                Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Data_Crearii: {result.Data_Crearii}");
-                Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: - Creat_De: '{result.Creat_De}'");
-            }
-
             var mappedResult = MapDtoToPersonal(result);
-            Console.WriteLine($"DEBUG PersonalRepository.CreateAsync: Personal mapped successfully. Returning result with ID: {mappedResult.Id_Personal}");
             
             return mappedResult;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR PersonalRepository.CreateAsync: Exception occurred: {ex.Message}");
-            Console.WriteLine($"ERROR PersonalRepository.CreateAsync: Exception type: {ex.GetType().Name}");
-            Console.WriteLine($"ERROR PersonalRepository.CreateAsync: Stack trace: {ex.StackTrace}");
-            
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"ERROR PersonalRepository.CreateAsync: Inner exception: {ex.InnerException.Message}");
-                Console.WriteLine($"ERROR PersonalRepository.CreateAsync: Inner stack trace: {ex.InnerException.StackTrace}");
-            }
-            
-            // LOGGING SPECIFIC PENTRU SQL EXCEPTIONS
             if (ex is Microsoft.Data.SqlClient.SqlException sqlEx)
             {
-                Console.WriteLine($"ERROR PersonalRepository.CreateAsync: SQL Error Number: {sqlEx.Number}");
-                Console.WriteLine($"ERROR PersonalRepository.CreateAsync: SQL Error Severity: {sqlEx.Class}");
-                Console.WriteLine($"ERROR PersonalRepository.CreateAsync: SQL Error State: {sqlEx.State}");
-                Console.WriteLine($"ERROR PersonalRepository.CreateAsync: SQL Error Procedure: {sqlEx.Procedure}");
-                Console.WriteLine($"ERROR PersonalRepository.CreateAsync: SQL Error Line: {sqlEx.LineNumber}");
+                _logger.LogError(ex, "SQL Error creating personal: Number={Number}, Severity={Severity}, State={State}", 
+                    sqlEx.Number, sqlEx.Class, sqlEx.State);
             }
             
             _logger.LogError(ex, "Error creating personal: {Nume} {Prenume}", personal.Nume, personal.Prenume);
@@ -202,73 +128,25 @@ public class PersonalRepository : IPersonalRepository
     {
         try
         {
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: ENTRY");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: Personal details:");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Id_Personal: {personal.Id_Personal}");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Nume: '{personal.Nume}'");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Prenume: '{personal.Prenume}'");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - CNP: '{personal.CNP}'");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Cod_Angajat: '{personal.Cod_Angajat}'");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Departament: {personal.Departament}");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Functia: '{personal.Functia}'");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Status_Angajat: {personal.Status_Angajat}");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - ModificatDe: '{modificatDe}'");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Data_Ultimei_Modificari: {personal.Data_Ultimei_Modificari}");
-            
             _logger.LogInformation("Updating personal: {PersonalId}", personal.Id_Personal);
 
-            Console.WriteLine("DEBUG PersonalRepository.UpdateAsync: Ensuring connection is open...");
             await EnsureConnectionOpenAsync();
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: Connection state: {_connection.State}");
 
-            Console.WriteLine("DEBUG PersonalRepository.UpdateAsync: Mapping personal to parameters...");
             var parameters = MapPersonalToParameters(personal);
             parameters.Add("@Id_Personal", personal.Id_Personal);
             parameters.Add("@Modificat_De", modificatDe);
 
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: Parameters prepared. Total count: {parameters.ParameterNames?.Count() ?? 0}");
-            foreach (var paramName in parameters.ParameterNames ?? Enumerable.Empty<string>())
-            {
-                var value = parameters.Get<object>(paramName);
-                Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - @{paramName} = '{value ?? "NULL"}'");
-            }
-
-            Console.WriteLine("DEBUG PersonalRepository.UpdateAsync: Calling stored procedure 'sp_Personal_Update'...");
-            
             var result = await _connection.QueryFirstAsync<PersonalDto>(
                 "sp_Personal_Update",
                 parameters,
                 commandType: CommandType.StoredProcedure);
 
-            Console.WriteLine("DEBUG PersonalRepository.UpdateAsync: Stored procedure executed successfully");
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: Result is null: {result == null}");
-            
-            if (result != null)
-            {
-                Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: Result details:");
-                Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Id_Personal: {result.Id_Personal}");
-                Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Nume: '{result.Nume}'");
-                Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Prenume: '{result.Prenume}'");
-                Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Data_Ultimei_Modificari: {result.Data_Ultimei_Modificari}");
-                Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: - Modificat_De: '{result.Modificat_De}'");
-            }
-
             var mappedResult = MapDtoToPersonal(result);
-            Console.WriteLine($"DEBUG PersonalRepository.UpdateAsync: Personal mapped successfully. Returning result with ID: {mappedResult.Id_Personal}");
             
             return mappedResult;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR PersonalRepository.UpdateAsync: Exception occurred: {ex.Message}");
-            Console.WriteLine($"ERROR PersonalRepository.UpdateAsync: Exception type: {ex.GetType().Name}");
-            Console.WriteLine($"ERROR PersonalRepository.UpdateAsync: Stack trace: {ex.StackTrace}");
-            
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"ERROR PersonalRepository.UpdateAsync: Inner exception: {ex.InnerException.Message}");
-            }
-            
             _logger.LogError(ex, "Error updating personal: {PersonalId}", personal.Id_Personal);
             throw;
         }
@@ -359,9 +237,6 @@ public class PersonalRepository : IPersonalRepository
     {
         try
         {
-            _logger.LogDebug("Getting departamente dropdown options");
-            
-            // ENSURE FRESH CONNECTION FOR EACH CALL
             await EnsureConnectionOpenAsync();
             
             var result = await _connection.QueryAsync<DropdownOption>(
@@ -380,9 +255,6 @@ public class PersonalRepository : IPersonalRepository
     {
         try
         {
-            _logger.LogDebug("Getting functii dropdown options");
-            
-            // ENSURE FRESH CONNECTION FOR EACH CALL
             await EnsureConnectionOpenAsync();
             
             var result = await _connection.QueryAsync<DropdownOption>(
@@ -401,9 +273,6 @@ public class PersonalRepository : IPersonalRepository
     {
         try
         {
-            _logger.LogDebug("Getting judete dropdown options");
-            
-            // ENSURE FRESH CONNECTION FOR EACH CALL
             await EnsureConnectionOpenAsync();
             
             var result = await _connection.QueryAsync<DropdownOption>(
@@ -428,109 +297,38 @@ public class PersonalRepository : IPersonalRepository
     {
         try
         {
-            Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: Initial connection state: {_connection.State}");
-            Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: Connection string (masked): Server={ExtractServerFromConnectionString(_connection.ConnectionString)}");
-            
             if (_connection.State == ConnectionState.Closed)
             {
-                Console.WriteLine("DEBUG EnsureConnectionOpenAsync: Connection is closed, opening...");
-                _logger.LogDebug("Opening database connection");
                 _connection.Open(); 
-                Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: Connection opened. New state: {_connection.State}");
             }
             else if (_connection.State == ConnectionState.Broken)
             {
-                Console.WriteLine("DEBUG EnsureConnectionOpenAsync: Connection is broken, closing and reopening...");
                 _logger.LogWarning("Connection is broken, closing and reopening");
                 _connection.Close();
                 _connection.Open(); 
-                Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: Connection reopened. New state: {_connection.State}");
             }
             else if (_connection.State == ConnectionState.Open)
             {
                 // Connection is already open - verify it's working with a simple test
                 try
                 {
-                    Console.WriteLine("DEBUG EnsureConnectionOpenAsync: Connection appears open, testing with SELECT 1...");
                     var testResult = await _connection.QuerySingleAsync<int>("SELECT 1");
-                    Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: Connection test successful. Result: {testResult}");
                 }
                 catch (Exception testEx)
                 {
-                    Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: Connection test failed: {testEx.Message}");
-                    _logger.LogWarning("Open connection test failed, reopening");
+                    _logger.LogWarning(testEx, "Open connection test failed, reopening");
                     _connection.Close();
                     _connection.Open(); 
-                    Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: Connection reopened after test failure. New state: {_connection.State}");
                 }
             }
 
-            // Additional database verification
-            try
-            {
-                Console.WriteLine("DEBUG EnsureConnectionOpenAsync: Verifying database and Personal table...");
-                var dbName = await _connection.QuerySingleAsync<string>("SELECT DB_NAME()");
-                Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: Connected to database: {dbName}");
-                
-                var tableExists = await _connection.QuerySingleAsync<int>(
-                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Personal'");
-                Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: Personal table exists: {tableExists > 0}");
-                
-                if (tableExists == 0)
-                {
-                    Console.WriteLine("ERROR EnsureConnectionOpenAsync: Personal table does not exist in database!");
-                    throw new InvalidOperationException("Personal table does not exist in the database");
-                }
-
-                // Check if stored procedures exist
-                var spCreateExists = await _connection.QuerySingleAsync<int>(
-                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_NAME = 'sp_Personal_Create'");
-                var spUpdateExists = await _connection.QuerySingleAsync<int>(
-                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_NAME = 'sp_Personal_Update'");
-                
-                Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: sp_Personal_Create exists: {spCreateExists > 0}");
-                Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: sp_Personal_Update exists: {spUpdateExists > 0}");
-                
-                if (spCreateExists == 0)
-                {
-                    Console.WriteLine("ERROR EnsureConnectionOpenAsync: sp_Personal_Create stored procedure does not exist!");
-                }
-                if (spUpdateExists == 0)
-                {
-                    Console.WriteLine("ERROR EnsureConnectionOpenAsync: sp_Personal_Update stored procedure does not exist!");
-                }
-            }
-            catch (Exception verifyEx)
-            {
-                Console.WriteLine($"WARNING EnsureConnectionOpenAsync: Database verification failed: {verifyEx.Message}");
-                // Continue anyway, but log the issue
-            }
-            
             // Add a small delay to ensure connection is fully ready
-            Console.WriteLine("DEBUG EnsureConnectionOpenAsync: Waiting 10ms for connection to be ready...");
             await Task.Delay(10);
-            Console.WriteLine($"DEBUG EnsureConnectionOpenAsync: Final connection state: {_connection.State}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR EnsureConnectionOpenAsync: Failed to ensure connection is open: {ex.Message}");
-            Console.WriteLine($"ERROR EnsureConnectionOpenAsync: Exception type: {ex.GetType().Name}");
             _logger.LogError(ex, "Failed to ensure connection is open");
             throw;
-        }
-    }
-
-    private static string ExtractServerFromConnectionString(string connectionString)
-    {
-        try
-        {
-            var serverPart = connectionString.Split(';')
-                .FirstOrDefault(part => part.Trim().StartsWith("Server=", StringComparison.OrdinalIgnoreCase));
-            return serverPart?.Substring(7) ?? "Unknown";
-        }
-        catch
-        {
-            return "Unknown";
         }
     }
 
@@ -616,19 +414,6 @@ public class PersonalRepository : IPersonalRepository
         parameters.Add("@Status_Angajat", personal.Status_Angajat.ToString());
         parameters.Add("@Observatii", personal.Observatii);
         
-        // ADAUGĂ DEBUGGING PENTRU PARAMETRI CRITICI
-        Console.WriteLine($"DEBUG MapPersonalToParameters: Mapping critical parameters:");
-        Console.WriteLine($"DEBUG MapPersonalToParameters: - @Cod_Angajat = '{personal.Cod_Angajat}'");
-        Console.WriteLine($"DEBUG MapPersonalToParameters: - @CNP = '{personal.CNP}'");
-        Console.WriteLine($"DEBUG MapPersonalToParameters: - @Nume = '{personal.Nume}'");
-        Console.WriteLine($"DEBUG MapPersonalToParameters: - @Prenume = '{personal.Prenume}'");
-        Console.WriteLine($"DEBUG MapPersonalToParameters: - @Adresa_Domiciliu = '{personal.Adresa_Domiciliu}'");
-        Console.WriteLine($"DEBUG MapPersonalToParameters: - @Judet_Domiciliu = '{personal.Judet_Domiciliu}'");
-        Console.WriteLine($"DEBUG MapPersonalToParameters: - @Oras_Domiciliu = '{personal.Oras_Domiciliu}'");
-        Console.WriteLine($"DEBUG MapPersonalToParameters: - @Functia = '{personal.Functia}'");
-        Console.WriteLine($"DEBUG MapPersonalToParameters: - @Departament = '{personal.Departament?.ToString()}'");
-        Console.WriteLine($"DEBUG MapPersonalToParameters: - @Status_Angajat = '{personal.Status_Angajat.ToString()}'");
-        
         return parameters;
     }
 
@@ -704,72 +489,28 @@ public class PersonalRepository : IPersonalRepository
     {
         try
         {
-            Console.WriteLine("DEBUG TestDatabaseConnectionAsync: Starting database connection test...");
-            
             await EnsureConnectionOpenAsync();
             
             // Test 1: Basic connection test
             var basicTest = await _connection.QuerySingleAsync<int>("SELECT 1");
-            Console.WriteLine($"DEBUG TestDatabaseConnectionAsync: Basic connection test result: {basicTest}");
             
             // Test 2: Database name
             var dbName = await _connection.QuerySingleAsync<string>("SELECT DB_NAME()");
-            Console.WriteLine($"DEBUG TestDatabaseConnectionAsync: Connected to database: {dbName}");
             
             // Test 3: Check Personal table
             var personalTableExists = await _connection.QuerySingleAsync<int>(
                 "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Personal'");
-            Console.WriteLine($"DEBUG TestDatabaseConnectionAsync: Personal table exists: {personalTableExists > 0}");
             
             if (personalTableExists == 0)
             {
-                Console.WriteLine("ERROR TestDatabaseConnectionAsync: Personal table does not exist!");
                 return false;
             }
             
-            // Test 4: Check stored procedures
-            var spExists = await _connection.QueryAsync<string>(
-                "SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_NAME LIKE 'sp_Personal_%'");
-            Console.WriteLine($"DEBUG TestDatabaseConnectionAsync: Found stored procedures: {string.Join(", ", spExists)}");
-            
-            // Test 5: Check table structure
-            var columns = await _connection.QueryAsync<string>(
-                "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Personal' ORDER BY ORDINAL_POSITION");
-            Console.WriteLine($"DEBUG TestDatabaseConnectionAsync: Personal table columns: {string.Join(", ", columns)}");
-            
-            // Test 6: Try simple insert/delete
-            try
-            {
-                var testGuid = Guid.NewGuid();
-                Console.WriteLine($"DEBUG TestDatabaseConnectionAsync: Testing simple insert with ID: {testGuid}");
-                
-                await _connection.ExecuteAsync(@"
-                    INSERT INTO Personal (Id_Personal, Cod_Angajat, CNP, Nume, Prenume, Data_Nasterii, 
-                                         Nationalitate, Cetatenie, Adresa_Domiciliu, Judet_Domiciliu, 
-                                         Oras_Domiciliu, Functia, Status_Angajat, Data_Crearii, Data_Ultimei_Modificari, Creat_De)
-                    VALUES (@Id, 'TEST001', '1234567890123', 'Test', 'User', '1990-01-01', 
-                           'Romana', 'Romana', 'Test Address', 'Bucuresti', 
-                           'Bucuresti', 'Test Function', 'Activ', GETUTCDATE(), GETUTCDATE(), 'TEST')", 
-                    new { Id = testGuid });
-                
-                Console.WriteLine("DEBUG TestDatabaseConnectionAsync: Simple insert successful");
-                
-                // Clean up test data
-                await _connection.ExecuteAsync("DELETE FROM Personal WHERE Id_Personal = @Id", new { Id = testGuid });
-                Console.WriteLine("DEBUG TestDatabaseConnectionAsync: Test data cleaned up");
-            }
-            catch (Exception testEx)
-            {
-                Console.WriteLine($"ERROR TestDatabaseConnectionAsync: Simple insert test failed: {testEx.Message}");
-                return false;
-            }
-            
-            Console.WriteLine("DEBUG TestDatabaseConnectionAsync: All tests passed!");
             return true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR TestDatabaseConnectionAsync: Database connection test failed: {ex.Message}");
+            _logger.LogError(ex, "Database connection test failed");
             return false;
         }
     }

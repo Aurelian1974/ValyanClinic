@@ -22,7 +22,7 @@ public interface IPersonalService
     
     Task<PersonalDropdownOptions> GetDropdownOptionsAsync();
     
-    Task<ValidationResult> ValidatePersonalAsync(Personal personal, bool isUpdate = false);
+    Task<PersonalValidationResult> ValidatePersonalAsync(Personal personal, bool isUpdate = false);
 }
 
 /// <summary>
@@ -106,16 +106,16 @@ public record PersonalDropdownOptions(
 public record DropdownItem(string Value, string Text);
 
 /// <summary>
-/// Result pentru validare
+/// Result pentru validare Personal
 /// </summary>
-public class ValidationResult
+public class PersonalValidationResult
 {
     public bool IsValid => !Errors.Any();
     public List<string> Errors { get; init; } = new();
     
-    public static ValidationResult Success() => new();
+    public static PersonalValidationResult Success() => new();
     
-    public static ValidationResult Failure(params string[] errors) => new()
+    public static PersonalValidationResult Failure(params string[] errors) => new()
     {
         Errors = errors.ToList()
     };

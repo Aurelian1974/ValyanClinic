@@ -394,8 +394,7 @@
             <Content>
                 @if (_state.IsEditMode && _state.EditingPersonal != null)
                 {
-                    <AdaugaEditezaPersonal PersonalId="@_state.EditingPersonal.Id_Personal" 
-                                          EditingPersonal="@_state.EditingPersonal"
+                    <AdaugaEditezaPersonal EditingPersonal="@_state.EditingPersonal"
                                           OnSave="@SavePersonal" 
                                           OnCancel="@CloseAddEditModal" />
                 }
@@ -405,18 +404,6 @@
                                           OnCancel="@CloseAddEditModal" />
                 }
             </Content>
-            <FooterTemplate>
-                <div class="modal-footer-actions">
-                    <button type="button" class="btn btn-primary" @onclick="OnFormSubmit" disabled="@_state.IsLoading">
-                        <i class="fas fa-save"></i>
-                        @(_state.IsEditMode ? "Actualizeaza Personalul" : "Creeaza Personalul")
-                    </button>
-                    <button type="button" class="btn btn-secondary" @onclick="CloseAddEditModal" disabled="@_state.IsLoading">
-                        <i class="fas fa-times"></i>
-                        Anuleaza
-                    </button>
-                </div>
-            </FooterTemplate>
         </DialogTemplates>
     </SfDialog>
 </div>

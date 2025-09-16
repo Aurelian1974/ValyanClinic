@@ -1,12 +1,13 @@
-using ValyanClinic.Domain.Models;
+﻿using ValyanClinic.Domain.Models;
 using ValyanClinic.Domain.Enums;
-using FluentValidation;
+using ValyanClinic.Application.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace ValyanClinic.Application.Services;
 
 /// <summary>
 /// Rich Authentication Service cu business logic
-/// �nlocuie?te simple pass-through cu domain operations
+/// Înlocuiește simple pass-through cu domain operations
 /// </summary>
 public interface IAuthenticationService
 {
@@ -20,33 +21,40 @@ public interface IAuthenticationService
 
 public class AuthenticationService : IAuthenticationService
 {
-    private readonly IValidator<LoginRequest> _validator;
+    private readonly IValidationService _validationService;
     private readonly IUserSessionService _userSessionService;
     private readonly ISecurityAuditService _auditService;
+    private readonly ILogger<AuthenticationService> _logger;
     
-    // �n-memory storage pentru demo - �n production ar fi database
+    // În-memory storage pentru demo - în production ar fi database
     private static readonly Dictionary<string, int> _loginAttempts = new();
     private static readonly Dictionary<string, DateTime> _lockoutTimes = new();
     
     public AuthenticationService(
-        IValidator<LoginRequest> validator,
+        IValidationService validationService,
         IUserSessionService userSessionService,
-        ISecurityAuditService auditService)
+        ISecurityAuditService auditService,
+        ILogger<AuthenticationService> logger)
     {
-        _validator = validator;
+        _validationService = validationService;
         _userSessionService = userSessionService;
         _auditService = auditService;
+        _logger = logger;
     }
 
     public async Task<LoginResult> AuthenticateAsync(LoginRequest request)
     {
         try
         {
-            // 1. Validare FluentValidation
-            var validationResult = await _validator.ValidateAsync(request);
+            _logger.LogInformation("Authentication attempt for user: {Username}", request.Username);
+
+            // 1. Validare FluentValidation prin ValidationService
+            var validationResult = await _validationService.ValidateAsync(request);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                _logger.LogWarning("Authentication validation failed for user: {Username} with {ErrorCount} errors", 
+                    request.Username, errors.Count);
                 await _auditService.LogValidationFailureAsync(request.Username, errors);
                 return LoginResult.Failure(errors, LoginFailureReason.ValidationError);
             }
@@ -56,9 +64,10 @@ public class AuthenticationService : IAuthenticationService
             {
                 var remainingTime = await GetLockoutTimeRemainingAsync(request.Username);
                 var message = remainingTime.HasValue 
-                    ? $"Cont blocat temporar. �ncerca?i din nou �n {Math.Ceiling(remainingTime.Value.TotalMinutes)} minute."
-                    : "Cont blocat din cauza prea multor �ncerc?ri.";
+                    ? $"Cont blocat temporar. Încercați din nou în {Math.Ceiling(remainingTime.Value.TotalMinutes)} minute."
+                    : "Cont blocat din cauza prea multor încercări.";
                 
+                _logger.LogWarning("Locked account attempt for user: {Username}", request.Username);
                 await _auditService.LogLockedAccountAttemptAsync(request.Username);
                 return LoginResult.AccountLocked(message, remainingTime ?? TimeSpan.Zero);
             }
@@ -77,6 +86,7 @@ public class AuthenticationService : IAuthenticationService
                 // Audit success
                 await _auditService.LogSuccessfulLoginAsync(request.Username, authResult.UserSession!.Role);
                 
+                _logger.LogInformation("Authentication successful for user: {Username}", request.Username);
                 return authResult;
             }
             else
@@ -87,13 +97,16 @@ public class AuthenticationService : IAuthenticationService
                 // Audit failure
                 await _auditService.LogFailedLoginAsync(request.Username, authResult.FailureReason ?? LoginFailureReason.InvalidCredentials);
                 
+                _logger.LogWarning("Authentication failed for user: {Username}, reason: {FailureReason}", 
+                    request.Username, authResult.FailureReason);
                 return authResult;
             }
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "System error during authentication for user: {Username}", request.Username);
             await _auditService.LogSystemErrorAsync(request.Username, ex);
-            return LoginResult.Failure("A ap?rut o eroare la autentificare. V? rug?m s? �ncerca?i din nou.", LoginFailureReason.SystemError);
+            return LoginResult.Failure("A apărut o eroare la autentificare. Vă rugăm să încercați din nou.", LoginFailureReason.SystemError);
         }
     }
 
@@ -112,10 +125,10 @@ public class AuthenticationService : IAuthenticationService
             // Business rules validation
             if (!userSession.IsActive)
             {
-                return LoginResult.Failure("Contul este inactiv. Contacta?i administratorul.", LoginFailureReason.AccountDisabled);
+                return LoginResult.Failure("Contul este inactiv. Contactați administratorul.", LoginFailureReason.AccountDisabled);
             }
             
-            return LoginResult.Success(userSession, "Autentificare reu?it?!");
+            return LoginResult.Success(userSession, "Autentificare reușită!");
         }
 
         return LoginResult.Failure("Numele de utilizator sau parola sunt incorecte.", LoginFailureReason.InvalidCredentials);
@@ -132,6 +145,7 @@ public class AuthenticationService : IAuthenticationService
             if (_loginAttempts[key] >= 5)
             {
                 _lockoutTimes[key] = DateTime.UtcNow.AddMinutes(15); // 15 minute lockout
+                _logger.LogWarning("Account locked for user: {Username} after {Attempts} failed attempts", username, _loginAttempts[key]);
             }
         });
     }
@@ -149,6 +163,7 @@ public class AuthenticationService : IAuthenticationService
                 // Lockout expired, clean up
                 _lockoutTimes.Remove(key);
                 _loginAttempts.Remove(key);
+                _logger.LogInformation("Account lockout expired for user: {Username}", username);
                 return false;
             }
             
@@ -204,7 +219,7 @@ public interface IUserSessionService
 }
 
 /// <summary>
-/// Service pentru audit ?i logging securitate
+/// Service pentru audit și logging securitate
 /// </summary>
 public interface ISecurityAuditService
 {
@@ -215,17 +230,23 @@ public interface ISecurityAuditService
     Task LogSystemErrorAsync(string username, Exception exception);
 }
 
-// Implement?ri simple pentru demo
+// Implementări simple pentru demo
 public class UserSessionService : IUserSessionService
 {
     private static readonly Dictionary<string, UserSession> _activeSessions = new();
+    private readonly ILogger<UserSessionService> _logger;
+
+    public UserSessionService(ILogger<UserSessionService> logger)
+    {
+        _logger = logger;
+    }
 
     public async Task<string> CreateSessionAsync(UserSession userSession)
     {
         await Task.CompletedTask;
         var sessionToken = Guid.NewGuid().ToString();
         _activeSessions[sessionToken] = userSession;
-        Console.WriteLine($"DEBUG: Session created with token: {sessionToken.Substring(0, 8)}... for user: {userSession.Username}");
+        _logger.LogInformation("Session created for user: {Username}", userSession.Username);
         return sessionToken;
     }
 
@@ -233,15 +254,15 @@ public class UserSessionService : IUserSessionService
     {
         await Task.CompletedTask;
         
-        // Pentru testare: accept? ?i token-ul de test
+        // Pentru testare: acceptă și token-ul de test
         if (sessionToken == "test-session-token")
         {
-            Console.WriteLine("DEBUG: Test session token accepted");
+            _logger.LogInformation("Test session token accepted");
             return true;
         }
         
         var isValid = _activeSessions.ContainsKey(sessionToken);
-        Console.WriteLine($"DEBUG: Session validation for {sessionToken.Substring(0, 8)}...: {isValid}");
+        _logger.LogInformation("Session validation result: {IsValid}", isValid);
         return isValid;
     }
 
@@ -249,7 +270,7 @@ public class UserSessionService : IUserSessionService
     {
         await Task.CompletedTask;
         var removed = _activeSessions.Remove(sessionToken);
-        Console.WriteLine($"DEBUG: Session invalidated: {sessionToken.Substring(0, 8)}... (removed: {removed})");
+        _logger.LogInformation("Session invalidated, removed: {Removed}", removed);
     }
 
     public async Task<UserSession?> GetSessionAsync(string sessionToken)
@@ -259,7 +280,7 @@ public class UserSessionService : IUserSessionService
         // Pentru testare: returnez un utilizator de test pentru token-ul de test
         if (sessionToken == "test-session-token")
         {
-            Console.WriteLine("DEBUG: Returning test user session");
+            _logger.LogInformation("Returning test user session");
             return new UserSession
             {
                 Username = "test-user",
@@ -273,40 +294,50 @@ public class UserSessionService : IUserSessionService
         }
         
         var session = _activeSessions.GetValueOrDefault(sessionToken);
-        Console.WriteLine($"DEBUG: Getting session for {sessionToken.Substring(0, 8)}...: {session?.Username ?? "null"}");
+        _logger.LogInformation("Getting session, user: {Username}", session?.Username ?? "null");
         return session;
     }
 }
 
 public class SecurityAuditService : ISecurityAuditService
 {
+    private readonly ILogger<SecurityAuditService> _logger;
+
+    public SecurityAuditService(ILogger<SecurityAuditService> logger)
+    {
+        _logger = logger;
+    }
+
     public async Task LogSuccessfulLoginAsync(string username, UserRole role)
     {
         await Task.CompletedTask;
-        Console.WriteLine($"[AUDIT] Successful login: {username} ({role.GetDisplayName()}) at {DateTime.Now}");
+        _logger.LogInformation("Successful login: {Username} ({Role}) at {Timestamp}", 
+            username, role.GetDisplayName(), DateTime.Now);
     }
 
     public async Task LogFailedLoginAsync(string username, LoginFailureReason reason)
     {
         await Task.CompletedTask;
-        Console.WriteLine($"[AUDIT] Failed login: {username} - {reason.GetDisplayName()} at {DateTime.Now}");
+        _logger.LogWarning("Failed login: {Username} - {Reason} at {Timestamp}", 
+            username, reason.GetDisplayName(), DateTime.Now);
     }
 
     public async Task LogValidationFailureAsync(string username, List<string> errors)
     {
         await Task.CompletedTask;
-        Console.WriteLine($"[AUDIT] Validation failure: {username} - {string.Join(", ", errors)} at {DateTime.Now}");
+        _logger.LogWarning("Validation failure: {Username} - {Errors} at {Timestamp}", 
+            username, string.Join(", ", errors), DateTime.Now);
     }
 
     public async Task LogLockedAccountAttemptAsync(string username)
     {
         await Task.CompletedTask;
-        Console.WriteLine($"[AUDIT] Locked account attempt: {username} at {DateTime.Now}");
+        _logger.LogWarning("Locked account attempt: {Username} at {Timestamp}", username, DateTime.Now);
     }
 
     public async Task LogSystemErrorAsync(string username, Exception exception)
     {
         await Task.CompletedTask;
-        Console.WriteLine($"[AUDIT] System error during login: {username} - {exception.Message} at {DateTime.Now}");
+        _logger.LogError(exception, "System error during login: {Username} at {Timestamp}", username, DateTime.Now);
     }
 }

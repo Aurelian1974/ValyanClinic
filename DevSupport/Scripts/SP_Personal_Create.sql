@@ -39,6 +39,7 @@ BEGIN
         BEGIN TRANSACTION;
         
         DECLARE @NewId UNIQUEIDENTIFIER = NEWID();
+        DECLARE @CurrentDate DATETIME2 = GETDATE(); -- Folose?te ora local? pentru consisten??
         
         -- Verificare unicitate CNP si Cod_Angajat
         IF EXISTS (SELECT 1 FROM Personal WHERE CNP = @CNP)
@@ -59,7 +60,8 @@ BEGIN
             Adresa_Resedinta, Judet_Resedinta, Oras_Resedinta, Cod_Postal_Resedinta,
             Stare_Civila, Functia, Departament,
             Serie_CI, Numar_CI, Eliberat_CI_De, Data_Eliberare_CI, Valabil_CI_Pana,
-            Status_Angajat, Observatii, Creat_De
+            Status_Angajat, Observatii, 
+            Data_Crearii, Data_Ultimei_Modificari, Creat_De, Modificat_De
         ) VALUES (
             @NewId, @Cod_Angajat, @CNP, @Nume, @Prenume, @Nume_Anterior,
             @Data_Nasterii, @Locul_Nasterii, @Nationalitate, @Cetatenie,
@@ -68,7 +70,8 @@ BEGIN
             @Adresa_Resedinta, @Judet_Resedinta, @Oras_Resedinta, @Cod_Postal_Resedinta,
             @Stare_Civila, @Functia, @Departament,
             @Serie_CI, @Numar_CI, @Eliberat_CI_De, @Data_Eliberare_CI, @Valabil_CI_Pana,
-            @Status_Angajat, @Observatii, @Creat_De
+            @Status_Angajat, @Observatii, 
+            @CurrentDate, @CurrentDate, @Creat_De, @Creat_De
         );
         
         COMMIT TRANSACTION;
