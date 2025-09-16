@@ -11,7 +11,11 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Localization;
 using System.Text.Encodings.Web;
-using Dapper; // Pentru QueryFirstOrDefault
+using Dapper;
+using ValyanClinic.Infrastructure.Repositories;
+using ValyanClinic.Application.Extensions;
+using ValyanClinic.Core.Services;
+using ValyanClinic.Core.HealthChecks;
 
 // BOOTSTRAP LOGGER MINIMAL - PENTRU DEBUGGING
 Log.Logger = new LoggerConfiguration()
@@ -109,6 +113,10 @@ try
 
     Log.Information("🔗 Configuring database connection");
 
+    // Configurare IDbConnectionFactory pentru backward compatibility
+    builder.Services.AddSingleton<IDbConnectionFactory>(provider =>
+        new SqlConnectionFactory(connectionString));
+
     // Configurare IDbConnection pentru Dapper
     builder.Services.AddScoped<IDbConnection>(provider => 
     {
@@ -152,12 +160,39 @@ try
 
     Log.Information("✅ UI Components and cache configured");
 
-    // Application services
+    // === CONFIGURARE FLUENTVALIDATION ===
+    builder.Services.AddValyanClinicValidation();
+    
+    // === REPOSITORY LAYER ===
+    // Infrastructure repositories
+    builder.Services.AddScoped<IPersonalRepository, PersonalRepository>();
+    
+    // === APPLICATION SERVICES ===
+    // Core application services
     builder.Services.AddScoped<IPersonalService, PersonalService>();
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IValidationService, ValidationService>();
 
-    Log.Information("✅ Application services configured");
+    // Rich Services pentru autentificare și securitate
+    builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+    builder.Services.AddScoped<IUserSessionService, UserSessionService>();
+    builder.Services.AddScoped<ISecurityAuditService, SecurityAuditService>();
+
+    // Management Services
+    builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+
+    // === CORE SERVICES ===
+    // Cache service
+    builder.Services.AddScoped<ICacheService, MemoryCacheService>();
+    
+    // Stock monitoring services
+    builder.Services.AddScoped<IStockMonitoringService, StockMonitoringService>();
+    
+    // === BACKGROUND SERVICES ===
+    builder.Services.AddHostedService<StockMonitoringBackgroundService>();
+
+    // === HEALTH CHECKS ===
+    builder.Services.AddValyanClinicHealthChecks();
 
     // Localization services
     builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
@@ -261,6 +296,9 @@ try
         SupportedCultures = new List<CultureInfo> { new CultureInfo("ro-RO"), new CultureInfo("en-US") },
         SupportedUICultures = new List<CultureInfo> { new CultureInfo("ro-RO"), new CultureInfo("en-US") }
     });
+
+    // Health checks endpoints
+    app.UseValyanClinicHealthChecks();
 
     app.UseHttpsRedirection();
     app.UseAntiforgery();
