@@ -34,6 +34,9 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     private bool isSubmitting = false;
     private FluentValidationHelper<PersonalModel>? validationHelper;
 
+    // Checkbox state pentru adresa de resedinta
+    private bool showResedintaSection = false;
+
     private bool IsEditMode => EditingPersonal != null;
 
     protected override async Task OnInitializedAsync()
@@ -44,6 +47,16 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         {
             Logger.LogInformation("Editare personal - CNP: {CNP}", EditingPersonal.CNP);
             personalFormModel = PersonalFormModel.FromPersonal(EditingPersonal);
+            
+            // Verifică dacă există date de reședință pentru a determina starea checkbox-ului
+            // Logica inversată: dacă există date de reședință, înseamnă că adresele DIFERĂ, deci checkbox-ul e NEBIFAT
+            var hasResedintaData = !string.IsNullOrEmpty(EditingPersonal.Adresa_Resedinta) ||
+                                  !string.IsNullOrEmpty(EditingPersonal.Judet_Resedinta) ||
+                                  !string.IsNullOrEmpty(EditingPersonal.Oras_Resedinta) ||
+                                  !string.IsNullOrEmpty(EditingPersonal.Cod_Postal_Resedinta);
+            
+            // Logica inversată: dacă există date de reședință, checkbox-ul e nebifat (adresele diferă)
+            showResedintaSection = !hasResedintaData;
         }
         else
         {
@@ -56,6 +69,8 @@ public partial class AdaugaEditezaPersonal : ComponentBase
                 Nationalitate = "Romana",
                 Cetatenie = "Romana"
             };
+            // Pentru personal nou, presupunem că adresele sunt identice (checkbox bifat, card ascuns)
+            showResedintaSection = true;
         }
     }
 
@@ -143,6 +158,37 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     private async Task HandleCancel()
     {
         await OnCancel.InvokeAsync();
+    }
+
+    /// <summary>
+    /// Metodă publică pentru a declanșa submit-ul din exterior (ex: din FooterTemplate)
+    /// </summary>
+    public async Task SubmitForm()
+    {
+        await HandleSubmit();
+    }
+
+    /// <summary>
+    /// Gestionează schimbarea checkbox-ului pentru adresa de resedinta
+    /// Logica inversată: bifat = adrese identice (card ascuns), nebifat = adrese diferite (card vizibil)
+    /// </summary>
+    private void OnResedintaCheckboxChanged(ChangeEventArgs args)
+    {
+        if (args.Value is bool isChecked)
+        {
+            showResedintaSection = isChecked;
+            
+            // Dacă checkbox-ul este BIFAT (adrese identice), curăță datele de reședință
+            if (showResedintaSection)
+            {
+                personalFormModel.Adresa_Resedinta = null;
+                personalFormModel.Judet_Resedinta = null;
+                personalFormModel.Oras_Resedinta = null;
+                personalFormModel.Cod_Postal_Resedinta = null;
+            }
+            
+            StateHasChanged();
+        }
     }
 
     /// <summary>

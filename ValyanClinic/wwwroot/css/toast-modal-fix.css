@@ -1,0 +1,49 @@
+﻿/* ===== TOAST VISIBILITY FIX PENTRU MODALE ===== */
+
+/* Forțează toast-urile să apară PESTE overlay-ul modalului */
+.e-toast-container {
+    z-index: 10000 !important; /* Peste toate modalele Syncfusion */
+}
+
+.e-toast {
+    z-index: 10001 !important;
+    backdrop-filter: none !important; /* Elimină blur-ul din toast */
+    filter: none !important; /* Elimină orice filtre aplicate */
+}
+
+/* Fix specific pentru personal-dialog */
+.personal-dialog ~ .e-toast-container,
+.personal-dialog .e-toast-container {
+    z-index: 10000 !important;
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+}
+
+/* Toast în contextul modalului - poziționare relativă */
+.modal-toast .e-toast-container {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    z-index: 1060 !important; /* Peste modalul curent */
+}
+
+.modal-toast .e-toast {
+    max-width: 300px !important;
+    font-size: 14px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Previne blur-ul să afecteze toast-urile */
+.e-toast-container,
+.e-toast {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Modal backdrop nu să afecteze toast-urile */
+.e-dlg-overlay ~ .e-toast-container {
+    z-index: 10000 !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+}

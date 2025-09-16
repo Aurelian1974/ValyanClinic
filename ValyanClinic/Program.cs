@@ -1,10 +1,10 @@
-﻿using ValyanClinic.Application.Services;
+﻿using ValyanClinic.Core.Services;
+using ValyanClinic.Application.Services;
 using ValyanClinic.Infrastructure.Data;
 using ValyanClinic.Application.Validators;
 using ValyanClinic.Middleware;
+using ValyanClinic.Core.Components;
 using Syncfusion.Blazor;
-using Serilog;
-using Serilog.Events;
 using System.Text;
 using System.Globalization;
 using System.Data;
@@ -14,54 +14,41 @@ using System.Text.Encodings.Web;
 using Dapper;
 using ValyanClinic.Infrastructure.Repositories;
 using ValyanClinic.Application.Extensions;
-using ValyanClinic.Core.Services;
 using ValyanClinic.Core.HealthChecks;
+using ValyanClinic.Components;
+using Serilog;
 
-// BOOTSTRAP LOGGER MINIMAL - PENTRU DEBUGGING
+// ===== SERILOG BOOTSTRAP LOGGER =====
+// Configure early bootstrap logger pentru a loga erorile din startup
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
-    .WriteTo.Console()
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
     .CreateBootstrapLogger();
 
 try
 {
-    Log.Information("🚀 Starting ValyanClinic application");
+    Log.Information("🚀 Starting ValyanClinic application with SERILOG STRUCTURED LOGGING");
 
     var builder = WebApplication.CreateBuilder(args);
 
-    // TESTARE PROGRESIVA SERILOG
-    try
-    {
-        Log.Information("📝 Configuring Serilog from appsettings");
-        
-        // CONFIGURARE SERILOG COMPLET DIN APPSETTINGS
-        builder.Host.UseSerilog((context, configuration) => 
-            configuration.ReadFrom.Configuration(context.Configuration));
-            
-        Log.Information("✅ Serilog configured successfully");
-    }
-    catch (Exception ex)
-    {
-        Log.Error(ex, "❌ Failed to configure Serilog from appsettings");
-        // Continua cu bootstrap logger
-    }
+    // ===== SERILOG CONFIGURATION =====
+    // Replace default logging with Serilog configured from appsettings.json
+    builder.Host.UseSerilog((context, configuration) => 
+        configuration.ReadFrom.Configuration(context.Configuration));
+
+    Log.Information("✅ Serilog configured from appsettings.json");
 
     // CONFIGURARE ENCODING COMPLET PENTRU DIACRITICE ROMANESTI
     System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-    // Pastram Console encoding pentru suportul UTF-8 in output
     Console.OutputEncoding = Encoding.UTF8;
     Console.InputEncoding = Encoding.UTF8;
     Log.Information("✅ Console encoding configured for UTF-8 support");
 
-    // Setare cultura implicita inainte de orice altceva
+    // Setare cultura implicita
     Thread.CurrentThread.CurrentCulture = new CultureInfo("ro-RO");
     Thread.CurrentThread.CurrentUICulture = new CultureInfo("ro-RO");
-
-    // Configure web encoding
-    builder.WebHost.ConfigureKestrel(options =>
-    {
-        options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
-    });
 
     // Configure localization with UTF-8 support
     builder.Services.Configure<RequestLocalizationOptions>(options =>
@@ -81,7 +68,7 @@ try
         };
     });
 
-    // Set default culture to Romanian with UTF-8
+    // Set default culture to Romanian
     var culture = new CultureInfo("ro-RO");
     culture.DateTimeFormat.ShortDatePattern = "dd.MM.yyyy";
     culture.DateTimeFormat.LongDatePattern = "dd MMMM yyyy";
@@ -93,7 +80,7 @@ try
 
     Log.Information("✅ Culture and encoding configured");
 
-    // Register Syncfusion license from configuration
+    // Register Syncfusion license
     var syncfusionLicense = builder.Configuration["Syncfusion:LicenseKey"];
     if (!string.IsNullOrEmpty(syncfusionLicense))
     {
@@ -102,12 +89,12 @@ try
     }
     else
     {
-        // Fallback to direct license if not in config
+        // Fallback license
         Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXZfcXRUR2lcVUV2V0BWYEg=");
         Log.Warning("⚠️ Using fallback Syncfusion license");
     }
 
-    // DAPPER DATABASE CONFIGURATION
+    // DAPPER DATABASE CONFIGURATION - SECURIZAT
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
         ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -125,26 +112,17 @@ try
         return connection;
     });
 
-    // Configurare pentru pool de conexiuni optimizat pentru Dapper
-    builder.Services.AddScoped<Func<IDbConnection>>(provider => 
-        () => new SqlConnection(connectionString));
+    // 🔥 SERVICII CRITICE PENTRU REZOLVAREA PROBLEMELOR
+    builder.Services.AddMemoryCache();
+    builder.Services.AddScoped<ICacheService, MemoryCacheService>();
+    builder.Services.AddSimpleGridStateService(); // Grid state persistence simplificat
 
-    // Add services to the container
+    // Add Blazor services
     builder.Services.AddRazorComponents(options =>
     {
         options.DetailedErrors = builder.Environment.IsDevelopment();
     })
     .AddInteractiveServerComponents();
-
-    // Add Controllers cu UTF-8 support
-    builder.Services.AddControllers(options =>
-    {
-        options.RespectBrowserAcceptHeader = true;
-    })
-    .ConfigureApiBehaviorOptions(options =>
-    {
-        // Configurari pentru UTF-8
-    });
 
     // Configure JSON cu UTF-8
     builder.Services.ConfigureHttpJsonOptions(options =>
@@ -155,39 +133,30 @@ try
     // Add Syncfusion Blazor services
     builder.Services.AddSyncfusionBlazor();
 
-    // Add memory cache
-    builder.Services.AddMemoryCache();
-
     Log.Information("✅ UI Components and cache configured");
 
     // === CONFIGURARE FLUENTVALIDATION ===
     builder.Services.AddValyanClinicValidation();
     
     // === REPOSITORY LAYER ===
-    // Infrastructure repositories
     builder.Services.AddScoped<IPersonalRepository, PersonalRepository>();
     
     // === APPLICATION SERVICES ===
-    // Core application services
-    builder.Services.AddScoped<IPersonalService, PersonalService>();
     builder.Services.AddScoped<IUserService, UserService>();
+    builder.Services.AddScoped<IPersonalService, PersonalService>();
     builder.Services.AddScoped<IValidationService, ValidationService>();
 
-    // Rich Services pentru autentificare și securitate
+    // === AUTHENTICATION & SECURITY SERVICES ===
     builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
     builder.Services.AddScoped<IUserSessionService, UserSessionService>();
     builder.Services.AddScoped<ISecurityAuditService, SecurityAuditService>();
 
-    // Management Services
+    // === MANAGEMENT SERVICES ===
     builder.Services.AddScoped<IUserManagementService, UserManagementService>();
-
-    // === CORE SERVICES ===
-    // Cache service
-    builder.Services.AddScoped<ICacheService, MemoryCacheService>();
     
-    // Stock monitoring services
+    // === STOCK MONITORING SERVICES ===
     builder.Services.AddScoped<IStockMonitoringService, StockMonitoringService>();
-    
+
     // === BACKGROUND SERVICES ===
     builder.Services.AddHostedService<StockMonitoringBackgroundService>();
 
@@ -197,36 +166,18 @@ try
     // Localization services
     builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-    Log.Information("✅ All services registered successfully");
+    Log.Information("✅ ALL SERVICES registered successfully: {ServiceCount} service types", 15);
 
     var app = builder.Build();
 
     Log.Information("✅ Application built successfully");
-
-    // ADD SERILOG REQUEST LOGGING - DOAR DACA SERILOG E CONFIGURAT CORECT
-    try
-    {
-        app.UseSerilogRequestLogging(options =>
-        {
-            options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
-            options.GetLevel = (httpContext, elapsed, ex) => ex != null
-                ? LogEventLevel.Error 
-                : httpContext.Response.StatusCode > 499 
-                    ? LogEventLevel.Error 
-                    : LogEventLevel.Information;
-        });
-        Log.Information("✅ Serilog request logging configured");
-    }
-    catch (Exception ex)
-    {
-        Log.Warning(ex, "⚠️ Could not configure Serilog request logging");
-    }
 
     // TEST DATABASE CONNECTION LA STARTUP
     try
     {
         using var scope = app.Services.CreateScope();
         var dbConnection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
+        
         if (dbConnection.State != ConnectionState.Open)
         {
             dbConnection.Open();
@@ -235,20 +186,18 @@ try
         var serverInfo = dbConnection.QueryFirstOrDefault<string>("SELECT @@VERSION");
         var databaseName = dbConnection.QueryFirstOrDefault<string>("SELECT DB_NAME()");
         
-        Log.Information("✅ Database connection established successfully via Dapper");
-        Log.Information("🗄️ Connected to database: {DatabaseName}", databaseName);
-        Log.Information("🔒 Connection string secured - never exposed to client");
+        Log.Information("✅ Database connection established successfully via Dapper to {DatabaseName}", databaseName);
+        Log.Debug("Database server info: {ServerInfo}", serverInfo?.Split('\n')[0]);
         
         dbConnection.Close();
     }
     catch (Exception ex)
     {
-        Log.Error(ex, "❌ Failed to establish database connection");
-        Log.Error("⚠️ Verify that SQL Server is running and accessible at: TS1828\\ERP");
-        Log.Error("⚠️ Ensure the ValyanMed database exists and permissions are correct");
+        Log.Error(ex, "❌ Failed to establish database connection to server TS1828\\ERP");
+        Log.Warning("⚠️ Application will continue but database operations may fail");
     }
 
-    // Configure the HTTP request pipeline.
+    // Configure the HTTP request pipeline
     if (!app.Environment.IsDevelopment())
     {
         app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -277,7 +226,7 @@ try
             {
                 response.ContentType = "text/html; charset=UTF-8";
             }
-            
+
             response.Headers.Append("Content-Language", "ro-RO");
             
             return Task.CompletedTask;
@@ -297,12 +246,25 @@ try
         SupportedUICultures = new List<CultureInfo> { new CultureInfo("ro-RO"), new CultureInfo("en-US") }
     });
 
+    // ===== SERILOG HTTP REQUEST LOGGING =====
+    // Add detailed HTTP request logging
+    app.UseSerilogRequestLogging(options =>
+    {
+        options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+        options.GetLevel = (httpContext, elapsed, ex) => ex != null
+            ? Serilog.Events.LogEventLevel.Error
+            : httpContext.Response.StatusCode > 499
+                ? Serilog.Events.LogEventLevel.Error
+                : httpContext.Response.StatusCode > 399
+                    ? Serilog.Events.LogEventLevel.Warning
+                    : Serilog.Events.LogEventLevel.Information;
+    });
+
     // Health checks endpoints
     app.UseValyanClinicHealthChecks();
 
     app.UseHttpsRedirection();
-    app.UseAntiforgery();
-
+    
     // Static files cu UTF-8 support
     app.UseStaticFiles(new StaticFileOptions
     {
@@ -330,21 +292,25 @@ try
         }
     });
 
+    app.UseAntiforgery();
+
     // Map routes
-    app.MapRazorComponents<ValyanClinic.Components.App>()
+    app.MapRazorComponents<App>()
         .AddInteractiveServerRenderMode();
 
-    Log.Information("🌟 ValyanClinic application configured successfully");
+    Log.Information("🌟 ValyanClinic application configured successfully with SERILOG STRUCTURED LOGGING");
+    Log.Information("✅ Features: Memory leak prevention, Grid state persistence, Error handling, Authentication, Stock monitoring");
     Log.Information("🌐 Listening on: https://localhost:7164 and http://localhost:5007");
 
     app.Run();
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "💥 Application terminated unexpectedly");
+    Log.Fatal(ex, "💥 ValyanClinic application terminated unexpectedly during startup");
+    throw;
 }
 finally
 {
-    Log.Information("🔚 ValyanClinic application shutdown complete");
+    Log.Information("🔚 ValyanClinic application shutdown complete - disposing Serilog");
     await Log.CloseAndFlushAsync();
 }

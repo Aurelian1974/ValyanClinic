@@ -9,663 +9,525 @@
 @rendermode InteractiveServer
 @using PersonalModel = ValyanClinic.Domain.Models.Personal
 
-<div class="personal-form-container">
-    <div class="form-header">
-        <h2>@(IsEditMode ? "Editeaza Personal" : "Adauga Personal Nou")</h2>
-    </div>
+<link href="~/css/pages/view-personal-syncfusion.css" rel="stylesheet" />
 
-    @if (validationErrors.Any())
-    {
-        <div class="alert alert-danger">
-            <ul>
-                @foreach (var error in validationErrors)
+<div class="view-personal-modal-content">
+    <!-- Content area cu scroll -->
+    <div class="view-personal-content-area">
+        @* Header Section *@
+        <div class="personal-details-dashboard">
+            <div class="detail-card">
+                <div class="card-header">
+                    <i class="fas fa-user-plus"></i>
+                    <h3>@(IsEditMode ? "Editeaza Personal" : "Adauga Personal Nou")</h3>
+                </div>
+                <div class="card-content">
+                    @if (IsEditMode && EditingPersonal != null)
+                    {
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Nume Complet</label>
+                                <span class="field-value">@EditingPersonal.NumeComplet</span>
+                            </div>
+                            <div class="form-field">
+                                <label>Cod Angajat</label>
+                                <span class="field-value">@EditingPersonal.Cod_Angajat</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="field-value" style="margin: 0; color: #6b7280;">Completează formularul pentru a adăuga un nou angajat în sistem.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Validation Errors *@
+        @if (validationErrors.Any())
+        {
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Erori de validare:</strong>
+                    <ul style="margin: 8px 0 0 0;">
+                        @foreach (var error in validationErrors)
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
+        <EditForm Model="@personalFormModel" OnValidSubmit="HandleSubmit">
+            <div class="personal-details-dashboard">
+                
+                @* Date de Identificare Card *@
+                <div class="detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-id-card"></i>
+                        <h3>Date de Identificare</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Nume *</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Nume" 
+                                          Placeholder="Introduceti numele" 
+                                          Width="100%"
+                                          MaxLength="100">
+                                </SfTextBox>
+                                @if (HasFieldErrors(nameof(PersonalModel.Nume)))
+                                {
+                                    <div class="field-error">
+                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Nume)))
+                                        {
+                                            <small>@error</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-field">
+                                <label>Prenume *</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Prenume" 
+                                          Placeholder="Introduceti prenumele" 
+                                          Width="100%"
+                                          MaxLength="100">
+                                </SfTextBox>
+                                @if (HasFieldErrors(nameof(PersonalModel.Prenume)))
+                                {
+                                    <div class="field-error">
+                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Prenume)))
+                                        {
+                                            <small>@error</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-field">
+                                <label>Nume Anterior</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Nume_Anterior" 
+                                          Placeholder="Pentru femei casatorite" 
+                                          Width="100%"
+                                          MaxLength="100">
+                                </SfTextBox>
+                            </div>
+
+                            <div class="form-field">
+                                <label>CNP *</label>
+                                <SfTextBox @bind-Value="@personalFormModel.CNP" 
+                                          Placeholder="Introduceti CNP-ul (13 cifre)" 
+                                          Width="100%"
+                                          MaxLength="13">
+                                </SfTextBox>
+                                @if (HasFieldErrors(nameof(PersonalModel.CNP)))
+                                {
+                                    <div class="field-error">
+                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.CNP)))
+                                        {
+                                            <small>@error</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-field">
+                                <label>Cod Angajat *</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Cod_Angajat" 
+                                          Placeholder="Ex: EMP001" 
+                                          Width="100%"
+                                          MaxLength="20">
+                                </SfTextBox>
+                                @if (HasFieldErrors(nameof(PersonalModel.Cod_Angajat)))
+                                {
+                                    <div class="field-error">
+                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Cod_Angajat)))
+                                        {
+                                            <small>@error</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-field">
+                                <label>Data Nasterii *</label>
+                                <SfDatePicker @bind-Value="@personalFormModel.Data_Nasterii" 
+                                             Format="dd/MM/yyyy" 
+                                             Width="100%">
+                                </SfDatePicker>
+                                @if (HasFieldErrors(nameof(PersonalModel.Data_Nasterii)))
+                                {
+                                    <div class="field-error">
+                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Data_Nasterii)))
+                                        {
+                                            <small>@error</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-field">
+                                <label>Locul Nasterii</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Locul_Nasterii" 
+                                          Placeholder="Ex: Bucuresti, Romania" 
+                                          Width="100%"
+                                          MaxLength="200">
+                                </SfTextBox>
+                            </div>
+
+                            <div class="form-field">
+                                <label>Nationalitate</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Nationalitate" 
+                                          Placeholder="Ex: Romana" 
+                                          Width="100%"
+                                          MaxLength="50">
+                                </SfTextBox>
+                            </div>
+
+                            <div class="form-field">
+                                <label>Cetatenie</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Cetatenie" 
+                                          Placeholder="Ex: Romana" 
+                                          Width="100%"
+                                          MaxLength="50">
+                                </SfTextBox>
+                            </div>
+
+                            <div class="form-field">
+                                <label>Stare Civila</label>
+                                <SfDropDownList @bind-Value="@personalFormModel.Stare_Civila" 
+                                               DataSource="@stareCivilaOptions" 
+                                               Width="100%"
+                                               AllowFiltering="true">
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Date Profesionale Card *@
+                <div class="detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-briefcase"></i>
+                        <h3>Date Profesionale</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Functia *</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Functia" 
+                                          Placeholder="Ex: Manager, Specialist, Asistent medical" 
+                                          Width="100%"
+                                          MaxLength="100">
+                                </SfTextBox>
+                                @if (HasFieldErrors(nameof(PersonalModel.Functia)))
+                                {
+                                    <div class="field-error">
+                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Functia)))
+                                        {
+                                            <small>@error</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-field">
+                                <label>Departament *</label>
+                                <SfDropDownList @bind-Value="@personalFormModel.Departament" 
+                                               DataSource="@departmentOptions" 
+                                               Width="100%"
+                                               AllowFiltering="true">
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                                @if (HasFieldErrors(nameof(PersonalModel.Departament)))
+                                {
+                                    <div class="field-error">
+                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Departament)))
+                                        {
+                                            <small>@error</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-field">
+                                <label>Status Angajat</label>
+                                <SfDropDownList @bind-Value="@personalFormModel.Status_Angajat" 
+                                               DataSource="@statusAngajatOptions" 
+                                               Width="100%">
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Informatii de Contact Card *@
+                <div class="detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-address-book"></i>
+                        <h3>Informatii de Contact</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Telefon Personal</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Telefon_Personal" 
+                                          Placeholder="Ex: 0723456789" 
+                                          Width="100%"
+                                          MaxLength="20">
+                                </SfTextBox>
+                            </div>
+
+                            <div class="form-field">
+                                <label>Telefon Serviciu</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Telefon_Serviciu" 
+                                          Placeholder="Ex: 0312345678" 
+                                          Width="100%"
+                                          MaxLength="20">
+                                </SfTextBox>
+                            </div>
+
+                            <div class="form-field full-width">
+                                <label>Email Personal</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Email_Personal" 
+                                          Placeholder="Ex: nume@email.com" 
+                                          Width="100%"
+                                          MaxLength="100">
+                                </SfTextBox>
+                            </div>
+
+                            <div class="form-field full-width">
+                                <label>Email Serviciu</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Email_Serviciu" 
+                                          Placeholder="Ex: nume@valyanclinic.ro" 
+                                          Width="100%"
+                                          MaxLength="100">
+                                </SfTextBox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Adresa de Domiciliu Card *@
+                <div class="detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>Adresa de Domiciliu</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-grid">
+                            <div class="form-field full-width">
+                                <label>Adresa Domiciliu *</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Adresa_Domiciliu" 
+                                          Placeholder="Ex: Str. Mihai Eminescu, nr. 15, bl. A1, sc. B, et. 2, ap. 25" 
+                                          Width="100%"
+                                          Multiline="true">
+                                </SfTextBox>
+                                @if (HasFieldErrors(nameof(PersonalModel.Adresa_Domiciliu)))
+                                {
+                                    <div class="field-error">
+                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Adresa_Domiciliu)))
+                                        {
+                                            <small>@error</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-field">
+                                <label>Judet Domiciliu *</label>
+                                <SfDropDownList @bind-Value="@personalFormModel.Judet_Domiciliu" 
+                                               DataSource="@judeteOptions" 
+                                               Width="100%"
+                                               AllowFiltering="true">
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                                @if (HasFieldErrors(nameof(PersonalModel.Judet_Domiciliu)))
+                                {
+                                    <div class="field-error">
+                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Judet_Domiciliu)))
+                                        {
+                                            <small>@error</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-field">
+                                <label>Oras Domiciliu *</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Oras_Domiciliu" 
+                                          Placeholder="Ex: Bucuresti" 
+                                          Width="100%"
+                                          MaxLength="100">
+                                </SfTextBox>
+                                @if (HasFieldErrors(nameof(PersonalModel.Oras_Domiciliu)))
+                                {
+                                    <div class="field-error">
+                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Oras_Domiciliu)))
+                                        {
+                                            <small>@error</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="form-field">
+                                <label>Cod Postal Domiciliu</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Cod_Postal_Domiciliu" 
+                                          Placeholder="Ex: 012345" 
+                                          Width="100%"
+                                          MaxLength="10">
+                                </SfTextBox>
+                            </div>
+
+                            @* Checkbox pentru a afișa secțiunea de reședință *@
+                            <div class="form-field full-width">
+                                <div class="checkbox-container">
+                                    <SfCheckBox @bind-Checked="@showResedintaSection" 
+                                              Label="Adresa de domiciliu este identica cu cea de resedinta"
+                                              @onchange="@OnResedintaCheckboxChanged">
+                                    </SfCheckBox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Adresa de Resedinta Card - Vizibil doar dacă checkbox-ul NU este bifat *@
+                @if (!showResedintaSection)
                 {
-                    <li>@error.ErrorMessage</li>
+                    <div class="detail-card resedinta-card">
+                        <div class="card-header">
+                            <i class="fas fa-home"></i>
+                            <h3>Adresa de Resedinta</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="address-separator">
+                                <span>Completati adresa de resedinta daca difera de domiciliu</span>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-field full-width">
+                                    <label>Adresa Resedinta</label>
+                                    <SfTextBox @bind-Value="@personalFormModel.Adresa_Resedinta" 
+                                              Placeholder="Ex: Str. Nicolae Balcescu, nr. 23, bl. C2, ap. 45" 
+                                              Width="100%"
+                                              Multiline="true">
+                                    </SfTextBox>
+                                </div>
+
+                                <div class="form-field">
+                                    <label>Judet Resedinta</label>
+                                    <SfDropDownList @bind-Value="@personalFormModel.Judet_Resedinta" 
+                                                   DataSource="@judeteOptions" 
+                                                   Width="100%"
+                                                   AllowFiltering="true">
+                                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                                    </SfDropDownList>
+                                </div>
+
+                                <div class="form-field">
+                                    <label>Oras Resedinta</label>
+                                    <SfTextBox @bind-Value="@personalFormModel.Oras_Resedinta" 
+                                              Placeholder="Ex: Cluj-Napoca" 
+                                              Width="100%"
+                                              MaxLength="100">
+                                    </SfTextBox>
+                                </div>
+
+                                <div class="form-field">
+                                    <label>Cod Postal Resedinta</label>
+                                    <SfTextBox @bind-Value="@personalFormModel.Cod_Postal_Resedinta" 
+                                              Placeholder="Ex: 400001" 
+                                              Width="100%"
+                                              MaxLength="10">
+                                    </SfTextBox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 }
-            </ul>
-        </div>
-    }
 
-    <EditForm Model="@personalFormModel" OnValidSubmit="HandleSubmit">
-        <!-- Sectiunea: Date de Identificare -->
-        <div class="form-section">
-            <h3>Date de Identificare</h3>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="nume">Nume *</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Nume" 
-                              ID="nume" 
-                              Placeholder="Introduceti numele" 
-                              Width="100%"
-                              MaxLength="100">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Nume)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Nume)))
-                            {
-                                <div>@error</div>
-                            }
+                @* Documente de Identitate Card *@
+                <div class="detail-card">
+                    <div class="card-header">
+                        <i class="fas fa-id-badge"></i>
+                        <h3>Documente de Identitate</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Serie CI</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Serie_CI" 
+                                          Placeholder="Ex: AB" 
+                                          Width="100%"
+                                          MaxLength="10">
+                                </SfTextBox>
+                            </div>
+
+                            <div class="form-field">
+                                <label>Numar CI</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Numar_CI" 
+                                          Placeholder="Ex: 123456" 
+                                          Width="100%"
+                                          MaxLength="20">
+                                </SfTextBox>
+                            </div>
+
+                            <div class="form-field full-width">
+                                <label>Eliberat CI De</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Eliberat_CI_De" 
+                                          Placeholder="Ex: SPCLEP Bucuresti" 
+                                          Width="100%"
+                                          MaxLength="100">
+                                </SfTextBox>
+                            </div>
+
+                            <div class="form-field">
+                                <label>Data Eliberare CI</label>
+                                <SfDatePicker @bind-Value="@personalFormModel.Data_Eliberare_CI" 
+                                             Format="dd/MM/yyyy" 
+                                             Width="100%">
+                                </SfDatePicker>
+                            </div>
+
+                            <div class="form-field">
+                                <label>Valid CI Pana</label>
+                                <SfDatePicker @bind-Value="@personalFormModel.Valabil_CI_Pana" 
+                                             Format="dd/MM/yyyy" 
+                                             Width="100%">
+                                </SfDatePicker>
+                            </div>
                         </div>
-                    }
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="prenume">Prenume *</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Prenume" 
-                              ID="prenume" 
-                              Placeholder="Introduceti prenumele" 
-                              Width="100%"
-                              MaxLength="100">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Prenume)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Prenume)))
-                            {
-                                <div>@error</div>
-                            }
+                @* Observatii Card *@
+                <div class="detail-card observations-card">
+                    <div class="card-header">
+                        <i class="fas fa-sticky-note"></i>
+                        <h3>Observatii</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-grid">
+                            <div class="form-field full-width">
+                                <label>Observatii</label>
+                                <SfTextBox @bind-Value="@personalFormModel.Observatii" 
+                                          Placeholder="Observatii generale despre angajat..." 
+                                          Width="100%"
+                                          Multiline="true">
+                                </SfTextBox>
+                            </div>
                         </div>
-                    }
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="nume-anterior">Nume Anterior</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Nume_Anterior" 
-                              ID="nume-anterior" 
-                              Placeholder="Pentru femei casatorite" 
-                              Width="100%"
-                              MaxLength="100">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Nume_Anterior)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Nume_Anterior)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="cnp">CNP *</label>
-                    <SfTextBox @bind-Value="@personalFormModel.CNP" 
-                              ID="cnp" 
-                              Placeholder="Introduceti CNP-ul (13 cifre)" 
-                              Width="100%"
-                              MaxLength="13">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.CNP)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.CNP)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="cod-angajat">Cod Angajat *</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Cod_Angajat" 
-                              ID="cod-angajat" 
-                              Placeholder="Ex: EMP001" 
-                              Width="100%"
-                              MaxLength="20">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Cod_Angajat)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Cod_Angajat)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="data-nasterii">Data Nasterii *</label>
-                    <SfDatePicker @bind-Value="@personalFormModel.Data_Nasterii" 
-                                 ID="data-nasterii" 
-                                 Format="dd/MM/yyyy" 
-                                 Width="100%">
-                    </SfDatePicker>
-                    @if (HasFieldErrors(nameof(PersonalModel.Data_Nasterii)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Data_Nasterii)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="locul-nasterii">Locul Nasterii</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Locul_Nasterii" 
-                              ID="locul-nasterii" 
-                              Placeholder="Ex: Bucuresti, Romania" 
-                              Width="100%"
-                              MaxLength="200">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Locul_Nasterii)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Locul_Nasterii)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="nationalitate">Nationalitate</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Nationalitate" 
-                              ID="nationalitate" 
-                              Placeholder="Ex: Romana" 
-                              Width="100%"
-                              MaxLength="50">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Nationalitate)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Nationalitate)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="cetatenie">Cetatenie</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Cetatenie" 
-                              ID="cetatenie" 
-                              Placeholder="Ex: Romana" 
-                              Width="100%"
-                              MaxLength="50">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Cetatenie)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Cetatenie)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="stare-civila">Stare Civila</label>
-                    <SfDropDownList @bind-Value="@personalFormModel.Stare_Civila" 
-                                   ID="stare-civila" 
-                                   DataSource="@stareCivilaOptions" 
-                                   Width="100%"
-                                   AllowFiltering="true">
-                        <DropDownListFieldSettings Text="Text" Value="Value" />
-                    </SfDropDownList>
-                    @if (HasFieldErrors(nameof(PersonalModel.Stare_Civila)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Stare_Civila)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
             </div>
-        </div>
 
-        <!-- Sectiunea: Informatii de Contact -->
-        <div class="form-section">
-            <h3>Informatii de Contact</h3>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="telefon-personal">Telefon Personal</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Telefon_Personal" 
-                              ID="telefon-personal" 
-                              Placeholder="Ex: 0723456789" 
-                              Width="100%"
-                              MaxLength="20">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Telefon_Personal)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Telefon_Personal)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="telefon-serviciu">Telefon Serviciu</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Telefon_Serviciu" 
-                              ID="telefon-serviciu" 
-                              Placeholder="Ex: 0312345678" 
-                              Width="100%"
-                              MaxLength="20">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Telefon_Serviciu)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Telefon_Serviciu)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="email-personal">Email Personal</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Email_Personal" 
-                              ID="email-personal" 
-                              Placeholder="Ex: nume@email.com" 
-                              Width="100%"
-                              MaxLength="100">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Email_Personal)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Email_Personal)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="email-serviciu">Email Serviciu</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Email_Serviciu" 
-                              ID="email-serviciu" 
-                              Placeholder="Ex: nume@valyanclinic.ro" 
-                              Width="100%"
-                              MaxLength="100">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Email_Serviciu)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Email_Serviciu)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <!-- Sectiunea: Adresa de Domiciliu -->
-        <div class="form-section">
-            <h3>Adresa de Domiciliu</h3>
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label for="adresa-domiciliu">Adresa Domiciliu *</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Adresa_Domiciliu" 
-                              ID="adresa-domiciliu" 
-                              Placeholder="Ex: Str. Mihai Eminescu, nr. 15, bl. A1, sc. B, et. 2, ap. 25" 
-                              Width="100%"
-                              Multiline="true">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Adresa_Domiciliu)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Adresa_Domiciliu)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="judet-domiciliu">Judet Domiciliu *</label>
-                    <SfDropDownList @bind-Value="@personalFormModel.Judet_Domiciliu" 
-                                   ID="judet-domiciliu" 
-                                   DataSource="@judeteOptions" 
-                                   Width="100%"
-                                   AllowFiltering="true">
-                        <DropDownListFieldSettings Text="Text" Value="Value" />
-                    </SfDropDownList>
-                    @if (HasFieldErrors(nameof(PersonalModel.Judet_Domiciliu)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Judet_Domiciliu)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="oras-domiciliu">Oras Domiciliu *</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Oras_Domiciliu" 
-                              ID="oras-domiciliu" 
-                              Placeholder="Ex: Bucuresti" 
-                              Width="100%"
-                              MaxLength="100">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Oras_Domiciliu)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Oras_Domiciliu)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="cod-postal-domiciliu">Cod Postal Domiciliu</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Cod_Postal_Domiciliu" 
-                              ID="cod-postal-domiciliu" 
-                              Placeholder="Ex: 012345" 
-                              Width="100%"
-                              MaxLength="10">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Cod_Postal_Domiciliu)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Cod_Postal_Domiciliu)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <!-- Sectiunea: Adresa de Resedinta -->
-        <div class="form-section">
-            <h3>Adresa de Resedinta (daca difera de domiciliu)</h3>
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label for="adresa-resedinta">Adresa Resedinta</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Adresa_Resedinta" 
-                              ID="adresa-resedinta" 
-                              Placeholder="Completati doar daca difera de domiciliu" 
-                              Width="100%"
-                              Multiline="true">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Adresa_Resedinta)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Adresa_Resedinta)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="judet-resedinta">Judet Resedinta</label>
-                    <SfDropDownList @bind-Value="@personalFormModel.Judet_Resedinta" 
-                                   ID="judet-resedinta" 
-                                   DataSource="@judeteOptions" 
-                                   Width="100%"
-                                   AllowFiltering="true">
-                        <DropDownListFieldSettings Text="Text" Value="Value" />
-                    </SfDropDownList>
-                    @if (HasFieldErrors(nameof(PersonalModel.Judet_Resedinta)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Judet_Resedinta)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="oras-resedinta">Oras Resedinta</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Oras_Resedinta" 
-                              ID="oras-resedinta" 
-                              Placeholder="Ex: Cluj-Napoca" 
-                              Width="100%"
-                              MaxLength="100">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Oras_Resedinta)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Oras_Resedinta)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="cod-postal-resedinta">Cod Postal Resedinta</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Cod_Postal_Resedinta" 
-                              ID="cod-postal-resedinta" 
-                              Placeholder="Ex: 400001" 
-                              Width="100%"
-                              MaxLength="10">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Cod_Postal_Resedinta)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Cod_Postal_Resedinta)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <!-- Sectiunea: Date Profesionale -->
-        <div class="form-section">
-            <h3>Date Profesionale</h3>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="functia">Functia *</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Functia" 
-                              ID="functia" 
-                              Placeholder="Ex: Manager, Specialist, Asistent medical" 
-                              Width="100%"
-                              MaxLength="100">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Functia)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Functia)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="departament">Departament *</label>
-                    <SfDropDownList @bind-Value="@personalFormModel.Departament" 
-                                   ID="departament" 
-                                   DataSource="@departmentOptions" 
-                                   Width="100%"
-                                   AllowFiltering="true">
-                        <DropDownListFieldSettings Text="Text" Value="Value" />
-                    </SfDropDownList>
-                    @if (HasFieldErrors(nameof(PersonalModel.Departament)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Departament)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="status-angajat">Status Angajat</label>
-                    <SfDropDownList @bind-Value="@personalFormModel.Status_Angajat" 
-                                   ID="status-angajat" 
-                                   DataSource="@statusAngajatOptions" 
-                                   Width="100%">
-                        <DropDownListFieldSettings Text="Text" Value="Value" />
-                    </SfDropDownList>
-                    @if (HasFieldErrors(nameof(PersonalModel.Status_Angajat)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Status_Angajat)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <!-- Sectiunea: Documente de Identitate -->
-        <div class="form-section">
-            <h3>Documente de Identitate</h3>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="serie-ci">Serie CI</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Serie_CI" 
-                              ID="serie-ci" 
-                              Placeholder="Ex: AB" 
-                              Width="100%"
-                              MaxLength="10">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Serie_CI)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Serie_CI)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="numar-ci">Numar CI</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Numar_CI" 
-                              ID="numar-ci" 
-                              Placeholder="Ex: 123456" 
-                              Width="100%"
-                              MaxLength="20">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Numar_CI)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Numar_CI)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="eliberat-ci-de">Eliberat CI De</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Eliberat_CI_De" 
-                              ID="eliberat-ci-de" 
-                              Placeholder="Ex: SPCLEP Bucuresti" 
-                              Width="100%"
-                              MaxLength="100">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Eliberat_CI_De)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Eliberat_CI_De)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="data-eliberare-ci">Data Eliberare CI</label>
-                    <SfDatePicker @bind-Value="@personalFormModel.Data_Eliberare_CI" 
-                                 ID="data-eliberare-ci" 
-                                 Format="dd/MM/yyyy" 
-                                 Width="100%">
-                    </SfDatePicker>
-                    @if (HasFieldErrors(nameof(PersonalModel.Data_Eliberare_CI)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Data_Eliberare_CI)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="valabil-ci-pana">Valid CI Pana</label>
-                    <SfDatePicker @bind-Value="@personalFormModel.Valabil_CI_Pana" 
-                                 ID="valabil-ci-pana" 
-                                 Format="dd/MM/yyyy" 
-                                 Width="100%">
-                    </SfDatePicker>
-                    @if (HasFieldErrors(nameof(PersonalModel.Valabil_CI_Pana)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Valabil_CI_Pana)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <!-- Sectiunea: Observatii -->
-        <div class="form-section">
-            <h3>Observatii</h3>
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label for="observatii">Observatii</label>
-                    <SfTextBox @bind-Value="@personalFormModel.Observatii" 
-                              ID="observatii" 
-                              Placeholder="Observatii generale despre angajat..." 
-                              Width="100%"
-                              Multiline="true">
-                    </SfTextBox>
-                    @if (HasFieldErrors(nameof(PersonalModel.Observatii)))
-                    {
-                        <div class="validation-error">
-                            @foreach (var error in GetFieldErrors(nameof(PersonalModel.Observatii)))
-                            {
-                                <div>@error</div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <div class="form-buttons">
-            <SfButton CssClass="e-primary" IsPrimary="true" disabled="@isSubmitting">
-                @(IsEditMode ? "Actualizeaza" : "Adauga") Personal
-            </SfButton>
-            <SfButton CssClass="e-outline" @onclick="HandleCancel">
-                Anuleaza
-            </SfButton>
-        </div>
-    </EditForm>
+        </EditForm>
+    </div>
 </div>

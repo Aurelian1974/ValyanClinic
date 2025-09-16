@@ -38,18 +38,18 @@
                     Gestionare Utilizatori
                 </h1>
                 <p class="users-page-subtitle">
-                    Administreaz? utilizatorii sistemului ValyanMed - adaug?, editeaz? ?i gestioneaz? permisiunile
+                    Administreaza utilizatorii sistemului ValyanMed - adauga, editeaza si gestioneaza permisiunile
                 </p>
             </div>
             
             <div class="users-header-actions">
                 <button class="btn btn-outline-primary" @onclick="ShowAddUserModal">
                     <i class="fas fa-plus"></i>
-                    <span class="btn-text">Adaug? Utilizator</span>
+                    <span class="btn-text">Adauga Utilizator</span>
                 </button>
                 <button class="btn btn-outline-secondary" @onclick="RefreshData">
                     <i class="fas fa-sync-alt"></i>
-                    <span class="btn-text">Actualizeaz?</span>
+                    <span class="btn-text">Actualizeaza</span>
                 </button>
             </div>
         </div>
@@ -77,11 +77,11 @@
         <div class="filter-panel-header">
             <h3>
                 <i class="fas fa-filter"></i>
-                Filtrare Avansat?
+                Filtrare Avansata
             </h3>
             <button class="btn btn-secondary btn-sm" @onclick="ToggleFilterPanel">
                 <i class="fas @(_state.ShowAdvancedFilters ? "fa-chevron-up" : "fa-chevron-down")"></i>
-                <span>@(_state.ShowAdvancedFilters ? "Ascunde Filtrele" : "Arat? Filtrele")</span>
+                <span>@(_state.ShowAdvancedFilters ? "Ascunde Filtrele" : "Arata Filtrele")</span>
             </button>
         </div>
         
@@ -132,12 +132,12 @@
                     </div>
                 </div>
                 
-                @* Second row - C?utare text, Perioada activitate *@
+                @* Second row - Cautare text, Perioada activitate *@
                 <div class="filter-row">
                     <div class="filter-group">
-                        <label class="filter-label">C?utare text:</label>
+                        <label class="filter-label">Cautare text:</label>
                         <SfTextBox @bind-Value="@_state.GlobalSearchText" 
-                                  Placeholder="Caut? în nume, email, username..."
+                                  Placeholder="Cauta in nume, email, username..."
                                   Width="250px"
                                   ShowClearButton="true">
                             <TextBoxEvents ValueChange="OnGlobalSearchChanged" />
@@ -149,7 +149,7 @@
                         <SfDropDownList TItem="string" TValue="string" 
                                        DataSource="@_models.ActivityPeriodOptions" 
                                        @bind-Value="@_state.SelectedActivityPeriod"
-                                       Placeholder="Orice perioad?"
+                                       Placeholder="Orice perioada"
                                        Width="180px">
                             <DropDownListEvents TItem="string" TValue="string" ValueChange="OnActivityPeriodChanged" />
                         </SfDropDownList>
@@ -162,15 +162,15 @@
                 <div class="filter-actions">
                     <button class="btn btn-primary btn-sm" @onclick="ApplyAdvancedFilters">
                         <i class="fas fa-check"></i>
-                        <span>Aplic? Filtrele</span>
+                        <span>Aplica Filtrele</span>
                     </button>
                     <button class="btn btn-secondary btn-sm" @onclick="ClearAdvancedFilters">
                         <i class="fas fa-times"></i>
-                        <span>Cur??? Filtrele</span>
+                        <span>Curata Filtrele</span>
                     </button>
                     <button class="btn btn-info btn-sm" @onclick="ExportFilteredData">
                         <i class="fas fa-download"></i>
-                        <span>Export? Rezultate</span>
+                        <span>Exporta Rezultate</span>
                     </button>
                 </div>
                 
@@ -185,7 +185,7 @@
                         {
                             <span class="filtered-indicator">
                                 <i class="fas fa-filter"></i>
-                                Filtrare activ?
+                                Filtrare activa
                             </span>
                         }
                     </div>
@@ -284,8 +284,8 @@
                         </Template>
                     </GridColumn>
                                
-                    <GridColumn Field="@nameof(User.JobTitle)" HeaderText="Func?ie" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(User.CreatedDate)" HeaderText="Data Cre?rii" Width="90" 
+                    <GridColumn Field="@nameof(User.JobTitle)" HeaderText="Functia" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(User.CreatedDate)" HeaderText="Data Crearii" Width="90" 
                                Format="dd.MM.yyyy" Type="ColumnType.Date" AllowFiltering="true" AllowReordering="true"></GridColumn>
                     <GridColumn Field="@nameof(User.LastLoginDate)" HeaderText="Ultima Autent." Width="100" 
                                Format="dd.MM.yyyy" Type="ColumnType.DateTime" AllowFiltering="true" AllowReordering="true"></GridColumn>
@@ -298,15 +298,15 @@
                                 var user = context as User;
                                 <div class="action-buttons">
                                     <button class="btn-action btn-view" @onclick="() => ShowUserDetailModal(user!)" 
-                                            title="Vizualizeaz? detaliile utilizatorului" aria-label="Vizualizeaz?">
+                                            title="Vizualizeaza detaliile utilizatorului" aria-label="Vizualizeaza">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <button class="btn-action btn-edit" @onclick="() => EditUser(user!)" 
-                                            title="Modific? utilizatorul" aria-label="Modific?">
+                                            title="Modifica utilizatorul" aria-label="Modifica">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button class="btn-action btn-delete" @onclick="() => DeleteUser(user!)" 
-                                            title="?terge utilizatorul" aria-label="?terge">
+                                            title="Sterge utilizatorul" aria-label="Sterge">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -348,10 +348,10 @@
             <FooterTemplate>
                 <div class="modal-footer-actions">
                     <button class="btn btn-primary" @onclick="EditUserFromModal">
-                        <i class="fas fa-edit"></i> Editeaz? Utilizatorul
+                        <i class="fas fa-edit"></i> Editeaza Utilizatorul
                     </button>
                     <button class="btn btn-secondary" @onclick="CloseUserDetailModal">
-                        <i class="fas fa-times"></i> Închide
+                        <i class="fas fa-times"></i> Inchide
                     </button>
                 </div>
             </FooterTemplate>
@@ -397,11 +397,11 @@
                 <div class="modal-footer-actions">
                     <button type="button" class="btn btn-primary" @onclick="OnFormSubmit" disabled="@_state.IsLoading">
                         <i class="fas fa-save"></i>
-                        @(_state.IsEditMode ? "Actualizeaz? Utilizatorul" : "Creeaz? Utilizatorul")
+                        @(_state.IsEditMode ? "Actualizeaza Utilizatorul" : "Creeaza Utilizatorul")
                     </button>
                     <button type="button" class="btn btn-secondary" @onclick="CloseAddEditModal" disabled="@_state.IsLoading">
                         <i class="fas fa-times"></i>
-                        Anuleaz?
+                        Anuleaza
                     </button>
                 </div>
             </FooterTemplate>

@@ -23,8 +23,8 @@ public interface IUserService
 }
 
 /// <summary>
-/// Rich User Service cu business logic avansat și Result Pattern
-/// Nu mai este simple pass-through - conține reguli de business
+/// Rich User Service cu business logic avansat si Result Pattern
+/// Nu mai este simple pass-through - contine reguli de business
 /// </summary>
 public class UserService : IUserService
 {

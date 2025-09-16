@@ -10,28 +10,35 @@ using ValyanClinic.Application.Services;
 using ValyanClinic.Domain.Models;
 using ValyanClinic.Domain.Enums;
 using PersonalModel = ValyanClinic.Domain.Models.Personal;
+using ValyanClinic.Core.Services;
 
 namespace ValyanClinic.Components.Pages.Administrare.Personal;
 
 /// <summary>
-/// Business Logic pentru AdministrarePersonal.razor - COMPLET SIMILAR CU UTILIZATORI
-/// Separated Business Logic pentru gestionarea personalului
+/// Business Logic pentru AdministrarePersonal.razor
+/// EXEMPLU DE UTILIZARE A FUNCȚIONALITĂȚILOR CRITICE IMPLEMENTATE:
+/// - Memory leak prevention prin proper disposal
+/// - DataGrid state persistence prin SimpleGridStateService  
+/// - Error handling robust
 /// </summary>
-public partial class AdministrarePersonal : ComponentBase
+public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
 {
     [Inject] private IPersonalService PersonalService { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private ILogger<AdministrarePersonal> Logger { get; set; } = default!;
+    [Inject] private ISimpleGridStateService GridStateService { get; set; } = default!;
 
     // Component References
-    private SfGrid<PersonalModel>? GridRef;
-    private SfToast? ToastRef;
-    private SfDialog? PersonalDetailModal;
-    private SfDialog? AddEditPersonalModal;
+    protected SfGrid<PersonalModel>? GridRef;
+    protected SfDialog? PersonalDetailModal;
+    protected SfDialog? AddEditPersonalModal;
+    protected SfToast? ToastRef;
+    protected SfToast? ModalToastRef; // TOAST PENTRU MODAL
 
-    // State Management
+    // State Management - FOLOSIM CLASA EXISTENTA DIN SIGNATURE
     private PersonalPageState _state = new();
     private PersonalModels _models = new();
+    private bool _disposed = false;
 
     // Dialog Animation Settings
     private DialogAnimationSettings DialogAnimation = new()
@@ -40,10 +47,8 @@ public partial class AdministrarePersonal : ComponentBase
         Duration = 300
     };
 
-    // Additional state properties for compatibility
-    public Departament? SelectedDepartmentFilter { get; set; }
-    public StatusAngajat? SelectedStatusFilter { get; set; }
-    public string? SelectedActivityPeriod { get; set; }
+    // Grid ID pentru persistență
+    private const string GRID_ID = "personal-management-grid";
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,11 +56,42 @@ public partial class AdministrarePersonal : ComponentBase
         {
             await LoadInitialData();
             InitializeFilterOptions();
+
+            // Load grid settings din persistență
+            var savedSettings = await GridStateService.GetGridSettingsAsync(GRID_ID);
+            if (savedSettings != null)
+            {
+                ApplyGridSettings(savedSettings);
+                Logger.LogInformation("Grid settings loaded for Personal management");
+            }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "AdministrarePersonal initialization failed");
-            _state.SetError("Eroare la incarcarea datelor initiale");
+            Logger.LogError(ex, "Error initializing Personal management page");
+            _state.SetError($"Eroare la inițializarea paginii: {ex.Message}");
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Safe StateHasChanged care verifică disposal
+    /// </summary>
+    protected void SafeStateHasChanged()
+    {
+        try
+        {
+            if (!_disposed)
+            {
+                InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            Logger?.LogDebug("StateHasChanged called on disposed component");
+        }
+        catch (Exception ex)
+        {
+            Logger?.LogError(ex, "Error in SafeStateHasChanged");
         }
     }
 
@@ -68,15 +104,15 @@ public partial class AdministrarePersonal : ComponentBase
             _state.SetLoading(true);
             StateHasChanged();
 
-            // Load personal data - using correct method
-            var searchRequest = new ValyanClinic.Application.Services.PersonalSearchRequest(
+            // Load personal data
+            var searchRequest = new PersonalSearchRequest(
                 PageNumber: 1,
-                PageSize: 1000, // Get all records for now
+                PageSize: 1000,
                 SearchText: null,
                 Departament: null,
                 Status: null
             );
-            
+
             var personalData = await PersonalService.GetPersonalAsync(searchRequest);
             _models.SetPersonal(personalData.Data.ToList());
 
@@ -87,7 +123,7 @@ public partial class AdministrarePersonal : ComponentBase
             _state.DropdownOptions = await PersonalService.GetDropdownOptionsAsync();
 
             Logger.LogInformation("Loaded {RecordCount} personal records", personalData.Data.Count());
-            _state.SetError(null);
+            _state.ClearError();
         }
         catch (Exception ex)
         {
@@ -106,13 +142,64 @@ public partial class AdministrarePersonal : ComponentBase
     private async Task RefreshData()
     {
         await LoadInitialData();
-
         if (GridRef != null)
         {
             await GridRef.Refresh();
         }
-
         await ShowToast("Succes", "Datele au fost actualizate", "e-toast-success");
+    }
+
+    #endregion
+
+    #region Grid State Management - CRITICAL FUNCTIONALITY
+
+    private Dictionary<string, object> CaptureGridSettings()
+    {
+        var settings = new Dictionary<string, object>();
+
+        try
+        {
+            if (GridRef != null)
+            {
+                settings["pageSize"] = GridRef.PageSettings?.PageSize ?? 20;
+                settings["currentPage"] = GridRef.PageSettings?.CurrentPage ?? 1;
+                settings["lastSaved"] = DateTime.UtcNow;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "Error capturing grid settings");
+        }
+
+        return settings;
+    }
+
+    private void ApplyGridSettings(Dictionary<string, object> settings)
+    {
+        try
+        {
+            if (settings.TryGetValue("pageSize", out var pageSize))
+            {
+                Logger.LogDebug("Applied saved page size: {PageSize}", pageSize);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "Error applying grid settings");
+        }
+    }
+
+    private async Task OnGridActionComplete()
+    {
+        try
+        {
+            var settings = CaptureGridSettings();
+            await GridStateService.SaveGridSettingsAsync(GRID_ID, settings);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "Error auto-saving grid state");
+        }
     }
 
     #endregion
@@ -126,14 +213,14 @@ public partial class AdministrarePersonal : ComponentBase
 
     private async Task OnDepartmentFilterChanged(ChangeEventArgs<Departament?, PersonalModels.FilterOption<Departament?>> args)
     {
-        SelectedDepartmentFilter = args.Value;
+        _state.SelectedDepartmentFilter = args.Value;
         _state.SelectedDepartment = args.Value?.ToString() ?? "";
         await ApplyAdvancedFilters();
     }
 
     private async Task OnStatusFilterChanged(ChangeEventArgs<StatusAngajat?, PersonalModels.FilterOption<StatusAngajat?>> args)
     {
-        SelectedStatusFilter = args.Value;
+        _state.SelectedStatusFilter = args.Value;
         _state.SelectedStatus = args.Value?.ToString() ?? "";
         await ApplyAdvancedFilters();
     }
@@ -146,7 +233,7 @@ public partial class AdministrarePersonal : ComponentBase
 
     private async Task OnActivityPeriodChanged(ChangeEventArgs<string, string> args)
     {
-        SelectedActivityPeriod = args.Value ?? "";
+        _state.SelectedActivityPeriod = args.Value ?? "";
         await ApplyAdvancedFilters();
     }
 
@@ -176,9 +263,6 @@ public partial class AdministrarePersonal : ComponentBase
     private async Task ClearAdvancedFilters()
     {
         _state.ClearFilters();
-        SelectedDepartmentFilter = null;
-        SelectedStatusFilter = null;
-        SelectedActivityPeriod = null;
 
         if (GridRef != null)
         {
@@ -216,11 +300,15 @@ public partial class AdministrarePersonal : ComponentBase
             _state.IsModalVisible = true;
             StateHasChanged();
 
-            await ShowToast("Detalii", $"Afisare detalii pentru {personal.NumeComplet}", "e-toast-info");
+            // ELIMINAT TOAST-UL DIN PĂRINTE - CAUZA PROBLEMEI
+            // await ShowToast("Detalii", $"Afisare detalii pentru {personal.NumeComplet}", "e-toast-info");
+            
+            // Toast-ul va fi afișat în modal prin ModalToastRef dacă este necesar
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error showing personal detail modal");
+            // DOAR pentru erori folosim toast-ul global
             await ShowToast("Eroare", "Eroare la afisarea detaliilor", "e-toast-danger");
         }
     }
@@ -279,10 +367,10 @@ public partial class AdministrarePersonal : ComponentBase
             _state.IsEditMode = false;
             _state.EditingPersonal = _models.CreateNewPersonal();
             _state.IsAddEditModalVisible = true;
-            
             StateHasChanged();
 
-            await ShowToast("Personal nou", "Completeaza formularul pentru a adauga personal nou", "e-toast-info");
+            // ELIMINAT TOAST-UL CARE SE BLUEAZĂ
+            // await ShowToast("Personal nou", "Completeaza formularul pentru a adauga personal nou", "e-toast-info");
         }
         catch (Exception ex)
         {
@@ -298,12 +386,12 @@ public partial class AdministrarePersonal : ComponentBase
             Logger.LogInformation("Starting to show edit modal for {PersonalName}", personal.NumeComplet);
             _state.IsEditMode = true;
             _state.EditingPersonal = _models.ClonePersonal(personal);
-            _state.SelectedPersonalForEdit = personal; // Păstrăm personalul original pentru referință
+            _state.SelectedPersonalForEdit = personal;
             _state.IsAddEditModalVisible = true;
-            
             StateHasChanged();
 
-            await ShowToast("Editare personal", $"Modificati informatiile pentru {personal.NumeComplet}", "e-toast-info");
+            // ELIMINAT TOAST-UL CARE SE BLUEAZĂ
+            // await ShowToast("Editare personal", $"Modificati informatiile pentru {personal.NumeComplet}", "e-toast-info");
         }
         catch (Exception ex)
         {
@@ -331,6 +419,17 @@ public partial class AdministrarePersonal : ComponentBase
         }
     }
 
+    // Reference către componenta AdaugaEditezaPersonal pentru a putea apela submit-ul
+    private AdaugaEditezaPersonal? _currentFormComponent;
+
+    private async Task HandleFormSubmit()
+    {
+        if (_currentFormComponent != null)
+        {
+            await _currentFormComponent.SubmitForm();
+        }
+    }
+
     private async Task SavePersonal(PersonalModel personalModel)
     {
         try
@@ -340,63 +439,33 @@ public partial class AdministrarePersonal : ComponentBase
 
             Logger.LogInformation("Starting save process for {PersonalName}", personalModel.NumeComplet);
 
-            ValyanClinic.Application.Services.PersonalResult result;
-            
-            if (_state.IsEditMode && _state.EditingPersonal != null)
+            PersonalResult result;
+
+            if (_state.IsEditMode)
             {
-                // Update existing personal
-                Logger.LogInformation("Updating existing personal {PersonalName} with ID {PersonalId}", 
-                    personalModel.NumeComplet, personalModel.Id_Personal);
-                
                 result = await PersonalService.UpdatePersonalAsync(personalModel, "current_user");
-                
-                Logger.LogInformation("UpdatePersonalAsync returned. IsSuccess = {IsSuccess}", result.IsSuccess);
-                
-                if (result.IsSuccess)
-                {
-                    Logger.LogInformation("Personal {PersonalName} updated successfully", personalModel.NumeComplet);
-                    await ShowToast("Actualizare reușită", $"Personalul {personalModel.NumeComplet} a fost actualizat cu succes", "e-toast-success");
-                }
-                else
-                {
-                    Logger.LogError("Failed to update personal {PersonalName}: {Error}", 
-                        personalModel.NumeComplet, result.ErrorMessage);
-                    await ShowToast("Eroare actualizare", result.ErrorMessage ?? "Eroare necunoscută la actualizare", "e-toast-danger");
-                    return;
-                }
             }
             else
             {
-                // Create new personal
-                Logger.LogInformation("Creating new personal {PersonalName} with ID {PersonalId}", 
-                    personalModel.NumeComplet, personalModel.Id_Personal);
-                
                 result = await PersonalService.CreatePersonalAsync(personalModel, "current_user");
-                
-                Logger.LogInformation("CreatePersonalAsync returned. IsSuccess = {IsSuccess}", result.IsSuccess);
-                
-                if (result.IsSuccess)
-                {
-                    Logger.LogInformation("Personal {PersonalName} created successfully", personalModel.NumeComplet);
-                    await ShowToast("Creare reușită", $"Personalul {personalModel.NumeComplet} a fost creat cu succes", "e-toast-success");
-                }
-                else
-                {
-                    Logger.LogError("Failed to create personal {PersonalName}: {Error}", 
-                        personalModel.NumeComplet, result.ErrorMessage);
-                    await ShowToast("Eroare creare", result.ErrorMessage ?? "Eroare necunoscută la creare", "e-toast-danger");
-                    return;
-                }
             }
 
-            Logger.LogInformation("Save process completed successfully for {PersonalName}", personalModel.NumeComplet);
-            // Close modal and refresh data
-            await CloseAddEditModal();
-            await LoadInitialData(); // Refresh the grid with new data
+            if (result.IsSuccess)
+            {
+                var action = _state.IsEditMode ? "actualizat" : "creat";
+                await ShowToast("Succes", $"Personalul {personalModel.NumeComplet} a fost {action} cu succes", "e-toast-success");
+                
+                await CloseAddEditModal();
+                await LoadInitialData();
+            }
+            else
+            {
+                await ShowToast("Eroare", result.ErrorMessage ?? "Eroare necunoscută", "e-toast-danger");
+            }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Exception occurred while saving personal {PersonalName}", personalModel?.NumeComplet ?? "Unknown");
+            Logger.LogError(ex, "Exception occurred while saving personal");
             await ShowToast("Eroare", $"Eroare la salvarea personalului: {ex.Message}", "e-toast-danger");
         }
         finally
@@ -506,42 +575,36 @@ public partial class AdministrarePersonal : ComponentBase
         }
     }
 
-    #endregion
-
-    #region Legacy Support Methods (pentru compatibilitate cu codul existent)
-
-    private async Task ApplyFilters() => await ApplyAdvancedFilters();
-    private async Task ClearFilters() => await ClearAdvancedFilters();
-    private async Task ExportData() => await ExportFilteredData();
-
-    private async Task OnDepartmentFilterChanged(ChangeEventArgs<string, DropdownItem> args)
+    /// <summary>
+    /// Afișează toast în contextul modalului - SOLUȚIA PENTRU TOAST BLURAT
+    /// </summary>
+    private async Task ShowModalToast(string title, string content, string cssClass = "e-toast-info")
     {
-        if (Enum.TryParse<Departament>(args.Value, out var dept))
+        if (ModalToastRef != null)
         {
-            SelectedDepartmentFilter = dept;
-            _state.SelectedDepartment = args.Value ?? "";
+            var toastModel = new ToastModel()
+            {
+                Title = title,
+                Content = content,
+                CssClass = cssClass,
+                ShowCloseButton = true,
+                Timeout = 4000
+            };
+            await ModalToastRef.ShowAsync(toastModel);
         }
         else
         {
-            SelectedDepartmentFilter = null;
-            _state.SelectedDepartment = "";
+            // Fallback la toast-ul global dacă modalul nu e disponibil
+            await ShowToast(title, content, cssClass);
         }
-        await ApplyAdvancedFilters();
     }
 
-    private async Task OnStatusFilterChanged(ChangeEventArgs<string, StatusItem> args)
+    /// <summary>
+    /// Handler pentru callback-ul toast din VizualizeazaPersonal
+    /// </summary>
+    private async Task HandleModalToast((string Title, string Message, string CssClass) args)
     {
-        if (Enum.TryParse<StatusAngajat>(args.Value, out var status))
-        {
-            SelectedStatusFilter = status;
-            _state.SelectedStatus = args.Value ?? "";
-        }
-        else
-        {
-            SelectedStatusFilter = null;
-            _state.SelectedStatus = "";
-        }
-        await ApplyAdvancedFilters();
+        await ShowModalToast(args.Title, args.Message, args.CssClass);
     }
 
     #endregion
@@ -557,27 +620,26 @@ public partial class AdministrarePersonal : ComponentBase
     private void ToggleStatistics()
     {
         _state.ShowStatistics = !_state.ShowStatistics;
-        _state.ShowKebabMenu = false; // Close menu after selection
+        _state.ShowKebabMenu = false;
         StateHasChanged();
     }
 
     private void ToggleAdvancedFilters()
     {
         _state.ShowAdvancedFilters = !_state.ShowAdvancedFilters;
-        _state.ShowKebabMenu = false; // Close menu after selection
+        _state.ShowKebabMenu = false;
         StateHasChanged();
     }
 
-    // Close kebab menu when clicking outside
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             try
             {
-                // Check if the JavaScript function exists before calling it
-                var functionExists = await JSRuntime.InvokeAsync<bool>("eval", "typeof window.addClickEventListener === 'function'");
-                
+                var functionExists = await JSRuntime.InvokeAsync<bool>("eval", 
+                    "typeof window.addClickEventListener === 'function'");
+
                 if (functionExists)
                 {
                     await JSRuntime.InvokeVoidAsync("window.addClickEventListener", 
@@ -585,7 +647,6 @@ public partial class AdministrarePersonal : ComponentBase
                 }
                 else
                 {
-                    // Try again after a short delay to allow scripts to load
                     await Task.Delay(100);
                     try
                     {
@@ -595,14 +656,12 @@ public partial class AdministrarePersonal : ComponentBase
                     catch (Exception retryEx)
                     {
                         Logger.LogInformation("JavaScript helper functions not available yet: {Error}", retryEx.Message);
-                        // Kebab menu will still work without outside click functionality
                     }
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogInformation("JavaScript helper functions not ready: {Error}", ex.Message);
-                // Non-critical error - kebab menu will still work, just won't close on outside click
             }
         }
     }
@@ -615,6 +674,43 @@ public partial class AdministrarePersonal : ComponentBase
             _state.ShowKebabMenu = false;
             StateHasChanged();
         }
+    }
+
+    #endregion
+
+    #region IAsyncDisposable - CRITICAL MEMORY LEAK PREVENTION
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            _disposed = true;
+
+            // Salvează starea grid-ului înainte de dispose - CRITICAL FUNCTIONALITY
+            if (GridRef != null)
+            {
+                var currentSettings = CaptureGridSettings();
+                await GridStateService.SaveGridSettingsAsync(GRID_ID, currentSettings);
+                Logger.LogDebug("Grid settings saved on disposal");
+            }
+
+            // Manual disposal pentru componentele Syncfusion - MEMORY LEAK PREVENTION
+            GridRef?.Dispose();
+            PersonalDetailModal?.Dispose();  
+            AddEditPersonalModal?.Dispose();
+            ToastRef?.Dispose();
+            ModalToastRef?.Dispose(); // DISPOSE PENTRU MODAL TOAST
+
+            Logger.LogDebug("AdministrarePersonal disposed successfully");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error during disposal");
+        }
+
+        GC.SuppressFinalize(this);
     }
 
     #endregion

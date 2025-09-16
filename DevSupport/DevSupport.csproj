@@ -4,10 +4,28 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- Dezactivam build-ul pentru acest proiect - este doar pentru documentatie -->
+    <IsPackable>false</IsPackable>
+    <IsPublishable>false</IsPublishable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseCommonOutputDirectory>false</UseCommonOutputDirectory>
   </PropertyGroup>
 
+  <!-- Include toate fisierele ca Content pentru a fi vizibile in Solution Explorer -->
   <ItemGroup>
-    <Folder Include="Improvement\" />
+    <Content Include="Documentation\**\*.*" />
+    <Content Include="Scripts\**\*.*" />
+    <Content Include="Improvement\**\*.*" />
+    <Content Include="SQLScripts\**\*.*" />
+  </ItemGroup>
+
+  <!-- Exclude folder-urile obj si bin -->
+  <ItemGroup>
+    <Compile Remove="obj\**" />
+    <Content Remove="obj\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <None Remove="obj\**" />
   </ItemGroup>
 
 </Project>

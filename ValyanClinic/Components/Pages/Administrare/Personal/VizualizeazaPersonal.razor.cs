@@ -16,6 +16,9 @@ public partial class VizualizeazaPersonal : ComponentBase
     
     [Parameter] public Guid? PersonalId { get; set; }
     [Parameter] public PersonalModel? PersonalData { get; set; }
+    
+    // CALLBACK PENTRU TOAST ÎN MODAL - SOLUȚIA PENTRU TOAST BLURAT
+    [Parameter] public EventCallback<(string Title, string Message, string CssClass)> OnToastMessage { get; set; }
 
     // UI State Properties - SIMILAR CU VizualizeazUtilizator
     public bool HasError { get; set; } = false;
@@ -30,11 +33,23 @@ public partial class VizualizeazaPersonal : ComponentBase
             {
                 IsLoading = true;
                 PersonalData = await PersonalService.GetPersonalByIdAsync(PersonalId.Value);
+                
+                // Toast de success pentru încărcarea datelor
+                if (OnToastMessage.HasDelegate && PersonalData != null)
+                {
+                    await OnToastMessage.InvokeAsync(("Succes", "Datele au fost incarcate cu succes", "e-toast-success"));
+                }
             }
             catch (Exception ex)
             {
                 HasError = true;
-                ErrorMessage = $"Eroare la încarcarea datelor: {ex.Message}";
+                ErrorMessage = $"Eroare la incarcarea datelor: {ex.Message}";
+                
+                // Toast de eroare
+                if (OnToastMessage.HasDelegate)
+                {
+                    await OnToastMessage.InvokeAsync(("Eroare", ErrorMessage, "e-toast-danger"));
+                }
             }
             finally
             {
@@ -54,11 +69,23 @@ public partial class VizualizeazaPersonal : ComponentBase
                 PersonalData = await PersonalService.GetPersonalByIdAsync(PersonalId.Value);
                 HasError = false;
                 ErrorMessage = string.Empty;
+                
+                // Toast de success pentru încărcarea datelor
+                if (OnToastMessage.HasDelegate && PersonalData != null)
+                {
+                    await OnToastMessage.InvokeAsync(("Succes", "Datele au fost incarcate cu succes", "e-toast-success"));
+                }
             }
             catch (Exception ex)
             {
                 HasError = true;
-                ErrorMessage = $"Eroare la încarcarea datelor: {ex.Message}";
+                ErrorMessage = $"Eroare la incarcarea datelor: {ex.Message}";
+                
+                // Toast de eroare
+                if (OnToastMessage.HasDelegate)
+                {
+                    await OnToastMessage.InvokeAsync(("Eroare", ErrorMessage, "e-toast-danger"));
+                }
             }
             finally
             {
@@ -122,7 +149,7 @@ public partial class VizualizeazaPersonal : ComponentBase
         
         if (age.TotalDays < 1)
         {
-            return "Astăzi";
+            return "Astazi";
         }
         else if (age.TotalDays < 30)
         {
@@ -145,7 +172,7 @@ public partial class VizualizeazaPersonal : ComponentBase
             }
             else
             {
-                return $"{years} {(years == 1 ? "an" : "ani")} și {remainingMonths} {(remainingMonths == 1 ? "lună" : "luni")}";
+                return $"{years} {(years == 1 ? "an" : "ani")} si {remainingMonths} {(remainingMonths == 1 ? "luna" : "luni")}";
             }
         }
     }

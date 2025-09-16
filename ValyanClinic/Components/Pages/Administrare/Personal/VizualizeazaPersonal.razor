@@ -45,6 +45,13 @@
                             <label>Prenume</label>
                             <span class="field-value">@PersonalData.Prenume</span>
                         </div>
+                        @if (!string.IsNullOrEmpty(PersonalData.Nume_Anterior))
+                        {
+                            <div class="form-field">
+                                <label>Nume Anterior</label>
+                                <span class="field-value">@PersonalData.Nume_Anterior</span>
+                            </div>
+                        }
                         <div class="form-field">
                             <label>CNP</label>
                             <span class="field-value">@PersonalData.CNP</span>
@@ -214,6 +221,13 @@
                                 <label>Orasul</label>
                                 <span class="field-value">@(PersonalData.Oras_Resedinta ?? "Nu este specificat")</span>
                             </div>
+                            @if (!string.IsNullOrEmpty(PersonalData.Cod_Postal_Resedinta))
+                            {
+                                <div class="form-field">
+                                    <label>Cod Postal</label>
+                                    <span class="field-value">@PersonalData.Cod_Postal_Resedinta</span>
+                                </div>
+                            }
                         </div>
                     }
                 </div>
@@ -249,7 +263,7 @@
                             {
                                 <div class="form-field full-width">
                                     <label>Valabil pana la</label>
-                                    <span class="field-value document-validity">
+                                    <span class="field-value">
                                         @PersonalData.Valabil_CI_Pana.Value.ToString("dd.MM.yyyy")
                                         @if (PersonalData.Valabil_CI_Pana.Value < DateTime.Now)
                                         {

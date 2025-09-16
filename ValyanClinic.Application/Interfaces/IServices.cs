@@ -1,6 +1,9 @@
-using ValyanClinic.Application.DTOs;
+﻿using ValyanClinic.Application.DTOs;
 
 namespace ValyanClinic.Application.Interfaces;
+
+// DOAR interfete pentru serviciile IMPLEMENTATE si FUNCTIONALE
+// Nu mai tinem placeholder-uri goale
 
 public interface IPatientService
 {
@@ -13,25 +16,6 @@ public interface IPatientService
     Task<bool> DeletePatientAsync(int id);
 }
 
-public interface IDoctorService
-{
-    Task<IEnumerable<DoctorDto>> GetAllDoctorsAsync();
-    Task<DoctorDto?> GetDoctorByIdAsync(int id);
-    Task<IEnumerable<DoctorDto>> GetDoctorsBySpecializationAsync(string specialization);
-}
-
-public interface IAppointmentService
-{
-    Task<IEnumerable<AppointmentDto>> GetAllAppointmentsAsync();
-    Task<AppointmentDto?> GetAppointmentByIdAsync(int id);
-    Task<IEnumerable<AppointmentDto>> GetAppointmentsByPatientIdAsync(int patientId);
-    Task<IEnumerable<AppointmentDto>> GetAppointmentsByDoctorIdAsync(int doctorId);
-    Task<IEnumerable<AppointmentDto>> GetTodayAppointmentsAsync();
-    Task<AppointmentDto> CreateAppointmentAsync(CreateAppointmentDto createAppointmentDto);
-    Task<bool> IsTimeSlotAvailableAsync(int doctorId, DateTime date, TimeSpan startTime, TimeSpan endTime);
-}
-
-public interface IDashboardService
-{
-    Task<DashboardStatsDto> GetDashboardStatsAsync();
-}
+// NOTE: IDocorService, IAppointmentService, IDashboardService au fost eliminate
+// deoarece erau doar placeholder-uri goale.
+// Vor fi readaugate cand vor fi implementate cu functionalitate reala.

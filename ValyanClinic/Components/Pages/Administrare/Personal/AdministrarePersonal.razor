@@ -330,7 +330,7 @@
         </div>
     }
 
-    @* Personal Detail Modal - USING SEPARATE COMPONENT *@
+    @* Personal Detail Modal - CU TOAST PROPRIU *@
     <SfDialog @ref="PersonalDetailModal" 
               Width="900px" 
               Height="700px"
@@ -340,6 +340,16 @@
               AllowDragging="true"
               CssClass="personal-dialog detail-dialog"
               AnimationSettings="@DialogAnimation">
+        
+        @* TOAST ÎN MODAL - FĂRĂ PROPRIETATEA POSITION PROBLEMATICĂ *@
+        <SfToast @ref="ModalToastRef" 
+                 Title="Personal Details" 
+                 Target=".personal-dialog" 
+                 NewestOnTop="true" 
+                 ShowProgressBar="true"
+                 CssClass="modal-toast">
+        </SfToast>
+        
         <DialogEvents Closed="OnModalClosed" />
         <DialogTemplates>
             <Header>
@@ -354,7 +364,8 @@
             <Content>
                 @if (_state.SelectedPersonal != null)
                 {
-                    <VizualizeazaPersonal PersonalData="@_state.SelectedPersonal" />
+                    <VizualizeazaPersonal PersonalData="@_state.SelectedPersonal" 
+                                        OnToastMessage="@HandleModalToast" />
                 }
             </Content>
             <FooterTemplate>
@@ -394,16 +405,30 @@
             <Content>
                 @if (_state.IsEditMode && _state.EditingPersonal != null)
                 {
-                    <AdaugaEditezaPersonal EditingPersonal="@_state.EditingPersonal"
+                    <AdaugaEditezaPersonal @ref="_currentFormComponent" 
+                                          EditingPersonal="@_state.EditingPersonal"
                                           OnSave="@SavePersonal" 
                                           OnCancel="@CloseAddEditModal" />
                 }
                 else
                 {
-                    <AdaugaEditezaPersonal OnSave="@SavePersonal" 
+                    <AdaugaEditezaPersonal @ref="_currentFormComponent" 
+                                          OnSave="@SavePersonal" 
                                           OnCancel="@CloseAddEditModal" />
                 }
             </Content>
+            <FooterTemplate>
+                <div class="modal-footer-actions">
+                    <button class="btn btn-primary" @onclick="HandleFormSubmit" disabled="@_state.IsLoading">
+                        <i class="fas fa-save"></i>
+                        @(_state.IsEditMode ? "Actualizeaza Personal" : "Adauga Personal")
+                    </button>
+                    <button class="btn btn-secondary" @onclick="CloseAddEditModal" disabled="@_state.IsLoading">
+                        <i class="fas fa-times"></i>
+                        Anuleaza
+                    </button>
+                </div>
+            </FooterTemplate>
         </DialogTemplates>
     </SfDialog>
 </div>
