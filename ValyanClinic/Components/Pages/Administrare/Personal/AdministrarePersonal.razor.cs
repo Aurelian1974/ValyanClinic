@@ -364,17 +364,22 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
     {
         try
         {
+            Logger.LogInformation("🚀 ShowAddPersonalModal called - Opening add personal modal");
+            
             _state.IsEditMode = false;
             _state.EditingPersonal = _models.CreateNewPersonal();
             _state.IsAddEditModalVisible = true;
             StateHasChanged();
+
+            Logger.LogInformation("✅ Add personal modal state set - IsAddEditModalVisible: {IsVisible}, EditingPersonal created", 
+                _state.IsAddEditModalVisible);
 
             // ELIMINAT TOAST-UL CARE SE BLUEAZĂ
             // await ShowToast("Personal nou", "Completeaza formularul pentru a adauga personal nou", "e-toast-info");
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error showing add personal modal");
+            Logger.LogError(ex, "💥 Error showing add personal modal");
             await ShowToast("Eroare", "Eroare la deschiderea formularului de adaugare", "e-toast-danger");
         }
     }

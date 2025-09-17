@@ -1,0 +1,57 @@
+﻿/* UTILIZATORI PAGE STYLING */
+/* Basic styling pentru pagina de administrare utilizatori */
+
+.utilizatori-page-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.utilizatori-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.utilizatori-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 8px 0;
+}
+
+.utilizatori-header p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.utilizatori-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.utilizatori-grid {
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.utilizatori-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.utilizatori-status.active {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.utilizatori-status.inactive {
+    background-color: #fee2e2;
+    color: #991b1b;
+}

@@ -1,0 +1,74 @@
+﻿@using ValyanClinic.Domain.Models
+@using Syncfusion.Blazor.DropDowns
+@rendermode InteractiveServer
+@implements IDisposable
+
+<!-- Layout integrat în grid-ul formularului - două coloane separate -->
+<div class="form-field">
+    <label>@JudetLabel</label>
+    <SfDropDownList TItem="Judet" 
+                   TValue="int?" 
+                   Value="@SelectedJudetId"
+                   DataSource="@Judete" 
+                   Width="100%"
+                   AllowFiltering="true"
+                   Placeholder="@JudetPlaceholder"
+                   Enabled="@(!IsLoadingJudete)">
+        <DropDownListFieldSettings Text="Nume" Value="IdJudet" />
+        <DropDownListEvents TItem="Judet" 
+                           TValue="int?" 
+                           ValueChange="@OnJudetChangedAsync" />
+    </SfDropDownList>
+    
+    @if (IsLoadingJudete)
+    {
+        <div class="loading-indicator">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Se încarcă județele...</span>
+        </div>
+    }
+</div>
+
+<div class="form-field">
+    <label>@LocalitateLabel</label>
+    <SfDropDownList TItem="Localitate" 
+                   TValue="int?" 
+                   Value="@SelectedLocalitateId"
+                   DataSource="@Localitati" 
+                   Width="100%"
+                   AllowFiltering="true"
+                   Placeholder="@LocalitatePlaceholder"
+                   Enabled="@(IsLocalitateEnabled && !IsLoadingLocalitati)">
+        <DropDownListFieldSettings Text="Nume" Value="IdOras" />
+        <DropDownListEvents TItem="Localitate" 
+                           TValue="int?" 
+                           ValueChange="@OnLocalitateChangedAsync" />
+    </SfDropDownList>
+    
+    @if (IsLoadingLocalitati)
+    {
+        <div class="loading-indicator">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Se încarcă localitățile...</span>
+        </div>
+    }
+    
+    @if (!IsLocalitateEnabled && !IsLoadingJudete)
+    {
+        <div class="help-text">
+            <i class="fas fa-info-circle"></i>
+            <span>Selectați mai întâi județul</span>
+        </div>
+    }
+</div>
+
+@* Afișare eroare dacă există - pe toată lățimea *@
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="form-field full-width">
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>@ErrorMessage</span>
+        </div>
+    </div>
+}

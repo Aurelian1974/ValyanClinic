@@ -1,6 +1,9 @@
 ﻿using ValyanClinic.Core.Services;
 using ValyanClinic.Application.Services;
+using ValyanClinic.Application.Interfaces;
+using ValyanClinic.Domain.Interfaces;
 using ValyanClinic.Infrastructure.Data;
+using ValyanClinic.Infrastructure.Repositories;
 using ValyanClinic.Application.Validators;
 using ValyanClinic.Middleware;
 using ValyanClinic.Core.Components;
@@ -140,17 +143,22 @@ try
     
     // === REPOSITORY LAYER ===
     builder.Services.AddScoped<IPersonalRepository, PersonalRepository>();
+    builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.IJudetRepository, JudetRepository>();
+    builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.ILocalitateRepository, LocalitateRepository>();
     
     // === APPLICATION SERVICES ===
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IPersonalService, PersonalService>();
+    builder.Services.AddScoped<ILocationService, LocationService>();
     builder.Services.AddScoped<IValidationService, ValidationService>();
+    
+    // === COMPONENT STATE SERVICES ===
+    builder.Services.AddScoped<ValyanClinic.Components.Shared.LocationDependentState>();
 
     // === AUTHENTICATION & SECURITY SERVICES ===
     builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
     builder.Services.AddScoped<IUserSessionService, UserSessionService>();
     builder.Services.AddScoped<ISecurityAuditService, SecurityAuditService>();
-
     // === MANAGEMENT SERVICES ===
     builder.Services.AddScoped<IUserManagementService, UserManagementService>();
     

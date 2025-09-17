@@ -1,6 +1,7 @@
 ﻿@using ValyanClinic.Domain.Models
 @using ValyanClinic.Domain.Enums
 @using ValyanClinic.Application.Services
+@using ValyanClinic.Application.Interfaces
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Calendars
@@ -9,7 +10,8 @@
 @rendermode InteractiveServer
 @using PersonalModel = ValyanClinic.Domain.Models.Personal
 
-<link href="~/css/pages/view-personal-syncfusion.css" rel="stylesheet" />
+<link href="/css/pages/view-personal-syncfusion.css" rel="stylesheet" />
+<link href="/css/components/location-dependent-grid-dropdowns.css" rel="stylesheet" />
 
 <div class="view-personal-modal-content">
     <!-- Content area cu scroll -->
@@ -339,42 +341,19 @@
                                 }
                             </div>
 
-                            <div class="form-field">
-                                <label>Judet Domiciliu *</label>
-                                <SfDropDownList @bind-Value="@personalFormModel.Judet_Domiciliu" 
-                                               DataSource="@judeteOptions" 
-                                               Width="100%"
-                                               AllowFiltering="true">
-                                    <DropDownListFieldSettings Text="Text" Value="Value" />
-                                </SfDropDownList>
-                                @if (HasFieldErrors(nameof(PersonalModel.Judet_Domiciliu)))
-                                {
-                                    <div class="field-error">
-                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Judet_Domiciliu)))
-                                        {
-                                            <small>@error</small>
-                                        }
-                                    </div>
-                                }
-                            </div>
-
-                            <div class="form-field">
-                                <label>Oras Domiciliu *</label>
-                                <SfTextBox @bind-Value="@personalFormModel.Oras_Domiciliu" 
-                                          Placeholder="Ex: Bucuresti" 
-                                          Width="100%"
-                                          MaxLength="100">
-                                </SfTextBox>
-                                @if (HasFieldErrors(nameof(PersonalModel.Oras_Domiciliu)))
-                                {
-                                    <div class="field-error">
-                                        @foreach (var error in GetFieldErrors(nameof(PersonalModel.Oras_Domiciliu)))
-                                        {
-                                            <small>@error</small>
-                                        }
-                                    </div>
-                                }
-                            </div>
+                            <!-- FOLOSIM COMPONENTA REUTILIZABILA LocationDependentGridDropdowns -->
+                            <LocationDependentGridDropdowns 
+                                SelectedJudetId="@selectedJudetDomiciliuId"
+                                SelectedJudetIdChanged="@((int? value) => selectedJudetDomiciliuId = value)"
+                                SelectedLocalitateId="@selectedLocalitateDomiciliuId"
+                                SelectedLocalitateIdChanged="@((int? value) => selectedLocalitateDomiciliuId = value)"
+                                JudetLabel="Județ Domiciliu *"
+                                LocalitateLabel="Localitate Domiciliu *"
+                                JudetPlaceholder="-- Selectează județul --"
+                                LocalitatePlaceholder="-- Selectează localitatea --"
+                                OnJudetNameChanged="@OnJudetDomiciliuNameChanged"
+                                OnLocalitateNameChanged="@OnLocalitateDomiciliuNameChanged" />
+                            <!-- end dropdown-uri location dependent -->
 
                             <div class="form-field">
                                 <label>Cod Postal Domiciliu</label>
@@ -420,24 +399,18 @@
                                     </SfTextBox>
                                 </div>
 
-                                <div class="form-field">
-                                    <label>Judet Resedinta</label>
-                                    <SfDropDownList @bind-Value="@personalFormModel.Judet_Resedinta" 
-                                                   DataSource="@judeteOptions" 
-                                                   Width="100%"
-                                                   AllowFiltering="true">
-                                        <DropDownListFieldSettings Text="Text" Value="Value" />
-                                    </SfDropDownList>
-                                </div>
-
-                                <div class="form-field">
-                                    <label>Oras Resedinta</label>
-                                    <SfTextBox @bind-Value="@personalFormModel.Oras_Resedinta" 
-                                              Placeholder="Ex: Cluj-Napoca" 
-                                              Width="100%"
-                                              MaxLength="100">
-                                    </SfTextBox>
-                                </div>
+                                <!-- FOLOSIM COMPONENTA REUTILIZABILA pentru Resedinta -->
+                                <LocationDependentGridDropdowns 
+                                    SelectedJudetId="@selectedJudetResedintaId"
+                                    SelectedJudetIdChanged="@((int? value) => selectedJudetResedintaId = value)"
+                                    SelectedLocalitateId="@selectedLocalitateResedintaId"
+                                    SelectedLocalitateIdChanged="@((int? value) => selectedLocalitateResedintaId = value)"
+                                    JudetLabel="Județ Reședință"
+                                    LocalitateLabel="Localitate Reședință"
+                                    JudetPlaceholder="-- Selectează județul --"
+                                    LocalitatePlaceholder="-- Selectează localitatea --"
+                                    OnJudetNameChanged="@OnJudetResedintaNameChanged"
+                                    OnLocalitateNameChanged="@OnLocalitateResedintaNameChanged" />
 
                                 <div class="form-field">
                                     <label>Cod Postal Resedinta</label>

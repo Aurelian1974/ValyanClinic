@@ -1,0 +1,70 @@
+﻿/* Stiluri pentru componenta LocationDependentGridDropdowns */
+/* Integrare perfectă în grid-ul formularului */
+
+.form-grid .loading-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.form-grid .loading-indicator i {
+    color: #3b82f6;
+}
+
+.form-grid .help-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.form-grid .help-text i {
+    color: #10b981;
+}
+
+/* Stiluri pentru mesajele de eroare în grid */
+.form-grid .error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #fef2f2;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-left: 4px solid #dc2626;
+    font-size: 14px;
+}
+
+.form-grid .error-message i {
+    color: #dc2626;
+    flex-shrink: 0;
+}
+
+/* Animații pentru tranziții smooth în grid */
+.form-grid .loading-indicator,
+.form-grid .help-text {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments pentru grid */
+@media (max-width: 767px) {
+    .form-grid .form-field {
+        grid-column: 1 / -1 !important;
+    }
+}

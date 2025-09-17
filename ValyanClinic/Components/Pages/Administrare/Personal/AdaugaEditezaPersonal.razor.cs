@@ -3,8 +3,10 @@ using Microsoft.JSInterop;
 using ValyanClinic.Domain.Models;
 using ValyanClinic.Domain.Enums;
 using ValyanClinic.Application.Services;
+using ValyanClinic.Application.Interfaces;
 using ValyanClinic.Application.Validators;
 using ValyanClinic.Components.Shared.Validation;
+using ValyanClinic.Components.Shared;
 using PersonalModel = ValyanClinic.Domain.Models.Personal;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,6 +15,7 @@ namespace ValyanClinic.Components.Pages.Administrare.Personal;
 public partial class AdaugaEditezaPersonal : ComponentBase
 {
     [Inject] private IPersonalService PersonalService { get; set; } = default!;
+    [Inject] private ILocationService LocationService { get; set; } = default!;
     [Inject] private IValidationService ValidationService { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private ILogger<AdaugaEditezaPersonal> Logger { get; set; } = default!;
@@ -25,11 +28,73 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     private PersonalFormModel personalFormModel = new();
     private List<ValidationError> validationErrors = new();
     
-    // Dropdown options
+    // Dropdown options pentru enums
     private List<DropdownOption<Departament>> departmentOptions = new();
     private List<DropdownOption<StareCivila>> stareCivilaOptions = new();
     private List<DropdownOption<StatusAngajat>> statusAngajatOptions = new();
-    private List<DropdownOption<string>> judeteOptions = new();
+    
+    // Selected values pentru lookup-uri dependente - folosind componentele
+    private int? _selectedJudetDomiciliuId = null;
+    private int? _selectedLocalitateDomiciliuId = null;
+    private int? _selectedJudetResedintaId = null;
+    private int? _selectedLocalitateResedintaId = null;
+
+    // Properties cu logging pentru a urmări schimbările
+    private int? selectedJudetDomiciliuId 
+    { 
+        get => _selectedJudetDomiciliuId;
+        set 
+        {
+            if (_selectedJudetDomiciliuId != value)
+            {
+                Logger.LogInformation("🔥 Parent selectedJudetDomiciliuId changed: {OldValue} → {NewValue}", 
+                    _selectedJudetDomiciliuId, value);
+                _selectedJudetDomiciliuId = value;
+            }
+        }
+    }
+
+    private int? selectedLocalitateDomiciliuId 
+    { 
+        get => _selectedLocalitateDomiciliuId;
+        set 
+        {
+            if (_selectedLocalitateDomiciliuId != value)
+            {
+                Logger.LogInformation("🔥 Parent selectedLocalitateDomiciliuId changed: {OldValue} → {NewValue}", 
+                    _selectedLocalitateDomiciliuId, value);
+                _selectedLocalitateDomiciliuId = value;
+            }
+        }
+    }
+
+    private int? selectedJudetResedintaId 
+    { 
+        get => _selectedJudetResedintaId;
+        set 
+        {
+            if (_selectedJudetResedintaId != value)
+            {
+                Logger.LogInformation("🔥 Parent selectedJudetResedintaId changed: {OldValue} → {NewValue}", 
+                    _selectedJudetResedintaId, value);
+                _selectedJudetResedintaId = value;
+            }
+        }
+    }
+
+    private int? selectedLocalitateResedintaId 
+    { 
+        get => _selectedLocalitateResedintaId;
+        set 
+        {
+            if (_selectedLocalitateResedintaId != value)
+            {
+                Logger.LogInformation("🔥 Parent selectedLocalitateResedintaId changed: {OldValue} → {NewValue}", 
+                    _selectedLocalitateResedintaId, value);
+                _selectedLocalitateResedintaId = value;
+            }
+        }
+    }
     
     private bool isSubmitting = false;
     private FluentValidationHelper<PersonalModel>? validationHelper;
@@ -41,26 +106,28 @@ public partial class AdaugaEditezaPersonal : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadDropdownOptions();
+        Logger.LogInformation("🚀 AdaugaEditezaPersonal OnInitializedAsync started");
+        
+        LoadDropdownOptions();
         
         if (IsEditMode && EditingPersonal != null)
         {
-            Logger.LogInformation("Editare personal - CNP: {CNP}", EditingPersonal.CNP);
+            Logger.LogInformation("📝 Edit mode - Personal CNP: {CNP}", EditingPersonal.CNP);
             personalFormModel = PersonalFormModel.FromPersonal(EditingPersonal);
             
             // Verifică dacă există date de reședință pentru a determina starea checkbox-ului
-            // Logica inversată: dacă există date de reședință, înseamnă că adresele DIFERĂ, deci checkbox-ul e NEBIFAT
             var hasResedintaData = !string.IsNullOrEmpty(EditingPersonal.Adresa_Resedinta) ||
                                   !string.IsNullOrEmpty(EditingPersonal.Judet_Resedinta) ||
                                   !string.IsNullOrEmpty(EditingPersonal.Oras_Resedinta) ||
                                   !string.IsNullOrEmpty(EditingPersonal.Cod_Postal_Resedinta);
             
-            // Logica inversată: dacă există date de reședință, checkbox-ul e nebifat (adresele diferă)
             showResedintaSection = !hasResedintaData;
+            Logger.LogInformation("📍 Residence section will be {ShowState} (has residence data: {HasData})", 
+                showResedintaSection ? "shown" : "hidden", hasResedintaData);
         }
         else
         {
-            Logger.LogInformation("Adaugare personal nou");
+            Logger.LogInformation("➕ Add mode - Creating new personal");
             personalFormModel = new PersonalFormModel
             {
                 Id_Personal = Guid.NewGuid(),
@@ -69,50 +136,62 @@ public partial class AdaugaEditezaPersonal : ComponentBase
                 Nationalitate = "Romana",
                 Cetatenie = "Romana"
             };
-            // Pentru personal nou, presupunem că adresele sunt identice (checkbox bifat, card ascuns)
             showResedintaSection = true;
+            Logger.LogInformation("🏠 Residence section set to shown for new personal");
         }
+        
+        Logger.LogInformation("✅ AdaugaEditezaPersonal OnInitializedAsync completed - LocationDependentGridDropdowns should initialize now");
     }
 
-    private async Task LoadDropdownOptions()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            // Load department options
-            departmentOptions = Enum.GetValues<Departament>()
-                .Select(d => new DropdownOption<Departament> 
-                { 
-                    Text = GetDepartmentDisplayName(d), 
-                    Value = d 
-                })
-                .ToList();
-
-            // Load stare civila options
-            stareCivilaOptions = Enum.GetValues<StareCivila>()
-                .Select(s => new DropdownOption<StareCivila>
-                {
-                    Text = GetStareCivilaDisplayName(s),
-                    Value = s
-                })
-                .ToList();
-
-            // Load status angajat options
-            statusAngajatOptions = Enum.GetValues<StatusAngajat>()
-                .Select(s => new DropdownOption<StatusAngajat>
-                {
-                    Text = GetStatusAngajatDisplayName(s),
-                    Value = s
-                })
-                .ToList();
-
-            // Load judete options (simplified list - in production this would come from a service)
-            judeteOptions = GetJudeteRomania();
+            Logger.LogInformation("🎨 AdaugaEditezaPersonal first render completed - DOM should be ready");
+            Logger.LogInformation("📊 Current state: ShowResedintaSection={ShowResedinta}, IsEditMode={IsEdit}", 
+                showResedintaSection, IsEditMode);
+            
+            // LocationDependentGridDropdowns componentele ar trebui să se inițializeze acum
         }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error loading dropdown options");
-        }
+        
+        await Task.CompletedTask;
     }
+
+    #region Event Handlers simplificati pentru Lookup-uri
+
+    private async Task OnJudetDomiciliuNameChanged(string? judetName)
+    {
+        Logger.LogInformation("🔥 Parent OnJudetDomiciliuNameChanged: {Name} - selectedJudetDomiciliuId={JudetId}", 
+            judetName, selectedJudetDomiciliuId);
+        personalFormModel.Judet_Domiciliu = judetName ?? "";
+        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singură
+    }
+
+    private async Task OnLocalitateDomiciliuNameChanged(string? localitateName)
+    {
+        Logger.LogInformation("🔥 Parent OnLocalitateDomiciliuNameChanged: {Name} - selectedLocalitateDomiciliuId={LocalitateId}", 
+            localitateName, selectedLocalitateDomiciliuId);
+        personalFormModel.Oras_Domiciliu = localitateName ?? "";
+        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singură
+    }
+
+    private async Task OnJudetResedintaNameChanged(string? judetName)
+    {
+        Logger.LogInformation("🔥 Parent OnJudetResedintaNameChanged: {Name} - selectedJudetResedintaId={JudetId}", 
+            judetName, selectedJudetResedintaId);
+        personalFormModel.Judet_Resedinta = judetName;
+        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singură
+    }
+
+    private async Task OnLocalitateResedintaNameChanged(string? localitateName)
+    {
+        Logger.LogInformation("🔥 Parent OnLocalitateResedintaNameChanged: {Name} - selectedLocalitateResedintaId={LocalitateId}", 
+            localitateName, selectedLocalitateResedintaId);
+        personalFormModel.Oras_Resedinta = localitateName;
+        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singură
+    }
+
+    #endregion
 
     private async Task HandleSubmit()
     {
@@ -185,6 +264,10 @@ public partial class AdaugaEditezaPersonal : ComponentBase
                 personalFormModel.Judet_Resedinta = null;
                 personalFormModel.Oras_Resedinta = null;
                 personalFormModel.Cod_Postal_Resedinta = null;
+                
+                // Reset și dropdown-urile
+                selectedJudetResedintaId = null;
+                selectedLocalitateResedintaId = null;
             }
             
             StateHasChanged();
@@ -279,53 +362,43 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         return displayAttribute?.Name ?? status.ToString();
     }
 
-    private List<DropdownOption<string>> GetJudeteRomania()
+    private void LoadDropdownOptions()
     {
-        return new List<DropdownOption<string>>
+        try
         {
-            new() { Text = "Alba", Value = "Alba" },
-            new() { Text = "Arad", Value = "Arad" },
-            new() { Text = "Arges", Value = "Arges" },
-            new() { Text = "Bacau", Value = "Bacau" },
-            new() { Text = "Bihor", Value = "Bihor" },
-            new() { Text = "Bistrita-Nasaud", Value = "Bistrita-Nasaud" },
-            new() { Text = "Botosani", Value = "Botosani" },
-            new() { Text = "Brasov", Value = "Brasov" },
-            new() { Text = "Braila", Value = "Braila" },
-            new() { Text = "Bucuresti", Value = "Bucuresti" },
-            new() { Text = "Buzau", Value = "Buzau" },
-            new() { Text = "Caras-Severin", Value = "Caras-Severin" },
-            new() { Text = "Calarasi", Value = "Calarasi" },
-            new() { Text = "Cluj", Value = "Cluj" },
-            new() { Text = "Constanta", Value = "Constanta" },
-            new() { Text = "Covasna", Value = "Covasna" },
-            new() { Text = "Dambovita", Value = "Dambovita" },
-            new() { Text = "Dolj", Value = "Dolj" },
-            new() { Text = "Galati", Value = "Galati" },
-            new() { Text = "Giurgiu", Value = "Giurgiu" },
-            new() { Text = "Gorj", Value = "Gorj" },
-            new() { Text = "Harghita", Value = "Harghita" },
-            new() { Text = "Hunedoara", Value = "Hunedoara" },
-            new() { Text = "Ialomita", Value = "Ialomita" },
-            new() { Text = "Iasi", Value = "Iasi" },
-            new() { Text = "Ilfov", Value = "Ilfov" },
-            new() { Text = "Maramures", Value = "Maramures" },
-            new() { Text = "Mehedinti", Value = "Mehedinti" },
-            new() { Text = "Mures", Value = "Mures" },
-            new() { Text = "Neamt", Value = "Neamt" },
-            new() { Text = "Olt", Value = "Olt" },
-            new() { Text = "Prahova", Value = "Prahova" },
-            new() { Text = "Salaj", Value = "Salaj" },
-            new() { Text = "Satu Mare", Value = "Satu Mare" },
-            new() { Text = "Sibiu", Value = "Sibiu" },
-            new() { Text = "Suceava", Value = "Suceava" },
-            new() { Text = "Teleorman", Value = "Teleorman" },
-            new() { Text = "Timis", Value = "Timis" },
-            new() { Text = "Tulcea", Value = "Tulcea" },
-            new() { Text = "Vaslui", Value = "Vaslui" },
-            new() { Text = "Valcea", Value = "Valcea" },
-            new() { Text = "Vrancea", Value = "Vrancea" }
-        };
+            // Load department options
+            departmentOptions = Enum.GetValues<Departament>()
+                .Select(d => new DropdownOption<Departament> 
+                { 
+                    Text = GetDepartmentDisplayName(d), 
+                    Value = d 
+                })
+                .ToList();
+
+            // Load stare civila options
+            stareCivilaOptions = Enum.GetValues<StareCivila>()
+                .Select(s => new DropdownOption<StareCivila>
+                {
+                    Text = GetStareCivilaDisplayName(s),
+                    Value = s
+                })
+                .ToList();
+
+            // Load status angajat options
+            statusAngajatOptions = Enum.GetValues<StatusAngajat>()
+                .Select(s => new DropdownOption<StatusAngajat>
+                {
+                    Text = GetStatusAngajatDisplayName(s),
+                    Value = s
+                })
+                .ToList();
+
+            Logger.LogInformation("Loaded dropdown options for enums");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading dropdown options");
+        }
     }
 }
 
