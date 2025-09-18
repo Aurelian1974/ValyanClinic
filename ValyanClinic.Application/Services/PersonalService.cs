@@ -280,6 +280,25 @@ public class PersonalService : IPersonalService
         }
     }
 
+    /// <summary>
+    /// Generează următorul cod de angajat disponibil bazat pe pattern EMP001, EMP002, etc.
+    /// </summary>
+    public async Task<string> GetNextCodAngajatAsync()
+    {
+        try
+        {
+            _logger.LogInformation("Generating next employee code");
+            return await _repository.GetNextCodAngajatAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating next employee code");
+            
+            // Fallback în caz de eroare
+            return $"EMP{DateTime.Now:HHmmss}";
+        }
+    }
+
     #region Private Business Logic Methods
 
     private Personal ApplyBusinessRulesForCreate(Personal personal, string utilizator)

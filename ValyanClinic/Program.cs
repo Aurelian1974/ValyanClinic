@@ -152,6 +152,9 @@ try
     builder.Services.AddScoped<ILocationService, LocationService>();
     builder.Services.AddScoped<IValidationService, ValidationService>();
     
+    // === TOAST NOTIFICATION SERVICE - LIPSĂ ÎN VERSIUNEA ANTERIOARĂ ===
+    builder.Services.AddToastNotificationService();
+
     // === COMPONENT STATE SERVICES ===
     builder.Services.AddScoped<ValyanClinic.Components.Shared.LocationDependentState>();
 

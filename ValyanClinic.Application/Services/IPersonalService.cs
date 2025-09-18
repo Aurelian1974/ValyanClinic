@@ -23,6 +23,11 @@ public interface IPersonalService
     Task<PersonalDropdownOptions> GetDropdownOptionsAsync();
     
     Task<PersonalValidationResult> ValidatePersonalAsync(Personal personal, bool isUpdate = false);
+    
+    /// <summary>
+    /// Generează următorul cod de angajat disponibil (EMP001, EMP002, etc.)
+    /// </summary>
+    Task<string> GetNextCodAngajatAsync();
 }
 
 /// <summary>

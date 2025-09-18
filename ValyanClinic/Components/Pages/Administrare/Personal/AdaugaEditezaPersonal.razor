@@ -120,11 +120,46 @@
 
                             <div class="form-field">
                                 <label>CNP *</label>
-                                <SfTextBox @bind-Value="@personalFormModel.CNP" 
-                                          Placeholder="Introduceti CNP-ul (13 cifre)" 
-                                          Width="100%"
-                                          MaxLength="13">
-                                </SfTextBox>
+                                <div class="cnp-input-container">
+                                    <SfTextBox @bind-Value="@personalFormModel.CNP" 
+                                              Placeholder="Introduceti CNP-ul (13 cifre)" 
+                                              Width="100%"
+                                              MaxLength="13"
+                                              CssClass="@GetCNPFieldCssClass()"
+                                              @oninput="@(async (args) => await OnCNPInputSimple(args))"
+                                              @onblur="@(async (args) => await OnCNPBlurSimple(args))">
+                                    </SfTextBox>
+                                    
+                                    @* Feedback vizual pentru CNP *@
+                                    @if (!string.IsNullOrWhiteSpace(cnpFeedbackMessage))
+                                    {
+                                        <div class="cnp-feedback @cnpFeedbackCssClass">
+                                            @if (isCNPBeingValidated)
+                                            {
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                            }
+                                            else if (isCNPValid)
+                                            {
+                                                <i class="fas fa-check-circle"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            }
+                                            <span>@cnpFeedbackMessage</span>
+                                        </div>
+                                    }
+                                    
+                                    @* Indicator de loading pentru validare *@
+                                    @if (isCNPBeingValidated)
+                                    {
+                                        <div class="cnp-validating-indicator">
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                            <span>Se verifică CNP...</span>
+                                        </div>
+                                    }
+                                </div>
+                                
                                 @if (HasFieldErrors(nameof(PersonalModel.CNP)))
                                 {
                                     <div class="field-error">
@@ -138,11 +173,35 @@
 
                             <div class="form-field">
                                 <label>Cod Angajat *</label>
-                                <SfTextBox @bind-Value="@personalFormModel.Cod_Angajat" 
-                                          Placeholder="Ex: EMP001" 
-                                          Width="100%"
-                                          MaxLength="20">
-                                </SfTextBox>
+                                <div class="cod-angajat-container">
+                                    @if (IsEditMode)
+                                    {
+                                        @* În modul de editare, câmpul rămâne editabil *@
+                                        <SfTextBox @bind-Value="@personalFormModel.Cod_Angajat" 
+                                                  Placeholder="Ex: EMP001" 
+                                                  Width="100%"
+                                                  MaxLength="20">
+                                        </SfTextBox>
+                                    }
+                                    else
+                                    {
+                                        @* În modul de adăugare, câmpul este READ-ONLY cu indicator vizual *@
+                                        <SfTextBox @bind-Value="@personalFormModel.Cod_Angajat" 
+                                                  Placeholder="Se generează automat..." 
+                                                  Width="100%"
+                                                  MaxLength="20"
+                                                  Readonly="true"
+                                                  CssClass="cod-angajat-readonly">
+                                        </SfTextBox>
+                                        
+                                        @* Indicator vizual pentru cod generat automat *@
+                                        <div class="cod-angajat-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>Cod generat automat - nu poate fi modificat</span>
+                                        </div>
+                                    }
+                                </div>
+                                
                                 @if (HasFieldErrors(nameof(PersonalModel.Cod_Angajat)))
                                 {
                                     <div class="field-error">

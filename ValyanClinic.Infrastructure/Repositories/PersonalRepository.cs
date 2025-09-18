@@ -514,4 +514,54 @@ public class PersonalRepository : IPersonalRepository
             return false;
         }
     }
+
+    /// <summary>
+    /// Generează următorul cod de angajat automat (EMP001, EMP002, etc.)
+    /// </summary>
+    public async Task<string> GetNextCodAngajatAsync()
+    {
+        try
+        {
+            _logger.LogInformation("Generating next employee code");
+
+            await EnsureConnectionOpenAsync();
+
+            // Query pentru a găsi ultimul cod de angajat
+            var lastCodAngajat = await _connection.QueryFirstOrDefaultAsync<string>(
+                @"SELECT TOP 1 Cod_Angajat 
+                  FROM Personal 
+                  WHERE Cod_Angajat LIKE 'EMP%' 
+                    AND LEN(Cod_Angajat) = 6
+                    AND ISNUMERIC(SUBSTRING(Cod_Angajat, 4, 3)) = 1
+                  ORDER BY CAST(SUBSTRING(Cod_Angajat, 4, 3) AS INT) DESC");
+
+            if (string.IsNullOrEmpty(lastCodAngajat))
+            {
+                // Primul angajat în sistem
+                _logger.LogInformation("No existing employee codes found, starting with EMP001");
+                return "EMP001";
+            }
+
+            // Extrage numărul din ultimul cod (ex: EMP029 -> 029 -> 29)
+            var lastNumberString = lastCodAngajat.Substring(3); // ultimele 3 cifre
+            if (!int.TryParse(lastNumberString, out var lastNumber))
+            {
+                _logger.LogWarning("Could not parse last employee code: {LastCode}, defaulting to EMP001", lastCodAngajat);
+                return "EMP001";
+            }
+
+            // Generează următorul număr
+            var nextNumber = lastNumber + 1;
+            var nextCode = $"EMP{nextNumber:D3}"; // Format cu 3 cifre: EMP001, EMP002, etc.
+
+            _logger.LogInformation("Generated next employee code: {NextCode} (previous was {LastCode})", nextCode, lastCodAngajat);
+            
+            return nextCode;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating next employee code");
+            throw;
+        }
+    }
 }

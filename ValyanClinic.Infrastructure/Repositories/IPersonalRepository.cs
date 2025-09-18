@@ -40,4 +40,9 @@ public interface IPersonalRepository
     
     // Test method for debugging database connectivity issues
     Task<bool> TestDatabaseConnectionAsync();
+    
+    /// <summary>
+    /// Generează următorul cod de angajat disponibil (EMP001, EMP002, etc.)
+    /// </summary>
+    Task<string> GetNextCodAngajatAsync();
 }
