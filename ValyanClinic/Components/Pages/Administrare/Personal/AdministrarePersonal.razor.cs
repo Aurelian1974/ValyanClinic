@@ -614,70 +614,85 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
 
     #endregion
 
-    #region Kebab Menu Management
+    #region Kebab Menu Management - V4 BASIC FUNCTIONAL
 
     private void ToggleKebabMenu()
     {
-        _state.ShowKebabMenu = !_state.ShowKebabMenu;
-        StateHasChanged();
+        try
+        {
+            var previousState = _state.ShowKebabMenu;
+            _state.ShowKebabMenu = !_state.ShowKebabMenu;
+            
+            Logger.LogInformation("🔘 Kebab menu toggled: {PreviousState} → {NewState}", 
+                previousState, _state.ShowKebabMenu);
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "❌ Critical error toggling kebab menu");
+            _state.ShowKebabMenu = false;
+            StateHasChanged();
+        }
     }
 
     private void ToggleStatistics()
     {
-        _state.ShowStatistics = !_state.ShowStatistics;
-        _state.ShowKebabMenu = false;
-        StateHasChanged();
+        try
+        {
+            var previousState = _state.ShowStatistics;
+            _state.ShowStatistics = !_state.ShowStatistics;
+            _state.ShowKebabMenu = false; // Close kebab menu
+            
+            Logger.LogInformation("📊 Statistics toggled: {PreviousState} → {NewState}", 
+                previousState, _state.ShowStatistics);
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "❌ Error toggling statistics");
+            _state.ShowKebabMenu = false;
+            StateHasChanged();
+        }
     }
 
     private void ToggleAdvancedFilters()
     {
-        _state.ShowAdvancedFilters = !_state.ShowAdvancedFilters;
-        _state.ShowKebabMenu = false;
-        StateHasChanged();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+        try
         {
-            try
-            {
-                var functionExists = await JSRuntime.InvokeAsync<bool>("eval", 
-                    "typeof window.addClickEventListener === 'function'");
-
-                if (functionExists)
-                {
-                    await JSRuntime.InvokeVoidAsync("window.addClickEventListener", 
-                        DotNetObjectReference.Create(this));
-                }
-                else
-                {
-                    await Task.Delay(100);
-                    try
-                    {
-                        await JSRuntime.InvokeVoidAsync("window.addClickEventListener", 
-                            DotNetObjectReference.Create(this));
-                    }
-                    catch (Exception retryEx)
-                    {
-                        Logger.LogInformation("JavaScript helper functions not available yet: {Error}", retryEx.Message);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogInformation("JavaScript helper functions not ready: {Error}", ex.Message);
-            }
+            var previousState = _state.ShowAdvancedFilters;
+            _state.ShowAdvancedFilters = !_state.ShowAdvancedFilters;
+            _state.ShowKebabMenu = false; // Close kebab menu
+            
+            Logger.LogInformation("🔍 Advanced filters toggled: {PreviousState} → {NewState}", 
+                previousState, _state.ShowAdvancedFilters);
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "❌ Error toggling advanced filters");
+            _state.ShowKebabMenu = false;
+            StateHasChanged();
         }
     }
 
-    [JSInvokable]
-    public void CloseKebabMenu()
+    // Close menu when clicking elsewhere - will be handled by CSS hover or simple timeout
+    private async Task CloseKebabMenuAfterDelay()
     {
-        if (_state.ShowKebabMenu)
+        try
         {
-            _state.ShowKebabMenu = false;
-            StateHasChanged();
+            await Task.Delay(3000); // Auto-close after 3 seconds
+            if (_state.ShowKebabMenu)
+            {
+                _state.ShowKebabMenu = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogDebug(ex, "Auto-close kebab menu cancelled or failed");
         }
     }
 
@@ -693,7 +708,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         {
             _disposed = true;
 
-            // Salvează starea grid-ului înainte de dispose - CRITICAL FUNCTIONALITY
+            // 1. Salvează starea grid-ului înainte de dispose - CRITICAL FUNCTIONALITY
             if (GridRef != null)
             {
                 var currentSettings = CaptureGridSettings();
@@ -701,7 +716,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
                 Logger.LogDebug("Grid settings saved on disposal");
             }
 
-            // Manual disposal pentru componentele Syncfusion - MEMORY LEAK PREVENTION
+            // 2. Manual disposal pentru componentele Syncfusion - MEMORY LEAK PREVENTION
             GridRef?.Dispose();
             PersonalDetailModal?.Dispose();  
             AddEditPersonalModal?.Dispose();

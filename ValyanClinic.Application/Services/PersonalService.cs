@@ -2,6 +2,7 @@
 using ValyanClinic.Domain.Enums;
 using ValyanClinic.Infrastructure.Repositories;
 using ValyanClinic.Application.Validators;
+using ValyanClinic.Application.Models;
 using Microsoft.Extensions.Logging;
 
 namespace ValyanClinic.Application.Services;

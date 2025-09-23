@@ -1,4 +1,5 @@
 ﻿using ValyanClinic.Domain.Models;
+using ValyanClinic.Application.Models;
 
 namespace ValyanClinic.Application.Services;
 
@@ -104,11 +105,6 @@ public record PersonalDropdownOptions(
     IEnumerable<DropdownItem> Functii,
     IEnumerable<DropdownItem> Judete
 );
-
-/// <summary>
-/// Item pentru dropdown-uri
-/// </summary>
-public record DropdownItem(string Value, string Text);
 
 /// <summary>
 /// Result pentru validare Personal

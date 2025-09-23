@@ -146,12 +146,20 @@ try
     builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.IJudetRepository, JudetRepository>();
     builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.ILocalitateRepository, LocalitateRepository>();
     
+    // === PERSONAL MEDICAL REPOSITORIES ===
+    builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.IPersonalMedicalRepository, ValyanClinic.Infrastructure.Repositories.PersonalMedicalRepository>();
+    builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.IDepartamentMedicalRepository, ValyanClinic.Infrastructure.Repositories.DepartamentMedicalRepository>();
+    
     // === APPLICATION SERVICES ===
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IPersonalService, PersonalService>();
     builder.Services.AddScoped<ILocationService, LocationService>();
     builder.Services.AddScoped<IValidationService, ValidationService>();
     
+    // === PERSONAL MEDICAL SERVICES ===
+    builder.Services.AddScoped<IPersonalMedicalService, PersonalMedicalService>();
+    builder.Services.AddScoped<IDepartamentMedicalService, DepartamentMedicalService>();
+
     // === TOAST NOTIFICATION SERVICE - LIPSĂ ÎN VERSIUNEA ANTERIOARĂ ===
     builder.Services.AddToastNotificationService();
 
@@ -258,7 +266,7 @@ try
     });
 
     // ===== SERILOG HTTP REQUEST LOGGING =====
-    // Add detailed HTTP request logging
+    // Add detailed HTTP request logging cu filtrare pentru debugging
     app.UseSerilogRequestLogging(options =>
     {
         options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
@@ -269,6 +277,21 @@ try
                 : httpContext.Response.StatusCode > 399
                     ? Serilog.Events.LogEventLevel.Warning
                     : Serilog.Events.LogEventLevel.Information;
+                    
+        // Exclude noisy requests in development
+        options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+        {
+            diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+            diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+            diagnosticContext.Set("UserAgent", httpContext.Request.Headers.UserAgent.FirstOrDefault());
+            
+            // Exclude debugging requests
+            if (httpContext.Request.Path.StartsWithSegments("/_vs") ||
+                httpContext.Request.Path.StartsWithSegments("/_framework"))
+            {
+                diagnosticContext.Set("DebugRequest", true);
+            }
+        };
     });
 
     // Health checks endpoints

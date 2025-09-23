@@ -17,6 +17,9 @@
 
 <PageTitle>Administrare Personal - ValyanMed</PageTitle>
 
+@* INCLUDE CSS SPECIFIC PENTRU PERSONAL PAGE *@
+<link href="~/css/pages/administrare-personal.css" rel="stylesheet" />
+
 <div class="personal-page-container">
     
     @* Error Display *@
@@ -54,27 +57,41 @@
                 
                 @* Kebab Menu Button *@
                 <div class="kebab-menu-container">
-                    <button class="btn btn-outline-secondary kebab-menu-btn" @onclick="ToggleKebabMenu">
+                    <button class="btn btn-outline-secondary kebab-menu-btn" 
+                            @onclick="ToggleKebabMenu"
+                            @onclick:stopPropagation="true"
+                            aria-label="Meniu opțiuni"
+                            aria-expanded="@_state.ShowKebabMenu.ToString().ToLower()"
+                            aria-haspopup="true">
                         <i class="fas fa-ellipsis-v"></i>
                     </button>
                     
                     @if (_state.ShowKebabMenu)
                     {
-                        <div class="kebab-menu-dropdown" @onclick:stopPropagation="true">
-                            <button class="kebab-menu-item" @onclick="() => ToggleStatistics()">
+                        <div class="kebab-menu-dropdown" 
+                             @onclick:stopPropagation="true"
+                             role="menu"
+                             aria-label="Opțiuni disponibile">
+                            <button class="kebab-menu-item" 
+                                    @onclick="() => ToggleStatistics()"
+                                    role="menuitem"
+                                    aria-label="Comută afișarea statisticilor">
                                 <i class="fas fa-chart-bar"></i>
                                 <span>Statistici</span>
                                 @if (_state.ShowStatistics)
                                 {
-                                    <i class="fas fa-check kebab-check"></i>
+                                    <i class="fas fa-check kebab-check" aria-label="Activat"></i>
                                 }
                             </button>
-                            <button class="kebab-menu-item" @onclick="() => ToggleAdvancedFilters()">
+                            <button class="kebab-menu-item" 
+                                    @onclick="() => ToggleAdvancedFilters()"
+                                    role="menuitem"
+                                    aria-label="Comută afișarea filtrelor avansate">
                                 <i class="fas fa-filter"></i>
                                 <span>Filtrare Avansata</span>
                                 @if (_state.ShowAdvancedFilters)
                                 {
-                                    <i class="fas fa-check kebab-check"></i>
+                                    <i class="fas fa-check kebab-check" aria-label="Activat"></i>
                                 }
                             </button>
                         </div>
