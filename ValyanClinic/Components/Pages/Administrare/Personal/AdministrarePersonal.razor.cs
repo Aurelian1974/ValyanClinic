@@ -2,8 +2,8 @@
 using Microsoft.JSInterop;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Blazor.Grids;
-using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Popups;
+using Syncfusion.Blazor.SplitButtons;
 using ValyanClinic.Application.Services;
 using ValyanClinic.Domain.Models;
 using ValyanClinic.Domain.Enums;
@@ -14,7 +14,7 @@ namespace ValyanClinic.Components.Pages.Administrare.Personal;
 
 /// <summary>
 /// Business Logic pentru AdministrarePersonal.razor
-/// SIMPLIFIED VERSION - Removed kebab menu and advanced filtering functionality
+/// SIMPLIFIED VERSION - Removed kebab menu, advanced filtering functionality and all toasts
 /// </summary>
 public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
 {
@@ -27,8 +27,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
     protected SfGrid<PersonalModel>? GridRef;
     protected SfDialog? PersonalDetailModal;
     protected SfDialog? AddEditPersonalModal;
-    protected SfToast? ToastRef;
-    protected SfToast? ModalToastRef;
 
     // State Management
     private PersonalPageState _state = new();
@@ -122,7 +120,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
             var errorMessage = "Nu s-au putut incarca datele personalului";
             Logger.LogError(ex, "Error loading personal data");
             _state.SetError(errorMessage);
-            await ShowToast("Eroare", errorMessage, "e-toast-danger");
         }
         finally
         {
@@ -138,7 +135,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         {
             await GridRef.Refresh();
         }
-        await ShowToast("Succes", "Datele au fost actualizate", "e-toast-success");
     }
 
     #endregion
@@ -205,6 +201,41 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
 
     #endregion
 
+    #region Action Dropdown Handler
+
+    /// <summary>
+    /// Handler pentru dropdown actions din grid
+    /// </summary>
+    private async Task OnActionSelected(MenuEventArgs args, PersonalModel personal)
+    {
+        try
+        {
+            Logger.LogInformation("Action selected: {ActionId} for personal {PersonalName}", args.Item.Id, personal.NumeComplet);
+
+            switch (args.Item.Id?.ToLower())
+            {
+                case "view":
+                    await ShowPersonalDetailModal(personal);
+                    break;
+                case "edit":
+                    await EditPersonal(personal);
+                    break;
+                case "delete":
+                    await DeletePersonal(personal);
+                    break;
+                default:
+                    Logger.LogWarning("Unknown action selected: {ActionId}", args.Item.Id);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error handling action selection");
+        }
+    }
+
+    #endregion
+
     #region Personal Detail Modal
 
     private async Task ShowPersonalDetailModal(PersonalModel personal)
@@ -219,7 +250,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error showing personal detail modal");
-            await ShowToast("Eroare", "Eroare la afisarea detaliilor", "e-toast-danger");
         }
     }
 
@@ -274,20 +304,18 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
     {
         try
         {
-            Logger.LogInformation("🚀 ShowAddPersonalModal called - Opening add personal modal");
+            Logger.LogInformation("Opening add personal modal");
             
             _state.IsEditMode = false;
             _state.EditingPersonal = _models.CreateNewPersonal();
             _state.IsAddEditModalVisible = true;
             StateHasChanged();
 
-            Logger.LogInformation("✅ Add personal modal state set - IsAddEditModalVisible: {IsVisible}, EditingPersonal created", 
-                _state.IsAddEditModalVisible);
+            Logger.LogInformation("Add personal modal opened successfully");
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "💥 Error showing add personal modal");
-            await ShowToast("Eroare", "Eroare la deschiderea formularului de adaugare", "e-toast-danger");
+            Logger.LogError(ex, "Error showing add personal modal");
         }
     }
 
@@ -305,7 +333,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error showing edit personal modal");
-            await ShowToast("Eroare", "Eroare la deschiderea formularului de editare", "e-toast-danger");
         }
     }
 
@@ -362,20 +389,21 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
             if (result.IsSuccess)
             {
                 var action = _state.IsEditMode ? "actualizat" : "creat";
-                await ShowToast("Succes", $"Personalul {personalModel.NumeComplet} a fost {action} cu succes", "e-toast-success");
+                Logger.LogInformation("Personal {PersonalName} successfully {Action}", personalModel.NumeComplet, action);
                 
                 await CloseAddEditModal();
                 await LoadInitialData();
             }
             else
             {
-                await ShowToast("Eroare", result.ErrorMessage ?? "Eroare necunoscută", "e-toast-danger");
+                Logger.LogWarning("Failed to save personal: {ErrorMessage}", result.ErrorMessage);
+                _state.SetError(result.ErrorMessage ?? "Eroare necunoscută");
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Exception occurred while saving personal");
-            await ShowToast("Eroare", $"Eroare la salvarea personalului: {ex.Message}", "e-toast-danger");
+            _state.SetError($"Eroare la salvarea personalului: {ex.Message}");
         }
         finally
         {
@@ -397,7 +425,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error editing personal");
-            await ShowToast("Eroare", "Eroare la editarea personalului", "e-toast-danger");
         }
     }
 
@@ -410,14 +437,13 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
 
             if (confirmDelete)
             {
-                await ShowToast("Stergere", $"Personalul {personal.NumeComplet} va fi sters", "e-toast-info");
+                Logger.LogInformation("Personal {PersonalName} will be deleted", personal.NumeComplet);
                 // TODO: Implement actual delete logic
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error deleting personal");
-            await ShowToast("Eroare", "Eroare la stergerea personalului", "e-toast-danger");
         }
     }
 
@@ -466,58 +492,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
 
     #endregion
 
-    #region Toast Notifications
-
-    private async Task ShowToast(string title, string content, string cssClass)
-    {
-        if (ToastRef != null)
-        {
-            var toastModel = new ToastModel()
-            {
-                Title = title,
-                Content = content,
-                CssClass = cssClass,
-                ShowCloseButton = true,
-                Timeout = 3000
-            };
-            await ToastRef.ShowAsync(toastModel);
-        }
-    }
-
-    /// <summary>
-    /// Afișează toast în contextul modalului
-    /// </summary>
-    private async Task ShowModalToast(string title, string content, string cssClass = "e-toast-info")
-    {
-        if (ModalToastRef != null)
-        {
-            var toastModel = new ToastModel()
-            {
-                Title = title,
-                Content = content,
-                CssClass = cssClass,
-                ShowCloseButton = true,
-                Timeout = 4000
-            };
-            await ModalToastRef.ShowAsync(toastModel);
-        }
-        else
-        {
-            // Fallback la toast-ul global dacă modalul nu e disponibil
-            await ShowToast(title, content, cssClass);
-        }
-    }
-
-    /// <summary>
-    /// Handler pentru callback-ul toast din VizualizeazaPersonal
-    /// </summary>
-    private async Task HandleModalToast((string Title, string Message, string CssClass) args)
-    {
-        await ShowModalToast(args.Title, args.Message, args.CssClass);
-    }
-
-    #endregion
-
     #region IAsyncDisposable - Memory Leak Prevention
 
     public async ValueTask DisposeAsync()
@@ -540,8 +514,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
             GridRef?.Dispose();
             PersonalDetailModal?.Dispose();  
             AddEditPersonalModal?.Dispose();
-            ToastRef?.Dispose();
-            ModalToastRef?.Dispose();
 
             Logger.LogDebug("AdministrarePersonal disposed successfully");
         }

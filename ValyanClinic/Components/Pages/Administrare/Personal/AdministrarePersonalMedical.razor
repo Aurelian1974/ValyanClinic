@@ -18,7 +18,7 @@
 <PageTitle>Administrare Personal Medical - ValyanMed</PageTitle>
 
 @* INCLUDE CSS SPECIFIC PENTRU PERSONAL MEDICAL PAGE *@
-<link href="~/css/pages/administrare-personal-medical.css" rel="stylesheet" />
+<link href="/css/pages/administrare-personal-medical.css" rel="stylesheet" />
 
 @* ADD NAVIGATION COMPONENT AS RECOMMENDED IN USAGE GUIDE *@
 <PersonalMedicalNavigation />
@@ -85,7 +85,8 @@
                     AllowSelection="true"
                     AllowReordering="true"
                     AllowResizing="true"
-                    ShowColumnMenu="true">
+                    ShowColumnMenu="true"
+                    GridLines="GridLine.None">
                 
                 @* Grid Events *@
                 <GridEvents TValue="PersonalMedicalModel" 
@@ -184,7 +185,8 @@
                                
                     @* Actions Column - FROZEN RIGHT WITH MEDICAL THEME *@
                     <GridColumn HeaderText="Actiuni" Width="120" AllowFiltering="false" AllowSorting="false"
-                               IsFrozen = "true" Freeze="FreezeDirection.Right" AllowReordering="false">
+                               IsFrozen="true" Freeze="FreezeDirection.Right" AllowReordering="false"
+                               MinWidth="120" MaxWidth="120">
                         <Template>
                             @{
                                 var personalMedical = context as PersonalMedicalModel;

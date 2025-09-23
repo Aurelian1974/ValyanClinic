@@ -6,9 +6,9 @@
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Inputs
-@using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.SplitButtons
 @using GridSelectionType = Syncfusion.Blazor.Grids.SelectionType
 @using GridSelectionMode = Syncfusion.Blazor.Grids.SelectionMode
 @using GridSortDirection = Syncfusion.Blazor.Grids.SortDirection
@@ -57,9 +57,6 @@
             </div>
         </div>
     </div>
-
-    @* Toast Notification *@
-    <SfToast @ref="ToastRef" Title="ValyanMed" Target="body" NewestOnTop="true" ShowProgressBar="true"></SfToast>
 
     @* Main DataGrid - WITHOUT ADVANCED FILTERING *@
     @if (_state.IsLoading)
@@ -117,13 +114,13 @@
                     </GridGroupColumns>
                 </GridGroupSettings>
 
-                @* Columns Definition - OPTIMIZED FOR SCREEN WIDTH *@
+                @* Columns Definition - WITH ACTIONS COLUMN *@
                 <GridColumns>
                     <GridColumn Field="@nameof(PersonalModel.Cod_Angajat)" HeaderText="Cod" Width="80" TextAlign="TextAlign.Center" 
                                IsPrimaryKey="false" AllowFiltering="true" AllowReordering="false"></GridColumn>
                     <GridColumn Field="@nameof(PersonalModel.Nume)" HeaderText="Nume" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
                     <GridColumn Field="@nameof(PersonalModel.Prenume)" HeaderText="Prenume" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(PersonalModel.Email_Personal)" HeaderText="Email" Width="160" AllowFiltering="true" AllowReordering="true"></GridColumn>
+                    <GridColumn Field="@nameof(PersonalModel.Email_Personal)" HeaderText="Email" Width="150" AllowFiltering="true" AllowReordering="true"></GridColumn>
                     <GridColumn Field="@nameof(PersonalModel.Telefon_Personal)" HeaderText="Telefon" Width="90" AllowFiltering="true" AllowReordering="true"></GridColumn>
                     <GridColumn Field="@nameof(PersonalModel.Functia)" HeaderText="Functia" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
                                
@@ -151,26 +148,25 @@
                                
                     <GridColumn Field="@nameof(PersonalModel.Data_Crearii)" HeaderText="Data Crearii" Width="90" 
                                Format="dd.MM.yyyy" Type="ColumnType.Date" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                               
-                    @* Actions Column - FROZEN RIGHT *@
-                    <GridColumn HeaderText="Actiuni" Width="120" AllowFiltering="false" AllowSorting="false"
-                               IsFrozen = "true" Freeze="FreezeDirection.Right" AllowReordering="false">
+                    
+                    @* Actions Column with Dropdown - FIXED CONFIGURATION *@
+                    <GridColumn HeaderText="Actiuni" Width="70" AllowFiltering="false" AllowSorting="false" 
+                               AllowReordering="false" AllowResizing="false" TextAlign="TextAlign.Center">
                         <Template>
                             @{
                                 var personal = context as PersonalModel;
-                                <div class="action-buttons">
-                                    <button class="btn-action btn-view" @onclick="() => ShowPersonalDetailModal(personal!)" 
-                                            title="Vizualizeaza detaliile personalului" aria-label="Vizualizeaza">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn-action btn-edit" @onclick="() => EditPersonal(personal!)" 
-                                            title="Modifica personalul" aria-label="Modifica">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn-action btn-delete" @onclick="() => DeletePersonal(personal!)" 
-                                            title="Sterge personalul" aria-label="Sterge">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                <div class="action-dropdown-container">
+                                    <SfDropDownButton Content="" 
+                                                    CssClass="action-dropdown-btn" 
+                                                    IconCss="fas fa-ellipsis-v"
+                                                    Target="body">
+                                        <DropDownButtonEvents ItemSelected="@((args) => OnActionSelected(args, personal!))" />
+                                        <DropDownMenuItems>
+                                            <DropDownMenuItem Id="view" Text="Vizualizeaza" IconCss="fas fa-eye"></DropDownMenuItem>
+                                            <DropDownMenuItem Id="edit" Text="Editeaza" IconCss="fas fa-edit"></DropDownMenuItem>
+                                            <DropDownMenuItem Id="delete" Text="Sterge" IconCss="fas fa-trash"></DropDownMenuItem>
+                                        </DropDownMenuItems>
+                                    </SfDropDownButton>
                                 </div>
                             }
                         </Template>
@@ -180,7 +176,7 @@
         </div>
     }
 
-    @* Personal Detail Modal - CU TOAST PROPRIU *@
+    @* Personal Detail Modal *@
     <SfDialog @ref="PersonalDetailModal" 
               Width="900px" 
               Height="700px"
@@ -190,15 +186,6 @@
               AllowDragging="true"
               CssClass="personal-dialog detail-dialog"
               AnimationSettings="@DialogAnimation">
-        
-        @* TOAST ÎN MODAL - FĂRĂ PROPRIETATEA POSITION PROBLEMATICĂ *@
-        <SfToast @ref="ModalToastRef" 
-                 Title="Personal Details" 
-                 Target=".personal-dialog" 
-                 NewestOnTop="true" 
-                 ShowProgressBar="true"
-                 CssClass="modal-toast">
-        </SfToast>
         
         <DialogEvents Closed="OnModalClosed" />
         <DialogTemplates>
@@ -214,8 +201,7 @@
             <Content>
                 @if (_state.SelectedPersonal != null)
                 {
-                    <VizualizeazaPersonal PersonalData="@_state.SelectedPersonal" 
-                                        OnToastMessage="@HandleModalToast" />
+                    <VizualizeazaPersonal PersonalData="@_state.SelectedPersonal" />
                 }
             </Content>
             <FooterTemplate>
