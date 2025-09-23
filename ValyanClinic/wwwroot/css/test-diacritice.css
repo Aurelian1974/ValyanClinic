@@ -1,21 +1,21 @@
 @charset "UTF-8";
 
-/* Test pentru diacriticele române?ti */
+/* Test pentru diacriticele romaneti */
 .test-diacritice {
-    /* Toate diacriticele române?ti: ? â î ? ? ? Â Î ? ? */
-    content: "Test: ?âî?? ?ÂÎ??";
+    /* Toate diacriticele romaneti: ? a i ? ? ? a i ? ? */
+    content: "Test: ?ai?? ?ai??";
 }
 
-/* Mesaje test în român? */
+/* Mesaje test in roman? */
 .test-mesaje::before {
-    content: "Bine a?i venit! Introduce?i datele de autentificare.";
+    content: "Bine ai venit! Introducei datele de autentificare.";
 }
 
 .test-titluri::after {
-    content: "Parol? • Nume utilizator • ?ine-m? minte";
+    content: "Parol? â€¢ Nume utilizator â€¢ ?ine-m? minte";
 }
 
 /* Verificare encoding UTF-8 */
 .utf8-test::before {
-    content: "UTF-8 Test: ?âî?? „ghilimele române?ti" – liniu?? lung?";
+    content: "UTF-8 Test: ?ai?? â€žghilimele romaneti" â€“ liniu?? lung?";
 }

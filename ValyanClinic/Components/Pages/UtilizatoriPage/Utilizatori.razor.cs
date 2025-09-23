@@ -13,7 +13,7 @@ using ValyanClinic.Domain.Enums;
 namespace ValyanClinic.Components.Pages.UtilizatoriPage;
 
 /// <summary>
-/// Business Logic pentru Utilizatori.razor - ORGANIZAT ÎN FOLDER UtilizatoriPage
+/// Business Logic pentru Utilizatori.razor - ORGANIZAT iN FOLDER UtilizatoriPage
 /// Separated Business Logic pentru gestionarea utilizatorilor
 /// </summary>
 public partial class Utilizatori : ComponentBase
@@ -27,7 +27,7 @@ public partial class Utilizatori : ComponentBase
     private SfDialog? UserDetailModal;
     private SfDialog? AddEditUserModal;
 
-    // State Management în acela?i folder
+    // State Management in acelai folder
     private UtilizatoriState _state = new();
     private UtilizatoriModels _models = new();
 
@@ -56,7 +56,7 @@ public partial class Utilizatori : ComponentBase
             _state.IsLoading = true;
             StateHasChanged();
 
-            // Încarc to?i utilizatorii prin search cu parametri implici?i
+            // incarc toi utilizatorii prin search cu parametri implicii
             var searchRequest = new UserSearchRequest(
                 SearchTerm: "",
                 Role: null,
@@ -77,7 +77,7 @@ public partial class Utilizatori : ComponentBase
         }
         catch (Exception ex)
         {
-            var errorMessage = "Nu s-au putut înc?rca utilizatorii";
+            var errorMessage = "Nu s-au putut incrca utilizatorii";
             Console.WriteLine($"Error loading users: {ex.Message}");
             _state.SetError(errorMessage);
             await ShowToast("Eroare", errorMessage, "e-toast-danger");
@@ -209,12 +209,12 @@ public partial class Utilizatori : ComponentBase
             _state.IsModalVisible = true;
             StateHasChanged();
 
-            await ShowToast("Detalii", $"Afi?are detalii pentru {user.FullName}", "e-toast-info");
+            await ShowToast("Detalii", $"Afiare detalii pentru {user.FullName}", "e-toast-info");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"ERROR: Error showing user detail modal: {ex.Message}");
-            await ShowToast("Eroare", "Eroare la afi?area detaliilor", "e-toast-danger");
+            await ShowToast("Eroare", "Eroare la afiarea detaliilor", "e-toast-danger");
         }
     }
 
@@ -272,12 +272,12 @@ public partial class Utilizatori : ComponentBase
             _state.IsAddEditModalVisible = true;
             StateHasChanged();
 
-            await ShowToast("Nou utilizator", "Completeaz? formularul pentru a ad?uga un utilizator nou", "e-toast-info");
+            await ShowToast("Nou utilizator", "Completeaz? formularul pentru a aduga un utilizator nou", "e-toast-info");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"ERROR: Error showing add user modal: {ex.Message}");
-            await ShowToast("Eroare", "Eroare la deschiderea formularului de ad?ugare", "e-toast-danger");
+            await ShowToast("Eroare", "Eroare la deschiderea formularului de adugare", "e-toast-danger");
         }
     }
 
@@ -287,11 +287,11 @@ public partial class Utilizatori : ComponentBase
         {
             _state.IsEditMode = true;
             _state.EditingUser = _models.CloneUser(user);
-            _state.SelectedUserForEdit = user; // P?str?m utilizatorul original pentru referin??
+            _state.SelectedUserForEdit = user; // Pstrm utilizatorul original pentru referin??
             _state.IsAddEditModalVisible = true;
             StateHasChanged();
 
-            await ShowToast("Editare utilizator", $"Modifica?i informa?iile pentru {user.FullName}", "e-toast-info");
+            await ShowToast("Editare utilizator", $"Modificai informaiile pentru {user.FullName}", "e-toast-info");
         }
         catch (Exception ex)
         {
@@ -421,7 +421,7 @@ public partial class Utilizatori : ComponentBase
         UserRole.Administrator => "Administrator",
         UserRole.Doctor => "Doctor",
         UserRole.Nurse => "Asistent medical",
-        UserRole.Receptionist => "Recep?ioner",
+        UserRole.Receptionist => "Recepioner",
         UserRole.Operator => "Operator",
         UserRole.Manager => "Manager",
         _ => "Necunoscut"

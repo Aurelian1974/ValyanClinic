@@ -29,17 +29,17 @@ public interface IPersonalMedicalRepository
     Task<bool> DeleteAsync(Guid id, string modificatDe);
     
     /// <summary>
-    /// Verifică unicitatea numărului de licență medicală
+    /// Verifica unicitatea numarului de licenta medicala
     /// </summary>
     Task<bool> CheckLicentaUnicityAsync(string numarLicenta, Guid? excludeId = null);
     
     /// <summary>
-    /// Verifică unicitatea email-ului în sistemul medical
+    /// Verifica unicitatea email-ului in sistemul medical
     /// </summary>
     Task<bool> CheckEmailUnicityAsync(string email, Guid? excludeId = null);
     
     /// <summary>
-    /// Verifică dacă personalul medical are programări active
+    /// Verifica daca personalul medical are programari active
     /// </summary>
     Task<bool> CheckActiveAppointmentsAsync(Guid personalId);
     
@@ -50,12 +50,12 @@ public interface IPersonalMedicalRepository
            int TotalDoctori, int TotalAsistenti, int TotalTehnicianiMedicali)> GetStatisticsAsync();
     
     /// <summary>
-    /// Distribuția personalului medical pe departamente
+    /// Distributia personalului medical pe departamente
     /// </summary>
     Task<Dictionary<string, int>> GetDistributiePerDepartamentAsync();
     
     /// <summary>
-    /// Distribuția personalului medical pe specializări
+    /// Distributia personalului medical pe specializari
     /// </summary>
     Task<Dictionary<string, int>> GetDistributiePerSpecializareAsync();
     

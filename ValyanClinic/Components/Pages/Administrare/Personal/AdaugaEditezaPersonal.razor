@@ -39,7 +39,7 @@
                     }
                     else
                     {
-                        <p class="field-value" style="margin: 0; color: #6b7280;">Completează formularul pentru a adăuga un nou angajat în sistem.</p>
+                        <p class="field-value" style="margin: 0; color: #6b7280;">Completeaza formularul pentru a adauga un nou angajat in sistem.</p>
                     }
                 </div>
             </div>
@@ -155,7 +155,7 @@
                                     {
                                         <div class="cnp-validating-indicator">
                                             <i class="fas fa-spinner fa-spin"></i>
-                                            <span>Se verifică CNP...</span>
+                                            <span>Se verifica CNP...</span>
                                         </div>
                                     }
                                 </div>
@@ -176,7 +176,7 @@
                                 <div class="cod-angajat-container">
                                     @if (IsEditMode)
                                     {
-                                        @* În modul de editare, câmpul rămâne editabil *@
+                                        @* in modul de editare, campul ramane editabil *@
                                         <SfTextBox @bind-Value="@personalFormModel.Cod_Angajat" 
                                                   Placeholder="Ex: EMP001" 
                                                   Width="100%"
@@ -185,9 +185,9 @@
                                     }
                                     else
                                     {
-                                        @* În modul de adăugare, câmpul este READ-ONLY cu indicator vizual *@
+                                        @* in modul de adaugare, campul este READ-ONLY cu indicator vizual *@
                                         <SfTextBox @bind-Value="@personalFormModel.Cod_Angajat" 
-                                                  Placeholder="Se generează automat..." 
+                                                  Placeholder="Se genereaza automat..." 
                                                   Width="100%"
                                                   MaxLength="20"
                                                   Readonly="true"
@@ -406,10 +406,10 @@
                                 SelectedJudetIdChanged="@((int? value) => selectedJudetDomiciliuId = value)"
                                 SelectedLocalitateId="@selectedLocalitateDomiciliuId"
                                 SelectedLocalitateIdChanged="@((int? value) => selectedLocalitateDomiciliuId = value)"
-                                JudetLabel="Județ Domiciliu *"
+                                JudetLabel="Judet Domiciliu *"
                                 LocalitateLabel="Localitate Domiciliu *"
-                                JudetPlaceholder="-- Selectează județul --"
-                                LocalitatePlaceholder="-- Selectează localitatea --"
+                                JudetPlaceholder="-- Selecteaza judetul --"
+                                LocalitatePlaceholder="-- Selecteaza localitatea --"
                                 OnJudetNameChanged="@OnJudetDomiciliuNameChanged"
                                 OnLocalitateNameChanged="@OnLocalitateDomiciliuNameChanged" />
                             <!-- end dropdown-uri location dependent -->
@@ -423,7 +423,7 @@
                                 </SfTextBox>
                             </div>
 
-                            @* Checkbox pentru a afișa secțiunea de reședință *@
+                            @* Checkbox pentru a afisa sectiunea de resedinta *@
                             <div class="form-field full-width">
                                 <div class="checkbox-container">
                                     <SfCheckBox @bind-Checked="@showResedintaSection" 
@@ -436,7 +436,7 @@
                     </div>
                 </div>
 
-                @* Adresa de Resedinta Card - Vizibil doar dacă checkbox-ul NU este bifat *@
+                @* Adresa de Resedinta Card - Vizibil doar daca checkbox-ul NU este bifat *@
                 @if (!showResedintaSection)
                 {
                     <div class="detail-card resedinta-card">
@@ -464,10 +464,10 @@
                                     SelectedJudetIdChanged="@((int? value) => selectedJudetResedintaId = value)"
                                     SelectedLocalitateId="@selectedLocalitateResedintaId"
                                     SelectedLocalitateIdChanged="@((int? value) => selectedLocalitateResedintaId = value)"
-                                    JudetLabel="Județ Reședință"
-                                    LocalitateLabel="Localitate Reședință"
-                                    JudetPlaceholder="-- Selectează județul --"
-                                    LocalitatePlaceholder="-- Selectează localitatea --"
+                                    JudetLabel="Judet Resedinta"
+                                    LocalitateLabel="Localitate Resedinta"
+                                    JudetPlaceholder="-- Selecteaza judetul --"
+                                    LocalitatePlaceholder="-- Selecteaza localitatea --"
                                     OnJudetNameChanged="@OnJudetResedintaNameChanged"
                                     OnLocalitateNameChanged="@OnLocalitateResedintaNameChanged" />
 

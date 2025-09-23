@@ -1,30 +1,30 @@
-﻿# Fix pentru NullReferenceException în Visual Studio Debugger
+﻿# Fix pentru NullReferenceException in Visual Studio Debugger
 
 ## Problema
-Visual Studio încearcă să decompileze codul Microsoft.AspNetCore.SignalR.Core.dll și întâmpină o NullReferenceException.
+Visual Studio incearca sa decompileze codul Microsoft.AspNetCore.SignalR.Core.dll si intampina o NullReferenceException.
 
-## Soluții
+## Solutii
 
-### 1. Închidere imediată
-- Închideți tab-ul cu `ClientProxyExtensions.cs`
-- Acest fișier este cod decompilat, nu aparține proiectului dumneavoastră
+### 1. inchidere imediata
+- inchideti tab-ul cu `ClientProxyExtensions.cs`
+- Acest fisier este cod decompilat, nu apartine proiectului dumneavoastra
 
 ### 2. Configurare Visual Studio
 
-#### Dezactivare Source Link (Soluție rapidă)
+#### Dezactivare Source Link (Solutie rapida)
 1. Tools → Options
 2. Debugging → General
-3. Debifați: "Enable source link support"
-4. Debifați: "Suppress JIT optimization on module load"
+3. Debifati: "Enable source link support"
+4. Debifati: "Suppress JIT optimization on module load"
 
-#### Dezactivare decompilare automată
+#### Dezactivare decompilare automata
 1. Tools → Options  
 2. Text Editor → C# → Advanced
-3. Debifați: "Enable navigation to decompiled sources"
+3. Debifati: "Enable navigation to decompiled sources"
 
 ### 3. Configurare proiect (.csproj)
 
-Adăugați în `ValyanClinic.csproj`:
+Adaugati in `ValyanClinic.csproj`:
 
 ```xml
 <PropertyGroup>
@@ -34,9 +34,9 @@ Adăugați în `ValyanClinic.csproj`:
 </PropertyGroup>
 ```
 
-### 4. Dacă problema persistă
+### 4. Daca problema persista
 
-#### Curățare proiect
+#### Curatare proiect
 ```bash
 dotnet clean
 dotnet restore
@@ -44,30 +44,30 @@ dotnet build
 ```
 
 #### Reset Visual Studio
-- Închideți Visual Studio complet
-- Ștergeți folderul `bin/` și `obj/` din toate proiectele
-- Redeschideți Visual Studio
+- inchideti Visual Studio complet
+- stergeti folderul `bin/` si `obj/` din toate proiectele
+- Redeschideti Visual Studio
 - Build → Rebuild Solution
 
 ### 5. Verificare logs Serilog
 
-Problema poate fi și o eroare din codul vostru care triggerează încercarea de decompilare.
+Problema poate fi si o eroare din codul vostru care triggereaza incercarea de decompilare.
 
-Verificați logs-urile Serilog pentru erorile reale:
+Verificati logs-urile Serilog pentru erorile reale:
 - Console output
 - Log files
-- Application Insights (dacă configurate)
+- Application Insights (daca configurate)
 
 ## Cauze posibile
 
-1. **Cod decompilat problematic** - Visual Studio încearcă să afișeze cod din assembly-uri .NET
-2. **Debugging excessive** - Prea multe breakpoint-uri în cod .NET intern  
-3. **Exception handling** - O eroare în codul vostru triggere
+1. **Cod decompilat problematic** - Visual Studio incearca sa afiseze cod din assembly-uri .NET
+2. **Debugging excessive** - Prea multe breakpoint-uri in cod .NET intern  
+3. **Exception handling** - O eroare in codul vostru triggere
 
 ## Prevenire
 
 ```csharp
-// În Program.cs - configurare debugging
+// in Program.cs - configurare debugging
 builder.Services.AddRazorComponents(options =>
 {
     options.DetailedErrors = builder.Environment.IsDevelopment();
@@ -76,7 +76,7 @@ builder.Services.AddRazorComponents(options =>
 
 ## Monitoring
 
-Folosiți Serilog pentru detectarea problemelor reale:
+Folositi Serilog pentru detectarea problemelor reale:
 
 ```csharp
 Log.Information("Application started successfully");

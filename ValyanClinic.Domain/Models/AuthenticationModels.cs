@@ -4,7 +4,7 @@ using ValyanClinic.Domain.Enums;
 namespace ValyanClinic.Domain.Models;
 
 /// <summary>
-/// Login request model cu valid?ri FluentValidation
+/// Login request model cu validri FluentValidation
 /// ELIMINAT magic strings - folosim enums
 /// </summary>
 public class LoginRequest
@@ -15,8 +15,8 @@ public class LoginRequest
 }
 
 /// <summary>
-/// Result Pattern pentru opera?ii Login
-/// Înlocuie?te simple pass-through cu rich domain logic
+/// Result Pattern pentru operaii Login
+/// inlocuiete simple pass-through cu rich domain logic
 /// </summary>
 public class LoginResult
 {
@@ -43,7 +43,7 @@ public class LoginResult
 }
 
 /// <summary>
-/// Enumeration pentru tipurile de e?ec la login
+/// Enumeration pentru tipurile de eec la login
 /// </summary>
 public enum LoginFailureReason
 {
@@ -59,7 +59,7 @@ public enum LoginFailureReason
     [Display(Name = "Eroare validare")]
     ValidationError,
     
-    [Display(Name = "Prea multe încerc?ri")]
+    [Display(Name = "Prea multe incercri")]
     TooManyAttempts,
     
     [Display(Name = "Eroare sistem")]
@@ -67,7 +67,7 @@ public enum LoginFailureReason
 }
 
 /// <summary>
-/// User session model îmbun?t??it cu Domain Logic
+/// User session model imbunt??it cu Domain Logic
 /// </summary>
 public class UserSession
 {
@@ -80,7 +80,7 @@ public class UserSession
     public string? AvatarUrl { get; init; }
     public UserStatus Status { get; init; } = UserStatus.Active;
 
-    // Domain Logic Methods - în loc de simple properties
+    // Domain Logic Methods - in loc de simple properties
     public string GetRoleDisplayName() => ((Enum)Role).GetDisplayName();
     public string GetStatusDisplayName() => ((Enum)Status).GetDisplayName();
     
@@ -119,7 +119,7 @@ public class UserSession
 }
 
 /// <summary>
-/// Demo users pentru testing - cu enums în loc de magic strings
+/// Demo users pentru testing - cu enums in loc de magic strings
 /// </summary>
 public static class DemoUsers
 {
@@ -162,7 +162,7 @@ public static class DemoUsers
             FullName = "Elena Vasile",
             Email = "elena.vasile@valyanmed.ro",
             Role = UserRole.Receptionist,
-            Department = "Recepție",
+            Department = "Receptie",
             Status = UserStatus.Active
         },
         new()

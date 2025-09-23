@@ -138,18 +138,18 @@ The Users Management page (`Utilizatori.razor`) is the central hub for managing 
                 Gestionare Utilizatori
             </h1>
             <p class="users-page-subtitle">
-                Administrează utilizatorii sistemului ValyanMed - adaugă, editează și gestionează permisiunile
+                Administreaza utilizatorii sistemului ValyanMed - adauga, editeaza si gestioneaza permisiunile
             </p>
         </div>
         
         <div class="users-header-actions">
             <button class="btn btn-outline-primary" @onclick="ShowAddUserModal">
                 <i class="fas fa-plus"></i>
-                <span class="btn-text">Adaugă Utilizator</span>
+                <span class="btn-text">Adauga Utilizator</span>
             </button>
             <button class="btn btn-outline-secondary" @onclick="RefreshData">
                 <i class="fas fa-sync-alt"></i>
-                <span class="btn-text">Actualizează</span>
+                <span class="btn-text">Actualizeaza</span>
             </button>
         </div>
     </div>
@@ -239,11 +239,11 @@ public class UserStatistic
     <div class="filter-panel-header">
         <h3>
             <i class="fas fa-filter"></i>
-            Filtrare Avansată
+            Filtrare Avansata
         </h3>
         <button class="btn btn-secondary btn-sm" @onclick="ToggleFilterPanel">
             <i class="fas @(_state.ShowAdvancedFilters ? "fa-chevron-up" : "fa-chevron-down")"></i>
-            <span>@(_state.ShowAdvancedFilters ? "Ascunde Filtrele" : "Arată Filtrele")</span>
+            <span>@(_state.ShowAdvancedFilters ? "Ascunde Filtrele" : "Arata Filtrele")</span>
         </button>
     </div>
 </div>
@@ -313,7 +313,7 @@ public class UtilizatoriState
         {
             <span class="filtered-indicator">
                 <i class="fas fa-filter"></i>
-                Filtrare activă
+                Filtrare activa
             </span>
         }
     </div>
@@ -419,22 +419,22 @@ public class UtilizatoriState
 ### 4. Actions Column Implementation
 
 ```razor
-<GridColumn HeaderText="Acțiuni" Width="90" AllowFiltering="false" AllowSorting="false"
+<GridColumn HeaderText="Actiuni" Width="90" AllowFiltering="false" AllowSorting="false"
            IsFrozen = "true" Freeze="FreezeDirection.Right" AllowReordering="false">
     <Template>
         @{
             var user = context as User;
             <div class="action-buttons">
                 <button class="btn-action btn-view" @onclick="() => ShowUserDetailModal(user!)" 
-                        title="Vizualizează detaliile utilizatorului">
+                        title="Vizualizeaza detaliile utilizatorului">
                     <i class="fas fa-eye"></i>
                 </button>
                 <button class="btn-action btn-edit" @onclick="() => EditUser(user!)" 
-                        title="Modifică utilizatorul">
+                        title="Modifica utilizatorul">
                     <i class="fas fa-edit"></i>
                 </button>
                 <button class="btn-action btn-delete" @onclick="() => DeleteUser(user!)" 
-                        title="Șterge utilizatorul">
+                        title="sterge utilizatorul">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -527,11 +527,11 @@ public class UtilizatoriState
     <div class="modal-footer-actions">
         <button type="button" class="btn btn-primary" @onclick="OnFormSubmit" disabled="@_state.IsLoading">
             <i class="fas fa-save"></i>
-            @(_state.IsEditMode ? "Actualizează Utilizatorul" : "Creează Utilizatorul")
+            @(_state.IsEditMode ? "Actualizeaza Utilizatorul" : "Creeaza Utilizatorul")
         </button>
         <button type="button" class="btn btn-secondary" @onclick="CloseAddEditModal" disabled="@_state.IsLoading">
             <i class="fas fa-times"></i>
-            Anulează
+            Anuleaza
         </button>
     </div>
 </FooterTemplate>
@@ -838,7 +838,7 @@ private bool CanViewUsers => CurrentUser.HasPermission(Permission.ViewUsers);
 ```razor
 @if (CanAddUsers)
 {
-    <button @onclick="ShowAddUserModal">Adaugă Utilizator</button>
+    <button @onclick="ShowAddUserModal">Adauga Utilizator</button>
 }
 
 @if (CanDeleteUsers)
@@ -1027,9 +1027,9 @@ public void FilterUsers_WithRoleFilter_ReturnsCorrectUsers()
 public static class UserPageResources
 {
     public const string PageTitle = "Gestionare Utilizatori";
-    public const string AddUser = "Adaugă Utilizator";
-    public const string EditUser = "Editează Utilizator";
-    public const string DeleteUser = "Șterge Utilizator";
+    public const string AddUser = "Adauga Utilizator";
+    public const string EditUser = "Editeaza Utilizator";
+    public const string DeleteUser = "sterge Utilizator";
     public const string FilterResults = "Rezultate: {0} din {1} utilizatori";
     // ... more resources
 }

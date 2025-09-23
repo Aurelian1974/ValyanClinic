@@ -516,7 +516,7 @@ public class PersonalRepository : IPersonalRepository
     }
 
     /// <summary>
-    /// Generează următorul cod de angajat automat (EMP001, EMP002, etc.)
+    /// Genereaza urmatorul cod de angajat automat (EMP001, EMP002, etc.)
     /// </summary>
     public async Task<string> GetNextCodAngajatAsync()
     {
@@ -526,7 +526,7 @@ public class PersonalRepository : IPersonalRepository
 
             await EnsureConnectionOpenAsync();
 
-            // Query pentru a găsi ultimul cod de angajat
+            // Query pentru a gasi ultimul cod de angajat
             var lastCodAngajat = await _connection.QueryFirstOrDefaultAsync<string>(
                 @"SELECT TOP 1 Cod_Angajat 
                   FROM Personal 
@@ -537,12 +537,12 @@ public class PersonalRepository : IPersonalRepository
 
             if (string.IsNullOrEmpty(lastCodAngajat))
             {
-                // Primul angajat în sistem
+                // Primul angajat in sistem
                 _logger.LogInformation("No existing employee codes found, starting with EMP001");
                 return "EMP001";
             }
 
-            // Extrage numărul din ultimul cod (ex: EMP029 -> 029 -> 29)
+            // Extrage numarul din ultimul cod (ex: EMP029 -> 029 -> 29)
             var lastNumberString = lastCodAngajat.Substring(3); // ultimele 3 cifre
             if (!int.TryParse(lastNumberString, out var lastNumber))
             {
@@ -550,7 +550,7 @@ public class PersonalRepository : IPersonalRepository
                 return "EMP001";
             }
 
-            // Generează următorul număr
+            // Genereaza urmatorul numar
             var nextNumber = lastNumber + 1;
             var nextCode = $"EMP{nextNumber:D3}"; // Format cu 3 cifre: EMP001, EMP002, etc.
 

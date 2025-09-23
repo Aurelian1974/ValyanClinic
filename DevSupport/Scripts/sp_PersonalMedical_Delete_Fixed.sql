@@ -9,10 +9,10 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
         
-        -- Verificare existen?a
+        -- Verificare existena
         IF NOT EXISTS (SELECT 1 FROM PersonalMedical WHERE PersonalID = @PersonalID)
         BEGIN
-            THROW 50003, 'Personalul medical nu a fost g?sit.', 1;
+            THROW 50003, 'Personalul medical nu a fost gsit.', 1;
         END
         
         -- Soft delete - setare EsteActiv pe false

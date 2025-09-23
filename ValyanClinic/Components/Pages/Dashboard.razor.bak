@@ -1,0 +1,119 @@
+@page "/dashboard"
+@using ValyanClinic.Application.Services
+@using ValyanClinic.Domain.Models
+@rendermode InteractiveServer
+
+<PageTitle>Dashboard - ValyanMed</PageTitle>
+
+<div class="dashboard-container">
+    
+    @* Success Message *@
+    <div class="alert alert-success d-flex align-items-center mb-4">
+        <i class="fas fa-check-circle me-2"></i>
+        <div class="flex-1">
+            <strong>Autentificare reu?it?!</strong>
+            <div>Bine a?i venit în sistemul ValyanMed</div>
+        </div>
+    </div>
+
+    @* Welcome Card *@
+    <div class="welcome-section">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-heartbeat" style="font-size: 4rem; color: var(--primary-blue);"></i>
+                </div>
+                
+                <h1 class="display-4 mb-3">Bine a?i venit în ValyanMed!</h1>
+                <p class="lead text-muted mb-4">
+                    Sistemul de management medical modern pentru clinica dumneavoastr?
+                </p>
+                
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="/utilizatori" class="btn btn-primary btn-lg">
+                        <i class="fas fa-users me-2"></i>
+                        Gestioneaz? Utilizatori
+                    </a>
+                    <a href="#" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-calendar me-2"></i>
+                        Program?ri (În Curând)
+                    </a>
+                    <a href="#" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-user-injured me-2"></i>
+                        Pacien?i (În Curând)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Quick Stats *@
+    <div class="row mt-5">
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                    <h3>Utilizatori</h3>
+                    <p class="text-muted">Gestionarea complet? a utilizatorilor sistemului</p>
+                    <a href="/utilizatori" class="btn btn-primary">Acceseaz?</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-calendar-alt fa-2x text-warning mb-3"></i>
+                    <h3>Program?ri</h3>
+                    <p class="text-muted">Va fi implementat în urm?toarea etap?</p>
+                    <button class="btn btn-outline-secondary" disabled>În Curând</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-user-injured fa-2x text-info mb-3"></i>
+                    <h3>Pacien?i</h3>
+                    <p class="text-muted">Va fi implementat în urm?toarea etap?</p>
+                    <button class="btn btn-outline-secondary" disabled>În Curând</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Development Info *@
+    <div class="mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-code me-2"></i>
+                    Status Dezvoltare
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="text-success">? Implementat</h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Sistem de autentificare modern</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Gestionarea utilizatorilor</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Design responsive ?i modern</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Arhitectur? Clean separat?</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-warning">? În Dezvoltare</h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-clock text-warning me-2"></i>Gestionarea pacien?ilor</li>
+                            <li><i class="fas fa-clock text-warning me-2"></i>Sistem de program?ri</li>
+                            <li><i class="fas fa-clock text-warning me-2"></i>Consultatii medicale</li>
+                            <li><i class="fas fa-clock text-warning me-2"></i>Facturare ?i rapoarte</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

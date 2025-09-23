@@ -4,7 +4,7 @@ using ValyanClinic.Domain.Enums;
 namespace ValyanClinic.Components.Pages.UtilizatoriPage;
 
 /// <summary>
-/// Page-specific models pentru Utilizatori - ORGANIZAT ÎN FOLDER UtilizatoriPage
+/// Page-specific models pentru Utilizatori - ORGANIZAT iN FOLDER UtilizatoriPage
 /// Optimizat pentru C# 13 & .NET 9
 /// </summary>
 public class UtilizatoriModels
@@ -201,7 +201,7 @@ public class UtilizatoriModels
         UserRole.Administrator => "Administrator",
         UserRole.Doctor => "Doctor",
         UserRole.Nurse => "Asistent medical",
-        UserRole.Receptionist => "Recep?ioner",
+        UserRole.Receptionist => "Recepioner",
         UserRole.Operator => "Operator",
         UserRole.Manager => "Manager",
         _ => "Necunoscut"

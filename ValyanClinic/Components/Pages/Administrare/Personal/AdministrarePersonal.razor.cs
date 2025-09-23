@@ -40,7 +40,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         Duration = 300
     };
 
-    // Grid ID pentru persistență
+    // Grid ID pentru persistenta
     private const string GRID_ID = "personal-management-grid";
 
     protected override async Task OnInitializedAsync()
@@ -50,7 +50,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
             await LoadInitialData();
             InitializeFilterOptions();
 
-            // Load grid settings din persistență
+            // Load grid settings din persistenta
             var savedSettings = await GridStateService.GetGridSettingsAsync(GRID_ID);
             if (savedSettings != null)
             {
@@ -61,13 +61,13 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error initializing Personal management page");
-            _state.SetError($"Eroare la inițializarea paginii: {ex.Message}");
+            _state.SetError($"Eroare la initializarea paginii: {ex.Message}");
             StateHasChanged();
         }
     }
 
     /// <summary>
-    /// Safe StateHasChanged care verifică disposal
+    /// Safe StateHasChanged care verifica disposal
     /// </summary>
     protected void SafeStateHasChanged()
     {
@@ -355,7 +355,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         }
     }
 
-    // Reference către componenta AdaugaEditezaPersonal pentru a putea apela submit-ul
+    // Reference catre componenta AdaugaEditezaPersonal pentru a putea apela submit-ul
     private AdaugaEditezaPersonal? _currentFormComponent;
 
     private async Task HandleFormSubmit()
@@ -397,7 +397,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
             else
             {
                 Logger.LogWarning("Failed to save personal: {ErrorMessage}", result.ErrorMessage);
-                _state.SetError(result.ErrorMessage ?? "Eroare necunoscută");
+                _state.SetError(result.ErrorMessage ?? "Eroare necunoscuta");
             }
         }
         catch (Exception ex)
@@ -502,7 +502,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         {
             _disposed = true;
 
-            // 1. Salvează starea grid-ului înainte de dispose
+            // 1. Salveaza starea grid-ului inainte de dispose
             if (GridRef != null)
             {
                 var currentSettings = CaptureGridSettings();

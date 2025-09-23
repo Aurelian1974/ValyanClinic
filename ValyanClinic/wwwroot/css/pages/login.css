@@ -1,12 +1,12 @@
 ﻿@charset "UTF-8";
-/* ===== PAGINĂ LOGIN UNIFICATĂ - DESIGN CURAT 2025 ===== */
-/* GRADIENT ALBASTRU FOARTE FIN ȘI SUBTIL */
+/* ===== PAGINa LOGIN UNIFICATa - DESIGN CURAT 2025 ===== */
+/* GRADIENT ALBASTRU FOARTE FIN sI SUBTIL */
 
-/* IMPORT FONTURI GOOGLE CU SUPORT ROMÂNESC GARANTAT - ÎNAINTE DE ORICE */
+/* IMPORT FONTURI GOOGLE CU SUPORT ROMaNESC GARANTAT - iNAINTE DE ORICE */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
 
-/* Reset și fundamente cu FONT STACK OPTIMIZAT PENTRU ROMÂNA */
+/* Reset si fundamente cu FONT STACK OPTIMIZAT PENTRU ROMaNA */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -17,11 +17,11 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  /* FONT STACK OPTIMIZAT PENTRU DIACRITICELE ROMÂNEȘTI */
+  /* FONT STACK OPTIMIZAT PENTRU DIACRITICELE ROMaNEsTI */
   font-family: 
     /* Fonturi moderne cu suport complet UTF-8 */
     "Inter", "SF Pro Display", "SF Pro Text", 
-    /* Fonturi system cu suport românesc garantat */
+    /* Fonturi system cu suport romanesc garantat */
     -apple-system, BlinkMacSystemFont, 
     /* Fonturi Windows cu suport diacritice */
     "Segoe UI", "Segoe UI Variable", 
@@ -34,31 +34,31 @@ html, body {
     /* Fallback final */
     sans-serif;
     
-  /* GRADIENT ALBASTRU FOARTE FIN - NUANȚE SUBTILE */
+  /* GRADIENT ALBASTRU FOARTE FIN - NUANtE SUBTILE */
   background: linear-gradient(135deg, #4a90e2 0%, #5ba3f5 25%, #6db4ff 50%, #5ba3f5 75%, #4a90e2 100%);
   overflow: hidden;
   
-  /* Îmbunătățiri pentru renderizarea fontului */
+  /* imbunatatiri pentru renderizarea fontului */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   text-rendering: optimizeLegibility;
 }
 
-/* Container principal pentru pagină */
+/* Container principal pentru pagina */
 .login-page-wrapper {
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  /* GRADIENT ALBASTRU FOARTE FIN - VARIAȚIE SUBTILĂ */
+  /* GRADIENT ALBASTRU FOARTE FIN - VARIAtIE SUBTILa */
   background: linear-gradient(135deg, 
     #4a90e2 0%,    /* Albastru principal */
-    #5195e6 20%,   /* Albastru foarte ușor mai deschis */
+    #5195e6 20%,   /* Albastru foarte usor mai deschis */
     #589aea 40%,   /* Albastru mediu subtil */
-    #5ba3f5 60%,   /* Albastru ușor mai strălucitor */
-    #5195e6 80%,   /* Revenire la nuanța anterioară */
+    #5ba3f5 60%,   /* Albastru usor mai stralucitor */
+    #5195e6 80%,   /* Revenire la nuanta anterioara */
     #4a90e2 100%   /* Revenire la albastru principal */
   );
   position: relative;
@@ -85,16 +85,16 @@ html, body {
   50% { opacity: 0.7; transform: scale(1.03) rotate(0.5deg); }
 }
 
-/* CONTAINER UNIFICAT PRINCIPAL - FIX ÎN VIEWPORT */
+/* CONTAINER UNIFICAT PRINCIPAL - FIX iN VIEWPORT */
 .login-unified-card {
   width: 100%;
   max-width: 580px;
   height: auto;
   max-height: none;
-  background: rgba(255, 255, 255, 0.96); /* UȘOR MAI OPAC PENTRU CONTRAST */
+  background: rgba(255, 255, 255, 0.96); /* UsOR MAI OPAC PENTRU CONTRAST */
   border-radius: 24px;
   box-shadow: 
-    0 32px 64px rgba(74, 144, 226, 0.15), /* UMBRĂ ALBASTRĂ SUBTILĂ */
+    0 32px 64px rgba(74, 144, 226, 0.15), /* UMBRa ALBASTRa SUBTILa */
     0 16px 32px rgba(74, 144, 226, 0.1),
     0 8px 16px rgba(74, 144, 226, 0.08);
   backdrop-filter: blur(20px);
@@ -109,12 +109,12 @@ html, body {
   font-family: inherit;
 }
 
-/* TOATE TEXTELE MOȘTENESC FONTUL OPTIMIZAT, DAR ICONURILE NU */
+/* TOATE TEXTELE MOsTENESC FONTUL OPTIMIZAT, DAR ICONURILE NU */
 .login-unified-card * {
   font-family: inherit;
 }
 
-/* EXCEPȚII PENTRU ICONURI FONT AWESOME */
+/* EXCEPtII PENTRU ICONURI FONT AWESOME */
 .login-unified-card i,
 .login-unified-card .fa,
 .login-unified-card .fas,
@@ -136,7 +136,7 @@ html, body {
   }
 }
 
-/* HEADER CU LOGO ȘI TITLU - REDUS */
+/* HEADER CU LOGO sI TITLU - REDUS */
 .login-header {
   text-align: center;
   margin-bottom: 1.25rem;
@@ -156,7 +156,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 18px rgba(74, 144, 226, 0.25); /* UMBRĂ ALBASTRĂ */
+  box-shadow: 0 6px 18px rgba(74, 144, 226, 0.25); /* UMBRa ALBASTRa */
   animation: logoFloat 3s ease-in-out infinite;
 }
 
@@ -233,7 +233,7 @@ html, body {
   color: #2d3748;
   margin-bottom: 0.375rem;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -241,7 +241,7 @@ html, body {
   color: #718096;
   font-size: 0.8125rem;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -263,7 +263,7 @@ html, body {
   margin-bottom: 0.5rem;
   font-size: 0.8125rem;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -287,7 +287,7 @@ html, body {
   transition: all 0.2s ease;
   font-weight: 500;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR ÎN INPUT-URI */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR iN INPUT-URI */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -310,7 +310,7 @@ html, body {
 .form-input::placeholder {
   color: #a0aec0;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR ÎN PLACEHOLDER */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR iN PLACEHOLDER */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -370,7 +370,7 @@ html, body {
   color: #4a5568;
   font-weight: 500;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -429,12 +429,12 @@ html, body {
   padding: 0.1875rem;
   border-radius: 4px;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
 .forgot-link:hover {
-  color: #3182ce; /* HOVER MAI ÎNCHIS */
+  color: #3182ce; /* HOVER MAI iNCHIS */
   text-decoration: underline;
   background: rgba(74, 144, 226, 0.08); /* BACKGROUND ALBASTRU SUBTIL */
 }
@@ -459,7 +459,7 @@ html, body {
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3); /* SHADOW ALBASTRU */
   text-transform: none;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR ÎN BUTTON */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR iN BUTTON */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -486,7 +486,7 @@ html, body {
 
 .login-button span {
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR ÎN BUTTON TEXT */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR iN BUTTON TEXT */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -524,7 +524,7 @@ html, body {
   font-weight: 500;
   margin-top: 0.625rem;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR ÎN MESAJE */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR iN MESAJE */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -567,7 +567,7 @@ html, body {
   font-size: 0.75rem;
   margin-bottom: 0.75rem;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -594,7 +594,7 @@ html, body {
   color: #a0aec0;
   font-size: 0.6875rem;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
@@ -610,12 +610,12 @@ html, body {
   border-radius: 5px;
   transition: all 0.2s ease;
   font-family: inherit;
-  /* FORȚEAZĂ AFIȘAREA CORECTĂ A DIACRITICELOR */
+  /* FORtEAZa AFIsAREA CORECTa A DIACRITICELOR */
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
 .support-link:hover {
-  color: #3182ce; /* HOVER MAI ÎNCHIS */
+  color: #3182ce; /* HOVER MAI iNCHIS */
   background: rgba(74, 144, 226, 0.08); /* BACKGROUND ALBASTRU SUBTIL */
 }
 
@@ -626,7 +626,7 @@ html, body {
   font-style: normal !important;
 }
 
-/* RESPONSIVE DESIGN - FĂRĂ SCROLL */
+/* RESPONSIVE DESIGN - FaRa SCROLL */
 @media (max-width: 640px) {
   .login-page-wrapper {
     padding: 0.75rem;
@@ -716,7 +716,7 @@ html, body {
   }
 }
 
-/* ELIMINARE COMPLETĂ SCROLL - FORȚATĂ */
+/* ELIMINARE COMPLETa SCROLL - FORtATa */
 @media (max-height: 700px) {
   .login-unified-card {
     padding: 1.5rem;
@@ -735,7 +735,7 @@ html, body {
   }
 }
 
-/* ANIMAȚII PENTRU PERFORMANȚĂ */
+/* ANIMAtII PENTRU PERFORMANta */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

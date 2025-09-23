@@ -7,8 +7,8 @@ namespace ValyanClinic.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation pentru DepartamentMedical folosind Dapper si Stored Procedures
-/// IMPORTANT: Încarcă departamentele medicale DOAR din baza de date, NU din enum-uri statice
-/// Toate departamentele medicale sunt dinamice și se pot adăuga/modifica fără rebuild
+/// IMPORTANT: incarca departamentele medicale DOAR din baza de date, NU din enum-uri statice
+/// Toate departamentele medicale sunt dinamice si se pot adauga/modifica fara rebuild
 /// </summary>
 public class DepartamentMedicalRepository : IDepartamentMedicalRepository
 {

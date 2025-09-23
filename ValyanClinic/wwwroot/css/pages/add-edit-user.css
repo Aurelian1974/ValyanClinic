@@ -1,4 +1,4 @@
-/* DESIGN PREMIUM CU SPECIFICITATE MAXIM? - FOR?EAZ? STILURILE! */
+/* DESIGN PREMIUM CU SPECIFICITATE MAXIM? - FOREAZ? STILURILE! */
 
 /* Container principal - SPECIFICITATE MAXIM? */
 div.add-edit-user-modal-content,
@@ -14,7 +14,7 @@ div.add-edit-user-modal-content,
     box-shadow: none !important;
 }
 
-/* Loading states - FOR?AT */
+/* Loading states - FORAT */
 div.add-edit-user-loading-container,
 .add-edit-user-modal-content .add-edit-user-loading-container {
     display: flex !important;
@@ -26,7 +26,7 @@ div.add-edit-user-loading-container,
     border-radius: 16px !important;
 }
 
-/* Container pentru form - FOR?AT */
+/* Container pentru form - FORAT */
 div.add-edit-user-form-container,
 .add-edit-user-modal-content .add-edit-user-form-container {
     width: 100% !important;
@@ -45,7 +45,7 @@ div.add-edit-user-form-sections,
     background: transparent !important;
 }
 
-/* Sec?iuni form premium - FOR?ATE */
+/* Seciuni form premium - FORATE */
 div.add-edit-user-form-section,
 .add-edit-user-modal-content .add-edit-user-form-section {
     background: white !important;
@@ -81,7 +81,7 @@ div.add-edit-user-form-section:hover,
         0 8px 24px rgba(102, 126, 234, 0.15) !important;
 }
 
-/* Titluri sec?iuni - FOR?ATE CU GRADIENT */
+/* Titluri seciuni - FORATE CU GRADIENT */
 h3.add-edit-user-section-title,
 .add-edit-user-modal-content h3.add-edit-user-section-title {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
@@ -130,7 +130,7 @@ h3.add-edit-user-section-title i,
     position: relative !important;
 }
 
-/* Form rows - FOR?ATE */
+/* Form rows - FORATE */
 div.add-edit-user-form-row,
 .add-edit-user-modal-content .add-edit-user-form-row {
     display: grid !important;
@@ -147,7 +147,7 @@ div.add-edit-user-form-row:last-child,
     padding-bottom: 24px !important;
 }
 
-/* Form groups premium - FOR?ATE */
+/* Form groups premium - FORATE */
 div.add-edit-user-form-group,
 .add-edit-user-modal-content .add-edit-user-form-group {
     display: flex !important;
@@ -159,7 +159,7 @@ div.add-edit-user-form-group,
     padding: 0 !important;
 }
 
-/* Labels premium - FOR?ATE */
+/* Labels premium - FORATE */
 label.add-edit-user-form-label,
 .add-edit-user-modal-content .add-edit-user-form-label {
     font-weight: 700 !important;
@@ -181,7 +181,7 @@ span.add-edit-user-required,
     font-weight: 700 !important;
 }
 
-/* Focus effects pentru labels - FOR?ATE */
+/* Focus effects pentru labels - FORATE */
 div.add-edit-user-form-group:focus-within label.add-edit-user-form-label,
 .add-edit-user-modal-content .add-edit-user-form-group:focus-within .add-edit-user-form-label {
     color: #3b82f6 !important;
@@ -193,7 +193,7 @@ div.add-edit-user-form-group:hover label.add-edit-user-form-label,
     color: #6366f1 !important;
 }
 
-/* Validation errors premium - FOR?ATE */
+/* Validation errors premium - FORATE */
 div.add-edit-user-validation-error,
 .add-edit-user-modal-content .add-edit-user-validation-error {
     color: #ef4444 !important;
@@ -239,7 +239,7 @@ div.add-edit-user-validation-error::before,
     box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
 }
 
-/* Syncfusion Premium Styling - FOR?AT CU SPECIFICITATE MAXIM? */
+/* Syncfusion Premium Styling - FORAT CU SPECIFICITATE MAXIM? */
 div.add-edit-user-modal-content .e-textbox,
 div.add-edit-user-modal-content .e-dropdownlist,
 .add-edit-user-modal-content .e-textbox,
@@ -317,7 +317,7 @@ div.add-edit-user-modal-content .e-input::placeholder,
     font-style: italic !important;
 }
 
-/* Dropdown Premium Styling - FOR?AT */
+/* Dropdown Premium Styling - FORAT */
 div.add-edit-user-modal-content .e-dropdownlist .e-ddl-icon,
 .add-edit-user-modal-content .e-dropdownlist .e-ddl-icon {
     color: #6b7280 !important;
@@ -335,7 +335,7 @@ div.add-edit-user-modal-content .e-dropdownlist:hover .e-ddl-icon,
     transform: rotate(180deg) scale(1.1) !important;
 }
 
-/* Alert messages premium - FOR?ATE */
+/* Alert messages premium - FORATE */
 div.add-edit-user-alert,
 .add-edit-user-modal-content .add-edit-user-alert {
     margin: 16px 24px !important;
@@ -357,7 +357,7 @@ div.add-edit-user-alert-danger,
     border: 1px solid rgba(239, 68, 68, 0.2) !important;
 }
 
-/* Responsive Design - FOR?AT */
+/* Responsive Design - FORAT */
 @media (max-width: 768px) {
     div.add-edit-user-modal-content,
     .add-edit-user-modal-content {

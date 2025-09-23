@@ -1,5 +1,5 @@
 -- =============================================
--- SP pentru ob?inerea distribu?iei personalului medical pe departamente
+-- SP pentru obinerea distribuiei personalului medical pe departamente
 -- Folosit pentru statisticile din AdministrarePersonalMedical
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_PersonalMedical_GetDistributiePerDepartament]

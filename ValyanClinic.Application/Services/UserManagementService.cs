@@ -272,11 +272,11 @@ public class UserManagementService : IUserManagementService
     {
         await Task.Delay(10);
         
-        // FluentValidation va gestiona aceste validări
-        // Păstrez doar business logic validation care nu poate fi în validators
+        // FluentValidation va gestiona aceste validari
+        // Pastrez doar business logic validation care nu poate fi in validators
         var errors = new List<string>();
         
-        // Business rule: verificare unicitate (nu poate fi în FluentValidation fără acces la service)
+        // Business rule: verificare unicitate (nu poate fi in FluentValidation fara acces la service)
         if (!await IsUsernameAvailableAsync(request.Username))
             errors.Add("Numele de utilizator este deja folosit.");
             

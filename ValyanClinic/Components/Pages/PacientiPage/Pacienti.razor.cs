@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Components;
 namespace ValyanClinic.Components.Pages.PacientiPage;
 
 /// <summary>
-/// Business Logic pentru Pacienti.razor - ORGANIZAT ÎN FOLDER PacientiPage
-/// Coming Soon page pentru func?ionalitatea Pacien?i
+/// Business Logic pentru Pacienti.razor - ORGANIZAT iN FOLDER PacientiPage
+/// Coming Soon page pentru funcionalitatea Pacieni
 /// </summary>
 public partial class Pacienti : ComponentBase
 {

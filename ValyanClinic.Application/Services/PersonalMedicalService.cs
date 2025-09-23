@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 namespace ValyanClinic.Application.Services;
 
 /// <summary>
-/// PersonalMedical Service implementation cu business logic avansat și validări specifice medicale
-/// Rich service conform best practices - focus pe validări medicale și business rules specifice
+/// PersonalMedical Service implementation cu business logic avansat si validari specifice medicale
+/// Rich service conform best practices - focus pe validari medicale si business rules specifice
 /// </summary>
 public class PersonalMedicalService : IPersonalMedicalService
 {
@@ -95,10 +95,10 @@ public class PersonalMedicalService : IPersonalMedicalService
             _logger.LogInformation("Creating personal medical: {Nume} {Prenume}, Pozitie: {Pozitie}", 
                 personalMedical.Nume, personalMedical.Prenume, personalMedical.Pozitie);
 
-            // Business rules pentru crearea personalului medical (înainte de validare)
+            // Business rules pentru crearea personalului medical (inainte de validare)
             personalMedical = ApplyBusinessRulesForCreate(personalMedical, utilizator);
 
-            // Validări specifice medicale
+            // Validari specifice medicale
             var validationResult = await ValidatePersonalMedicalAsync(personalMedical, false);
             if (!validationResult.IsValid)
             {
@@ -107,25 +107,25 @@ public class PersonalMedicalService : IPersonalMedicalService
                 return PersonalMedicalResult.ValidationFailure(validationResult.Errors);
             }
 
-            // Verificare unicitate licență medicală
+            // Verificare unicitate licenta medicala
             if (!string.IsNullOrEmpty(personalMedical.NumarLicenta))
             {
                 var licentaExists = await _personalMedicalRepository.CheckLicentaUnicityAsync(personalMedical.NumarLicenta);
                 if (licentaExists)
                 {
                     _logger.LogWarning("Medical license already exists: {NumarLicenta}", personalMedical.NumarLicenta);
-                    return PersonalMedicalResult.Failure("Numărul de licență medicală există deja în sistem");
+                    return PersonalMedicalResult.Failure("Numarul de licenta medicala exista deja in sistem");
                 }
             }
 
-            // Verificare email unic în sectorul medical
+            // Verificare email unic in sectorul medical
             if (!string.IsNullOrEmpty(personalMedical.Email))
             {
                 var emailExists = await _personalMedicalRepository.CheckEmailUnicityAsync(personalMedical.Email);
                 if (emailExists)
                 {
                     _logger.LogWarning("Medical email already exists: {Email}", personalMedical.Email);
-                    return PersonalMedicalResult.Failure("Adresa de email există deja în sistemul medical");
+                    return PersonalMedicalResult.Failure("Adresa de email exista deja in sistemul medical");
                 }
             }
 
@@ -152,13 +152,13 @@ public class PersonalMedicalService : IPersonalMedicalService
             if (existing == null)
             {
                 _logger.LogWarning("Personal medical not found for update: {PersonalId}", personalMedical.PersonalID);
-                return PersonalMedicalResult.Failure("Personalul medical nu a fost găsit");
+                return PersonalMedicalResult.Failure("Personalul medical nu a fost gasit");
             }
 
-            // Business rules pentru update (înainte de validare)
+            // Business rules pentru update (inainte de validare)
             personalMedical = ApplyBusinessRulesForUpdate(personalMedical, existing, utilizator);
 
-            // Validări specifice medicale
+            // Validari specifice medicale
             var validationResult = await ValidatePersonalMedicalAsync(personalMedical, true);
             if (!validationResult.IsValid)
             {
@@ -167,7 +167,7 @@ public class PersonalMedicalService : IPersonalMedicalService
                 return PersonalMedicalResult.ValidationFailure(validationResult.Errors);
             }
 
-            // Verificare unicitate licență (exclude ID-ul curent)
+            // Verificare unicitate licenta (exclude ID-ul curent)
             if (!string.IsNullOrEmpty(personalMedical.NumarLicenta))
             {
                 var licentaExists = await _personalMedicalRepository.CheckLicentaUnicityAsync(
@@ -175,7 +175,7 @@ public class PersonalMedicalService : IPersonalMedicalService
                 if (licentaExists)
                 {
                     _logger.LogWarning("Medical license already exists for update: {NumarLicenta}", personalMedical.NumarLicenta);
-                    return PersonalMedicalResult.Failure("Numărul de licență medicală există deja în sistem");
+                    return PersonalMedicalResult.Failure("Numarul de licenta medicala exista deja in sistem");
                 }
             }
 
@@ -187,7 +187,7 @@ public class PersonalMedicalService : IPersonalMedicalService
                 if (emailExists)
                 {
                     _logger.LogWarning("Medical email already exists for update: {Email}", personalMedical.Email);
-                    return PersonalMedicalResult.Failure("Adresa de email există deja în sistemul medical");
+                    return PersonalMedicalResult.Failure("Adresa de email exista deja in sistemul medical");
                 }
             }
 
@@ -212,7 +212,7 @@ public class PersonalMedicalService : IPersonalMedicalService
             var existing = await _personalMedicalRepository.GetByIdAsync(id);
             if (existing == null)
             {
-                return PersonalMedicalResult.Failure("Personalul medical nu a fost găsit");
+                return PersonalMedicalResult.Failure("Personalul medical nu a fost gasit");
             }
 
             // Business rule: nu poti sterge personal medical care nu este deja inactiv
@@ -221,17 +221,17 @@ public class PersonalMedicalService : IPersonalMedicalService
                 return PersonalMedicalResult.Failure("Personalul medical este deja inactiv");
             }
 
-            // Business rule: verifică dacă personalul medical are programări active
+            // Business rule: verifica daca personalul medical are programari active
             var areProgamariActive = await _personalMedicalRepository.CheckActiveAppointmentsAsync(id);
             if (areProgamariActive)
             {
-                return PersonalMedicalResult.Failure("Nu se poate șterge personalul medical cu programări active. Dezactivați mai întâi programările.");
+                return PersonalMedicalResult.Failure("Nu se poate sterge personalul medical cu programari active. Dezactivati mai intai programarile.");
             }
 
             var success = await _personalMedicalRepository.DeleteAsync(id, utilizator);
             if (!success)
             {
-                return PersonalMedicalResult.Failure("Eroare la ștergerea personalului medical");
+                return PersonalMedicalResult.Failure("Eroare la stergerea personalului medical");
             }
 
             _logger.LogInformation("Personal medical deleted successfully: {PersonalId}", id);
@@ -240,7 +240,7 @@ public class PersonalMedicalService : IPersonalMedicalService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting personal medical: {PersonalId}", id);
-            return PersonalMedicalResult.Failure($"Eroare la ștergerea personalului medical: {ex.Message}");
+            return PersonalMedicalResult.Failure($"Eroare la stergerea personalului medical: {ex.Message}");
         }
     }
 
@@ -317,7 +317,7 @@ public class PersonalMedicalService : IPersonalMedicalService
         {
             _logger.LogInformation("Getting personal medical dropdown options");
 
-            // Încarcă departamentele medicale din serviciul dedicat (NU din enum-uri!)
+            // incarca departamentele medicale din serviciul dedicat (NU din enum-uri!)
             var departamenteMedicaleTask = _departamentMedicalService.GetAllDepartamenteMedicaleAsync();
             var categoriiTask = _departamentMedicalService.GetCategoriiMedicaleAsync();
             var specializariTask = _departamentMedicalService.GetSpecializariMedicaleAsync();
@@ -337,7 +337,7 @@ public class PersonalMedicalService : IPersonalMedicalService
             var subspecializari = (await subspecializariTask)
                 .Select(x => new DropdownItem(x.DepartamentID.ToString(), x.Nume));
 
-            // Poziții medicale din enum (acestea NU se schimbă dinamic)
+            // Pozitii medicale din enum (acestea NU se schimba dinamic)
             var pozitiiMedicale = Enum.GetValues<PozitiePersonalMedical>()
                 .Select(p => new DropdownItem(p.ToString(), p.GetDisplayName()));
 
@@ -365,29 +365,29 @@ public class PersonalMedicalService : IPersonalMedicalService
 
             var result = PersonalMedicalValidationResult.Success();
 
-            // Validări de bază
+            // Validari de baza
             if (string.IsNullOrWhiteSpace(personalMedical.Nume))
                 result.AddError("Numele este obligatoriu");
 
             if (string.IsNullOrWhiteSpace(personalMedical.Prenume))
                 result.AddError("Prenumele este obligatoriu");
 
-            // Validări specifice medicale
+            // Validari specifice medicale
             if (personalMedical.AreNevieDeLicenta && !personalMedical.AreLicentaValida)
-                result.AddError("Numărul de licență medicală este obligatoriu pentru doctori și asistenți medicali");
+                result.AddError("Numarul de licenta medicala este obligatoriu pentru doctori si asistenti medicali");
 
             if (!string.IsNullOrEmpty(personalMedical.NumarLicenta))
             {
                 if (personalMedical.NumarLicenta.Length < MIN_LUNGIME_LICENTA || 
                     personalMedical.NumarLicenta.Length > MAX_LUNGIME_LICENTA)
                 {
-                    result.AddError($"Numărul de licență medicală trebuie să aibă între {MIN_LUNGIME_LICENTA} și {MAX_LUNGIME_LICENTA} caractere");
+                    result.AddError($"Numarul de licenta medicala trebuie sa aiba intre {MIN_LUNGIME_LICENTA} si {MAX_LUNGIME_LICENTA} caractere");
                 }
 
-                // Verificare format licență medicală
+                // Verificare format licenta medicala
                 if (!IsValidLicenseFormat(personalMedical.NumarLicenta))
                 {
-                    result.AddError("Formatul numărului de licență medicală este invalid");
+                    result.AddError("Formatul numarului de licenta medicala este invalid");
                 }
             }
 
@@ -397,15 +397,15 @@ public class PersonalMedicalService : IPersonalMedicalService
 
             // Validare telefon medical
             if (!string.IsNullOrEmpty(personalMedical.Telefon) && !IsValidPhoneNumber(personalMedical.Telefon))
-                result.AddError("Formatul numărului de telefon este invalid");
+                result.AddError("Formatul numarului de telefon este invalid");
 
-            // Validări pentru specializări medicale
+            // Validari pentru specializari medicale
             if (personalMedical.EsteDoctorSauAsistent && !personalMedical.AreSpecializareCompleta)
             {
-                result.AddError("Doctorii și asistenții medicali trebuie să aibă cel puțin o categorie și o specializare");
+                result.AddError("Doctorii si asistentii medicali trebuie sa aiba cel putin o categorie si o specializare");
             }
 
-            // Validare business logic pentru poziții medicale
+            // Validare business logic pentru pozitii medicale
             var pozitieValidation = await ValidatePozitieBusinessRulesAsync(personalMedical);
             if (!pozitieValidation.IsValid)
             {
@@ -442,7 +442,7 @@ public class PersonalMedicalService : IPersonalMedicalService
             if (!IsValidLicenseFormat(numarLicenta))
                 return false;
 
-            // Verificare în registrul medical național (simulat)
+            // Verificare in registrul medical national (simulat)
             return await SimulateNationalMedicalRegistryCheck(numarLicenta, pozitie);
         }
         catch (Exception ex)
@@ -467,17 +467,17 @@ public class PersonalMedicalService : IPersonalMedicalService
                 case PozitiePersonalMedical.Doctor:
                     certificariNecesare.AddRange(new[]
                     {
-                        "Licența medicală valabilă",
+                        "Licenta medicala valabila",
                         "Certificat de specializare",
-                        "Educație medicală continuă (EMC)"
+                        "Educatie medicala continua (EMC)"
                     });
                     break;
 
                 case PozitiePersonalMedical.AsistentMedical:
                     certificariNecesare.AddRange(new[]
                     {
-                        "Licența de asistent medical",
-                        "Certificat de competențe",
+                        "Licenta de asistent medical",
+                        "Certificat de competente",
                         "Primul ajutor"
                     });
                     break;
@@ -486,12 +486,12 @@ public class PersonalMedicalService : IPersonalMedicalService
                     certificariNecesare.AddRange(new[]
                     {
                         "Certificat de calificare tehnician",
-                        "Instruire securitate și sănătate"
+                        "Instruire securitate si sanatate"
                     });
                     break;
 
                 default:
-                    certificariNecesare.Add("Instruire securitate și sănătate");
+                    certificariNecesare.Add("Instruire securitate si sanatate");
                     break;
             }
 
@@ -508,13 +508,13 @@ public class PersonalMedicalService : IPersonalMedicalService
 
     private PersonalMedical ApplyBusinessRulesForCreate(PersonalMedical personalMedical, string utilizator)
     {
-        // Setare date sistem pentru crearea - folosește ora locală pentru consistență
+        // Setare date sistem pentru crearea - foloseste ora locala pentru consistenta
         personalMedical.DataCreare = DateTime.Now;
 
         // Business rule: personalul medical nou este mereu Activ
         personalMedical.EsteActiv = true;
 
-        // Business rule: normalizează datele medicale
+        // Business rule: normalizeaza datele medicale
         personalMedical = NormalizePersonalMedicalData(personalMedical);
 
         return personalMedical;
@@ -522,10 +522,10 @@ public class PersonalMedicalService : IPersonalMedicalService
 
     private PersonalMedical ApplyBusinessRulesForUpdate(PersonalMedical personalMedical, PersonalMedical existing, string utilizator)
     {
-        // Păstrare data creării originale
+        // Pastrare data crearii originale
         personalMedical.DataCreare = existing.DataCreare;
 
-        // Business rule: normalizează datele medicale la update
+        // Business rule: normalizeaza datele medicale la update
         personalMedical = NormalizePersonalMedicalData(personalMedical);
         
         return personalMedical;
@@ -537,7 +537,7 @@ public class PersonalMedicalService : IPersonalMedicalService
         personalMedical.Nume = NormalizeName(personalMedical.Nume);
         personalMedical.Prenume = NormalizeName(personalMedical.Prenume);
         
-        // Normalizare număr licență medicală
+        // Normalizare numar licenta medicala
         if (!string.IsNullOrEmpty(personalMedical.NumarLicenta))
             personalMedical.NumarLicenta = personalMedical.NumarLicenta.Trim().ToUpper();
 
@@ -565,7 +565,7 @@ public class PersonalMedicalService : IPersonalMedicalService
         if (string.IsNullOrEmpty(name))
             return name;
 
-        // Prima literă mare, restul mici pentru fiecare cuvânt
+        // Prima litera mare, restul mici pentru fiecare cuvant
         return string.Join(" ", name.Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Select(word => char.ToUpper(word[0]) + word[1..].ToLower()));
     }
@@ -574,25 +574,25 @@ public class PersonalMedicalService : IPersonalMedicalService
     {
         var result = PersonalMedicalValidationResult.Success();
 
-        // Business rules specifice pentru fiecare poziție medicală
+        // Business rules specifice pentru fiecare pozitie medicala
         switch (personalMedical.Pozitie)
         {
             case PozitiePersonalMedical.Doctor:
                 if (string.IsNullOrEmpty(personalMedical.NumarLicenta))
-                    result.AddError("Doctorii trebuie să aibă obligatoriu numărul de licență medicală");
+                    result.AddError("Doctorii trebuie sa aiba obligatoriu numarul de licenta medicala");
                     
                 if (!personalMedical.AreSpecializareCompleta)
-                    result.AddError("Doctorii trebuie să aibă cel puțin o specializare definită");
+                    result.AddError("Doctorii trebuie sa aiba cel putin o specializare definita");
                 break;
 
             case PozitiePersonalMedical.AsistentMedical:
                 if (string.IsNullOrEmpty(personalMedical.NumarLicenta))
-                    result.AddError("Asistenții medicali trebuie să aibă obligatoriu numărul de licență");
+                    result.AddError("Asistentii medicali trebuie sa aiba obligatoriu numarul de licenta");
                 break;
 
             case PozitiePersonalMedical.TehnicianMedical:
                 if (personalMedical.AreSpecializareCompleta && string.IsNullOrEmpty(personalMedical.Specializare))
-                    result.AddError("Tehnicianii medicali cu specializări trebuie să aibă specificată specializarea principală");
+                    result.AddError("Tehnicianii medicali cu specializari trebuie sa aiba specificata specializarea principala");
                 break;
         }
 
@@ -604,7 +604,7 @@ public class PersonalMedicalService : IPersonalMedicalService
         if (string.IsNullOrEmpty(numarLicenta))
             return false;
 
-        // Format simplu: cel puțin 5 caractere, conține cifre și/sau litere
+        // Format simplu: cel putin 5 caractere, contine cifre si/sau litere
         return numarLicenta.Length >= 5 && 
                numarLicenta.Any(char.IsLetterOrDigit);
     }
@@ -630,18 +630,18 @@ public class PersonalMedicalService : IPersonalMedicalService
         if (string.IsNullOrEmpty(telefon))
             return false;
 
-        // Format simplu: cel puțin 7 cifre, poate conține +, -, spații, ()
+        // Format simplu: cel putin 7 cifre, poate contine +, -, spatii, ()
         var numarCurat = new string(telefon.Where(c => char.IsDigit(c)).ToArray());
         return numarCurat.Length >= 7 && numarCurat.Length <= 15;
     }
 
     private async Task<bool> SimulateNationalMedicalRegistryCheck(string numarLicenta, string pozitie)
     {
-        // Simulare verificare în registrul medical național
-        // În implementarea reală ar fi o chiamare la un API extern
-        await Task.Delay(100); // Simulare latență API
+        // Simulare verificare in registrul medical national
+        // in implementarea reala ar fi o chiamare la un API extern
+        await Task.Delay(100); // Simulare latenta API
         
-        // Pentru demonstrație, returnăm true pentru licențe care încep cu litere
+        // Pentru demonstratie, returnam true pentru licente care incep cu litere
         return numarLicenta.Length >= 5 && char.IsLetter(numarLicenta[0]);
     }
 

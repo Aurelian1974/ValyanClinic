@@ -26,12 +26,12 @@ BEGIN
         -- Verificare unicitate Email ?i NumarLicenta
         IF @Email IS NOT NULL AND EXISTS (SELECT 1 FROM PersonalMedical WHERE Email = @Email)
         BEGIN
-            THROW 50001, 'Email-ul exist? deja în baza de date.', 1;
+            THROW 50001, 'Email-ul exist? deja in baza de date.', 1;
         END
         
         IF @NumarLicenta IS NOT NULL AND EXISTS (SELECT 1 FROM PersonalMedical WHERE NumarLicenta = @NumarLicenta)
         BEGIN
-            THROW 50002, 'Num?rul de licen?? exist? deja în baza de date.', 1;
+            THROW 50002, 'Numrul de licen?? exist? deja in baza de date.', 1;
         END
         
         INSERT INTO PersonalMedical (

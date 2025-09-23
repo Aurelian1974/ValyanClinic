@@ -4,8 +4,8 @@ using Serilog;
 namespace ValyanClinic.Services;
 
 /// <summary>
-/// Hosted Service pentru curățarea fișierelor de log la shutdown-ul aplicației
-/// Alternativă la LogCleanupService pentru mai multă control și flexibilitate
+/// Hosted Service pentru curatarea fisierelor de log la shutdown-ul aplicatiei
+/// Alternativa la LogCleanupService pentru mai multa control si flexibilitate
 /// </summary>
 public class LogCleanupHostedService : IHostedService, IDisposable
 {

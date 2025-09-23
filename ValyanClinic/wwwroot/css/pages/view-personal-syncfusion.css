@@ -14,7 +14,7 @@
   position: relative;
 }
 
-/* Content area - SIMPLIFICATĂ */
+/* Content area - SIMPLIFICATa */
 .view-personal-content-area {
   padding: 20px;
   /* Smooth scrolling */
@@ -55,7 +55,7 @@
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
 }
 
-/* FALLBACK pentru orice clasa Syncfusion generează */
+/* FALLBACK pentru orice clasa Syncfusion genereaza */
 .cnp-input-container .cnp-valid,
 .cnp-input-container .cnp-valid input {
     border-color: #10b981 !important;
@@ -144,12 +144,12 @@
    COD ANGAJAT READ-ONLY STYLING
    ========================================================================== */
 
-/* Container pentru câmpul cod angajat */
+/* Container pentru campul cod angajat */
 .cod-angajat-container {
     position: relative;
 }
 
-/* Stiluri pentru câmpul read-only */
+/* Stiluri pentru campul read-only */
 .cod-angajat-readonly.e-input-group,
 .cod-angajat-readonly.e-input-group .e-input {
     background: #f8fafc !important;
@@ -192,7 +192,7 @@
     font-size: 14px !important;
 }
 
-/* Animații pentru cod generat */
+/* Animatii pentru cod generat */
 .cod-angajat-container {
     animation: fadeInRight 0.5s ease !important;
 }
@@ -229,7 +229,7 @@
     }
 }
 
-/* Responsive pentru câmpuri speciale */
+/* Responsive pentru campuri speciale */
 @media (max-width: 768px) {
     .cnp-feedback {
         font-size: 12px !important;

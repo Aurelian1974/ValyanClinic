@@ -3,33 +3,33 @@
 namespace ValyanClinic.Core.Services;
 
 /// <summary>
-/// SERVICE pentru gestionarea centralizată a toast-urilor în aplicația Blazor
-/// Rezolvă problema cu toast-urile blurate în modale
+/// SERVICE pentru gestionarea centralizata a toast-urilor in aplicatia Blazor
+/// Rezolva problema cu toast-urile blurate in modale
 /// </summary>
 public interface IToastNotificationService
 {
     /// <summary>
-    /// Înregistrează instanța de toast pentru utilizare globală
+    /// inregistreaza instanta de toast pentru utilizare globala
     /// </summary>
     void RegisterToast(SfToast toast);
     
     /// <summary>
-    /// Afișează toast de succes
+    /// Afiseaza toast de succes
     /// </summary>
     Task ShowSuccessAsync(string title, string message);
     
     /// <summary>
-    /// Afișează toast de eroare
+    /// Afiseaza toast de eroare
     /// </summary>
     Task ShowErrorAsync(string title, string message);
     
     /// <summary>
-    /// Afișează toast de avertizare
+    /// Afiseaza toast de avertizare
     /// </summary>
     Task ShowWarningAsync(string title, string message);
     
     /// <summary>
-    /// Afișează toast informativ
+    /// Afiseaza toast informativ
     /// </summary>
     Task ShowInfoAsync(string title, string message);
 }
@@ -81,7 +81,7 @@ public class ToastNotificationService : IToastNotificationService
     {
         try
         {
-            // Folosește toast-ul modal dacă există, altfel pe cel global
+            // Foloseste toast-ul modal daca exista, altfel pe cel global
             var activeToast = _modalToast ?? _globalToast;
             
             if (activeToast != null)
@@ -118,7 +118,7 @@ public class ToastNotificationService : IToastNotificationService
 }
 
 /// <summary>
-/// Extension methods pentru înregistrarea serviciului
+/// Extension methods pentru inregistrarea serviciului
 /// </summary>
 public static class ToastServiceExtensions
 {

@@ -121,6 +121,6 @@ public class PatientService : IPatientService
         patient.Allergies = dto.Allergies;
         patient.MedicalHistory = dto.MedicalHistory;
         patient.Notes = dto.Notes;
-        patient.UpdatedAt = DateTime.Now; // CORECTAT: folosește ora locală în loc de UtcNow
+        patient.UpdatedAt = DateTime.Now; // CORECTAT: foloseste ora locala in loc de UtcNow
     }
 }

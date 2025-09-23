@@ -1,5 +1,5 @@
 -- =============================================
--- SP pentru ob?inerea op?iunilor pentru dropdown-uri
+-- SP pentru obinerea opiunilor pentru dropdown-uri
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_PersonalMedical_GetDropdownOptions]
 AS
@@ -14,7 +14,7 @@ BEGIN
     WHERE Departament IS NOT NULL 
     ORDER BY Departament;
     
-    -- Pozi?ii distincte
+    -- Poziii distincte
     SELECT DISTINCT 
         Pozitie as Value,
         Pozitie as Text
@@ -22,7 +22,7 @@ BEGIN
     WHERE Pozitie IS NOT NULL 
     ORDER BY Pozitie;
     
-    -- Specializ?ri distincte
+    -- Specializri distincte
     SELECT DISTINCT 
         Specializare as Value,
         Specializare as Text

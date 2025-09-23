@@ -1,5 +1,5 @@
 -- =============================================
--- SP pentru ob?inerea statisticilor personal medical
+-- SP pentru obinerea statisticilor personal medical
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_PersonalMedical_GetStatistics]
 AS

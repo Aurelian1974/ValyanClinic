@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Generic Result pattern implementation pentru ValyanClinic
-/// Înlocuiește bool/exception pattern cu Result<T> type-safe
+/// inlocuieste bool/exception pattern cu Result<T> type-safe
 /// </summary>
 public class Result<T>
 {
@@ -21,52 +21,52 @@ public class Result<T>
     }
     
     /// <summary>
-    /// Creează un rezultat de succes
+    /// Creeaza un rezultat de succes
     /// </summary>
     public static Result<T> Success(T value, string? message = null)
         => new(true, value, new List<string>(), message);
     
     /// <summary>
-    /// Creează un rezultat de eșec cu o singură eroare
+    /// Creeaza un rezultat de esec cu o singura eroare
     /// </summary>
     public static Result<T> Failure(string error)
         => new(false, default, new List<string> { error });
     
     /// <summary>
-    /// Creează un rezultat de eșec cu multiple erori
+    /// Creeaza un rezultat de esec cu multiple erori
     /// </summary>
     public static Result<T> Failure(params string[] errors)
         => new(false, default, errors.ToList());
     
     /// <summary>
-    /// Creează un rezultat de eșec cu o listă de erori
+    /// Creeaza un rezultat de esec cu o lista de erori
     /// </summary>
     public static Result<T> Failure(List<string> errors)
         => new(false, default, errors);
     
     /// <summary>
-    /// Creează un rezultat de eșec de la un Exception
+    /// Creeaza un rezultat de esec de la un Exception
     /// </summary>
     public static Result<T> Failure(Exception exception)
         => new(false, default, new List<string> { exception.Message });
     
     /// <summary>
-    /// Obține prima eroare sau string gol
+    /// Obtine prima eroare sau string gol
     /// </summary>
     public string FirstError => Errors.FirstOrDefault() ?? string.Empty;
     
     /// <summary>
-    /// Obține toate erorile ca un string concatenat
+    /// Obtine toate erorile ca un string concatenat
     /// </summary>
     public string ErrorsAsString => string.Join("; ", Errors);
     
     /// <summary>
-    /// Verifică dacă există erori
+    /// Verifica daca exista erori
     /// </summary>
     public bool HasErrors => Errors.Any();
     
     /// <summary>
-    /// Mapează rezultatul la un alt tip
+    /// Mapeaza rezultatul la un alt tip
     /// </summary>
     public Result<TNew> Map<TNew>(Func<T, TNew> mapper)
     {
@@ -85,7 +85,7 @@ public class Result<T>
     }
     
     /// <summary>
-    /// Combină cu alt rezultat
+    /// Combina cu alt rezultat
     /// </summary>
     public Result<T> Combine(Result<T> other)
     {
@@ -100,7 +100,7 @@ public class Result<T>
     }
     
     /// <summary>
-    /// Execută o acțiune dacă rezultatul este success
+    /// Executa o actiune daca rezultatul este success
     /// </summary>
     public Result<T> OnSuccess(Action<T> action)
     {
@@ -110,7 +110,7 @@ public class Result<T>
     }
     
     /// <summary>
-    /// Execută o acțiune dacă rezultatul este failure
+    /// Executa o actiune daca rezultatul este failure
     /// </summary>
     public Result<T> OnFailure(Action<List<string>> action)
     {
@@ -121,7 +121,7 @@ public class Result<T>
 }
 
 /// <summary>
-/// Result pattern fără valoare pentru operații simple
+/// Result pattern fara valoare pentru operatii simple
 /// </summary>
 public class Result
 {
@@ -157,7 +157,7 @@ public class Result
     public bool HasErrors => Errors.Any();
     
     /// <summary>
-    /// Convertește la Result<T>
+    /// Converteste la Result<T>
     /// </summary>
     public Result<T> ToResult<T>(T value)
     {
@@ -182,12 +182,12 @@ public class Result
 }
 
 /// <summary>
-/// Extension methods pentru Result pattern în Blazor
+/// Extension methods pentru Result pattern in Blazor
 /// </summary>
 public static class ResultExtensions
 {
     /// <summary>
-    /// Afișează toast notification pe baza rezultatului
+    /// Afiseaza toast notification pe baza rezultatului
     /// </summary>
     public static async Task ShowToastAsync<T>(this Result<T> result, 
         Func<string, Task> showSuccess, 
@@ -200,7 +200,7 @@ public static class ResultExtensions
     }
     
     /// <summary>
-    /// Afișează toast notification pentru Result simplu
+    /// Afiseaza toast notification pentru Result simplu
     /// </summary>
     public static async Task ShowToastAsync(this Result result, 
         Func<string, Task> showSuccess, 
@@ -213,7 +213,7 @@ public static class ResultExtensions
     }
     
     /// <summary>
-    /// Convertește ValidationResult la Result<T>
+    /// Converteste ValidationResult la Result<T>
     /// </summary>
     public static Result<T> ToResult<T>(this Application.Validators.ValidationResult validationResult, T value)
     {
@@ -225,7 +225,7 @@ public static class ResultExtensions
     }
     
     /// <summary>
-    /// Convertește Exception la Result<T>
+    /// Converteste Exception la Result<T>
     /// </summary>
     public static Result<T> ToResult<T>(this Exception exception)
     {
@@ -234,12 +234,12 @@ public static class ResultExtensions
 }
 
 /// <summary>
-/// Result-uri specifice pentru domain-ul aplicației
+/// Result-uri specifice pentru domain-ul aplicatiei
 /// </summary>
 public static class DomainResults
 {
     /// <summary>
-    /// Result pentru operații cu Personal
+    /// Result pentru operatii cu Personal
     /// </summary>
     public class PersonalResult : Result<Domain.Models.Personal>
     {
@@ -274,7 +274,7 @@ public static class DomainResults
     }
     
     /// <summary>
-    /// Result pentru operații cu User
+    /// Result pentru operatii cu User
     /// </summary>
     public class UserResult : Result<Domain.Models.User>
     {

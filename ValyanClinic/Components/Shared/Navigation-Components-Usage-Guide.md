@@ -4,26 +4,26 @@
 
 Am creat **2 componente de navigare** pentru a facilita accesul la pagina Personal Medical:
 
-### 1. **QuickNavigation.razor** - Navigare Rapidă Generală
-**Locație**: `ValyanClinic\Components\Shared\QuickNavigation.razor`
-**Scopul**: Componentă generală de navigare rapidă pentru toate paginile principale
+### 1. **QuickNavigation.razor** - Navigare Rapida Generala
+**Locatie**: `ValyanClinic\Components\Shared\QuickNavigation.razor`
+**Scopul**: Componenta generala de navigare rapida pentru toate paginile principale
 
-### 2. **PersonalMedicalNavigation.razor** - Navigare Specifică Personal Medical  
-**Locație**: `ValyanClinic\Components\Shared\PersonalMedicalNavigation.razor`
-**Scopul**: Breadcrumb și quick actions specifice pentru zona Personal Medical
+### 2. **PersonalMedicalNavigation.razor** - Navigare Specifica Personal Medical  
+**Locatie**: `ValyanClinic\Components\Shared\PersonalMedicalNavigation.razor`
+**Scopul**: Breadcrumb si quick actions specifice pentru zona Personal Medical
 
 ---
 
-## 🎯 Cum să Folosiți Componentele
+## 🎯 Cum sa Folositi Componentele
 
-### **Opțiunea 1: În AdministrarePersonalMedical.razor**
+### **Optiunea 1: in AdministrarePersonalMedical.razor**
 ```razor
 @page "/administrare/personal-medical"
 @rendermode InteractiveServer
 
 <PageTitle>Administrare Personal Medical - ValyanMed</PageTitle>
 
-@* ADAUGĂ NAVIGAREA ÎNAINTE DE CONTENT *@
+@* ADAUGa NAVIGAREA iNAINTE DE CONTENT *@
 <PersonalMedicalNavigation />
 
 <div class="personal-medical-page-container">
@@ -31,15 +31,15 @@ Am creat **2 componente de navigare** pentru a facilita accesul la pagina Person
 </div>
 ```
 
-### **Opțiunea 2: În MainLayout.razor** (Global)
+### **Optiunea 2: in MainLayout.razor** (Global)
 ```razor
-@* În MainLayout.razor, înainte de @Body *@
+@* in MainLayout.razor, inainte de @Body *@
 <main class="main-content @(isSidebarOpen ? "sidebar-open" : "")" role="main">
     <header class="main-header">
         <!-- Existing header content -->
     </header>
 
-    @* ADAUGĂ NAVIGAREA CONDIȚIONALĂ *@
+    @* ADAUGa NAVIGAREA CONDItIONALa *@
     @if (ShouldShowPersonalMedicalNav())
     {
         <PersonalMedicalNavigation />
@@ -59,13 +59,13 @@ Am creat **2 componente de navigare** pentru a facilita accesul la pagina Person
 }
 ```
 
-### **Opțiunea 3: Pe Homepage pentru Quick Access**
+### **Optiunea 3: Pe Homepage pentru Quick Access**
 ```razor
 @* Pe HomePage sau Dashboard principal *@
 <div class="dashboard-content">
     <h1>Dashboard ValyanMed</h1>
     
-    @* Navigare rapidă către toate paginile *@
+    @* Navigare rapida catre toate paginile *@
     <QuickNavigation />
     
     @* Rest of dashboard content... *@
@@ -78,36 +78,36 @@ Am creat **2 componente de navigare** pentru a facilita accesul la pagina Person
 
 ### **QuickNavigation Component:**
 - ✅ **4 categorii principale**: Personal, Pacienti, Programari, Financiar
-- ✅ **Links directe** către toate paginile importante
+- ✅ **Links directe** catre toate paginile importante
 - ✅ **Design gradient** cu efecte hover
 - ✅ **Fully responsive** pentru mobile
-- ✅ **Iconițe color-coded** pentru identificare rapidă
+- ✅ **Iconite color-coded** pentru identificare rapida
 
 ### **PersonalMedicalNavigation Component:**
 - ✅ **Breadcrumb inteligent** cu dropdown pentru Personal
-- ✅ **Quick actions** către pagini înrudite
-- ✅ **Tema medicală** (verde medical)
-- ✅ **Active state detection** pentru pagina curentă
-- ✅ **Mobile optimized** cu iconițe când spațiul e limitat
+- ✅ **Quick actions** catre pagini inrudite
+- ✅ **Tema medicala** (verde medical)
+- ✅ **Active state detection** pentru pagina curenta
+- ✅ **Mobile optimized** cu iconite cand spatiul e limitat
 
 ---
 
-## 🎨 Stiluri și Tematică
+## 🎨 Stiluri si Tematica
 
 ### **Paleta de Culori:**
 - **Personal Medical**: Verde medical (#10b981, #059669)
 - **Personal Administrativ**: Albastru (#3b82f6)
 - **Utilizatori**: Violet (#8b5cf6)
-- **Background**: Gradient 135deg cu transparență
+- **Background**: Gradient 135deg cu transparenta
 
 ### **Responsive Design:**
-- **Desktop**: Layout complet cu text și iconițe
+- **Desktop**: Layout complet cu text si iconite
 - **Tablet**: Layout adaptat, unele texte ascunse
-- **Mobile**: Doar iconițe, layout vertical
+- **Mobile**: Doar iconite, layout vertical
 
 ---
 
-## 🚀 Implementare Recomandată
+## 🚀 Implementare Recomandata
 
 ### **Pentru Pagina Personal Medical:**
 ```razor
@@ -117,7 +117,7 @@ Am creat **2 componente de navigare** pentru a facilita accesul la pagina Person
 <PageTitle>Administrare Personal Medical - ValyanMed</PageTitle>
 <link href="~/css/pages/administrare-personal-medical.css" rel="stylesheet" />
 
-@* ADAUGĂ ACEASTĂ LINIE PENTRU NAVIGARE *@
+@* ADAUGa ACEASTa LINIE PENTRU NAVIGARE *@
 <PersonalMedicalNavigation />
 
 <div class="personal-medical-page-container">
@@ -144,10 +144,10 @@ Am creat **2 componente de navigare** pentru a facilita accesul la pagina Person
 @page "/"
 
 <div class="dashboard-container">
-    <h1>Bun venit în ValyanMed</h1>
-    <p>Selectați o opțiune pentru a continua:</p>
+    <h1>Bun venit in ValyanMed</h1>
+    <p>Selectati o optiune pentru a continua:</p>
     
-    @* ADAUGĂ ACEASTĂ LINIE PENTRU ACCESS RAPID *@
+    @* ADAUGa ACEASTa LINIE PENTRU ACCESS RAPID *@
     <QuickNavigation />
     
     @* Alte componente dashboard... *@
@@ -173,28 +173,28 @@ Am creat **2 componente de navigare** pentru a facilita accesul la pagina Person
 
 ## 🎯 Next Steps
 
-### **1. Alege unde să pui navigarea:**
-- ✅ **În AdministrarePersonalMedical.razor** - Pentru navigare locală
-- ✅ **În MainLayout.razor** - Pentru navigare globală
-- ✅ **În Dashboard** - Pentru quick access
+### **1. Alege unde sa pui navigarea:**
+- ✅ **in AdministrarePersonalMedical.razor** - Pentru navigare locala
+- ✅ **in MainLayout.razor** - Pentru navigare globala
+- ✅ **in Dashboard** - Pentru quick access
 
-### **2. Testează responsive design:**
-- Verifică pe desktop (1200px+)
-- Verifică pe tablet (768px-1199px) 
-- Verifică pe mobile (320px-767px)
+### **2. Testeaza responsive design:**
+- Verifica pe desktop (1200px+)
+- Verifica pe tablet (768px-1199px) 
+- Verifica pe mobile (320px-767px)
 
-### **3. Customizează după nevoie:**
-- Modifică culorile în CSS
-- Adaugă/elimină link-uri
-- Ajustează dimensiunile pentru layout-ul tău
+### **3. Customizeaza dupa nevoie:**
+- Modifica culorile in CSS
+- Adauga/elimina link-uri
+- Ajusteaza dimensiunile pentru layout-ul tau
 
 ---
 
 ## 🔧 Extensibilitate
 
-### **Pentru a adăuga link-uri noi:**
+### **Pentru a adauga link-uri noi:**
 ```razor
-@* În QuickNavigation.razor *@
+@* in QuickNavigation.razor *@
 <a href="/new-page" class="quick-nav-link new-feature">
     <i class="fas fa-new-icon"></i>
     <span>New Feature</span>
@@ -202,7 +202,7 @@ Am creat **2 componente de navigare** pentru a facilita accesul la pagina Person
 </a>
 ```
 
-### **Pentru a adăuga stil nou:**
+### **Pentru a adauga stil nou:**
 ```css
 .quick-nav-link.new-feature i {
     color: #your-color;
@@ -213,12 +213,12 @@ Am creat **2 componente de navigare** pentru a facilita accesul la pagina Person
 
 ## 💡 Tips pentru Implementare
 
-1. **Adaugă navigarea în `_Imports.razor`** dacă vrei să o folosești global:
+1. **Adauga navigarea in `_Imports.razor`** daca vrei sa o folosesti global:
    ```razor
    @using ValyanClinic.Components.Shared
    ```
 
-2. **Pentru debug**, poți adăuga în `PersonalMedicalNavigation.razor`:
+2. **Pentru debug**, poti adauga in `PersonalMedicalNavigation.razor`:
    ```csharp
    @code {
        protected override void OnInitialized()
@@ -228,7 +228,7 @@ Am creat **2 componente de navigare** pentru a facilita accesul la pagina Person
    }
    ```
 
-3. **Pentru analytics**, poți adăuga tracking:
+3. **Pentru analytics**, poti adauga tracking:
    ```csharp
    private void TrackNavigation(string destination)
    {
@@ -238,7 +238,7 @@ Am creat **2 componente de navigare** pentru a facilita accesul la pagina Person
 
 ---
 
-**🎉 Gata de utilizare!** Componentele sunt complete și ready for production cu:
+**🎉 Gata de utilizare!** Componentele sunt complete si ready for production cu:
 - ✅ Responsive design
 - ✅ Accessibility support  
 - ✅ Professional styling

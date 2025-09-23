@@ -1,5 +1,5 @@
 ﻿/* Stiluri pentru componenta LocationDependentGridDropdowns */
-/* Integrare perfectă în grid-ul formularului */
+/* Integrare perfecta in grid-ul formularului */
 
 .form-grid .loading-indicator {
     display: flex;
@@ -27,7 +27,7 @@
     color: #10b981;
 }
 
-/* Stiluri pentru mesajele de eroare în grid */
+/* Stiluri pentru mesajele de eroare in grid */
 .form-grid .error-message {
     display: flex;
     align-items: center;
@@ -45,7 +45,7 @@
     flex-shrink: 0;
 }
 
-/* Animații pentru tranziții smooth în grid */
+/* Animatii pentru tranzitii smooth in grid */
 .form-grid .loading-indicator,
 .form-grid .help-text {
     animation: fadeIn 0.3s ease-in-out;

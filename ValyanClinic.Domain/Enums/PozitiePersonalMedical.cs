@@ -3,7 +3,7 @@
 namespace ValyanClinic.Domain.Enums;
 
 /// <summary>
-/// Enumerare pentru pozițiile personalului medical în clinică
+/// Enumerare pentru pozitiile personalului medical in clinica
 /// Valorile sunt mapate pentru a corespunde cu datele din baza de date
 /// </summary>
 public enum PozitiePersonalMedical
@@ -21,19 +21,19 @@ public enum PozitiePersonalMedical
     AsistentMedical = 2,
 
     /// <summary>
-    /// Tehnician Medical - Tehnician de laborator sau imagistică
+    /// Tehnician Medical - Tehnician de laborator sau imagistica
     /// </summary>
     [Display(Name = "Tehnician Medical")]
     TehnicianMedical = 3,
 
     /// <summary>
-    /// Recepționer Medical - Personal de la recepție în zona medicală
+    /// Receptioner Medical - Personal de la receptie in zona medicala
     /// </summary>
-    [Display(Name = "Recepționer Medical")]
+    [Display(Name = "Receptioner Medical")]
     ReceptionerMedical = 4,
 
     /// <summary>
-    /// Radiolog - Specialist în imagistică medicală
+    /// Radiolog - Specialist in imagistica medicala
     /// </summary>
     [Display(Name = "Radiolog")]
     Radiolog = 5,
@@ -51,10 +51,10 @@ public enum PozitiePersonalMedical
 public static class PozitiePersonalMedicalExtensions
 {
     /// <summary>
-    /// Returnează numele afișat al poziției
+    /// Returneaza numele afisat al pozitiei
     /// </summary>
-    /// <param name="pozitie">Poziția pentru care se dorește numele</param>
-    /// <returns>Numele afișat al poziției</returns>
+    /// <param name="pozitie">Pozitia pentru care se doreste numele</param>
+    /// <returns>Numele afisat al pozitiei</returns>
     public static string GetDisplayName(this PozitiePersonalMedical pozitie)
     {
         var field = pozitie.GetType().GetField(pozitie.ToString());
@@ -64,17 +64,17 @@ public static class PozitiePersonalMedicalExtensions
     }
 
     /// <summary>
-    /// Parsează o valoare string sau numerică către enum PozitiePersonalMedical
-    /// Această metodă este robustă și poate parsa atât nume, cât și valori numerice
+    /// Parseaza o valoare string sau numerica catre enum PozitiePersonalMedical
+    /// Aceasta metoda este robusta si poate parsa atat nume, cat si valori numerice
     /// </summary>
-    /// <param name="value">Valoarea de parsare (string nume sau număr)</param>
-    /// <returns>Enum-ul corespunzător sau null dacă nu se poate parsa</returns>
+    /// <param name="value">Valoarea de parsare (string nume sau numar)</param>
+    /// <returns>Enum-ul corespunzator sau null daca nu se poate parsa</returns>
     public static PozitiePersonalMedical? ParseFromDatabase(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return null;
 
-        // Încercăm să parsăm ca număr mai întâi
+        // incercam sa parsam ca numar mai intai
         if (int.TryParse(value.Trim(), out var numericValue))
         {
             if (Enum.IsDefined(typeof(PozitiePersonalMedical), numericValue))
@@ -83,13 +83,13 @@ public static class PozitiePersonalMedicalExtensions
             }
         }
 
-        // Încercăm să parsăm ca string - prin numele enum-ului
+        // incercam sa parsam ca string - prin numele enum-ului
         if (Enum.TryParse<PozitiePersonalMedical>(value.Trim(), true, out var enumResult))
         {
             return enumResult;
         }
 
-        // Încercăm să găsim prin display name
+        // incercam sa gasim prin display name
         foreach (PozitiePersonalMedical pozitie in Enum.GetValues<PozitiePersonalMedical>())
         {
             if (string.Equals(pozitie.GetDisplayName(), value.Trim(), StringComparison.OrdinalIgnoreCase))
@@ -98,7 +98,7 @@ public static class PozitiePersonalMedicalExtensions
             }
         }
 
-        // Mapări comune pentru compatibilitate cu datele existente din baza de date
+        // Mapari comune pentru compatibilitate cu datele existente din baza de date
         var mappings = new Dictionary<string, PozitiePersonalMedical>(StringComparer.OrdinalIgnoreCase)
         {
             // Variante comune pentru Doctor
@@ -118,7 +118,7 @@ public static class PozitiePersonalMedicalExtensions
             { "Technician", PozitiePersonalMedical.TehnicianMedical },
             { "Tehnician de Laborator", PozitiePersonalMedical.TehnicianMedical },
             
-            // Variante comune pentru Recepționer Medical
+            // Variante comune pentru Receptioner Medical
             { "Receptioner", PozitiePersonalMedical.ReceptionerMedical },
             { "Receptie", PozitiePersonalMedical.ReceptionerMedical },
             { "Front Desk", PozitiePersonalMedical.ReceptionerMedical },
@@ -143,9 +143,9 @@ public static class PozitiePersonalMedicalExtensions
     }
 
     /// <summary>
-    /// Returnează toate pozițiile disponibile ca listă de perechi nume-valoare
+    /// Returneaza toate pozitiile disponibile ca lista de perechi nume-valoare
     /// </summary>
-    /// <returns>Lista pozițiilor cu numele și valorile lor</returns>
+    /// <returns>Lista pozitiilor cu numele si valorile lor</returns>
     public static List<(string Name, int Value)> GetAllPositions()
     {
         return Enum.GetValues<PozitiePersonalMedical>()
@@ -154,10 +154,10 @@ public static class PozitiePersonalMedicalExtensions
     }
 
     /// <summary>
-    /// Verifică dacă poziția necesită licență medicală
+    /// Verifica daca pozitia necesita licenta medicala
     /// </summary>
-    /// <param name="pozitie">Poziția de verificat</param>
-    /// <returns>True dacă poziția necesită licență medicală</returns>
+    /// <param name="pozitie">Pozitia de verificat</param>
+    /// <returns>True daca pozitia necesita licenta medicala</returns>
     public static bool RequiresLicensaMedicala(this PozitiePersonalMedical pozitie)
     {
         return pozitie == PozitiePersonalMedical.Doctor || 
@@ -166,9 +166,9 @@ public static class PozitiePersonalMedicalExtensions
     }
 
     /// <summary>
-    /// Returnează culoarea badge-ului pentru poziție (pentru UI)
+    /// Returneaza culoarea badge-ului pentru pozitie (pentru UI)
     /// </summary>
-    /// <param name="pozitie">Poziția pentru care se dorește culoarea</param>
+    /// <param name="pozitie">Pozitia pentru care se doreste culoarea</param>
     /// <returns>Clasa CSS pentru culoarea badge-ului</returns>
     public static string GetBadgeColorClass(this PozitiePersonalMedical pozitie)
     {
@@ -185,10 +185,10 @@ public static class PozitiePersonalMedicalExtensions
     }
 
     /// <summary>
-    /// Returnează iconița Font Awesome pentru poziție
+    /// Returneaza iconita Font Awesome pentru pozitie
     /// </summary>
-    /// <param name="pozitie">Poziția pentru care se dorește iconița</param>
-    /// <returns>Clasa CSS pentru iconița Font Awesome</returns>
+    /// <param name="pozitie">Pozitia pentru care se doreste iconita</param>
+    /// <returns>Clasa CSS pentru iconita Font Awesome</returns>
     public static string GetFontAwesomeIcon(this PozitiePersonalMedical pozitie)
     {
         return pozitie switch
@@ -204,21 +204,21 @@ public static class PozitiePersonalMedicalExtensions
     }
 
     /// <summary>
-    /// Convertește enum-ul la format string pentru salvare în baza de date
+    /// Converteste enum-ul la format string pentru salvare in baza de date
     /// </summary>
-    /// <param name="pozitie">Poziția de convertit</param>
+    /// <param name="pozitie">Pozitia de convertit</param>
     /// <returns>Reprezentarea string pentru baza de date</returns>
     public static string ToDatabase(this PozitiePersonalMedical pozitie)
     {
-        // Salvăm ca număr pentru consistență
+        // Salvam ca numar pentru consistenta
         return ((int)pozitie).ToString();
     }
 
     /// <summary>
-    /// Validează dacă o poziție este validă pentru operațiuni medicale
+    /// Valideaza daca o pozitie este valida pentru operatiuni medicale
     /// </summary>
-    /// <param name="pozitie">Poziția de validat</param>
-    /// <returns>True dacă poziția este validă</returns>
+    /// <param name="pozitie">Pozitia de validat</param>
+    /// <returns>True daca pozitia este valida</returns>
     public static bool IsValidMedicalPosition(this PozitiePersonalMedical pozitie)
     {
         return Enum.IsDefined(typeof(PozitiePersonalMedical), pozitie);

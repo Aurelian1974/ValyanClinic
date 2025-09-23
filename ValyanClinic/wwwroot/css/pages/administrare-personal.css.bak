@@ -1,0 +1,456 @@
+﻿/* ==========================================================================
+   DESIGN COMPACT ȘI PROFESIONAL - PERSONAL PAGE (SIMILAR CU USERS.CSS)
+   ========================================================================== */
+
+/* Container principal - ADAPTAT PENTRU LAYOUT CORECT */
+.personal-page-container {
+  position: absolute; /* CHANGED from fixed */
+  top: 0; /* RESET - layout-ul gestionează offsetul */
+  left: 0; /* RESET - layout-ul gestionează offsetul */
+  right: 0; /* PĂSTRAT pentru margin */
+  bottom: 0; /* PĂSTRAT pentru margin */
+  width: 100%; /* CHANGED to full width within parent */
+  height: 100%; /* CHANGED to full height within parent */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* INCREASED for better spacing */
+  padding: 20px; /* INCREASED for better spacing */
+  overflow: hidden;
+  box-sizing: border-box;
+  background: transparent; /* CHANGED - let parent handle background */
+}
+
+/* Header - REDUCED SIZE */
+.personal-page-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  padding: 16px 20px; /* FURTHER REDUCED from 20px 24px */
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 123, 255, 0.15);
+  flex-shrink: 0;
+  min-height: 60px; /* FURTHER REDUCED from 70px */
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  height: 100%;
+}
+
+.header-text {
+  flex: 1;
+}
+
+.personal-page-title {
+  font-size: 22px; /* FURTHER REDUCED from 24px */
+  font-weight: 700;
+  margin: 0 0 4px 0; /* FURTHER REDUCED from 6px */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  line-height: 1.2;
+}
+
+.personal-page-title i {
+  font-size: 20px; /* FURTHER REDUCED from 22px */
+}
+
+.personal-page-subtitle {
+  font-size: 13px; /* FURTHER REDUCED from 14px */
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.4;
+  max-width: 700px;
+}
+
+.personal-header-actions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+  align-items: center; /* ADDED for proper alignment */
+}
+
+.personal-header-actions .btn {
+  padding: 8px 16px; /* FURTHER REDUCED from 10px 18px */
+  font-size: 12px; /* FURTHER REDUCED from 13px */
+  font-weight: 500;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  text-decoration: none;
+  min-width: 130px; /* FURTHER REDUCED from 140px */
+  justify-content: center;
+}
+
+.personal-header-actions .btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+/* Container Grid - IMPROVED WITH PROPER SCROLL HANDLING */
+.personal-grid-container {
+  background: white;
+  border: 1px solid #e1e8ff;
+  border-radius: 16px; /* INCREASED */
+  overflow: hidden; /* KEEP HIDDEN for container */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); /* IMPROVED shadow */
+  flex: 1;
+  min-height: 0; /* IMPORTANT: allows flexbox shrinking */
+  display: flex;
+  flex-direction: column;
+  position: relative; /* ADDED for dropdown positioning context */
+}
+
+/* Grid Syncfusion - CORRECTED SCROLL BEHAVIOR */
+.personal-grid-container .e-grid {
+  height: 100% !important;
+  border: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  font-family: inherit !important;
+  overflow: hidden !important; /* Container should be hidden */
+}
+
+.personal-grid-container .e-grid .e-gridheader {
+  flex-shrink: 0 !important;
+  background: #f8faff !important;
+  border-bottom: 1px solid #e1e8ff !important;
+}
+
+.personal-grid-container .e-grid .e-headercell {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  font-size: 12px !important; /* FURTHER REDUCED from 13px */
+  padding: 8px 6px !important; /* FURTHER REDUCED from 11px 8px - saves 6px total per header */
+  border-right: 1px solid #f1f5f9 !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  height: auto !important; /* Allow auto height */
+  line-height: 1.3 !important; /* Tighter line height */
+}
+
+/* FIXED: Grid Content with proper scrolling */
+.personal-grid-container .e-grid .e-gridcontent {
+  flex: 1 !important;
+  overflow-y: auto !important; /* RESTORED: Enable vertical scrolling */
+  overflow-x: auto !important; /* RESTORED: Enable horizontal scrolling if needed */
+  min-height: 0 !important; /* IMPORTANT: allows content to shrink */
+  position: relative !important; /* For dropdown positioning */
+}
+
+.personal-grid-container .e-grid .e-row:hover {
+  background: #f8faff !important;
+}
+
+/* MAJOR REDUCTION: Row cell padding for compact display */
+.personal-grid-container .e-grid .e-rowcell {
+  font-size: 12px !important; /* FURTHER REDUCED from 13px */
+  padding: 6px 6px !important; /* MAJOR REDUCTION from 9px 8px - saves 6px total per row */
+  border-right: 1px solid #f8fafc !important;
+  border-bottom: 1px solid #f8fafc !important;
+  vertical-align: middle !important;
+  line-height: 1.3 !important; /* Tighter line height */
+  height: auto !important; /* Allow auto height */
+}
+
+/* Action Dropdown Container - OPTIMIZED FOR COMPACT ROWS */
+.action-dropdown-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1px; /* REDUCED from 2px */
+  position: relative; /* ADDED for proper positioning context */
+}
+
+/* Action Dropdown Button - SMALLER FOR COMPACT DESIGN */
+.action-dropdown-btn.e-dropdown-btn {
+  width: 24px !important; /* REDUCED from 28px */
+  height: 24px !important; /* REDUCED from 28px */
+  min-width: 24px !important; /* REDUCED from 28px */
+  padding: 0 !important;
+  border-radius: 6px !important;
+  border: 1px solid #d1d5db !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  color: #4b5563 !important;
+  font-size: 12px !important; /* REDUCED from 14px */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  position: relative !important;
+}
+
+.action-dropdown-btn.e-dropdown-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  padding: 1px;
+  background: linear-gradient(135deg, #e5e7eb, #f3f4f6);
+  transition: all 0.3s ease;
+  pointer-events: none; /* ADDED to prevent interaction issues */
+}
+
+.action-dropdown-btn.e-dropdown-btn:hover {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+  border-color: #007bff !important;
+  color: white !important;
+  transform: translateY(-1px) !important; /* REDUCED transform */
+  box-shadow: 0 3px 8px rgba(0, 123, 255, 0.25) !important; /* REDUCED shadow */
+}
+
+.action-dropdown-btn.e-dropdown-btn:hover::before {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.action-dropdown-btn.e-dropdown-btn:focus {
+  outline: none !important;
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2) !important; /* REDUCED focus ring */
+}
+
+.action-dropdown-btn.e-dropdown-btn:active {
+  transform: translateY(0px) !important;
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3) !important;
+}
+
+/* Icon styling inside dropdown button */
+.action-dropdown-btn .e-caret {
+  display: none !important; /* Hide default caret */
+}
+
+.action-dropdown-btn.e-dropdown-btn .e-btn-icon {
+  font-size: 11px !important; /* REDUCED from 13px */
+  font-weight: 900 !important;
+  transition: all 0.3s ease !important;
+  margin: 0 !important; /* Remove default margins */
+}
+
+.action-dropdown-btn.e-dropdown-btn i {
+  font-size: 11px !important; /* REDUCED from 13px */
+  font-weight: 900 !important;
+  transition: all 0.3s ease !important;
+  margin: 0 !important; /* Remove default margins */
+}
+
+/* Dropdown Menu Styling - IMPROVED POSITIONING FOR SCROLLABLE GRID */
+.e-dropdown-popup.e-popup {
+  min-width: 160px !important;
+  max-width: 200px !important;
+  border-radius: 12px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.06) !important;
+  background: white !important;
+  backdrop-filter: blur(10px) !important;
+  overflow: hidden !important;
+  animation: dropdownFadeIn 0.2s ease-out !important;
+  padding: 4px !important;
+  z-index: 10000 !important; /* VERY HIGH Z-INDEX to ensure visibility */
+  position: fixed !important; /* FIXED positioning to avoid grid clipping */
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Dropdown Items - PROFESSIONAL STYLING */
+.e-dropdown-popup.e-popup .e-item.e-menu-item {
+  padding: 8px 12px !important; /* REDUCED from 10px 14px */
+  margin: 2px 0 !important;
+  font-size: 12px !important; /* REDUCED from 13px */
+  font-weight: 500 !important;
+  color: #374151 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important; /* REDUCED from 10px */
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  position: relative !important;
+  text-decoration: none !important;
+}
+
+.e-dropdown-popup.e-popup .e-item.e-menu-item:hover {
+  background: linear-gradient(135deg, #f8faff 0%, #e8f4fd 100%) !important;
+  color: #007bff !important;
+  border-color: rgba(0, 123, 255, 0.1) !important;
+  transform: translateX(2px) !important;
+}
+
+.e-dropdown-popup.e-popup .e-item.e-menu-item:active {
+  background: linear-gradient(135deg, #e3f2fd 0%, #dbeafe 100%) !important;
+  transform: translateX(1px) !important;
+}
+
+/* Individual item styling based on action type - Using data attributes */
+.e-dropdown-popup.e-popup .e-item.e-menu-item[data-uid*="view"]:hover,
+.e-dropdown-popup.e-popup .e-item.e-menu-item:first-child:hover {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+  color: #0369a1 !important;
+  border-color: rgba(3, 105, 161, 0.1) !important;
+}
+
+.e-dropdown-popup.e-popup .e-item.e-menu-item[data-uid*="edit"]:hover,
+.e-dropdown-popup.e-popup .e-item.e-menu-item:nth-child(2):hover {
+  background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%) !important;
+  color: #ea580c !important;
+  border-color: rgba(234, 88, 12, 0.1) !important;
+}
+
+.e-dropdown-popup.e-popup .e-item.e-menu-item[data-uid*="delete"]:hover,
+.e-dropdown-popup.e-popup .e-item.e-menu-item:last-child:hover {
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%) !important;
+  color: #dc2626 !important;
+  border-color: rgba(220, 38, 38, 0.1) !important;
+}
+
+/* Icons in dropdown items */
+.e-dropdown-popup.e-popup .e-item.e-menu-item .e-menu-icon,
+.e-dropdown-popup.e-popup .e-item.e-menu-item i {
+  font-size: 11px !important; /* REDUCED from 12px */
+  width: 14px !important; /* REDUCED from 16px */
+  height: 14px !important; /* REDUCED from 16px */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: inherit !important;
+  transition: all 0.2s ease !important;
+  margin-right: 6px !important;
+}
+
+/* Specific icon styling */
+.e-dropdown-popup.e-popup .e-item.e-menu-item:first-child .e-menu-icon,
+.e-dropdown-popup.e-popup .e-item.e-menu-item:first-child i {
+  color: #0369a1 !important;
+}
+
+.e-dropdown-popup.e-popup .e-item.e-menu-item:nth-child(2) .e-menu-icon,
+.e-dropdown-popup.e-popup .e-item.e-menu-item:nth-child(2) i {
+  color: #ea580c !important;
+}
+
+.e-dropdown-popup.e-popup .e-item.e-menu-item:last-child .e-menu-icon,
+.e-dropdown-popup.e-popup .e-item.e-menu-item:last-child i {
+  color: #dc2626 !important;
+}
+
+/* Separator line between items */
+.e-dropdown-popup.e-popup .e-item.e-menu-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 12px; /* REDUCED from 14px */
+  right: 12px; /* REDUCED from 14px */
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #f3f4f6 50%, transparent 100%);
+}
+
+/* Special styling pentru action column cells - COMPACT VERSION */
+.personal-grid-container .e-grid .e-rowcell:last-child {
+  padding: 2px !important; /* FURTHER REDUCED from 4px */
+  text-align: center !important;
+  overflow: visible !important; /* Keep visible for dropdown positioning */
+  position: relative !important;
+  background: rgba(248, 250, 255, 0.3) !important;
+  z-index: 1 !important; /* Ensure cell is above other cells */
+}
+
+.personal-grid-container .e-grid .e-row:hover .e-rowcell:last-child {
+  background: rgba(0, 123, 255, 0.05) !important;
+}
+
+/* Status badges - COMPACT STYLING */
+.status-badge {
+  display: inline-block;
+  padding: 2px 6px !important; /* REDUCED from default */
+  border-radius: 4px;
+  font-size: 10px !important; /* REDUCED for compact display */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.status-activ {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.status-inactiv {
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+/* Mobile optimizations for action dropdown - ENHANCED */
+@media (max-width: 768px) {
+  .action-dropdown-btn.e-dropdown-btn {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+  }
+  
+  .e-dropdown-popup.e-popup {
+    min-width: 140px !important;
+  }
+  
+  .e-dropdown-popup.e-popup .e-item.e-menu-item {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+  
+  .e-dropdown-popup.e-popup .e-item.e-menu-item .e-menu-icon,
+  .e-dropdown-popup.e-popup .e-item.e-menu-item i {
+    font-size: 12px !important;
+  }
+  
+  /* Increase row padding on mobile for better touch targets */
+  .personal-grid-container .e-grid .e-rowcell {
+    padding: 8px 6px !important;
+  }
+  
+  .personal-grid-container .e-grid .e-headercell {
+    padding: 10px 6px !important;
+  }
+}
+
+/* Loading indicator styling - COMPACT */
+.loading-indicator {
+  min-height: 200px !important; /* REDUCED for compact design */
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.loading-indicator i {
+  font-size: 1.5rem !important; /* REDUCED from 2rem */
+}
+
+.loading-indicator div {
+  font-size: 13px !important;
+  margin-top: 12px !important;
+  color: #6b7280;
+}

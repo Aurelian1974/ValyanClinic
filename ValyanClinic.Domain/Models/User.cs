@@ -15,7 +15,7 @@ public class User
     public UserStatus Status { get; set; }
     public string? Department { get; set; }
     public string? JobTitle { get; set; }
-    public DateTime CreatedDate { get; set; } = DateTime.Now; // CONSISTENT: folosește ora locală
+    public DateTime CreatedDate { get; set; } = DateTime.Now; // CONSISTENT: foloseste ora locala
     public DateTime? LastLoginDate { get; set; }
     
     // Domain Properties - business logic in model

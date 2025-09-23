@@ -1,26 +1,26 @@
-﻿# 📝 Documentație Serilog - ValyanClinic
+﻿# 📝 Documentatie Serilog - ValyanClinic
 
-**Aplicație:** ValyanMed - Sistem de Management Clinic  
+**Aplicatie:** ValyanMed - Sistem de Management Clinic  
 **Framework:** .NET 9 Blazor Server  
 **Logging:** Serilog v4.0+ cu multiple sinks  
 **Creat:** Septembrie 2025  
-**Status:** ✅ Implementat și Funcțional  
+**Status:** ✅ Implementat si Functional  
 
 ---
 
-## 📋 Prezentare Generală
+## 📋 Prezentare Generala
 
-ValyanClinic folosește **Serilog** ca sistem principal de logging, oferind:
-- ✅ **Structured Logging** - Log-uri structurate și ușor de parsat
-- ✅ **Multiple Sinks** - Output către Console, Fișiere, și potențial Seq
-- ✅ **Automatic Rotation** - Fișiere noi zilnic cu cleanup automat
-- ✅ **Level-based Filtering** - Separare erori de informații generale
-- ✅ **Performance Optimized** - Buffered writing și configuration lazy
-- ✅ **Production Ready** - Error handling complet și graceful shutdown
+ValyanClinic foloseste **Serilog** ca sistem principal de logging, oferind:
+- ✅ **Structured Logging** - Log-uri structurate si usor de parsat
+- ✅ **Multiple Sinks** - Output catre Console, Fisiere, si potential Seq
+- ✅ **Automatic Rotation** - Fisiere noi zilnic cu cleanup automat
+- ✅ **Level-based Filtering** - Separare erori de informatii generale
+- ✅ **Performance Optimized** - Buffered writing si configuration lazy
+- ✅ **Production Ready** - Error handling complet si graceful shutdown
 
 ---
 
-## 🏗️ Arhitectura Implementării
+## 🏗️ Arhitectura Implementarii
 
 ### 📦 Pachete NuGet Instalate
 
@@ -33,28 +33,28 @@ ValyanClinic folosește **Serilog** ca sistem principal de logging, oferind:
 <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
 ```
 
-### 🔧 Structura Configurării
+### 🔧 Structura Configurarii
 
 #### 1. **Bootstrap Logger** (Program.cs)
-- ✅ **Startup logging** înainte de configurarea completă
+- ✅ **Startup logging** inainte de configurarea completa
 - ✅ **Error handling** pentru probleme de configurare
 - ✅ **File output** pentru debugging startup issues
 
 #### 2. **Main Logger** (appsettings.json)
 - ✅ **Configuration-based** pentru flexibilitate
 - ✅ **Environment-specific** settings
-- ✅ **Multiple sinks** cu configurare separată
+- ✅ **Multiple sinks** cu configurare separata
 
 #### 3. **Request Logging** (Middleware)
 - ✅ **HTTP request tracking** automatic
 - ✅ **Performance monitoring** cu timing
-- ✅ **Error correlation** între requests și log-uri
+- ✅ **Error correlation** intre requests si log-uri
 
 ---
 
-## ⚙️ Configurarea Detaliată
+## ⚙️ Configurarea Detaliata
 
-### 📄 appsettings.json - Configurare Principală
+### 📄 appsettings.json - Configurare Principala
 
 ```json
 {
@@ -136,7 +136,7 @@ ValyanClinic folosește **Serilog** ca sistem principal de logging, oferind:
 }
 ```
 
-### 💻 Program.cs - Implementarea în .NET 9
+### 💻 Program.cs - Implementarea in .NET 9
 
 ```csharp
 using Serilog;
@@ -164,7 +164,7 @@ try
     builder.Host.UseSerilog((context, configuration) => 
         configuration.ReadFrom.Configuration(context.Configuration));
 
-    // ... restul configurării ...
+    // ... restul configurarii ...
 
     var app = builder.Build();
 
@@ -197,7 +197,7 @@ finally
 
 ---
 
-## 📁 Structura Fișierelor de Log
+## 📁 Structura Fisierelor de Log
 
 ### 🗂️ Directorul `Logs/`
 
@@ -205,36 +205,36 @@ finally
 ValyanClinic/
 ├── Logs/
 │   ├── .gitignore                          # Exclude log files from Git
-│   ├── README.md                          # Acest fișier
-│   ├── startup-2025-09-14.log             # Bootstrap și pornire
+│   ├── README.md                          # Acest fisier
+│   ├── startup-2025-09-14.log             # Bootstrap si pornire
 │   ├── valyan-clinic-2025-09-14.log       # Toate log-urile generale
-│   ├── errors-2025-09-14.log              # DOAR warnings și errors
-│   ├── startup-2025-09-15.log             # Ziua următoare...
-│   └── ...                                # Rotație automată zilnică
+│   ├── errors-2025-09-14.log              # DOAR warnings si errors
+│   ├── startup-2025-09-15.log             # Ziua urmatoare...
+│   └── ...                                # Rotatie automata zilnica
 ```
 
-### 📋 Tipuri de Fișiere Log
+### 📋 Tipuri de Fisiere Log
 
 #### 1. **startup-YYYY-MM-DD.log**
-- **Scop:** Log-uri de la pornirea aplicației
-- **Conținut:** Bootstrap logger, configurare servicii, erori de startup
+- **Scop:** Log-uri de la pornirea aplicatiei
+- **Continut:** Bootstrap logger, configurare servicii, erori de startup
 - **Format:** `[2025-09-14 13:07:37.160 +03:00 INF] 🚀 Starting ValyanClinic application`
-- **Rotație:** Zilnică
-- **Retenție:** Implicit (nu e setat limit)
+- **Rotatie:** Zilnica
+- **Retentie:** Implicit (nu e setat limit)
 
 #### 2. **valyan-clinic-YYYY-MM-DD.log**
-- **Scop:** Toate log-urile aplicației (Info, Warning, Error)
-- **Conținut:** Operațiuni business, request-uri HTTP, informații generale
+- **Scop:** Toate log-urile aplicatiei (Info, Warning, Error)
+- **Continut:** Operatiuni business, request-uri HTTP, informatii generale
 - **Format:** `[2025-09-14 13:07:37.160 +03:00 INF] ValyanClinic.Application.Services.PersonalService: Getting personal data`
-- **Rotație:** Zilnică
-- **Retenție:** 30 de zile
+- **Rotatie:** Zilnica
+- **Retentie:** 30 de zile
 
 #### 3. **errors-YYYY-MM-DD.log**
-- **Scop:** DOAR warnings și errors (Level: Warning+)
-- **Conținut:** Erori, excepții, probleme de performanță
-- **Format:** Detaliat cu stack trace complet și separator
-- **Rotație:** Zilnică
-- **Retenție:** 90 de zile (mai mult pentru debugging)
+- **Scop:** DOAR warnings si errors (Level: Warning+)
+- **Continut:** Erori, exceptii, probleme de performanta
+- **Format:** Detaliat cu stack trace complet si separator
+- **Rotatie:** Zilnica
+- **Retentie:** 90 de zile (mai mult pentru debugging)
 
 ---
 
@@ -242,14 +242,14 @@ ValyanClinic/
 
 ### 📊 Hierarchia Log Levels
 
-| Level | Număr | Descriere | Când să folosești |
+| Level | Numar | Descriere | Cand sa folosesti |
 |-------|-------|-----------|-------------------|
 | **Verbose** | 0 | Debugging foarte detaliat | Doar pentru development local |
-| **Debug** | 1 | Informații pentru debugging | Development și troubleshooting |
-| **Information** | 2 | Operațiuni normale | Operațiuni business standard |
-| **Warning** | 3 | Probleme potențiale | Degradări de performanță, validări |
-| **Error** | 4 | Erori care afectează operațiunile | Excepții, probleme de conectivitate |
-| **Fatal** | 5 | Erori critice | Aplicația nu mai poate continua |
+| **Debug** | 1 | Informatii pentru debugging | Development si troubleshooting |
+| **Information** | 2 | Operatiuni normale | Operatiuni business standard |
+| **Warning** | 3 | Probleme potentiale | Degradari de performanta, validari |
+| **Error** | 4 | Erori care afecteaza operatiunile | Exceptii, probleme de conectivitate |
+| **Fatal** | 5 | Erori critice | Aplicatia nu mai poate continua |
 
 ### ⚙️ Override-uri Configurate
 
@@ -265,9 +265,9 @@ ValyanClinic/
 
 ---
 
-## 🔍 Exemple de Utilizare în Cod
+## 🔍 Exemple de Utilizare in Cod
 
-### 📝 În Services
+### 📝 in Services
 
 ```csharp
 public class PersonalService : IPersonalService
@@ -301,7 +301,7 @@ public class PersonalService : IPersonalService
 }
 ```
 
-### 🗄️ În Repository
+### 🗄️ in Repository
 
 ```csharp
 public class PersonalRepository : IPersonalRepository
@@ -334,7 +334,7 @@ public class PersonalRepository : IPersonalRepository
 }
 ```
 
-### 🎭 În Controllers
+### 🎭 in Controllers
 
 ```csharp
 [ApiController]
@@ -427,75 +427,75 @@ System.Data.SqlClient.SqlException: Cannot insert duplicate key row...
 
 ---
 
-## 🛠️ Troubleshooting și Debugging
+## 🛠️ Troubleshooting si Debugging
 
-### 🔍 Monitorizarea Log-urilor în Timp Real
+### 🔍 Monitorizarea Log-urilor in Timp Real
 
 #### PowerShell
 ```powershell
-# Monitorizare erori în timp real
+# Monitorizare erori in timp real
 Get-Content .\Logs\errors-*.log -Wait -Tail 10
 
 # Monitorizare log-uri generale
 Get-Content .\Logs\valyan-clinic-*.log -Wait -Tail 20
 
-# Căutare în log-uri după pattern
+# Cautare in log-uri dupa pattern
 Select-String -Path ".\Logs\*.log" -Pattern "PersonalService"
 ```
 
 #### Command Prompt
 ```cmd
-# Afișare conținut fișier erori
+# Afisare continut fisier erori
 type .\Logs\errors-2025-09-14.log
 
 # Monitorizare cu refresh
 powershell -Command "Get-Content .\Logs\errors-*.log -Wait"
 ```
 
-#### Linux/Mac (dacă rulezi pe Linux)
+#### Linux/Mac (daca rulezi pe Linux)
 ```bash
 # Monitorizare timp real
 tail -f Logs/errors-*.log
 
-# Căutare în toate log-urile
+# Cautare in toate log-urile
 grep -r "ERROR" Logs/
 
-# Numărul de erori pe zi
+# Numarul de erori pe zi
 grep -c "ERR" Logs/errors-$(date +%Y-%m-%d).log
 ```
 
-### 🚨 Probleme Comune și Soluții
+### 🚨 Probleme Comune si Solutii
 
-#### 1. **Aplicația nu pornește cu Serilog**
-- ✅ **Verifică:** Sintaxa din `appsettings.json`
-- ✅ **Soluție:** Folosește configurarea simplificată din acest document
-- ✅ **Debug:** Verifică `startup-*.log` pentru detalii
+#### 1. **Aplicatia nu porneste cu Serilog**
+- ✅ **Verifica:** Sintaxa din `appsettings.json`
+- ✅ **Solutie:** Foloseste configurarea simplificata din acest document
+- ✅ **Debug:** Verifica `startup-*.log` pentru detalii
 
-#### 2. **Log-urile nu se scriu în fișiere**
-- ✅ **Verifică:** Directorul `Logs/` există și are permisiuni de scriere
-- ✅ **Soluție:** Creează directorul manual sau verifică permisiunile
-- ✅ **Alternative:** Folosește path absolut în configurare
+#### 2. **Log-urile nu se scriu in fisiere**
+- ✅ **Verifica:** Directorul `Logs/` exista si are permisiuni de scriere
+- ✅ **Solutie:** Creeaza directorul manual sau verifica permisiunile
+- ✅ **Alternative:** Foloseste path absolut in configurare
 
-#### 3. **Prea multe log-uri în console**
-- ✅ **Verifică:** Level-urile din `appsettings.Development.json`
-- ✅ **Soluție:** Setează `"Microsoft": "Warning"` sau mai mare
-- ✅ **Filter:** Folosește `"restrictedToMinimumLevel": "Information"`
+#### 3. **Prea multe log-uri in console**
+- ✅ **Verifica:** Level-urile din `appsettings.Development.json`
+- ✅ **Solutie:** Seteaza `"Microsoft": "Warning"` sau mai mare
+- ✅ **Filter:** Foloseste `"restrictedToMinimumLevel": "Information"`
 
-#### 4. **Log-urile nu se rotează**
-- ✅ **Verifică:** Setarea `"rollingInterval": "Day"`
-- ✅ **Soluție:** Repornește aplicația la miezul nopții pentru teste
-- ✅ **Alternative:** Folosește `"Hour"` pentru testare rapidă
+#### 4. **Log-urile nu se roteaza**
+- ✅ **Verifica:** Setarea `"rollingInterval": "Day"`
+- ✅ **Solutie:** Reporneste aplicatia la miezul noptii pentru teste
+- ✅ **Alternative:** Foloseste `"Hour"` pentru testare rapida
 
-#### 5. **Performanță slabă cu multe log-uri**
-- ✅ **Verifică:** Folosești level-uri corecte (nu Debug în producție)
-- ✅ **Soluție:** Adaugă `"buffered": true` în configurarea File sink
-- ✅ **Optimize:** Folosește `"shared": true` pentru multiple procese
+#### 5. **Performanta slaba cu multe log-uri**
+- ✅ **Verifica:** Folosesti level-uri corecte (nu Debug in productie)
+- ✅ **Solutie:** Adauga `"buffered": true` in configurarea File sink
+- ✅ **Optimize:** Foloseste `"shared": true` pentru multiple procese
 
 ---
 
-## 🚀 Deployment și Producție
+## 🚀 Deployment si Productie
 
-### 📦 Configurare pentru Producție
+### 📦 Configurare pentru Productie
 
 #### appsettings.Production.json
 ```json
@@ -551,7 +551,7 @@ grep -c "ERR" Logs/errors-$(date +%Y-%m-%d).log
 }
 ```
 
-### 📊 Integrare cu Seq (Opțional)
+### 📊 Integrare cu Seq (Optional)
 
 ```bash
 # Instalare Seq cu Docker
@@ -560,26 +560,26 @@ docker run --name seq -d --restart unless-stopped -e ACCEPT_EULA=Y -p 5341:80 da
 # Seq va fi disponibil la: http://localhost:5341
 ```
 
-### 🔒 Securitate și Conformitate
+### 🔒 Securitate si Conformitate
 
 #### Log Sanitization
 ```csharp
-// În servicii, evită să loghezi informații sensibile
+// in servicii, evita sa loghezi informatii sensibile
 _logger.LogInformation("User {UserId} updated personal data", userId); // ✅ Good
-_logger.LogInformation("User {UserData} logged in", userObject); // ❌ Bad - poate conține parole
+_logger.LogInformation("User {UserData} logged in", userObject); // ❌ Bad - poate contine parole
 
-// Folosește destructuring pentru obiecte complexe
+// Foloseste destructuring pentru obiecte complexe
 _logger.LogInformation("Processing {@PersonalRequest}", request); // ✅ Structurat dar sigur
 ```
 
 #### Compliance GDPR
 ```csharp
-// Implementează data masking pentru informații personale
+// Implementeaza data masking pentru informatii personale
 public class PersonalDataMaskingEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        // Mask CNP, email, telefon în log-uri
+        // Mask CNP, email, telefon in log-uri
         // Implementare custom pentru conformitate GDPR
     }
 }
@@ -587,9 +587,9 @@ public class PersonalDataMaskingEnricher : ILogEventEnricher
 
 ---
 
-## 📈 Monitorizare și Alerting
+## 📈 Monitorizare si Alerting
 
-### 🚨 Setări de Alerting Recomandate
+### 🚨 Setari de Alerting Recomandate
 
 1. **Critical Errors:** Orice log cu level `Fatal`
 2. **High Error Rate:** Mai mult de 10 errors/minut
@@ -601,27 +601,27 @@ public class PersonalDataMaskingEnricher : ILogEventEnricher
 
 1. **Error Rate:** Procentul de request-uri cu erori
 2. **Response Time:** P95/P99 pentru request-uri HTTP
-3. **Log Volume:** Numărul de log entries/minut
-4. **Disk Usage:** Spațiul ocupat de log files
-5. **Application Health:** Status aplicație din health checks
+3. **Log Volume:** Numarul de log entries/minut
+4. **Disk Usage:** Spatiul ocupat de log files
+5. **Application Health:** Status aplicatie din health checks
 
 ---
 
-## 🎯 Best Practices și Recomandări
+## 🎯 Best Practices si Recomandari
 
 ### ✅ DO's
 
-1. **Folosește structured logging:**
+1. **Foloseste structured logging:**
    ```csharp
    _logger.LogInformation("User {UserId} created personal {PersonalId}", userId, personalId);
    ```
 
-2. **Log-urile să fie actionable:**
+2. **Log-urile sa fie actionable:**
    ```csharp
    _logger.LogError("Failed to send email to {Email}. Retry in {RetryDelay}ms", email, retryDelay);
    ```
 
-3. **Folosește scopes pentru contextul complet:**
+3. **Foloseste scopes pentru contextul complet:**
    ```csharp
    using (_logger.BeginScope("ProcessingBatch {BatchId}", batchId))
    {
@@ -629,15 +629,15 @@ public class PersonalDataMaskingEnricher : ILogEventEnricher
    }
    ```
 
-4. **Log-urile să fie consistente:**
+4. **Log-urile sa fie consistente:**
    ```csharp
-   // Standard format pentru operațiuni CRUD
+   // Standard format pentru operatiuni CRUD
    _logger.LogInformation("Creating {EntityType} with {EntityId} by {UserId}", "Personal", personalId, userId);
    ```
 
 ### ❌ DON'Ts
 
-1. **Nu loga informații sensibile:**
+1. **Nu loga informatii sensibile:**
    ```csharp
    _logger.LogDebug("Login attempt: {Username} with {Password}", username, password); // ❌ BAD
    ```
@@ -647,7 +647,7 @@ public class PersonalDataMaskingEnricher : ILogEventEnricher
    _logger.LogInformation("User " + userId + " updated " + personalId); // ❌ BAD
    ```
 
-3. **Nu loga în catch fără să re-throw:**
+3. **Nu loga in catch fara sa re-throw:**
    ```csharp
    try { ... }
    catch (Exception ex)
@@ -657,7 +657,7 @@ public class PersonalDataMaskingEnricher : ILogEventEnricher
    }
    ```
 
-4. **Nu loga prea mult în production:**
+4. **Nu loga prea mult in production:**
    ```csharp
    // ❌ BAD pentru production
    _logger.LogDebug("Processing item {Index} of {Total}", i, total);
@@ -667,35 +667,35 @@ public class PersonalDataMaskingEnricher : ILogEventEnricher
 
 ## 🏁 Concluzie
 
-### ✅ Status Actual: IMPLEMENTAT ȘI FUNCȚIONAL
+### ✅ Status Actual: IMPLEMENTAT sI FUNCtIONAL
 
-Sistemul de logging Serilog este complet implementat în ValyanClinic cu următoarele caracteristici:
+Sistemul de logging Serilog este complet implementat in ValyanClinic cu urmatoarele caracteristici:
 
-- ✅ **Configurare stabilă** pentru .NET 9 Blazor Server
-- ✅ **Multiple sinks** (Console, File, potențial Seq)
+- ✅ **Configurare stabila** pentru .NET 9 Blazor Server
+- ✅ **Multiple sinks** (Console, File, potential Seq)
 - ✅ **Structured logging** cu template-uri optimizate
-- ✅ **Error handling** complet și graceful shutdown
+- ✅ **Error handling** complet si graceful shutdown
 - ✅ **Performance optimized** cu buffered writing
 - ✅ **Production ready** cu configurare environment-specific
 
-### 🎯 Beneficii Obținute
+### 🎯 Beneficii Obtinute
 
-1. **🔍 Debugging Improved** - Log-uri structurate și accesibile
-2. **📊 Monitoring Ready** - Metrici și alerting capabilities
-3. **🚀 Performance** - Overhead minim și configurare optimizată
-4. **🔒 Security** - Fără informații sensibile în log-uri
-5. **📈 Scalability** - Gata pentru load balancing și clustering
+1. **🔍 Debugging Improved** - Log-uri structurate si accesibile
+2. **📊 Monitoring Ready** - Metrici si alerting capabilities
+3. **🚀 Performance** - Overhead minim si configurare optimizata
+4. **🔒 Security** - Fara informatii sensibile in log-uri
+5. **📈 Scalability** - Gata pentru load balancing si clustering
 
-### 🛣️ Next Steps (Opțional)
+### 🛣️ Next Steps (Optional)
 
-1. **Seq Integration** - Pentru dashboard vizual și alerting
-2. **ELK Stack** - Pentru log analysis avansată
+1. **Seq Integration** - Pentru dashboard vizual si alerting
+2. **ELK Stack** - Pentru log analysis avansata
 3. **Application Insights** - Pentru Azure deployment
 4. **Custom Enrichers** - Pentru context business specific
 5. **Log Aggregation** - Pentru multiple instances
 
 ---
 
-**📚 Această documentație acoperă complet implementarea Serilog în ValyanClinic și poate fi folosită ca referință pentru maintenance și extensii viitoare.**
+**📚 Aceasta documentatie acopera complet implementarea Serilog in ValyanClinic si poate fi folosita ca referinta pentru maintenance si extensii viitoare.**
 
-**🎯 Implementarea este stabilă și production-ready!**
+**🎯 Implementarea este stabila si production-ready!**

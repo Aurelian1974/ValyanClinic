@@ -6,7 +6,7 @@ using ValyanClinic.Domain.Models;
 namespace ValyanClinic.Application.Services;
 
 /// <summary>
-/// Service simplificat pentru gestionarea județelor și localităților
+/// Service simplificat pentru gestionarea judetelor si localitatilor
 /// </summary>
 public class LocationService : ILocationService
 {

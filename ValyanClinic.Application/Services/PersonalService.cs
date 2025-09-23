@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace ValyanClinic.Application.Services;
 
 /// <summary>
-/// Personal Service implementation cu business logic avansat și FluentValidation
+/// Personal Service implementation cu business logic avansat si FluentValidation
 /// Rich service conform best practices - nu doar forwarding
 /// </summary>
 public class PersonalService : IPersonalService
@@ -81,7 +81,7 @@ public class PersonalService : IPersonalService
         {
             _logger.LogInformation("Creating personal: {Nume} {Prenume}", personal.Nume, personal.Prenume);
 
-            // Business rules pentru crearea personalului (înainte de validare)
+            // Business rules pentru crearea personalului (inainte de validare)
             personal = ApplyBusinessRulesForCreate(personal, utilizator);
 
             // Validare FluentValidation
@@ -99,12 +99,12 @@ public class PersonalService : IPersonalService
             if (cnpExists)
             {
                 _logger.LogWarning("CNP already exists for personal creation: {CNP}", personal.CNP);
-                return PersonalResult.Failure("CNP-ul există deja în sistem");
+                return PersonalResult.Failure("CNP-ul exista deja in sistem");
             }
             if (codExists)
             {
                 _logger.LogWarning("Employee code already exists for personal creation: {CodAngajat}", personal.Cod_Angajat);
-                return PersonalResult.Failure("Codul de angajat există deja în sistem");
+                return PersonalResult.Failure("Codul de angajat exista deja in sistem");
             }
 
             var result = await _repository.CreateAsync(personal, utilizator);
@@ -130,10 +130,10 @@ public class PersonalService : IPersonalService
             if (existing == null)
             {
                 _logger.LogWarning("Personal not found for update: {PersonalId}", personal.Id_Personal);
-                return PersonalResult.Failure("Personalul nu a fost găsit");
+                return PersonalResult.Failure("Personalul nu a fost gasit");
             }
 
-            // Business rules pentru update (înainte de validare)
+            // Business rules pentru update (inainte de validare)
             personal = ApplyBusinessRulesForUpdate(personal, existing, utilizator);
 
             // Validare FluentValidation
@@ -154,12 +154,12 @@ public class PersonalService : IPersonalService
             if (cnpExists)
             {
                 _logger.LogWarning("CNP already exists for personal update: {CNP}", personal.CNP);
-                return PersonalResult.Failure("CNP-ul există deja în sistem");
+                return PersonalResult.Failure("CNP-ul exista deja in sistem");
             }
             if (codExists)
             {
                 _logger.LogWarning("Employee code already exists for personal update: {CodAngajat}", personal.Cod_Angajat);
-                return PersonalResult.Failure("Codul de angajat există deja în sistem");
+                return PersonalResult.Failure("Codul de angajat exista deja in sistem");
             }
 
             var result = await _repository.UpdateAsync(personal, utilizator);
@@ -183,7 +183,7 @@ public class PersonalService : IPersonalService
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
             {
-                return PersonalResult.Failure("Personalul nu a fost găsit");
+                return PersonalResult.Failure("Personalul nu a fost gasit");
             }
 
             // Business rule: nu poti sterge personal cu status deja Inactiv
@@ -195,7 +195,7 @@ public class PersonalService : IPersonalService
             var success = await _repository.DeleteAsync(id, utilizator);
             if (!success)
             {
-                return PersonalResult.Failure("Eroare la ștergerea personalului");
+                return PersonalResult.Failure("Eroare la stergerea personalului");
             }
 
             _logger.LogInformation("Personal deleted successfully: {PersonalId}", id);
@@ -204,7 +204,7 @@ public class PersonalService : IPersonalService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting personal: {PersonalId}", id);
-            return PersonalResult.Failure($"Eroare la ștergerea personalului: {ex.Message}");
+            return PersonalResult.Failure($"Eroare la stergerea personalului: {ex.Message}");
         }
     }
 
@@ -282,7 +282,7 @@ public class PersonalService : IPersonalService
     }
 
     /// <summary>
-    /// Generează următorul cod de angajat disponibil bazat pe pattern EMP001, EMP002, etc.
+    /// Genereaza urmatorul cod de angajat disponibil bazat pe pattern EMP001, EMP002, etc.
     /// </summary>
     public async Task<string> GetNextCodAngajatAsync()
     {
@@ -295,7 +295,7 @@ public class PersonalService : IPersonalService
         {
             _logger.LogError(ex, "Error generating next employee code");
             
-            // Fallback în caz de eroare
+            // Fallback in caz de eroare
             return $"EMP{DateTime.Now:HHmmss}";
         }
     }
@@ -304,7 +304,7 @@ public class PersonalService : IPersonalService
 
     private Personal ApplyBusinessRulesForCreate(Personal personal, string utilizator)
     {
-        // Setare date sistem pentru crearea - folosește ora locală pentru consistență
+        // Setare date sistem pentru crearea - foloseste ora locala pentru consistenta
         personal.Data_Crearii = DateTime.Now;
         personal.Data_Ultimei_Modificari = DateTime.Now;
         personal.Creat_De = utilizator;
@@ -325,7 +325,7 @@ public class PersonalService : IPersonalService
         personal.Data_Crearii = existing.Data_Crearii;
         personal.Creat_De = existing.Creat_De;
 
-        // Setare date de modificare - folosește ora locală pentru consistență
+        // Setare date de modificare - foloseste ora locala pentru consistenta
         personal.Data_Ultimei_Modificari = DateTime.Now;
         personal.Modificat_De = utilizator;
 
@@ -341,7 +341,7 @@ public class PersonalService : IPersonalService
         personal.Nume = NormalizeName(personal.Nume);
         personal.Prenume = NormalizeName(personal.Prenume);
         
-        // Normalizare CNP și cod angajat
+        // Normalizare CNP si cod angajat
         personal.CNP = personal.CNP?.Trim() ?? string.Empty;
         personal.Cod_Angajat = personal.Cod_Angajat?.Trim().ToUpper() ?? string.Empty;
 
@@ -364,7 +364,7 @@ public class PersonalService : IPersonalService
         if (string.IsNullOrEmpty(name))
             return name;
 
-        // Prima literă mare, restul mici pentru fiecare cuvânt
+        // Prima litera mare, restul mici pentru fiecare cuvant
         return string.Join(" ", name.Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Select(word => char.ToUpper(word[0]) + word[1..].ToLower()));
     }

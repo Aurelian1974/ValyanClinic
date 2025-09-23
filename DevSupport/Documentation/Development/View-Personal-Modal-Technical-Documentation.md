@@ -75,7 +75,7 @@ private string? errorMessage = null;
 <div class="detail-card">
     <div class="card-header">
         <i class="fas fa-id-card"></i>
-        <h3>Informații Generale</h3>
+        <h3>Informatii Generale</h3>
     </div>
     <div class="card-content">
         <div class="form-grid">
@@ -169,7 +169,7 @@ private async Task HandleEmailClick(string email)
         
         await OnToastMessage.InvokeAsync((
             "Email", 
-            $"Se deschide aplicația de email pentru {email}", 
+            $"Se deschide aplicatia de email pentru {email}", 
             "e-toast-info"
         ));
     }
@@ -187,7 +187,7 @@ private async Task HandlePhoneClick(string phone)
         
         await OnToastMessage.InvokeAsync((
             "Telefon", 
-            $"Se inițiază apelul către {FormatPhoneNumber(phone)}", 
+            $"Se initiaza apelul catre {FormatPhoneNumber(phone)}", 
             "e-toast-info"
         ));
     }
@@ -231,10 +231,10 @@ private string FormatPhoneNumber(string phone)
         @if (HasResidenceAddress())
         {
             <div class="address-separator">
-                <span>Adresa de Reședință</span>
+                <span>Adresa de Resedinta</span>
             </div>
             <div class="form-field full-width">
-                <label>Adresa Reședință</label>
+                <label>Adresa Resedinta</label>
                 <div class="field-value">
                     @GetFullAddress(PersonalData.Adresa_Resedinta, 
                                     PersonalData.Oras_Resedinta, 
@@ -263,12 +263,12 @@ private string GetFullAddress(string? street, string? city, string? county, stri
     
     if (!string.IsNullOrEmpty(street)) components.Add(street);
     if (!string.IsNullOrEmpty(city)) components.Add(city);
-    if (!string.IsNullOrEmpty(county)) components.Add($"Județul {county}");
+    if (!string.IsNullOrEmpty(county)) components.Add($"Judetul {county}");
     if (!string.IsNullOrEmpty(postalCode)) components.Add($"CP {postalCode}");
     
     return components.Count > 0 
         ? string.Join(", ", components) 
-        : "Nu este specificată";
+        : "Nu este specificata";
 }
 ```
 
@@ -302,18 +302,18 @@ private string GetDepartmentDisplay(Departament? departament)
 {
     return departament switch
     {
-        Departament.Administratie => "Administrație",
+        Departament.Administratie => "Administratie",
         Departament.Financiar => "Financiar",
         Departament.IT => "IT",
-        Departament.Intretinere => "Întreținere",
-        Departament.Logistica => "Logistică",
+        Departament.Intretinere => "intretinere",
+        Departament.Logistica => "Logistica",
         Departament.Marketing => "Marketing",
-        Departament.Receptie => "Recepție",
+        Departament.Receptie => "Receptie",
         Departament.ResurseUmane => "Resurse Umane",
         Departament.Securitate => "Securitate",
         Departament.Transport => "Transport",
         Departament.Juridic => "Juridic",
-        Departament.RelatiiClienti => "Relații Clienți",
+        Departament.RelatiiClienti => "Relatii Clienti",
         Departament.Calitate => "Calitate",
         Departament.CallCenter => "Call Center",
         _ => "Nu este specificat"
@@ -326,7 +326,7 @@ private string GetDepartmentDisplay(Departament? departament)
 #### Advanced Validity Checking
 ```razor
 <div class="form-field">
-    <label>Valabil până la</label>
+    <label>Valabil pana la</label>
     <div class="field-value">
         @if (PersonalData.Valabil_CI_Pana.HasValue)
         {
@@ -335,7 +335,7 @@ private string GetDepartmentDisplay(Departament? departament)
         }
         else
         {
-            <span class="text-muted">Nu este specificată</span>
+            <span class="text-muted">Nu este specificata</span>
         }
     </div>
 </div>
@@ -351,7 +351,7 @@ private MarkupString GetValidityBadge(DateTime validUntil)
     return daysUntilExpiry switch
     {
         < 0 => new MarkupString("<span class=\"validity-badge expired\">Expirat</span>"),
-        <= 30 => new MarkupString("<span class=\"validity-badge warning\">Expiră în curând</span>"),
+        <= 30 => new MarkupString("<span class=\"validity-badge warning\">Expira in curand</span>"),
         _ => new MarkupString("<span class=\"validity-badge valid\">Valid</span>")
     };
 }
@@ -381,7 +381,7 @@ private string GetValidityStatus(DateTime? validUntil)
     <div class="detail-card observations-card">
         <div class="card-header">
             <i class="fas fa-sticky-note"></i>
-            <h3>Observații</h3>
+            <h3>Observatii</h3>
         </div>
         <div class="card-content">
             <div class="observations-content">
@@ -600,7 +600,7 @@ html body .view-personal-modal-content .personal-details-dashboard {
 ```razor
 <div class="detail-card" role="region" aria-labelledby="general-info-header">
     <div class="card-header">
-        <h3 id="general-info-header">Informații Generale</h3>
+        <h3 id="general-info-header">Informatii Generale</h3>
     </div>
     <div class="card-content" aria-describedby="general-info-header">
         <!-- Content with proper labeling -->
@@ -612,8 +612,8 @@ html body .view-personal-modal-content .personal-details-dashboard {
 ```razor
 <a href="mailto:@PersonalData.Email_Personal" 
    class="contact-link"
-   aria-label="Trimite email către @PersonalData.Email_Personal"
-   title="Deschide aplicația de email">
+   aria-label="Trimite email catre @PersonalData.Email_Personal"
+   title="Deschide aplicatia de email">
     <i class="fas fa-envelope" aria-hidden="true"></i>
     @PersonalData.Email_Personal
 </a>
@@ -679,7 +679,7 @@ protected override async Task OnInitializedAsync()
     {
         Logger.LogError(ex, "Error initializing personal details view");
         hasError = true;
-        errorMessage = "Eroare la încărcarea detaliilor personalului";
+        errorMessage = "Eroare la incarcarea detaliilor personalului";
     }
     finally
     {

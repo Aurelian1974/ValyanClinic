@@ -1,21 +1,21 @@
 ﻿# Log Files Preservation - NO MORE CLEANUP
 
-## 🔄 Modificări pentru Păstrarea Log-urilor
+## 🔄 Modificari pentru Pastrarea Log-urilor
 
-### **Problema Identificată**
-Aplicația șterge automat fișierele de log la închidere prin `LogCleanupService`, ceea ce elimina informațiile importante pentru debugging și analiza problemelor.
+### **Problema Identificata**
+Aplicatia sterge automat fisierele de log la inchidere prin `LogCleanupService`, ceea ce elimina informatiile importante pentru debugging si analiza problemelor.
 
-### **Soluția Implementată**
+### **Solutia Implementata**
 
 #### **1. AdminController.cs - Endpoint de Cleanup Dezactivat**
 ```csharp
 [HttpPost("cleanup-logs")]
 public async Task<IActionResult> CleanupLogs()
 {
-    // NU MAI ȘTERGE FIȘIERELE - doar verifică statusul lor
+    // NU MAI sTERGE FIsIERELE - doar verifica statusul lor
     _logger.LogInformation("📊 Log status check requested via API (no cleanup performed)");
     
-    // Doar raportează informațiile despre log-uri
+    // Doar raporteaza informatiile despre log-uri
     results.Add(new { 
         file = fileName, 
         action = "preserved", // ← Schimbat din "deleted"
@@ -28,18 +28,18 @@ public async Task<IActionResult> CleanupLogs()
 #### **2. Program.cs - LogCleanupService Modificat**
 ```csharp
 /// <summary>
-/// Service pentru păstrarea fișierelor de log la shutdown - NU MAI ȘTERGE LOG-URILE
+/// Service pentru pastrarea fisierelor de log la shutdown - NU MAI sTERGE LOG-URILE
 /// </summary>
 public class LogCleanupService
 {
     public void CleanupLogsOnShutdown()
     {
-        // NU MAI ȘTERGE - doar raportează statusul
+        // NU MAI sTERGE - doar raporteaza statusul
         Console.WriteLine($"📊 Preserving logs in directory: {_logsDirectory}");
         
         foreach (var logFile in logFiles)
         {
-            // Doar citește informațiile despre fișier
+            // Doar citeste informatiile despre fisier
             Console.WriteLine($"✅ Preserved log file: {Path.GetFileName(logFile)} ({FormatBytes(fileInfo.Length)})");
         }
         
@@ -56,57 +56,57 @@ GET /api/admin/read-log/{fileName}
 ```
 **Exemplu:** `GET /api/admin/read-log/errors-20250915.log`
 
-**Funcționalitate:**
-- Citește conținutul complet al fișierului de log
-- Returnează ultimele 100 linii pentru quick view
-- Include informații despre mărime, data creării, etc.
+**Functionalitate:**
+- Citeste continutul complet al fisierului de log
+- Returneaza ultimele 100 linii pentru quick view
+- Include informatii despre marime, data crearii, etc.
 
-#### **B. Căutarea în Log-uri**
+#### **B. Cautarea in Log-uri**
 ```http
-GET /api/admin/search-logs?searchText=Badea&maxResults=50
+GET /api/admin/search-logssearchText=Badea&maxResults=50
 ```
 
-**Funcționalitate:**
-- Caută text specific în toate log-urile sau într-un fișier specific
-- Returnează matches cu numărul liniei
-- Highlight-ează textul găsit
+**Functionalitate:**
+- Cauta text specific in toate log-urile sau intr-un fisier specific
+- Returneaza matches cu numarul liniei
+- Highlight-eaza textul gasit
 
-### **✅ Beneficiile Noii Implementări**
+### **✅ Beneficiile Noii Implementari**
 
-1. **🔒 Log-urile sunt Păstrate Complet**
-   - Nu se mai pierd informații importante la închiderea aplicației
-   - Istoricul complet rămâne disponibil pentru debugging
+1. **🔒 Log-urile sunt Pastrate Complet**
+   - Nu se mai pierd informatii importante la inchiderea aplicatiei
+   - Istoricul complet ramane disponibil pentru debugging
 
-2. **🔍 Instrumente de Analiză**
-   - Endpoint pentru citirea completă a log-urilor
-   - Funcție de căutare în log-uri
+2. **🔍 Instrumente de Analiza**
+   - Endpoint pentru citirea completa a log-urilor
+   - Functie de cautare in log-uri
    - Format JSON pentru integrare cu alte tools
 
-3. **📊 Raportare Detaliată**
-   - Status complet al fișierelor de log
-   - Mărimile fișierelor formatate
+3. **📊 Raportare Detaliata**
+   - Status complet al fisierelor de log
+   - Marimile fisierelor formatate
    - Timestamp-uri pentru tracking
 
-4. **🛡️ Securitate Menținută**
-   - Endpoint-urile funcționează doar în development
+4. **🛡️ Securitate Mentinuta**
+   - Endpoint-urile functioneaza doar in development
    - Sanitizare pentru filename pentru prevenirea directory traversal
    - Error handling robust
 
-### **🧪 Cum să Testezi Noile Funcționalități**
+### **🧪 Cum sa Testezi Noile Functionalitati**
 
-#### **1. Verifică Status Log-uri:**
+#### **1. Verifica Status Log-uri:**
 ```bash
 curl -X GET https://localhost:7164/api/admin/logs-status
 ```
 
-#### **2. Citește un Log Specific:**
+#### **2. Citeste un Log Specific:**
 ```bash
 curl -X GET https://localhost:7164/api/admin/read-log/errors-20250915.log
 ```
 
-#### **3. Caută în Log-uri:**
+#### **3. Cauta in Log-uri:**
 ```bash
-curl -X GET "https://localhost:7164/api/admin/search-logs?searchText=Personal&maxResults=20"
+curl -X GET "https://localhost:7164/api/admin/search-logssearchText=Personal&maxResults=20"
 ```
 
 #### **4. Test Database Connection:**
@@ -119,13 +119,13 @@ curl -X POST https://localhost:7164/api/admin/test-database
 curl -X POST https://localhost:7164/api/admin/test-personal-save
 ```
 
-### **🎯 Rezultate Așteptate**
+### **🎯 Rezultate Asteptate**
 
-#### **La Rularea Aplicației:**
-- Log-urile se scriu normal în directorul `Logs/`
-- Toate informațiile de debugging sunt înregistrate
+#### **La Rularea Aplicatiei:**
+- Log-urile se scriu normal in directorul `Logs/`
+- Toate informatiile de debugging sunt inregistrate
 
-#### **La Închiderea Aplicației:**
+#### **La inchiderea Aplicatiei:**
 ```
 📊 Preserving logs in directory: D:\Projects\CMS\ValyanClinic\Logs
 ✅ Preserved log file: valyan-clinic-20250915.log (45.2 KB)
@@ -136,22 +136,22 @@ curl -X POST https://localhost:7164/api/admin/test-personal-save
 ✅ Log files preserved successfully on shutdown
 ```
 
-### **📝 Notițe Importante**
+### **📝 Notite Importante**
 
-1. **Backup Manual Recomandat:** Deși log-urile nu se mai șterg automat, recomandăm backup manual periodic pentru log-uri foarte mari
+1. **Backup Manual Recomandat:** Desi log-urile nu se mai sterg automat, recomandam backup manual periodic pentru log-uri foarte mari
 
-2. **Monitoring Mărime:** Folosiți `/api/admin/logs-status` pentru monitorizarea mărimii log-urilor
+2. **Monitoring Marime:** Folositi `/api/admin/logs-status` pentru monitorizarea marimii log-urilor
 
-3. **Development Only:** Toate endpoint-urile de management log-uri funcționează doar în mediul de development pentru securitate
+3. **Development Only:** Toate endpoint-urile de management log-uri functioneaza doar in mediul de development pentru securitate
 
-4. **Căutare Eficientă:** Endpoint-ul de căutare este limitat la 50 rezultate per fișier pentru performance
+4. **Cautare Eficienta:** Endpoint-ul de cautare este limitat la 50 rezultate per fisier pentru performance
 
 ### **🎉 Concluzie**
 
-**✅ Log-urile sunt acum complet păstrate și accesibile pentru debugging**  
-**✅ Instrument complet de management și analiză log-uri**  
-**✅ Securitate menținută cu restricții development-only**  
-**✅ Build succesful fără erori**
+**✅ Log-urile sunt acum complet pastrate si accesibile pentru debugging**  
+**✅ Instrument complet de management si analiza log-uri**  
+**✅ Securitate mentinuta cu restrictii development-only**  
+**✅ Build succesful fara erori**
 
 ---
 

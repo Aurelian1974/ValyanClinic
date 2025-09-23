@@ -1,44 +1,44 @@
-﻿# Sistem de Curățare Automată a Log-urilor
+﻿# Sistem de Curatare Automata a Log-urilor
 
-## Descriere Generală
+## Descriere Generala
 
-ValyanClinic implementează un sistem complet de curățare automată a fișierelor de log la închiderea aplicației. Această funcționalitate asigură că log-urile nu se acumulează excesiv și că fișierele sunt resetate la fiecare restart al aplicației.
+ValyanClinic implementeaza un sistem complet de curatare automata a fisierelor de log la inchiderea aplicatiei. Aceasta functionalitate asigura ca log-urile nu se acumuleaza excesiv si ca fisierele sunt resetate la fiecare restart al aplicatiei.
 
 ## Componente Implementate
 
 ### 1. LogCleanupService
-**Locație:** `ValyanClinic\Program.cs` (implementare inline)
-**Scop:** Service principal pentru curățarea log-urilor la shutdown
+**Locatie:** `ValyanClinic\Program.cs` (implementare inline)
+**Scop:** Service principal pentru curatarea log-urilor la shutdown
 
-**Funcționalități:**
-- ✅ Flush automată a tuturor log-urilor Serilog înainte de curățare
-- ✅ Ștergerea completă a fișierelor de log existente
-- ✅ Fallback la golirea conținutului dacă fișierul nu poate fi șters (în caz că e în uz)
-- ✅ Recrearea fișierelor goale cu header-e pentru următoarea rulare
-- ✅ Logging detailat al procesului de curățare
+**Functionalitati:**
+- ✅ Flush automata a tuturor log-urilor Serilog inainte de curatare
+- ✅ stergerea completa a fisierelor de log existente
+- ✅ Fallback la golirea continutului daca fisierul nu poate fi sters (in caz ca e in uz)
+- ✅ Recrearea fisierelor goale cu header-e pentru urmatoarea rulare
+- ✅ Logging detailat al procesului de curatare
 
-### 2. LogCleanupHostedService (Opțional)
-**Locație:** `ValyanClinic\Services\LogCleanupHostedService.cs`
-**Scop:** Alternativă avansată cu mai mult control și opțiune de cleanup periodic
+### 2. LogCleanupHostedService (Optional)
+**Locatie:** `ValyanClinic\Services\LogCleanupHostedService.cs`
+**Scop:** Alternativa avansata cu mai mult control si optiune de cleanup periodic
 
-**Funcționalități:**
-- ✅ IHostedService pentru integrare nativă cu ASP.NET Core
+**Functionalitati:**
+- ✅ IHostedService pentru integrare nativa cu ASP.NET Core
 - ✅ Suport pentru cleanup periodic (comentat, dar disponibil)
-- ✅ Cleanup automată la StopAsync()
+- ✅ Cleanup automata la StopAsync()
 - ✅ Implementare IDisposable pentru cleanup la dispose
-- ✅ Async/await pentru operațiuni non-blocking
+- ✅ Async/await pentru operatiuni non-blocking
 
 ### 3. AdminController
-**Locație:** `ValyanClinic\Controllers\AdminController.cs`
-**Scop:** Endpoint-uri API pentru administrarea log-urilor în timpul rulării
+**Locatie:** `ValyanClinic\Controllers\AdminController.cs`
+**Scop:** Endpoint-uri API pentru administrarea log-urilor in timpul rularii
 
 **Endpoint-uri disponibile:**
 ```http
-POST /api/admin/cleanup-logs    # Curățare manuală (doar în Development)
-GET  /api/admin/logs-status     # Status și dimensiuni fișiere log
+POST /api/admin/cleanup-logs    # Curatare manuala (doar in Development)
+GET  /api/admin/logs-status     # Status si dimensiuni fisiere log
 ```
 
-## Configurarea în Program.cs
+## Configurarea in Program.cs
 
 ### Callback-uri pentru Application Lifecycle
 ```csharp
@@ -62,25 +62,25 @@ lifetime.ApplicationStopped.Register(() =>
 });
 ```
 
-## Procesul de Curățare
+## Procesul de Curatare
 
 ### Pas 1: ApplicationStopping
-1. **Prepare for Shutdown** - se apelează `PrepareForShutdown()`
+1. **Prepare for Shutdown** - se apeleaza `PrepareForShutdown()`
 2. **Flush Serilog** - toate log-urile pending sunt scrise pe disk
-3. **Log cleanup preparation** - se marchează că shutdown-ul a fost pregătit
+3. **Log cleanup preparation** - se marcheaza ca shutdown-ul a fost pregatit
 
 ### Pas 2: ApplicationStopped
-1. **Wait for file handles** - se așteaptă 100ms pentru eliberarea handle-urilor
-2. **Delete log files** - se încearcă ștergerea completă a fișierelor
-3. **Fallback to clear** - dacă ștergerea eșuează, se golește conținutul
-4. **Recreate empty files** - se creează fișiere noi goale cu header-e
+1. **Wait for file handles** - se asteapta 100ms pentru eliberarea handle-urilor
+2. **Delete log files** - se incearca stergerea completa a fisierelor
+3. **Fallback to clear** - daca stergerea esueaza, se goleste continutul
+4. **Recreate empty files** - se creeaza fisiere noi goale cu header-e
 
 ### Pas 3: File Recreation
 ```
 valyan-clinic-YYYYMMDD.log
 errors-YYYYMMDD.log
 ```
-Cu conținut inițial:
+Cu continut initial:
 ```
 # ValyanClinic Log File - Created: YYYY-MM-DD HH:mm:ss
 # Application: ValyanMed Clinical Management System
@@ -89,42 +89,42 @@ Cu conținut inițial:
 
 ## Beneficii
 
-### 🧹 **Curățenie Automată**
-- Nu se acumulează log-uri între rulări
-- Fișierele nu cresc necontrolat în timp
-- Spațiul pe disk rămâne optimizat
+### 🧹 **Curatenie Automata**
+- Nu se acumuleaza log-uri intre rulari
+- Fisierele nu cresc necontrolat in timp
+- Spatiul pe disk ramane optimizat
 
 ### 🔄 **Debugging Fresh Start**
-- Fiecare rulare începe cu log-uri curate
-- Mai ușor de urmărit problemele specifice sesiunii curente
-- Nu se amestecă log-urile vechi cu cele noi
+- Fiecare rulare incepe cu log-uri curate
+- Mai usor de urmarit problemele specifice sesiunii curente
+- Nu se amesteca log-urile vechi cu cele noi
 
 ### 📊 **Monitorizare Status**
 - API endpoints pentru verificarea dimensiunii log-urilor
-- Cleanup manual pentru situații speciale
-- Logging detailat al procesului de curățare
+- Cleanup manual pentru situatii speciale
+- Logging detailat al procesului de curatare
 
-### 🛡️ **Reziliență**
-- Fallback methods dacă fișierele sunt în uz
-- Multiple încercări de cleanup
-- Nu blochează shutdown-ul aplicației chiar dacă cleanup-ul eșuează
+### 🛡️ **Rezilienta**
+- Fallback methods daca fisierele sunt in uz
+- Multiple incercari de cleanup
+- Nu blocheaza shutdown-ul aplicatiei chiar daca cleanup-ul esueaza
 
 ## Utilizare
 
-### Automată (Recomandată)
-Curățarea se face automat la fiecare închidere a aplicației. Nu e nevoie de configurare suplimentară.
+### Automata (Recomandata)
+Curatarea se face automat la fiecare inchidere a aplicatiei. Nu e nevoie de configurare suplimentara.
 
-### Manuală via API (Development Only)
+### Manuala via API (Development Only)
 ```bash
 # Status log-uri
 curl -X GET https://localhost:7164/api/admin/logs-status
 
-# Curățare manuală
+# Curatare manuala
 curl -X POST https://localhost:7164/api/admin/cleanup-logs
 ```
 
-### Hosted Service (Opțional)
-Decomentează în `Program.cs`:
+### Hosted Service (Optional)
+Decomenteaza in `Program.cs`:
 ```csharp
 builder.Services.AddHostedService<ValyanClinic.Services.LogCleanupHostedService>();
 ```
@@ -132,56 +132,56 @@ builder.Services.AddHostedService<ValyanClinic.Services.LogCleanupHostedService>
 ## Scenarii de Testare
 
 ### Test 1: Shutdown Normal
-1. Rulează aplicația și generează log-uri
-2. Oprește aplicația normal (Ctrl+C sau Visual Studio Stop)
-3. Verifică că fișierele din `Logs/` sunt goale/recreate
+1. Ruleaza aplicatia si genereaza log-uri
+2. Opreste aplicatia normal (Ctrl+C sau Visual Studio Stop)
+3. Verifica ca fisierele din `Logs/` sunt goale/recreate
 
 ### Test 2: Cleanup Manual
-1. Rulează aplicația în Development
-2. Accesează `GET /api/admin/logs-status`
-3. Accesează `POST /api/admin/cleanup-logs`
-4. Verifică răspunsul JSON cu rezultatele
+1. Ruleaza aplicatia in Development
+2. Acceseaza `GET /api/admin/logs-status`
+3. Acceseaza `POST /api/admin/cleanup-logs`
+4. Verifica raspunsul JSON cu rezultatele
 
-### Test 3: File Handles în Uz
-1. Deschide un fișier de log într-un text editor
-2. Oprește aplicația
-3. Verifică că conținutul fișierului este golit (nu șters)
+### Test 3: File Handles in Uz
+1. Deschide un fisier de log intr-un text editor
+2. Opreste aplicatia
+3. Verifica ca continutul fisierului este golit (nu sters)
 
-## Configurare Avansată
+## Configurare Avansata
 
 ### Personalizare Directoare
-Modifică în servicii:
+Modifica in servicii:
 ```csharp
 _logsDirectory = Path.Combine(environment.ContentRootPath, "CustomLogsPath");
 ```
 
 ### Cleanup Periodic
-Decomentează în `LogCleanupHostedService.StartAsync()`:
+Decomenteaza in `LogCleanupHostedService.StartAsync()`:
 ```csharp
 _cleanupTimer = new Timer(PeriodicCleanup, null, TimeSpan.Zero, _cleanupInterval);
 ```
 
-### Păstrare Backup
-Modifică logica pentru a muta fișierele în loc să le șteargă:
+### Pastrare Backup
+Modifica logica pentru a muta fisierele in loc sa le stearga:
 ```csharp
 var backupPath = Path.Combine(_logsDirectory, "backup", DateTime.Now.ToString("yyyyMMdd"));
 Directory.CreateDirectory(backupPath);
 File.Move(logFile, Path.Combine(backupPath, Path.GetFileName(logFile)));
 ```
 
-## Dependențe
+## Dependente
 
-- **Serilog** - pentru flush și management log-uri
+- **Serilog** - pentru flush si management log-uri
 - **IHostApplicationLifetime** - pentru callback-uri shutdown
-- **IWebHostEnvironment** - pentru căi fișiere
-- **System.IO** - pentru operațiuni fișiere
+- **IWebHostEnvironment** - pentru cai fisiere
+- **System.IO** - pentru operatiuni fisiere
 
 ## Status
 
-- ✅ **Implementată** - funcționalitatea de bază
-- ✅ **Testată** - build-ul reușește
-- 🔄 **În testare** - rularea efectivă
-- 📝 **Documentată** - acest fișier
+- ✅ **Implementata** - functionalitatea de baza
+- ✅ **Testata** - build-ul reuseste
+- 🔄 **in testare** - rularea efectiva
+- 📝 **Documentata** - acest fisier
 
 ---
 

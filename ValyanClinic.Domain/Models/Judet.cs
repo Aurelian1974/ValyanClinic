@@ -3,7 +3,7 @@
 namespace ValyanClinic.Domain.Models;
 
 /// <summary>
-/// Model pentru entitatea Județ din baza de date
+/// Model pentru entitatea Judet din baza de date
 /// </summary>
 public class Judet
 {

@@ -113,7 +113,7 @@ The User Details View (`VizualizeazUtilizator.razor`) is a read-only display com
     <div class="loading-container">
         <div class="loading-indicator">
             <i class="fas fa-spinner fa-spin"></i>
-            <span>Se încarcă...</span>
+            <span>Se incarca...</span>
         </div>
     </div>
 }
@@ -121,7 +121,7 @@ The User Details View (`VizualizeazUtilizator.razor`) is a read-only display com
 
 **Loading State Features:**
 - **Professional Animation**: Smooth spinning indicator
-- **Romanian Text**: "Se încarcă..." (Loading...)
+- **Romanian Text**: "Se incarca..." (Loading...)
 - **Centered Layout**: Proper vertical and horizontal centering
 - **Accessibility**: Screen reader announcements for loading states
 
@@ -184,7 +184,7 @@ The User Details View (`VizualizeazUtilizator.razor`) is a read-only display com
 <div class="detail-card">
     <div class="card-header">
         <i class="fas fa-id-card"></i>
-        <h3>Informații Personale</h3>
+        <h3>Informatii Personale</h3>
     </div>
     <div class="card-content">
         <div class="form-grid">
@@ -214,7 +214,7 @@ The User Details View (`VizualizeazUtilizator.razor`) is a read-only display com
 **Header Design:**
 - **Gradient Background**: Premium medical application styling
 - **Icon Integration**: ID card icon for context recognition
-- **Romanian Title**: "Informații Personale" (Personal Information)
+- **Romanian Title**: "Informatii Personale" (Personal Information)
 - **Shimmer Effect**: Subtle animation on hover for premium feel
 
 **Content Layout:**
@@ -235,12 +235,12 @@ The User Details View (`VizualizeazUtilizator.razor`) is a read-only display com
 <div class="detail-card">
     <div class="card-header">
         <i class="fas fa-user-cog"></i>
-        <h3>Informații Cont</h3>
+        <h3>Informatii Cont</h3>
     </div>
     <div class="card-content">
         <div class="form-grid">
             <div class="form-field">
-                <label>Rol în Sistem</label>
+                <label>Rol in Sistem</label>
                 <SfBadge CssClass="@($"role-badge role-{User.Role.ToString().ToLower()}")">
                     @GetRoleDisplayName(User.Role)
                 </SfBadge>
@@ -274,7 +274,7 @@ private string GetRoleDisplayName(UserRole role)
         UserRole.Administrator => "Administrator",
         UserRole.Doctor => "Medic",
         UserRole.Nurse => "Asistent Medical",
-        UserRole.Receptionist => "Recepționer",
+        UserRole.Receptionist => "Receptioner",
         UserRole.Manager => "Manager",
         UserRole.Operator => "Operator",
         _ => role.ToString()
@@ -294,7 +294,7 @@ private string GetRoleDisplayName(UserRole role)
 <div class="detail-card">
     <div class="card-header">
         <i class="fas fa-building"></i>
-        <h3>Informații Organizaționale</h3>
+        <h3>Informatii Organizationale</h3>
     </div>
     <div class="card-content">
         <div class="form-grid">
@@ -303,8 +303,8 @@ private string GetRoleDisplayName(UserRole role)
                 <span class="field-value">@(User.Department ?? "Nu este specificat")</span>
             </div>
             <div class="form-field">
-                <label>Funcția</label>
-                <span class="field-value">@(User.JobTitle ?? "Nu este specificată")</span>
+                <label>Functia</label>
+                <span class="field-value">@(User.JobTitle ?? "Nu este specificata")</span>
             </div>
         </div>
     </div>
@@ -323,24 +323,24 @@ private string GetRoleDisplayName(UserRole role)
 <div class="detail-card">
     <div class="card-header">
         <i class="fas fa-calendar-alt"></i>
-        <h3>Informații Temporale</h3>
+        <h3>Informatii Temporale</h3>
     </div>
     <div class="card-content">
         <div class="form-grid">
             <div class="form-field">
-                <label>Data creării</label>
+                <label>Data crearii</label>
                 <span class="field-value">@User.CreatedDate.ToString("dd.MM.yyyy HH:mm")</span>
             </div>
             <div class="form-field">
                 <label>Ultima autentificare</label>
-                <span class="field-value">@(User.LastLoginDate?.ToString("dd.MM.yyyy HH:mm") ?? "Niciodată")</span>
+                <span class="field-value">@(User.LastLoginDate?.ToString("dd.MM.yyyy HH:mm") ?? "Niciodata")</span>
             </div>
             <div class="form-field full-width">
-                <label>Activitate recentă</label>
+                <label>Activitate recenta</label>
                 <span class="field-value activity-status">@GetActivityStatus(User.LastLoginDate)</span>
             </div>
             <div class="form-field">
-                <label>Vechime în sistem</label>
+                <label>Vechime in sistem</label>
                 <span class="field-value">@GetSystemAge(User.CreatedDate)</span>
             </div>
         </div>
@@ -360,15 +360,15 @@ private string GetRoleDisplayName(UserRole role)
 private string GetActivityStatus(DateTime? lastLogin)
 {
     if (!lastLogin.HasValue)
-        return "Niciodată autentificat";
+        return "Niciodata autentificat";
         
     var daysSinceLogin = (DateTime.Now - lastLogin.Value).Days;
     return daysSinceLogin switch
     {
-        0 => "Activ astăzi",
+        0 => "Activ astazi",
         1 => "Activ ieri",
         <= 7 => $"Activ acum {daysSinceLogin} zile",
-        <= 30 => $"Activ acum {daysSinceLogin / 7} săptămâni",
+        <= 30 => $"Activ acum {daysSinceLogin / 7} saptamani",
         _ => "Inactiv de mult timp"
     };
 }
@@ -394,7 +394,7 @@ private string GetSystemAge(DateTime createdDate)
 <div class="detail-card permissions-card">
     <div class="card-header">
         <i class="fas fa-shield-alt"></i>
-        <h3>Permisiuni și Securitate</h3>
+        <h3>Permisiuni si Securitate</h3>
     </div>
     <div class="card-content">
         <div class="permissions-grid">
@@ -460,7 +460,7 @@ private string GetSystemAge(DateTime createdDate)
     <div class="permission-item">
         <SfButton IsPrimary="true" CssClass="permission-button medical">
             <i class="fas fa-file-medical"></i>
-            Fișe Medicale
+            Fise Medicale
         </SfButton>
     </div>
     
@@ -650,7 +650,7 @@ protected override async Task OnInitializedAsync()
     }
     catch (Exception ex)
     {
-        await HandleError(ex, "încărcarea datelor utilizatorului");
+        await HandleError(ex, "incarcarea datelor utilizatorului");
     }
     
     StateHasChanged();
@@ -680,7 +680,7 @@ private async Task LoadUserData(int userId)
         var user = await _userService.GetUserByIdAsync(userId);
         if (user == null)
         {
-            throw new InvalidOperationException($"Utilizatorul cu ID-ul {userId} nu a fost găsit");
+            throw new InvalidOperationException($"Utilizatorul cu ID-ul {userId} nu a fost gasit");
         }
         
         _state.DisplayUser = user;
@@ -690,7 +690,7 @@ private async Task LoadUserData(int userId)
     catch (Exception ex)
     {
         _state.HasError = true;
-        _state.ErrorMessage = $"Eroare la încărcarea utilizatorului: {ex.Message}";
+        _state.ErrorMessage = $"Eroare la incarcarea utilizatorului: {ex.Message}";
         
         // Log error for debugging
         _logger.LogError(ex, "Failed to load user data for UserId: {UserId}", userId);
@@ -715,7 +715,7 @@ private async Task LoadUserData(int userId)
 private string GetActivityStatus(DateTime? lastLogin)
 {
     if (!lastLogin.HasValue)
-        return "Niciodată autentificat";
+        return "Niciodata autentificat";
         
     var timeSinceLogin = DateTime.Now - lastLogin.Value;
     
@@ -723,10 +723,10 @@ private string GetActivityStatus(DateTime? lastLogin)
     {
         0 when timeSinceLogin.Hours < 1 => "Online acum",
         0 when timeSinceLogin.Hours < 8 => $"Activ acum {timeSinceLogin.Hours} ore",
-        0 => "Activ astăzi",
+        0 => "Activ astazi",
         1 => "Activ ieri",
         <= 7 => $"Activ acum {timeSinceLogin.Days} zile",
-        <= 30 => $"Activ acum {timeSinceLogin.Days / 7} săptămâni",
+        <= 30 => $"Activ acum {timeSinceLogin.Days / 7} saptamani",
         <= 365 => $"Activ acum {timeSinceLogin.Days / 30} luni",
         _ => "Inactiv de mult timp"
     };
@@ -738,11 +738,11 @@ private string GetSystemAge(DateTime createdDate)
     
     return age.Days switch
     {
-        < 1 => "Creat astăzi",
+        < 1 => "Creat astazi",
         < 7 => $"{age.Days} zile",
-        < 30 => $"{age.Days / 7} săptămâni",
+        < 30 => $"{age.Days / 7} saptamani",
         < 365 => $"{age.Days / 30} luni",
-        _ => $"{age.Days / 365} ani și {(age.Days % 365) / 30} luni"
+        _ => $"{age.Days / 365} ani si {(age.Days % 365) / 30} luni"
     };
 }
 ```
@@ -764,10 +764,10 @@ private string GetSystemAge(DateTime createdDate)
 <div class="detail-card" role="region" aria-labelledby="personal-info-title">
     <div class="card-header">
         <i class="fas fa-id-card" aria-hidden="true"></i>
-        <h3 id="personal-info-title">Informații Personale</h3>
+        <h3 id="personal-info-title">Informatii Personale</h3>
     </div>
     <div class="card-content">
-        <div class="form-grid" role="group" aria-label="Informații personale ale utilizatorului">
+        <div class="form-grid" role="group" aria-label="Informatii personale ale utilizatorului">
             <div class="form-field">
                 <label id="nume-label">Nume</label>
                 <span class="field-value" aria-labelledby="nume-label">@User.FirstName</span>

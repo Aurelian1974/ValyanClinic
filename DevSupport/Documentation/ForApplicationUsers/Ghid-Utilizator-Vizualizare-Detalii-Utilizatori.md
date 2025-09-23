@@ -1,236 +1,236 @@
 ﻿# Ghid Utilizator - Vizualizarea Detaliilor Utilizatorilor
 
-**Aplicație:** ValyanMed - Sistem de Management Clinic  
-**Funcție:** Vizualizarea informațiilor detaliate ale utilizatorilor  
+**Aplicatie:** ValyanMed - Sistem de Management Clinic  
+**Functie:** Vizualizarea informatiilor detaliate ale utilizatorilor  
 **Creat:** Septembrie 2025  
 **Actualizat:** Septembrie 2025  
 **Destinat pentru:** Administratori, Manageri, Personal cu acces la gestionarea utilizatorilor  
 
 ---
 
-## Prezentare Generală
+## Prezentare Generala
 
-Fereastra de vizualizare a detaliilor utilizatorilor vă oferă o imagine completă și organizată asupra informațiilor unui utilizator din sistem. Este concepută ca un dashboard elegant care prezintă toate datele relevante într-un format ușor de citit și professional.
+Fereastra de vizualizare a detaliilor utilizatorilor va ofera o imagine completa si organizata asupra informatiilor unui utilizator din sistem. Este conceputa ca un dashboard elegant care prezinta toate datele relevante intr-un format usor de citit si professional.
 
-### Ce puteți vedea în această fereastră
-- **Informații personale** complete ale utilizatorului
-- **Detalii ale contului** și statusul acestuia
-- **Informații organizaționale** și rolul în clinică
-- **Istoricul activității** și statistici temporale
-- **Permisiunile și drepturile** de acces în sistem
-- **Indicatori vizuali** pentru status și rol
+### Ce puteti vedea in aceasta fereastra
+- **Informatii personale** complete ale utilizatorului
+- **Detalii ale contului** si statusul acestuia
+- **Informatii organizationale** si rolul in clinica
+- **Istoricul activitatii** si statistici temporale
+- **Permisiunile si drepturile** de acces in sistem
+- **Indicatori vizuali** pentru status si rol
 
 ---
 
 ## Deschiderea Ferestrei de Detalii
 
-### Cum să accesați informațiile unui utilizator
+### Cum sa accesati informatiile unui utilizator
 
-1. **Navigați** la modulul "Gestionare Utilizatori"
-2. **Găsiți utilizatorul** în lista afișată
-3. **În coloana "Acțiuni"** căutați butonul albastru cu iconița ochiului 👁️
-4. **Apăsați pe acest buton** - se va deschide fereastra de detalii
+1. **Navigati** la modulul "Gestionare Utilizatori"
+2. **Gasiti utilizatorul** in lista afisata
+3. **in coloana "Actiuni"** cautati butonul albastru cu iconita ochiului 👁️
+4. **Apasati pe acest buton** - se va deschide fereastra de detalii
 
-### Ce veți vedea la deschidere
+### Ce veti vedea la deschidere
 
-- **O fereastră modală** se va deschide peste pagina curentă
-- **Antetul ferestrei** va afișa numele complet al utilizatorului
-- **Conținutul** va fi organizat în carduri colorate și ușor de citit
-- **Butoanele de acțiune** vor fi disponibile în partea de jos
+- **O fereastra modala** se va deschide peste pagina curenta
+- **Antetul ferestrei** va afisa numele complet al utilizatorului
+- **Continutul** va fi organizat in carduri colorate si usor de citit
+- **Butoanele de actiune** vor fi disponibile in partea de jos
 
 ---
 
-## Structura Informațiilor
+## Structura Informatiilor
 
-Informațiile sunt prezentate în **5 carduri principale**, fiecare cu o culoare și o iconiță specifică:
+Informatiile sunt prezentate in **5 carduri principale**, fiecare cu o culoare si o iconita specifica:
 
-### 📋 Card "Informații Personale" 
-- **Culoarea**: Gradient roșu-turquoise-albastru
-- **Iconița**: Card de identitate
-- **Conținutul**: Date personale de bază
+### 📋 Card "Informatii Personale" 
+- **Culoarea**: Gradient rosu-turquoise-albastru
+- **Iconita**: Card de identitate
+- **Continutul**: Date personale de baza
 
-### 👤 Card "Informații Cont"
+### 👤 Card "Informatii Cont"
 - **Culoarea**: Gradient turquoise-albastru-violet  
-- **Iconița**: Roată de setări utilizator
-- **Conținutul**: Date de conectare și status cont
+- **Iconita**: Roata de setari utilizator
+- **Continutul**: Date de conectare si status cont
 
-### 🏢 Card "Informații Organizaționale"
-- **Culoarea**: Gradient violet-roz-roșu
-- **Iconița**: Clădire
-- **Conținutul**: Rolul în organizația clinicii
+### 🏢 Card "Informatii Organizationale"
+- **Culoarea**: Gradient violet-roz-rosu
+- **Iconita**: Cladire
+- **Continutul**: Rolul in organizatia clinicii
 
-### ⏰ Card "Informații Temporale"
+### ⏰ Card "Informatii Temporale"
 - **Culoarea**: Gradient albastru-portocaliu-verde
-- **Iconița**: Calendar
-- **Conținutul**: Istoricul și activitatea în timp
+- **Iconita**: Calendar
+- **Continutul**: Istoricul si activitatea in timp
 
-### 🛡️ Card "Permisiuni și Securitate" (Lățime completă)
+### 🛡️ Card "Permisiuni si Securitate" (Latime completa)
 - **Culoarea**: Gradient verde
-- **Iconița**: Scut de securitate
-- **Conținutul**: Toate permisiunile și drepturile de acces
+- **Iconita**: Scut de securitate
+- **Continutul**: Toate permisiunile si drepturile de acces
 
 ---
 
-## Cardul "Informații Personale"
+## Cardul "Informatii Personale"
 
-### Ce veți găsi aici
+### Ce veti gasi aici
 
 #### 👤 Nume
-- **Afișează**: Numele de familie al utilizatorului
-- **Format**: Text simplu, clar și lizibil
+- **Afiseaza**: Numele de familie al utilizatorului
+- **Format**: Text simplu, clar si lizibil
 - **Exemple**: Popescu, Marinescu, Ionescu
 
 #### 👤 Prenume  
-- **Afișează**: Prenumele utilizatorului
+- **Afiseaza**: Prenumele utilizatorului
 - **Format**: Text simplu
 - **Exemple**: Maria, Alexandru, Elena
 
 #### 📧 Email
-- **Afișează**: Adresa de email completă
+- **Afiseaza**: Adresa de email completa
 - **Format**: Link activ pentru trimiterea de email-uri
-- **Funcționalitate**: Puteți apăsa pe email pentru a deschide clientul de email
+- **Functionalitate**: Puteti apasa pe email pentru a deschide clientul de email
 
 #### 📱 Telefon
-- **Afișează**: Numărul de telefon de contact
-- **Format**: Format românesc standard
-- **Cazuri speciale**: Dacă nu este specificat, va afișa "Nu este specificat"
+- **Afiseaza**: Numarul de telefon de contact
+- **Format**: Format romanesc standard
+- **Cazuri speciale**: Daca nu este specificat, va afisa "Nu este specificat"
 
-### Cum să interpretați informațiile
+### Cum sa interpretati informatiile
 
-- **Toate câmpurile** sunt doar pentru vizualizare (nu pot fi editate direct)
-- **Email-ul** este link activ - puteți apăsa pe el pentru contact rapid
-- **Datele lipsă** sunt afișate cu mesajul "Nu este specificat"
-- **Informațiile** sunt actualizate în timp real
+- **Toate campurile** sunt doar pentru vizualizare (nu pot fi editate direct)
+- **Email-ul** este link activ - puteti apasa pe el pentru contact rapid
+- **Datele lipsa** sunt afisate cu mesajul "Nu este specificat"
+- **Informatiile** sunt actualizate in timp real
 
 ---
 
-## Cardul "Informații Cont"
+## Cardul "Informatii Cont"
 
-### Ce veți găsi aici
+### Ce veti gasi aici
 
 #### 👤 Username
-- **Afișează**: Numele de utilizator pentru conectare
+- **Afiseaza**: Numele de utilizator pentru conectare
 - **Format**: Text simplu, de obicei format nume.prenume
-- **Importanță**: Este ceea ce utilizatorul folosește pentru a se conecta
+- **Importanta**: Este ceea ce utilizatorul foloseste pentru a se conecta
 
 #### 🔢 ID Utilizator
-- **Afișează**: Numărul unic de identificare în sistem
-- **Format**: #123 (cu simbolul diez înaintea numărului)
-- **Utilitate**: Pentru referințe tehnice și suport
+- **Afiseaza**: Numarul unic de identificare in sistem
+- **Format**: #123 (cu simbolul diez inaintea numarului)
+- **Utilitate**: Pentru referinte tehnice si suport
 
-#### 🎭 Rol în Sistem
-- **Afișează**: Rolul principal al utilizatorului
-- **Format**: Badge colorat cu numele rolului în română
+#### 🎭 Rol in Sistem
+- **Afiseaza**: Rolul principal al utilizatorului
+- **Format**: Badge colorat cu numele rolului in romana
 - **Culori**:
   - **Albastru**: Administrator
   - **Verde**: Medic  
   - **Turquoise**: Asistent Medical
-  - **Portocaliu**: Recepționer
+  - **Portocaliu**: Receptioner
   - **Violet**: Manager
   - **Gri**: Operator
 
 #### ✅ Status
-- **Afișează**: Starea curentă a contului
-- **Format**: Badge colorat cu statusul în română
+- **Afiseaza**: Starea curenta a contului
+- **Format**: Badge colorat cu statusul in romana
 - **Culori**:
   - **Verde**: Activ (utilizatorul se poate conecta)
-  - **Roșu**: Inactiv (contul este dezactivat)
+  - **Rosu**: Inactiv (contul este dezactivat)
   - **Portocaliu**: Suspendat (blocat temporar)
   - **Albastru**: Blocat (blocat din motive de securitate)
 
-### Înțelegerea rolurilor afișate
+### intelegerea rolurilor afisate
 
 #### 👑 Administrator
-- **Înseamnă**: Acces complet la toate funcțiile sistemului
-- **Responsabilități**: Gestionarea întregului sistem
-- **Atenție**: Rol cu putere mare, acordat cu grijă
+- **inseamna**: Acces complet la toate functiile sistemului
+- **Responsabilitati**: Gestionarea intregului sistem
+- **Atentie**: Rol cu putere mare, acordat cu grija
 
 #### 👨‍⚕️ Medic
-- **Înseamnă**: Personal medical cu drepturi de consultație
-- **Responsabilități**: Îngrijirea pacienților, prescripții
-- **Acces**: La toate datele medicale ale pacienților
+- **inseamna**: Personal medical cu drepturi de consultatie
+- **Responsabilitati**: ingrijirea pacientilor, prescriptii
+- **Acces**: La toate datele medicale ale pacientilor
 
 #### 👩‍⚕️ Asistent Medical
-- **Înseamnă**: Personal de asistență medicală
-- **Responsabilități**: Suportul în activitatea medicală
-- **Acces**: La datele pacienților pentru asistență
+- **inseamna**: Personal de asistenta medicala
+- **Responsabilitati**: Suportul in activitatea medicala
+- **Acces**: La datele pacientilor pentru asistenta
 
 ---
 
-## Cardul "Informații Organizaționale"
+## Cardul "Informatii Organizationale"
 
-### Ce veți găsi aici
+### Ce veti gasi aici
 
 #### 🏢 Departament
-- **Afișează**: Departamentul de apartenență
+- **Afiseaza**: Departamentul de apartenenta
 - **Format**: Numele complet al departamentului
-- **Exemple**: Cardiologie, Chirurgie, Radiologie, Administrație
-- **Cazuri speciale**: "Nu este specificat" dacă nu e asignat
+- **Exemple**: Cardiologie, Chirurgie, Radiologie, Administratie
+- **Cazuri speciale**: "Nu este specificat" daca nu e asignat
 
-#### 💼 Funcția
-- **Afișează**: Postul ocupat în clinică
-- **Format**: Descriere liberă a funcției
+#### 💼 Functia
+- **Afiseaza**: Postul ocupat in clinica
+- **Format**: Descriere libera a functiei
 - **Exemple**: "Medic Specialist Cardiologie", "Asistent Medical Chirurgie"
-- **Cazuri speciale**: "Nu este specificată" dacă nu e completată
+- **Cazuri speciale**: "Nu este specificata" daca nu e completata
 
-### Importanța informațiilor organizaționale
+### Importanta informatiilor organizationale
 
 #### Pentru ce sunt utile:
-- **Înțelegerea structurii** organizaționale
-- **Identificarea responsabilităților** fiecărui utilizator
+- **intelegerea structurii** organizationale
+- **Identificarea responsabilitatilor** fiecarui utilizator
 - **Organizarea echipelor** pe departamente
-- **Raportările** ierarhice și funcționale
+- **Raportarile** ierarhice si functionale
 
 ---
 
-## Cardul "Informații Temporale"
+## Cardul "Informatii Temporale"
 
-### Ce veți găsi aici
+### Ce veti gasi aici
 
-#### 📅 Data creării
-- **Afișează**: Când a fost creat contul în sistem
+#### 📅 Data crearii
+- **Afiseaza**: Cand a fost creat contul in sistem
 - **Format**: dd.MM.yyyy HH:mm (ex: 15.03.2025 14:30)
-- **Utilitate**: Pentru a știi de când există contul
+- **Utilitate**: Pentru a stii de cand exista contul
 
 #### 🔑 Ultima autentificare
-- **Afișează**: Când s-a conectat utilizatorul ultima dată
+- **Afiseaza**: Cand s-a conectat utilizatorul ultima data
 - **Format**: dd.MM.yyyy HH:mm
-- **Cazuri speciale**: "Niciodată" dacă nu s-a conectat încă niciodată
+- **Cazuri speciale**: "Niciodata" daca nu s-a conectat inca niciodata
 
-#### 🟢 Activitate recentă
-- **Afișează**: Un text descriptiv despre activitatea recentă
+#### 🟢 Activitate recenta
+- **Afiseaza**: Un text descriptiv despre activitatea recenta
 - **Formate posibile**:
-  - "Online acum" - este conectat în acest moment
-  - "Activ astăzi" - s-a conectat azi
+  - "Online acum" - este conectat in acest moment
+  - "Activ astazi" - s-a conectat azi
   - "Activ ieri" - s-a conectat ieri
-  - "Activ acum 3 zile" - ultima conectare acum câteva zile
-  - "Activ acum 2 săptămâni" - pentru perioade mai mari
+  - "Activ acum 3 zile" - ultima conectare acum cateva zile
+  - "Activ acum 2 saptamani" - pentru perioade mai mari
   - "Inactiv de mult timp" - nu s-a mai conectat de foarte mult timp
 
-#### ⏳ Vechime în sistem
-- **Afișează**: Cât timp a trecut de la crearea contului
+#### ⏳ Vechime in sistem
+- **Afiseaza**: Cat timp a trecut de la crearea contului
 - **Formate posibile**:
   - "5 zile" - pentru conturi noi
-  - "2 luni" - pentru conturi de câteva luni
-  - "1 an și 3 luni" - pentru conturi mai vechi
+  - "2 luni" - pentru conturi de cateva luni
+  - "1 an si 3 luni" - pentru conturi mai vechi
 
-### Interpretarea informațiilor temporale
+### Interpretarea informatiilor temporale
 
 #### Indicatori de activitate:
 - **"Online acum"** 🟢 = Utilizatorul este foarte activ
-- **"Activ astăzi"** 🟢 = Activitate regulată
-- **"Activ acum 2-3 zile"** 🟡 = Activitate normală  
-- **"Inactiv de mult timp"** 🔴 = Posibilă problemă sau plecare
+- **"Activ astazi"** 🟢 = Activitate regulata
+- **"Activ acum 2-3 zile"** 🟡 = Activitate normala  
+- **"Inactiv de mult timp"** 🔴 = Posibila problema sau plecare
 
 #### Indicatori pentru conturi noi:
-- **Creat recent + Niciodată conectat** = Utilizatorul nu și-a activat încă contul
-- **Creat recent + Activ** = Utilizatorul nou și activ
+- **Creat recent + Niciodata conectat** = Utilizatorul nu si-a activat inca contul
+- **Creat recent + Activ** = Utilizatorul nou si activ
 
 ---
 
-## Cardul "Permisiuni și Securitate"
+## Cardul "Permisiuni si Securitate"
 
-Acest card ocupă **întreaga lățime** a ferestrei și afișează toate permisiunile utilizatorului sub forma unor butoane colorate.
+Acest card ocupa **intreaga latime** a ferestrei si afiseaza toate permisiunile utilizatorului sub forma unor butoane colorate.
 
 ### Tipuri de permisiuni
 
@@ -238,100 +238,100 @@ Acest card ocupă **întreaga lățime** a ferestrei și afișează toate permis
 Acestea sunt acordate tuturor utilizatorilor:
 
 - **"Acces Modul Utilizatori"** - Poate vedea lista utilizatorilor
-- **"Acces Rapoarte"** - Poate consulta rapoartele de bază
+- **"Acces Rapoarte"** - Poate consulta rapoartele de baza
 
 #### 🔵 Permisiuni Administrative (Albastru)
 Acestea apar doar pentru Administratori:
 
 - **"Administrare Sistem"** - Control complet asupra sistemului
-- **"Gestionare Utilizatori"** - Poate crea, modifica și șterge utilizatori
+- **"Gestionare Utilizatori"** - Poate crea, modifica si sterge utilizatori
 
 #### 🟣 Permisiuni Medicale (Violet)
 Acestea apar doar pentru Medici:
 
-- **"Fișe Medicale"** - Acces complet la fișele pacienților  
+- **"Fise Medicale"** - Acces complet la fisele pacientilor  
 - **"Prescriere Medicamente"** - Poate prescrie tratamente
 
 #### 🟡 Permisiuni Departamentale (Portocaliu)
-Acestea apar pentru Manageri și alte roluri specifice:
+Acestea apar pentru Manageri si alte roluri specifice:
 
 - **"Management Departament"** - Poate gestiona propriul departament
 - **"Rapoarte Avansate"** - Acces la rapoarte detaliate
 
-### Cum să interpretați permisiunile
+### Cum sa interpretati permisiunile
 
-#### Numărul de butoane:
+#### Numarul de butoane:
 - **Multe butoane** = Utilizator cu multe drepturi
-- **Puține butoane** = Utilizator cu acces limitat
+- **Putine butoane** = Utilizator cu acces limitat
 - **Butoane diferite** = Permisiuni specifice rolului
 
 #### Culorile butoanelor:
-- **Verde** = Permisiuni de bază, sigure
+- **Verde** = Permisiuni de baza, sigure
 - **Albastru** = Permisiuni administrative, importante
 - **Violet** = Permisiuni medicale, sensibile
 - **Portocaliu** = Permisiuni departamentale, locale
 
 ---
 
-## Navigarea în Fereastră
+## Navigarea in Fereastra
 
 ### Butoanele din antet
 
-#### ❌ Butonul X (închidere)
-- **Locația**: Colțul din dreapta-sus
-- **Funcția**: Închide fereastra fără alte acțiuni
-- **Scurtătură**: Tasta Escape
+#### ❌ Butonul X (inchidere)
+- **Locatia**: Coltul din dreapta-sus
+- **Functia**: inchide fereastra fara alte actiuni
+- **Scurtatura**: Tasta Escape
 
 #### 📖 Titlul ferestrei
-- **Afișează**: Numele complet al utilizatorului
+- **Afiseaza**: Numele complet al utilizatorului
 - **Format**: "Prenume Nume" (ex: "Maria Popescu")
 - **Subtitlu**: "Detalii utilizator"
 
 ### Butoanele din josul ferestrei
 
-#### ✏️ "Editează Utilizatorul"
-- **Culoarea**: Albastru (acțiune principală)
-- **Funcția**: Deschide formularul de editare pentru acest utilizator
-- **Disponibilitate**: Doar dacă aveți drepturi de editare
+#### ✏️ "Editeaza Utilizatorul"
+- **Culoarea**: Albastru (actiune principala)
+- **Functia**: Deschide formularul de editare pentru acest utilizator
+- **Disponibilitate**: Doar daca aveti drepturi de editare
 
-#### ❌ "Închide"
-- **Culoarea**: Gri (acțiune secundară)  
-- **Funcția**: Închide fereastra și reveniți la lista utilizatorilor
-- **Disponibilitate**: Întotdeauna disponibil
+#### ❌ "inchide"
+- **Culoarea**: Gri (actiune secundara)  
+- **Functia**: inchide fereastra si reveniti la lista utilizatorilor
+- **Disponibilitate**: intotdeauna disponibil
 
-### Scroll și navigare
+### Scroll si navigare
 
-#### Dacă informațiile nu încap pe ecran:
-- **Scroll vertical** este disponibil în interiorul ferestrei
-- **Fereastra păstrează** antetul și butoanele vizibile
-- **Scroll-ul este smooth** și optimizat pentru citire
+#### Daca informatiile nu incap pe ecran:
+- **Scroll vertical** este disponibil in interiorul ferestrei
+- **Fereastra pastreaza** antetul si butoanele vizibile
+- **Scroll-ul este smooth** si optimizat pentru citire
 
 ---
 
-## Situații Speciale de Afișare
+## Situatii Speciale de Afisare
 
-### Utilizatori fără anumite informații
+### Utilizatori fara anumite informatii
 
-#### Pentru câmpurile opționale:
-- **Telefon lipsă**: "Nu este specificat"
-- **Departament lipsă**: "Nu este specificat"  
-- **Funcția lipsă**: "Nu este specificată"
+#### Pentru campurile optionale:
+- **Telefon lipsa**: "Nu este specificat"
+- **Departament lipsa**: "Nu este specificat"  
+- **Functia lipsa**: "Nu este specificata"
 
-#### Pentru informații de activitate:
-- **Niciodată conectat**: "Niciodată autentificat"
-- **Ultima conectare**: "Niciodată" în loc de dată
+#### Pentru informatii de activitate:
+- **Niciodata conectat**: "Niciodata autentificat"
+- **Ultima conectare**: "Niciodata" in loc de data
 
 ### Utilizatori cu roluri speciale
 
 #### Pentru super-administratori:
-- **Permisiuni suplimentare** pot apărea
-- **Butoane speciale** pentru funcții avansate
+- **Permisiuni suplimentare** pot aparea
+- **Butoane speciale** pentru functii avansate
 - **Indicatori vizuali** pentru statusul privilegiat
 
 #### Pentru utilizatori inactivi:
-- **Informațiile** sunt afișate normal
-- **Statusul** va arăta "Inactiv" cu badge roșu
-- **Activitatea recentă** va reflecta inactivitatea
+- **Informatiile** sunt afisate normal
+- **Statusul** va arata "Inactiv" cu badge rosu
+- **Activitatea recenta** va reflecta inactivitatea
 
 ---
 
@@ -339,89 +339,89 @@ Acestea apar pentru Manageri și alte roluri specifice:
 
 ### Identificarea problemelor
 
-#### 🔴 Semnale de alertă:
+#### 🔴 Semnale de alerta:
 - **Status "Blocat" sau "Suspendat"** - Utilizatorul are probleme
-- **"Inactiv de mult timp"** - Posibil nu mai lucrează
-- **"Niciodată autentificat"** - Contul nu a fost activat
-- **Lipsă departament** pentru personal medical - Informații incomplete
+- **"Inactiv de mult timp"** - Posibil nu mai lucreaza
+- **"Niciodata autentificat"** - Contul nu a fost activat
+- **Lipsa departament** pentru personal medical - Informatii incomplete
 
-#### 🟡 Semnale de atenție:
-- **Permisiuni neobișnuit de multe** - Verificați necesitatea
-- **Roluri incompatibile** cu funcția - Posibilă greșeală
-- **Informații de contact incomplete** - Ar trebui actualizate
+#### 🟡 Semnale de atentie:
+- **Permisiuni neobisnuit de multe** - Verificati necesitatea
+- **Roluri incompatibile** cu functia - Posibila greseala
+- **Informatii de contact incomplete** - Ar trebui actualizate
 
-### Verificarea consecvenței
+### Verificarea consecventei
 
-#### Verificați că:
-- **Rolul** corespunde cu funcția din organizație
-- **Departamentul** este corect pentru specialitatea medicală
-- **Permisiunile** sunt adecvate pentru responsabilități
-- **Statusul** reflectă situația reală a angajatului
+#### Verificati ca:
+- **Rolul** corespunde cu functia din organizatie
+- **Departamentul** este corect pentru specialitatea medicala
+- **Permisiunile** sunt adecvate pentru responsabilitati
+- **Statusul** reflecta situatia reala a angajatului
 
 ---
 
-## Acțiuni Rapide din Fereastră
+## Actiuni Rapide din Fereastra
 
 ### Contactarea utilizatorului
 
 #### Prin email:
-1. **Apăsați pe adresa de email** din cardul "Informații Personale"
+1. **Apasati pe adresa de email** din cardul "Informatii Personale"
 2. **Se va deschide** clientul de email implicit
 3. **Email-ul** va fi pre-completat cu adresa utilizatorului
 
 #### Prin telefon:
-- **Notați numărul** din cardul "Informații Personale"
-- **Apelați** folosind telefonul mobil sau fix
-- **Salvați** numărul în agenda telefonului dacă e necesar
+- **Notati numarul** din cardul "Informatii Personale"
+- **Apelati** folosind telefonul mobil sau fix
+- **Salvati** numarul in agenda telefonului daca e necesar
 
-### Editarea rapidă
+### Editarea rapida
 
-1. **Apăsați "Editează Utilizatorul"** din josul ferestrei
-2. **Se va închide** fereastra de detalii
+1. **Apasati "Editeaza Utilizatorul"** din josul ferestrei
+2. **Se va inchide** fereastra de detalii
 3. **Se va deschide** formularul de editare cu datele precompletate
-4. **Faceți modificările** necesare și salvați
+4. **Faceti modificarile** necesare si salvati
 
 ---
 
-## Înțelegerea Contextului
+## intelegerea Contextului
 
 ### Pentru administratori
 
-#### Ce să urmăriți:
-- **Distribuția rolurilor** - nu prea mulți administratori
-- **Utilizatori inactivi** - posibil de curățat
+#### Ce sa urmariti:
+- **Distributia rolurilor** - nu prea multi administratori
+- **Utilizatori inactivi** - posibil de curatat
 - **Permisiuni excesive** - reducere pentru securitate
-- **Informații incomplete** - completare necesară
+- **Informatii incomplete** - completare necesara
 
 ### Pentru manageri departamentali
 
-#### Ce să urmăriți:
+#### Ce sa urmariti:
 - **Personalul din departament** are rolurile corecte
-- **Activitatea recentă** a echipei dvs.
-- **Informațiile de contact** sunt actualizate
-- **Funcțiile** reflectă realitatea organizațională
+- **Activitatea recenta** a echipei dvs.
+- **Informatiile de contact** sunt actualizate
+- **Functiile** reflecta realitatea organizationala
 
 ---
 
-## Întrebări Frecvente
+## intrebari Frecvente
 
-### 1. De ce nu pot să editez informațiile direct din această fereastră?
-**Răspuns:** Această fereastră este doar pentru vizualizare. Pentru editare, folosiți butonul "Editează Utilizatorul" sau butonul de editare din lista principală.
+### 1. De ce nu pot sa editez informatiile direct din aceasta fereastra?
+**Raspuns:** Aceasta fereastra este doar pentru vizualizare. Pentru editare, folositi butonul "Editeaza Utilizatorul" sau butonul de editare din lista principala.
 
-### 2. Ce înseamnă când văd "Niciodată autentificat"?
-**Răspuns:** Utilizatorul nu s-a conectat încă niciodată în sistem. Este normal pentru conturi nou create.
+### 2. Ce inseamna cand vad "Niciodata autentificat"?
+**Raspuns:** Utilizatorul nu s-a conectat inca niciodata in sistem. Este normal pentru conturi nou create.
 
-### 3. De ce nu văd toate permisiunile pentru un utilizator?
-**Răspuns:** Se afișează doar permisiunile relevante pentru rolul utilizatorului. Permisiunile tehnice interne nu sunt afișate.
+### 3. De ce nu vad toate permisiunile pentru un utilizator?
+**Raspuns:** Se afiseaza doar permisiunile relevante pentru rolul utilizatorului. Permisiunile tehnice interne nu sunt afisate.
 
-### 4. Pot să printez aceste informații?
-**Răspuns:** Da, folosiți funcția de printare a browserului (Ctrl+P) când fereastra este deschisă. Se va printa frumos formatat.
+### 4. Pot sa printez aceste informatii?
+**Raspuns:** Da, folositi functia de printare a browserului (Ctrl+P) cand fereastra este deschisa. Se va printa frumos formatat.
 
-### 5. De ce unele informații lipsesc?
-**Răspuns:** Informațiile opționale (telefon, departament, funcția) pot să nu fi fost completate la crearea contului.
+### 5. De ce unele informatii lipsesc?
+**Raspuns:** Informatiile optionale (telefon, departament, functia) pot sa nu fi fost completate la crearea contului.
 
-### 6. Cum știu dacă un utilizator este conectat acum?
-**Răspuns:** Dacă în "Activitate recentă" scrie "Online acum", înseamnă că utilizatorul este conectat în acest moment.
+### 6. Cum stiu daca un utilizator este conectat acum?
+**Raspuns:** Daca in "Activitate recenta" scrie "Online acum", inseamna ca utilizatorul este conectat in acest moment.
 
 ---
 
@@ -430,32 +430,32 @@ Acestea apar pentru Manageri și alte roluri specifice:
 ### Fereastra nu se deschide
 
 #### Cauze posibile:
-- Browser blocat sau încărcat
+- Browser blocat sau incarcat
 - Probleme de conectivitate
-- Eroare temporară de server
+- Eroare temporara de server
 
-#### Soluții:
-1. **Reîmprospătați pagina** cu F5
-2. **Încercați cu alt browser**
-3. **Verificați conexiunea** la internet
-4. **Contactați suportul** dacă problema persistă
+#### Solutii:
+1. **Reimprospatati pagina** cu F5
+2. **incercati cu alt browser**
+3. **Verificati conexiunea** la internet
+4. **Contactati suportul** daca problema persista
 
-### Informațiile nu se încarcă complet
+### Informatiile nu se incarca complet
 
 #### Cauze posibile:
-- Încărcare lentă de date
-- Utilizator cu multe informații
-- Probleme de rețea
+- incarcare lenta de date
+- Utilizator cu multe informatii
+- Probleme de retea
 
-#### Soluții:
-1. **Așteptați** câteva secunde suplimentare
-2. **Închideți și redeschideți** fereastra
-3. **Verificați conexiunea** la internet
+#### Solutii:
+1. **Asteptati** cateva secunde suplimentare
+2. **inchideti si redeschideti** fereastra
+3. **Verificati conexiunea** la internet
 
 ---
 
-*Această fereastră vă oferă o imagine completă asupra utilizatorilor din sistemul ValyanMed. Folosiți informațiile pentru a înțelege mai bine organizația și a gestiona eficient personalul clinicii.*
+*Aceasta fereastra va ofera o imagine completa asupra utilizatorilor din sistemul ValyanMed. Folositi informatiile pentru a intelege mai bine organizatia si a gestiona eficient personalul clinicii.*
 
 **Versiune document:** 1.0  
-**Data actualizării:** Septembrie 2025  
+**Data actualizarii:** Septembrie 2025  
 **Autor:** Echipa ValyanMed

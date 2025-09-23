@@ -109,7 +109,7 @@ private void ToggleKebabMenu()
 🔘 Kebab Menu (⋮) Button
 ├── 📊 Statistici (Toggle statistics cards)
 │   └── ✅ Shows checkmark when active
-├── 🔍 Filtrare Avansată (Toggle filter panel)  
+├── 🔍 Filtrare Avansata (Toggle filter panel)  
 │   └── ✅ Shows checkmark when active
 ├── 🖱️ Click-outside to close (if JavaScript available)
 ├── ⌨️ Escape key to close (if JavaScript available)
@@ -151,7 +151,7 @@ private void ToggleKebabMenu()
 The kebab menu now works reliably:
 - **Click the ⋮ button** in the top-right of the page header
 - **Select "Statistici"** to show/hide statistics cards
-- **Select "Filtrare Avansată"** to show/hide the filter panel
+- **Select "Filtrare Avansata"** to show/hide the filter panel
 - **Checkmarks indicate** which features are currently active
 - **Enhanced UX** → Click outside menu or press Escape to close (if JavaScript enabled)
 

@@ -1,163 +1,163 @@
-﻿# Documentație pentru Utilizatorii Aplicației
+﻿# Documentatie pentru Utilizatorii Aplicatiei
 
-Această secțiune conține documentația pentru utilizatorii finali ai aplicației ValyanClinic - sistemul de management pentru clinici medicale.
+Aceasta sectiune contine documentatia pentru utilizatorii finali ai aplicatiei ValyanClinic - sistemul de management pentru clinici medicale.
 
-## Structura Documentației
+## Structura Documentatiei
 
 ### 📖 Ghiduri Generale
-- **Introducere în Sistem** - Prezentarea generală a aplicației
-- **Primii Pași** - Cum să începeți să folosiți aplicația
-- **Interfața Comună** - Elemente comune în toate paginile
+- **Introducere in Sistem** - Prezentarea generala a aplicatiei
+- **Primii Pasi** - Cum sa incepeti sa folositi aplicatia
+- **Interfata Comuna** - Elemente comune in toate paginile
 
-### 🔐 Autentificare și Securitate
-- **[Ghid Autentificare](Ghid-Utilizator-Autentificare.md)** - Cum să vă conectați în aplicație
-- **Resetarea Parolei** - Cum să vă recuperați accesul la cont
+### 🔐 Autentificare si Securitate
+- **[Ghid Autentificare](Ghid-Utilizator-Autentificare.md)** - Cum sa va conectati in aplicatie
+- **Resetarea Parolei** - Cum sa va recuperati accesul la cont
 - **Securitatea Contului** - Sfaturi pentru protejarea datelor
 
 ### 👥 Gestionarea Utilizatorilor
-- **[Gestionare Utilizatori](Ghid-Utilizator-Gestionare-Utilizatori.md)** - Pagina principală de management
-- **[Adăugare și Editare Utilizatori](Ghid-Utilizator-Adaugare-Editare-Utilizatori.md)** - Formularele pentru utilizatori
-- **[Vizualizare Detalii Utilizatori](Ghid-Utilizator-Vizualizare-Detalii-Utilizatori.md)** - Fereastra cu informații complete
-- **Roluri și Permisiuni** - Înțelegerea drepturilor de acces
+- **[Gestionare Utilizatori](Ghid-Utilizator-Gestionare-Utilizatori.md)** - Pagina principala de management
+- **[Adaugare si Editare Utilizatori](Ghid-Utilizator-Adaugare-Editare-Utilizatori.md)** - Formularele pentru utilizatori
+- **[Vizualizare Detalii Utilizatori](Ghid-Utilizator-Vizualizare-Detalii-Utilizatori.md)** - Fereastra cu informatii complete
+- **Roluri si Permisiuni** - intelegerea drepturilor de acces
 
 ### 🏥 Module Clinica
-- **Gestionarea Pacienților** - Lucrul cu fișele de pacienți
-- **Programări** - Gestionarea programărilor medicale
-- **Consultatii** - Înregistrarea consultațiilor
-- **Tratamente** - Urmărirea tratamentelor pacienților
+- **Gestionarea Pacientilor** - Lucrul cu fisele de pacienti
+- **Programari** - Gestionarea programarilor medicale
+- **Consultatii** - inregistrarea consultatiilor
+- **Tratamente** - Urmarirea tratamentelor pacientilor
 
-### 📊 Raportare și Statistici
-- **Rapoarte Standard** - Generarea rapoartelor de bază
-- **Rapoarte Personalizate** - Crearea rapoartelor pe măsură
-- **Exportarea Datelor** - Salvarea informațiilor în diverse formate
+### 📊 Raportare si Statistici
+- **Rapoarte Standard** - Generarea rapoartelor de baza
+- **Rapoarte Personalizate** - Crearea rapoartelor pe masura
+- **Exportarea Datelor** - Salvarea informatiilor in diverse formate
 
-### 💊 Farmacia și Stocuri
+### 💊 Farmacia si Stocuri
 - **Gestiunea Medicamentelor** - Administrarea stocurilor
-- **Prescripții** - Eliberarea și urmărirea prescripțiilor
+- **Prescriptii** - Eliberarea si urmarirea prescriptiilor
 - **Inventarul** - Gestionarea inventarului medical
 
-### 💰 Facturare și Financiar
-- **Facturare Pacienți** - Emiterea facturilor
-- **Gestionarea Plăților** - Urmărirea încasărilor
-- **Rapoarte Financiare** - Situația financiară a clinicii
+### 💰 Facturare si Financiar
+- **Facturare Pacienti** - Emiterea facturilor
+- **Gestionarea Platilor** - Urmarirea incasarilor
+- **Rapoarte Financiare** - Situatia financiara a clinicii
 
-## Ghiduri Folosite în Această Documentație
+## Ghiduri Folosite in Aceasta Documentatie
 
-### Limbă și Terminologie
-- Toată documentația este în **limba română** cu diacritice corecte
-- Folosim terminologie medicală și tehnică adecvată
-- Explicații clare pentru concepte complexe
+### Limba si Terminologie
+- Toata documentatia este in **limba romana** cu diacritice corecte
+- Folosim terminologie medicala si tehnica adecvata
+- Explicatii clare pentru concepte complexe
 - Exemple practice din activitatea clinicii
 
 ### Structura Ghidurilor
-- **Prezentare generală** - Scopul și funcționalitatea
-- **Acces și navigare** - Cum să ajungeți unde trebuie
-- **Pași detaliați** - Instrucțiuni pas cu pas
-- **Sfaturi și trucuri** - Optimizarea utilizării
-- **Probleme și soluții** - Depanarea problemelor comune
-- **Întrebări frecvente** - Răspunsuri la întrebările obișnuite
+- **Prezentare generala** - Scopul si functionalitatea
+- **Acces si navigare** - Cum sa ajungeti unde trebuie
+- **Pasi detaliati** - Instructiuni pas cu pas
+- **Sfaturi si trucuri** - Optimizarea utilizarii
+- **Probleme si solutii** - Depanarea problemelor comune
+- **intrebari frecvente** - Raspunsuri la intrebarile obisnuite
 
 ### Niveluri de Utilizatori
 
 #### 👨‍⚕️ **Medici**
-- Acces complet la datele pacienților
-- Funcții de consultație și prescriere
+- Acces complet la datele pacientilor
+- Functii de consultatie si prescriere
 - Rapoarte medicale detaliate
 
 #### 👩‍⚕️ **Personal Medical**
-- Asistență în consultații
-- Gestionarea programărilor
-- Înregistrarea datelor vitale
+- Asistenta in consultatii
+- Gestionarea programarilor
+- inregistrarea datelor vitale
 
 #### 👔 **Personal Administrativ**
 - Gestionarea utilizatorilor
 - Rapoarte administrative
-- Configurări sistem
+- Configurari sistem
 
-#### 📞 **Recepționeri**
-- Programarea pacienților
+#### 📞 **Receptioneri**
+- Programarea pacientilor
 - Gestionarea contactelor
-- Informații generale
+- Informatii generale
 
-### Simboluri și Convenții
+### Simboluri si Conventii
 
 #### Simboluri folosite:
-- ✅ **Acțiuni recomandate**
-- ❌ **Acțiuni de evitat**
-- ⚠️ **Atenționări importante**
+- ✅ **Actiuni recomandate**
+- ❌ **Actiuni de evitat**
+- ⚠️ **Atentionari importante**
 - 💡 **Sfaturi utile**
-- 🔍 **Informații suplimentare**
+- 🔍 **Informatii suplimentare**
 
 #### Formatare text:
-- **Text îngroșat** pentru concepte importante
-- `Text monospaciu` pentru elemente din interfață
-- *Text cursiv* pentru explicații sau note
+- **Text ingrosat** pentru concepte importante
+- `Text monospaciu` pentru elemente din interfata
+- *Text cursiv* pentru explicatii sau note
 
-### Actualizări Documentație
+### Actualizari Documentatie
 
-#### Frecvența actualizărilor:
-- **La fiecare versiune nouă** a aplicației
-- **La schimbări majore** în interfață
-- **La adăugarea** de funcționalități noi
-- **La solicitarea utilizatorilor** pentru clarificări
+#### Frecventa actualizarilor:
+- **La fiecare versiune noua** a aplicatiei
+- **La schimbari majore** in interfata
+- **La adaugarea** de functionalitati noi
+- **La solicitarea utilizatorilor** pentru clarificari
 
 #### Versionarea:
-- Fiecare document are **numărul versiunii** în subsol
-- **Data ultimei actualizări** este menționată
-- **Changelog-ul** modificărilor importante
+- Fiecare document are **numarul versiunii** in subsol
+- **Data ultimei actualizari** este mentionata
+- **Changelog-ul** modificarilor importante
 
-### Suport și Asistență
+### Suport si Asistenta
 
 #### Canale de suport:
 - **📞 Telefon**: 0373-XXX-XXX (Program: L-V 08:00-18:00)
 - **📧 Email**: suport.utilizatori@valyanmed.ro
-- **💬 Chat**: Butonul "Ajutor" din aplicație
-- **📱 WhatsApp**: Doar pentru urgențe
+- **💬 Chat**: Butonul "Ajutor" din aplicatie
+- **📱 WhatsApp**: Doar pentru urgente
 
-#### Tipuri de asistență:
-- **Tehnică** - Probleme cu aplicația
-- **Funcțională** - Cum să folosiți funcțiile
+#### Tipuri de asistenta:
+- **Tehnica** - Probleme cu aplicatia
+- **Functionala** - Cum sa folositi functiile
 - **Instruire** - Cursuri pentru utilizatori noi
 - **Personalizare** - Adaptarea la nevoile specifice
 
-### Feedback și Îmbunătățiri
+### Feedback si imbunatatiri
 
-#### Cum să ne ajutați:
-- **Raportați** problemele întâlnite
-- **Sugerați** îmbunătățiri pentru documentație
-- **Împărtășiți** experiența cu alți utilizatori
-- **Participați** la sesiunile de feedback
+#### Cum sa ne ajutati:
+- **Raportati** problemele intalnite
+- **Sugerati** imbunatatiri pentru documentatie
+- **impartasiti** experienta cu alti utilizatori
+- **Participati** la sesiunile de feedback
 
 #### Contact pentru feedback:
 - **Email**: feedback.documentatie@valyanmed.ro
-- **Formular online**: În aplicație, secțiunea "Feedback"
-- **Întâlniri periodice** cu echipele din clinici
+- **Formular online**: in aplicatie, sectiunea "Feedback"
+- **intalniri periodice** cu echipele din clinici
 
-## Index de Căutare
+## Index de Cautare
 
 ### Termeni cheie:
-- **Autentificare**: Procesul de conectare în aplicație
-- **Dashboard**: Pagina principală cu statistici
+- **Autentificare**: Procesul de conectare in aplicatie
+- **Dashboard**: Pagina principala cu statistici
 - **Utilizatori**: Persoanele cu acces la sistem
-- **Roluri**: Tipurile de acces în aplicație
+- **Roluri**: Tipurile de acces in aplicatie
 - **Permisiuni**: Drepturile specifice ale utilizatorilor
-- **Departament**: Secțiile din clinică
+- **Departament**: Sectiile din clinica
 - **Status**: Starea conturilor de utilizator
 
-### Funcții principale:
-- **Adăugare utilizator**: Crearea conturilor noi
-- **Editare utilizator**: Modificarea informațiilor
-- **Vizualizare detalii**: Consultarea informațiilor complete
-- **Filtrare**: Găsirea rapidă a utilizatorilor
-- **Export**: Salvarea datelor în fișiere
-- **Căutare**: Găsirea informațiilor în sistem
+### Functii principale:
+- **Adaugare utilizator**: Crearea conturilor noi
+- **Editare utilizator**: Modificarea informatiilor
+- **Vizualizare detalii**: Consultarea informatiilor complete
+- **Filtrare**: Gasirea rapida a utilizatorilor
+- **Export**: Salvarea datelor in fisiere
+- **Cautare**: Gasirea informatiilor in sistem
 
 ---
 
-*Această documentație este în dezvoltare continuă. Pentru cele mai recente informații, consultați versiunea online sau contactați echipa de suport.*
+*Aceasta documentatie este in dezvoltare continua. Pentru cele mai recente informatii, consultati versiunea online sau contactati echipa de suport.*
 
-**Atenție**: Respectați întotdeauna politicile de confidențialitate ale clinicii și nu împărtășiți informații despre pacienți sau personal fără autorizare.
+**Atentie**: Respectati intotdeauna politicile de confidentialitate ale clinicii si nu impartasiti informatii despre pacienti sau personal fara autorizare.
 
-**Versiune documentație:** 2.0  
-**Data ultimei actualizări:** Septembrie 2025  
-**Responsabil documentație:** Echipa ValyanMed
+**Versiune documentatie:** 2.0  
+**Data ultimei actualizari:** Septembrie 2025  
+**Responsabil documentatie:** Echipa ValyanMed

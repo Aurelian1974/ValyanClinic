@@ -4,8 +4,8 @@ using ValyanClinic.Domain.Models;
 namespace ValyanClinic.Components.Pages.HomePage;
 
 /// <summary>
-/// Page-specific models pentru Home - ORGANIZAT ÎN FOLDER HomePage
-/// UPDATED: Dashboard models în loc de coming soon features
+/// Page-specific models pentru Home - ORGANIZAT iN FOLDER HomePage
+/// UPDATED: Dashboard models in loc de coming soon features
 /// Optimizat pentru C# 13 & .NET 9
 /// </summary>
 public class HomeModels
@@ -48,13 +48,13 @@ public class HomeModels
             },
             new() { 
                 Icon = "fas fa-calendar-check", 
-                Label = "Program?ri Ast?zi", 
+                Label = "Programri Astzi", 
                 Value = "8",
                 Color = "#17a2b8" 
             },
             new() { 
                 Icon = "fas fa-heartbeat", 
-                Label = "Consul?ii Active", 
+                Label = "Consulii Active", 
                 Value = "3",
                 Color = "#dc3545" 
             }
@@ -75,8 +75,8 @@ public class HomeModels
             },
             new()
             {
-                Title = "Pacien?i",
-                Description = "Gestioneaz? pacien?ii ?i dosarele medicale",
+                Title = "Pacieni",
+                Description = "Gestioneaz? pacienii ?i dosarele medicale",
                 Icon = "fas fa-user-injured",
                 Color = "#28a745",
                 Route = "/pacienti",
@@ -84,8 +84,8 @@ public class HomeModels
             },
             new()
             {
-                Title = "Program?ri",
-                Description = "Calendar ?i program?ri medicale",
+                Title = "Programri",
+                Description = "Calendar ?i programri medicale",
                 Icon = "fas fa-calendar-alt",
                 Color = "#17a2b8",
                 Route = "/programari",
@@ -127,7 +127,7 @@ public class HomeModels
             new()
             {
                 Icon = "fas fa-user-plus",
-                Message = "Utilizator nou înregistrat: Dr. Maria Popescu",
+                Message = "Utilizator nou inregistrat: Dr. Maria Popescu",
                 TimeAgo = "Acum 2 ore"
             },
             new()
@@ -139,7 +139,7 @@ public class HomeModels
             new()
             {
                 Icon = "fas fa-file-medical",
-                Message = "Consulta?ie completat? pentru Ana Ionescu",
+                Message = "Consultaie completat? pentru Ana Ionescu",
                 TimeAgo = "Acum 5 ore"
             },
             new()
@@ -197,6 +197,6 @@ public static class HomeModelsExtensions
     {
         var availableActions = models.QuickActions.Count(a => a.IsAvailable);
         var totalActions = models.QuickActions.Count;
-        return $"{availableActions} din {totalActions} func?ii disponibile";
+        return $"{availableActions} din {totalActions} funcii disponibile";
     }
 }

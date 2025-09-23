@@ -1,98 +1,98 @@
-﻿# Documentație Administrare Personal - ValyanClinic
+﻿# Documentatie Administrare Personal - ValyanClinic
 
-## Prezentare Generală
+## Prezentare Generala
 
-Modulul **Administrare Personal** este o componentă centrală a sistemului ValyanClinic, destinată gestionării întregului personal non-medical al clinicii. Această pagină oferă funcționalități complete pentru administrarea angajaților din departamentele de suport: administrativ, financiar, IT, întreținere, logistică și altele.
+Modulul **Administrare Personal** este o componenta centrala a sistemului ValyanClinic, destinata gestionarii intregului personal non-medical al clinicii. Aceasta pagina ofera functionalitati complete pentru administrarea angajatilor din departamentele de suport: administrativ, financiar, IT, intretinere, logistica si altele.
 
 ## Cuprins
 
 ### 📋 Pentru Utilizatori Finali
 - **[Ghid Utilizator - Administrare Personal](ForApplicationUsers/Ghid-Utilizator-Administrare-Personal.md)** - Ghid complet pentru utilizarea paginii de administrare personal
-- **[Ghid Utilizator - Adăugare Personal](ForApplicationUsers/Ghid-Utilizator-Adaugare-Personal.md)** - Cum să adăugați personal nou în sistem
-- **[Ghid Utilizator - Editare Personal](ForApplicationUsers/Ghid-Utilizator-Editare-Personal.md)** - Cum să modificați informațiile personalului existent
-- **[Ghid Utilizator - Vizualizare Detalii Personal](ForApplicationUsers/Ghid-Utilizator-Vizualizare-Detalii-Personal.md)** - Dashboard pentru vizualizarea informațiilor complete
-- **[Ghid Utilizator - Filtrare și Căutare Personal](ForApplicationUsers/Ghid-Utilizator-Filtrare-Cautare-Personal.md)** - Cum să folosiți sistemul de filtrare avansată
+- **[Ghid Utilizator - Adaugare Personal](ForApplicationUsers/Ghid-Utilizator-Adaugare-Personal.md)** - Cum sa adaugati personal nou in sistem
+- **[Ghid Utilizator - Editare Personal](ForApplicationUsers/Ghid-Utilizator-Editare-Personal.md)** - Cum sa modificati informatiile personalului existent
+- **[Ghid Utilizator - Vizualizare Detalii Personal](ForApplicationUsers/Ghid-Utilizator-Vizualizare-Detalii-Personal.md)** - Dashboard pentru vizualizarea informatiilor complete
+- **[Ghid Utilizator - Filtrare si Cautare Personal](ForApplicationUsers/Ghid-Utilizator-Filtrare-Cautare-Personal.md)** - Cum sa folositi sistemul de filtrare avansata
 
 ### 🔧 Pentru Dezvoltatori
-- **[Documentație Tehnică - Administrare Personal](Development/Administrare-Personal-Technical-Documentation.md)** - Documentație tehnică completă pentru pagina principală
-- **[Documentație Tehnică - Modal Adăugare/Editare Personal](Development/Add-Edit-Personal-Modal-Technical-Documentation.md)** - Implementarea formularului de adăugare/editare
-- **[Documentație Tehnică - Modal Vizualizare Personal](Development/View-Personal-Modal-Technical-Documentation.md)** - Dashboard-ul de vizualizare detalii
-- **[Documentație Tehnică - Sistem Filtrare Personal](Development/Personal-Filtering-System-Technical-Documentation.md)** - Sistemul avansat de filtrare și căutare
-- **[Documentație Tehnică - Kebab Menu și UI Components](Development/Kebab-Menu-UI-Components-Technical-Documentation.md)** - Componente UI și interacțiuni JavaScript
+- **[Documentatie Tehnica - Administrare Personal](Development/Administrare-Personal-Technical-Documentation.md)** - Documentatie tehnica completa pentru pagina principala
+- **[Documentatie Tehnica - Modal Adaugare/Editare Personal](Development/Add-Edit-Personal-Modal-Technical-Documentation.md)** - Implementarea formularului de adaugare/editare
+- **[Documentatie Tehnica - Modal Vizualizare Personal](Development/View-Personal-Modal-Technical-Documentation.md)** - Dashboard-ul de vizualizare detalii
+- **[Documentatie Tehnica - Sistem Filtrare Personal](Development/Personal-Filtering-System-Technical-Documentation.md)** - Sistemul avansat de filtrare si cautare
+- **[Documentatie Tehnica - Kebab Menu si UI Components](Development/Kebab-Menu-UI-Components-Technical-Documentation.md)** - Componente UI si interactiuni JavaScript
 
-### 📊 Arhitectură și Design
-- **[Arhitectura Modulului Personal](Technical/Personal-Module-Architecture.md)** - Arhitectura completă a modulului
-- **[State Management - Personal](Technical/Personal-State-Management.md)** - Managementul stării aplicației
-- **[Database Schema - Personal](Technical/Personal-Database-Schema.md)** - Schema bazei de date și stored procedures
-- **[API Endpoints - Personal](Technical/Personal-API-Endpoints.md)** - Documentația API-urilor
-- **[Security și Audit - Personal](Technical/Personal-Security-Audit.md)** - Securitate și audit trail
+### 📊 Arhitectura si Design
+- **[Arhitectura Modulului Personal](Technical/Personal-Module-Architecture.md)** - Arhitectura completa a modulului
+- **[State Management - Personal](Technical/Personal-State-Management.md)** - Managementul starii aplicatiei
+- **[Database Schema - Personal](Technical/Personal-Database-Schema.md)** - Schema bazei de date si stored procedures
+- **[API Endpoints - Personal](Technical/Personal-API-Endpoints.md)** - Documentatia API-urilor
+- **[Security si Audit - Personal](Technical/Personal-Security-Audit.md)** - Securitate si audit trail
 
-## Funcționalități Cheie
+## Functionalitati Cheie
 
-### 🏢 Gestionare Completă Personal
-- **CRUD Operations**: Create, Read, Update, Delete pentru înregistrările de personal
-- **Validare Avansată**: CNP românesc, email, telefon, date de identitate
-- **Gestionare Departamente**: Administratie, Financiar, IT, Întreținere, etc.
+### 🏢 Gestionare Completa Personal
+- **CRUD Operations**: Create, Read, Update, Delete pentru inregistrarile de personal
+- **Validare Avansata**: CNP romanesc, email, telefon, date de identitate
+- **Gestionare Departamente**: Administratie, Financiar, IT, intretinere, etc.
 - **Tracking Status**: Activ/Inactiv cu audit trail
 
-### 🔍 Căutare și Filtrare Avansată
+### 🔍 Cautare si Filtrare Avansata
 - **Filtrare Multi-Criteriu**: Departament, Status, Perioada activitate
-- **Căutare Text**: În nume, prenume, email, telefon
-- **Export Date**: Funcționalități de export pentru raportare
-- **Grupare Inteligentă**: Organizare automată după departament
+- **Cautare Text**: in nume, prenume, email, telefon
+- **Export Date**: Functionalitati de export pentru raportare
+- **Grupare Inteligenta**: Organizare automata dupa departament
 
-### 📱 Interfață Modernă
-- **Responsive Design**: Optimizat pentru desktop, tablet și mobile
-- **Syncfusion DataGrid**: Grid profesional cu funcții avansate
-- **Toast Notifications**: Feedback instant pentru operații
-- **Kebab Menu**: Acces rapid la funcții secundare
+### 📱 Interfata Moderna
+- **Responsive Design**: Optimizat pentru desktop, tablet si mobile
+- **Syncfusion DataGrid**: Grid profesional cu functii avansate
+- **Toast Notifications**: Feedback instant pentru operatii
+- **Kebab Menu**: Acces rapid la functii secundare
 
-### 🔐 Securitate și Audit
-- **Validare Server-Side**: Toate validările se fac pe server
-- **Audit Logging**: Înregistrarea tuturor modificărilor
-- **Role-Based Access**: Acces bazat pe roluri și permisiuni
-- **Data Protection**: Protecția datelor personale conform GDPR
+### 🔐 Securitate si Audit
+- **Validare Server-Side**: Toate validarile se fac pe server
+- **Audit Logging**: inregistrarea tuturor modificarilor
+- **Role-Based Access**: Acces bazat pe roluri si permisiuni
+- **Data Protection**: Protectia datelor personale conform GDPR
 
 ## Componente Principale
 
-### 1. **AdministrarePersonal.razor** - Componenta Principală
+### 1. **AdministrarePersonal.razor** - Componenta Principala
 ```
-Locație: ValyanClinic\Components\Pages\Administrare\Personal\
-Responsabilități:
+Locatie: ValyanClinic\Components\Pages\Administrare\Personal\
+Responsabilitati:
 - Management principal al paginii
-- Coordonarea modalelor și componentelor
-- Gestionarea stării aplicației
-- Event handling și comunicarea cu serviciile
+- Coordonarea modalelor si componentelor
+- Gestionarea starii aplicatiei
+- Event handling si comunicarea cu serviciile
 ```
 
 ### 2. **AdaugaEditezaPersonal.razor** - Modal Add/Edit
 ```
-Locație: ValyanClinic\Components\Pages\Administrare\Personal\
-Responsabilități:
-- Formulare pentru adăugare/editare personal
-- Validare client și server-side
-- Gestionarea lookup-urilor (județe, localități)
-- CNP validation și auto-calculare data nașterii
+Locatie: ValyanClinic\Components\Pages\Administrare\Personal\
+Responsabilitati:
+- Formulare pentru adaugare/editare personal
+- Validare client si server-side
+- Gestionarea lookup-urilor (judete, localitati)
+- CNP validation si auto-calculare data nasterii
 ```
 
 ### 3. **VizualizeazaPersonal.razor** - Modal Vizualizare
 ```
-Locație: ValyanClinic\Components\Pages\Administrare\Personal\
-Responsabilități:
+Locatie: ValyanClinic\Components\Pages\Administrare\Personal\
+Responsabilitati:
 - Dashboard pentru vizualizarea detaliilor complete
-- Layout card-based pentru informații organizate
-- Read-only mode cu opțiuni de editare
-- Export și print functionality
+- Layout card-based pentru informatii organizate
+- Read-only mode cu optiuni de editare
+- Export si print functionality
 ```
 
 ### 4. **LocationDependentGridDropdowns.razor** - Componente Lookup
 ```
-Locație: ValyanClinic\Components\Shared\
-Responsabilități:
-- Dropdown-uri dependente (Județ → Localitate)
-- Încărcare asincronă a datelor
-- State management pentru selecții
-- Error handling și retry logic
+Locatie: ValyanClinic\Components\Shared\
+Responsabilitati:
+- Dropdown-uri dependente (Judet → Localitate)
+- incarcare asincrona a datelor
+- State management pentru selectii
+- Error handling si retry logic
 ```
 
 ## Stack Tehnologic
@@ -101,20 +101,20 @@ Responsabilități:
 - **Framework**: Blazor Server (.NET 9)
 - **UI Components**: Syncfusion Blazor Enterprise Suite
 - **Rendering**: InteractiveServer mode
-- **CSS**: Custom CSS cu specificitate maximă
+- **CSS**: Custom CSS cu specificitate maxima
 - **JavaScript**: Helper functions pentru event handling
 
 ### Backend
 - **Architecture**: Clean Architecture
 - **ORM**: Dapper pentru high-performance data access
 - **Database**: SQL Server cu stored procedures
-- **Validation**: FluentValidation pentru validări complexe
+- **Validation**: FluentValidation pentru validari complexe
 - **Logging**: Serilog pentru structured logging
 
 ### Infrastructure
 - **Caching**: MemoryCache pentru optimizare
 - **State Management**: Custom state classes
-- **Grid State Persistence**: Salvarea preferințelor utilizatorilor
+- **Grid State Persistence**: Salvarea preferintelor utilizatorilor
 - **Disposal Pattern**: Memory leak prevention
 
 ## Workflow Tipic
@@ -122,140 +122,140 @@ Responsabilități:
 ### 1. **Accesarea Paginii**
 ```
 1. Navigare la /administrare/personal
-2. Încărcare date personal din baza de date
-3. Inițializare componente UI (grid, filtre, statistici)
+2. incarcare date personal din baza de date
+3. Initializare componente UI (grid, filtre, statistici)
 4. Setup JavaScript helpers pentru kebab menu
 ```
 
-### 2. **Adăugare Personal Nou**
+### 2. **Adaugare Personal Nou**
 ```
-1. Click pe "Adaugă Personal" → Deschidere modal
+1. Click pe "Adauga Personal" → Deschidere modal
 2. Auto-generare cod angajat unic
 3. Completare formular cu validare real-time
-4. Validare CNP și calculare automată data nașterii
-5. Salvare cu validare server-side completă
+4. Validare CNP si calculare automata data nasterii
+5. Salvare cu validare server-side completa
 ```
 
 ### 3. **Editare Personal Existent**
 ```
 1. Selectare din grid → Click "Edit"
 2. Pre-populare formular cu date existente
-3. Modificare câmpuri cu validare
+3. Modificare campuri cu validare
 4. Salvare cu audit trail
 ```
 
 ### 4. **Vizualizare Detalii**
 ```
 1. Click pe "View" din grid
-2. Afișare dashboard cu toate informațiile
-3. Organizare în carduri tematice
-4. Opțiuni pentru editare directă
+2. Afisare dashboard cu toate informatiile
+3. Organizare in carduri tematice
+4. Optiuni pentru editare directa
 ```
 
-## Considerații de Performanță
+## Consideratii de Performanta
 
 ### Grid Performance
-- **Lazy Loading**: Încărcare pe pagini pentru volume mari de date
+- **Lazy Loading**: incarcare pe pagini pentru volume mari de date
 - **Virtual Scrolling**: Pentru liste foarte lungi
 - **Column Virtualization**: Optimizare pentru ecrane mici
-- **State Persistence**: Salvarea preferințelor utilizatorului
+- **State Persistence**: Salvarea preferintelor utilizatorului
 
 ### Memory Management
-- **Proper Disposal**: Curățarea tuturor resurselor
+- **Proper Disposal**: Curatarea tuturor resurselor
 - **Event Listener Cleanup**: Prevenirea memory leaks
-- **Component Lifecycle**: Management corect al ciclului de viață
+- **Component Lifecycle**: Management corect al ciclului de viata
 
 ### Database Optimization
-- **Stored Procedures**: Pentru operații complexe
-- **Indexing**: Pe coloanele frecvent căutate
+- **Stored Procedures**: Pentru operatii complexe
+- **Indexing**: Pe coloanele frecvent cautate
 - **Connection Pooling**: Optimizarea conexiunilor
-- **Async Operations**: Pentru toate operațiile I/O
+- **Async Operations**: Pentru toate operatiile I/O
 
-## Integrări
+## Integrari
 
 ### Cu Alte Module
-- **Personal Medical**: Legătura cu modulul de personal medical
+- **Personal Medical**: Legatura cu modulul de personal medical
 - **Utilizatori**: Sincronizarea cu conturile de utilizator
 - **Raportare**: Generarea de rapoarte pentru personal
-- **Audit**: Înregistrarea în log-urile de audit
+- **Audit**: inregistrarea in log-urile de audit
 
 ### Cu Servicii Externe
-- **Email Service**: Pentru notificări
+- **Email Service**: Pentru notificari
 - **SMS Service**: Pentru alerte urgente
-- **Export Service**: Pentru generarea fișierelor
+- **Export Service**: Pentru generarea fisierelor
 - **Backup Service**: Pentru arhivarea datelor
 
-## Quick Reference - Comenzi și Shortcut-uri
+## Quick Reference - Comenzi si Shortcut-uri
 
-### Navigare Rapidă
+### Navigare Rapida
 - **URL Direct**: `/administrare/personal`
-- **Keyboard Shortcut**: `Alt + A` → `P` (dacă sunt activate)
+- **Keyboard Shortcut**: `Alt + A` → `P` (daca sunt activate)
 - **Din meniu**: Administrare → Administrare Personal
 
-### Operații Principale
-- **Adaugă Personal**: Click butonul verde "Adaugă Personal"
-- **Editează**: Click butonul portocaliu ✏️ din grid
-- **Vizualizează**: Click butonul albastru 👁️ din grid
-- **Șterge**: Click butonul roșu 🗑️ din grid (doar Admin)
+### Operatii Principale
+- **Adauga Personal**: Click butonul verde "Adauga Personal"
+- **Editeaza**: Click butonul portocaliu ✏️ din grid
+- **Vizualizeaza**: Click butonul albastru 👁️ din grid
+- **sterge**: Click butonul rosu 🗑️ din grid (doar Admin)
 
-### Filtrare și Căutare
-- **Meniu Kebab**: Click pe ⋮ pentru opțiuni avansate
+### Filtrare si Cautare
+- **Meniu Kebab**: Click pe ⋮ pentru optiuni avansate
 - **Statistici**: Toggle din kebab menu
 - **Filtre Avansate**: Toggle din kebab menu
-- **Căutare Rapidă**: Folosește bara de căutare din filtre
+- **Cautare Rapida**: Foloseste bara de cautare din filtre
 
-### Keyboard Shortcuts în Modal
-- **Salvare**: `Ctrl + S` (în formulare)
-- **Anulare**: `Escape` (închide modalul)
-- **Tab Navigation**: Pentru navigarea între câmpuri
+### Keyboard Shortcuts in Modal
+- **Salvare**: `Ctrl + S` (in formulare)
+- **Anulare**: `Escape` (inchide modalul)
+- **Tab Navigation**: Pentru navigarea intre campuri
 
 ## Troubleshooting Rapid
 
 ### Probleme Comune
-| Problemă | Cauză Probabilă | Soluție Rapidă |
+| Problema | Cauza Probabila | Solutie Rapida |
 |----------|----------------|----------------|
-| Nu se încarcă datele | Conexiune/Permisiuni | `Ctrl + F5` pentru refresh |
-| CNP nu se validează | Format incorect | Verifică 13 cifre și algoritm |
-| Modal nu se deschide | JavaScript blocat | Dezactivează AdBlock |
-| Filtrarea nu funcționează | Cache corupt | Curăță filtrele și reload |
+| Nu se incarca datele | Conexiune/Permisiuni | `Ctrl + F5` pentru refresh |
+| CNP nu se valideaza | Format incorect | Verifica 13 cifre si algoritm |
+| Modal nu se deschide | JavaScript blocat | Dezactiveaza AdBlock |
+| Filtrarea nu functioneaza | Cache corupt | Curata filtrele si reload |
 
 ### Contacte Urgente
 - **Suport Tehnic**: +40 373 XXX XXX
 - **Email Suport**: suport.urgent@valyanmed.ro
-- **Chat Intern**: Butonul "Ajutor" din aplicație
+- **Chat Intern**: Butonul "Ajutor" din aplicatie
 
 ## Planuri de Dezvoltare
 
-### Următoarea Versiune (v2.1)
+### Urmatoarea Versiune (v2.1)
 - **Export PDF**: Generare rapoarte PDF pentru personal
 - **Import Bulk**: Import masiv din Excel/CSV
-- **Mobile App**: Aplicație mobilă pentru manageri
+- **Mobile App**: Aplicatie mobila pentru manageri
 - **Advanced Analytics**: Dashboard-uri analitice
 
 ### Viitor (v3.0)
 - **AI Integration**: Asistent AI pentru completarea formularelor
-- **Document Scanner**: Scanare automată CI/CV
+- **Document Scanner**: Scanare automata CI/CV
 - **Biometric Integration**: Pontaj cu amprente
-- **API Public**: API REST pentru integrări externe
+- **API Public**: API REST pentru integrari externe
 
 ---
 
 **📧 Contact Echipa de Dezvoltare**: development@valyanmed.ro  
 **📞 Suport Tehnic**: +40 373 XXX XXX  
-**🌐 Documentație Online**: https://docs.valyanmed.ro
+**🌐 Documentatie Online**: https://docs.valyanmed.ro
 
 **Versiune**: 2.0  
-**Data ultimei actualizări**: Decembrie 2024  
-**Responsabil documentație**: Echipa ValyanMed Development
+**Data ultimei actualizari**: Decembrie 2024  
+**Responsabil documentatie**: Echipa ValyanMed Development
 
 ## 📜 Changelog
 
 ### v2.0 (Decembrie 2024)
-- ✅ Documentație completă și atotcuprinzătoare
-- ✅ Toate modalele documentate în detaliu
+- ✅ Documentatie completa si atotcuprinzatoare
+- ✅ Toate modalele documentate in detaliu
 - ✅ Sistem de filtrare avansat
 - ✅ Kebab menu cu JavaScript integration
-- ✅ Accessibility și responsive design complet
+- ✅ Accessibility si responsive design complet
 
 ### v1.9 (Noiembrie 2024)
 - ✅ Implementare AdministrarePersonal.razor
@@ -265,6 +265,6 @@ Responsabilități:
 
 ### v1.8 (Octombrie 2024)
 - ✅ Integrare Syncfusion DataGrid
-- ✅ Bază de date și stored procedures
+- ✅ Baza de date si stored procedures
 - ✅ Logging cu Serilog
 - ✅ Clean Architecture implementation

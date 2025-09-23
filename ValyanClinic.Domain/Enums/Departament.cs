@@ -41,12 +41,12 @@ public enum Departament
     [Display(Name = "Juridic")]
     Juridic = 11,
     
-    [Display(Name = "Relatii Clienti")]  // Corectat: spațiu în loc de underscore
+    [Display(Name = "Relatii Clienti")]  // Corectat: spatiu in loc de underscore
     RelatiiClienti = 12,
     
     [Display(Name = "Calitate")]
     Calitate = 13,
     
-    [Display(Name = "Call Center")]  // Corectat: spațiu în loc de CamelCase
+    [Display(Name = "Call Center")]  // Corectat: spatiu in loc de CamelCase
     CallCenter = 14
 }

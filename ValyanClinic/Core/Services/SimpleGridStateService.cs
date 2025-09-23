@@ -6,23 +6,23 @@ namespace ValyanClinic.Core.Services;
 
 /// <summary>
 /// SIMPLE GRID STATE PERSISTENCE SERVICE
-/// Implementare simplificată pentru persistența stării grid-ului Syncfusion
-/// Folosește ICacheService pentru a păstra setările temporar in memoria aplicatiei
+/// Implementare simplificata pentru persistenta starii grid-ului Syncfusion
+/// Foloseste ICacheService pentru a pastra setarile temporar in memoria aplicatiei
 /// </summary>
 public interface ISimpleGridStateService
 {
     /// <summary>
-    /// Salvează setările unui grid (page size, sortare, filtre)
+    /// Salveaza setarile unui grid (page size, sortare, filtre)
     /// </summary>
     Task SaveGridSettingsAsync(string gridId, Dictionary<string, object> settings);
     
     /// <summary>
-    /// Recuperează setările salvate pentru un grid
+    /// Recupereaza setarile salvate pentru un grid
     /// </summary>
     Task<Dictionary<string, object>?> GetGridSettingsAsync(string gridId);
     
     /// <summary>
-    /// Șterge setările pentru un grid specific
+    /// sterge setarile pentru un grid specific
     /// </summary>
     Task ClearGridSettingsAsync(string gridId);
 }
@@ -100,7 +100,7 @@ public class SimpleGridStateService : ISimpleGridStateService
 }
 
 /// <summary>
-/// Simple grid state model pentru persistență
+/// Simple grid state model pentru persistenta
 /// </summary>
 public class SimpleGridState
 {

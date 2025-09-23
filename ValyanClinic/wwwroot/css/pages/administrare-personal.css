@@ -1,14 +1,14 @@
 ﻿/* ==========================================================================
-   DESIGN COMPACT ȘI PROFESIONAL - PERSONAL PAGE (SIMILAR CU USERS.CSS)
+   DESIGN COMPACT sI PROFESIONAL - PERSONAL PAGE (SIMILAR CU USERS.CSS)
    ========================================================================== */
 
 /* Container principal - ADAPTAT PENTRU LAYOUT CORECT */
 .personal-page-container {
   position: absolute; /* CHANGED from fixed */
-  top: 0; /* RESET - layout-ul gestionează offsetul */
-  left: 0; /* RESET - layout-ul gestionează offsetul */
-  right: 0; /* PĂSTRAT pentru margin */
-  bottom: 0; /* PĂSTRAT pentru margin */
+  top: 0; /* RESET - layout-ul gestioneaza offsetul */
+  left: 0; /* RESET - layout-ul gestioneaza offsetul */
+  right: 0; /* PaSTRAT pentru margin */
+  bottom: 0; /* PaSTRAT pentru margin */
   width: 100%; /* CHANGED to full width within parent */
   height: 100%; /* CHANGED to full height within parent */
   display: flex;

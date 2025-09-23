@@ -4,7 +4,7 @@ using ValyanClinic.Domain.Enums;
 namespace ValyanClinic.Components.Pages.LoginPage;
 
 /// <summary>
-/// State Management pentru Login page - ORGANIZAT ÎN FOLDER LoginPage
+/// State Management pentru Login page - ORGANIZAT iN FOLDER LoginPage
 /// RESTRUCTURAT conform planului de refactorizare
 /// </summary>
 public class LoginState
@@ -14,12 +14,12 @@ public class LoginState
     public bool IsLoading { get; set; } = false;
     public bool ShowPassword { get; set; } = false;
     
-    // Validation State - FluentValidation în loc de Data Annotations
+    // Validation State - FluentValidation in loc de Data Annotations
     public string? ErrorMessage { get; set; }
     public List<string> ValidationErrors { get; set; } = [];
     public bool HasValidationErrors => ValidationErrors.Count > 0;
     
-    // UI State - calculat? în loc de hardcodat?
+    // UI State - calculat? in loc de hardcodat?
     public bool IsFormValid => !HasValidationErrors && 
                               !string.IsNullOrWhiteSpace(LoginRequest.Username) && 
                               !string.IsNullOrWhiteSpace(LoginRequest.Password);
@@ -114,7 +114,7 @@ public class LoginState
 
     public bool CanAttemptLogin()
     {
-        // Business rules pentru când poate încerca login
+        // Business rules pentru cand poate incerca login
         if (IsAccountLocked && LockoutTimeRemaining.HasValue && LockoutTimeRemaining.Value > TimeSpan.Zero)
         {
             return false;
@@ -135,7 +135,7 @@ public class LoginState
         {
             true => "Se autentific?...",
             false when IsAccountLocked => "Cont blocat",
-            _ => "Intr? în aplica?ie"
+            _ => "Intr? in aplicaie"
         };
     }
 
@@ -146,10 +146,10 @@ public class LoginState
         if (LockoutTimeRemaining.HasValue && LockoutTimeRemaining.Value > TimeSpan.Zero)
         {
             var minutes = Math.Ceiling(LockoutTimeRemaining.Value.TotalMinutes);
-            return $"Cont temporar blocat. Încerca?i din nou în {minutes} minute.";
+            return $"Cont temporar blocat. incercai din nou in {minutes} minute.";
         }
 
-        return "Cont blocat din cauza prea multor încerc?ri de autentificare.";
+        return "Cont blocat din cauza prea multor incercri de autentificare.";
     }
 
     public List<DemoCredential> GetDemoCredentials() =>
@@ -157,7 +157,7 @@ public class LoginState
         new("admin", "admin123", "Administrator", "Acces complet la sistem", UserRole.Administrator),
         new("doctor1", "doctor123", "Dr. Maria Popescu", "Medic Cardiolog", UserRole.Doctor),
         new("asistent1", "asistent123", "Ana Ionescu", "Asistent Medical", UserRole.Nurse),
-        new("receptioner1", "receptioner123", "Elena Vasile", "Recep?ioner", UserRole.Receptionist),
+        new("receptioner1", "receptioner123", "Elena Vasile", "Recepioner", UserRole.Receptionist),
         new("manager1", "manager123", "Ion Marinescu", "Manager Medical", UserRole.Manager)
     ];
 
@@ -165,8 +165,8 @@ public class LoginState
 }
 
 /// <summary>
-/// Demo credential model cu enum în loc de magic strings
-/// ORGANIZAT ÎN ACELA?I FOLDER CU LoginState
+/// Demo credential model cu enum in loc de magic strings
+/// ORGANIZAT iN ACELAI FOLDER CU LoginState
 /// </summary>
 public record DemoCredential(
     string Username, 

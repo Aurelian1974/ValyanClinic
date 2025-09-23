@@ -1,9 +1,9 @@
 ﻿# 🎯 CORECTURILE APLICATE PENTRU DROPDOWN-URI
 
-## ✅ **Problema identificată și rezolvată:**
+## ✅ **Problema identificata si rezolvata:**
 
-### **🚨 Problema principală:** 
-Fișierele CSS și JS nu se încărcau din cauza path-urilor greșite cu sintaxa `~` în `App.razor` care nu se procesează corect în .NET 9 Blazor.
+### **🚨 Problema principala:** 
+Fisierele CSS si JS nu se incarcau din cauza path-urilor gresite cu sintaxa `~` in `App.razor` care nu se proceseaza corect in .NET 9 Blazor.
 
 ### **🔧 Corecturile aplicate:**
 
@@ -16,28 +16,28 @@ Fișierele CSS și JS nu se încărcau din cauza path-urilor greșite cu sintaxa
    - `~/css/pages/view-personal-syncfusion.css` → `/css/pages/view-personal-syncfusion.css` ✅
    - `~/css/components/location-dependent-grid-dropdowns.css` → `/css/components/location-dependent-grid-dropdowns.css` ✅
 
-3. **Fișiere create:**
+3. **Fisiere create:**
    - `/css/pages/utilizatori.css` - pentru eliminarea erorii 404 ✅
 
-## 🧪 **PAȘII DE TESTARE FINALI:**
+## 🧪 **PAsII DE TESTARE FINALI:**
 
-### **1. Aplicația este pornită în background**
-Verifică că aplicația rulează la `https://localhost:7164`
+### **1. Aplicatia este pornita in background**
+Verifica ca aplicatia ruleaza la `https://localhost:7164`
 
-### **2. Testează încărcarea CSS-urilor:**
-Accesează în browser și verifică Developer Tools → Network tab:
-- `/css/toast-override.css` - trebuie să returneze 200 OK ✅
-- `/css/toast-modal-fix.css` - trebuie să returneze 200 OK ✅
-- `/js/valyan-helpers.js` - trebuie să returneze 200 OK ✅
+### **2. Testeaza incarcarea CSS-urilor:**
+Acceseaza in browser si verifica Developer Tools → Network tab:
+- `/css/toast-override.css` - trebuie sa returneze 200 OK ✅
+- `/css/toast-modal-fix.css` - trebuie sa returneze 200 OK ✅
+- `/js/valyan-helpers.js` - trebuie sa returneze 200 OK ✅
 
-### **3. Testează dropdown-urile:**
-1. **Homepage** → Click "Personal" → Click "Adaugă Personal"
-2. **Urmărește logurile** din fereastra PowerShell separată
-3. **Verifică dropdown-urile** în secțiunea "Adresa de Domiciliu"
+### **3. Testeaza dropdown-urile:**
+1. **Homepage** → Click "Personal" → Click "Adauga Personal"
+2. **Urmareste logurile** din fereastra PowerShell separata
+3. **Verifica dropdown-urile** in sectiunea "Adresa de Domiciliu"
 
-## 🎉 **Log-uri de succes așteptate:**
+## 🎉 **Log-uri de succes asteptate:**
 
-După corecturile aplicate, ar trebui să vezi:
+Dupa corecturile aplicate, ar trebui sa vezi:
 
 ```
 🚀 ShowAddPersonalModal called - Opening add personal modal
@@ -61,22 +61,22 @@ După corecturile aplicate, ar trebui să vezi:
 🎉 LocationDependentGridDropdowns initialized successfully! Judete count: 42
 ```
 
-## ❌ **Dacă problema persistă:**
+## ❌ **Daca problema persista:**
 
-### **1. Verifică dacă stored procedures există:**
+### **1. Verifica daca stored procedures exista:**
 ```sql
--- În SQL Server Management Studio
+-- in SQL Server Management Studio
 SELECT * FROM sys.procedures WHERE name LIKE 'sp_Judete%'
 SELECT * FROM sys.procedures WHERE name LIKE 'sp_Localitati%'
 ```
 
-### **2. Testează manual stored procedures:**
+### **2. Testeaza manual stored procedures:**
 ```sql
 EXEC sp_Judete_GetOrderedByName;
 EXEC sp_Localitati_GetAll;
 ```
 
-### **3. Verifică tabelele din baza de date:**
+### **3. Verifica tabelele din baza de date:**
 ```sql
 SELECT COUNT(*) FROM Judete;
 SELECT TOP 5 * FROM Judete;
@@ -85,11 +85,11 @@ SELECT TOP 5 * FROM Localitati;
 ```
 
 ## 🆘 **Contact pentru debugging:**
-Dacă dropdown-urile încă nu se încarcă, trimite:
+Daca dropdown-urile inca nu se incarca, trimite:
 1. **Screenshot-ul din Developer Tools → Network tab**
 2. **Log-urile complete din consola PowerShell** 
 3. **Rezultatele query-urilor SQL de mai sus**
 
 ---
 
-**🎯 Testează acum și spune-mi rezultatul!** Corecturile pentru path-urile CSS/JS ar trebui să rezolve problema principală.
+**🎯 Testeaza acum si spune-mi rezultatul!** Corecturile pentru path-urile CSS/JS ar trebui sa rezolve problema principala.

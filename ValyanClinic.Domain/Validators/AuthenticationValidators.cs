@@ -5,7 +5,7 @@ namespace ValyanClinic.Domain.Validators;
 
 /// <summary>
 /// Validator FluentValidation pentru modelul LoginRequest
-/// Implementează reguli de securitate și validare pentru autentificare
+/// Implementeaza reguli de securitate si validare pentru autentificare
 /// </summary>
 public class LoginRequestValidator : AbstractValidator<LoginRequest>
 {
@@ -17,9 +17,9 @@ public class LoginRequestValidator : AbstractValidator<LoginRequest>
             .NotEmpty()
             .WithMessage("Numele de utilizator este obligatoriu")
             .Length(3, 50)
-            .WithMessage("Numele de utilizator trebuie să aibă între 3 și 50 de caractere")
+            .WithMessage("Numele de utilizator trebuie sa aiba intre 3 si 50 de caractere")
             .Must(BeValidUsername)
-            .WithMessage("Numele de utilizator conține caractere nepermise");
+            .WithMessage("Numele de utilizator contine caractere nepermise");
 
         // === REGULI PENTRU PASSWORD ===
         
@@ -27,29 +27,29 @@ public class LoginRequestValidator : AbstractValidator<LoginRequest>
             .NotEmpty()
             .WithMessage("Parola este obligatorie")
             .Length(6, 100)
-            .WithMessage("Parola trebuie să aibă între 6 și 100 de caractere")
+            .WithMessage("Parola trebuie sa aiba intre 6 si 100 de caractere")
             .Must(BeSecurePassword)
-            .WithMessage("Parola trebuie să conțină cel puțin o literă mare, o literă mică și o cifră");
+            .WithMessage("Parola trebuie sa contina cel putin o litera mare, o litera mica si o cifra");
 
         // === REGULI PENTRU REMEMBER ME ===
         
-        // RememberMe este boolean, deci nu necesită validare specifică
-        // Dar putem adăuga logică de business dacă e necesar
+        // RememberMe este boolean, deci nu necesita validare specifica
+        // Dar putem adauga logica de business daca e necesar
         RuleFor(x => x.RememberMe)
             .Must(BeValidRememberMeChoice)
-            .WithMessage("Opțiunea 'Păstrează-mă logat' nu este validă în contextul curent");
+            .WithMessage("Optiunea 'Pastreaza-ma logat' nu este valida in contextul curent");
     }
 
     /// <summary>
-    /// Verifică dacă username-ul are formatul corect
+    /// Verifica daca username-ul are formatul corect
     /// </summary>
     private bool BeValidUsername(string username)
     {
         if (string.IsNullOrEmpty(username))
             return false;
 
-        // Username poate conține litere, cifre, puncte, cratime și underscore
-        // Nu poate începe sau termina cu caractere speciale
+        // Username poate contine litere, cifre, puncte, cratime si underscore
+        // Nu poate incepe sau termina cu caractere speciale
         if (username.StartsWith(".") || username.EndsWith(".") ||
             username.StartsWith("_") || username.EndsWith("_") ||
             username.StartsWith("-") || username.EndsWith("-"))
@@ -57,22 +57,22 @@ public class LoginRequestValidator : AbstractValidator<LoginRequest>
             return false;
         }
 
-        // Verifică dacă conține doar caractere permise
+        // Verifica daca contine doar caractere permise
         return username.All(c => char.IsLetterOrDigit(c) || c == '.' || c == '_' || c == '-');
     }
 
     /// <summary>
-    /// Verifică dacă parola respectă criteriile de securitate
+    /// Verifica daca parola respecta criteriile de securitate
     /// </summary>
     private bool BeSecurePassword(string password)
     {
         if (string.IsNullOrEmpty(password))
             return false;
 
-        // Verifică dacă parola conține:
-        // - cel puțin o literă mare
-        // - cel puțin o literă mică  
-        // - cel puțin o cifră
+        // Verifica daca parola contine:
+        // - cel putin o litera mare
+        // - cel putin o litera mica  
+        // - cel putin o cifra
         bool hasUpperCase = password.Any(char.IsUpper);
         bool hasLowerCase = password.Any(char.IsLower);
         bool hasDigit = password.Any(char.IsDigit);
@@ -81,12 +81,12 @@ public class LoginRequestValidator : AbstractValidator<LoginRequest>
     }
 
     /// <summary>
-    /// Verifică dacă opțiunea RememberMe este validă în contextul curent
+    /// Verifica daca optiunea RememberMe este valida in contextul curent
     /// </summary>
     private bool BeValidRememberMeChoice(bool rememberMe)
     {
-        // În prezent acceptăm orice valoare pentru RememberMe
-        // Această metodă poate fi extinsă cu logică de business specifică
+        // in prezent acceptam orice valoare pentru RememberMe
+        // Aceasta metoda poate fi extinsa cu logica de business specifica
         // De exemplu: interzicerea RememberMe pe computere publice
         
         return true;
@@ -102,38 +102,38 @@ public class ChangePasswordRequestValidator : AbstractValidator<ChangePasswordRe
     {
         RuleFor(x => x.CurrentPassword)
             .NotEmpty()
-            .WithMessage("Parola curentă este obligatorie");
+            .WithMessage("Parola curenta este obligatorie");
 
         RuleFor(x => x.NewPassword)
             .NotEmpty()
-            .WithMessage("Parola nouă este obligatorie")
+            .WithMessage("Parola noua este obligatorie")
             .Length(8, 100)
-            .WithMessage("Parola nouă trebuie să aibă între 8 și 100 de caractere")
+            .WithMessage("Parola noua trebuie sa aiba intre 8 si 100 de caractere")
             .Must(BeStrongPassword)
-            .WithMessage("Parola nouă trebuie să conțină cel puțin: o literă mare, o literă mică, o cifră și un caracter special")
+            .WithMessage("Parola noua trebuie sa contina cel putin: o litera mare, o litera mica, o cifra si un caracter special")
             .NotEqual(x => x.CurrentPassword)
-            .WithMessage("Parola nouă trebuie să fie diferită de cea curentă");
+            .WithMessage("Parola noua trebuie sa fie diferita de cea curenta");
 
         RuleFor(x => x.ConfirmNewPassword)
             .NotEmpty()
             .WithMessage("Confirmarea parolei este obligatorie")
             .Equal(x => x.NewPassword)
-            .WithMessage("Confirmarea parolei nu corespunde cu parola nouă");
+            .WithMessage("Confirmarea parolei nu corespunde cu parola noua");
     }
 
     /// <summary>
-    /// Verifică dacă parola nouă este suficient de puternică
+    /// Verifica daca parola noua este suficient de puternica
     /// </summary>
     private bool BeStrongPassword(string password)
     {
         if (string.IsNullOrEmpty(password))
             return false;
 
-        // Verifică dacă parola conține:
-        // - cel puțin o literă mare
-        // - cel puțin o literă mică  
-        // - cel puțin o cifră
-        // - cel puțin un caracter special
+        // Verifica daca parola contine:
+        // - cel putin o litera mare
+        // - cel putin o litera mica  
+        // - cel putin o cifra
+        // - cel putin un caracter special
         bool hasUpperCase = password.Any(char.IsUpper);
         bool hasLowerCase = password.Any(char.IsLower);
         bool hasDigit = password.Any(char.IsDigit);
@@ -156,17 +156,17 @@ public class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequ
             .EmailAddress()
             .WithMessage("Formatul email-ului nu este valid")
             .Must(BeValidBusinessEmail)
-            .WithMessage("Email-ul trebuie să aparțină domeniului organizației");
+            .WithMessage("Email-ul trebuie sa apartina domeniului organizatiei");
 
         RuleFor(x => x.Username)
             .NotEmpty()
             .WithMessage("Numele de utilizator este obligatoriu")
             .Length(3, 50)
-            .WithMessage("Numele de utilizator trebuie să aibă între 3 și 50 de caractere");
+            .WithMessage("Numele de utilizator trebuie sa aiba intre 3 si 50 de caractere");
     }
 
     /// <summary>
-    /// Verifică dacă email-ul aparține domeniului organizației
+    /// Verifica daca email-ul apartine domeniului organizatiei
     /// </summary>
     private bool BeValidBusinessEmail(string email)
     {

@@ -6,7 +6,7 @@ namespace ValyanClinic.Domain.Validators;
 
 /// <summary>
 /// Validator FluentValidation pentru modelul Personal
-/// Implementează toate regulile de business pentru personalul medical
+/// Implementeaza toate regulile de business pentru personalul medical
 /// SINCRONIZAT cu structura bazei de date Personal
 /// </summary>
 public class PersonalValidator : AbstractValidator<Personal>
@@ -19,97 +19,97 @@ public class PersonalValidator : AbstractValidator<Personal>
             .NotEmpty()
             .WithMessage("Codul de angajat este obligatoriu")
             .Length(3, 20)
-            .WithMessage("Codul de angajat trebuie să aibă între 3 și 20 de caractere")
+            .WithMessage("Codul de angajat trebuie sa aiba intre 3 si 20 de caractere")
             .Matches(@"^[A-Z0-9]+$")
-            .WithMessage("Codul de angajat poate conține doar litere mari și cifre");
+            .WithMessage("Codul de angajat poate contine doar litere mari si cifre");
 
         RuleFor(x => x.CNP)
             .NotEmpty()
             .WithMessage("CNP-ul este obligatoriu")
             .Length(13)
-            .WithMessage("CNP-ul trebuie să aibă exact 13 cifre")
+            .WithMessage("CNP-ul trebuie sa aiba exact 13 cifre")
             .Matches(@"^\d{13}$")
-            .WithMessage("CNP-ul poate conține doar cifre")
+            .WithMessage("CNP-ul poate contine doar cifre")
             .Must(BeValidCNP)
             .WithMessage("CNP-ul nu este valid conform algoritmului oficial");
 
-        // === REGULI PENTRU DATE PERSONALE DE BAZĂ ===
+        // === REGULI PENTRU DATE PERSONALE DE BAZa ===
         
         RuleFor(x => x.Nume)
             .NotEmpty()
             .WithMessage("Numele este obligatoriu")
             .Length(2, 100)  // CORECTAT: DB permite 100, nu 50
-            .WithMessage("Numele trebuie să aibă între 2 și 100 de caractere")
+            .WithMessage("Numele trebuie sa aiba intre 2 si 100 de caractere")
             .Matches(@"^[A-ZÀ-ÿa-z\s\-']+$")
-            .WithMessage("Numele poate conține doar litere, spații, cratime și apostrofuri");
+            .WithMessage("Numele poate contine doar litere, spatii, cratime si apostrofuri");
 
         RuleFor(x => x.Prenume)
             .NotEmpty()
             .WithMessage("Prenumele este obligatoriu")
             .Length(2, 100)  // CORECTAT: DB permite 100, nu 50
-            .WithMessage("Prenumele trebuie să aibă între 2 și 100 de caractere")
+            .WithMessage("Prenumele trebuie sa aiba intre 2 si 100 de caractere")
             .Matches(@"^[A-ZÀ-ÿa-z\s\-']+$")
-            .WithMessage("Prenumele poate conține doar litere, spații, cratime și apostrofuri");
+            .WithMessage("Prenumele poate contine doar litere, spatii, cratime si apostrofuri");
 
         RuleFor(x => x.Nume_Anterior)
             .Length(2, 100)  // CORECTAT: DB permite 100, nu 50
-            .WithMessage("Numele anterior trebuie să aibă între 2 și 100 de caractere")
+            .WithMessage("Numele anterior trebuie sa aiba intre 2 si 100 de caractere")
             .Matches(@"^[A-ZÀ-ÿa-z\s\-']+$")
-            .WithMessage("Numele anterior poate conține doar litere, spații, cratime și apostrofuri")
+            .WithMessage("Numele anterior poate contine doar litere, spatii, cratime si apostrofuri")
             .When(x => !string.IsNullOrEmpty(x.Nume_Anterior));
 
         RuleFor(x => x.Data_Nasterii)
             .NotEmpty()
-            .WithMessage("Data nașterii este obligatorie")
+            .WithMessage("Data nasterii este obligatorie")
             .Must(BeValidBirthDate)
-            .WithMessage("Data nașterii trebuie să fie între 1940 și acum")
+            .WithMessage("Data nasterii trebuie sa fie intre 1940 si acum")
             .Must(BeMinimumAge)
-            .WithMessage("Angajatul trebuie să aibă minimum 16 ani");
+            .WithMessage("Angajatul trebuie sa aiba minimum 16 ani");
 
-        // ADĂUGAT: Validare pentru Locul_Nasterii conform DB (nvarchar(200))
+        // ADaUGAT: Validare pentru Locul_Nasterii conform DB (nvarchar(200))
         RuleFor(x => x.Locul_Nasterii)
             .MaximumLength(200)
-            .WithMessage("Locul nașterii nu poate depăși 200 de caractere")
+            .WithMessage("Locul nasterii nu poate depasi 200 de caractere")
             .When(x => !string.IsNullOrEmpty(x.Locul_Nasterii));
 
         RuleFor(x => x.Nationalitate)
             .NotEmpty()
-            .WithMessage("Naționalitatea este obligatorie")
+            .WithMessage("Nationalitatea este obligatorie")
             .Length(2, 50)  // CONFIRMAT: DB permite 50
-            .WithMessage("Naționalitatea trebuie să aibă între 2 și 50 de caractere");
+            .WithMessage("Nationalitatea trebuie sa aiba intre 2 si 50 de caractere");
 
         RuleFor(x => x.Cetatenie)
             .NotEmpty()
-            .WithMessage("Cetățenia este obligatorie")
+            .WithMessage("Cetatenia este obligatorie")
             .Length(2, 50)  // CONFIRMAT: DB permite 50
-            .WithMessage("Cetățenia trebuie să aibă între 2 și 50 de caractere");
+            .WithMessage("Cetatenia trebuie sa aiba intre 2 si 50 de caractere");
 
-        // === REGULI PENTRU INFORMAȚII DE CONTACT ===
+        // === REGULI PENTRU INFORMAtII DE CONTACT ===
 
         RuleFor(x => x.Telefon_Personal)
-            .MaximumLength(20)  // ADĂUGAT: Limitare conform DB
-            .WithMessage("Telefonul personal nu poate depăși 20 de caractere")
+            .MaximumLength(20)  // ADaUGAT: Limitare conform DB
+            .WithMessage("Telefonul personal nu poate depasi 20 de caractere")
             .Matches(@"^(\+40|0)[1-9]\d{8}$")
             .WithMessage("Formatul telefonului personal nu este valid (ex: 0722123456 sau +40722123456)")
             .When(x => !string.IsNullOrEmpty(x.Telefon_Personal));
 
         RuleFor(x => x.Telefon_Serviciu)
-            .MaximumLength(20)  // ADĂUGAT: Limitare conform DB
-            .WithMessage("Telefonul de serviciu nu poate depăși 20 de caractere")
+            .MaximumLength(20)  // ADaUGAT: Limitare conform DB
+            .WithMessage("Telefonul de serviciu nu poate depasi 20 de caractere")
             .Matches(@"^(\+40|0)[1-9]\d{8}$")
             .WithMessage("Formatul telefonului de serviciu nu este valid (ex: 0722123456 sau +40722123456)")
             .When(x => !string.IsNullOrEmpty(x.Telefon_Serviciu));
 
         RuleFor(x => x.Email_Personal)
-            .MaximumLength(100)  // ADĂUGAT: Limitare conform DB
-            .WithMessage("Email-ul personal nu poate depăși 100 de caractere")
+            .MaximumLength(100)  // ADaUGAT: Limitare conform DB
+            .WithMessage("Email-ul personal nu poate depasi 100 de caractere")
             .EmailAddress()
             .WithMessage("Formatul email-ului personal nu este valid")
             .When(x => !string.IsNullOrEmpty(x.Email_Personal));
 
         RuleFor(x => x.Email_Serviciu)
-            .MaximumLength(100)  // ADĂUGAT: Limitare conform DB
-            .WithMessage("Email-ul de serviciu nu poate depăși 100 de caractere")
+            .MaximumLength(100)  // ADaUGAT: Limitare conform DB
+            .WithMessage("Email-ul de serviciu nu poate depasi 100 de caractere")
             .EmailAddress()
             .WithMessage("Formatul email-ului de serviciu nu este valid")
             .When(x => !string.IsNullOrEmpty(x.Email_Serviciu));
@@ -119,58 +119,58 @@ public class PersonalValidator : AbstractValidator<Personal>
         RuleFor(x => x.Adresa_Domiciliu)
             .NotEmpty()
             .WithMessage("Adresa de domiciliu este obligatorie")
-            .Length(10, 4000)  // CORECTAT: DB este nvarchar(MAX), dar limitare practică
-            .WithMessage("Adresa de domiciliu trebuie să aibă între 10 și 4000 de caractere");
+            .Length(10, 4000)  // CORECTAT: DB este nvarchar(MAX), dar limitare practica
+            .WithMessage("Adresa de domiciliu trebuie sa aiba intre 10 si 4000 de caractere");
 
         RuleFor(x => x.Judet_Domiciliu)
             .NotEmpty()
-            .WithMessage("Județul de domiciliu este obligatoriu")
+            .WithMessage("Judetul de domiciliu este obligatoriu")
             .Length(2, 50)  // CONFIRMAT: DB permite 50
-            .WithMessage("Județul de domiciliu trebuie să aibă între 2 și 50 de caractere");
+            .WithMessage("Judetul de domiciliu trebuie sa aiba intre 2 si 50 de caractere");
 
         RuleFor(x => x.Oras_Domiciliu)
             .NotEmpty()
-            .WithMessage("Orașul de domiciliu este obligatoriu")
+            .WithMessage("Orasul de domiciliu este obligatoriu")
             .Length(2, 100)  // CONFIRMAT: DB permite 100
-            .WithMessage("Orașul de domiciliu trebuie să aibă între 2 și 100 de caractere");
+            .WithMessage("Orasul de domiciliu trebuie sa aiba intre 2 si 100 de caractere");
 
         RuleFor(x => x.Cod_Postal_Domiciliu)
             .MaximumLength(10)  // CONFIRMAT: DB permite 10
-            .WithMessage("Codul poștal nu poate depăși 10 caractere")
+            .WithMessage("Codul postal nu poate depasi 10 caractere")
             .Matches(@"^\d{6}$")
-            .WithMessage("Codul poștal trebuie să aibă exact 6 cifre")
+            .WithMessage("Codul postal trebuie sa aiba exact 6 cifre")
             .When(x => !string.IsNullOrEmpty(x.Cod_Postal_Domiciliu));
 
-        // ADĂUGAT: Validări pentru adresa de reședință
+        // ADaUGAT: Validari pentru adresa de resedinta
         RuleFor(x => x.Adresa_Resedinta)
-            .MaximumLength(4000)  // DB este nvarchar(MAX), limitare practică
-            .WithMessage("Adresa de reședință nu poate depăși 4000 de caractere")
+            .MaximumLength(4000)  // DB este nvarchar(MAX), limitare practica
+            .WithMessage("Adresa de resedinta nu poate depasi 4000 de caractere")
             .When(x => !string.IsNullOrEmpty(x.Adresa_Resedinta));
 
         RuleFor(x => x.Judet_Resedinta)
             .MaximumLength(50)  // CONFIRMAT: DB permite 50
-            .WithMessage("Județul de reședință nu poate depăși 50 de caractere")
+            .WithMessage("Judetul de resedinta nu poate depasi 50 de caractere")
             .When(x => !string.IsNullOrEmpty(x.Judet_Resedinta));
 
         RuleFor(x => x.Oras_Resedinta)
             .MaximumLength(100)  // CONFIRMAT: DB permite 100
-            .WithMessage("Orașul de reședință nu poate depăși 100 de caractere")
+            .WithMessage("Orasul de resedinta nu poate depasi 100 de caractere")
             .When(x => !string.IsNullOrEmpty(x.Oras_Resedinta));
 
         RuleFor(x => x.Cod_Postal_Resedinta)
             .MaximumLength(10)  // CONFIRMAT: DB permite 10
-            .WithMessage("Codul poștal de reședință nu poate depăși 10 caractere")
+            .WithMessage("Codul postal de resedinta nu poate depasi 10 caractere")
             .Matches(@"^\d{6}$")
-            .WithMessage("Codul poștal de reședință trebuie să aibă exact 6 cifre")
+            .WithMessage("Codul postal de resedinta trebuie sa aiba exact 6 cifre")
             .When(x => !string.IsNullOrEmpty(x.Cod_Postal_Resedinta));
 
         // === REGULI PENTRU DATE PROFESIONALE ===
 
         RuleFor(x => x.Functia)
             .NotEmpty()
-            .WithMessage("Funcția este obligatorie")
+            .WithMessage("Functia este obligatorie")
             .Length(2, 100)  // CONFIRMAT: DB permite 100
-            .WithMessage("Funcția trebuie să aibă între 2 și 100 de caractere");
+            .WithMessage("Functia trebuie sa aiba intre 2 si 100 de caractere");
 
         RuleFor(x => x.Departament)
             .NotNull()
@@ -182,77 +182,77 @@ public class PersonalValidator : AbstractValidator<Personal>
 
         RuleFor(x => x.Serie_CI)
             .MaximumLength(10)  // CONFIRMAT: DB permite 10
-            .WithMessage("Seria CI nu poate depăși 10 caractere")
+            .WithMessage("Seria CI nu poate depasi 10 caractere")
             .Matches(@"^[A-Z]{2}$")
-            .WithMessage("Seria CI trebuie să aibă 2 litere mari (ex: AB)")
+            .WithMessage("Seria CI trebuie sa aiba 2 litere mari (ex: AB)")
             .When(x => !string.IsNullOrEmpty(x.Serie_CI));
 
         RuleFor(x => x.Numar_CI)
             .MaximumLength(20)  // CONFIRMAT: DB permite 20
-            .WithMessage("Numărul CI nu poate depăși 20 caractere")
+            .WithMessage("Numarul CI nu poate depasi 20 caractere")
             .Matches(@"^\d{6}$")
-            .WithMessage("Numărul CI trebuie să aibă exact 6 cifre")
+            .WithMessage("Numarul CI trebuie sa aiba exact 6 cifre")
             .When(x => !string.IsNullOrEmpty(x.Numar_CI));
 
         RuleFor(x => x.Eliberat_CI_De)
             .MaximumLength(100)  // CONFIRMAT: DB permite 100
-            .WithMessage("'Eliberat CI de' nu poate depăși 100 de caractere")
+            .WithMessage("'Eliberat CI de' nu poate depasi 100 de caractere")
             .When(x => !string.IsNullOrEmpty(x.Eliberat_CI_De));
 
         RuleFor(x => x.Data_Eliberare_CI)
             .LessThanOrEqualTo(DateTime.Today)
-            .WithMessage("Data eliberării CI nu poate fi în viitor")
+            .WithMessage("Data eliberarii CI nu poate fi in viitor")
             .When(x => x.Data_Eliberare_CI.HasValue);
 
         RuleFor(x => x.Valabil_CI_Pana)
             .GreaterThan(x => x.Data_Eliberare_CI)
-            .WithMessage("Data expirării CI trebuie să fie după data eliberării")
+            .WithMessage("Data expirarii CI trebuie sa fie dupa data eliberarii")
             .When(x => x.Data_Eliberare_CI.HasValue && x.Valabil_CI_Pana.HasValue);
 
-        // === REGULI PENTRU STATUS ȘI METADATA ===
+        // === REGULI PENTRU STATUS sI METADATA ===
 
         RuleFor(x => x.Status_Angajat)
             .IsInEnum()
             .WithMessage("Statusul angajatului nu este valid");
 
         RuleFor(x => x.Observatii)
-            .MaximumLength(4000)  // DB este nvarchar(MAX), limitare practică pentru performanță
-            .WithMessage("Observațiile nu pot depăși 4000 de caractere");
+            .MaximumLength(4000)  // DB este nvarchar(MAX), limitare practica pentru performanta
+            .WithMessage("Observatiile nu pot depasi 4000 de caractere");
 
-        // ADĂUGAT: Validări pentru câmpurile de audit
+        // ADaUGAT: Validari pentru campurile de audit
         RuleFor(x => x.Creat_De)
             .MaximumLength(50)  // CONFIRMAT: DB permite 50
-            .WithMessage("'Creat de' nu poate depăși 50 de caractere")
+            .WithMessage("'Creat de' nu poate depasi 50 de caractere")
             .When(x => !string.IsNullOrEmpty(x.Creat_De));
 
         RuleFor(x => x.Modificat_De)
             .MaximumLength(50)  // CONFIRMAT: DB permite 50
-            .WithMessage("'Modificat de' nu poate depăși 50 de caractere")
+            .WithMessage("'Modificat de' nu poate depasi 50 de caractere")
             .When(x => !string.IsNullOrEmpty(x.Modificat_De));
 
         // === REGULI COMPLEXE DE BUSINESS ===
         
-        // Verificare consistență telefon - trebuie să aibă cel puțin unul
+        // Verificare consistenta telefon - trebuie sa aiba cel putin unul
         RuleFor(x => x)
             .Must(HaveAtLeastOnePhone)
-            .WithMessage("Trebuie să existe cel puțin un număr de telefon (personal sau serviciu)")
+            .WithMessage("Trebuie sa existe cel putin un numar de telefon (personal sau serviciu)")
             .WithName("Contact");
 
-        // Verificare consistență CI - dacă există seria, trebuie să existe și numărul
+        // Verificare consistenta CI - daca exista seria, trebuie sa existe si numarul
         RuleFor(x => x)
             .Must(HaveCompleteCI)
-            .WithMessage("Dacă este completată seria CI, trebuie completat și numărul CI")
+            .WithMessage("Daca este completata seria CI, trebuie completat si numarul CI")
             .WithName("Documente");
 
-        // ADĂUGAT: Validare consistență stare civilă (nvarchar(100) în DB)
+        // ADaUGAT: Validare consistenta stare civila (nvarchar(100) in DB)
         RuleFor(x => x.Stare_Civila)
             .IsInEnum()
-            .WithMessage("Starea civilă selectată nu este validă")
+            .WithMessage("Starea civila selectata nu este valida")
             .When(x => x.Stare_Civila.HasValue);
     }
 
     /// <summary>
-    /// Validează CNP-ul conform algoritmului oficial românesc
+    /// Valideaza CNP-ul conform algoritmului oficial romanesc
     /// </summary>
     private bool BeValidCNP(string cnp)
     {
@@ -278,7 +278,7 @@ public class PersonalValidator : AbstractValidator<Personal>
     }
 
     /// <summary>
-    /// Verifică dacă data nașterii este într-un interval valid
+    /// Verifica daca data nasterii este intr-un interval valid
     /// </summary>
     private bool BeValidBirthDate(DateTime birthDate)
     {
@@ -286,7 +286,7 @@ public class PersonalValidator : AbstractValidator<Personal>
     }
 
     /// <summary>
-    /// Verifică dacă persoana are minimum 16 ani
+    /// Verifica daca persoana are minimum 16 ani
     /// </summary>
     private bool BeMinimumAge(DateTime birthDate)
     {
@@ -298,7 +298,7 @@ public class PersonalValidator : AbstractValidator<Personal>
     }
 
     /// <summary>
-    /// Verifică dacă există cel puțin un număr de telefon
+    /// Verifica daca exista cel putin un numar de telefon
     /// </summary>
     private bool HaveAtLeastOnePhone(Personal personal)
     {
@@ -307,15 +307,15 @@ public class PersonalValidator : AbstractValidator<Personal>
     }
 
     /// <summary>
-    /// Verifică consistența datelor CI
+    /// Verifica consistenta datelor CI
     /// </summary>
     private bool HaveCompleteCI(Personal personal)
     {
-        // Dacă nu este completată seria, e OK
+        // Daca nu este completata seria, e OK
         if (string.IsNullOrEmpty(personal.Serie_CI))
             return true;
 
-        // Dacă e completată seria, trebuie să fie completat și numărul
+        // Daca e completata seria, trebuie sa fie completat si numarul
         return !string.IsNullOrEmpty(personal.Numar_CI);
     }
 }
@@ -332,21 +332,21 @@ public class PersonalCreateValidator : PersonalValidator
             .NotEmpty()
             .WithMessage("ID-ul personalului este obligatoriu")
             .Must(BeValidGuid)
-            .WithMessage("ID-ul personalului trebuie să fie un GUID valid");
+            .WithMessage("ID-ul personalului trebuie sa fie un GUID valid");
 
-        // Data creării trebuie să fie setată (corectat pentru ora locală)
+        // Data crearii trebuie sa fie setata (corectat pentru ora locala)
         RuleFor(x => x.Data_Crearii)
             .NotEmpty()
-            .WithMessage("Data creării este obligatorie")
+            .WithMessage("Data crearii este obligatorie")
             .LessThanOrEqualTo(DateTime.Now.AddMinutes(1)) // Buffer de 1 minut pentru sincronizare
-            .WithMessage("Data creării nu poate fi în viitor");
+            .WithMessage("Data crearii nu poate fi in viitor");
 
-        // Creat_De trebuie să fie setat
+        // Creat_De trebuie sa fie setat
         RuleFor(x => x.Creat_De)
             .NotEmpty()
-            .WithMessage("Utilizatorul care creează înregistrarea trebuie specificat")
+            .WithMessage("Utilizatorul care creeaza inregistrarea trebuie specificat")
             .Length(2, 50)
-            .WithMessage("Numele utilizatorului trebuie să aibă între 2 și 50 de caractere");
+            .WithMessage("Numele utilizatorului trebuie sa aiba intre 2 si 50 de caractere");
     }
 
     private bool BeValidGuid(Guid id)
@@ -362,38 +362,38 @@ public class PersonalUpdateValidator : PersonalValidator
 {
     public PersonalUpdateValidator()
     {
-        // Pentru update, ID-ul trebuie să existe și să fie valid
+        // Pentru update, ID-ul trebuie sa existe si sa fie valid
         RuleFor(x => x.Id_Personal)
             .NotEmpty()
             .WithMessage("ID-ul personalului este obligatoriu pentru actualizare")
             .Must(BeValidGuid)
-            .WithMessage("ID-ul personalului trebuie să fie un GUID valid");
+            .WithMessage("ID-ul personalului trebuie sa fie un GUID valid");
 
-        // Data ultimei modificări trebuie să fie setată (corectat pentru ora locală)
+        // Data ultimei modificari trebuie sa fie setata (corectat pentru ora locala)
         RuleFor(x => x.Data_Ultimei_Modificari)
             .NotEmpty()
-            .WithMessage("Data ultimei modificări este obligatorie")
+            .WithMessage("Data ultimei modificari este obligatorie")
             .LessThanOrEqualTo(DateTime.Now.AddMinutes(1)) // Buffer de 1 minut pentru sincronizare
-            .WithMessage("Data ultimei modificări nu poate fi în viitor");
+            .WithMessage("Data ultimei modificari nu poate fi in viitor");
 
-        // Modificat_De trebuie să fie setat
+        // Modificat_De trebuie sa fie setat
         RuleFor(x => x.Modificat_De)
             .NotEmpty()
-            .WithMessage("Utilizatorul care modifică înregistrarea trebuie specificat")
+            .WithMessage("Utilizatorul care modifica inregistrarea trebuie specificat")
             .Length(2, 50)
-            .WithMessage("Numele utilizatorului trebuie să aibă între 2 și 50 de caractere");
+            .WithMessage("Numele utilizatorului trebuie sa aiba intre 2 si 50 de caractere");
 
-        // Data creării trebuie să existe și să fie anterioară datei de modificare
+        // Data crearii trebuie sa existe si sa fie anterioara datei de modificare
         RuleFor(x => x.Data_Crearii)
             .NotEmpty()
-            .WithMessage("Data creării trebuie să existe pentru actualizare")
+            .WithMessage("Data crearii trebuie sa existe pentru actualizare")
             .LessThan(x => x.Data_Ultimei_Modificari)
-            .WithMessage("Data creării trebuie să fie anterioară datei ultimei modificări");
+            .WithMessage("Data crearii trebuie sa fie anterioara datei ultimei modificari");
 
-        // Creat_De trebuie să existe
+        // Creat_De trebuie sa existe
         RuleFor(x => x.Creat_De)
             .NotEmpty()
-            .WithMessage("Creatorul original al înregistrării trebuie să existe");
+            .WithMessage("Creatorul original al inregistrarii trebuie sa existe");
     }
 
     private bool BeValidGuid(Guid id)

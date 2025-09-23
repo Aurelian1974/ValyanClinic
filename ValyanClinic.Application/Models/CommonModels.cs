@@ -8,7 +8,7 @@ namespace ValyanClinic.Application.Models;
 public record DropdownItem(string Value, string Text);
 
 /// <summary>
-/// Clasă de bază pentru rezultate de validare
+/// Clasa de baza pentru rezultate de validare
 /// </summary>
 public class ValidationResultBase
 {
@@ -29,7 +29,7 @@ public class ValidationResultBase
 }
 
 /// <summary>
-/// Clasă de bază pentru rezultate de operații CRUD
+/// Clasa de baza pentru rezultate de operatii CRUD
 /// </summary>
 public abstract class OperationResultBase
 {

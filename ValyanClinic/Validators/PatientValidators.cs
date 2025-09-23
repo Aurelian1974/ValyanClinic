@@ -84,7 +84,7 @@ public class PatientCreateRequestValidator : AbstractValidator<PatientListModel>
 
         // Allow letters, spaces, hyphens, and Romanian characters
         return System.Text.RegularExpressions.Regex.IsMatch(name, 
-            @"^[a-zA-Z?גמ???ÂÎ??\s\-\.]+$");
+            @"^[a-zA-Zai???ai??\s\-\.]+$");
     }
 
     private bool BeValidCNP(string? cnp)

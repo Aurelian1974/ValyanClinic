@@ -1,6 +1,6 @@
 ﻿/* TOAST OVERRIDE PENTRU A FI DEASUPRA SIDEBAR-ULUI */
 
-/* Toast-uri în modal - poziționare relativă la BODY în loc de container */
+/* Toast-uri in modal - pozitionare relativa la BODY in loc de container */
 .advanced-personal-form-container .e-toast-container,
 .advanced-personal-form-container .personal-toast-container .e-toast-container,
 .personal-toast-container .e-toast-container {
@@ -29,7 +29,7 @@
     transform: none !important;
 }
 
-/* Forțează toate toast-urile să aibă z-index foarte mare pentru body */
+/* Forteaza toate toast-urile sa aiba z-index foarte mare pentru body */
 .e-toast-container,
 .e-toast-parent,
 body .e-toast-container,
@@ -69,7 +69,7 @@ body .e-toast,
     z-index: 999999 !important;
 }
 
-/* Fix pentru positioning în toate cazurile */
+/* Fix pentru positioning in toate cazurile */
 .e-toast-container > .e-toast {
     z-index: 1000000 !important;
 }
@@ -92,7 +92,7 @@ body .e-toast,
     animation-duration: 200ms !important;
 }
 
-/* CLEAR TOASTS - helper class pentru curățenie */
+/* CLEAR TOASTS - helper class pentru curatenie */
 .clearing-toasts .e-toast-container,
 .clearing-toasts .e-toast {
     display: none !important;

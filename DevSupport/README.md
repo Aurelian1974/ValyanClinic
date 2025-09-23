@@ -1,18 +1,18 @@
-﻿# DevSupport - Documentație și Scripturi de Suport
+﻿# DevSupport - Documentatie si Scripturi de Suport
 
-Această mapă conține documentația tehnică, ghidurile de utilizator și scripturile de suport pentru aplicația ValyanClinic.
+Aceasta mapa contine documentatia tehnica, ghidurile de utilizator si scripturile de suport pentru aplicatia ValyanClinic.
 
 ## 📂 Structura Mapei
 
 ### 📚 Documentation/
-- **Development/**: Documentație tehnică pentru dezvoltatori
+- **Development/**: Documentatie tehnica pentru dezvoltatori
 - **ForApplicationUsers/**: Ghiduri pentru utilizatorii finali
-- **Technical/**: Documentație tehnică specializată
+- **Technical/**: Documentatie tehnica specializata
 
 ### 🔧 Scripts/
-- **SQL Scripts**: Stored procedures și scripturi de bază de date
-- **PowerShell Scripts**: Scripturi de deployment și administrare
-- **Maintenance Scripts**: Scripturi de mentenanță
+- **SQL Scripts**: Stored procedures si scripturi de baza de date
+- **PowerShell Scripts**: Scripturi de deployment si administrare
+- **Maintenance Scripts**: Scripturi de mentenanta
 
 ### 📋 Improvement/
 - **Plans de refactorizare**
@@ -21,12 +21,12 @@ Această mapă conține documentația tehnică, ghidurile de utilizator și scri
 
 ## 🎯 Scopul Mapei
 
-Această mapă NU este un proiect .NET - este o colecție organizată de:
-- Documentație de dezvoltare
+Aceasta mapa NU este un proiect .NET - este o colectie organizata de:
+- Documentatie de dezvoltare
 - Ghiduri pentru utilizatori
 - Scripturi de automatizare
-- Planuri de îmbunătățire
+- Planuri de imbunatatire
 
-## 📝 Notă
+## 📝 Nota
 
-DevSupport nu face parte din build-ul aplicației principale, ci servește ca resursă de suport pentru dezvoltatori și utilizatori.
+DevSupport nu face parte din build-ul aplicatiei principale, ci serveste ca resursa de suport pentru dezvoltatori si utilizatori.

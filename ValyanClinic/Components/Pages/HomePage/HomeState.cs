@@ -1,7 +1,7 @@
 namespace ValyanClinic.Components.Pages.HomePage;
 
 /// <summary>
-/// State Management pentru Home page - ORGANIZAT ÎN FOLDER HomePage
+/// State Management pentru Home page - ORGANIZAT iN FOLDER HomePage
 /// </summary>
 public class HomeState
 {

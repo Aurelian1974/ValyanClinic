@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 namespace ValyanClinic.Application.Services;
 
 /// <summary>
-/// Service implementation pentru încărcarea departamentelor medicale din baza de date
-/// Folosește caching simplu în memorie pentru performanță optimă și încarcă doar din stored procedures
-/// NU folosește enum-uri statice - totul din baza de date pentru flexibilitate maximă
+/// Service implementation pentru incarcarea departamentelor medicale din baza de date
+/// Foloseste caching simplu in memorie pentru performanta optima si incarca doar din stored procedures
+/// NU foloseste enum-uri statice - totul din baza de date pentru flexibilitate maxima
 /// </summary>
 public class DepartamentMedicalService : IDepartamentMedicalService
 {
@@ -24,7 +24,7 @@ public class DepartamentMedicalService : IDepartamentMedicalService
     private const string CACHE_KEY_SUBSPECIALIZARI = "departamente_medicale_subspecializari";
     private const string CACHE_KEY_CONTAINER = "departamente_medicale_container";
     
-    // Cache expiration time - departamentele medicale se schimbă rar
+    // Cache expiration time - departamentele medicale se schimba rar
     private readonly TimeSpan _cacheExpiration = TimeSpan.FromHours(4);
 
     public DepartamentMedicalService(
@@ -191,7 +191,7 @@ public class DepartamentMedicalService : IDepartamentMedicalService
             {
                 _logger.LogInformation("Loading medical departments container from database");
                 
-                // Încarcă toate tipurile de departamente în paralel pentru performanță
+                // incarca toate tipurile de departamente in paralel pentru performanta
                 var categoriiTask = GetCategoriiMedicaleAsync();
                 var specializariTask = GetSpecializariMedicaleAsync();
                 var subspecializariTask = GetSubspecializariMedicaleAsync();
@@ -246,7 +246,7 @@ public class DepartamentMedicalService : IDepartamentMedicalService
         {
             _logger.LogInformation("Refreshing medical departments cache");
             
-            // Elimină toate cache-urile pentru departamentele medicale
+            // Elimina toate cache-urile pentru departamentele medicale
             lock (_cache)
             {
                 _cache.Remove(CACHE_KEY_ALL_DEPARTAMENTE);
@@ -256,7 +256,7 @@ public class DepartamentMedicalService : IDepartamentMedicalService
                 _cache.Remove(CACHE_KEY_CONTAINER);
             }
             
-            // Pre-încarcă din nou cache-urile principale pentru performanță
+            // Pre-incarca din nou cache-urile principale pentru performanta
             var preloadTasks = new List<Task>
             {
                 GetAllDepartamenteMedicaleAsync().ContinueWith(t => { /* ignore result */ }),

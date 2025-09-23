@@ -3,8 +3,8 @@
 namespace ValyanClinic.Domain.Enums;
 
 /// <summary>
-/// Opțiuni pentru filtrarea statusurilor în UI
-/// Înlocuiește magic strings cu enum type-safe
+/// Optiuni pentru filtrarea statusurilor in UI
+/// inlocuieste magic strings cu enum type-safe
 /// </summary>
 public enum StatusFilterOption
 {
@@ -22,7 +22,7 @@ public enum StatusFilterOption
 }
 
 /// <summary>
-/// Opțiuni pentru filtrarea rolurilor în UI
+/// Optiuni pentru filtrarea rolurilor in UI
 /// </summary>
 public enum RoleFilterOption
 {
@@ -49,7 +49,7 @@ public enum RoleFilterOption
 }
 
 /// <summary>
-/// Opțiuni pentru filtrarea departamentelor
+/// Optiuni pentru filtrarea departamentelor
 /// </summary>
 public enum DepartmentFilterOption
 {
@@ -79,7 +79,7 @@ public enum DepartmentFilterOption
 }
 
 /// <summary>
-/// Opțiuni pentru perioada de activitate
+/// Optiuni pentru perioada de activitate
 /// </summary>
 public enum ActivityPeriodOption
 {
@@ -106,7 +106,7 @@ public enum ActivityPeriodOption
 }
 
 /// <summary>
-/// Status pentru medicație
+/// Status pentru medicatie
 /// </summary>
 public enum MedicationStatus
 {
@@ -151,12 +151,12 @@ public enum TipPersonalMedical
 }
 
 /// <summary>
-/// Extension methods pentru obținerea display name-urilor
+/// Extension methods pentru obtinerea display name-urilor
 /// </summary>
 public static class EnumExtensions
 {
     /// <summary>
-    /// Obține display name-ul pentru un enum value
+    /// Obtine display name-ul pentru un enum value
     /// </summary>
     public static string GetDisplayName(this Enum enumValue)
     {
@@ -169,7 +169,7 @@ public static class EnumExtensions
     }
     
     /// <summary>
-    /// Obține toate valorile enum-ului ca lista de opțiuni pentru dropdown
+    /// Obtine toate valorile enum-ului ca lista de optiuni pentru dropdown
     /// </summary>
     public static List<FilterOption<TEnum>> GetFilterOptions<TEnum>() 
         where TEnum : struct, Enum
@@ -185,7 +185,7 @@ public static class EnumExtensions
 }
 
 /// <summary>
-/// Clasa helper pentru opțiuni dropdown
+/// Clasa helper pentru optiuni dropdown
 /// </summary>
 public class FilterOption<T>
 {

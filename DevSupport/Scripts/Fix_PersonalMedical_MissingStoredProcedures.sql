@@ -14,7 +14,7 @@ END
 PRINT 'Creating missing stored procedures for PersonalMedical...'
 
 -- =============================================
--- SP pentru ob?inerea distribu?iei personalului medical pe departamente
+-- SP pentru obinerea distribuiei personalului medical pe departamente
 -- CRITICAL: This procedure was missing and causing the SqlException
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_PersonalMedical_GetDistributiePerDepartament]
@@ -34,7 +34,7 @@ END;
 PRINT 'Created: sp_PersonalMedical_GetDistributiePerDepartament'
 
 -- =============================================
--- SP pentru ob?inerea distribu?iei personalului medical pe specializ?ri
+-- SP pentru obinerea distribuiei personalului medical pe specializri
 -- CRITICAL: This procedure was also missing and would cause errors
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_PersonalMedical_GetDistributiePerSpecializare]

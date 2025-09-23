@@ -42,7 +42,7 @@ public interface IPersonalRepository
     Task<bool> TestDatabaseConnectionAsync();
     
     /// <summary>
-    /// Generează următorul cod de angajat disponibil (EMP001, EMP002, etc.)
+    /// Genereaza urmatorul cod de angajat disponibil (EMP001, EMP002, etc.)
     /// </summary>
     Task<string> GetNextCodAngajatAsync();
 }

@@ -1,12 +1,12 @@
-﻿# 🚀 Quick Reference - Serilog în ValyanClinic
+﻿# 🚀 Quick Reference - Serilog in ValyanClinic
 
 **📋 Ghid rapid pentru dezvoltatori**
 
 ---
 
-## ⚡ Utilizare Rapidă
+## ⚡ Utilizare Rapida
 
-### 📝 În Services
+### 📝 in Services
 ```csharp
 private readonly ILogger<PersonalService> _logger;
 
@@ -22,7 +22,7 @@ _logger.LogWarning("Validation failed for {Operation}: {Errors}",
     "CreatePersonal", string.Join(", ", errors));
 ```
 
-### 🗄️ În Repository
+### 🗄️ in Repository
 ```csharp
 // ✅ Debug pentru SQL operations
 _logger.LogDebug("Executing {StoredProcedure} with {ParameterCount} parameters", 
@@ -47,36 +47,36 @@ using (_logger.BeginScope("ProcessingBatch {BatchId}", batchId))
 
 ---
 
-## 🔍 Log Levels - Când să Folosești
+## 🔍 Log Levels - Cand sa Folosesti
 
-| Level | Când | Exemple |
+| Level | Cand | Exemple |
 |-------|------|---------|
 | **Debug** | Development, debugging detaliat | SQL queries, parametri, flow control |
-| **Information** | Operațiuni normale business | "User created", "Email sent", "Data exported" |
-| **Warning** | Probleme minore, degradări | "Slow query", "Validation failed", "Cache miss" |
-| **Error** | Erori care afectează operațiunile | Excepții, database errors, API failures |
-| **Fatal** | Aplicația nu mai poate continua | Startup failures, critical system errors |
+| **Information** | Operatiuni normale business | "User created", "Email sent", "Data exported" |
+| **Warning** | Probleme minore, degradari | "Slow query", "Validation failed", "Cache miss" |
+| **Error** | Erori care afecteaza operatiunile | Exceptii, database errors, API failures |
+| **Fatal** | Aplicatia nu mai poate continua | Startup failures, critical system errors |
 
 ---
 
-## 📁 Fișiere Log Generate
+## 📁 Fisiere Log Generate
 
 ```
 Logs/
-├── startup-2025-09-14.log          # Bootstrap și startup
+├── startup-2025-09-14.log          # Bootstrap si startup
 ├── valyan-clinic-2025-09-14.log    # Toate log-urile (Info+)
-└── errors-2025-09-14.log           # Doar Warning și Error
+└── errors-2025-09-14.log           # Doar Warning si Error
 ```
 
 ---
 
-## 🛠️ Monitoring în Timp Real
+## 🛠️ Monitoring in Timp Real
 
 ```powershell
 # Monitorizare erori
 Get-Content .\Logs\errors-*.log -Wait -Tail 10
 
-# Căutare specifică
+# Cautare specifica
 Select-String -Path ".\Logs\*.log" -Pattern "PersonalService"
 ```
 

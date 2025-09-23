@@ -3,7 +3,7 @@
 namespace ValyanClinic.Application.Exceptions;
 
 /// <summary>
-/// Excepție de bază pentru toate excepțiile de business din ValyanClinic
+/// Exceptie de baza pentru toate exceptiile de business din ValyanClinic
 /// Provides structured error handling with Romanian messages
 /// </summary>
 [Serializable]
@@ -20,7 +20,7 @@ public abstract class BusinessException : Exception
     public string? Details { get; protected set; }
 
     /// <summary>
-    /// Timestamp când a apărut eroarea
+    /// Timestamp cand a aparut eroarea
     /// </summary>
     public DateTime Timestamp { get; protected set; } = DateTime.Now;
 
@@ -56,18 +56,18 @@ public abstract class BusinessException : Exception
 }
 
 /// <summary>
-/// Excepție pentru când o entitate nu este găsită
+/// Exceptie pentru cand o entitate nu este gasita
 /// </summary>
 [Serializable]
 public class NotFoundException : BusinessException
 {
     public NotFoundException(string entityName, object id) 
-        : base($"{entityName} cu ID-ul {id} nu a fost găsit", "NOT_FOUND", $"Entity: {entityName}, ID: {id}")
+        : base($"{entityName} cu ID-ul {id} nu a fost gasit", "NOT_FOUND", $"Entity: {entityName}, ID: {id}")
     {
     }
 
     public NotFoundException(string entityName, string criteria, object value) 
-        : base($"{entityName} cu {criteria} {value} nu a fost găsit", "NOT_FOUND", $"Entity: {entityName}, {criteria}: {value}")
+        : base($"{entityName} cu {criteria} {value} nu a fost gasit", "NOT_FOUND", $"Entity: {entityName}, {criteria}: {value}")
     {
     }
 
@@ -81,13 +81,13 @@ public class NotFoundException : BusinessException
 }
 
 /// <summary>
-/// Excepție pentru încălcarea regulilor de business
+/// Exceptie pentru incalcarea regulilor de business
 /// </summary>
 [Serializable]
 public class BusinessRuleException : BusinessException
 {
     /// <summary>
-    /// Lista de reguli încălcate
+    /// Lista de reguli incalcate
     /// </summary>
     public List<string> ViolatedRules { get; protected set; } = new();
 
@@ -128,7 +128,7 @@ public class BusinessRuleException : BusinessException
 }
 
 /// <summary>
-/// Excepție pentru conflicte (ex: date duplicate, constrangeri unicitate)
+/// Exceptie pentru conflicte (ex: date duplicate, constrangeri unicitate)
 /// </summary>
 [Serializable]
 public class ConflictException : BusinessException
@@ -177,7 +177,7 @@ public class ConflictException : BusinessException
 }
 
 /// <summary>
-/// Excepție pentru probleme de validare
+/// Exceptie pentru probleme de validare
 /// </summary>
 [Serializable]
 public class ValidationException : BusinessException
@@ -193,13 +193,13 @@ public class ValidationException : BusinessException
     }
 
     public ValidationException(string property, string error) 
-        : base($"Validare eșuată pentru {property}: {error}", "VALIDATION_ERROR")
+        : base($"Validare esuata pentru {property}: {error}", "VALIDATION_ERROR")
     {
         ValidationErrors.Add(property, new List<string> { error });
     }
 
     public ValidationException(Dictionary<string, List<string>> errors) 
-        : base("Validare eșuată", "VALIDATION_ERROR", $"Properties: {string.Join(", ", errors.Keys)}")
+        : base("Validare esuata", "VALIDATION_ERROR", $"Properties: {string.Join(", ", errors.Keys)}")
     {
         ValidationErrors = errors;
     }
@@ -223,7 +223,7 @@ public class ValidationException : BusinessException
     }
 
     /// <summary>
-    /// Obține toate erorile ca string formatat
+    /// Obtine toate erorile ca string formatat
     /// </summary>
     public string GetFormattedErrors()
     {
@@ -233,18 +233,18 @@ public class ValidationException : BusinessException
 }
 
 /// <summary>
-/// Excepție pentru operații neautorizate
+/// Exceptie pentru operatii neautorizate
 /// </summary>
 [Serializable]
 public class UnauthorizedException : BusinessException
 {
     /// <summary>
-    /// Acțiunea care a fost încercată
+    /// Actiunea care a fost incercata
     /// </summary>
     public string? AttemptedAction { get; protected set; }
 
     /// <summary>
-    /// Utilizatorul care a încercat acțiunea
+    /// Utilizatorul care a incercat actiunea
     /// </summary>
     public string? UserId { get; protected set; }
 
@@ -276,13 +276,13 @@ public class UnauthorizedException : BusinessException
 }
 
 /// <summary>
-/// Excepție pentru operații interzise
+/// Exceptie pentru operatii interzise
 /// </summary>
 [Serializable]
 public class ForbiddenException : BusinessException
 {
     /// <summary>
-    /// Motivul pentru care operația este interzisă
+    /// Motivul pentru care operatia este interzisa
     /// </summary>
     public string? Reason { get; protected set; }
 
@@ -311,7 +311,7 @@ public class ForbiddenException : BusinessException
 }
 
 /// <summary>
-/// Excepție pentru erori externe (servicii terțe, API-uri, baze de date)
+/// Exceptie pentru erori externe (servicii terte, API-uri, baze de date)
 /// </summary>
 [Serializable]
 public class ExternalServiceException : BusinessException
@@ -363,28 +363,28 @@ public class ExternalServiceException : BusinessException
 }
 
 /// <summary>
-/// Excepție pentru când resursa este în uz și nu poate fi modificată/ștearsă
+/// Exceptie pentru cand resursa este in uz si nu poate fi modificata/stearsa
 /// </summary>
 [Serializable]
 public class ResourceInUseException : BusinessException
 {
     /// <summary>
-    /// Tipul resursei care este în uz
+    /// Tipul resursei care este in uz
     /// </summary>
     public string ResourceType { get; protected set; } = string.Empty;
 
     /// <summary>
-    /// ID-ul resursei care este în uz
+    /// ID-ul resursei care este in uz
     /// </summary>
     public string ResourceId { get; protected set; } = string.Empty;
 
     /// <summary>
-    /// Lista de dependențe care împiedică operația
+    /// Lista de dependente care impiedica operatia
     /// </summary>
     public List<string> Dependencies { get; protected set; } = new();
 
     public ResourceInUseException(string resourceType, string resourceId, List<string> dependencies) 
-        : base($"{resourceType} cu ID-ul {resourceId} nu poate fi {(dependencies.Any() ? "modificat/șters" : "procesat")} deoarece este în uz", 
+        : base($"{resourceType} cu ID-ul {resourceId} nu poate fi {(dependencies.Any() ? "modificat/sters" : "procesat")} deoarece este in uz", 
                "RESOURCE_IN_USE", $"Type: {resourceType}, ID: {resourceId}, Dependencies: {string.Join(", ", dependencies)}")
     {
         ResourceType = resourceType;
@@ -415,29 +415,29 @@ public class ResourceInUseException : BusinessException
 }
 
 /// <summary>
-/// Extension methods pentru handling-ul excepțiilor
+/// Extension methods pentru handling-ul exceptiilor
 /// </summary>
 public static class BusinessExceptionExtensions
 {
     /// <summary>
-    /// Verifică dacă excepția este o excepție de business
+    /// Verifica daca exceptia este o exceptie de business
     /// </summary>
     public static bool IsBusinessException(this Exception ex) => ex is BusinessException;
 
     /// <summary>
-    /// Obține codul de eroare din excepție
+    /// Obtine codul de eroare din exceptie
     /// </summary>
     public static string GetErrorCode(this Exception ex) => 
         ex is BusinessException businessEx ? businessEx.ErrorCode : "UNKNOWN_ERROR";
 
     /// <summary>
-    /// Obține detaliile din excepție
+    /// Obtine detaliile din exceptie
     /// </summary>
     public static string? GetDetails(this Exception ex) => 
         ex is BusinessException businessEx ? businessEx.Details : null;
 
     /// <summary>
-    /// Convertește excepția la un obiect structurat pentru API
+    /// Converteste exceptia la un obiect structurat pentru API
     /// </summary>
     public static object ToApiResponse(this BusinessException ex) => new
     {
@@ -445,7 +445,7 @@ public static class BusinessExceptionExtensions
         message = ex.Message,
         details = ex.Details,
         timestamp = ex.Timestamp,
-        // Adaugă proprietăți specifice bazate pe tipul excepției
+        // Adauga proprietati specifice bazate pe tipul exceptiei
         additionalInfo = ex switch
         {
             ValidationException validationEx => (object)new { validationErrors = validationEx.ValidationErrors },

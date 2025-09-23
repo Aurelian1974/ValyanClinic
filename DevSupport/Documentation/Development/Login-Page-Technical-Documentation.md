@@ -132,17 +132,17 @@ The Login page is the authentication entry point for the ValyanClinic management
 
 ```razor
 <div class="login-welcome">
-    <h2 class="welcome-title">Bine ați revenit!</h2>
-    <p class="welcome-text">Introduceți datele pentru a accesa aplicația</p>
+    <h2 class="welcome-title">Bine ati revenit!</h2>
+    <p class="welcome-text">Introduceti datele pentru a accesa aplicatia</p>
 </div>
 ```
 
 **Purpose:** User-friendly greeting in Romanian
 
 **Localization Notes:**
-- **"Bine ați revenit!"** - "Welcome back!" in Romanian
-- **Proper Diacritics**: Uses ă, î, ț characters correctly
-- **Professional Tone**: Formal Romanian addressing (ați vs. ai)
+- **"Bine ati revenit!"** - "Welcome back!" in Romanian
+- **Proper Diacritics**: Uses a, i, t characters correctly
+- **Professional Tone**: Formal Romanian addressing (ati vs. ai)
 
 ---
 
@@ -175,7 +175,7 @@ The Login page is the authentication entry point for the ValyanClinic management
     <input type="text" 
            id="username"
            class="form-input @(_state.HasValidationErrors && _state.ValidationErrors.Any(e => e.Contains("utilizator")) ? "error" : "")"
-           placeholder="Introduceți numele de utilizator"
+           placeholder="Introduceti numele de utilizator"
            @bind="_state.LoginRequest.Username"
            @onkeypress="HandleKeyPress"
            disabled="@_state.IsLoading"
@@ -209,7 +209,7 @@ The Login page is the authentication entry point for the ValyanClinic management
     <input type="@_state.PasswordInputType" 
            id="password"
            class="form-input @(_state.HasValidationErrors && _state.ValidationErrors.Any(e => e.Contains("parola") || e.Contains("Parola")) ? "error" : "")"
-           placeholder="Introduceți parola"
+           placeholder="Introduceti parola"
            @bind="_state.LoginRequest.Password"
            @onkeypress="HandleKeyPress"
            disabled="@_state.IsLoading"
@@ -250,7 +250,7 @@ The Login page is the authentication entry point for the ValyanClinic management
                @bind="_state.LoginRequest.RememberMe"
                disabled="@_state.IsLoading" />
         <span class="checkmark"></span>
-        <span class="checkbox-text">Ține-mă minte</span>
+        <span class="checkbox-text">tine-ma minte</span>
     </label>
     
     <a href="#" class="forgot-link" @onclick="HandleForgotPassword" @onclick:preventDefault="true">
@@ -264,7 +264,7 @@ The Login page is the authentication entry point for the ValyanClinic management
 **Remember Me Checkbox:**
 - **Custom Styling**: Uses spans for visual customization
 - **State Binding**: Bound to `LoginRequest.RememberMe`
-- **Romanian Text**: "Ține-mă minte" (Remember me)
+- **Romanian Text**: "tine-ma minte" (Remember me)
 
 **Forgot Password Link:**
 - **Prevent Default**: Stops navigation, handles click server-side
@@ -281,7 +281,7 @@ The Login page is the authentication entry point for the ValyanClinic management
     @if (_state.IsLoading)
     {
         <div class="button-spinner"></div>
-        <span>Se autentifică...</span>
+        <span>Se autentifica...</span>
     }
     else if (_state.IsAccountLocked)
     {
@@ -291,7 +291,7 @@ The Login page is the authentication entry point for the ValyanClinic management
     else
     {
         <i class="fas fa-sign-in-alt"></i>
-        <span>Intră în aplicație</span>
+        <span>Intra in aplicatie</span>
     }
 </button>
 ```
@@ -300,7 +300,7 @@ The Login page is the authentication entry point for the ValyanClinic management
 
 **Loading State:**
 - **CSS Spinner**: Custom CSS animation for loading indicator
-- **Romanian Text**: "Se autentifică..." (Authenticating...)
+- **Romanian Text**: "Se autentifica..." (Authenticating...)
 - **Disabled Button**: Prevents multiple submissions
 
 **Account Locked State:**
@@ -310,7 +310,7 @@ The Login page is the authentication entry point for the ValyanClinic management
 
 **Normal State:**
 - **Login Icon**: Sign-in arrow icon
-- **Romanian Text**: "Intră în aplicație" (Enter application)
+- **Romanian Text**: "Intra in aplicatie" (Enter application)
 - **Call-to-Action**: Clear primary action
 
 **Business Logic:**

@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace ValyanClinic.Domain.Enums;
 
 /// <summary>
-/// Roluri utilizator în sistemul ValyanMed
-/// F?R? magic strings - folosim enum cu Display attributes
+/// Roluri utilizator in sistemul ValyanMed
+/// FR? magic strings - folosim enum cu Display attributes
 /// </summary>
 public enum UserRole
 {
@@ -28,7 +28,7 @@ public enum UserRole
 }
 
 /// <summary>
-/// Status utilizator în sistem
+/// Status utilizator in sistem
 /// </summary>
 public enum UserStatus
 {

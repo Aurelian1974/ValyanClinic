@@ -2,31 +2,31 @@
 
 ## 🎯 **Logging foarte detaliat implementat:**
 
-### **1. În LocationDependentGridDropdowns:**
-- **OnLocalitateChangedAsync:** STEP 1-4 pentru a urmări fluxul valorii
-- **OnParametersSetAsync:** Detectează exact când și de ce se schimbă parametrii
+### **1. in LocationDependentGridDropdowns:**
+- **OnLocalitateChangedAsync:** STEP 1-4 pentru a urmari fluxul valorii
+- **OnParametersSetAsync:** Detecteaza exact cand si de ce se schimba parametrii
 
-### **2. În AdaugaEditezaPersonal (Parent):**
-- **Properties cu logging:** Urmărește exact când se schimbă `selectedJudetDomiciliuId` și `selectedLocalitateDomiciliuId`
+### **2. in AdaugaEditezaPersonal (Parent):**
+- **Properties cu logging:** Urmareste exact cand se schimba `selectedJudetDomiciliuId` si `selectedLocalitateDomiciliuId`
 - **Event handlers:** Logging pentru fiecare callback primit
 
-## 🧪 **PAȘII DE TESTARE DETALIAT:**
+## 🧪 **PAsII DE TESTARE DETALIAT:**
 
-### **1. Restart aplicația și browser:**
+### **1. Restart aplicatia si browser:**
 ```
-Ctrl+F5 în browser pentru cache clear complet
+Ctrl+F5 in browser pentru cache clear complet
 ```
 
-### **2. Navighează la form:**
-- Personal → Adaugă Personal
+### **2. Navigheaza la form:**
+- Personal → Adauga Personal
 - Scroll la "Adresa de Domiciliu"
 
-### **3. Testează pașii:**
-1. **Selectează un județ** (ex: Cluj)
-2. **Selectează o localitate** (ex: Cluj-Napoca) 
-3. **Urmărește logurile în consolă**
+### **3. Testeaza pasii:**
+1. **Selecteaza un judet** (ex: Cluj)
+2. **Selecteaza o localitate** (ex: Cluj-Napoca) 
+3. **Urmareste logurile in consola**
 
-## 📊 **Log-uri critice de urmărit:**
+## 📊 **Log-uri critice de urmarit:**
 
 ### **✅ FLUXUL NORMAL (SUCCESS):**
 ```
@@ -44,18 +44,18 @@ Ctrl+F5 în browser pentru cache clear complet
 🔥 ⚠️ ALERT: External localitate change detected: 1234 → null - This might be the RESET!
 ```
 
-## 🎯 **CE CĂUTĂM:**
+## 🎯 **CE CaUTaM:**
 
-### **Întrebarea cheie:** 
-**De ce `SelectedLocalitateId` devine din nou `null` după ce a fost setat la valoarea corectă?**
+### **intrebarea cheie:** 
+**De ce `SelectedLocalitateId` devine din nou `null` dupa ce a fost setat la valoarea corecta?**
 
 ### **Scenarii posibile:**
-1. **Parent resetează valoarea** → Vei vedea în log: `Parent selectedLocalitateDomiciliuId changed: 1234 → null`
+1. **Parent reseteaza valoarea** → Vei vedea in log: `Parent selectedLocalitateDomiciliuId changed: 1234 → null`
 2. **Blazor re-renderizare** → Vei vedea `OnParametersSetAsync` cu `LocalitateId=null`
-3. **Event handler problemă** → Se va vedea în secvența STEP 1-4
+3. **Event handler problema** → Se va vedea in secventa STEP 1-4
 
-## 🆘 **TESTEAZĂ ȘI TRIMITE-MI:**
+## 🆘 **TESTEAZa sI TRIMITE-MI:**
 
-**După ce testezi selectarea unei localități, trimite-mi TOATE log-urile care conțin `🔥` din momentul selectării până când se resetează.**
+**Dupa ce testezi selectarea unei localitati, trimite-mi TOATE log-urile care contin `🔥` din momentul selectarii pana cand se reseteaza.**
 
-**Aceste log-uri vor arăta EXACT unde și de ce se întâmplă reset-ul!** 🕵️‍♂️
+**Aceste log-uri vor arata EXACT unde si de ce se intampla reset-ul!** 🕵️‍♂️

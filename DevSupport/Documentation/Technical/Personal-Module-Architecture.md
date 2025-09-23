@@ -155,7 +155,7 @@ namespace ValyanClinic.Domain.Enums
 {
     public enum Departament
     {
-        [Display(Name = "Administrație")]
+        [Display(Name = "Administratie")]
         Administratie = 1,
         
         [Display(Name = "Financiar")]
@@ -229,7 +229,7 @@ public class PersonalService : IPersonalService
             
             // 2. Business rules
             if (await _repository.ExistsByCNPAsync(personal.CNP))
-                return ServiceResult<PersonalModel>.Failure("CNP-ul există deja în sistem");
+                return ServiceResult<PersonalModel>.Failure("CNP-ul exista deja in sistem");
             
             // 3. Domain operation
             personal.Cod_Angajat = await GetNextCodAngajatAsync();
@@ -315,7 +315,7 @@ public class CreatePersonalValidationStrategy : IValidationStrategy<PersonalMode
         
         // Business rules validation
         if (await CNPExistsInDatabase(personal.CNP))
-            result.AddError("CNP", "CNP-ul există deja în sistem");
+            result.AddError("CNP", "CNP-ul exista deja in sistem");
         
         return result;
     }
@@ -507,16 +507,16 @@ public class PersonalSecurityValidator : ISecurityValidator<PersonalModel>
         // SQL Injection prevention (already handled by Dapper parameters)
         // XSS prevention
         if (ContainsPotentialXSS(personal.Observatii))
-            result.AddError("Observatii", "Conținut potențial periculos detectat");
+            result.AddError("Observatii", "Continut potential periculos detectat");
         
         // Data leak prevention
         if (ContainsSensitiveData(personal.Observatii))
-            result.AddError("Observatii", "Nu includeți informații sensibile");
+            result.AddError("Observatii", "Nu includeti informatii sensibile");
         
         // Business logic validation
         if (personal.Status_Angajat == StatusAngajat.Activ && 
             !IsValidActivationRequest(personal))
-            result.AddError("Status", "Activarea necesită validări suplimentare");
+            result.AddError("Status", "Activarea necesita validari suplimentare");
         
         return result;
     }

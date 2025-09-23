@@ -1,8 +1,8 @@
 ﻿# Visual Studio Settings pentru Eliminarea Problemelor de Debugging
 
-## Setări Critice pentru Eliminarea Erorilor de Decompilare
+## Setari Critice pentru Eliminarea Erorilor de Decompilare
 
-### 1. Dezactivare Source Link și Decompilare
+### 1. Dezactivare Source Link si Decompilare
 **Tools → Options → Debugging → General:**
 - ❌ Enable source link support
 - ❌ Enable navigation to decompiled sources  
@@ -13,7 +13,7 @@
 **Tools → Options → Text Editor → C# → Advanced:**
 - ❌ Enable navigation to decompiled sources
 - ❌ Enable navigation to source servers
-- ✅ Enable full solution analysis (păstrați)
+- ✅ Enable full solution analysis (pastrati)
 
 ### 3. Debugging Behavior
 **Tools → Options → Debugging:**
@@ -25,28 +25,28 @@
 **Tools → Options → IntelliCode:**
 - ❌ Enable completions from decompiled sources
 
-## Rezultat Așteptat
+## Rezultat Asteptat
 
-După aplicarea acestor setări:
-- ✅ Nu veți mai vedea cod decompilat Microsoft
-- ✅ Debugging-ul va funcționa doar în codul vostru
-- ✅ Nu veți mai întâmpina NullReferenceException în cod extern
+Dupa aplicarea acestor setari:
+- ✅ Nu veti mai vedea cod decompilat Microsoft
+- ✅ Debugging-ul va functiona doar in codul vostru
+- ✅ Nu veti mai intampina NullReferenceException in cod extern
 - ✅ Performance-ul Visual Studio va fi mai bun
 
-## Verificare Rapidă
+## Verificare Rapida
 
-Dacă setările nu se aplică imediat:
-1. Închideți complet Visual Studio
-2. Redeschideți solution-ul
-3. Verificați că nu mai aveți tab-uri cu cod decompilat deschise
+Daca setarile nu se aplica imediat:
+1. inchideti complet Visual Studio
+2. Redeschideti solution-ul
+3. Verificati ca nu mai aveti tab-uri cu cod decompilat deschise
 
-## Alternativa Rapidă
+## Alternativa Rapida
 
-Dacă nu doriți să modificați setările global, pur și simplu:
-1. **NU faceți click pe stack trace-uri** care duc la cod .NET Framework
-2. **Folosiți F10/F11 doar în codul vostru**  
-3. **Ignorați erorile din cod decompilat**
+Daca nu doriti sa modificati setarile global, pur si simplu:
+1. **NU faceti click pe stack trace-uri** care duc la cod .NET Framework
+2. **Folositi F10/F11 doar in codul vostru**  
+3. **Ignorati erorile din cod decompilat**
 
 ---
 
-**Nota Important:** Codul decompilat este doar pentru referință și poate conține erori de afișare. Aplicația voastră funcționează perfect - problema este doar în debugger-ul Visual Studio când încearcă să decompileze cod Microsoft.
+**Nota Important:** Codul decompilat este doar pentru referinta si poate contine erori de afisare. Aplicatia voastra functioneaza perfect - problema este doar in debugger-ul Visual Studio cand incearca sa decompileze cod Microsoft.

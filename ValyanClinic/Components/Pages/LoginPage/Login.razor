@@ -41,8 +41,8 @@
 
         <!-- Welcome Message -->
         <div class="login-welcome">
-            <h2 class="welcome-title">Bine a?i revenit!</h2>
-            <p class="welcome-text">Introduce?i datele pentru a accesa aplica?ia</p>
+            <h2 class="welcome-title">Bine ai revenit!</h2>
+            <p class="welcome-text">Introducei datele pentru a accesa aplicaia</p>
         </div>
 
         <!-- Login Form -->
@@ -57,7 +57,7 @@
                 <input type="text" 
                        id="username"
                        class="form-input @(_state.HasValidationErrors && _state.ValidationErrors.Any(e => e.Contains("utilizator")) ? "error" : "")"
-                       placeholder="Introduce?i numele de utilizator"
+                       placeholder="Introducei numele de utilizator"
                        @bind="_state.LoginRequest.Username"
                        @onkeypress="HandleKeyPress"
                        disabled="@_state.IsLoading"
@@ -85,7 +85,7 @@
                     <input type="@_state.PasswordInputType" 
                            id="password"
                            class="form-input @(_state.HasValidationErrors && _state.ValidationErrors.Any(e => e.Contains("parola") || e.Contains("Parola")) ? "error" : "")"
-                           placeholder="Introduce?i parola"
+                           placeholder="Introducei parola"
                            @bind="_state.LoginRequest.Password"
                            @onkeypress="HandleKeyPress"
                            disabled="@_state.IsLoading"
@@ -144,7 +144,7 @@
                 else
                 {
                     <i class="fas fa-sign-in-alt"></i>
-                    <span>Intr? în aplica?ie</span>
+                    <span>Intr? in aplicaie</span>
                 }
             </button>
 
@@ -175,7 +175,7 @@
             </div>
             
             <div class="footer-links">
-                <div class="copyright">© 2025 ValyanMed. Toate drepturile rezervate.</div>
+                <div class="copyright">Â© 2025 ValyanMed. Toate drepturile rezervate.</div>
                 <a href="#" @onclick="ShowContactSupport" @onclick:preventDefault="true" class="support-link">
                     <i class="fas fa-headset"></i>
                     Suport tehnic

@@ -1,20 +1,20 @@
-﻿# SOLUȚIA PROBLEMEI: SfToast Blurat în Modale
+﻿# SOLUtIA PROBLEMEI: SfToast Blurat in Modale
 
-## 🔍 **PROBLEMA IDENTIFICATĂ:**
+## 🔍 **PROBLEMA IDENTIFICATa:**
 
-Când se deschide un modal (`SfDialog`), toast-urile din componenta părinte se afișează blurate și nu sunt lizibile deoarece:
+Cand se deschide un modal (`SfDialog`), toast-urile din componenta parinte se afiseaza blurate si nu sunt lizibile deoarece:
 
-1. **Modal Backdrop** pune `backdrop-filter: blur(4px)` peste tot conținutul din spate
-2. **Toast-ul din `body`** rămâne în spatele overlay-ului modalului
-3. **Z-index conflicts** între toast-uri și modale
+1. **Modal Backdrop** pune `backdrop-filter: blur(4px)` peste tot continutul din spate
+2. **Toast-ul din `body`** ramane in spatele overlay-ului modalului
+3. **Z-index conflicts** intre toast-uri si modale
 4. **Utilizatorul nu poate vedea mesajele** importante
 
-## ✅ **SOLUȚIA IMPLEMENTATĂ (MULTI-LAYER):**
+## ✅ **SOLUtIA IMPLEMENTATa (MULTI-LAYER):**
 
-### **🥇 Soluția 1: Toast în Modal (Principală)**
+### **🥇 Solutia 1: Toast in Modal (Principala)**
 
 ```razor
-<!-- În modal - AdministrarePersonal.razor -->
+<!-- in modal - AdministrarePersonal.razor -->
 <SfDialog @ref="PersonalDetailModal" CssClass="personal-dialog detail-dialog">
     
     <!-- TOAST DEDICAT PENTRU MODAL -->
@@ -27,7 +27,7 @@ Când se deschide un modal (`SfDialog`), toast-urile din componenta părinte se 
              CssClass="modal-toast">
     </SfToast>
     
-    <!-- Conținutul modalului -->
+    <!-- Continutul modalului -->
     <Content>
         <VizualizeazaPersonal PersonalData="@_state.SelectedPersonal" 
                             OnToastMessage="@ShowModalToast" />
@@ -36,11 +36,11 @@ Când se deschide un modal (`SfDialog`), toast-urile din componenta părinte se 
 ```
 
 **Avantaje:**
-- ✅ **Toast-ul apare ÎN modal** - nu e afectat de backdrop blur
-- ✅ **Context-aware** - utilizatorul vede mesajele în contextul corect
-- ✅ **Z-index safe** - toast-ul e în același layer cu modalul
+- ✅ **Toast-ul apare iN modal** - nu e afectat de backdrop blur
+- ✅ **Context-aware** - utilizatorul vede mesajele in contextul corect
+- ✅ **Z-index safe** - toast-ul e in acelasi layer cu modalul
 
-### **🥈 Soluția 2: CSS Z-Index Override**
+### **🥈 Solutia 2: CSS Z-Index Override**
 
 ```css
 /* toast-modal-fix.css */
@@ -50,11 +50,11 @@ Când se deschide un modal (`SfDialog`), toast-urile din componenta părinte se 
 
 .e-toast {
     z-index: 10001 !important;
-    backdrop-filter: none !important; /* Elimină blur */
+    backdrop-filter: none !important; /* Elimina blur */
     filter: none !important;
 }
 
-/* Previne blur-ul să afecteze toast-urile */
+/* Previne blur-ul sa afecteze toast-urile */
 .e-dlg-overlay ~ .e-toast-container {
     z-index: 10000 !important;
     filter: none !important;
@@ -63,11 +63,11 @@ Când se deschide un modal (`SfDialog`), toast-urile din componenta părinte se 
 ```
 
 **Avantaje:**
-- ✅ **Forțează vizibilitatea** toast-urilor globale
-- ✅ **Backup solution** dacă modalul nu are toast propriu
-- ✅ **Works globally** - afectează toate toast-urile
+- ✅ **Forteaza vizibilitatea** toast-urilor globale
+- ✅ **Backup solution** daca modalul nu are toast propriu
+- ✅ **Works globally** - afecteaza toate toast-urile
 
-### **🥉 Soluția 3: Service Pattern (Opțional)**
+### **🥉 Solutia 3: Service Pattern (Optional)**
 
 ```csharp
 // ToastNotificationService.cs
@@ -80,13 +80,13 @@ public interface IToastNotificationService
 ```
 
 **Avantaje:**
-- ✅ **Centralizat** - o singură implementare
-- ✅ **Testable** - ușor de mock în unit tests
-- ✅ **Flexible** - poate schimba între toast global/modal
+- ✅ **Centralizat** - o singura implementare
+- ✅ **Testable** - usor de mock in unit tests
+- ✅ **Flexible** - poate schimba intre toast global/modal
 
-## 🔧 **IMPLEMENTARE PRACTICĂ:**
+## 🔧 **IMPLEMENTARE PRACTICa:**
 
-### **Pasul 1: Toast în Code-Behind**
+### **Pasul 1: Toast in Code-Behind**
 
 ```csharp
 // AdministrarePersonal.razor.cs
@@ -115,7 +115,7 @@ private async Task ShowModalToast(string title, string content, string cssClass 
 }
 ```
 
-### **Pasul 2: CSS Inclus în App.razor**
+### **Pasul 2: CSS Inclus in App.razor**
 
 ```html
 <!-- App.razor -->
@@ -135,47 +135,47 @@ public async ValueTask DisposeAsync()
 
 ## 🎯 **REZULTATUL FINAL:**
 
-### **✅ ÎNAINTE (Problematic):**
-- Toast blurat și ilizibil în modal ❌
+### **✅ iNAINTE (Problematic):**
+- Toast blurat si ilizibil in modal ❌
 - Utilizatorii nu vedeau mesajele importante ❌  
-- Experiență utilizator deficitară ❌
+- Experienta utilizator deficitara ❌
 
-### **✅ DUPĂ (Soluționat):**
-- Toast clar și vizibil în modal ✅
-- Mesaje contextuale în locul corect ✅
-- Experiență utilizator excelentă ✅
+### **✅ DUPa (Solutionat):**
+- Toast clar si vizibil in modal ✅
+- Mesaje contextuale in locul corect ✅
+- Experienta utilizator excelenta ✅
 
 ## 💡 **BEST PRACTICES:**
 
-### **Când să folosești fiecare soluție:**
+### **Cand sa folosesti fiecare solutie:**
 
-**Toast în Modal:**
-- Pentru acțiuni specifice modalului
+**Toast in Modal:**
+- Pentru actiuni specifice modalului
 - Pentru feedback contextual
-- Pentru validări și erori din forms
+- Pentru validari si erori din forms
 
 **Toast Global:**
-- Pentru acțiuni sistem-wide (salvare, delete)
-- Pentru notificări care trebuie văzute peste tot
+- Pentru actiuni sistem-wide (salvare, delete)
+- Pentru notificari care trebuie vazute peste tot
 - Pentru status updates generale
 
 **CSS Override:**
 - Ca backup pentru toast-urile globale
-- Pentru aplicații existente cu multe toast-uri
+- Pentru aplicatii existente cu multe toast-uri
 - Pentru compatibilitate cu componente third-party
 
 ## 🧪 **TESTARE:**
 
 ### **Scenario de Test:**
 1. **Deschide modal** pentru vizualizare personal
-2. **Declanșează acțiune** care generează toast (ex: încarcă date)
-3. **Verifică vizibilitatea** - toast-ul trebuie să fie clar și lizibil
-4. **Testează pe diferite rezoluții** - desktop, tablet, mobile
+2. **Declanseaza actiune** care genereaza toast (ex: incarca date)
+3. **Verifica vizibilitatea** - toast-ul trebuie sa fie clar si lizibil
+4. **Testeaza pe diferite rezolutii** - desktop, tablet, mobile
 
 ### **Expected Results:**
-- ✅ Toast-ul apare în colțul modalului
-- ✅ Textul este clar și lizibil
-- ✅ Nu există blur sau efecte vizuale negative
-- ✅ Toast-ul se autodismiss după timeout
+- ✅ Toast-ul apare in coltul modalului
+- ✅ Textul este clar si lizibil
+- ✅ Nu exista blur sau efecte vizuale negative
+- ✅ Toast-ul se autodismiss dupa timeout
 
-**Problema cu toast-urile blurate în modale este complet rezolvată!** 🎉
+**Problema cu toast-urile blurate in modale este complet rezolvata!** 🎉

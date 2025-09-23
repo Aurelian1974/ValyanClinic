@@ -63,7 +63,7 @@ public partial class AdministrarePersonalMedical : ComponentBase, IAsyncDisposab
         catch (Exception ex)
         {
             Logger.LogError(ex, "💥 Error initializing PersonalMedical management page");
-            _state.SetError($"Eroare la inițializarea paginii: {ex.Message}");
+            _state.SetError($"Eroare la initializarea paginii: {ex.Message}");
             StateHasChanged();
         }
     }
@@ -248,7 +248,7 @@ public partial class AdministrarePersonalMedical : ComponentBase, IAsyncDisposab
         catch (Exception ex)
         {
             Logger.LogError(ex, "💥 Error showing detail modal");
-            await ShowToast("Eroare", "Eroare la afișarea detaliilor", "e-toast-danger");
+            await ShowToast("Eroare", "Eroare la afisarea detaliilor", "e-toast-danger");
         }
     }
 
@@ -314,13 +314,13 @@ public partial class AdministrarePersonalMedical : ComponentBase, IAsyncDisposab
 
             if (confirmDelete)
             {
-                await ShowToast("Ștergere", $"Personal {personalMedical.NumeComplet} va fi șters", "e-toast-info");
+                await ShowToast("stergere", $"Personal {personalMedical.NumeComplet} va fi sters", "e-toast-info");
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "💥 Error deleting");
-            await ShowToast("Eroare", "Eroare la ștergere", "e-toast-danger");
+            await ShowToast("Eroare", "Eroare la stergere", "e-toast-danger");
         }
     }
 

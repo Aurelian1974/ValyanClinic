@@ -5,7 +5,7 @@ using PersonalModel = ValyanClinic.Domain.Models.Personal;
 namespace ValyanClinic.Components.Pages.Administrare.Personal;
 
 /// <summary>
-/// Models și helper classes pentru pagina Personal
+/// Models si helper classes pentru pagina Personal
 /// Similar cu UtilizatoriModels dar adaptat pentru Personal
 /// </summary>
 public class PersonalModels

@@ -19,7 +19,7 @@ public class User
     public string Email { get; set; } = string.Empty;
     
     [Required(ErrorMessage = "Numele de utilizator este obligatoriu")]
-    [StringLength(30, MinimumLength = 3, ErrorMessage = "Numele de utilizator trebuie s? aib? între 3 ?i 30 de caractere")]
+    [StringLength(30, MinimumLength = 3, ErrorMessage = "Numele de utilizator trebuie s? aib? intre 3 ?i 30 de caractere")]
     public string Username { get; set; } = string.Empty;
     
     [Phone(ErrorMessage = "Format telefon invalid")]
@@ -39,7 +39,7 @@ public class User
         UserStatus.Active => "Activ",
         UserStatus.Inactive => "Inactiv",
         UserStatus.Suspended => "Suspendat",
-        UserStatus.Pending => "În a?teptare",
+        UserStatus.Pending => "in ateptare",
         _ => "Necunoscut"
     };
     

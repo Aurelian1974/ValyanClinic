@@ -39,7 +39,7 @@ BEGIN
         BEGIN TRANSACTION;
         
         DECLARE @NewId UNIQUEIDENTIFIER = NEWID();
-        DECLARE @CurrentDate DATETIME2 = GETDATE(); -- Folose?te ora local? pentru consisten??
+        DECLARE @CurrentDate DATETIME2 = GETDATE(); -- Folosete ora local? pentru consisten??
         
         -- Verificare unicitate CNP si Cod_Angajat
         IF EXISTS (SELECT 1 FROM Personal WHERE CNP = @CNP)

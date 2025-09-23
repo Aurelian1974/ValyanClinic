@@ -1,4 +1,4 @@
-/* DESIGN PREMIUM CU SPECIFICITATE MAXIM? - FOR?EAZ? STILURILE! */
+/* DESIGN PREMIUM CU SPECIFICITATE MAXIM? - FOREAZ? STILURILE! */
 
 /* Container principal - SPECIFICITATE MAXIM? */
 div.view-user-modal-content,
@@ -14,7 +14,7 @@ div.view-user-modal-content,
     box-shadow: none !important;
 }
 
-/* Loading states - FOR?AT */
+/* Loading states - FORAT */
 div.view-user-loading-container,
 .view-user-modal-content .view-user-loading-container {
     display: flex !important;
@@ -26,7 +26,7 @@ div.view-user-loading-container,
     border-radius: 16px !important;
 }
 
-/* Container pentru sec?iuni - FOR?AT */
+/* Container pentru seciuni - FORAT */
 div.view-user-details-container,
 .view-user-modal-content .view-user-details-container {
     width: 100% !important;
@@ -45,7 +45,7 @@ div.view-user-details-sections,
     background: transparent !important;
 }
 
-/* Sec?iuni premium - FOR?ATE */
+/* Seciuni premium - FORATE */
 div.view-user-details-section,
 .view-user-modal-content .view-user-details-section {
     background: white !important;
@@ -81,7 +81,7 @@ div.view-user-details-section:hover,
         0 8px 24px rgba(102, 126, 234, 0.15) !important;
 }
 
-/* Titluri sec?iuni - FOR?ATE CU GRADIENT */
+/* Titluri seciuni - FORATE CU GRADIENT */
 h3.view-user-section-title,
 .view-user-modal-content h3.view-user-section-title {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
@@ -130,7 +130,7 @@ h3.view-user-section-title i,
     position: relative !important;
 }
 
-/* Itemi detalii - FOR?A?I CU HOVER EFFECTS */
+/* Itemi detalii - FORAI CU HOVER EFFECTS */
 div.view-user-detail-item,
 .view-user-modal-content .view-user-detail-item {
     padding: 20px 24px !important;
@@ -195,7 +195,7 @@ span.view-user-detail-value,
     position: relative !important;
 }
 
-/* Lista permisiuni - FOR?AT? */
+/* Lista permisiuni - FORAT? */
 div.view-user-permissions-list,
 .view-user-modal-content .view-user-permissions-list {
     padding: 24px !important;
@@ -266,7 +266,7 @@ div.view-user-permission-item i,
     box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2) !important;
 }
 
-/* Badges Premium - FOR?ATE CU GRADIENTE */
+/* Badges Premium - FORATE CU GRADIENTE */
 span.view-user-status-badge,
 span.view-user-role-badge,
 .view-user-modal-content .view-user-status-badge,
@@ -317,7 +317,7 @@ span.view-user-role-badge:hover,
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Status Badge Colors - FOR?ATE */
+/* Status Badge Colors - FORATE */
 span.view-user-status-badge.status-active,
 .view-user-modal-content .view-user-status-badge.status-active {
     background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
@@ -339,7 +339,7 @@ span.view-user-status-badge.status-suspended,
     box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4) !important;
 }
 
-/* Role Badge Colors - FOR?ATE */
+/* Role Badge Colors - FORATE */
 span.view-user-role-badge.role-administrator,
 .view-user-modal-content .view-user-role-badge.role-administrator {
     background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
@@ -407,7 +407,7 @@ span.view-user-role-badge.role-operator,
     color: #22c55e !important;
 }
 
-/* Responsive Design - FOR?AT */
+/* Responsive Design - FORAT */
 @media (max-width: 768px) {
     div.view-user-modal-content,
     .view-user-modal-content {

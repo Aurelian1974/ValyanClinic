@@ -326,28 +326,28 @@ REGULI PENTRU UI CU CARACTERE ANSI:
 ✅ Anulare (OK - ANSI)
 
 ❌ EVITAM COMPLET:
-- Toate diacriticele romanesti: ă, â, î, ș, ț
+- Toate diacriticele romanesti: a, a, i, s, t
 - Caractere speciale: ç, ë, ö, ü
 - Unicode characters care pot cauza probleme de encoding
 
 EXEMPLE DE INLOCUIRE DIACRITICE:
 ===============================
-❌ Căutare → ✅ Cautare
-❌ Județul → ✅ Judetul  
-❌ Vârsta → ✅ Varsta
-❌ Locația → ✅ Locatia
-❌ Înregistrare → ✅ Inregistrare
-❌ Acțiuni → ✅ Actiuni
-❌ Administrează → ✅ Administreaza
-❌ înălțime → ✅ inaltime
-❌ căutare → ✅ cautare
-❌ Această → ✅ Aceasta
-❌ condiții → ✅ conditii
-❌ operațiuni → ✅ operatiuni
-❌ funcții → ✅ functii
-❌ utilizează → ✅ utilizeaza
-❌ șterge → ✅ sterge
-❌ creează → ✅ creaza
-❌ modifică → ✅ modifica
-❌ validează → ✅ valideaza
+❌ Cautare → ✅ Cautare
+❌ Judetul → ✅ Judetul  
+❌ Varsta → ✅ Varsta
+❌ Locatia → ✅ Locatia
+❌ inregistrare → ✅ Inregistrare
+❌ Actiuni → ✅ Actiuni
+❌ Administreaza → ✅ Administreaza
+❌ inaltime → ✅ inaltime
+❌ cautare → ✅ cautare
+❌ Aceasta → ✅ Aceasta
+❌ conditii → ✅ conditii
+❌ operatiuni → ✅ operatiuni
+❌ functii → ✅ functii
+❌ utilizeaza → ✅ utilizeaza
+❌ sterge → ✅ sterge
+❌ creeaza → ✅ creaza
+❌ modifica → ✅ modifica
+❌ valideaza → ✅ valideaza
 

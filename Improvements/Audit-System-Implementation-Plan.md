@@ -2,18 +2,18 @@
 
 **Creat:** Septembrie 2025  
 **Status:** Planificat pentru implementare  
-**Prioritate:** Medie-Ridicată  
+**Prioritate:** Medie-Ridicata  
 **Tehnologii:** .NET 9, Blazor Server, Dapper  
 
 ---
 
-## Prezentare Generală
+## Prezentare Generala
 
-Acest document descrie planul de implementare pentru sistemul de auditare al aplicației ValyanClinic. În loc de triggeri de bază de date, vom implementa un sistem modern de auditare la nivel de aplicație cu multiple strategii și funcționalități avansate.
+Acest document descrie planul de implementare pentru sistemul de auditare al aplicatiei ValyanClinic. in loc de triggeri de baza de date, vom implementa un sistem modern de auditare la nivel de aplicatie cu multiple strategii si functionalitati avansate.
 
 ## Context Actual
 
-În prezent, tabela `Personal` și alte tabele au câmpuri de auditare de bază:
+in prezent, tabela `Personal` si alte tabele au campuri de auditare de baza:
 - `Data_Crearii`
 - `Data_Ultimei_Modificari` 
 - `Creat_De`
@@ -25,10 +25,10 @@ Dar nu avem un sistem complet de auditare implementat.
 
 ## Strategii de Implementare
 
-### 1. 🔥 Interceptors și Decorators (PRIORITATE ÎNALTĂ)
+### 1. 🔥 Interceptors si Decorators (PRIORITATE iNALTa)
 
 #### Descriere
-Implementarea unui service pentru auditare centralizată care interceptează toate operațiunile CRUD.
+Implementarea unui service pentru auditare centralizata care intercepteaza toate operatiunile CRUD.
 
 #### Componente
 ```csharp
@@ -48,22 +48,22 @@ public class AuditService : IAuditService
     private readonly ILogger<AuditService> _logger;
     private readonly ICurrentUserService _currentUser;
     
-    // Implementare detaliată pentru toate metodele
+    // Implementare detaliata pentru toate metodele
 }
 ```
 
 #### Beneficii
-- ✅ Control complet în aplicație
-- ✅ Flexibilitate maximă în configurare
+- ✅ Control complet in aplicatie
+- ✅ Flexibilitate maxima in configurare
 - ✅ Integrare cu sistemul de logging existent
-- ✅ Testare ușoară
+- ✅ Testare usoara
 
 ---
 
-### 2. 🔧 Repository Pattern cu Auditare Automată
+### 2. 🔧 Repository Pattern cu Auditare Automata
 
 #### Descriere
-Extinderea repository pattern-ului existent pentru a include auditare automată în toate operațiunile.
+Extinderea repository pattern-ului existent pentru a include auditare automata in toate operatiunile.
 
 #### Exemplu de Implementare
 ```csharp
@@ -76,7 +76,7 @@ public abstract class BaseAuditableRepository<T> where T : IAuditableEntity
     
     protected async Task<T> CreateWithAuditAsync(T entity, string sql)
     {
-        // Auditare înainte de creeare
+        // Auditare inainte de creeare
         await _auditService.LogOperationAsync("CREATE_BEFORE", entity, _currentUser.UserId);
         
         // Setare metadate de auditare
@@ -85,10 +85,10 @@ public abstract class BaseAuditableRepository<T> where T : IAuditableEntity
         entity.Data_Ultimei_Modificari = DateTime.UtcNow;
         entity.Modificat_De = _currentUser.Username;
         
-        // Executare operațiune
+        // Executare operatiune
         await _connection.ExecuteAsync(sql, entity);
         
-        // Auditare după creare
+        // Auditare dupa creare
         await _auditService.LogOperationAsync("CREATE_AFTER", entity, _currentUser.UserId);
         
         return entity;
@@ -96,17 +96,17 @@ public abstract class BaseAuditableRepository<T> where T : IAuditableEntity
     
     protected async Task<T> UpdateWithAuditAsync(T oldEntity, T newEntity, string sql)
     {
-        // Auditare înainte de update cu comparație
+        // Auditare inainte de update cu comparatie
         await _auditService.LogOperationAsync("UPDATE_BEFORE", oldEntity, newEntity, _currentUser.UserId);
         
         // Setare metadate de auditare
         newEntity.Data_Ultimei_Modificari = DateTime.UtcNow;
         newEntity.Modificat_De = _currentUser.Username;
         
-        // Executare operațiune
+        // Executare operatiune
         await _connection.ExecuteAsync(sql, newEntity);
         
-        // Auditare după update
+        // Auditare dupa update
         await _auditService.LogOperationAsync("UPDATE_AFTER", newEntity, _currentUser.UserId);
         
         return newEntity;
@@ -136,7 +136,7 @@ public class PersonalRepository : BaseAuditableRepository<Personal>, IPersonalRe
 ### 3. 📊 Aspect-Oriented Programming (AOP)
 
 #### Descriere
-Folosirea atributelor pentru marcarea metodelor care necesită auditare automată.
+Folosirea atributelor pentru marcarea metodelor care necesita auditare automata.
 
 #### Implementare
 ```csharp
@@ -150,7 +150,7 @@ public class AuditableAttribute : Attribute
     public bool CompareEntities { get; set; } = false;
 }
 
-// Usage în repository
+// Usage in repository
 [Auditable(Operation = "CREATE_PERSONAL")]
 public async Task<Personal> CreateAsync(Personal personal) { ... }
 
@@ -171,7 +171,7 @@ public class AuditInterceptor : IInterceptor
         var auditAttribute = method.GetCustomAttribute<AuditableAttribute>();
         if (auditAttribute != null)
         {
-            // Logica de auditare înainte
+            // Logica de auditare inainte
             if (auditAttribute.LogBefore)
             {
                 await LogBeforeOperation(auditAttribute.Operation, args);
@@ -179,7 +179,7 @@ public class AuditInterceptor : IInterceptor
             
             var result = await next();
             
-            // Logica de auditare după
+            // Logica de auditare dupa
             if (auditAttribute.LogAfter)
             {
                 await LogAfterOperation(auditAttribute.Operation, args, result);
@@ -254,7 +254,7 @@ public class PersonalAuditEventHandler :
 ### 5. 🔄 Blazor Server Lifecycle Hooks
 
 #### Descriere
-Integrarea auditării direct în componentele Blazor pentru tracking complet al acțiunilor utilizatorului.
+Integrarea auditarii direct in componentele Blazor pentru tracking complet al actiunilor utilizatorului.
 
 #### Implementare
 ```csharp
@@ -271,7 +271,7 @@ public abstract class AuditableComponentBase : ComponentBase
     {
         try
         {
-            // Auditare încercare operațiune
+            // Auditare incercare operatiune
             await AuditService.LogOperationAsync($"{operation}_ATTEMPT", entity, CurrentUser.UserId);
             
             var result = await action();
@@ -318,17 +318,17 @@ public partial class EditPersonal : AuditableComponentBase
 CREATE TABLE AuditLog (
     Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWSEQUENTIALID(),
     
-    -- Identificarea operațiunii
+    -- Identificarea operatiunii
     TableName NVARCHAR(50) NOT NULL,
     Operation NVARCHAR(20) NOT NULL, -- CREATE, UPDATE, DELETE, VIEW, EXPORT
-    EntityId NVARCHAR(50), -- ID-ul entității modificate
+    EntityId NVARCHAR(50), -- ID-ul entitatii modificate
     
-    -- Datele modificării
+    -- Datele modificarii
     OldValues NVARCHAR(MAX), -- JSON cu valorile vechi
     NewValues NVARCHAR(MAX), -- JSON cu valorile noi
-    ChangedFields NVARCHAR(500), -- Lista câmpurilor modificate
+    ChangedFields NVARCHAR(500), -- Lista campurilor modificate
     
-    -- Informații utilizator
+    -- Informatii utilizator
     UserId NVARCHAR(50) NOT NULL,
     UserName NVARCHAR(100),
     UserRole NVARCHAR(50),
@@ -343,11 +343,11 @@ CREATE TABLE AuditLog (
     SessionId NVARCHAR(100),
     
     -- Pentru correlation
-    CorrelationId UNIQUEIDENTIFIER, -- Pentru a grupa operațiuni multiple
-    ParentAuditId UNIQUEIDENTIFIER -- Pentru operațiuni în cascadă
+    CorrelationId UNIQUEIDENTIFIER, -- Pentru a grupa operatiuni multiple
+    ParentAuditId UNIQUEIDENTIFIER -- Pentru operatiuni in cascada
 );
 
--- Indexuri pentru performanță
+-- Indexuri pentru performanta
 CREATE INDEX IX_AuditLog_TableName ON AuditLog(TableName);
 CREATE INDEX IX_AuditLog_Operation ON AuditLog(Operation);
 CREATE INDEX IX_AuditLog_UserId ON AuditLog(UserId);
@@ -375,29 +375,29 @@ CREATE INDEX IX_UserSessions_IsActive ON UserSessions(IsActive);
 
 ---
 
-## Funcționalități Avansate de Implementat
+## Functionalitati Avansate de Implementat
 
 ### 1. 📊 Dashboard de Auditare
-- **Vizualizare în timp real** a activității utilizatorilor
-- **Statistici** pe operațiuni și utilizatori
-- **Alerte** pentru activități suspicioase
-- **Exporturi** pentru compliance și raportare
+- **Vizualizare in timp real** a activitatii utilizatorilor
+- **Statistici** pe operatiuni si utilizatori
+- **Alerte** pentru activitati suspicioase
+- **Exporturi** pentru compliance si raportare
 
-### 2. 🔍 Căutare și Filtrare Avansată
-- **Căutare pe perioada de timp**
-- **Filtrare după utilizator, operațiune, tabel**
-- **Comparația versiunilor** unei înregistrări
-- **Timeline** cu toate modificările unei entități
+### 2. 🔍 Cautare si Filtrare Avansata
+- **Cautare pe perioada de timp**
+- **Filtrare dupa utilizator, operatiune, tabel**
+- **Comparatia versiunilor** unei inregistrari
+- **Timeline** cu toate modificarile unei entitati
 
-### 3. 🚨 Alerting și Monitoring
-- **Alerturi în timp real** pentru operațiuni critice
-- **Threshold monitoring** pentru volume mari de operațiuni
+### 3. 🚨 Alerting si Monitoring
+- **Alerturi in timp real** pentru operatiuni critice
+- **Threshold monitoring** pentru volume mari de operatiuni
 - **Integration cu sistemele de monitoring** existente
-- **Notificări** către administratori
+- **Notificari** catre administratori
 
-### 4. 📈 Raportare și Analytics
+### 4. 📈 Raportare si Analytics
 - **Rapoarte de activitate** per utilizator/departament
-- **Trending** și pattern recognition
+- **Trending** si pattern recognition
 - **Compliance reports** pentru audituri externe
 - **Data retention policies**
 
@@ -405,55 +405,55 @@ CREATE INDEX IX_UserSessions_IsActive ON UserSessions(IsActive);
 
 ## Planul de Implementare
 
-### Faza 1: Fundația (2-3 săptămâni)
+### Faza 1: Fundatia (2-3 saptamani)
 1. ✅ Crearea tabelelor de auditare
-2. ✅ Implementarea IAuditService și AuditService
+2. ✅ Implementarea IAuditService si AuditService
 3. ✅ Integrarea cu ICurrentUserService
-4. ✅ Testarea de bază
+4. ✅ Testarea de baza
 
-### Faza 2: Repository Integration (2 săptămâni)
+### Faza 2: Repository Integration (2 saptamani)
 1. ✅ Extinderea BaseRepository cu auditare
-2. ✅ Implementarea în PersonalRepository
-3. ✅ Testing și debugging
+2. ✅ Implementarea in PersonalRepository
+3. ✅ Testing si debugging
 4. ✅ Performance optimization
 
-### Faza 3: Blazor Integration (2 săptămâni)
+### Faza 3: Blazor Integration (2 saptamani)
 1. ✅ Crearea AuditableComponentBase
-2. ✅ Integrarea în componentele existente
+2. ✅ Integrarea in componentele existente
 3. ✅ UI pentru viewing audit logs
 4. ✅ Real-time notifications
 
-### Faza 4: Advanced Features (3-4 săptămâni)
+### Faza 4: Advanced Features (3-4 saptamani)
 1. ✅ Dashboard de auditare
-2. ✅ Advanced search și filtering
+2. ✅ Advanced search si filtering
 3. ✅ Alerting system
-4. ✅ Reporting și analytics
+4. ✅ Reporting si analytics
 
-### Faza 5: Production Readiness (1 săptămână)
+### Faza 5: Production Readiness (1 saptamana)
 1. ✅ Performance tuning
 2. ✅ Security review
 3. ✅ Documentation completion
-4. ✅ Deployment și monitoring
+4. ✅ Deployment si monitoring
 
 ---
 
-## Considerații Tehnice
+## Consideratii Tehnice
 
 ### Performance
-- **Async operations** pentru toate operațiunile de auditare
+- **Async operations** pentru toate operatiunile de auditare
 - **Batching** pentru volume mari de log-uri
-- **Background processing** pentru operațiuni non-critice
+- **Background processing** pentru operatiuni non-critice
 - **Database partitioning** pentru tabela AuditLog
 
 ### Security
-- **Encryption** pentru datele sensibile în audit logs
+- **Encryption** pentru datele sensibile in audit logs
 - **Access control** pentru viewing audit logs
 - **Tamper-proof** design pentru integritatea log-urilor
-- **Audit of audit** - cine accesează log-urile de auditare
+- **Audit of audit** - cine acceseaza log-urile de auditare
 
 ### Scalability
 - **Horizontal scaling** prin microservices
-- **Event sourcing** pentru aplicații mari
+- **Event sourcing** pentru aplicatii mari
 - **Caching strategies** pentru queries frecvente
 - **Archive policies** pentru log-uri vechi
 
@@ -462,53 +462,53 @@ CREATE INDEX IX_UserSessions_IsActive ON UserSessions(IsActive);
 ## Resurse Necesare
 
 ### Dezvoltare
-- **1 Senior Developer** pentru arhitectură și design
+- **1 Senior Developer** pentru arhitectura si design
 - **1 Mid-level Developer** pentru implementare
 - **1 QA Engineer** pentru testing
 
-### Infrastructură
+### Infrastructura
 - **Database storage** suplimentar pentru audit logs
 - **Monitoring tools** pentru performance tracking
 - **Backup solutions** pentru audit data
 
 ### Timp Estimat
-- **Total: 10-12 săptămâni**
-- **MVP (Minimum Viable Product): 6-8 săptămâni**
+- **Total: 10-12 saptamani**
+- **MVP (Minimum Viable Product): 6-8 saptamani**
 
 ---
 
 ## Criteriile de Succes
 
-### Funcționale
-- ✅ Toate operațiunile CRUD sunt auditate automat
-- ✅ Dashboard functional pentru vizualizarea activității
-- ✅ Search și filtering funcționează performant
-- ✅ Alerting system funcțional
+### Functionale
+- ✅ Toate operatiunile CRUD sunt auditate automat
+- ✅ Dashboard functional pentru vizualizarea activitatii
+- ✅ Search si filtering functioneaza performant
+- ✅ Alerting system functional
 
-### Non-Funcționale
-- ✅ Performance impact < 5% în operațiunile normale
-- ✅ Audit logs disponibile în < 1 secundă
+### Non-Functionale
+- ✅ Performance impact < 5% in operatiunile normale
+- ✅ Audit logs disponibile in < 1 secunda
 - ✅ 99.9% uptime pentru sistemul de auditare
-- ✅ Compliance cu reglementările medicale
+- ✅ Compliance cu reglementarile medicale
 
 ---
 
-## Riscuri și Mitigări
+## Riscuri si Mitigari
 
 ### Riscuri Tehnice
-- **Performance degradation** → Optimizări proactive și monitoring
-- **Storage overflow** → Policies de arhivare și curățare
-- **Complex queries** → Indexuri optimizate și query tuning
+- **Performance degradation** → Optimizari proactive si monitoring
+- **Storage overflow** → Policies de arhivare si curatare
+- **Complex queries** → Indexuri optimizate si query tuning
 
 ### Riscuri de Business
-- **User resistance** → Training și communication
-- **Compliance gaps** → Review cu legal și compliance team
-- **Cost overrun** → Iterative development și MVP approach
+- **User resistance** → Training si communication
+- **Compliance gaps** → Review cu legal si compliance team
+- **Cost overrun** → Iterative development si MVP approach
 
 ---
 
-*Acest document va fi actualizat pe măsură ce implementăm funcționalitățile de auditare. Pentru detalii tehnice suplimentare, consultați documentația de dezvoltare.*
+*Acest document va fi actualizat pe masura ce implementam functionalitatile de auditare. Pentru detalii tehnice suplimentare, consultati documentatia de dezvoltare.*
 
 **Status:** 📋 Planificat pentru implementare  
-**Data următoarei review:** După implementarea tabelei Personal  
+**Data urmatoarei review:** Dupa implementarea tabelei Personal  
 **Owner:** Echipa de dezvoltare ValyanClinic

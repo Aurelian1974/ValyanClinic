@@ -4,8 +4,8 @@ using ValyanClinic.Application.Validators;
 namespace ValyanClinic.Components.Shared.Validation;
 
 /// <summary>
-/// Component helper pentru validarea FluentValidation în Blazor
-/// Integrează ValidationService cu componentele UI
+/// Component helper pentru validarea FluentValidation in Blazor
+/// Integreaza ValidationService cu componentele UI
 /// </summary>
 public class FluentValidationHelper<T> : ComponentBase where T : class
 {
@@ -18,7 +18,7 @@ public class FluentValidationHelper<T> : ComponentBase where T : class
     [Parameter] public EventCallback OnValidationSuccess { get; set; }
 
     /// <summary>
-    /// Validează modelul folosind validatorul de bază
+    /// Valideaza modelul folosind validatorul de baza
     /// </summary>
     public async Task<ValidationResult> ValidateAsync()
     {
@@ -54,7 +54,7 @@ public class FluentValidationHelper<T> : ComponentBase where T : class
     }
 
     /// <summary>
-    /// Validează pentru operațiunea de creare
+    /// Valideaza pentru operatiunea de creare
     /// </summary>
     public async Task<ValidationResult> ValidateForCreateAsync()
     {
@@ -90,7 +90,7 @@ public class FluentValidationHelper<T> : ComponentBase where T : class
     }
 
     /// <summary>
-    /// Validează pentru operațiunea de actualizare
+    /// Valideaza pentru operatiunea de actualizare
     /// </summary>
     public async Task<ValidationResult> ValidateForUpdateAsync()
     {
@@ -126,7 +126,7 @@ public class FluentValidationHelper<T> : ComponentBase where T : class
     }
 
     /// <summary>
-    /// Validează un singur câmp
+    /// Valideaza un singur camp
     /// </summary>
     public async Task<bool> ValidatePropertyAsync(string propertyName)
     {
@@ -143,7 +143,7 @@ public class FluentValidationHelper<T> : ComponentBase where T : class
     }
 
     /// <summary>
-    /// Obține mesajul de eroare pentru o proprietate specifică
+    /// Obtine mesajul de eroare pentru o proprietate specifica
     /// </summary>
     public async Task<string?> GetPropertyErrorAsync(string propertyName)
     {
@@ -161,7 +161,7 @@ public class FluentValidationHelper<T> : ComponentBase where T : class
     }
 
     /// <summary>
-    /// Obține toate erorile pentru o proprietate specifică
+    /// Obtine toate erorile pentru o proprietate specifica
     /// </summary>
     public async Task<List<string>> GetPropertyErrorsAsync(string propertyName)
     {
@@ -180,12 +180,12 @@ public class FluentValidationHelper<T> : ComponentBase where T : class
 }
 
 /// <summary>
-/// Extension methods pentru facilitarea validării în componente
+/// Extension methods pentru facilitarea validarii in componente
 /// </summary>
 public static class BlazorValidationExtensions
 {
     /// <summary>
-    /// Extension method pentru validare rapidă în componente
+    /// Extension method pentru validare rapida in componente
     /// </summary>
     public static async Task<ValidationResult> ValidateAsync<T>(this T model, IServiceProvider serviceProvider) where T : class
     {
@@ -194,7 +194,7 @@ public static class BlazorValidationExtensions
     }
 
     /// <summary>
-    /// Verifică dacă un model este valid
+    /// Verifica daca un model este valid
     /// </summary>
     public static async Task<bool> IsValidAsync<T>(this T model, IServiceProvider serviceProvider) where T : class
     {
@@ -203,7 +203,7 @@ public static class BlazorValidationExtensions
     }
 
     /// <summary>
-    /// Obține toate erorile de validare ca string
+    /// Obtine toate erorile de validare ca string
     /// </summary>
     public static async Task<string> GetValidationErrorsAsync<T>(this T model, IServiceProvider serviceProvider) where T : class
     {

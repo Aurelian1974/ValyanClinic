@@ -115,7 +115,7 @@ The Add/Edit User Form (`AdaugaEditezUtilizator.razor`) is a comprehensive form 
     <div class="add-edit-user-loading-container">
         <div class="add-edit-user-loading-indicator">
             <i class="fas fa-spinner fa-spin"></i>
-            <span>Se încarcă...</span>
+            <span>Se incarca...</span>
         </div>
     </div>
 }
@@ -178,7 +178,7 @@ The Add/Edit User Form (`AdaugaEditezUtilizator.razor`) is a comprehensive form 
 <div class="add-edit-user-form-section">
     <h3 class="add-edit-user-section-title">
         <i class="fas fa-id-card"></i>
-        Informații Personale
+        Informatii Personale
     </h3>
     
     <div class="add-edit-user-form-row">
@@ -187,7 +187,7 @@ The Add/Edit User Form (`AdaugaEditezUtilizator.razor`) is a comprehensive form 
                 Nume <span class="add-edit-user-required">*</span>
             </label>
             <SfTextBox @bind-Value="CurrentUser.FirstName" 
-                      Placeholder="Introduceți numele"
+                      Placeholder="Introduceti numele"
                       CssClass="form-control">
             </SfTextBox>
             <ValidationMessage For="@(() => CurrentUser.FirstName)" class="add-edit-user-validation-error" />
@@ -200,7 +200,7 @@ The Add/Edit User Form (`AdaugaEditezUtilizator.razor`) is a comprehensive form 
 
 **Header Design:**
 - **Icon Integration**: Medical ID card icon for context
-- **Romanian Title**: "Informații Personale" (Personal Information)
+- **Romanian Title**: "Informatii Personale" (Personal Information)
 - **Premium Styling**: Gradient background with hover effects
 - **Accessibility**: Proper heading hierarchy
 
@@ -222,18 +222,18 @@ The Add/Edit User Form (`AdaugaEditezUtilizator.razor`) is a comprehensive form 
 <div class="add-edit-user-form-section">
     <h3 class="add-edit-user-section-title">
         <i class="fas fa-user-cog"></i>
-        Informații Cont
+        Informatii Cont
     </h3>
     
     <div class="add-edit-user-form-row">
         <div class="add-edit-user-form-group">
             <label class="add-edit-user-form-label">
-                Rol în Sistem <span class="add-edit-user-required">*</span>
+                Rol in Sistem <span class="add-edit-user-required">*</span>
             </label>
             <SfDropDownList TItem="UserRole" TValue="UserRole" 
                            @bind-Value="CurrentUser.Role"
                            DataSource="@AllRoles"
-                           Placeholder="Selectează rolul"
+                           Placeholder="Selecteaza rolul"
                            CssClass="form-control">
                 <DropDownListTemplates TItem="UserRole">
                     <ItemTemplate Context="roleContext">
@@ -264,7 +264,7 @@ private string GetRoleDisplayName(UserRole role)
         UserRole.Administrator => "Administrator",
         UserRole.Doctor => "Medic",
         UserRole.Nurse => "Asistent Medical",
-        UserRole.Receptionist => "Recepționer",
+        UserRole.Receptionist => "Receptioner",
         UserRole.Manager => "Manager",
         UserRole.Operator => "Operator",
         _ => role.ToString()
@@ -274,7 +274,7 @@ private string GetRoleDisplayName(UserRole role)
 
 **Account Fields:**
 1. **Username** - Required, uniqueness validation
-2. **Rol în Sistem (System Role)** - Required dropdown
+2. **Rol in Sistem (System Role)** - Required dropdown
 3. **Status** - Optional dropdown with default value
 4. **Empty Layout Space** - Maintains grid balance
 
@@ -284,7 +284,7 @@ private string GetRoleDisplayName(UserRole role)
 <div class="add-edit-user-form-section">
     <h3 class="add-edit-user-section-title">
         <i class="fas fa-building"></i>
-        Informații Organizaționale
+        Informatii Organizationale
     </h3>
     
     <div class="add-edit-user-form-row">
@@ -293,7 +293,7 @@ private string GetRoleDisplayName(UserRole role)
             <SfDropDownList TItem="string" TValue="string" 
                            @bind-Value="CurrentUser.Department"
                            DataSource="@DepartmentOptions"
-                           Placeholder="Selectează departamentul"
+                           Placeholder="Selecteaza departamentul"
                            AllowFiltering="true"
                            CssClass="form-control">
             </SfDropDownList>
@@ -310,7 +310,7 @@ private string GetRoleDisplayName(UserRole role)
 
 **Organizational Fields:**
 1. **Departament (Department)** - Optional filtered dropdown
-2. **Funcția (Job Title)** - Optional text field with examples
+2. **Functia (Job Title)** - Optional text field with examples
 
 ---
 
@@ -320,7 +320,7 @@ private string GetRoleDisplayName(UserRole role)
 
 ```razor
 <SfTextBox @bind-Value="CurrentUser.FirstName" 
-          Placeholder="Introduceți numele"
+          Placeholder="Introduceti numele"
           CssClass="form-control">
 </SfTextBox>
 ```
@@ -349,7 +349,7 @@ private string GetRoleDisplayName(UserRole role)
 <SfDropDownList TItem="UserRole" TValue="UserRole" 
                @bind-Value="CurrentUser.Role"
                DataSource="@AllRoles"
-               Placeholder="Selectează rolul"
+               Placeholder="Selecteaza rolul"
                CssClass="form-control">
     <DropDownListTemplates TItem="UserRole">
         <ItemTemplate Context="roleContext">
@@ -617,11 +617,11 @@ private async Task OnRoleChanged(UserRole newRole)
 public class User
 {
     [Required(ErrorMessage = "Numele este obligatoriu")]
-    [StringLength(50, ErrorMessage = "Numele nu poate depăși 50 de caractere")]
+    [StringLength(50, ErrorMessage = "Numele nu poate depasi 50 de caractere")]
     public string FirstName { get; set; }
     
     [Required(ErrorMessage = "Prenumele este obligatoriu")]
-    [StringLength(50, ErrorMessage = "Prenumele nu poate depăși 50 de caractere")]
+    [StringLength(50, ErrorMessage = "Prenumele nu poate depasi 50 de caractere")]
     public string LastName { get; set; }
     
     [Required(ErrorMessage = "Email-ul este obligatoriu")]
@@ -659,7 +659,7 @@ private List<ValidationResult> ValidateUser(User user)
     if (await _userService.EmailExistsAsync(user.Email, user.Id))
     {
         results.Add(new ValidationResult(
-            "Acest email este deja înregistrat", 
+            "Acest email este deja inregistrat", 
             new[] { nameof(user.Email) }));
     }
     
@@ -667,7 +667,7 @@ private List<ValidationResult> ValidateUser(User user)
     if (user.Role == UserRole.Doctor && string.IsNullOrEmpty(user.Department))
     {
         results.Add(new ValidationResult(
-            "Medicii trebuie să aibă un departament asignat", 
+            "Medicii trebuie sa aiba un departament asignat", 
             new[] { nameof(user.Department) }));
     }
     
@@ -712,7 +712,7 @@ private async Task LoadInitialData()
     }
     catch (Exception ex)
     {
-        await HandleError(ex, "încărcarea datelor inițiale");
+        await HandleError(ex, "incarcarea datelor initiale");
     }
 }
 ```
@@ -803,7 +803,7 @@ private User SanitizeUserInput(User user)
 {
     <div class="add-edit-user-form-group">
         <label class="add-edit-user-form-label">
-            Rol în Sistem <span class="add-edit-user-required">*</span>
+            Rol in Sistem <span class="add-edit-user-required">*</span>
         </label>
         <SfDropDownList @bind-Value="CurrentUser.Role" DataSource="@AllRoles">
         </SfDropDownList>
@@ -891,7 +891,7 @@ private async Task LogUserOperation(User user, string operation)
 **ARIA Implementation:**
 ```razor
 <label class="add-edit-user-form-label" id="firstName-label">
-    Nume <span class="add-edit-user-required" aria-label="câmp obligatoriu">*</span>
+    Nume <span class="add-edit-user-required" aria-label="camp obligatoriu">*</span>
 </label>
 <SfTextBox @bind-Value="CurrentUser.FirstName" 
           aria-labelledby="firstName-label"
@@ -899,7 +899,7 @@ private async Task LogUserOperation(User user, string operation)
           aria-describedby="firstName-help">
 </SfTextBox>
 <div id="firstName-help" class="form-help-text">
-    Introduceți numele de familie al utilizatorului
+    Introduceti numele de familie al utilizatorului
 </div>
 ```
 

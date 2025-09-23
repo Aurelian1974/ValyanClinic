@@ -403,7 +403,7 @@ public class PersonalPageState
     public void ClearError() => ErrorMessage = null;
     public bool IsAnyFilterActive => /* complex logic */;
     public string GetModalTitle() => IsEditMode ? "Editare Personal" : "Personal Nou";
-    public string GetModalSubtitle() => IsEditMode ? "Modificați informațiile existente" : "Adăugați informații pentru angajatul nou";
+    public string GetModalSubtitle() => IsEditMode ? "Modificati informatiile existente" : "Adaugati informatii pentru angajatul nou";
 }
 ```
 
@@ -652,7 +652,7 @@ private async Task SavePersonal(PersonalModel personalModel)
     catch (Exception ex)
     {
         Logger.LogError(ex, "Security validation failed");
-        await ShowToast("Eroare", "Operație respinsă din motive de securitate", "e-toast-danger");
+        await ShowToast("Eroare", "Operatie respinsa din motive de securitate", "e-toast-danger");
     }
 }
 ```

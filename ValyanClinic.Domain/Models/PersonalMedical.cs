@@ -4,7 +4,7 @@ namespace ValyanClinic.Domain.Models;
 
 /// <summary>
 /// Model pentru personalul medical din clinica ValyanMed
-/// Diferă de Personal prin focus pe date medicale specifice și departamente din DB
+/// Difera de Personal prin focus pe date medicale specifice si departamente din DB
 /// </summary>
 public class PersonalMedical
 {
@@ -23,15 +23,15 @@ public class PersonalMedical
     public string? Telefon { get; set; }
     public string? Email { get; set; }
     
-    // Departament și Poziție
+    // Departament si Pozitie
     public string? Departament { get; set; } // Text pentru compatibilitate
     public PozitiePersonalMedical? Pozitie { get; set; }
     
-    // Status și Metadata
+    // Status si Metadata
     public bool EsteActiv { get; set; } = true;
     public DateTime DataCreare { get; set; } = DateTime.Now;
     
-    // Relații cu Departamente (FK din tabela Departamente WHERE Tip = 'Medical')
+    // Relatii cu Departamente (FK din tabela Departamente WHERE Tip = 'Medical')
     public Guid? CategorieID { get; set; }
     public Guid? SpecializareID { get; set; }
     public Guid? SubspecializareID { get; set; }
@@ -44,10 +44,10 @@ public class PersonalMedical
     // Computed Properties pentru UI
     public string NumeComplet => $"{Nume} {Prenume}";
     public string StatusDisplay => EsteActiv ? "Activ" : "Inactiv";
-    public string PozitieDisplay => Pozitie?.GetDisplayName() ?? "Neprecizată";
+    public string PozitieDisplay => Pozitie?.GetDisplayName() ?? "Neprecizata";
     public string DepartamentDisplay => Departament ?? CategorieName ?? "Nedefinit";
     
-    // Proprietăți pentru validări medicale
+    // Proprietati pentru validari medicale
     public bool EsteDoctorSauAsistent => 
         Pozitie == PozitiePersonalMedical.Doctor || 
         Pozitie == PozitiePersonalMedical.AsistentMedical;
@@ -56,7 +56,7 @@ public class PersonalMedical
     
     public bool AreLicentaValida => !string.IsNullOrWhiteSpace(NumarLicenta) && NumarLicenta.Length >= 5;
     
-    // Proprietăți pentru specializări medicale
+    // Proprietati pentru specializari medicale
     public bool AreSpecializareCompleta => 
         CategorieID.HasValue && SpecializareID.HasValue;
         
@@ -69,11 +69,11 @@ public class PersonalMedical
             if (!string.IsNullOrEmpty(SpecializareName)) parts.Add(SpecializareName);
             if (!string.IsNullOrEmpty(SubspecializareName)) parts.Add(SubspecializareName);
             
-            return parts.Count > 0 ? string.Join(" / ", parts) : (Specializare ?? "Nespecificată");
+            return parts.Count > 0 ? string.Join(" / ", parts) : (Specializare ?? "Nespecificata");
         }
     }
     
-    // Proprietăți pentru UI și business logic
+    // Proprietati pentru UI si business logic
     public string ContactDisplay
     {
         get
@@ -81,11 +81,11 @@ public class PersonalMedical
             var contacts = new List<string>();
             if (!string.IsNullOrEmpty(Telefon)) contacts.Add($"📞 {Telefon}");
             if (!string.IsNullOrEmpty(Email)) contacts.Add($"✉️ {Email}");
-            return contacts.Count > 0 ? string.Join(" | ", contacts) : "Fără contact";
+            return contacts.Count > 0 ? string.Join(" | ", contacts) : "Fara contact";
         }
     }
     
-    // Proprietăți pentru căutare și filtrare
+    // Proprietati pentru cautare si filtrare
     public string SearchableText => 
         $"{NumeComplet} {Email} {Telefon} {NumarLicenta} {Specializare} {CategorieName} {SpecializareName} {Departament}".ToLower();
         
@@ -115,7 +115,7 @@ public class PersonalMedical
         return EsteActiv == esteActiv;
     }
     
-    // Metode pentru audit și tracking
+    // Metode pentru audit si tracking
     public bool IsValidForSave()
     {
         if (string.IsNullOrWhiteSpace(Nume) || string.IsNullOrWhiteSpace(Prenume))
@@ -141,13 +141,13 @@ public class PersonalMedical
             errors.Add("Prenumele este obligatoriu");
             
         if (AreNevieDeLicenta && !AreLicentaValida)
-            errors.Add("Numărul de licență este obligatoriu pentru doctori și asistenți medicali");
+            errors.Add("Numarul de licenta este obligatoriu pentru doctori si asistenti medicali");
             
         if (!string.IsNullOrWhiteSpace(Email) && !Email.Contains('@'))
             errors.Add("Formatul email-ului este invalid");
             
         if (!string.IsNullOrWhiteSpace(NumarLicenta) && NumarLicenta.Length < 5)
-            errors.Add("Numărul de licență trebuie să aibă cel puțin 5 caractere");
+            errors.Add("Numarul de licenta trebuie sa aiba cel putin 5 caractere");
             
         return errors;
     }

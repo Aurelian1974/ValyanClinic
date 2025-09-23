@@ -1,15 +1,15 @@
 ﻿/* ==========================================================================
-   DESIGN COMPACT ȘI PROFESIONAL - PERSONAL MEDICAL PAGE
+   DESIGN COMPACT sI PROFESIONAL - PERSONAL MEDICAL PAGE
    UNIFIED BLUE THEME - CONSISTENT WITH ADMINISTRARE-PERSONAL.CSS
    ========================================================================== */
 
 /* Container principal - ADAPTAT PENTRU LAYOUT CORECT */
 .personal-medical-page-container {
   position: absolute; /* CHANGED from fixed */
-  top: 0; /* RESET - layout-ul gestionează offsetul */
-  left: 0; /* RESET - layout-ul gestionează offsetul */
-  right: 0; /* PĂSTRAT pentru margin */
-  bottom: 0; /* PĂSTRAT pentru margin */
+  top: 0; /* RESET - layout-ul gestioneaza offsetul */
+  left: 0; /* RESET - layout-ul gestioneaza offsetul */
+  right: 0; /* PaSTRAT pentru margin */
+  bottom: 0; /* PaSTRAT pentru margin */
   width: 100%; /* CHANGED to full width within parent */
   height: 100%; /* CHANGED to full height within parent */
   display: flex;
@@ -299,7 +299,7 @@
     padding: 2px !important;
 }
 
-/* Specific pentru coloana înghețată - TIGHTER CONSTRAINTS */
+/* Specific pentru coloana inghetata - TIGHTER CONSTRAINTS */
 .e-grid .e-frozen-right-border {
     padding: 1px !important;
     overflow: hidden !important;
@@ -522,20 +522,20 @@
   }
 }
 /*ascunde linia*/
-/* Ascunde linia verticală pentru coloanele înghețate */
+/* Ascunde linia verticala pentru coloanele inghetate */
 .e-grid .e-frozenrow-border,
 .e-grid .e-frozencontent .e-table .e-row .e-rowcell.e-frozen-right-border,
 .e-grid .e-frozenheader .e-table .e-columnheader.e-frozen-right-border {
     border-right: none !important;
 }
 
-/* Sau pentru linia din stânga */
+/* Sau pentru linia din stanga */
 .e-grid .e-frozencontent .e-table .e-row .e-rowcell.e-frozen-left-border,
 .e-grid .e-frozenheader .e-table .e-columnheader.e-frozen-left-border {
     border-left: none !important;
 }
 
-/* Pentru a elimina complet bordera coloanelor înghețate */
+/* Pentru a elimina complet bordera coloanelor inghetate */
 .e-grid .e-frozen-right-border,
 .e-grid .e-frozen-left-border {
     border: none !important;

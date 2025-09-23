@@ -1,5 +1,5 @@
 -- =============================================
--- SP pentru ob?inerea unui personal medical dup? ID
+-- SP pentru obinerea unui personal medical dup? ID
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_PersonalMedical_GetById]
     @PersonalID UNIQUEIDENTIFIER

@@ -1,5 +1,5 @@
 -- =============================================
--- SP pentru ob?inerea departamentelor din tabela Departamente
+-- SP pentru obinerea departamentelor din tabela Departamente
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_Departamente_GetByTip]
     @Tip NVARCHAR(50)
@@ -18,7 +18,7 @@ END;
 GO
 
 -- =============================================
--- SP pentru ob?inerea tuturor departamentelor
+-- SP pentru obinerea tuturor departamentelor
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_Departamente_GetAll]
 AS

@@ -4,7 +4,7 @@ using ValyanClinic.Domain.Enums;
 namespace ValyanClinic.Components.Pages.UtilizatoriPage;
 
 /// <summary>
-/// State Management pentru Utilizatori page - ORGANIZAT ÎN FOLDER UtilizatoriPage
+/// State Management pentru Utilizatori page - ORGANIZAT iN FOLDER UtilizatoriPage
 /// </summary>
 public class UtilizatoriState
 {

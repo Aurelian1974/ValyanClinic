@@ -1,5 +1,5 @@
 -- =============================================
--- SP pentru ob?inerea listei de personal medical cu filtrare ?i paginare
+-- SP pentru obinerea listei de personal medical cu filtrare ?i paginare
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_PersonalMedical_GetAll]
     @PageNumber INT = 1,

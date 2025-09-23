@@ -548,7 +548,7 @@
   z-index: 100000 !important;
 }
 
-/* Forțează toast-urile să fie peste sidebar */
+/* Forteaza toast-urile sa fie peste sidebar */
 body .e-toast-container {
   z-index: 99999 !important;
   position: fixed !important;

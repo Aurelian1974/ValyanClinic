@@ -9,28 +9,28 @@ using Microsoft.Extensions.DependencyInjection;
 namespace ValyanClinic.Application.Validators;
 
 /// <summary>
-/// Service centralizat pentru toate validările aplicației
-/// Folosește FluentValidation pentru validări consistente și extensibile
+/// Service centralizat pentru toate validarile aplicatiei
+/// Foloseste FluentValidation pentru validari consistente si extensibile
 /// </summary>
 public interface IValidationService
 {
     /// <summary>
-    /// Validează un obiect folosind validatorul corespunzător
+    /// Valideaza un obiect folosind validatorul corespunzator
     /// </summary>
     Task<ValidationResult> ValidateAsync<T>(T entity) where T : class;
     
     /// <summary>
-    /// Validează un obiect pentru operațiunea de creare
+    /// Valideaza un obiect pentru operatiunea de creare
     /// </summary>
     Task<ValidationResult> ValidateForCreateAsync<T>(T entity) where T : class;
     
     /// <summary>
-    /// Validează un obiect pentru operațiunea de actualizare
+    /// Valideaza un obiect pentru operatiunea de actualizare
     /// </summary>
     Task<ValidationResult> ValidateForUpdateAsync<T>(T entity) where T : class;
     
     /// <summary>
-    /// Validează cu un validator specificat
+    /// Valideaza cu un validator specificat
     /// </summary>
     Task<ValidationResult> ValidateWithValidatorAsync<T>(T entity, IValidator<T> validator) where T : class;
 }
@@ -143,7 +143,7 @@ public class ValidationService : IValidationService
     }
 
     /// <summary>
-    /// Obține validatorul de bază pentru un tip
+    /// Obtine validatorul de baza pentru un tip
     /// </summary>
     private IValidator<T>? GetValidator<T>() where T : class
     {
@@ -158,7 +158,7 @@ public class ValidationService : IValidationService
     }
 
     /// <summary>
-    /// Obține validatorul pentru operațiunea de creare
+    /// Obtine validatorul pentru operatiunea de creare
     /// </summary>
     private IValidator<T>? GetCreateValidator<T>() where T : class
     {
@@ -172,7 +172,7 @@ public class ValidationService : IValidationService
     }
 
     /// <summary>
-    /// Obține validatorul pentru operațiunea de actualizare
+    /// Obtine validatorul pentru operatiunea de actualizare
     /// </summary>
     private IValidator<T>? GetUpdateValidator<T>() where T : class
     {
@@ -186,7 +186,7 @@ public class ValidationService : IValidationService
     }
 
     /// <summary>
-    /// Loghează rezultatul validării
+    /// Logheaza rezultatul validarii
     /// </summary>
     private void LogValidationResult<T>(T entity, FluentValidation.Results.ValidationResult result, string operation = "VALIDATE")
     {
@@ -205,7 +205,7 @@ public class ValidationService : IValidationService
 }
 
 /// <summary>
-/// Rezultatul validării
+/// Rezultatul validarii
 /// </summary>
 public class ValidationResult
 {
@@ -244,12 +244,12 @@ public class ValidationError
 public static class ValidationResultExtensions
 {
     /// <summary>
-    /// Convertește ValidationResult la boolean
+    /// Converteste ValidationResult la boolean
     /// </summary>
     public static bool IsSuccess(this ValidationResult result) => result.IsValid;
 
     /// <summary>
-    /// Convertește ValidationResult la string cu toate erorile
+    /// Converteste ValidationResult la string cu toate erorile
     /// </summary>
     public static string GetErrorsAsString(this ValidationResult result)
     {
@@ -260,7 +260,7 @@ public static class ValidationResultExtensions
     }
 
     /// <summary>
-    /// Obține erorile pentru o proprietate specifică
+    /// Obtine erorile pentru o proprietate specifica
     /// </summary>
     public static List<ValidationError> GetErrorsForProperty(this ValidationResult result, string propertyName)
     {
@@ -268,7 +268,7 @@ public static class ValidationResultExtensions
     }
 
     /// <summary>
-    /// Verifică dacă o proprietate specifică are erori
+    /// Verifica daca o proprietate specifica are erori
     /// </summary>
     public static bool HasErrorForProperty(this ValidationResult result, string propertyName)
     {

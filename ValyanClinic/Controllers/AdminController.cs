@@ -4,7 +4,7 @@ using Serilog;
 namespace ValyanClinic.Controllers;
 
 /// <summary>
-/// Controller pentru operațiuni administrative - inclusiv curățarea log-urilor
+/// Controller pentru operatiuni administrative - inclusiv curatarea log-urilor
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -20,7 +20,7 @@ public class AdminController : ControllerBase
     }
 
     /// <summary>
-    /// Endpoint pentru curățarea manuală a log-urilor (doar în development)
+    /// Endpoint pentru curatarea manuala a log-urilor (doar in development)
     /// </summary>
     [HttpPost("cleanup-logs")]
     public async Task<IActionResult> CleanupLogs()
@@ -147,7 +147,7 @@ public class AdminController : ControllerBase
     }
 
     /// <summary>
-    /// Endpoint pentru testarea conexiunii la baza de date și personal repository
+    /// Endpoint pentru testarea conexiunii la baza de date si personal repository
     /// </summary>
     [HttpPost("test-database")]
     public async Task<IActionResult> TestDatabase([FromServices] ValyanClinic.Infrastructure.Repositories.IPersonalRepository personalRepository)
@@ -253,7 +253,7 @@ public class AdminController : ControllerBase
     }
 
     /// <summary>
-    /// Endpoint pentru testarea actualizării unui Personal existent
+    /// Endpoint pentru testarea actualizarii unui Personal existent
     /// </summary>
     [HttpPost("test-personal-update")]
     public async Task<IActionResult> TestPersonalUpdate([FromServices] ValyanClinic.Application.Services.IPersonalService personalService)
@@ -352,7 +352,7 @@ public class AdminController : ControllerBase
     }
 
     /// <summary>
-    /// Endpoint pentru citirea conținutului unui fișier de log specific
+    /// Endpoint pentru citirea continutului unui fisier de log specific
     /// </summary>
     [HttpGet("read-log/{fileName}")]
     public async Task<IActionResult> ReadLogFile(string fileName)
@@ -413,7 +413,7 @@ public class AdminController : ControllerBase
     }
 
     /// <summary>
-    /// Endpoint pentru căutarea în log-uri după text specific
+    /// Endpoint pentru cautarea in log-uri dupa text specific
     /// </summary>
     [HttpGet("search-logs")]
     public async Task<IActionResult> SearchLogs([FromQuery] string searchText, [FromQuery] string? fileName = null, [FromQuery] int maxResults = 50)

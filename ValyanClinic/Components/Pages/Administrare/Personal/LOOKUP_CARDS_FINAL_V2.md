@@ -1,17 +1,17 @@
-﻿# 🎯 LOOKUP-URI JUDEȚ-LOCALITATE ÎN CARDURILE DE ADRESE
+﻿# 🎯 LOOKUP-URI JUDEt-LOCALITATE iN CARDURILE DE ADRESE
 
-## ✅ **IMPLEMENTARE FINALIZATĂ V2 - INTEGRARE PERFECTĂ ÎN GRID**
+## ✅ **IMPLEMENTARE FINALIZATa V2 - INTEGRARE PERFECTa iN GRID**
 
-### **🎨 PROBLEMA REZOLVATĂ COMPLET**
+### **🎨 PROBLEMA REZOLVATa COMPLET**
 
-Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambele carduri de adrese din pagina `AdaugaEditezaPersonal.razor`:
+Lookup-urile pentru Judet si Localitate sunt acum perfecte integrate in ambele carduri de adrese din pagina `AdaugaEditezaPersonal.razor`:
 
 1. ✅ **Card "Adresa de Domiciliu"** - cu lookup-uri dependente
 2. ✅ **Card "Adresa de Resedinta"** - cu lookup-uri dependente
 
 ---
 
-## 📁 **STRUCTURA IMPLEMENTĂRII V2**
+## 📁 **STRUCTURA IMPLEMENTaRII V2**
 
 ### **🔧 Componente Noi Create:**
 
@@ -23,7 +23,7 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
     └── 📄 location-dependent-grid-dropdowns.css # 🎯 Stiluri pentru grid
 ```
 
-### **🔄 Componente Existente (Păstrate):**
+### **🔄 Componente Existente (Pastrate):**
 
 ```
 📁 ValyanClinic/Components/Shared/
@@ -36,13 +36,13 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
 
 ---
 
-## 🏗️ **DIFERENȚA ÎNTRE COMPONENTELE V1 și V2**
+## 🏗️ **DIFERENtA iNTRE COMPONENTELE V1 si V2**
 
 ### **LocationDependentDropdowns (V1 - Standalone)**
 ```razor
-<!-- Layout intern în două coloane cu flex -->
+<!-- Layout intern in doua coloane cu flex -->
 <div class="dependent-dropdowns-container">
-    <div class="form-field">...</div>  <!-- Județ -->
+    <div class="form-field">...</div>  <!-- Judet -->
     <div class="form-field">...</div>  <!-- Localitate -->
 </div>
 ```
@@ -50,11 +50,11 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
 
 ### **LocationDependentGridDropdowns (V2 - Grid Integrated)**
 ```razor
-<!-- Generează două div-uri separate pentru integrarea în grid -->
-<div class="form-field">...</div>     <!-- Județ -->
+<!-- Genereaza doua div-uri separate pentru integrarea in grid -->
+<div class="form-field">...</div>     <!-- Judet -->
 <div class="form-field">...</div>     <!-- Localitate -->
 ```
-**Folosire:** Pentru integrarea perfectă în `.form-grid` existent
+**Folosire:** Pentru integrarea perfecta in `.form-grid` existent
 
 ---
 
@@ -64,24 +64,24 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 📍 Adresa de Domiciliu                                      │
-│ [Adresa completă - multiline text box]                      │
+│ [Adresa completa - multiline text box]                      │
 ├─────────────────────────┬───────────────────────────────────┤
-│ Județ Domiciliu *       │ Localitate Domiciliu *            │
-│ [Dropdown Județ]        │ [Dropdown Localitate]             │
+│ Judet Domiciliu *       │ Localitate Domiciliu *            │
+│ [Dropdown Judet]        │ [Dropdown Localitate]             │
 ├─────────────────────────┼───────────────────────────────────┤
 │ Cod Postal Domiciliu    │                                   │
 │ [Text input]            │                                   │
 └─────────────────────────┴───────────────────────────────────┘
 ```
 
-### **Card "Adresa de Resedinta" (dacă diferă):**
+### **Card "Adresa de Resedinta" (daca difera):**
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 🏠 Adresa de Resedinta                                      │
-│ [Adresa completă - multiline text box]                      │
+│ [Adresa completa - multiline text box]                      │
 ├─────────────────────────┬───────────────────────────────────┤
-│ Județ Reședință         │ Localitate Reședință              │
-│ [Dropdown Județ]        │ [Dropdown Localitate]             │
+│ Judet Resedinta         │ Localitate Resedinta              │
+│ [Dropdown Judet]        │ [Dropdown Localitate]             │
 ├─────────────────────────┼───────────────────────────────────┤
 │ Cod Postal Resedinta    │                                   │
 │ [Text input]            │                                   │
@@ -93,33 +93,33 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
 ## ⚡ **FEATURES IMPLEMENTATE**
 
 ### **✅ Layout Perfect Integrat:**
-- ✅ Dropdown-urile se integrează natural în `.form-grid`
-- ✅ Layout în două coloane: Județ | Localitate  
-- ✅ Cod Postal pe coloana separată
-- ✅ Adresa pe toată lățimea (full-width)
+- ✅ Dropdown-urile se integreaza natural in `.form-grid`
+- ✅ Layout in doua coloane: Judet | Localitate  
+- ✅ Cod Postal pe coloana separata
+- ✅ Adresa pe toata latimea (full-width)
 
 ### **✅ Lookup Dependent Logic:**
-- ✅ **Selectează Județ** → Se încarcă localitățile pentru acel județ
-- ✅ **Dropdown Localitate disabled** → până la selectarea județului
-- ✅ **Reset automat** → Schimbarea județului resetează localitate
-- ✅ **Filtrare live** → Căutare în timp real în ambele dropdown-uri
+- ✅ **Selecteaza Judet** → Se incarca localitatile pentru acel judet
+- ✅ **Dropdown Localitate disabled** → pana la selectarea judetului
+- ✅ **Reset automat** → Schimbarea judetului reseteaza localitate
+- ✅ **Filtrare live** → Cautare in timp real in ambele dropdown-uri
 
 ### **✅ UX Premium:**
-- ✅ **Loading indicators** → "Se încarcă județele..." / "Se încarcă localitățile..."
-- ✅ **Help text** → "Selectați mai întâi județul" când localitate e disabled
-- ✅ **Error display** → Mesaje de eroare vizibile și poziționate corect
-- ✅ **Validation integration** → Erori de validare integrate în grid
+- ✅ **Loading indicators** → "Se incarca judetele..." / "Se incarca localitatile..."
+- ✅ **Help text** → "Selectati mai intai judetul" cand localitate e disabled
+- ✅ **Error display** → Mesaje de eroare vizibile si pozitionate corect
+- ✅ **Validation integration** → Erori de validare integrate in grid
 
 ### **✅ Data Binding:**
-- ✅ **Two-way binding** → Schimbările se reflectă în `personalFormModel`
-- ✅ **Name callbacks** → `OnJudetNameChanged` și `OnLocalitateNameChanged`
-- ✅ **ID callbacks** → `SelectedJudetIdChanged` și `SelectedLocalitateIdChanged`
+- ✅ **Two-way binding** → Schimbarile se reflecta in `personalFormModel`
+- ✅ **Name callbacks** → `OnJudetNameChanged` si `OnLocalitateNameChanged`
+- ✅ **ID callbacks** → `SelectedJudetIdChanged` si `SelectedLocalitateIdChanged`
 
 ---
 
 ## 🔄 **FLUXUL DE DATE IMPLEMENTAT**
 
-### **Inițializare Card:**
+### **Initializare Card:**
 ```
 1. Card se deschide
    ↓
@@ -129,12 +129,12 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
    ↓
 4. LoadJudeteAsync() → ILocationService.GetAllJudeteAsync()
    ↓
-5. UI Update → Dropdown Județ populat cu 42 județe
+5. UI Update → Dropdown Judet populat cu 42 judete
 ```
 
-### **Selecție Județ în Card:**
+### **Selectie Judet in Card:**
 ```
-1. User selectează județ în dropdown
+1. User selecteaza judet in dropdown
    ↓
 2. OnJudetChangedAsync() → ChangeEventArgs<int?, Judet>
    ↓
@@ -146,12 +146,12 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
    ↓
 6. personalFormModel.Judet_Domiciliu = judetName
    ↓
-7. UI Update → Dropdown Localitate populat cu ~671 localități
+7. UI Update → Dropdown Localitate populat cu ~671 localitati
 ```
 
-### **Selecție Localitate în Card:**
+### **Selectie Localitate in Card:**
 ```
-1. User selectează localitate în dropdown
+1. User selecteaza localitate in dropdown
    ↓
 2. OnLocalitateChangedAsync() → ChangeEventArgs<int?, Localitate>
    ↓
@@ -161,39 +161,39 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
    ↓
 5. personalFormModel.Oras_Domiciliu = localitateName
    ↓
-6. UI Update → Valoarea selectată salvată în model
+6. UI Update → Valoarea selectata salvata in model
 ```
 
 ---
 
 ## 💻 **SINTAXA DE UTILIZARE**
 
-### **În Card Domiciliu:**
+### **in Card Domiciliu:**
 ```razor
 <LocationDependentGridDropdowns 
     SelectedJudetId="@selectedJudetDomiciliuId"
     SelectedJudetIdChanged="@((int? value) => selectedJudetDomiciliuId = value)"
     SelectedLocalitateId="@selectedLocalitateDomiciliuId"
     SelectedLocalitateIdChanged="@((int? value) => selectedLocalitateDomiciliuId = value)"
-    JudetLabel="Județ Domiciliu *"
+    JudetLabel="Judet Domiciliu *"
     LocalitateLabel="Localitate Domiciliu *"
-    JudetPlaceholder="-- Selectează județul --"
-    LocalitatePlaceholder="-- Selectează localitatea --"
+    JudetPlaceholder="-- Selecteaza judetul --"
+    LocalitatePlaceholder="-- Selecteaza localitatea --"
     OnJudetNameChanged="@OnJudetDomiciliuNameChanged"
     OnLocalitateNameChanged="@OnLocalitateDomiciliuNameChanged" />
 ```
 
-### **În Card Reședință:**
+### **in Card Resedinta:**
 ```razor
 <LocationDependentGridDropdowns 
     SelectedJudetId="@selectedJudetResedintaId"
     SelectedJudetIdChanged="@((int? value) => selectedJudetResedintaId = value)"
     SelectedLocalitateId="@selectedLocalitateResedintaId"
     SelectedLocalitateIdChanged="@((int? value) => selectedLocalitateResedintaId = value)"
-    JudetLabel="Județ Reședință"
-    LocalitateLabel="Localitate Reședință"
-    JudetPlaceholder="-- Selectează județul --"
-    LocalitatePlaceholder="-- Selectează localitatea --"
+    JudetLabel="Judet Resedinta"
+    LocalitateLabel="Localitate Resedinta"
+    JudetPlaceholder="-- Selecteaza judetul --"
+    LocalitatePlaceholder="-- Selecteaza localitatea --"
     OnJudetNameChanged="@OnJudetResedintaNameChanged"
     OnLocalitateNameChanged="@OnLocalitateResedintaNameChanged" />
 ```
@@ -205,7 +205,7 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
 ### **Desktop (≥768px):**
 ```
 ┌─────────────────────┬───────────────────────┐
-│ Județ Domiciliu *   │ Localitate Domiciliu *│
+│ Judet Domiciliu *   │ Localitate Domiciliu *│
 │ [Dropdown]          │ [Dropdown]            │
 └─────────────────────┴───────────────────────┘
 ```
@@ -213,7 +213,7 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
 ### **Mobile (<768px):**
 ```
 ┌─────────────────────────────────────────────┐
-│ Județ Domiciliu *                           │
+│ Judet Domiciliu *                           │
 │ [Dropdown]                                  │
 ├─────────────────────────────────────────────┤
 │ Localitate Domiciliu *                      │
@@ -228,22 +228,22 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
 | Metric | Valoare |
 |--------|---------|
 | **Build Status** | ✅ SUCCESS (0 erori) |
-| **Load Time Județe** | ~100ms pentru 42 județe |
-| **Load Time Localități** | ~200ms pentru ~671 localități |
+| **Load Time Judete** | ~100ms pentru 42 judete |
+| **Load Time Localitati** | ~200ms pentru ~671 localitati |
 | **Component Size** | ~12KB (grid variant) |
 | **Memory Usage** | Optimizat cu IDisposable |
 | **Grid Integration** | Perfect compatible |
 
 ---
 
-## 🏆 **COMPARAȚIE V1 vs V2**
+## 🏆 **COMPARAtIE V1 vs V2**
 
 | Aspect | V1 (Standalone) | V2 (Grid Integrated) |
 |--------|-------------------|---------------------|
 | **Layout** | ❌ Flex container intern | ✅ Grid integration perfect |
-| **Responsive** | ⚠️ Layout propriu | ✅ Urmează grid-ul parent |
-| **Spațiere** | ❌ Incorect în grid | ✅ Perfect aliniat |
-| **Validation** | ⚠️ Poziționate intern | ✅ Poziționate în grid |
+| **Responsive** | ⚠️ Layout propriu | ✅ Urmeaza grid-ul parent |
+| **Spatiere** | ❌ Incorect in grid | ✅ Perfect aliniat |
+| **Validation** | ⚠️ Pozitionate intern | ✅ Pozitionate in grid |
 | **Cod Duplicat** | ❌ Labels duplicat | ✅ Labels unici |
 | **Performance** | ✅ Same | ✅ Same |
 | **Utilizare** | ✅ Standalone forms | ✅ Grid forms |
@@ -254,19 +254,19 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
 
 ### **✅ IMPLEMENTAREA V2 ESTE PRODUCTION READY!**
 
-**Lookup-urile Județ și Localitate sunt acum perfect integrate în cardurile de adrese:**
+**Lookup-urile Judet si Localitate sunt acum perfect integrate in cardurile de adrese:**
 
 1. **🏠 Card "Adresa de Domiciliu"**:
-   - ✅ Adresa pe toată lățimea
-   - ✅ Județ și Localitate în două coloane
-   - ✅ Cod Postal pe coloana separată
-   - ✅ Lookup dependent funcțional
+   - ✅ Adresa pe toata latimea
+   - ✅ Judet si Localitate in doua coloane
+   - ✅ Cod Postal pe coloana separata
+   - ✅ Lookup dependent functional
 
 2. **📍 Card "Adresa de Resedinta"**:
    - ✅ Layout identic cu domiciliul
-   - ✅ Vizibil doar când adresele diferă
-   - ✅ Lookup dependent funcțional
-   - ✅ Integrare perfectă în grid
+   - ✅ Vizibil doar cand adresele difera
+   - ✅ Lookup dependent functional
+   - ✅ Integrare perfecta in grid
 
 3. **⚡ Features Premium**:
    - ✅ Loading indicators animat
@@ -275,8 +275,8 @@ Lookup-urile pentru Județ și Localitate sunt acum perfecte integrate în ambel
    - ✅ Validation integration
    - ✅ Performance optimizat
 
-### **🚀 COMPONENTA ESTE GATA PENTRU PRODUCȚIE!**
+### **🚀 COMPONENTA ESTE GATA PENTRU PRODUCtIE!**
 
 ---
 
-*Implementarea respectă toate cerințele: lookup-uri dependente perfect integrate în grid-ul formularului, layout consistent între carduri, UX premium și performance optimizat.*
+*Implementarea respecta toate cerintele: lookup-uri dependente perfect integrate in grid-ul formularului, layout consistent intre carduri, UX premium si performance optimizat.*

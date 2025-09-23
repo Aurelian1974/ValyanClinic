@@ -42,7 +42,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     private int? _selectedJudetResedintaId = null;
     private int? _selectedLocalitateResedintaId = null;
 
-    // Properties cu logging pentru a urmări schimbările
+    // Properties cu logging pentru a urmari schimbarile
     private int? selectedJudetDomiciliuId 
     { 
         get => _selectedJudetDomiciliuId;
@@ -124,7 +124,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
             Logger.LogInformation("📝 Edit mode - Personal CNP: {CNP}", EditingPersonal.CNP);
             personalFormModel = PersonalFormModel.FromPersonal(EditingPersonal);
             
-            // Verifică dacă există date de reședință pentru a determina starea checkbox-ului
+            // Verifica daca exista date de resedinta pentru a determina starea checkbox-ului
             var hasResedintaData = !string.IsNullOrEmpty(EditingPersonal.Adresa_Resedinta) ||
                                   !string.IsNullOrEmpty(EditingPersonal.Judet_Resedinta) ||
                                   !string.IsNullOrEmpty(EditingPersonal.Oras_Resedinta) ||
@@ -146,7 +146,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
                 Cetatenie = "Romana"
             };
             
-            // 🔥 AUTO-GENERARE COD ANGAJAT PENTRU ADĂUGARE NOU
+            // 🔥 AUTO-GENERARE COD ANGAJAT PENTRU ADaUGARE NOU
             await GenerateNextCodAngajatAsync();
             
             showResedintaSection = true;
@@ -157,7 +157,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Generează și setează următorul cod de angajat disponibil pentru personal nou
+    /// Genereaza si seteaza urmatorul cod de angajat disponibil pentru personal nou
     /// </summary>
     private async Task GenerateNextCodAngajatAsync()
     {
@@ -165,17 +165,17 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         {
             Logger.LogInformation("🔢 Generating next employee code for new personal");
             
-            // Folosește serviciul PersonalService pentru generarea codului
+            // Foloseste serviciul PersonalService pentru generarea codului
             var nextCode = await PersonalService.GetNextCodAngajatAsync();
             
             personalFormModel.Cod_Angajat = nextCode;
             
             Logger.LogInformation("✅ Generated next employee code: {Code}", nextCode);
             
-            // Notificare vizuală pentru utilizator
+            // Notificare vizuala pentru utilizator
             await ToastService.ShowInfoAsync(
                 "Cod Angajat Generat", 
-                $"Următorul cod disponibil: {nextCode}");
+                $"Urmatorul cod disponibil: {nextCode}");
         }
         catch (Exception ex)
         {
@@ -187,7 +187,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
             
             await ToastService.ShowWarningAsync(
                 "Avertisment", 
-                "Nu s-a putut genera automat codul. Utilizați codul generat temporar și verificați manual.");
+                "Nu s-a putut genera automat codul. Utilizati codul generat temporar si verificati manual.");
         }
     }
 
@@ -199,7 +199,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
             Logger.LogInformation("📊 Current state: ShowResedintaSection={ShowResedinta}, IsEditMode={IsEdit}", 
                 showResedintaSection, IsEditMode);
             
-            // LocationDependentGridDropdowns componentele ar trebui să se inițializeze acum
+            // LocationDependentGridDropdowns componentele ar trebui sa se initializeze acum
         }
         
         await Task.CompletedTask;
@@ -212,7 +212,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         Logger.LogInformation("🔥 Parent OnJudetDomiciliuNameChanged: {Name} - selectedJudetDomiciliuId={JudetId}", 
             judetName, selectedJudetDomiciliuId);
         personalFormModel.Judet_Domiciliu = judetName ?? "";
-        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singură
+        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singura
     }
 
     private async Task OnLocalitateDomiciliuNameChanged(string? localitateName)
@@ -220,7 +220,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         Logger.LogInformation("🔥 Parent OnLocalitateDomiciliuNameChanged: {Name} - selectedLocalitateDomiciliuId={LocalitateId}", 
             localitateName, selectedLocalitateDomiciliuId);
         personalFormModel.Oras_Domiciliu = localitateName ?? "";
-        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singură
+        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singura
     }
 
     private async Task OnJudetResedintaNameChanged(string? judetName)
@@ -228,7 +228,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         Logger.LogInformation("🔥 Parent OnJudetResedintaNameChanged: {Name} - selectedJudetResedintaId={JudetId}", 
             judetName, selectedJudetResedintaId);
         personalFormModel.Judet_Resedinta = judetName;
-        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singură
+        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singura
     }
 
     private async Task OnLocalitateResedintaNameChanged(string? localitateName)
@@ -236,7 +236,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         Logger.LogInformation("🔥 Parent OnLocalitateResedintaNameChanged: {Name} - selectedLocalitateResedintaId={LocalitateId}", 
             localitateName, selectedLocalitateResedintaId);
         personalFormModel.Oras_Resedinta = localitateName;
-        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singură
+        // Nu apela StateHasChanged() aici - componenta copil se va actualiza singura
     }
 
     #endregion
@@ -288,7 +288,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Metodă publică pentru a declanșa submit-ul din exterior (ex: din FooterTemplate)
+    /// Metoda publica pentru a declansa submit-ul din exterior (ex: din FooterTemplate)
     /// </summary>
     public async Task SubmitForm()
     {
@@ -296,7 +296,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Gestionează schimbarea checkbox-ului pentru adresa de resedinta
+    /// Gestioneaza schimbarea checkbox-ului pentru adresa de resedinta
     /// </summary>
     private void OnResedintaCheckboxChanged(ChangeEventArgs args)
     {
@@ -418,7 +418,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Obține clasa CSS pentru câmpul CNP în funcție de starea validării
+    /// Obtine clasa CSS pentru campul CNP in functie de starea validarii
     /// </summary>
     private string GetCNPFieldCssClass()
     {
@@ -452,10 +452,10 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         var cnpValue = args.Value?.ToString() ?? "";
         personalFormModel.CNP = cnpValue;
 
-        // Reset feedback-ul imediat ce utilizatorul schimbă valoarea
+        // Reset feedback-ul imediat ce utilizatorul schimba valoarea
         ResetCNPValidationFeedback();
 
-        // Validare în timp real doar pentru CNP-uri complete
+        // Validare in timp real doar pentru CNP-uri complete
         if (!string.IsNullOrWhiteSpace(cnpValue) && cnpValue.Length == 13)
         {
             await ValidateCNPRealTime(cnpValue);
@@ -482,10 +482,10 @@ public partial class AdaugaEditezaPersonal : ComponentBase
             return;
         }
 
-        // Validare completă la blur
+        // Validare completa la blur
         await ValidateCNPRealTime(personalFormModel.CNP);
 
-        // Dacă CNP-ul este valid, calculează data nașterii
+        // Daca CNP-ul este valid, calculeaza data nasterii
         if (isCNPValid)
         {
             await CalculateAndUpdateBirthDate();
@@ -493,7 +493,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Validează CNP-ul în timp real cu feedback vizual
+    /// Valideaza CNP-ul in timp real cu feedback vizual
     /// </summary>
     private async Task ValidateCNPRealTime(string cnp)
     {
@@ -502,11 +502,11 @@ public partial class AdaugaEditezaPersonal : ComponentBase
             isCNPBeingValidated = true;
             StateHasChanged();
 
-            // Validare preliminară rapidă
+            // Validare preliminara rapida
             if (cnp.Length != 13)
             {
                 SetCNPValidationFeedback(false, 
-                    "CNP-ul trebuie să aibă exact 13 cifre", 
+                    "CNP-ul trebuie sa aiba exact 13 cifre", 
                     "cnp-feedback-error");
                 return;
             }
@@ -514,7 +514,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
             if (!cnp.All(char.IsDigit))
             {
                 SetCNPValidationFeedback(false, 
-                    "CNP-ul trebuie să conțină doar cifre", 
+                    "CNP-ul trebuie sa contina doar cifre", 
                     "cnp-feedback-error");
                 return;
             }
@@ -526,7 +526,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
             {
                 var calculatedAge = CalculateAgeFromCNP(cnp);
                 SetCNPValidationFeedback(true, 
-                    $"CNP valid - Vârsta: {calculatedAge} ani", 
+                    $"CNP valid - Varsta: {calculatedAge} ani", 
                     "cnp-feedback-success");
             }
             else
@@ -550,7 +550,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Calculează și actualizează data nașterii dacă CNP-ul este valid
+    /// Calculeaza si actualizeaza data nasterii daca CNP-ul este valid
     /// </summary>
     private async Task CalculateAndUpdateBirthDate()
     {
@@ -562,27 +562,27 @@ public partial class AdaugaEditezaPersonal : ComponentBase
                 var currentBirthDate = personalFormModel.Data_Nasterii;
                 var newBirthDate = calculatedBirthDate.Value;
 
-                // Verifică dacă data calculată diferă semnificativ de cea existentă
+                // Verifica daca data calculata difera semnificativ de cea existenta
                 bool shouldUpdate = false;
                 string updateReason = "";
 
                 if (currentBirthDate.Date == DateTime.Today.AddYears(-30))
                 {
-                    // Data implicită - actualizează automat
+                    // Data implicita - actualizeaza automat
                     shouldUpdate = true;
-                    updateReason = "automat (dată implicită)";
+                    updateReason = "automat (data implicita)";
                 }
                 else if (Math.Abs((currentBirthDate.Date - newBirthDate.Date).TotalDays) > 30)
                 {
-                    // Diferență semnificativă - actualizează cu notificare
+                    // Diferenta semnificativa - actualizeaza cu notificare
                     shouldUpdate = true;
-                    updateReason = "calculat din CNP (diferența mare față de data existentă)";
+                    updateReason = "calculat din CNP (diferenta mare fata de data existenta)";
                 }
                 else if (currentBirthDate.Date != newBirthDate.Date)
                 {
-                    // Diferență mică - actualizează silențios
+                    // Diferenta mica - actualizeaza silentios
                     shouldUpdate = true;
-                    updateReason = "corecție minore din CNP";
+                    updateReason = "corectie minore din CNP";
                 }
 
                 if (shouldUpdate)
@@ -590,21 +590,21 @@ public partial class AdaugaEditezaPersonal : ComponentBase
                     var oldDate = personalFormModel.Data_Nasterii.ToString("dd.MM.yyyy");
                     personalFormModel.Data_Nasterii = newBirthDate;
                     
-                    Logger.LogInformation("✅ Data nașterii actualizată {Reason}: {OldDate} → {NewDate} (CNP: {CNP})", 
+                    Logger.LogInformation("✅ Data nasterii actualizata {Reason}: {OldDate} → {NewDate} (CNP: {CNP})", 
                         updateReason, oldDate, newBirthDate.ToString("dd.MM.yyyy"), personalFormModel.CNP);
                     
-                    // Notificare vizuală pentru utilizator (numai pentru diferențe mari)
-                    if (updateReason.Contains("diferența mare"))
+                    // Notificare vizuala pentru utilizator (numai pentru diferente mari)
+                    if (updateReason.Contains("diferenta mare"))
                     {
                         await ToastService.ShowSuccessAsync(
-                            "Data nașterii actualizată", 
-                            $"Calculată din CNP: {oldDate} → {newBirthDate.ToString("dd.MM.yyyy")}");
+                            "Data nasterii actualizata", 
+                            $"Calculata din CNP: {oldDate} → {newBirthDate.ToString("dd.MM.yyyy")}");
                     }
-                    else if (!updateReason.Contains("implicită"))
+                    else if (!updateReason.Contains("implicita"))
                     {
                         await ToastService.ShowInfoAsync(
-                            "Data nașterii ajustată", 
-                            $"Corecție bazată pe CNP: {newBirthDate.ToString("dd.MM.yyyy")}");
+                            "Data nasterii ajustata", 
+                            $"Corectie bazata pe CNP: {newBirthDate.ToString("dd.MM.yyyy")}");
                     }
                     
                     StateHasChanged();
@@ -613,7 +613,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         }
         catch (ArgumentException ex)
         {
-            // Erori de validare CNP - afișează în interfață
+            // Erori de validare CNP - afiseaza in interfata
             Logger.LogWarning("⚠️ CNP invalid - {Error}: {CNP}", ex.Message, personalFormModel.CNP);
             SetCNPValidationFeedback(false, GetUserFriendlyCNPError(ex.Message), "cnp-feedback-error");
             await ShowCNPValidationError(ex.Message);
@@ -621,12 +621,12 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         catch (Exception ex)
         {
             // Alte erori - log pentru debug, nu deranja utilizatorul
-            Logger.LogError(ex, "🔥 Eroare neașteptată la parsarea CNP {CNP}", personalFormModel.CNP);
+            Logger.LogError(ex, "🔥 Eroare neasteptata la parsarea CNP {CNP}", personalFormModel.CNP);
         }
     }
 
     /// <summary>
-    /// Validare completă CNP cu algoritm de control
+    /// Validare completa CNP cu algoritm de control
     /// </summary>
     private (bool IsValid, string ErrorMessage) ValidateCNPComplete(string cnp)
     {
@@ -635,67 +635,67 @@ public partial class AdaugaEditezaPersonal : ComponentBase
 
         try
         {
-            // Validare cifra de control (ultima cifră)
+            // Validare cifra de control (ultima cifra)
             var controlDigit = CalculateCNPControlDigit(cnp.Substring(0, 12));
             var actualControlDigit = int.Parse(cnp[12].ToString());
             
             if (controlDigit != actualControlDigit)
             {
-                return (false, $"Cifra de control incorectă: așteptată {controlDigit}, găsită {actualControlDigit}");
+                return (false, $"Cifra de control incorecta: asteptata {controlDigit}, gasita {actualControlDigit}");
             }
 
-            // Prima cifră determină sexul și secolul
+            // Prima cifra determina sexul si secolul
             int firstDigit = int.Parse(cnp[0].ToString());
             
-            // Extragere an, lună, zi din CNP (poziții 1-2, 3-4, 5-6)
+            // Extragere an, luna, zi din CNP (pozitii 1-2, 3-4, 5-6)
             int cnpYear = int.Parse(cnp.Substring(1, 2));
             int cnpMonth = int.Parse(cnp.Substring(3, 2));
             int cnpDay = int.Parse(cnp.Substring(5, 2));
 
-            // Determinare secol complet bazat pe prima cifră
+            // Determinare secol complet bazat pe prima cifra
             int fullYear = firstDigit switch
             {
-                1 or 2 => 1900 + cnpYear,        // Persoane născute între 1900-1999
-                3 or 4 => 1800 + cnpYear,        // Persoane născute între 1800-1899 (rar)
-                5 or 6 => 2000 + cnpYear,        // Persoane născute între 2000-2099
-                7 or 8 => 2000 + cnpYear,        // Rezidenți străini născuți între 2000-2099
-                _ => throw new ArgumentException($"Prima cifră CNP invalidă: {firstDigit}")
+                1 or 2 => 1900 + cnpYear,        // Persoane nascute intre 1900-1999
+                3 or 4 => 1800 + cnpYear,        // Persoane nascute intre 1800-1899 (rar)
+                5 or 6 => 2000 + cnpYear,        // Persoane nascute intre 2000-2099
+                7 or 8 => 2000 + cnpYear,        // Rezidenti straini nascuti intre 2000-2099
+                _ => throw new ArgumentException($"Prima cifra CNP invalida: {firstDigit}")
             };
 
             // Validare interval an rezonabil pentru personal medical
             var currentYear = DateTime.Now.Year;
             if (fullYear < 1940 || fullYear > currentYear)
-                return (false, $"Anul calculat din CNP nu este în intervalul acceptat (1940-{currentYear}): {fullYear}");
+                return (false, $"Anul calculat din CNP nu este in intervalul acceptat (1940-{currentYear}): {fullYear}");
 
-            // Validare lună
+            // Validare luna
             if (cnpMonth < 1 || cnpMonth > 12)
-                return (false, $"Luna din CNP nu este validă: {cnpMonth}");
+                return (false, $"Luna din CNP nu este valida: {cnpMonth}");
 
-            // Validare zi și creare dată
+            // Validare zi si creare data
             try
             {
                 var birthDate = new DateTime(fullYear, cnpMonth, cnpDay);
                 
-                // Verificare că data nu este în viitor
+                // Verificare ca data nu este in viitor
                 if (birthDate.Date > DateTime.Today)
-                    return (false, "Data nașterii calculată este în viitor");
+                    return (false, "Data nasterii calculata este in viitor");
 
-                // Verificare vârstă rezonabilă pentru angajați (între 16-80 ani)
+                // Verificare varsta rezonabila pentru angajati (intre 16-80 ani)
                 var age = DateTime.Today.Year - birthDate.Year;
                 if (birthDate.Date > DateTime.Today.AddYears(-age))
                     age--;
                 
                 if (age < 16)
-                    return (false, $"Vârsta calculată este prea mică pentru un angajat: {age} ani");
+                    return (false, $"Varsta calculata este prea mica pentru un angajat: {age} ani");
                 
                 if (age > 80)
-                    return (false, $"Vârsta calculată nu este rezonabilă: {age} ani");
+                    return (false, $"Varsta calculata nu este rezonabila: {age} ani");
 
                 return (true, "CNP valid");
             }
             catch (ArgumentOutOfRangeException)
             {
-                return (false, $"Ziua {cnpDay} nu este validă pentru luna {cnpMonth}/{fullYear}");
+                return (false, $"Ziua {cnpDay} nu este valida pentru luna {cnpMonth}/{fullYear}");
             }
         }
         catch (Exception ex) when (ex is not ArgumentException)
@@ -705,7 +705,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Calculează cifra de control pentru CNP conform algoritmului oficial
+    /// Calculeaza cifra de control pentru CNP conform algoritmului oficial
     /// </summary>
     private int CalculateCNPControlDigit(string cnp12Digits)
     {
@@ -722,7 +722,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Calculează vârsta pe baza CNP-ului
+    /// Calculeaza varsta pe baza CNP-ului
     /// </summary>
     private int CalculateAgeFromCNP(string cnp)
     {
@@ -737,7 +737,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Setează feedback-ul vizual pentru validarea CNP
+    /// Seteaza feedback-ul vizual pentru validarea CNP
     /// </summary>
     private void SetCNPValidationFeedback(bool isValid, string message, string cssClass)
     {
@@ -747,7 +747,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Resetează feedback-ul vizual pentru CNP
+    /// Reseteaza feedback-ul vizual pentru CNP
     /// </summary>
     private void ResetCNPValidationFeedback()
     {
@@ -757,7 +757,7 @@ public partial class AdaugaEditezaPersonal : ComponentBase
     }
 
     /// <summary>
-    /// Afișează eroare de validare CNP
+    /// Afiseaza eroare de validare CNP
     /// </summary>
     private async Task ShowCNPValidationError(string errorMessage)
     {
@@ -768,77 +768,77 @@ public partial class AdaugaEditezaPersonal : ComponentBase
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Eroare la afișarea notificării de eroare CNP");
+            Logger.LogError(ex, "Eroare la afisarea notificarii de eroare CNP");
         }
     }
 
     /// <summary>
-    /// Convertește mesajele tehnice de eroare în mesaje prietenoase pentru utilizator
+    /// Converteste mesajele tehnice de eroare in mesaje prietenoase pentru utilizator
     /// </summary>
     private string GetUserFriendlyCNPError(string technicalError)
     {
         return technicalError.ToLowerInvariant() switch
         {
-            var error when error.Contains("prima cifră cnp invalidă") => 
-                "Prima cifră din CNP nu este validă (trebuie să fie între 1-8)",
+            var error when error.Contains("prima cifra cnp invalida") => 
+                "Prima cifra din CNP nu este valida (trebuie sa fie intre 1-8)",
             var error when error.Contains("anul calculat") => 
                 "Anul calculat din CNP nu este realist",
             var error when error.Contains("luna din cnp") => 
-                "Luna din CNP nu este validă (trebuie să fie între 01-12)",
-            var error when error.Contains("data nașterii calculată este în viitor") => 
-                "CNP-ul indică o dată de naștere din viitor",
-            var error when error.Contains("vârsta calculată") => 
-                "CNP-ul indică o vârstă nepotrivită pentru un angajat",
-            var error when error.Contains("ziua") && error.Contains("nu este validă") => 
-                "Ziua din CNP nu este validă pentru luna respectivă",
+                "Luna din CNP nu este valida (trebuie sa fie intre 01-12)",
+            var error when error.Contains("data nasterii calculata este in viitor") => 
+                "CNP-ul indica o data de nastere din viitor",
+            var error when error.Contains("varsta calculata") => 
+                "CNP-ul indica o varsta nepotrivita pentru un angajat",
+            var error when error.Contains("ziua") && error.Contains("nu este valida") => 
+                "Ziua din CNP nu este valida pentru luna respectiva",
             var error when error.Contains("cnp-ul nu poate fi procesat") => 
-                "CNP-ul conține o dată invalidă",
+                "CNP-ul contine o data invalida",
             var error when error.Contains("cifra de control") => 
-                "CNP-ul nu respectă algoritmul de control românesc",
-            _ => "CNP-ul introdus nu respectă formatul românesc standard"
+                "CNP-ul nu respecta algoritmul de control romanesc",
+            _ => "CNP-ul introdus nu respecta formatul romanesc standard"
         };
     }
 
     /// <summary>
-    /// Parsează data nașterii din CNP-ul românesc
-    /// Algoritm conform standardului românesc pentru CNP cu validare extinsă
+    /// Parseaza data nasterii din CNP-ul romanesc
+    /// Algoritm conform standardului romanesc pentru CNP cu validare extinsa
     /// </summary>
     private DateTime? ParseBirthDateFromCNP(string cnp)
     {
-        // Validare preliminară
+        // Validare preliminara
         if (string.IsNullOrWhiteSpace(cnp) || cnp.Length != 13 || !cnp.All(char.IsDigit))
             return null;
 
         try
         {
-            // Prima cifră determină sexul și secolul
+            // Prima cifra determina sexul si secolul
             int firstDigit = int.Parse(cnp[0].ToString());
             
-            // Extragere an, lună, zi din CNP (poziții 1-2, 3-4, 5-6)
+            // Extragere an, luna, zi din CNP (pozitii 1-2, 3-4, 5-6)
             int cnpYear = int.Parse(cnp.Substring(1, 2));
             int cnpMonth = int.Parse(cnp.Substring(3, 2));
             int cnpDay = int.Parse(cnp.Substring(5, 2));
 
-            // Determinare secol complet bazat pe prima cifră
+            // Determinare secol complet bazat pe prima cifra
             int fullYear = firstDigit switch
             {
-                1 or 2 => 1900 + cnpYear,        // Persoane născute între 1900-1999
-                3 or 4 => 1800 + cnpYear,        // Persoane născute între 1800-1899 (rar)
-                5 or 6 => 2000 + cnpYear,        // Persoane născute între 2000-2099
-                7 or 8 => 2000 + cnpYear,        // Rezidenți străini născuți între 2000-2099
-                _ => throw new ArgumentException($"Prima cifră CNP invalidă: {firstDigit}")
+                1 or 2 => 1900 + cnpYear,        // Persoane nascute intre 1900-1999
+                3 or 4 => 1800 + cnpYear,        // Persoane nascute intre 1800-1899 (rar)
+                5 or 6 => 2000 + cnpYear,        // Persoane nascute intre 2000-2099
+                7 or 8 => 2000 + cnpYear,        // Rezidenti straini nascuti intre 2000-2099
+                _ => throw new ArgumentException($"Prima cifra CNP invalida: {firstDigit}")
             };
 
             // Validare interval an rezonabil pentru personal medical
             var currentYear = DateTime.Now.Year;
             if (fullYear < 1940 || fullYear > currentYear)
-                throw new ArgumentException($"Anul calculat din CNP nu este în intervalul acceptat (1940-{currentYear}): {fullYear}");
+                throw new ArgumentException($"Anul calculat din CNP nu este in intervalul acceptat (1940-{currentYear}): {fullYear}");
 
-            // Validare lună
+            // Validare luna
             if (cnpMonth < 1 || cnpMonth > 12)
-                throw new ArgumentException($"Luna din CNP nu este validă: {cnpMonth}");
+                throw new ArgumentException($"Luna din CNP nu este valida: {cnpMonth}");
 
-            // Validare zi și creare dată (DateTime va valida automat zile invalide pentru lună)
+            // Validare zi si creare data (DateTime va valida automat zile invalide pentru luna)
             DateTime birthDate;
             try
             {
@@ -846,29 +846,29 @@ public partial class AdaugaEditezaPersonal : ComponentBase
             }
             catch (ArgumentOutOfRangeException)
             {
-                throw new ArgumentException($"Ziua {cnpDay} nu este valabilă pentru luna {cnpMonth}/{fullYear}");
+                throw new ArgumentException($"Ziua {cnpDay} nu este valabila pentru luna {cnpMonth}/{fullYear}");
             }
 
-            // Verificare că data nu este în viitor
+            // Verificare ca data nu este in viitor
             if (birthDate.Date > DateTime.Today)
-                throw new ArgumentException("Data nașterii calculată este în viitor");
+                throw new ArgumentException("Data nasterii calculata este in viitor");
 
-            // Verificare vârstă rezonabilă pentru angajați (între 16-80 ani)
+            // Verificare varsta rezonabila pentru angajati (intre 16-80 ani)
             var age = DateTime.Today.Year - birthDate.Year;
             if (birthDate.Date > DateTime.Today.AddYears(-age))
                 age--;
             
             if (age < 16)
-                throw new ArgumentException($"Vârsta calculată este prea mică pentru un angajat: {age} ani");
+                throw new ArgumentException($"Varsta calculata este prea mica pentru un angajat: {age} ani");
             
             if (age > 80)
-                throw new ArgumentException($"Vârsta calculată nu este rezonabilă: {age} ani");
+                throw new ArgumentException($"Varsta calculata nu este rezonabila: {age} ani");
 
             return birthDate;
         }
         catch (Exception ex) when (ex is not ArgumentException)
         {
-            // Pentru orice altă excepție (FormatException, etc.)
+            // Pentru orice alta exceptie (FormatException, etc.)
             throw new ArgumentException($"CNP-ul nu poate fi procesat: {ex.Message}", ex);
         }
     }

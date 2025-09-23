@@ -1,6 +1,6 @@
 -- =============================================
 -- VERIFICARE CONCORDANTA STORED PROCEDURES BAZA DE DATE vs COD
--- Verific? dac? SP-urile din baza de date au aceea?i denumire cu cele folosite în cod
+-- Verific? dac? SP-urile din baza de date au aceeai denumire cu cele folosite in cod
 -- =============================================
 
 PRINT '?? VERIFICARE STORED PROCEDURES - BAZA DE DATE vs COD'
@@ -10,7 +10,7 @@ PRINT '======================================================'
 -- SECTION 1: Lista SP-urilor din baza de date
 -- =============================================
 PRINT ''
-PRINT '?? SECTION 1: Stored Procedures existente în baza de date'
+PRINT '?? SECTION 1: Stored Procedures existente in baza de date'
 PRINT '------------------------------------------------------'
 
 SELECT 
@@ -24,13 +24,13 @@ WHERE type = 'P'
 ORDER BY name;
 
 -- =============================================
--- SECTION 2: SP-urile folosite în COD (PersonalRepository)
+-- SECTION 2: SP-urile folosite in COD (PersonalRepository)
 -- =============================================
 PRINT ''
 PRINT '?? SECTION 2: Verificare SP-uri Personal (PersonalRepository.cs)'
 PRINT '------------------------------------------------------'
 
--- Lista SP-urilor g?site în PersonalRepository.cs:
+-- Lista SP-urilor gsite in PersonalRepository.cs:
 DECLARE @PersonalSPs TABLE (SPName VARCHAR(100), UsedInMethod VARCHAR(100))
 INSERT INTO @PersonalSPs VALUES
     ('sp_Personal_GetAll', 'GetAllAsync'),
@@ -41,13 +41,13 @@ INSERT INTO @PersonalSPs VALUES
     ('sp_Personal_CheckUnique', 'CheckUniqueAsync'),
     ('sp_Personal_GetStatistics', 'GetStatisticsAsync')
 
--- Verificare dac? exist? în baza de date
+-- Verificare dac? exist? in baza de date
 SELECT 
     p.SPName,
     p.UsedInMethod,
     CASE 
         WHEN s.name IS NOT NULL THEN '? EXIST?'
-        ELSE '? LIPSE?TE'
+        ELSE '? LIPSETE'
     END as StatusInDB,
     s.create_date as CreateDate
 FROM @PersonalSPs p
@@ -55,7 +55,7 @@ LEFT JOIN sys.objects s ON s.name = p.SPName AND s.type = 'P'
 ORDER BY p.SPName;
 
 -- =============================================
--- SECTION 3: SP-urile folosite în COD (PersonalMedicalStoredProcedures.sql)
+-- SECTION 3: SP-urile folosite in COD (PersonalMedicalStoredProcedures.sql)
 -- =============================================
 PRINT ''
 PRINT '?? SECTION 3: Verificare SP-uri PersonalMedical'
@@ -78,7 +78,7 @@ SELECT
     pm.Purpose,
     CASE 
         WHEN s.name IS NOT NULL THEN '? EXIST?'
-        ELSE '? LIPSE?TE'
+        ELSE '? LIPSETE'
     END as StatusInDB,
     s.create_date as CreateDate
 FROM @PersonalMedicalSPs pm
@@ -107,7 +107,7 @@ SELECT
     d.Purpose,
     CASE 
         WHEN s.name IS NOT NULL THEN '? EXIST?'
-        ELSE '? LIPSE?TE'
+        ELSE '? LIPSETE'
     END as StatusInDB,
     s.create_date as CreateDate
 FROM @DepartamenteSPs d
@@ -115,10 +115,10 @@ LEFT JOIN sys.objects s ON s.name = d.SPName AND s.type = 'P'
 ORDER BY d.SPName;
 
 -- =============================================
--- SECTION 5: SP-urile pentru Jude?e ?i Localit??i (LocationRepository)
+-- SECTION 5: SP-urile pentru Judee ?i Localit??i (LocationRepository)
 -- =============================================
 PRINT ''
-PRINT '?? SECTION 5: Verificare SP-uri Location (Jude?e ?i Localit??i)'
+PRINT '?? SECTION 5: Verificare SP-uri Location (Judee ?i Localit??i)'
 PRINT '------------------------------------------------------'
 
 DECLARE @LocationSPs TABLE (SPName VARCHAR(100), Purpose VARCHAR(200))
@@ -138,7 +138,7 @@ SELECT
     l.Purpose,
     CASE 
         WHEN s.name IS NOT NULL THEN '? EXIST?'
-        ELSE '? LIPSE?TE'
+        ELSE '? LIPSETE'
     END as StatusInDB,
     s.create_date as CreateDate
 FROM @LocationSPs l
@@ -152,20 +152,20 @@ PRINT ''
 PRINT '?? SECTION 6: SUMAR VERIFICARE'
 PRINT '======================================================'
 
--- Count total SPs în baza de date
+-- Count total SPs in baza de date
 DECLARE @TotalSPsInDB INT
 SELECT @TotalSPsInDB = COUNT(*) FROM sys.objects WHERE type = 'P' AND name LIKE 'sp_%'
 
--- Count SPs definite în cod
+-- Count SPs definite in cod
 DECLARE @TotalSPsInCode INT = 23  -- Total din toate categoriile de mai sus
 
 PRINT '?? STATISTICI:'
-PRINT '   • Total SP-uri în baza de date: ' + CAST(@TotalSPsInDB AS VARCHAR(10))
-PRINT '   • Total SP-uri definite în cod: ' + CAST(@TotalSPsInCode AS VARCHAR(10))
+PRINT '   â€¢ Total SP-uri in baza de date: ' + CAST(@TotalSPsInDB AS VARCHAR(10))
+PRINT '   â€¢ Total SP-uri definite in cod: ' + CAST(@TotalSPsInCode AS VARCHAR(10))
 
--- Verificare SPs extra în baza de date (care nu sunt în cod)
+-- Verificare SPs extra in baza de date (care nu sunt in cod)
 PRINT ''
-PRINT '??  SP-uri din baza de date care NU sunt folosite în cod:'
+PRINT '??  SP-uri din baza de date care NU sunt folosite in cod:'
 PRINT '------------------------------------------------------'
 
 SELECT s.name as UnusedStoredProcedure
@@ -194,21 +194,21 @@ WHERE s.type = 'P'
 ORDER BY s.name;
 
 -- =============================================
--- SECTION 7: RECOMAND?RI
+-- SECTION 7: RECOMANDRI
 -- =============================================
 PRINT ''
-PRINT '?? RECOMAND?RI:'
+PRINT '?? RECOMANDRI:'
 PRINT '------------------------------------------------------'
-PRINT '1. Verifica?i SP-urile marcate cu ? LIPSE?TE ?i crea?i-le folosind scripturile din DevSupport/Scripts/'
+PRINT '1. Verificai SP-urile marcate cu ? LIPSETE ?i creai-le folosind scripturile din DevSupport/Scripts/'
 PRINT '2. SP-urile nefolosite pot fi ?terse sau documentate ca fiind pentru uz viitor'
-PRINT '3. Asigura?i-v? c? toate SP-urile au acelea?i nume în cod ?i în baza de date'
-PRINT '4. Testa?i fiecare SP folosind scripturile de test din DevSupport/Scripts/'
-PRINT '5. Documenta?i orice modific?ri în fi?ierele de documenta?ie'
+PRINT '3. Asigurai-v? c? toate SP-urile au aceleai nume in cod ?i in baza de date'
+PRINT '4. Testai fiecare SP folosind scripturile de test din DevSupport/Scripts/'
+PRINT '5. Documentai orice modificri in fiierele de documentaie'
 PRINT ''
-PRINT '?? Pentru a rula testele complete, executa?i:'
-PRINT '   • sp_Departamente_Test.sql - pentru testare Departamente'
-PRINT '   • Test-PersonalMedicalStoredProcedures.ps1 - pentru testare PersonalMedical'
-PRINT '   • SP_Personal_GetAll.sql ?i alte scripturi individuale'
+PRINT '?? Pentru a rula testele complete, executai:'
+PRINT '   â€¢ sp_Departamente_Test.sql - pentru testare Departamente'
+PRINT '   â€¢ Test-PersonalMedicalStoredProcedures.ps1 - pentru testare PersonalMedical'
+PRINT '   â€¢ SP_Personal_GetAll.sql ?i alte scripturi individuale'
 PRINT ''
 PRINT '? VERIFICARE COMPLET?!'
 PRINT '======================================================'

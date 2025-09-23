@@ -1,28 +1,28 @@
-🏗️ Arhitectură & Infrastructură
+🏗️ Arhitectura & Infrastructura
 Backend Architecture:
-•	[ ] Clean Architecture - Separarea în layers (Domain, Application, Infrastructure, API)
+•	[ ] Clean Architecture - Separarea in layers (Domain, Application, Infrastructure, API)
 •	[ ] Repository Pattern - Pentru acces la date standardizat
-•	[ ] Unit of Work Pattern - Pentru tranzacții complexe
+•	[ ] Unit of Work Pattern - Pentru tranzactii complexe
 •	[ ] CQRS Pattern - Separarea Read/Write operations pentru scalabilitate
 •	[ ] API Versioning - Pentru backward compatibility
-•	[ ] Health Checks - Endpoint-uri pentru monitorizare status aplicație
-•	[ ] Circuit Breaker Pattern - Pentru resilience în comunicarea cu servicii externe
+•	[ ] Health Checks - Endpoint-uri pentru monitorizare status aplicatie
+•	[ ] Circuit Breaker Pattern - Pentru resilience in comunicarea cu servicii externe
 Security & Authentication:
 •	[ ] JWT Token Management - Cu refresh tokens
 •	[ ] Role-Based Access Control (RBAC) - Granular permissions
-•	[ ] Two-Factor Authentication (2FA) - Pentru securitate sporită
+•	[ ] Two-Factor Authentication (2FA) - Pentru securitate sporita
 •	[ ] API Rate Limiting - Prevenire DDoS
-•	[ ] CORS Configuration - Properly configured pentru producție
+•	[ ] CORS Configuration - Properly configured pentru productie
 •	[ ] SQL Injection Prevention - Parameterized queries everywhere
 •	[ ] XSS Protection - Input sanitization
 •	[ ] HTTPS Enforcement - SSL certificates
 📊 Data Management
 Database:
 •	[ ] Database Dapper
-•	[ ] Audit Trail - Track toate modificările (CreatedBy, ModifiedBy, etc.)
-•	[ ] Soft Delete - În loc de ștergere permanentă
+•	[ ] Audit Trail - Track toate modificarile (CreatedBy, ModifiedBy, etc.)
+•	[ ] Soft Delete - in loc de stergere permanenta
 •	[ ] Database Indexing - Pentru query performance
-•	[ ] Stored Procedures - Pentru operații complexe
+•	[ ] Stored Procedures - Pentru operatii complexe
 •	[ ] Database Backup Strategy - Automated backups
 Caching:
 •	[ ] Redis/MemoryCache - Pentru date frecvent accesate
@@ -43,10 +43,10 @@ Logging Strategy:
 •	[ ] Correlation IDs - Pentru request tracking
 🎨 UI/UX Enhancements
 User Experience:
-•	[ ] Loading Skeletons - În loc de spinners simpli
+•	[ ] Loading Skeletons - in loc de spinners simpli
 •	[ ] Offline Mode - PWA capabilities
 •	[ ] Auto-Save - Pentru formulare complexe
-•	[ ] Undo/Redo - Pentru acțiuni critice
+•	[ ] Undo/Redo - Pentru actiuni critice
 •	[ ] Keyboard Shortcuts - Pentru power users
 •	[ ] Dark Mode - Theme switching
 •	[ ] Multi-Language Support - i18n implementation
@@ -55,10 +55,10 @@ User Experience:
 Advanced Components:
 •	[ ] Dashboard cu KPIs - Real-time metrics
 •	[ ] Advanced Reporting - Export PDF/Excel cu Syncfusion
-•	[ ] Calendar Integration - Pentru programări
+•	[ ] Calendar Integration - Pentru programari
 •	[ ] Notification Center - In-app notifications
 •	[ ] File Management - Upload/download documente medicale
-•	[ ] Chat/Messaging - Comunicare internă
+•	[ ] Chat/Messaging - Comunicare interna
 🔄 Business Logic
 Medical Features:
 •	[ ] Patient Management - Full CRUD cu istoric medical
@@ -70,9 +70,9 @@ Medical Features:
 •	[ ] Lab Results - Integration cu laboratoare
 Workflow Engine:
 •	[ ] Approval Workflows - Pentru decizii medicale
-•	[ ] Email Templates - Pentru notificări
+•	[ ] Email Templates - Pentru notificari
 •	[ ] SMS Integration - Pentru reminders
-•	[ ] Queue Management - Pentru procesări asincrone
+•	[ ] Queue Management - Pentru procesari asincrone
 🚀 DevOps & Deployment
 CI/CD Pipeline:
 •	[ ] Azure DevOps/GitHub Actions - Automated builds
@@ -114,7 +114,7 @@ External Integrations:
 Regulatory Compliance:
 •	[ ] GDPR Compliance - Data privacy controls
 •	[ ] HIPAA Compliance - Pentru date medicale (US)
-•	[ ] Data Encryption - At rest și in transit
+•	[ ] Data Encryption - At rest si in transit
 •	[ ] Privacy Policy - Terms of Service
 Documentation:
 •	[ ] API Documentation - Swagger/OpenAPI

@@ -3,7 +3,7 @@
 namespace ValyanClinic.Domain.Interfaces;
 
 /// <summary>
-/// Interface pentru operațiunile cu Județe
+/// Interface pentru operatiunile cu Judete
 /// </summary>
 public interface IJudetRepository
 {
@@ -14,7 +14,7 @@ public interface IJudetRepository
 }
 
 /// <summary>
-/// Interface pentru operațiunile cu Localități
+/// Interface pentru operatiunile cu Localitati
 /// </summary>
 public interface ILocalitateRepository
 {

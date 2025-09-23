@@ -1,67 +1,67 @@
 ﻿# Verificare Stored Procedures - Baza de Date vs Cod
 
-## 📋 Prezentare Generală
+## 📋 Prezentare Generala
 
-Acest document verifică concordanța dintre stored procedure-urile definite în baza de date și cele utilizate în codul aplicației ValyanClinic. Obiectivul este să ne asigurăm că nu există discrepanțe de denumire care ar putea cauza erori la runtime.
+Acest document verifica concordanta dintre stored procedure-urile definite in baza de date si cele utilizate in codul aplicatiei ValyanClinic. Obiectivul este sa ne asiguram ca nu exista discrepante de denumire care ar putea cauza erori la runtime.
 
 ## 🔍 Metodologie de Verificare
 
-Am analizat următoarele surse:
+Am analizat urmatoarele surse:
 1. **Codul C# din Repository-uri** - pentru a identifica SP-urile apelate
 2. **Scripturile SQL** - pentru a vedea SP-urile create
-3. **Fișierele de documentație** - pentru a înțelege arhitectura
+3. **Fisierele de documentatie** - pentru a intelege arhitectura
 
-## 📊 Rezultatele Verificării
+## 📊 Rezultatele Verificarii
 
 ### 1. **Personal Module (PersonalRepository.cs)**
 
-| Stored Procedure | Utilizat în Metoda | Status |
+| Stored Procedure | Utilizat in Metoda | Status |
 |-----------------|-------------------|---------|
-| `sp_Personal_GetAll` | `GetAllAsync()` | ✅ **Definit în cod** |
-| `sp_Personal_GetById` | `GetByIdAsync()` | ✅ **Definit în cod** |
-| `sp_Personal_Create` | `CreateAsync()` | ✅ **Definit în cod** |
-| `sp_Personal_Update` | `UpdateAsync()` | ✅ **Definit în cod** |
-| `sp_Personal_Delete` | `DeleteAsync()` | ✅ **Definit în cod** |
-| `sp_Personal_CheckUnique` | `CheckUniqueAsync()` | ✅ **Definit în cod** |
-| `sp_Personal_GetStatistics` | `GetStatisticsAsync()` | ✅ **Definit în cod** |
+| `sp_Personal_GetAll` | `GetAllAsync()` | ✅ **Definit in cod** |
+| `sp_Personal_GetById` | `GetByIdAsync()` | ✅ **Definit in cod** |
+| `sp_Personal_Create` | `CreateAsync()` | ✅ **Definit in cod** |
+| `sp_Personal_Update` | `UpdateAsync()` | ✅ **Definit in cod** |
+| `sp_Personal_Delete` | `DeleteAsync()` | ✅ **Definit in cod** |
+| `sp_Personal_CheckUnique` | `CheckUniqueAsync()` | ✅ **Definit in cod** |
+| `sp_Personal_GetStatistics` | `GetStatisticsAsync()` | ✅ **Definit in cod** |
 
 ### 2. **PersonalMedical Module**
 
 | Stored Procedure | Scop | Status |
 |-----------------|------|---------|
-| `sp_PersonalMedical_GetAll` | Listă personal medical cu filtrare și paginare | ✅ **Definit în script** |
-| `sp_PersonalMedical_GetStatistics` | Statistici personal medical | ✅ **Definit în script** |
-| `sp_PersonalMedical_GetById` | Personal medical după ID | ✅ **Definit în script** |
-| `sp_PersonalMedical_CheckUnique` | Verificare unicitate Email și NumarLicenta | ✅ **Definit în script** |
-| `sp_PersonalMedical_Create` | Creare personal medical nou | ✅ **Definit în script** |
-| `sp_PersonalMedical_Update` | Actualizare personal medical | ✅ **Definit în script** |
-| `sp_PersonalMedical_Delete` | Ștergere personal medical (soft delete) | ✅ **Definit în script** |
-| `sp_PersonalMedical_GetDropdownOptions` | Opțiuni pentru dropdown-uri | ✅ **Definit în script** |
+| `sp_PersonalMedical_GetAll` | Lista personal medical cu filtrare si paginare | ✅ **Definit in script** |
+| `sp_PersonalMedical_GetStatistics` | Statistici personal medical | ✅ **Definit in script** |
+| `sp_PersonalMedical_GetById` | Personal medical dupa ID | ✅ **Definit in script** |
+| `sp_PersonalMedical_CheckUnique` | Verificare unicitate Email si NumarLicenta | ✅ **Definit in script** |
+| `sp_PersonalMedical_Create` | Creare personal medical nou | ✅ **Definit in script** |
+| `sp_PersonalMedical_Update` | Actualizare personal medical | ✅ **Definit in script** |
+| `sp_PersonalMedical_Delete` | stergere personal medical (soft delete) | ✅ **Definit in script** |
+| `sp_PersonalMedical_GetDropdownOptions` | Optiuni pentru dropdown-uri | ✅ **Definit in script** |
 
 ### 3. **Departamente Module**
 
 | Stored Procedure | Scop | Status |
 |-----------------|------|---------|
-| `sp_Departamente_GetAll` | Toate departamentele | ⚠️ **Definit în script dar nu găsit în Repository** |
-| `sp_Departamente_GetByTip` | Departamente după tip | ✅ **Definit în cod PersonalMedical** |
+| `sp_Departamente_GetAll` | Toate departamentele | ⚠️ **Definit in script dar nu gasit in Repository** |
+| `sp_Departamente_GetByTip` | Departamente dupa tip | ✅ **Definit in cod PersonalMedical** |
 
 ### 4. **Location Module (JudetRepository.cs & LocalitateRepository.cs)**
 
 | Stored Procedure | Repository | Metoda | Status |
 |-----------------|-----------|---------|---------|
-| `sp_Judete_GetAll` | JudetRepository | `GetAllAsync()` | ⚠️ **Folosit în cod dar nu găsit script** |
-| `sp_Judete_GetOrderedByName` | JudetRepository | `GetOrderedByNameAsync()` | ⚠️ **Folosit în cod dar nu găsit script** |
-| `sp_Judete_GetById` | JudetRepository | `GetByIdAsync()` | ⚠️ **Folosit în cod dar nu găsit script** |
-| `sp_Judete_GetByCod` | JudetRepository | `GetByCodAsync()` | ⚠️ **Folosit în cod dar nu găsit script** |
-| `sp_Localitati_GetAll` | LocalitateRepository | `GetAllAsync()` | ⚠️ **Folosit în cod dar nu găsit script** |
-| `sp_Localitati_GetById` | LocalitateRepository | `GetByIdAsync()` | ⚠️ **Folosit în cod dar nu găsit script** |
-| `sp_Localitati_GetByJudetId` | LocalitateRepository | `GetByJudetIdAsync()` | ⚠️ **Folosit în cod dar nu găsit script** |
-| `sp_Localitati_GetByJudetIdOrdered` | LocalitateRepository | `GetByJudetIdOrderedAsync()` | ⚠️ **Folosit în cod dar nu găsit script** |
+| `sp_Judete_GetAll` | JudetRepository | `GetAllAsync()` | ⚠️ **Folosit in cod dar nu gasit script** |
+| `sp_Judete_GetOrderedByName` | JudetRepository | `GetOrderedByNameAsync()` | ⚠️ **Folosit in cod dar nu gasit script** |
+| `sp_Judete_GetById` | JudetRepository | `GetByIdAsync()` | ⚠️ **Folosit in cod dar nu gasit script** |
+| `sp_Judete_GetByCod` | JudetRepository | `GetByCodAsync()` | ⚠️ **Folosit in cod dar nu gasit script** |
+| `sp_Localitati_GetAll` | LocalitateRepository | `GetAllAsync()` | ⚠️ **Folosit in cod dar nu gasit script** |
+| `sp_Localitati_GetById` | LocalitateRepository | `GetByIdAsync()` | ⚠️ **Folosit in cod dar nu gasit script** |
+| `sp_Localitati_GetByJudetId` | LocalitateRepository | `GetByJudetIdAsync()` | ⚠️ **Folosit in cod dar nu gasit script** |
+| `sp_Localitati_GetByJudetIdOrdered` | LocalitateRepository | `GetByJudetIdOrderedAsync()` | ⚠️ **Folosit in cod dar nu gasit script** |
 
 ## 🚨 Probleme Identificate
 
-### 1. **SP-uri lipsă pentru Location Module**
-Repository-urile `JudetRepository` și `LocalitateRepository` folosesc SP-uri care nu au fost găsite în scripturile fornizate:
+### 1. **SP-uri lipsa pentru Location Module**
+Repository-urile `JudetRepository` si `LocalitateRepository` folosesc SP-uri care nu au fost gasite in scripturile fornizate:
 
 ```csharp
 // Exemple din JudetRepository.cs
@@ -70,16 +70,16 @@ await _connection.QueryAsync<JudetDto>("sp_Judete_GetOrderedByName", commandType
 ```
 
 ### 2. **SP-uri create dar nefolosite**
-Scriptul `sp_Departamente_Test.sql` testează `sp_Departamente_GetAll`, dar nu am găsit un repository dedicat pentru Departamente.
+Scriptul `sp_Departamente_Test.sql` testeaza `sp_Departamente_GetAll`, dar nu am gasit un repository dedicat pentru Departamente.
 
-### 3. **Inconsistență în Personal vs PersonalMedical**
-Există două module similare (`Personal` și `PersonalMedical`) cu SP-uri separate, ceea ce poate crea confuzie.
+### 3. **Inconsistenta in Personal vs PersonalMedical**
+Exista doua module similare (`Personal` si `PersonalMedical`) cu SP-uri separate, ceea ce poate crea confuzie.
 
-## ✅ Recomandări pentru Rezolvare
+## ✅ Recomandari pentru Rezolvare
 
-### 1. **Urgent: Creați SP-urile lipsă pentru Location Module**
+### 1. **Urgent: Creati SP-urile lipsa pentru Location Module**
 
-Creați următoarele scripturi în `DevSupport/Scripts/`:
+Creati urmatoarele scripturi in `DevSupport/Scripts/`:
 
 ```sql
 -- sp_Judete_GetAll.sql
@@ -125,9 +125,9 @@ BEGIN
 END;
 ```
 
-Similar pentru Localități.
+Similar pentru Localitati.
 
-### 2. **Implementați Repository pentru Departamente**
+### 2. **Implementati Repository pentru Departamente**
 
 ```csharp
 // ValyanClinic.Infrastructure/Repositories/DepartamenteRepository.cs
@@ -137,55 +137,55 @@ public class DepartamenteRepository : IDepartamenteRepository
 }
 ```
 
-### 3. **Verificați în baza de date**
+### 3. **Verificati in baza de date**
 
-Rulați scriptul creat `VerifyStoredProcedureNames.sql` pentru a vedea exact care SP-uri există în baza de date:
+Rulati scriptul creat `VerifyStoredProcedureNames.sql` pentru a vedea exact care SP-uri exista in baza de date:
 
 ```sql
 EXEC VerifyStoredProcedureNames.sql
 ```
 
-### 4. **Testați toate SP-urile**
+### 4. **Testati toate SP-urile**
 
-După ce creați SP-urile lipsă, rulați testele:
+Dupa ce creati SP-urile lipsa, rulati testele:
 - `sp_Departamente_Test.sql`
 - `Test-PersonalMedicalStoredProcedures.ps1`
-- Creați scripturi de test pentru Location Module
+- Creati scripturi de test pentru Location Module
 
-## 🎯 Plan de Acțiune Prioritizat
+## 🎯 Plan de Actiune Prioritizat
 
-### **Prioritate 1 - CRITICĂ** 
-- [ ] Creați SP-urile pentru Location Module (Județe și Localități)
-- [ ] Testați că aplicația pornește fără erori
+### **Prioritate 1 - CRITICa** 
+- [ ] Creati SP-urile pentru Location Module (Judete si Localitati)
+- [ ] Testati ca aplicatia porneste fara erori
 
-### **Prioritate 2 - IMPORTANTĂ**
-- [ ] Implementați DepartamenteRepository
-- [ ] Verificați toate SP-urile în baza de date folosind scriptul de verificare
+### **Prioritate 2 - IMPORTANTa**
+- [ ] Implementati DepartamenteRepository
+- [ ] Verificati toate SP-urile in baza de date folosind scriptul de verificare
 
 ### **Prioritate 3 - OPTIMIZARE**
-- [ ] Documentați diferențele dintre Personal și PersonalMedical
-- [ ] Considerați consolidarea celor două module dacă sunt redundante
+- [ ] Documentati diferentele dintre Personal si PersonalMedical
+- [ ] Considerati consolidarea celor doua module daca sunt redundante
 
 ## 🔧 Script de Verificare
 
-Pentru a automatiza verificarea, folosiți:
+Pentru a automatiza verificarea, folositi:
 
 ```bash
-# Rulați scriptul SQL de verificare
+# Rulati scriptul SQL de verificare
 sqlcmd -S "TS1828\ERP" -d "ValyanMed" -E -i "DevSupport/Scripts/VerifyStoredProcedureNames.sql"
 ```
 
 ## 📝 Concluzie
 
-**Status general**: ⚠️ **Acțiune necesară**
+**Status general**: ⚠️ **Actiune necesara**
 
-Aplicația are o arhitectură solidă cu SP-uri bine definite pentru modulele Personal și PersonalMedical, dar **lipsesc SP-urile critice pentru Location Module** (Județe și Localități). Aceasta poate cauza erori la runtime când se încearcă încărcarea dropdown-urilor pentru județe și localități.
+Aplicatia are o arhitectura solida cu SP-uri bine definite pentru modulele Personal si PersonalMedical, dar **lipsesc SP-urile critice pentru Location Module** (Judete si Localitati). Aceasta poate cauza erori la runtime cand se incearca incarcarea dropdown-urilor pentru judete si localitati.
 
-**Estimare timp rezolvare**: 2-3 ore pentru crearea și testarea SP-urilor lipsă.
+**Estimare timp rezolvare**: 2-3 ore pentru crearea si testarea SP-urilor lipsa.
 
 ---
 
 **Verificat de**: GitHub Copilot  
-**Data verificării**: {DATE}  
-**Fișiere analizate**: 15+ fișiere C# și SQL  
-**Status**: Necesită acțiune pentru SP-uri Location Module
+**Data verificarii**: {DATE}  
+**Fisiere analizate**: 15+ fisiere C# si SQL  
+**Status**: Necesita actiune pentru SP-uri Location Module

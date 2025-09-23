@@ -6,29 +6,29 @@ namespace ValyanClinic.Domain.Validators;
 
 /// <summary>
 /// Validator FluentValidation pentru entitatea Patient
-/// Implementează toate regulile de business pentru pacienții clinicii
+/// Implementeaza toate regulile de business pentru pacientii clinicii
 /// </summary>
 public class PatientValidator : AbstractValidator<Patient>
 {
     public PatientValidator()
     {
-        // === REGULI PENTRU DATE PERSONALE DE BAZĂ ===
+        // === REGULI PENTRU DATE PERSONALE DE BAZa ===
         
         RuleFor(x => x.FirstName)
             .NotEmpty()
             .WithMessage("Prenumele este obligatoriu")
             .Length(2, 50)
-            .WithMessage("Prenumele trebuie să aibă între 2 și 50 de caractere")
+            .WithMessage("Prenumele trebuie sa aiba intre 2 si 50 de caractere")
             .Matches(@"^[A-ZÀ-ÿa-z\s\-']+$")
-            .WithMessage("Prenumele poate conține doar litere, spații, cratime și apostrofuri");
+            .WithMessage("Prenumele poate contine doar litere, spatii, cratime si apostrofuri");
 
         RuleFor(x => x.LastName)
             .NotEmpty()
             .WithMessage("Numele este obligatoriu")
             .Length(2, 50)
-            .WithMessage("Numele trebuie să aibă între 2 și 50 de caractere")
+            .WithMessage("Numele trebuie sa aiba intre 2 si 50 de caractere")
             .Matches(@"^[A-ZÀ-ÿa-z\s\-']+$")
-            .WithMessage("Numele poate conține doar litere, spații, cratime și apostrofuri");
+            .WithMessage("Numele poate contine doar litere, spatii, cratime si apostrofuri");
 
         // === REGULI PENTRU CONTACT ===
         
@@ -38,11 +38,11 @@ public class PatientValidator : AbstractValidator<Patient>
             .EmailAddress()
             .WithMessage("Formatul email-ului nu este valid")
             .Length(5, 100)
-            .WithMessage("Email-ul trebuie să aibă între 5 și 100 de caractere");
+            .WithMessage("Email-ul trebuie sa aiba intre 5 si 100 de caractere");
 
         RuleFor(x => x.PhoneNumber)
             .NotEmpty()
-            .WithMessage("Numărul de telefon este obligatoriu")
+            .WithMessage("Numarul de telefon este obligatoriu")
             .Matches(@"^(\+40|0)[1-9]\d{8}$")
             .WithMessage("Formatul telefonului nu este valid (ex: 0722123456 sau +40722123456)");
 
@@ -50,11 +50,11 @@ public class PatientValidator : AbstractValidator<Patient>
         
         RuleFor(x => x.DateOfBirth)
             .NotEmpty()
-            .WithMessage("Data nașterii este obligatorie")
+            .WithMessage("Data nasterii este obligatorie")
             .Must(BeValidBirthDate)
-            .WithMessage("Data nașterii trebuie să fie între 1900 și acum")
+            .WithMessage("Data nasterii trebuie sa fie intre 1900 si acum")
             .Must(BeReasonableAge)
-            .WithMessage("Vârsta pacientului trebuie să fie rezonabilă (sub 150 de ani)");
+            .WithMessage("Varsta pacientului trebuie sa fie rezonabila (sub 150 de ani)");
 
         RuleFor(x => x.Gender)
             .IsInEnum()
@@ -66,70 +66,70 @@ public class PatientValidator : AbstractValidator<Patient>
             .NotEmpty()
             .WithMessage("CNP-ul este obligatoriu")
             .Length(13)
-            .WithMessage("CNP-ul trebuie să aibă exact 13 cifre")
+            .WithMessage("CNP-ul trebuie sa aiba exact 13 cifre")
             .Matches(@"^\d{13}$")
-            .WithMessage("CNP-ul poate conține doar cifre")
+            .WithMessage("CNP-ul poate contine doar cifre")
             .Must(BeValidCNP)
             .WithMessage("CNP-ul nu este valid conform algoritmului oficial")
             .Must((patient, cnp) => CNPMatchesDateOfBirthAndGender(cnp, patient.DateOfBirth, patient.Gender))
-            .WithMessage("CNP-ul nu corespunde cu data nașterii sau genul specificat");
+            .WithMessage("CNP-ul nu corespunde cu data nasterii sau genul specificat");
 
-        // === REGULI PENTRU ADRESĂ ===
+        // === REGULI PENTRU ADRESa ===
         
         RuleFor(x => x.Address)
             .NotEmpty()
             .WithMessage("Adresa este obligatorie")
             .Length(10, 200)
-            .WithMessage("Adresa trebuie să aibă între 10 și 200 de caractere");
+            .WithMessage("Adresa trebuie sa aiba intre 10 si 200 de caractere");
 
-        // === REGULI PENTRU CONTACT DE URGENȚĂ ===
+        // === REGULI PENTRU CONTACT DE URGENta ===
         
         RuleFor(x => x.EmergencyContactName)
             .NotEmpty()
-            .WithMessage("Numele contactului de urgență este obligatoriu")
+            .WithMessage("Numele contactului de urgenta este obligatoriu")
             .Length(2, 100)
-            .WithMessage("Numele contactului de urgență trebuie să aibă între 2 și 100 de caractere")
+            .WithMessage("Numele contactului de urgenta trebuie sa aiba intre 2 si 100 de caractere")
             .Matches(@"^[A-ZÀ-ÿa-z\s\-']+$")
-            .WithMessage("Numele contactului de urgență poate conține doar litere, spații, cratime și apostrofuri");
+            .WithMessage("Numele contactului de urgenta poate contine doar litere, spatii, cratime si apostrofuri");
 
         RuleFor(x => x.EmergencyContactPhone)
             .NotEmpty()
-            .WithMessage("Telefonul contactului de urgență este obligatoriu")
+            .WithMessage("Telefonul contactului de urgenta este obligatoriu")
             .Matches(@"^(\+40|0)[1-9]\d{8}$")
-            .WithMessage("Formatul telefonului de urgență nu este valid (ex: 0722123456 sau +40722123456)")
+            .WithMessage("Formatul telefonului de urgenta nu este valid (ex: 0722123456 sau +40722123456)")
             .Must((patient, emergencyPhone) => emergencyPhone != patient.PhoneNumber)
-            .WithMessage("Telefonul de urgență trebuie să fie diferit de telefonul pacientului");
+            .WithMessage("Telefonul de urgenta trebuie sa fie diferit de telefonul pacientului");
 
-        // === REGULI PENTRU INFORMAȚII MEDICALE OPȚIONALE ===
+        // === REGULI PENTRU INFORMAtII MEDICALE OPtIONALE ===
         
         RuleFor(x => x.BloodType)
             .Must(BeValidBloodType)
-            .WithMessage("Grupa sanguină nu este validă (ex: A+, B-, AB+, O-)")
+            .WithMessage("Grupa sanguina nu este valida (ex: A+, B-, AB+, O-)")
             .When(x => !string.IsNullOrEmpty(x.BloodType));
 
         RuleFor(x => x.Allergies)
             .MaximumLength(1000)
-            .WithMessage("Alergiile nu pot depăși 1000 de caractere");
+            .WithMessage("Alergiile nu pot depasi 1000 de caractere");
 
         RuleFor(x => x.MedicalHistory)
             .MaximumLength(5000)
-            .WithMessage("Istoricul medical nu poate depăși 5000 de caractere");
+            .WithMessage("Istoricul medical nu poate depasi 5000 de caractere");
 
         RuleFor(x => x.Notes)
             .MaximumLength(2000)
-            .WithMessage("Notele nu pot depăși 2000 de caractere");
+            .WithMessage("Notele nu pot depasi 2000 de caractere");
 
         // === REGULI COMPLEXE DE BUSINESS ===
         
-        // Verifică că pacienții sub 18 ani au contacte de urgență diferite
+        // Verifica ca pacientii sub 18 ani au contacte de urgenta diferite
         RuleFor(x => x)
             .Must(HaveValidEmergencyContactForMinors)
-            .WithMessage("Pacienții sub 18 ani trebuie să aibă un contact de urgență adult (părinți/tutori)")
+            .WithMessage("Pacientii sub 18 ani trebuie sa aiba un contact de urgenta adult (parinti/tutori)")
             .WithName("ContactUrgentaMinori");
     }
 
     /// <summary>
-    /// Validează CNP-ul conform algoritmului oficial românesc
+    /// Valideaza CNP-ul conform algoritmului oficial romanesc
     /// </summary>
     private bool BeValidCNP(string cnp)
     {
@@ -155,7 +155,7 @@ public class PatientValidator : AbstractValidator<Patient>
     }
 
     /// <summary>
-    /// Verifică dacă data nașterii este într-un interval valid
+    /// Verifica daca data nasterii este intr-un interval valid
     /// </summary>
     private bool BeValidBirthDate(DateTime birthDate)
     {
@@ -163,7 +163,7 @@ public class PatientValidator : AbstractValidator<Patient>
     }
 
     /// <summary>
-    /// Verifică dacă vârsta este rezonabilă (sub 150 de ani)
+    /// Verifica daca varsta este rezonabila (sub 150 de ani)
     /// </summary>
     private bool BeReasonableAge(DateTime birthDate)
     {
@@ -175,22 +175,22 @@ public class PatientValidator : AbstractValidator<Patient>
     }
 
     /// <summary>
-    /// Verifică dacă CNP-ul corespunde cu data nașterii și genul
+    /// Verifica daca CNP-ul corespunde cu data nasterii si genul
     /// </summary>
     private bool CNPMatchesDateOfBirthAndGender(string cnp, DateTime dateOfBirth, Gender gender)
     {
         if (string.IsNullOrEmpty(cnp) || cnp.Length != 13)
             return false;
 
-        // Prima cifra indică sexul și secolul
+        // Prima cifra indica sexul si secolul
         int firstDigit = int.Parse(cnp[0].ToString());
         
-        // Extragere an, lună, zi din CNP
+        // Extragere an, luna, zi din CNP
         int cnpYear = int.Parse(cnp.Substring(1, 2));
         int cnpMonth = int.Parse(cnp.Substring(3, 2));
         int cnpDay = int.Parse(cnp.Substring(5, 2));
 
-        // Determinare secol complet bazat pe prima cifră
+        // Determinare secol complet bazat pe prima cifra
         int fullYear;
         switch (firstDigit)
         {
@@ -208,13 +208,13 @@ public class PatientValidator : AbstractValidator<Patient>
                 break;
             case 7:
             case 8:
-                fullYear = 2000 + cnpYear; // Rezidenți străini
+                fullYear = 2000 + cnpYear; // Rezidenti straini
                 break;
             default:
                 return false;
         }
 
-        // Verificare dată
+        // Verificare data
         try
         {
             var cnpDate = new DateTime(fullYear, cnpMonth, cnpDay);
@@ -223,7 +223,7 @@ public class PatientValidator : AbstractValidator<Patient>
         }
         catch
         {
-            return false; // Data din CNP nu este validă
+            return false; // Data din CNP nu este valida
         }
 
         // Verificare gen (cifre impare = masculin, cifre pare = feminin)
@@ -234,7 +234,7 @@ public class PatientValidator : AbstractValidator<Patient>
     }
 
     /// <summary>
-    /// Verifică dacă grupa sanguină este validă
+    /// Verifica daca grupa sanguina este valida
     /// </summary>
     private bool BeValidBloodType(string? bloodType)
     {
@@ -246,7 +246,7 @@ public class PatientValidator : AbstractValidator<Patient>
     }
 
     /// <summary>
-    /// Verifică dacă pacienții minori au contacte de urgență valide
+    /// Verifica daca pacientii minori au contacte de urgenta valide
     /// </summary>
     private bool HaveValidEmergencyContactForMinors(Patient patient)
     {
@@ -254,18 +254,18 @@ public class PatientValidator : AbstractValidator<Patient>
         if (patient.DateOfBirth.Date > DateTime.Today.AddYears(-age))
             age--;
 
-        // Dacă pacientul este sub 18 ani
+        // Daca pacientul este sub 18 ani
         if (age < 18)
         {
-            // Trebuie să aibă nume și telefon de contact de urgență
-            // și să nu fie același cu ale pacientului
+            // Trebuie sa aiba nume si telefon de contact de urgenta
+            // si sa nu fie acelasi cu ale pacientului
             return !string.IsNullOrEmpty(patient.EmergencyContactName) &&
                    !string.IsNullOrEmpty(patient.EmergencyContactPhone) &&
                    patient.EmergencyContactPhone != patient.PhoneNumber &&
                    patient.EmergencyContactName.ToLower() != patient.FullName.ToLower();
         }
 
-        return true; // Pentru adulți, nu e obligatoriu
+        return true; // Pentru adulti, nu e obligatoriu
     }
 }
 
@@ -278,19 +278,19 @@ public class PatientCreateValidator : PatientValidator
     {
         // Reguli suplimentare pentru crearea unui nou pacient
         
-        // ID-ul nu trebuie să fie setat manual (se generează automat)
+        // ID-ul nu trebuie sa fie setat manual (se genereaza automat)
         RuleFor(x => x.Id)
             .Equal(0)
-            .WithMessage("ID-ul se generează automat și nu trebuie specificat");
+            .WithMessage("ID-ul se genereaza automat si nu trebuie specificat");
 
-        // Data creării trebuie să fie setată
+        // Data crearii trebuie sa fie setata
         RuleFor(x => x.CreatedAt)
             .NotEmpty()
-            .WithMessage("Data creării este obligatorie")
+            .WithMessage("Data crearii este obligatorie")
             .GreaterThan(DateTime.Now.AddMinutes(-5))
-            .WithMessage("Data creării trebuie să fie aproape de momentul curent")
+            .WithMessage("Data crearii trebuie sa fie aproape de momentul curent")
             .LessThanOrEqualTo(DateTime.Now.AddMinutes(1))
-            .WithMessage("Data creării nu poate fi în viitor");
+            .WithMessage("Data crearii nu poate fi in viitor");
     }
 }
 
@@ -303,24 +303,24 @@ public class PatientUpdateValidator : PatientValidator
     {
         // Reguli suplimentare pentru actualizarea unui pacient
         
-        // ID-ul trebuie să existe și să fie valid
+        // ID-ul trebuie sa existe si sa fie valid
         RuleFor(x => x.Id)
             .GreaterThan(0)
-            .WithMessage("ID-ul pacientului trebuie să fie valid pentru actualizare");
+            .WithMessage("ID-ul pacientului trebuie sa fie valid pentru actualizare");
 
-        // Data creării nu se poate modifica
+        // Data crearii nu se poate modifica
         RuleFor(x => x.CreatedAt)
             .NotEmpty()
-            .WithMessage("Data creării trebuie să existe pentru actualizare")
+            .WithMessage("Data crearii trebuie sa existe pentru actualizare")
             .LessThan(DateTime.Now.AddDays(-1))
-            .WithMessage("Data creării pare să fi fost modificată - nu este permis");
+            .WithMessage("Data crearii pare sa fi fost modificata - nu este permis");
 
-        // Data ultimei modificări trebuie să fie setată și să fie după data creării
+        // Data ultimei modificari trebuie sa fie setata si sa fie dupa data crearii
         RuleFor(x => x.UpdatedAt)
             .GreaterThan(x => x.CreatedAt)
-            .WithMessage("Data ultimei modificări trebuie să fie după data creării")
+            .WithMessage("Data ultimei modificari trebuie sa fie dupa data crearii")
             .LessThanOrEqualTo(DateTime.Now.AddMinutes(1))
-            .WithMessage("Data ultimei modificări nu poate fi în viitor")
+            .WithMessage("Data ultimei modificari nu poate fi in viitor")
             .When(x => x.UpdatedAt.HasValue);
     }
 }

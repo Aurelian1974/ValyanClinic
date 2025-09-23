@@ -1,28 +1,28 @@
-Plan Final de Refactorizare - Lista Consolidată
-După verificarea completă a documentelor, iată lista finală ordonată după prioritate:
+Plan Final de Refactorizare - Lista Consolidata
+Dupa verificarea completa a documentelor, iata lista finala ordonata dupa prioritate:
 🔴 CRITICE - Blocker-uri Imediate
 1.	DataGrid Settings Persistence Fix ⚠️
-•	LocalStorage poate eșua fără error handling
+•	LocalStorage poate esua fara error handling
 •	Implementare fallback cu memory cache
-2.	Memory Leaks în Components ⚠️
-•	Timer-uri ne-disposed în GestionarePersoane.razor.cs
+2.	Memory Leaks in Components ⚠️
+•	Timer-uri ne-disposed in GestionarePersoane.razor.cs
 •	Implementare Dispose pattern complet
 3.	Group State Management ⚠️
-•	State complex pentru grupări fără persistență
+•	State complex pentru grupari fara persistenta
 •	Creare DataGridStateService centralizat
-4.	Eliminare completă diacritice din UI
-•	Găsite în DTOs: "Numărul de licență este obligatoriu"
+4.	Eliminare completa diacritice din UI
+•	Gasite in DTOs: "Numarul de licenta este obligatoriu"
 •	Audit complet toate string-urile
-5.	Migrare completă MudBlazor → Radzen
-•	Inconsistență: cod folosește Radzen, CSS referă MudBlazor
-•	patient-list.css conține 500+ linii pentru MudBlazor
+5.	Migrare completa MudBlazor → Radzen
+•	Inconsistenta: cod foloseste Radzen, CSS refera MudBlazor
+•	patient-list.css contine 500+ linii pentru MudBlazor
 
 
 🟠 URGENTE - Calitate Cod
 6.	Eliminare Magic Strings - Implementare Enum-uri
 •	StatusOptions, TipPersonalMedical, MedicationStatus
 7.	Result Pattern Implementation
-•	Înlocuire bool/exception cu Result<T>
+•	inlocuire bool/exception cu Result<T>
 •	Metode helper pentru Blazor notifications
 8.	Exception Handling Specific
 •	ValidationException, NotFoundException, BusinessRuleException
@@ -31,18 +31,18 @@ După verificarea completă a documentelor, iată lista finală ordonată după 
 •	Validators pentru Create/Update operations
 •	Async validation pentru unicitate
 10.	Component Code-Behind Separation
-•	.razor doar markup, .razor.cs toată logica
-•	Pattern consistent în toată aplicația
+•	.razor doar markup, .razor.cs toata logica
+•	Pattern consistent in toata aplicatia
 
-🟡 IMPORTANTE - Arhitectură
+🟡 IMPORTANTE - Arhitectura
 11.	CSS Reorganizare - Max 2 culori
 12.	Rich Services Implementation
 •	Services cu business logic, nu doar forwarding
-•	Validări, calcule, domain events
-13.	CQRS pentru operații complexe
+•	Validari, calcule, domain events
+13.	CQRS pentru operatii complexe
 •	Commands pentru write, Queries pentru read
-•	Handlers cu validare și events
-14.	Domain Models în loc de DTOs Everywhere
+•	Handlers cu validare si events
+14.	Domain Models in loc de DTOs Everywhere
 •	DTOs doar la API boundaries
 •	Domain models pentru business logic
 15.	Caching Strategy Implementation
@@ -66,15 +66,15 @@ După verificarea completă a documentelor, iată lista finală ordonată după 
 •	Stock monitoring
 •	Scheduled tasks
 
-🔵 UTILE - Îmbunătățiri
+🔵 UTILE - imbunatatiri
 21.	AutoMapper Integration
 •	DTO ↔ Domain mapping
 •	Profile-based configuration
 22.	Serilog Structured Logging
-•	Înlocuire console logging
+•	inlocuire console logging
 •	Log aggregation ready
 23.	API Versioning
-•	Version în route
+•	Version in route
 •	Backward compatibility
 24.	Audit Trail Implementation
 •	Track changes automatizat
@@ -83,7 +83,7 @@ După verificarea completă a documentelor, iată lista finală ordonată după 
 •	Encrypt sensitive data
 •	GDPR compliance
 
-⚪ NICE TO HAVE - Optimizări
+⚪ NICE TO HAVE - Optimizari
 26.	MediatR pentru CQRS complet
 27.	Hangfire pentru task-uri background
 28.	Database Migrations (DbUp/FluentMigrator)

@@ -16,7 +16,7 @@ public class PersonalMedicalPageState
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
     public string? ErrorMessage { get; private set; }
 
-    // Data - folosind PersonalMedical în loc de Personal
+    // Data - folosind PersonalMedical in loc de Personal
     public PersonalMedicalPagedResult? PagedResult { get; set; }
     public PersonalMedicalDropdownOptions? DropdownOptions { get; set; }
 
@@ -36,16 +36,16 @@ public class PersonalMedicalPageState
     // Filtering specific pentru PersonalMedical - BASIC ONLY
     public string? SearchText { get; set; }
     public string? SelectedDepartment { get; set; } // String pentru departamente din DB
-    public PozitiePersonalMedical? SelectedPozitie { get; set; } // Enum pentru poziții
+    public PozitiePersonalMedical? SelectedPozitie { get; set; } // Enum pentru pozitii
     public bool? SelectedStatus { get; set; } // Bool pentru EsteActiv
 
     // Departamente medicale options - DIN DB, nu enum-uri
     public List<DepartamentFilterItem> DepartmentOptions { get; set; } = new();
     
-    // Poziții options - DOAR pentru poziții (enum)
+    // Pozitii options - DOAR pentru pozitii (enum)
     public List<PozitieFilterItem> PozitieOptions { get; } = new()
     {
-        new(null, "Toate pozițiile")
+        new(null, "Toate pozitiile")
     };
 
     // Status options pentru PersonalMedical (EsteActiv)
@@ -63,7 +63,7 @@ public class PersonalMedicalPageState
         SelectedPozitie.HasValue ||
         SelectedStatus.HasValue;
 
-    // Constructor pentru inițializarea pozițiilor
+    // Constructor pentru initializarea pozitiilor
     public PersonalMedicalPageState()
     {
         InitializePozitieOptions();
@@ -110,7 +110,7 @@ public class PersonalMedicalPageState
         DepartmentOptions.Clear();
         DepartmentOptions.Add(new DepartamentFilterItem("", "Toate departamentele"));
 
-        // Grupează departamentele după nume pentru a evita duplicatele
+        // Grupeaza departamentele dupa nume pentru a evita duplicatele
         var uniqueDepartments = departamenteMedicale
             .Where(d => !string.IsNullOrWhiteSpace(d.Nume))
             .GroupBy(d => d.Nume)
@@ -124,13 +124,13 @@ public class PersonalMedicalPageState
     }
 
     // Modal management pentru PersonalMedical
-    public string GetModalTitle() => IsEditMode ? "Editează Personal Medical" : "Adaugă Personal Medical Nou";
+    public string GetModalTitle() => IsEditMode ? "Editeaza Personal Medical" : "Adauga Personal Medical Nou";
     public string GetModalSubtitle() => IsEditMode 
-        ? $"Modifică informațiile pentru {EditingPersonalMedical?.NumeComplet}"
-        : "Completează formularul pentru a adăuga personal medical nou";
+        ? $"Modifica informatiile pentru {EditingPersonalMedical?.NumeComplet}"
+        : "Completeaza formularul pentru a adauga personal medical nou";
 
     // Metode pentru business logic specific PersonalMedical
-    public bool NeedsDepartmentFromDatabase => true; // Întotdeauna pentru PersonalMedical
+    public bool NeedsDepartmentFromDatabase => true; // intotdeauna pentru PersonalMedical
     public bool SupportsSpecializari => true;
     public bool RequiresLicensaMedicala => SelectedPozitie?.RequiresLicensaMedicala() == true;
 }
@@ -199,13 +199,13 @@ public class PersonalMedicalDropdownOptions
     public List<DepartamentMedical> Specializari { get; set; } = new();
     public List<DepartamentMedical> Subspecializari { get; set; } = new();
 
-    // Computed properties pentru verificări
+    // Computed properties pentru verificari
     public bool HasDepartamenteMedicale => DepartamenteMedicale.Any();
     public bool HasCategorii => Categorii.Any();
     public bool HasSpecializari => Specializari.Any();
     public bool HasSubspecializari => Subspecializari.Any();
 
-    // Metode pentru căutare și găsirea elementelor
+    // Metode pentru cautare si gasirea elementelor
     public DepartamentMedical? FindDepartamentByName(string? name)
     {
         if (string.IsNullOrWhiteSpace(name)) return null;

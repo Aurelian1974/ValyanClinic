@@ -1,22 +1,22 @@
 ﻿# 🔍 DEBUGGING DROPDOWN-URILOR CU SERILOG
 
 ## 🎯 Scop
-Acest ghid te ajută să identifici de ce dropdown-urile pentru Județ-Localitate nu se încarcă corect.
+Acest ghid te ajuta sa identifici de ce dropdown-urile pentru Judet-Localitate nu se incarca corect.
 
-## 📋 Pașii de debugging
+## 📋 Pasii de debugging
 
-### 1. Pornirea aplicației cu logging
+### 1. Pornirea aplicatiei cu logging
 ```powershell
 cd "D:\Projects\CMS\ValyanClinic"
 dotnet run --environment Development
 ```
 
-### 2. Accesează pagina cu dropdown-urile
+### 2. Acceseaza pagina cu dropdown-urile
 1. Deschide browser la `https://localhost:7164`
-2. Navighează la **Personal** → **Adaugă Personal**
-3. Urmărește log-urile în consolă
+2. Navigheaza la **Personal** → **Adauga Personal**
+3. Urmareste log-urile in consola
 
-### 3. Log-urile de urmărit
+### 3. Log-urile de urmarit
 
 #### ✅ Log-uri normale (SUCCESS):
 ```
@@ -54,37 +54,37 @@ dotnet run --environment Development
 💥 FATAL: Cannot even count Judete table records
 ```
 
-### 4. Verificări manuale în baza de date
+### 4. Verificari manuale in baza de date
 
-#### Verifică tabelul Judete:
+#### Verifica tabelul Judete:
 ```sql
 SELECT COUNT(*) FROM Judete;
 SELECT TOP 5 * FROM Judete ORDER BY Nume;
 ```
 
-#### Verifică stored procedure:
+#### Verifica stored procedure:
 ```sql
 EXEC sp_Judete_GetOrderedByName;
 ```
 
-#### Verifică tabelul Localitati:
+#### Verifica tabelul Localitati:
 ```sql
 SELECT COUNT(*) FROM Localitati;
 SELECT TOP 5 * FROM Localitati ORDER BY Nume;
 ```
 
-### 5. Probleme comune și soluții
+### 5. Probleme comune si solutii
 
 #### ❌ **Stored Procedures lipsesc**
-**Soluție**: Rulează scripturile din `DevSupport/Scripts/`:
+**Solutie**: Ruleaza scripturile din `DevSupport/Scripts/`:
 - `SP_Judete_StoredProcedures.sql`
 - `SP_Localitati_StoredProcedures.sql`
 
 #### ❌ **Tabelele sunt goale**
-**Soluție**: Importă datele de județe și localități în baza de date
+**Solutie**: Importa datele de judete si localitati in baza de date
 
-#### ❌ **Connection string greșit**
-**Soluție**: Verifică `appsettings.json`:
+#### ❌ **Connection string gresit**
+**Solutie**: Verifica `appsettings.json`:
 ```json
 {
   "ConnectionStrings": {
@@ -93,22 +93,22 @@ SELECT TOP 5 * FROM Localitati ORDER BY Nume;
 }
 ```
 
-#### ❌ **Repository nu este înregistrat**
-**Soluție**: Verifică `Program.cs`:
+#### ❌ **Repository nu este inregistrat**
+**Solutie**: Verifica `Program.cs`:
 ```csharp
 builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.IJudetRepository, JudetRepository>();
 builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.ILocalitateRepository, LocalitateRepository>();
 ```
 
-### 6. Testarea rapidă
-După ce aplici o soluție:
-1. Oprește aplicația (Ctrl+C)
+### 6. Testarea rapida
+Dupa ce aplici o solutie:
+1. Opreste aplicatia (Ctrl+C)
 2. Rebuild: `dotnet build`
 3. Restart: `dotnet run`
-4. Reaccesează pagina și urmărește log-urile
+4. Reacceseaza pagina si urmareste log-urile
 
-## 🆘 Dacă problema persistă
+## 🆘 Daca problema persista
 Trimite log-urile complete cu:
 - Mesajele de eroare exacte
 - Stack trace-ul complet
-- Rezultatele verificărilor manuale din baza de date
+- Rezultatele verificarilor manuale din baza de date

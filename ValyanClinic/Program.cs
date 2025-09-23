@@ -160,7 +160,7 @@ try
     builder.Services.AddScoped<IPersonalMedicalService, PersonalMedicalService>();
     builder.Services.AddScoped<IDepartamentMedicalService, DepartamentMedicalService>();
 
-    // === TOAST NOTIFICATION SERVICE - LIPSĂ ÎN VERSIUNEA ANTERIOARĂ ===
+    // === TOAST NOTIFICATION SERVICE - LIPSa iN VERSIUNEA ANTERIOARa ===
     builder.Services.AddToastNotificationService();
 
     // === COMPONENT STATE SERVICES ===

@@ -48,7 +48,7 @@ public partial class VizualizeazUtilizator : ComponentBase
         catch (Exception ex)
         {
             HasError = true;
-            ErrorMessage = $"Eroare la înc?rcarea datelor: {ex.Message}";
+            ErrorMessage = $"Eroare la incrcarea datelor: {ex.Message}";
         }
         finally
         {
@@ -77,7 +77,7 @@ public partial class VizualizeazUtilizator : ComponentBase
             UserRole.Administrator => "Administrator",
             UserRole.Doctor => "Doctor",
             UserRole.Nurse => "Asistent Medical",
-            UserRole.Receptionist => "Recep?ioner",
+            UserRole.Receptionist => "Recepioner",
             UserRole.Manager => "Manager",
             UserRole.Operator => "Operator",
             _ => role.ToString()
@@ -102,7 +102,7 @@ public partial class VizualizeazUtilizator : ComponentBase
         var daysSince = (DateTime.Now - lastLogin.Value).Days;
         return daysSince switch
         {
-            0 => "Activ ast?zi",
+            0 => "Activ astzi",
             1 => "Activ ieri",
             <= 7 => $"Activ acum {daysSince} zile",
             <= 30 => $"Activ acum {daysSince} zile",

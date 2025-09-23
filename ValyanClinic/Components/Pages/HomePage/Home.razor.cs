@@ -8,5 +8,5 @@ namespace ValyanClinic.Components.Pages.HomePage;
 /// </summary>
 public partial class Home : ComponentBase
 {
-    // Nimic aici - totul se face în markup
+    // Nimic aici - totul se face in markup
 }

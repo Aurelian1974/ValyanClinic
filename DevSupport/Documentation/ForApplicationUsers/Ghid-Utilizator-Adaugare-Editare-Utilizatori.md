@@ -1,282 +1,282 @@
-﻿# Ghid Utilizator - Adăugarea și Editarea Utilizatorilor
+﻿# Ghid Utilizator - Adaugarea si Editarea Utilizatorilor
 
-**Aplicație:** ValyanMed - Sistem de Management Clinic  
-**Funcție:** Formulare de adăugare și editare utilizatori  
+**Aplicatie:** ValyanMed - Sistem de Management Clinic  
+**Functie:** Formulare de adaugare si editare utilizatori  
 **Creat:** Septembrie 2025  
 **Actualizat:** Septembrie 2025  
 **Destinat pentru:** Administratori, Manageri cu drepturi de gestionare personal  
 
 ---
 
-## Prezentare Generală
+## Prezentare Generala
 
-Formularele de adăugare și editare utilizatori vă permit să introduceți sau să modificați informațiile despre personalul clinicii într-un mod structurat și securizat. Același formular este folosit atât pentru crearea utilizatorilor noi, cât și pentru modificarea celor existenți.
+Formularele de adaugare si editare utilizatori va permit sa introduceti sau sa modificati informatiile despre personalul clinicii intr-un mod structurat si securizat. Acelasi formular este folosit atat pentru crearea utilizatorilor noi, cat si pentru modificarea celor existenti.
 
-### Ce puteți face cu aceste formulare
-- **Adăugarea** de utilizatori noi în sistem
-- **Modificarea** informațiilor utilizatorilor existenți  
-- **Asignarea rolurilor** și permisiunilor
-- **Setarea informațiilor** organizaționale
-- **Validarea datelor** în timp real
-- **Salvarea securizată** a informațiilor
+### Ce puteti face cu aceste formulare
+- **Adaugarea** de utilizatori noi in sistem
+- **Modificarea** informatiilor utilizatorilor existenti  
+- **Asignarea rolurilor** si permisiunilor
+- **Setarea informatiilor** organizationale
+- **Validarea datelor** in timp real
+- **Salvarea securizata** a informatiilor
 
 ---
 
 ## Accesarea Formularelor
 
-### Pentru adăugarea unui utilizator nou
+### Pentru adaugarea unui utilizator nou
 
-1. **Accesați** modulul "Gestionare Utilizatori"
-2. **Apăsați** butonul "Adaugă Utilizator" din antetul paginii
-3. **Se va deschide** formularul de adăugare cu câmpuri goale
+1. **Accesati** modulul "Gestionare Utilizatori"
+2. **Apasati** butonul "Adauga Utilizator" din antetul paginii
+3. **Se va deschide** formularul de adaugare cu campuri goale
 
 ### Pentru editarea unui utilizator existent
 
-1. **În lista utilizatorilor** găsiți utilizatorul dorit
-2. **În coloana "Acțiuni"** apăsați butonul portocaliu cu creionul ✏️
+1. **in lista utilizatorilor** gasiti utilizatorul dorit
+2. **in coloana "Actiuni"** apasati butonul portocaliu cu creionul ✏️
 3. **Se va deschide** formularul cu datele precompletate
 
 ---
 
 ## Structura Formularului
 
-Formularul este organizat în **3 secțiuni principale**, fiecare cu un titlu colorat și o iconiță specifică:
+Formularul este organizat in **3 sectiuni principale**, fiecare cu un titlu colorat si o iconita specifica:
 
-### 📋 1. Informații Personale
-- **Iconița**: Card de identitate
+### 📋 1. Informatii Personale
+- **Iconita**: Card de identitate
 - **Culoarea**: Gradient albastru-verde
-- **Conținut**: Datele de bază ale persoanei
+- **Continut**: Datele de baza ale persoanei
 
-### 👤 2. Informații Cont  
-- **Iconița**: Roată de setări utilizator
+### 👤 2. Informatii Cont  
+- **Iconita**: Roata de setari utilizator
 - **Culoarea**: Gradient verde-albastru
-- **Conținut**: Datele pentru conectarea în sistem
+- **Continut**: Datele pentru conectarea in sistem
 
-### 🏢 3. Informații Organizaționale
-- **Iconița**: Clădire
+### 🏢 3. Informatii Organizationale
+- **Iconita**: Cladire
 - **Culoarea**: Gradient albastru-violet
-- **Conținut**: Informații despre rolul în clinică
+- **Continut**: Informatii despre rolul in clinica
 
 ---
 
-## Secțiunea "Informații Personale"
+## Sectiunea "Informatii Personale"
 
-### Câmpurile disponibile
+### Campurile disponibile
 
 #### 📝 Nume (Obligatoriu)
-- **Ce să introduceți**: Numele de familie al persoanei
+- **Ce sa introduceti**: Numele de familie al persoanei
 - **Exemple**: Popescu, Ionescu, Marinescu
-- **Restricții**: Minimum 2 caractere, maximum 50
-- **Validare**: Se verifică automat că nu este gol
+- **Restrictii**: Minimum 2 caractere, maximum 50
+- **Validare**: Se verifica automat ca nu este gol
 
 #### 📝 Prenume (Obligatoriu)  
-- **Ce să introduceți**: Prenumele persoanei
+- **Ce sa introduceti**: Prenumele persoanei
 - **Exemple**: Maria, Alexandru, Elena
-- **Restricții**: Minimum 2 caractere, maximum 50
-- **Validare**: Se verifică automat că nu este gol
+- **Restrictii**: Minimum 2 caractere, maximum 50
+- **Validare**: Se verifica automat ca nu este gol
 
 #### 📧 Email (Obligatoriu)
-- **Ce să introduceți**: Adresa de email profesională
+- **Ce sa introduceti**: Adresa de email profesionala
 - **Exemple**: maria.popescu@valyanmed.ro, doctor.ionescu@gmail.com
-- **Restricții**: Trebuie să aibă format valid de email
-- **Validare**: Se verifică că nu este deja folosită de altcineva
+- **Restrictii**: Trebuie sa aiba format valid de email
+- **Validare**: Se verifica ca nu este deja folosita de altcineva
 
-#### 📱 Telefon (Opțional)
-- **Ce să introduceți**: Numărul de telefon pentru contact
+#### 📱 Telefon (Optional)
+- **Ce sa introduceti**: Numarul de telefon pentru contact
 - **Exemple**: 0723456789, +40723456789, 0373123456
-- **Restricții**: Format românesc valid
-- **Validare**: Se verifică formatul dacă este completat
+- **Restrictii**: Format romanesc valid
+- **Validare**: Se verifica formatul daca este completat
 
 ### Sfaturi pentru completare
 
 #### ✅ Bune practici:
-- **Folosiți** nume complete și corecte din punct de vedere ortografic
-- **Verificați** că email-ul este corect înainte de salvare
-- **Folosiți email-uri profesionale** când este posibil
-- **Introduceți** numărul de telefon pentru situații urgente
+- **Folositi** nume complete si corecte din punct de vedere ortografic
+- **Verificati** ca email-ul este corect inainte de salvare
+- **Folositi email-uri profesionale** cand este posibil
+- **Introduceti** numarul de telefon pentru situatii urgente
 
-#### ❌ Ce să evitați:
-- **Nu folosiți** prescurtări pentru nume (ex: "Alex" în loc de "Alexandru")
-- **Nu folosiți** email-uri personale pentru posturi importante
-- **Nu lăsați** câmpurile obligatorii goale
-- **Nu introduceți** date false pentru testare
+#### ❌ Ce sa evitati:
+- **Nu folositi** prescurtari pentru nume (ex: "Alex" in loc de "Alexandru")
+- **Nu folositi** email-uri personale pentru posturi importante
+- **Nu lasati** campurile obligatorii goale
+- **Nu introduceti** date false pentru testare
 
 ---
 
-## Secțiunea "Informații Cont"
+## Sectiunea "Informatii Cont"
 
-### Câmpurile disponibile
+### Campurile disponibile
 
 #### 👤 Username (Obligatoriu)
-- **Ce să introduceți**: Numele de utilizator pentru conectare
+- **Ce sa introduceti**: Numele de utilizator pentru conectare
 - **Exemple**: maria.popescu, doctor.ionescu, asistent.elena
-- **Restricții**: Trebuie să fie unic în sistem
-- **Convenții**: Recomandăm formatul nume.prenume
+- **Restrictii**: Trebuie sa fie unic in sistem
+- **Conventii**: Recomandam formatul nume.prenume
 
-#### 🎭 Rol în Sistem (Obligatoriu)
-- **Ce să alegeți**: Rolul principal al utilizatorului
-- **Opțiuni disponibile**:
+#### 🎭 Rol in Sistem (Obligatoriu)
+- **Ce sa alegeti**: Rolul principal al utilizatorului
+- **Optiuni disponibile**:
   - **Administrator** - Control total asupra sistemului
-  - **Medic** - Acces la funcții medicale și pacienți  
-  - **Asistent Medical** - Asistență medicală și înregistrări
-  - **Recepționer** - Gestionarea programărilor și primirii pacienților
-  - **Manager** - Supraveghere și raportări departamentale
+  - **Medic** - Acces la functii medicale si pacienti  
+  - **Asistent Medical** - Asistenta medicala si inregistrari
+  - **Receptioner** - Gestionarea programarilor si primirii pacientilor
+  - **Manager** - Supraveghere si raportari departamentale
   - **Operator** - Utilizator cu acces limitat
 
-#### ✅ Status (Opțional)
-- **Valoarea implicită**: Activ
-- **Opțiuni disponibile**:
+#### ✅ Status (Optional)
+- **Valoarea implicita**: Activ
+- **Optiuni disponibile**:
   - **Activ** - Utilizatorul se poate conecta normal
   - **Inactiv** - Contul este temporar dezactivat
   - **Suspendat** - Contul este blocat temporar
   - **Blocat** - Contul este blocat din motive de securitate
 
-### Înțelegerea rolurilor
+### intelegerea rolurilor
 
 #### 👑 Administrator
 - **Pentru cine**: Personal IT, manageri superiori
-- **Ce poate face**: Tot ce este disponibil în sistem
-- **Responsabilități**: Gestionarea completă a sistemului
-- **Atenție**: Acordați cu grijă, doar personalului de încredere
+- **Ce poate face**: Tot ce este disponibil in sistem
+- **Responsabilitati**: Gestionarea completa a sistemului
+- **Atentie**: Acordati cu grija, doar personalului de incredere
 
 #### 👨‍⚕️ Medic  
-- **Pentru cine**: Medici de toate specialitățile
-- **Ce poate face**: Consultații, prescripții, fișe medicale
-- **Responsabilități**: Îngrijirea pacienților și documentația medicală
+- **Pentru cine**: Medici de toate specialitatile
+- **Ce poate face**: Consultatii, prescriptii, fise medicale
+- **Responsabilitati**: ingrijirea pacientilor si documentatia medicala
 - **Permisiuni**: Acces la toate datele medicale
 
 #### 👩‍⚕️ Asistent Medical
 - **Pentru cine**: Asistente medicale, infirmiere
-- **Ce poate face**: Asistența medicală, înregistrări vitale
-- **Responsabilități**: Suportul în activitatea medicală
-- **Restricții**: Nu poate prescrie medicamente
+- **Ce poate face**: Asistenta medicala, inregistrari vitale
+- **Responsabilitati**: Suportul in activitatea medicala
+- **Restrictii**: Nu poate prescrie medicamente
 
-#### 📞 Recepționer
-- **Pentru cine**: Personalul de la recepție
-- **Ce poate face**: Programări, înregistrarea pacienților
-- **Responsabilități**: Primul contact cu pacienții
-- **Restricții**: Nu are acces la datele medicale
+#### 📞 Receptioner
+- **Pentru cine**: Personalul de la receptie
+- **Ce poate face**: Programari, inregistrarea pacientilor
+- **Responsabilitati**: Primul contact cu pacientii
+- **Restrictii**: Nu are acces la datele medicale
 
 ---
 
-## Secțiunea "Informații Organizaționale"
+## Sectiunea "Informatii Organizationale"
 
-### Câmpurile disponibile
+### Campurile disponibile
 
-#### 🏢 Departament (Opțional)
-- **Ce să alegeți**: Departamentul unde lucrează persoana
-- **Exemple**: Cardiologie, Chirurgie, Radiologie, Administrație
-- **Funcționalitate**: Lista se încarcă dinamic cu departamentele active
-- **Căutare**: Puteți căuta rapid în lista departamentelor
+#### 🏢 Departament (Optional)
+- **Ce sa alegeti**: Departamentul unde lucreaza persoana
+- **Exemple**: Cardiologie, Chirurgie, Radiologie, Administratie
+- **Functionalitate**: Lista se incarca dinamic cu departamentele active
+- **Cautare**: Puteti cauta rapid in lista departamentelor
 
-#### 💼 Funcția (Opțional)
-- **Ce să introduceți**: Postul específic ocupat
+#### 💼 Functia (Optional)
+- **Ce sa introduceti**: Postul específic ocupat
 - **Exemple**: "Medic Specialist Cardiologie", "Asistent Medical Chirurgie"
-- **Format liber**: Puteți introduce orice descriere relevantă
-- **Sfat**: Fiți cât mai specifici pentru claritate
+- **Format liber**: Puteti introduce orice descriere relevanta
+- **Sfat**: Fiti cat mai specifici pentru claritate
 
-### Importanța informațiilor organizaționale
+### Importanta informatiilor organizationale
 
 #### De ce sunt importante:
 - **Organizarea** personalului pe departamente
-- **Raportările** pe structura organizațională  
+- **Raportarile** pe structura organizationala  
 - **Permisiunile** bazate pe departament
-- **Comunicarea** internă eficientă
+- **Comunicarea** interna eficienta
 
-#### Cum să le completați corect:
-- **Verificați** că departamentul este correct
-- **Consultați** organigramele existente
-- **Folosiți** denumiri oficiale pentru funcții
-- **Actualizați** la schimbări organizaționale
+#### Cum sa le completati corect:
+- **Verificati** ca departamentul este correct
+- **Consultati** organigramele existente
+- **Folositi** denumiri oficiale pentru functii
+- **Actualizati** la schimbari organizationale
 
 ---
 
-## Validarea și Mesajele de Eroare
+## Validarea si Mesajele de Eroare
 
-### Validarea în timp real
+### Validarea in timp real
 
-Pe măsură ce completați formularul, sistemul verifică datele și afișează:
-- **Bife verzi** ✅ pentru câmpurile corecte
-- **X-uri roșii** ❌ pentru câmpurile cu probleme
-- **Mesaje explicative** sub fiecare câmp cu probleme
+Pe masura ce completati formularul, sistemul verifica datele si afiseaza:
+- **Bife verzi** ✅ pentru campurile corecte
+- **X-uri rosii** ❌ pentru campurile cu probleme
+- **Mesaje explicative** sub fiecare camp cu probleme
 
 ### Mesajele de eroare comune
 
-#### Pentru câmpurile obligatorii:
-- ❌ **"Numele este obligatoriu"** - Nu ați completat numele
-- ❌ **"Prenumele este obligatoriu"** - Nu ați completat prenumele  
-- ❌ **"Email-ul este obligatoriu"** - Nu ați completat email-ul
-- ❌ **"Username-ul este obligatoriu"** - Nu ați completat username-ul
+#### Pentru campurile obligatorii:
+- ❌ **"Numele este obligatoriu"** - Nu ati completat numele
+- ❌ **"Prenumele este obligatoriu"** - Nu ati completat prenumele  
+- ❌ **"Email-ul este obligatoriu"** - Nu ati completat email-ul
+- ❌ **"Username-ul este obligatoriu"** - Nu ati completat username-ul
 
 #### Pentru formatul datelor:
 - ❌ **"Format email invalid"** - Email-ul nu are formatul corect
-- ❌ **"Format telefon invalid"** - Telefonul nu are format românesc
-- ❌ **"Numele nu poate depăși 50 de caractere"** - Textul este prea lung
+- ❌ **"Format telefon invalid"** - Telefonul nu are format romanesc
+- ❌ **"Numele nu poate depasi 50 de caractere"** - Textul este prea lung
 
 #### Pentru unicitate:
-- ❌ **"Acest username este deja utilizat"** - Alt utilizator folosește același username
-- ❌ **"Acest email este deja înregistrat"** - Alt utilizator folosește același email
+- ❌ **"Acest username este deja utilizat"** - Alt utilizator foloseste acelasi username
+- ❌ **"Acest email este deja inregistrat"** - Alt utilizator foloseste acelasi email
 
 ### Rezolvarea erorilor
 
-#### Pași pentru corectare:
-1. **Citiți cu atenție** mesajul de eroare
-2. **Corectați** datele în câmpul indicat
-3. **Așteptați** să dispară mesajul de eroare
-4. **Continuați** cu completarea formularului
-5. **Salvați** doar când toate erorile sunt rezolvate
+#### Pasi pentru corectare:
+1. **Cititi cu atentie** mesajul de eroare
+2. **Corectati** datele in campul indicat
+3. **Asteptati** sa dispara mesajul de eroare
+4. **Continuati** cu completarea formularului
+5. **Salvati** doar cand toate erorile sunt rezolvate
 
 ---
 
-## Salvarea și Anularea
+## Salvarea si Anularea
 
 ### Butoanele din josul formularului
 
 #### 💾 Butonul de salvare
 **Pentru utilizatori noi**:
-- **Textul**: "Creează Utilizatorul"  
+- **Textul**: "Creeaza Utilizatorul"  
 - **Culoarea**: Albastru (buton principal)
-- **Funcția**: Salvează utilizatorul nou în sistem
+- **Functia**: Salveaza utilizatorul nou in sistem
 
-**Pentru utilizatori existenți**:
-- **Textul**: "Actualizează Utilizatorul"
+**Pentru utilizatori existenti**:
+- **Textul**: "Actualizeaza Utilizatorul"
 - **Culoarea**: Albastru (buton principal)  
-- **Funcția**: Salvează modificările făcute
+- **Functia**: Salveaza modificarile facute
 
 #### ❌ Butonul de anulare
-- **Textul**: "Anulează"
+- **Textul**: "Anuleaza"
 - **Culoarea**: Gri (buton secundar)
-- **Funcția**: Închide formularul fără salvare
+- **Functia**: inchide formularul fara salvare
 
 ### Procesul de salvare
 
-#### Ce se întâmplă când apăsați "Salvează":
-1. **Validarea finală** - Sistemul verifică încă o dată toate datele
-2. **Afișarea "Se salvează..."** - Indicatorul de progres apare
-3. **Trimiterea datelor** - Informațiile sunt trimise la server
-4. **Confirmarea** - Primiți un mesaj de succes sau eroare
-5. **Închiderea automată** - Formularul se închide la succes
-6. **Actualizarea listei** - Lista de utilizatori se reîncarcă
+#### Ce se intampla cand apasati "Salveaza":
+1. **Validarea finala** - Sistemul verifica inca o data toate datele
+2. **Afisarea "Se salveaza..."** - Indicatorul de progres apare
+3. **Trimiterea datelor** - Informatiile sunt trimise la server
+4. **Confirmarea** - Primiti un mesaj de succes sau eroare
+5. **inchiderea automata** - Formularul se inchide la succes
+6. **Actualizarea listei** - Lista de utilizatori se reincarca
 
-#### În caz de eroare la salvare:
-- **Mesajul de eroare** va apărea în partea de sus a formularului
-- **Formularul rămâne deschis** pentru corectări
+#### in caz de eroare la salvare:
+- **Mesajul de eroare** va aparea in partea de sus a formularului
+- **Formularul ramane deschis** pentru corectari
 - **Datele introduse** nu se pierd
-- **Corectați problemele** și încercați din nou
+- **Corectati problemele** si incercati din nou
 
-### Anularea modificărilor
+### Anularea modificarilor
 
-#### Când să folosiți "Anulează":
-- **Nu mai doriți** să faceți modificări
-- **Ați făcut greșeli** și vreți să reluați
-- **V-ați răzgândit** privind crearea utilizatorului
-- **Formularul nu funcționează** corect
+#### Cand sa folositi "Anuleaza":
+- **Nu mai doriti** sa faceti modificari
+- **Ati facut greseli** si vreti sa reluati
+- **V-ati razgandit** privind crearea utilizatorului
+- **Formularul nu functioneaza** corect
 
-#### Ce se întâmplă la anulare:
-- **Toate modificările** se pierd (nu se salvează)
-- **Formularul se închide** imediat  
-- **Reveniți** la lista de utilizatori
-- **Datele originale** rămân neschimbate (la editare)
+#### Ce se intampla la anulare:
+- **Toate modificarile** se pierd (nu se salveaza)
+- **Formularul se inchide** imediat  
+- **Reveniti** la lista de utilizatori
+- **Datele originale** raman neschimbate (la editare)
 
 ---
 
@@ -284,157 +284,157 @@ Pe măsură ce completați formularul, sistemul verifică datele și afișează:
 
 ### Editarea propriului cont
 
-#### Ce puteți modifica:
-- ✅ **Informațiile de contact** (telefon, email)
-- ✅ **Informațiile organizaționale** (dacă aveți drepturi)
+#### Ce puteti modifica:
+- ✅ **Informatiile de contact** (telefon, email)
+- ✅ **Informatiile organizationale** (daca aveti drepturi)
 
-#### Ce NU puteți modifica:
-- ❌ **Propriul rol** în sistem
+#### Ce NU puteti modifica:
+- ❌ **Propriul rol** in sistem
 - ❌ **Propriul status** (activ/inactiv)
-- ❌ **Username-ul** (în majoritatea cazurilor)
+- ❌ **Username-ul** (in majoritatea cazurilor)
 
 ### Editarea utilizatorilor cu rol superior
 
-#### Restricții pentru administratori:
-- **Alți administratori** pot fi editați doar de super-administratori
+#### Restrictii pentru administratori:
+- **Alti administratori** pot fi editati doar de super-administratori
 - **Propriile permisiuni** nu pot fi reduse
-- **Conturile de sistem** pot avea restricții speciale
+- **Conturile de sistem** pot avea restrictii speciale
 
 #### Mesaje de avertizare:
-- ⚠️ **"Nu aveți permisiuni pentru a modifica acest rol"**
-- ⚠️ **"Nu puteți modifica un utilizator cu drepturi superioare"**
+- ⚠️ **"Nu aveti permisiuni pentru a modifica acest rol"**
+- ⚠️ **"Nu puteti modifica un utilizator cu drepturi superioare"**
 
 ### Editarea utilizatorilor inactivi
 
 #### Pentru utilizatori inactivi:
-- **Toate câmpurile** pot fi editare în mod normal
+- **Toate campurile** pot fi editare in mod normal
 - **Statusul** poate fi schimbat la "Activ" pentru reactivare
-- **Validările** sunt identice cu cele pentru utilizatori activi
+- **Validarile** sunt identice cu cele pentru utilizatori activi
 
 ---
 
-## Sfaturi pentru Eficiență
+## Sfaturi pentru Eficienta
 
-### Pentru crearea în masă
+### Pentru crearea in masa
 
-#### Dacă aveți mulți utilizatori de adăugat:
-1. **Pregătiți o listă** cu toate datele necesare
-2. **Folosiți convenții** consistente pentru username-uri
-3. **Verificați email-urile** înainte să începeți
-4. **Lucrați** departament cu departament
-5. **Testați primul utilizator** complet înainte să continuați
+#### Daca aveti multi utilizatori de adaugat:
+1. **Pregatiti o lista** cu toate datele necesare
+2. **Folositi conventii** consistente pentru username-uri
+3. **Verificati email-urile** inainte sa incepeti
+4. **Lucrati** departament cu departament
+5. **Testati primul utilizator** complet inainte sa continuati
 
-### Pentru modificări în grup
+### Pentru modificari in grup
 
-#### Dacă trebuie să schimbați același lucru la mai mulți utilizatori:
-1. **Notați utilizatorii** care au nevoie de modificare
-2. **Faceți modificările** una câte una
-3. **Verificați rezultatele** după fiecare modificare
-4. **Documentați schimbările** importante
+#### Daca trebuie sa schimbati acelasi lucru la mai multi utilizatori:
+1. **Notati utilizatorii** care au nevoie de modificare
+2. **Faceti modificarile** una cate una
+3. **Verificati rezultatele** dupa fiecare modificare
+4. **Documentati schimbarile** importante
 
 ### Pentru organizare
 
-#### Păstrarea unei organizări coerente:
-- **Username-uri**: Folosiți același format (nume.prenume)
-- **Email-uri**: Preferați adresele profesionale
-- **Funcții**: Folosiți denumiri oficiale din organigrame
-- **Departamente**: Mențineți lista actualizată
+#### Pastrarea unei organizari coerente:
+- **Username-uri**: Folositi acelasi format (nume.prenume)
+- **Email-uri**: Preferati adresele profesionale
+- **Functii**: Folositi denumiri oficiale din organigrame
+- **Departamente**: Mentineti lista actualizata
 
 ---
 
 ## Depanarea Problemelor
 
-### Probleme frecvente și soluții
+### Probleme frecvente si solutii
 
-#### "Formularul nu se încarcă"
+#### "Formularul nu se incarca"
 **Cauze posibile**:
-- Conexiune slabă la internet
+- Conexiune slaba la internet
 - Probleme de permisiuni
-- Eroare temporară de server
+- Eroare temporara de server
 
-**Soluții**:
-1. Reîmprospătați pagina (F5)
-2. Verificați conexiunea la internet
-3. Deconectați-vă și conectați-vă din nou
-4. Contactați suportul tehnic
+**Solutii**:
+1. Reimprospatati pagina (F5)
+2. Verificati conexiunea la internet
+3. Deconectati-va si conectati-va din nou
+4. Contactati suportul tehnic
 
-#### "Nu pot să salvez datele"
+#### "Nu pot sa salvez datele"
 **Cauze posibile**:
-- Câmpuri obligatorii necompletate
-- Date în format greșit
+- Campuri obligatorii necompletate
+- Date in format gresit
 - Username sau email deja folosite
 - Probleme de permisiuni
 
-**Soluții**:
-1. Verificați toate mesajele de eroare roșii
-2. Corectați câmpurile marcate cu erori  
-3. Încercați username sau email diferite
-4. Verificați că aveți dreptul să creați/modificați utilizatori
+**Solutii**:
+1. Verificati toate mesajele de eroare rosii
+2. Corectati campurile marcate cu erori  
+3. incercati username sau email diferite
+4. Verificati ca aveti dreptul sa creati/modificati utilizatori
 
-#### "Formularele merg încet"
+#### "Formularele merg incet"
 **Cauze posibile**:
-- Multe aplicații deschise simultan
+- Multe aplicatii deschise simultan
 - Browser vechi sau cu multe tab-uri
 - Cache plin
 
-**Soluții**:
-1. Închideți tab-urile și aplicațiile neufolositoare
-2. Curățați cache-ul browserului
-3. Folosiți un browser mai nou
-4. Restartați browserul
+**Solutii**:
+1. inchideti tab-urile si aplicatiile neufolositoare
+2. Curatati cache-ul browserului
+3. Folositi un browser mai nou
+4. Restartati browserul
 
 ---
 
-## Întrebări Frecvente
+## intrebari Frecvente
 
-### 1. Pot să creez utilizatori fără email?
-**Răspuns:** Nu, email-ul este obligatoriu pentru toate conturile. Este folosit pentru comunicări și recuperarea parolei.
+### 1. Pot sa creez utilizatori fara email?
+**Raspuns:** Nu, email-ul este obligatoriu pentru toate conturile. Este folosit pentru comunicari si recuperarea parolei.
 
-### 2. Ce se întâmplă cu parola pentru utilizatorii noi?
-**Răspuns:** Sistemul generează automat o parolă temporară care este trimisă pe email. Utilizatorul va trebui să o schimbe la prima conectare.
+### 2. Ce se intampla cu parola pentru utilizatorii noi?
+**Raspuns:** Sistemul genereaza automat o parola temporara care este trimisa pe email. Utilizatorul va trebui sa o schimbe la prima conectare.
 
-### 3. Pot să modific rolul unui utilizator în orice moment?
-**Răspuns:** Da, dacă aveți permisiuni pentru ambele roluri (cel vechi și cel nou). Modificarea este imediată.
+### 3. Pot sa modific rolul unui utilizator in orice moment?
+**Raspuns:** Da, daca aveti permisiuni pentru ambele roluri (cel vechi si cel nou). Modificarea este imediata.
 
-### 4. Ce fac dacă introduc din greșeală un email greșit?
-**Răspuns:** Editați utilizatorul și corectați email-ul. Dacă utilizatorul nou nu și-a setat încă parola, nu va fi afectat.
+### 4. Ce fac daca introduc din greseala un email gresit?
+**Raspuns:** Editati utilizatorul si corectati email-ul. Daca utilizatorul nou nu si-a setat inca parola, nu va fi afectat.
 
-### 5. Pot să creez utilizatori cu același nume și prenume?
-**Răspuns:** Da, dar username-ul și email-ul trebuie să fie diferite. Sistemul distinge utilizatorii după username.
+### 5. Pot sa creez utilizatori cu acelasi nume si prenume?
+**Raspuns:** Da, dar username-ul si email-ul trebuie sa fie diferite. Sistemul distinge utilizatorii dupa username.
 
-### 6. De ce nu văd toate departamentele în listă?
-**Răspuns:** Sunt afișate doar departamentele active și pentru care aveți permisiuni de asignare a personalului.
+### 6. De ce nu vad toate departamentele in lista?
+**Raspuns:** Sunt afisate doar departamentele active si pentru care aveti permisiuni de asignare a personalului.
 
 ---
 
 ## Lista de Verificare
 
-### Înainte de a crea un utilizator nou:
+### inainte de a crea un utilizator nou:
 
-- [ ] **Am toate informațiile** necesare despre persoană
-- [ ] **Am verificat** că persoana chiar lucrează în clinică
-- [ ] **Am stabilit rolul corect** pentru funcția lor
-- [ ] **Am verificat** că email-ul și username-ul sunt unice
-- [ ] **Am ales departamentul** și funcția corecte
+- [ ] **Am toate informatiile** necesare despre persoana
+- [ ] **Am verificat** ca persoana chiar lucreaza in clinica
+- [ ] **Am stabilit rolul corect** pentru functia lor
+- [ ] **Am verificat** ca email-ul si username-ul sunt unice
+- [ ] **Am ales departamentul** si functia corecte
 
-### Înainte de a edita un utilizator:
+### inainte de a edita un utilizator:
 
-- [ ] **Am confirmat** că modificările sunt autorizate
-- [ ] **Am verificat** impactul schimbării de rol (dacă aplicabil)
-- [ ] **Am informat utilizatorul** despre modificări (dacă e relevant)
-- [ ] **Am backup** la informațiile importante (dacă e necesar)
+- [ ] **Am confirmat** ca modificarile sunt autorizate
+- [ ] **Am verificat** impactul schimbarii de rol (daca aplicabil)
+- [ ] **Am informat utilizatorul** despre modificari (daca e relevant)
+- [ ] **Am backup** la informatiile importante (daca e necesar)
 
-### După salvare:
+### Dupa salvare:
 
-- [ ] **Am verificat** că utilizatorul apare corect în listă
+- [ ] **Am verificat** ca utilizatorul apare corect in lista
 - [ ] **Am testat** conectarea (pentru utilizatori noi)
-- [ ] **Am informat utilizatorul** despre cont și date de conectare
-- [ ] **Am documentat** modificările importante
+- [ ] **Am informat utilizatorul** despre cont si date de conectare
+- [ ] **Am documentat** modificarile importante
 
 ---
 
-*Acest ghid vă ajută să utilizați eficient formularele de adăugare și editare a utilizatorilor. Pentru probleme specifice sau întrebări tehnice, contactați echipa de suport.*
+*Acest ghid va ajuta sa utilizati eficient formularele de adaugare si editare a utilizatorilor. Pentru probleme specifice sau intrebari tehnice, contactati echipa de suport.*
 
 **Versiune document:** 1.0  
-**Data actualizării:** Septembrie 2025  
+**Data actualizarii:** Septembrie 2025  
 **Autor:** Echipa ValyanMed

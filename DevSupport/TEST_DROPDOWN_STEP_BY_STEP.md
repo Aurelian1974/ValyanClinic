@@ -1,18 +1,18 @@
-﻿# 🔍 PAȘI DE DEBUGGING PENTRU DROPDOWN-URILE LOCATION
+﻿# 🔍 PAsI DE DEBUGGING PENTRU DROPDOWN-URILE LOCATION
 
-## ✅ **Ce am implementat în logging:**
+## ✅ **Ce am implementat in logging:**
 
-### **1. Logging în componente:**
-- `AdministrarePersonal.razor.cs` - când se deschide modalul
-- `AdaugaEditezaPersonal.razor.cs` - când se inițializează formularul  
-- `LocationDependentGridDropdowns.razor.cs` - când se inițializează componenta
-- `LocationDependentState.cs` - când se încarcă datele
-- `LocationService.cs` - când se apelează repository
-- `JudetRepository.cs` - când se execută query-urile database
+### **1. Logging in componente:**
+- `AdministrarePersonal.razor.cs` - cand se deschide modalul
+- `AdaugaEditezaPersonal.razor.cs` - cand se initializeaza formularul  
+- `LocationDependentGridDropdowns.razor.cs` - cand se initializeaza componenta
+- `LocationDependentState.cs` - cand se incarca datele
+- `LocationService.cs` - cand se apeleaza repository
+- `JudetRepository.cs` - cand se executa query-urile database
 
 ### **2. Fluxul complet de logging:**
 ```
-📱 User click "Adaugă Personal" 
+📱 User click "Adauga Personal" 
    ↓ 🚀 ShowAddPersonalModal called
    ↓ 📝 Modal state set - IsAddEditModalVisible: true
    ↓ 🚀 AdaugaEditezaPersonal OnInitializedAsync started  
@@ -27,25 +27,25 @@
    ↓ 🎉 LocationDependentGridDropdowns initialized successfully! Judete count: 42
 ```
 
-## 🎯 **PAȘII DE TESTARE:**
+## 🎯 **PAsII DE TESTARE:**
 
-### **1. Pornește aplicația cu logging:**
+### **1. Porneste aplicatia cu logging:**
 ```powershell
 cd "D:\Projects\CMS\ValyanClinic"
 dotnet run --environment Development
 ```
 
-### **2. Accesează browserul:**
+### **2. Acceseaza browserul:**
 - Deschide `https://localhost:7164`
 - **NU naviga direct la /administrare/personal**
-- Folosește meniul pentru a ajunge la pagina
+- Foloseste meniul pentru a ajunge la pagina
 
-### **3. Testează fluxul complet:**
-1. **Homepage** → Click pe "Personal" în meniu
-2. **Lista Personal** → Click pe "Adaugă Personal" (butonul din header)
-3. **Urmărește logurile** în consola PowerShell
+### **3. Testeaza fluxul complet:**
+1. **Homepage** → Click pe "Personal" in meniu
+2. **Lista Personal** → Click pe "Adauga Personal" (butonul din header)
+3. **Urmareste logurile** in consola PowerShell
 
-## 📋 **Log-uri de succes așteptate:**
+## 📋 **Log-uri de succes asteptate:**
 
 ```
 🚀 ShowAddPersonalModal called - Opening add personal modal
@@ -87,12 +87,12 @@ dotnet run --environment Development
 💥 Error showing add personal modal
 ```
 
-2. **Formular nu se inițializează:**  
+2. **Formular nu se initializeaza:**  
 ```
 💥 CRITICAL ERROR initializing LocationDependentGridDropdowns
 ```
 
-3. **Service nu funcționează:**
+3. **Service nu functioneaza:**
 ```
 💥 FATAL ERROR in LocationService.GetAllJudeteAsync()
 ```
@@ -103,18 +103,18 @@ dotnet run --environment Development
 📊 Direct table count: 0 judete in Judete table
 ```
 
-## 🆘 **Ce faci dacă nu vezi loguri:**
+## 🆘 **Ce faci daca nu vezi loguri:**
 
-### **Verifică dacă se ajunge la pagina:**
-- Dacă nu vezi `🚀 ShowAddPersonalModal called` → problema e în UI/navigație
-- Dacă nu vezi `🚀 AdaugaEditezaPersonal OnInitializedAsync` → problema e în modal
-- Dacă nu vezi `🚀 LocationDependentGridDropdowns initializing` → problema e în render
+### **Verifica daca se ajunge la pagina:**
+- Daca nu vezi `🚀 ShowAddPersonalModal called` → problema e in UI/navigatie
+- Daca nu vezi `🚀 AdaugaEditezaPersonal OnInitializedAsync` → problema e in modal
+- Daca nu vezi `🚀 LocationDependentGridDropdowns initializing` → problema e in render
 
-### **Verifică dacă e problemă de bază de date:**
+### **Verifica daca e problema de baza de date:**
 ```sql 
--- Testează direct în SQL Server
+-- Testeaza direct in SQL Server
 SELECT COUNT(*) FROM Judete;
 EXEC sp_Judete_GetOrderedByName;
 ```
 
-**Acum rulează testarea și trimite-mi exact log-urile pe care le vezi!** 🎯
+**Acum ruleaza testarea si trimite-mi exact log-urile pe care le vezi!** 🎯

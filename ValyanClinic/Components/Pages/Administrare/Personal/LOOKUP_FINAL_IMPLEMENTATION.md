@@ -1,8 +1,8 @@
-﻿# ✅ LOOKUP-URI JUDEȚ-LOCALITATE ÎN CARDURILE DE ADRESE - IMPLEMENTARE FINALĂ
+﻿# ✅ LOOKUP-URI JUDEt-LOCALITATE iN CARDURILE DE ADRESE - IMPLEMENTARE FINALa
 
-## 🎯 **PROBLEMA REZOLVATĂ**
+## 🎯 **PROBLEMA REZOLVATa**
 
-Lookup-urile pentru Județ și Localitate sunt acum perfect implementate în cardurile de adrese folosind componenta reutilizabilă `LocationDependentDropdowns`.
+Lookup-urile pentru Judet si Localitate sunt acum perfect implementate in cardurile de adrese folosind componenta reutilizabila `LocationDependentDropdowns`.
 
 ---
 
@@ -12,25 +12,25 @@ Lookup-urile pentru Județ și Localitate sunt acum perfect implementate în car
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 📍 Adresa de Domiciliu                                      │
-│ [Adresa completă - text multiline]                          │
+│ [Adresa completa - text multiline]                          │
 ├─────────────────────────┬───────────────────────────────────┤
-│ Județ Domiciliu *       │ Localitate Domiciliu *            │
-│ [Dropdown Județ]        │ [Dropdown Localitate]             │
+│ Judet Domiciliu *       │ Localitate Domiciliu *            │
+│ [Dropdown Judet]        │ [Dropdown Localitate]             │
 ├─────────────────────────┼───────────────────────────────────┤
 │ Cod Postal Domiciliu    │                                   │
 ├─────────────────────────┴───────────────────────────────────┤
-│ ☑ Adresa de domiciliu este identică cu cea de reședință    │
+│ ☑ Adresa de domiciliu este identica cu cea de resedinta    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### **✅ Card "Adresa de Resedinta" (dacă checkbox NU este bifat):**
+### **✅ Card "Adresa de Resedinta" (daca checkbox NU este bifat):**
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 🏠 Adresa de Resedinta                                      │
-│ [Adresa completă - text multiline]                          │
+│ [Adresa completa - text multiline]                          │
 ├─────────────────────────┬───────────────────────────────────┤
-│ Județ Reședință         │ Localitate Reședință              │
-│ [Dropdown Județ]        │ [Dropdown Localitate]             │
+│ Judet Resedinta         │ Localitate Resedinta              │
+│ [Dropdown Judet]        │ [Dropdown Localitate]             │
 ├─────────────────────────┼───────────────────────────────────┤
 │ Cod Postal Resedinta    │                                   │
 └─────────────────────────┴───────────────────────────────────┘
@@ -38,71 +38,71 @@ Lookup-urile pentru Județ și Localitate sunt acum perfect implementate în car
 
 ---
 
-## ⚡ **COMPONENTA FOLOSITĂ**
+## ⚡ **COMPONENTA FOLOSITa**
 
-### **`LocationDependentDropdowns` - Componenta Reutilizabilă**
+### **`LocationDependentDropdowns` - Componenta Reutilizabila**
 
-**Layout Responsive în 2 Coloane:**
-- **Desktop (≥768px):** Județ și Localitate afișate în 2 coloane alăturate
-- **Mobile (<768px):** Județ și Localitate afișate vertical (o coloană)
+**Layout Responsive in 2 Coloane:**
+- **Desktop (≥768px):** Judet si Localitate afisate in 2 coloane alaturate
+- **Mobile (<768px):** Judet si Localitate afisate vertical (o coloana)
 
 **Features Premium:**
-- ✅ **Lookup Dependent:** Selectează județul → se încarcă localitățile
-- ✅ **Loading Indicators:** "Se încarcă județele..." / "Se încarcă localitățile..."
-- ✅ **Help Text:** "Selectați mai întâi județul" când localitate e disabled
-- ✅ **Error Handling:** Afișare vizuală a erorilor de încărcare
-- ✅ **Filtrare Live:** Căutare în timp real în ambele dropdown-uri
-- ✅ **Auto-Reset:** Schimbarea județului resetează automat localitatea
+- ✅ **Lookup Dependent:** Selecteaza judetul → se incarca localitatile
+- ✅ **Loading Indicators:** "Se incarca judetele..." / "Se incarca localitatile..."
+- ✅ **Help Text:** "Selectati mai intai judetul" cand localitate e disabled
+- ✅ **Error Handling:** Afisare vizuala a erorilor de incarcare
+- ✅ **Filtrare Live:** Cautare in timp real in ambele dropdown-uri
+- ✅ **Auto-Reset:** Schimbarea judetului reseteaza automat localitatea
 
 ---
 
 ## 🔄 **LOGICA CHECKBOX-ULUI**
 
-### **Checkbox: "Adresa de domiciliu este identică cu cea de reședință"**
+### **Checkbox: "Adresa de domiciliu este identica cu cea de resedinta"**
 
 **Comportament:**
 - ✅ **Bifat** → Card "Adresa de Resedinta" ASCUNS
 - ❌ **Nebifat** → Card "Adresa de Resedinta" VIZIBIL
 
-**Utilizare Tipică:**
-1. **Majoritatea cazurilor:** Checkbox bifat (domiciliu = reședință)
+**Utilizare Tipica:**
+1. **Majoritatea cazurilor:** Checkbox bifat (domiciliu = resedinta)
 2. **Cazuri speciale:** Checkbox nebifat (adrese diferite)
 
 ---
 
-## 💻 **IMPLEMENTAREA TEHNICĂ**
+## 💻 **IMPLEMENTAREA TEHNICa**
 
-### **Sintaxă în Card Domiciliu:**
+### **Sintaxa in Card Domiciliu:**
 ```razor
 <LocationDependentDropdowns 
     SelectedJudetId="@selectedJudetDomiciliuId"
     SelectedJudetIdChanged="@((int? value) => selectedJudetDomiciliuId = value)"
     SelectedLocalitateId="@selectedLocalitateDomiciliuId"
     SelectedLocalitateIdChanged="@((int? value) => selectedLocalitateDomiciliuId = value)"
-    JudetLabel="Județ Domiciliu *"
+    JudetLabel="Judet Domiciliu *"
     LocalitateLabel="Localitate Domiciliu *"
-    JudetPlaceholder="-- Selectează județul --"
-    LocalitatePlaceholder="-- Selectează localitatea --"
+    JudetPlaceholder="-- Selecteaza judetul --"
+    LocalitatePlaceholder="-- Selecteaza localitatea --"
     OnJudetNameChanged="@OnJudetDomiciliuNameChanged"
     OnLocalitateNameChanged="@OnLocalitateDomiciliuNameChanged" />
 ```
 
-### **Sintaxă în Card Reședință:**
+### **Sintaxa in Card Resedinta:**
 ```razor
 <LocationDependentDropdowns 
     SelectedJudetId="@selectedJudetResedintaId"
     SelectedJudetIdChanged="@((int? value) => selectedJudetResedintaId = value)"
     SelectedLocalitateId="@selectedLocalitateResedintaId"
     SelectedLocalitateIdChanged="@((int? value) => selectedLocalitateResedintaId = value)"
-    JudetLabel="Județ Reședință"
-    LocalitateLabel="Localitate Reședință"
-    JudetPlaceholder="-- Selectează județul --"
-    LocalitatePlaceholder="-- Selectează localitatea --"
+    JudetLabel="Judet Resedinta"
+    LocalitateLabel="Localitate Resedinta"
+    JudetPlaceholder="-- Selecteaza judetul --"
+    LocalitatePlaceholder="-- Selecteaza localitatea --"
     OnJudetNameChanged="@OnJudetResedintaNameChanged"
     OnLocalitateNameChanged="@OnLocalitateResedintaNameChanged" />
 ```
 
-### **Sintaxă Checkbox:**
+### **Sintaxa Checkbox:**
 ```razor
 <SfCheckBox @bind-Checked="@showResedintaSection" 
           Label="Adresa de domiciliu este identica cu cea de resedinta"
@@ -112,43 +112,43 @@ Lookup-urile pentru Județ și Localitate sunt acum perfect implementate în car
 
 ---
 
-## 🎨 **EXPERIENȚA UTILIZATOR**
+## 🎨 **EXPERIENtA UTILIZATOR**
 
 ### **Flow Natural:**
 ```
-1. User completează "Adresa Domiciliu"
+1. User completeaza "Adresa Domiciliu"
    ↓
-2. User selectează "Județ Domiciliu" → Se încarcă localitățile
+2. User selecteaza "Judet Domiciliu" → Se incarca localitatile
    ↓  
-3. User selectează "Localitate Domiciliu"
+3. User selecteaza "Localitate Domiciliu"
    ↓
-4. User adaugă "Cod Postal Domiciliu" (opțional)
+4. User adauga "Cod Postal Domiciliu" (optional)
    ↓
 5. User decide:
-   • Bifează checkbox → Gata! (adrese identice)
-   • NU bifează → Se afișează cardul "Adresa de Resedinta"
+   • Bifeaza checkbox → Gata! (adrese identice)
+   • NU bifeaza → Se afiseaza cardul "Adresa de Resedinta"
 ```
 
 ### **Flow pentru Adrese Diferite:**
 ```
-6. User completează "Adresa Resedinta"
+6. User completeaza "Adresa Resedinta"
    ↓
-7. User selectează "Județ Recensământ" → Se încarcă localitățile
+7. User selecteaza "Judet Recensamant" → Se incarca localitatile
    ↓
-8. User selectează "Localitate Recensământ"
+8. User selecteaza "Localitate Recensamant"
    ↓
-9. User adaugă "Cod Postal Resedinta" → Salvare completă
+9. User adauga "Cod Postal Resedinta" → Salvare completa
 ```
 
 ---
 
 ## 🏗️ **ARHITECTURA COMPONENTELOR**
 
-### **Fișierele Folosite:**
+### **Fisierele Folosite:**
 ```
 📁 ValyanClinic/Components/Shared/
 ├── 📄 LocationDependentDropdowns.razor       # UI cu 2 coloane
-├── 📄 LocationDependentDropdowns.razor.cs    # Logică și event handling
+├── 📄 LocationDependentDropdowns.razor.cs    # Logica si event handling
 ├── 📄 LocationDependentState.cs              # State management
 └── 📁 wwwroot/css/components/
     └── 📄 location-dependent-dropdowns.css   # Stiluri responsive
@@ -167,13 +167,13 @@ LocationService → LocationRepository → Database
 
 ---
 
-## ⚡ **PERFORMANȚA**
+## ⚡ **PERFORMANtA**
 
 | Metric | Valoare |
 |--------|---------|
 | **Build Status** | ✅ SUCCESS (0 erori) |
-| **Județe Încărcare** | ~100ms (42 județe) |
-| **Localități Încărcare** | ~200ms (~671 localități/județ) |
+| **Judete incarcare** | ~100ms (42 judete) |
+| **Localitati incarcare** | ~200ms (~671 localitati/judet) |
 | **Responsive Layout** | ✅ Perfect pe toate device-urile |
 | **Memory Usage** | ✅ Optimizat cu IDisposable |
 
@@ -183,18 +183,18 @@ LocationService → LocationRepository → Database
 
 ### **✅ IMPLEMENTAREA ESTE PRODUCTION READY!**
 
-**Toate cerințele îndeplinite:**
+**Toate cerintele indeplinite:**
 
-1. ✅ **Lookup-uri în cardul Domiciliu** - cu componenta reutilizabilă
-2. ✅ **Layout în 2 coloane** - Județ | Localitate (responsive)
-3. ✅ **Checkbox pentru reședință** - readăugat și funcțional
-4. ✅ **Lookup-uri în cardul Reședință** - când e vizibil
-5. ✅ **Componenta reutilizabilă** - LocationDependentDropdowns
-6. ✅ **UX Premium** - loading, erori, help text, animații
+1. ✅ **Lookup-uri in cardul Domiciliu** - cu componenta reutilizabila
+2. ✅ **Layout in 2 coloane** - Judet | Localitate (responsive)
+3. ✅ **Checkbox pentru resedinta** - readaugat si functional
+4. ✅ **Lookup-uri in cardul Resedinta** - cand e vizibil
+5. ✅ **Componenta reutilizabila** - LocationDependentDropdowns
+6. ✅ **UX Premium** - loading, erori, help text, animatii
 
 ### **🚀 GATA PENTRU UTILIZARE!**
 
-Formularul are acum lookup-urile complete pentru județ și localitate în ambele carduri de adrese, cu checkbox funcțional și layout responsive în 2 coloane! 🎯
+Formularul are acum lookup-urile complete pentru judet si localitate in ambele carduri de adrese, cu checkbox functional si layout responsive in 2 coloane! 🎯
 
 ---
 

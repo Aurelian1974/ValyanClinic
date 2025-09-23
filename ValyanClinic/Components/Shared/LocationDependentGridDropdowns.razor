@@ -3,7 +3,7 @@
 @rendermode InteractiveServer
 @implements IDisposable
 
-<!-- Layout integrat în grid-ul formularului - două coloane separate -->
+<!-- Layout integrat in grid-ul formularului - doua coloane separate -->
 <div class="form-field">
     <label>@JudetLabel</label>
     <SfDropDownList TItem="Judet" 
@@ -24,7 +24,7 @@
     {
         <div class="loading-indicator">
             <i class="fas fa-spinner fa-spin"></i>
-            <span>Se încarcă județele...</span>
+            <span>Se incarca judetele...</span>
         </div>
     }
 </div>
@@ -49,7 +49,7 @@
     {
         <div class="loading-indicator">
             <i class="fas fa-spinner fa-spin"></i>
-            <span>Se încarcă localitățile...</span>
+            <span>Se incarca localitatile...</span>
         </div>
     }
     
@@ -57,12 +57,12 @@
     {
         <div class="help-text">
             <i class="fas fa-info-circle"></i>
-            <span>Selectați mai întâi județul</span>
+            <span>Selectati mai intai judetul</span>
         </div>
     }
 </div>
 
-@* Afișare eroare dacă există - pe toată lățimea *@
+@* Afisare eroare daca exista - pe toata latimea *@
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
     <div class="form-field full-width">

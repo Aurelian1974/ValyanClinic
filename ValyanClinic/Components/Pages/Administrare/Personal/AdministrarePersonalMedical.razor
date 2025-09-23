@@ -44,7 +44,7 @@
                     Administrare Personal Medical
                 </h1>
                 <p class="personal-medical-page-subtitle">
-                    Gestioneaza personalul medical - doctori, asistente și specialiști medicali
+                    Gestioneaza personalul medical - doctori, asistente si specialisti medicali
                 </p>
             </div>
             
@@ -223,7 +223,7 @@
               CssClass="personal-medical-dialog detail-dialog"
               AnimationSettings="@DialogAnimation">
         
-        @* TOAST ÎN MODAL *@
+        @* TOAST iN MODAL *@
         <SfToast @ref="ModalToastRef" 
                  Title="Personal Medical Details" 
                  Target=".personal-medical-dialog" 
@@ -252,14 +252,14 @@
                         <p>Personal medical details will be displayed here when VizualizeazaPersonalMedical component is created.</p>
                         
                         <div class="personal-medical-details">
-                            <p><strong>Poziție:</strong> @_state.SelectedPersonalMedical.Pozitie?.GetDisplayName()</p>
+                            <p><strong>Pozitie:</strong> @_state.SelectedPersonalMedical.Pozitie?.GetDisplayName()</p>
                             <p><strong>Specializare:</strong> @_state.SelectedPersonalMedical.Specializare</p>
-                            <p><strong>Nr. Licență:</strong> @_state.SelectedPersonalMedical.NumarLicenta</p>
+                            <p><strong>Nr. Licenta:</strong> @_state.SelectedPersonalMedical.NumarLicenta</p>
                             <p><strong>Email:</strong> @_state.SelectedPersonalMedical.Email</p>
                             <p><strong>Telefon:</strong> @_state.SelectedPersonalMedical.Telefon</p>
                             <p><strong>Departament:</strong> @_state.SelectedPersonalMedical.DepartamentDisplay</p>
                             <p><strong>Status:</strong> @(_state.SelectedPersonalMedical.EsteActiv ? "Activ" : "Inactiv")</p>
-                            <p><strong>Data Creării:</strong> @_state.SelectedPersonalMedical.DataCreare.ToString("dd.MM.yyyy")</p>
+                            <p><strong>Data Crearii:</strong> @_state.SelectedPersonalMedical.DataCreare.ToString("dd.MM.yyyy")</p>
                         </div>
                     </div>
                 }

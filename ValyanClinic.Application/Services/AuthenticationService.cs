@@ -7,7 +7,7 @@ namespace ValyanClinic.Application.Services;
 
 /// <summary>
 /// Rich Authentication Service cu business logic
-/// Înlocuiește simple pass-through cu domain operations
+/// inlocuieste simple pass-through cu domain operations
 /// </summary>
 public interface IAuthenticationService
 {
@@ -26,7 +26,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly ISecurityAuditService _auditService;
     private readonly ILogger<AuthenticationService> _logger;
     
-    // În-memory storage pentru demo - în production ar fi database
+    // in-memory storage pentru demo - in production ar fi database
     private static readonly Dictionary<string, int> _loginAttempts = new();
     private static readonly Dictionary<string, DateTime> _lockoutTimes = new();
     
@@ -64,8 +64,8 @@ public class AuthenticationService : IAuthenticationService
             {
                 var remainingTime = await GetLockoutTimeRemainingAsync(request.Username);
                 var message = remainingTime.HasValue 
-                    ? $"Cont blocat temporar. Încercați din nou în {Math.Ceiling(remainingTime.Value.TotalMinutes)} minute."
-                    : "Cont blocat din cauza prea multor încercări.";
+                    ? $"Cont blocat temporar. incercati din nou in {Math.Ceiling(remainingTime.Value.TotalMinutes)} minute."
+                    : "Cont blocat din cauza prea multor incercari.";
                 
                 _logger.LogWarning("Locked account attempt for user: {Username}", request.Username);
                 await _auditService.LogLockedAccountAttemptAsync(request.Username);
@@ -106,7 +106,7 @@ public class AuthenticationService : IAuthenticationService
         {
             _logger.LogError(ex, "System error during authentication for user: {Username}", request.Username);
             await _auditService.LogSystemErrorAsync(request.Username, ex);
-            return LoginResult.Failure("A apărut o eroare la autentificare. Vă rugăm să încercați din nou.", LoginFailureReason.SystemError);
+            return LoginResult.Failure("A aparut o eroare la autentificare. Va rugam sa incercati din nou.", LoginFailureReason.SystemError);
         }
     }
 
@@ -125,10 +125,10 @@ public class AuthenticationService : IAuthenticationService
             // Business rules validation
             if (!userSession.IsActive)
             {
-                return LoginResult.Failure("Contul este inactiv. Contactați administratorul.", LoginFailureReason.AccountDisabled);
+                return LoginResult.Failure("Contul este inactiv. Contactati administratorul.", LoginFailureReason.AccountDisabled);
             }
             
-            return LoginResult.Success(userSession, "Autentificare reușită!");
+            return LoginResult.Success(userSession, "Autentificare reusita!");
         }
 
         return LoginResult.Failure("Numele de utilizator sau parola sunt incorecte.", LoginFailureReason.InvalidCredentials);
@@ -219,7 +219,7 @@ public interface IUserSessionService
 }
 
 /// <summary>
-/// Service pentru audit și logging securitate
+/// Service pentru audit si logging securitate
 /// </summary>
 public interface ISecurityAuditService
 {
@@ -230,7 +230,7 @@ public interface ISecurityAuditService
     Task LogSystemErrorAsync(string username, Exception exception);
 }
 
-// Implementări simple pentru demo
+// Implementari simple pentru demo
 public class UserSessionService : IUserSessionService
 {
     private static readonly Dictionary<string, UserSession> _activeSessions = new();
@@ -254,7 +254,7 @@ public class UserSessionService : IUserSessionService
     {
         await Task.CompletedTask;
         
-        // Pentru testare: acceptă și token-ul de test
+        // Pentru testare: accepta si token-ul de test
         if (sessionToken == "test-session-token")
         {
             _logger.LogInformation("Test session token accepted");

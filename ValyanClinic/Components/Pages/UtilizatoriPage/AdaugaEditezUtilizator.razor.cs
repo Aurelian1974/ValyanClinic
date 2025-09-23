@@ -84,7 +84,7 @@ public partial class AdaugaEditezUtilizator : ComponentBase
         catch (Exception ex)
         {
             HasError = true;
-            ErrorMessage = $"Eroare la înc?rcarea datelor: {ex.Message}";
+            ErrorMessage = $"Eroare la incrcarea datelor: {ex.Message}";
         }
         finally
         {
@@ -140,7 +140,7 @@ public partial class AdaugaEditezUtilizator : ComponentBase
             UserRole.Administrator => "Administrator",
             UserRole.Doctor => "Doctor",
             UserRole.Nurse => "Asistent Medical",
-            UserRole.Receptionist => "Recep?ioner",
+            UserRole.Receptionist => "Recepioner",
             UserRole.Manager => "Manager",
             UserRole.Operator => "Operator",
             _ => role.ToString()

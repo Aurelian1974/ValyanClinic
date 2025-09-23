@@ -96,10 +96,10 @@ public static class DepartamentMedicalExtensions
 
         var cleanType = departament.Tip.ToLowerInvariant()
             .Replace(" ", "-")
-            .Replace("ă", "a")
-            .Replace("î", "i")
-            .Replace("ș", "s")
-            .Replace("ț", "t");
+            .Replace("a", "a")
+            .Replace("i", "i")
+            .Replace("s", "s")
+            .Replace("t", "t");
 
         return $"{prefix}-{cleanType}";
     }

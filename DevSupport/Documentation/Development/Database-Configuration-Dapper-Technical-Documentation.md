@@ -199,7 +199,7 @@ catch (Exception ex)
 
 **Blazor Server Security:**
 ```csharp
-// Connection string DOAR pe server - NICIODATĂ nu ajunge la client
+// Connection string DOAR pe server - NICIODATa nu ajunge la client
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 ```
 
@@ -392,7 +392,7 @@ public async Task<Result<User>> CreateUserAsync(User user)
     }
     catch (SqlException ex) when (ex.Number == 2627) // Duplicate key
     {
-        return Result<User>.Failure("Un utilizator cu acest email există deja.");
+        return Result<User>.Failure("Un utilizator cu acest email exista deja.");
     }
     catch (SqlException ex)
     {
@@ -402,7 +402,7 @@ public async Task<Result<User>> CreateUserAsync(User user)
     catch (Exception ex)
     {
         _logger.LogError(ex, "Unexpected error creating user: {Email}", user.Email);
-        return Result<User>.Failure("Eroare neașteptată la crearea utilizatorului.");
+        return Result<User>.Failure("Eroare neasteptata la crearea utilizatorului.");
     }
 }
 ```
@@ -523,9 +523,9 @@ public class RomanianNameValidator : AbstractValidator<string>
     {
         RuleFor(name => name)
             .NotEmpty().WithMessage("Numele este obligatoriu")
-            .Length(2, 50).WithMessage("Numele trebuie să aibă între 2 și 50 de caractere")
-            .Matches("^[a-zA-ZăâîșțĂÂÎȘȚ\\s-]+$")
-            .WithMessage("Numele poate conține doar litere românești, spații și cratime");
+            .Length(2, 50).WithMessage("Numele trebuie sa aiba intre 2 si 50 de caractere")
+            .Matches("^[a-zA-Zaaistaaist\\s-]+$")
+            .WithMessage("Numele poate contine doar litere romanesti, spatii si cratime");
     }
 }
 ```

@@ -17,7 +17,7 @@ public partial class VizualizeazaPersonal : ComponentBase
     [Parameter] public Guid? PersonalId { get; set; }
     [Parameter] public PersonalModel? PersonalData { get; set; }
     
-    // CALLBACK PENTRU TOAST ÎN MODAL - SOLUȚIA PENTRU TOAST BLURAT
+    // CALLBACK PENTRU TOAST iN MODAL - SOLUtIA PENTRU TOAST BLURAT
     [Parameter] public EventCallback<(string Title, string Message, string CssClass)> OnToastMessage { get; set; }
 
     // UI State Properties - SIMILAR CU VizualizeazUtilizator
@@ -34,7 +34,7 @@ public partial class VizualizeazaPersonal : ComponentBase
                 IsLoading = true;
                 PersonalData = await PersonalService.GetPersonalByIdAsync(PersonalId.Value);
                 
-                // Toast de success pentru încărcarea datelor
+                // Toast de success pentru incarcarea datelor
                 if (OnToastMessage.HasDelegate && PersonalData != null)
                 {
                     await OnToastMessage.InvokeAsync(("Succes", "Datele au fost incarcate cu succes", "e-toast-success"));
@@ -70,7 +70,7 @@ public partial class VizualizeazaPersonal : ComponentBase
                 HasError = false;
                 ErrorMessage = string.Empty;
                 
-                // Toast de success pentru încărcarea datelor
+                // Toast de success pentru incarcarea datelor
                 if (OnToastMessage.HasDelegate && PersonalData != null)
                 {
                     await OnToastMessage.InvokeAsync(("Succes", "Datele au fost incarcate cu succes", "e-toast-success"));

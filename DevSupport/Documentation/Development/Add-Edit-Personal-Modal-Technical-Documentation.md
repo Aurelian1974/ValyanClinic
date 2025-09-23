@@ -19,7 +19,7 @@ add-edit-user.css                    # Component-specific styling
 - **UI Components**: Syncfusion Blazor Enterprise Suite
 - **Validation**: FluentValidation + Real-time CNP validation
 - **Form Model**: PersonalFormModel with full data binding
-- **Lookup System**: Dynamic dependent dropdowns (Județ → Localitate)
+- **Lookup System**: Dynamic dependent dropdowns (Judet → Localitate)
 
 ## 🔧 Core Implementation
 
@@ -122,7 +122,7 @@ private async Task GenerateNextCodAngajatAsync()
         
         await ToastService.ShowInfoAsync(
             "Cod Angajat Generat", 
-            $"Următorul cod disponibil: {nextCode}");
+            $"Urmatorul cod disponibil: {nextCode}");
     }
     catch (Exception ex)
     {
@@ -134,7 +134,7 @@ private async Task GenerateNextCodAngajatAsync()
         
         await ToastService.ShowWarningAsync(
             "Avertisment", 
-            "Nu s-a putut genera automat codul. Utilizați codul generat temporar și verificați manual.");
+            "Nu s-a putut genera automat codul. Utilizati codul generat temporar si verificati manual.");
     }
 }
 ```
@@ -186,7 +186,7 @@ private (bool IsValid, string ErrorMessage) ValidateCNPComplete(string cnp)
         
         if (controlDigit != actualControlDigit)
         {
-            return (false, $"Cifra de control incorectă: așteptată {controlDigit}, găsită {actualControlDigit}");
+            return (false, $"Cifra de control incorecta: asteptata {controlDigit}, gasita {actualControlDigit}");
         }
         
         // 2. Century and gender determination
@@ -201,23 +201,23 @@ private (bool IsValid, string ErrorMessage) ValidateCNPComplete(string cnp)
             3 or 4 => 1800 + cnpYear,  // Born 1800-1899 (rare)
             5 or 6 => 2000 + cnpYear,  // Born 2000-2099
             7 or 8 => 2000 + cnpYear,  // Foreign residents born 2000-2099
-            _ => throw new ArgumentException($"Prima cifră CNP invalidă: {firstDigit}")
+            _ => throw new ArgumentException($"Prima cifra CNP invalida: {firstDigit}")
         };
         
         // 3. Date validation
         var currentYear = DateTime.Now.Year;
         if (fullYear < 1940 || fullYear > currentYear)
-            return (false, $"Anul calculat din CNP nu este în intervalul acceptat (1940-{currentYear}): {fullYear}");
+            return (false, $"Anul calculat din CNP nu este in intervalul acceptat (1940-{currentYear}): {fullYear}");
         
         if (cnpMonth < 1 || cnpMonth > 12)
-            return (false, $"Luna din CNP nu este validă: {cnpMonth}");
+            return (false, $"Luna din CNP nu este valida: {cnpMonth}");
         
         try
         {
             var birthDate = new DateTime(fullYear, cnpMonth, cnpDay);
             
             if (birthDate.Date > DateTime.Today)
-                return (false, "Data nașterii calculată este în viitor");
+                return (false, "Data nasterii calculata este in viitor");
             
             // Age validation for employees
             var age = DateTime.Today.Year - birthDate.Year;
@@ -225,16 +225,16 @@ private (bool IsValid, string ErrorMessage) ValidateCNPComplete(string cnp)
                 age--;
             
             if (age < 16)
-                return (false, $"Vârsta calculată este prea mică pentru un angajat: {age} ani");
+                return (false, $"Varsta calculata este prea mica pentru un angajat: {age} ani");
             
             if (age > 80)
-                return (false, $"Vârsta calculată nu este rezonabilă: {age} ani");
+                return (false, $"Varsta calculata nu este rezonabila: {age} ani");
             
             return (true, "CNP valid");
         }
         catch (ArgumentOutOfRangeException)
         {
-            return (false, $"Ziua {cnpDay} nu este validă pentru luna {cnpMonth}/{fullYear}");
+            return (false, $"Ziua {cnpDay} nu este valida pentru luna {cnpMonth}/{fullYear}");
         }
     }
     catch (Exception ex) when (ex is not ArgumentException)
@@ -280,13 +280,13 @@ private async Task CalculateAndUpdateBirthDate()
             {
                 // Default date - update automatically
                 shouldUpdate = true;
-                updateReason = "automat (dată implicită)";
+                updateReason = "automat (data implicita)";
             }
             else if (Math.Abs((currentBirthDate.Date - newBirthDate.Date).TotalDays) > 30)
             {
                 // Significant difference - update with notification
                 shouldUpdate = true;
-                updateReason = "calculat din CNP (diferența mare față de data existentă)";
+                updateReason = "calculat din CNP (diferenta mare fata de data existenta)";
             }
             
             if (shouldUpdate)
@@ -294,14 +294,14 @@ private async Task CalculateAndUpdateBirthDate()
                 var oldDate = personalFormModel.Data_Nasterii.ToString("dd.MM.yyyy");
                 personalFormModel.Data_Nasterii = newBirthDate;
                 
-                Logger.LogInformation("✅ Data nașterii actualizată {Reason}: {OldDate} → {NewDate}", 
+                Logger.LogInformation("✅ Data nasterii actualizata {Reason}: {OldDate} → {NewDate}", 
                     updateReason, oldDate, newBirthDate.ToString("dd.MM.yyyy"));
                 
-                if (updateReason.Contains("diferența mare"))
+                if (updateReason.Contains("diferenta mare"))
                 {
                     await ToastService.ShowSuccessAsync(
-                        "Data nașterii actualizată", 
-                        $"Calculată din CNP: {oldDate} → {newBirthDate.ToString("dd.MM.yyyy")}");
+                        "Data nasterii actualizata", 
+                        $"Calculata din CNP: {oldDate} → {newBirthDate.ToString("dd.MM.yyyy")}");
                 }
                 
                 StateHasChanged();
@@ -346,8 +346,8 @@ private async Task OnLocalitateDomiciliuNameChanged(string? localitateName)
     OnLocalitateNameChanged="@OnLocalitateDomiciliuNameChanged"
     OnJudetIdChanged="@((int? id) => selectedJudetDomiciliuId = id)"
     OnLocalitateIdChanged="@((int? id) => selectedLocalitateDomiciliuId = id)"
-    JudetLabel="Județul de domiciliu"
-    LocalitateLabel="Orașul/Comuna de domiciliu"
+    JudetLabel="Judetul de domiciliu"
+    LocalitateLabel="Orasul/Comuna de domiciliu"
     IsRequired="true" />
 
 <!-- Residence Address (Conditional) -->
@@ -361,8 +361,8 @@ private async Task OnLocalitateDomiciliuNameChanged(string? localitateName)
         OnLocalitateNameChanged="@OnLocalitateResedintaNameChanged"
         OnJudetIdChanged="@((int? id) => selectedJudetResedintaId = id)"
         OnLocalitateIdChanged="@((int? id) => selectedLocalitateResedintaId = id)"
-        JudetLabel="Județul de reședință"
-        LocalitateLabel="Orașul/Comuna de reședință"
+        JudetLabel="Judetul de resedinta"
+        LocalitateLabel="Orasul/Comuna de resedinta"
         IsRequired="false" />
 }
 ```
@@ -375,7 +375,7 @@ private async Task OnLocalitateDomiciliuNameChanged(string? localitateName)
 <div class="add-edit-user-form-section">
     <h3 class="add-edit-user-section-title">
         <i class="fas fa-id-card"></i>
-        Informații Generale
+        Informatii Generale
     </h3>
     <div class="add-edit-user-form-row">
         <!-- Employee Code (Auto-generated, Read-only) -->
@@ -384,14 +384,14 @@ private async Task OnLocalitateDomiciliuNameChanged(string? localitateName)
                 Cod Angajat <span class="add-edit-user-required">*</span>
             </label>
             <SfTextBox @bind-Value="@personalFormModel.Cod_Angajat"
-                      Placeholder="Se generează automat"
+                      Placeholder="Se genereaza automat"
                       Width="100%"
                       Readonly="true"
                       CssClass="cod-angajat-readonly">
             </SfTextBox>
             <div class="cod-angajat-info">
                 <i class="fas fa-info-circle"></i>
-                <span>Codul se generează automat la salvare</span>
+                <span>Codul se genereaza automat la salvare</span>
             </div>
         </div>
 
@@ -413,7 +413,7 @@ private async Task OnLocalitateDomiciliuNameChanged(string? localitateName)
             {
                 <div class="cnp-validating-indicator">
                     <i class="fas fa-spinner fa-spin"></i>
-                    <span>Se validează CNP-ul...</span>
+                    <span>Se valideaza CNP-ul...</span>
                 </div>
             }
             
@@ -435,12 +435,12 @@ private async Task OnLocalitateDomiciliuNameChanged(string? localitateName)
 <div class="add-edit-user-form-section">
     <h3 class="add-edit-user-section-title">
         <i class="fas fa-briefcase"></i>
-        Informații Profesionale
+        Informatii Profesionale
     </h3>
     <div class="add-edit-user-form-row">
         <div class="add-edit-user-form-group">
             <label class="add-edit-user-form-label">
-                Funcția <span class="add-edit-user-required">*</span>
+                Functia <span class="add-edit-user-required">*</span>
             </label>
             <SfTextBox @bind-Value="@personalFormModel.Functia"
                       Placeholder="Administrator, Contabil, etc."
@@ -455,7 +455,7 @@ private async Task OnLocalitateDomiciliuNameChanged(string? localitateName)
             <SfDropDownList TItem="DropdownOption<Departament>" TValue="Departament?"
                            DataSource="@departmentOptions"
                            @bind-Value="@personalFormModel.Departament"
-                           Placeholder="Selectează departamentul"
+                           Placeholder="Selecteaza departamentul"
                            Width="100%">
                 <DropDownListFieldSettings Text="Text" Value="Value" />
             </SfDropDownList>
@@ -604,7 +604,7 @@ private void OnResedintaCheckboxChanged(ChangeEventArgs args)
                    checked="@showResedintaSection"
                    @onchange="OnResedintaCheckboxChanged">
             <label class="form-check-label" for="resedinta-different">
-                Adresa de reședință diferă de cea de domiciliu
+                Adresa de resedinta difera de cea de domiciliu
             </label>
         </div>
     </div>
@@ -661,8 +661,8 @@ private string GetCNPFieldCssClass()
 private async Task ShowValidationSuccessToast()
 {
     await ToastService.ShowSuccessAsync(
-        "Validare reușită", 
-        "Toate câmpurile sunt completate corect");
+        "Validare reusita", 
+        "Toate campurile sunt completate corect");
 }
 
 private async Task ShowSaveSuccessToast(string personalName)

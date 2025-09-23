@@ -26,7 +26,7 @@ public interface IPersonalService
     Task<PersonalValidationResult> ValidatePersonalAsync(Personal personal, bool isUpdate = false);
     
     /// <summary>
-    /// Generează următorul cod de angajat disponibil (EMP001, EMP002, etc.)
+    /// Genereaza urmatorul cod de angajat disponibil (EMP001, EMP002, etc.)
     /// </summary>
     Task<string> GetNextCodAngajatAsync();
 }

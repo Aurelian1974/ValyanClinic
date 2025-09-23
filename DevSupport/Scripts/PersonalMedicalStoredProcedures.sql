@@ -1,6 +1,6 @@
 -- =============================================
 -- Stored Procedures pentru tabela PersonalMedical
--- CRUD operations cu rela?ii c?tre tabela Departamente
+-- CRUD operations cu relaii ctre tabela Departamente
 -- =============================================
 
 -- =============================================
@@ -169,7 +169,7 @@ BEGIN
 END;
 
 -- =============================================
--- SP pentru ob?inerea distribu?iei personalului medical pe departamente
+-- SP pentru obinerea distribuiei personalului medical pe departamente
 -- Folosit pentru statisticile din AdministrarePersonalMedical
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_PersonalMedical_GetDistributiePerDepartament]
@@ -187,7 +187,7 @@ BEGIN
 END;
 
 -- =============================================
--- SP pentru ob?inerea distribu?iei personalului medical pe specializ?ri
+-- SP pentru obinerea distribuiei personalului medical pe specializri
 -- Folosit pentru statisticile din AdministrarePersonalMedical
 -- =============================================
 CREATE OR ALTER PROCEDURE [dbo].[sp_PersonalMedical_GetDistributiePerSpecializare]

@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 namespace ValyanClinic.Core.Components;
 
 /// <summary>
-/// Implementare simplificată pentru memory leak prevention în Blazor components
-/// Focus pe Syncfusion components disposal și state persistence
+/// Implementare simplificata pentru memory leak prevention in Blazor components
+/// Focus pe Syncfusion components disposal si state persistence
 /// </summary>
 public abstract class BaseDisposableComponent : ComponentBase, IAsyncDisposable
 {
@@ -18,7 +18,7 @@ public abstract class BaseDisposableComponent : ComponentBase, IAsyncDisposable
     protected bool _disposed = false;
 
     /// <summary>
-    /// Safe StateHasChanged care verifică disposal
+    /// Safe StateHasChanged care verifica disposal
     /// </summary>
     protected void SafeStateHasChanged()
     {
@@ -40,7 +40,7 @@ public abstract class BaseDisposableComponent : ComponentBase, IAsyncDisposable
     }
 
     /// <summary>
-    /// Cleanup specific pentru componenta curentă
+    /// Cleanup specific pentru componenta curenta
     /// </summary>
     protected virtual ValueTask DisposeComponentAsync()
     {
@@ -70,7 +70,7 @@ public abstract class BaseDisposableComponent : ComponentBase, IAsyncDisposable
 }
 
 /// <summary>
-/// Base class simplificată pentru pagini cu DataGrid
+/// Base class simplificata pentru pagini cu DataGrid
 /// </summary>
 public abstract class BaseDataGridPage<TItem> : BaseDisposableComponent where TItem : class
 {

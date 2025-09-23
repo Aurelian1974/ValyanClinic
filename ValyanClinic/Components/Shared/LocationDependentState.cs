@@ -5,8 +5,8 @@ using Microsoft.Extensions.Logging;
 namespace ValyanClinic.Components.Shared;
 
 /// <summary>
-/// State management pentru lookup-urile dependente Județ-Localitate
-/// ZERO cod de business în markup - doar state pure
+/// State management pentru lookup-urile dependente Judet-Localitate
+/// ZERO cod de business in markup - doar state pure
 /// </summary>
 public class LocationDependentState
 {
@@ -34,7 +34,7 @@ public class LocationDependentState
     }
 
     /// <summary>
-    /// Încarcă județele la inițializarea componentei
+    /// incarca judetele la initializarea componentei
     /// </summary>
     public async Task InitializeAsync()
     {
@@ -44,7 +44,7 @@ public class LocationDependentState
         
         _logger.LogInformation("📊 After LoadJudeteAsync - Judete count: {Count}", Judete.Count);
         
-        // Dacă avem un județ pre-selectat, încarcă localitățile
+        // Daca avem un judet pre-selectat, incarca localitatile
         if (SelectedJudetId.HasValue && SelectedJudetId > 0)
         {
             _logger.LogInformation("🔄 Pre-selected judet found: {JudetId}, loading localitati...", SelectedJudetId);
@@ -59,7 +59,7 @@ public class LocationDependentState
     }
 
     /// <summary>
-    /// Încarcă județele din baza de date
+    /// incarca judetele din baza de date
     /// </summary>
     public async Task LoadJudeteAsync()
     {
@@ -91,7 +91,7 @@ public class LocationDependentState
         catch (Exception ex)
         {
             _logger.LogError(ex, "💥 CRITICAL ERROR loading judete from LocationService");
-            ErrorMessage = "Eroare la încărcarea județelor";
+            ErrorMessage = "Eroare la incarcarea judetelor";
             Judete = new List<Judet>();
         }
         finally
@@ -104,7 +104,7 @@ public class LocationDependentState
     }
 
     /// <summary>
-    /// Încarcă localitățile pentru un județ specificat
+    /// incarca localitatile pentru un judet specificat
     /// </summary>
     public async Task LoadLocalitatiAsync(int judetId)
     {
@@ -122,7 +122,7 @@ public class LocationDependentState
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading localitati for judet {JudetId}", judetId);
-            ErrorMessage = "Eroare la încărcarea localităților";
+            ErrorMessage = "Eroare la incarcarea localitatilor";
             Localitati = new List<Localitate>();
         }
         finally
@@ -133,7 +133,7 @@ public class LocationDependentState
     }
 
     /// <summary>
-    /// Schimbă județul selectat și resetează localitatea
+    /// Schimba judetul selectat si reseteaza localitatea
     /// </summary>
     public async Task ChangeJudetAsync(int? judetId, string? judetName)
     {
@@ -143,11 +143,11 @@ public class LocationDependentState
             SelectedLocalitateId = null; // Reset localitate
             Localitati.Clear(); // Clear localitati pentru vizualizare
 
-            // Notifică schimbarea numelui de județ
+            // Notifica schimbarea numelui de judet
             JudetNameChanged?.Invoke(judetName);
-            LocalitateNameChanged?.Invoke(null); // Reset numele localității
+            LocalitateNameChanged?.Invoke(null); // Reset numele localitatii
 
-            // Încarcă localitățile pentru noul județ
+            // incarca localitatile pentru noul judet
             if (judetId.HasValue && judetId > 0)
             {
                 await LoadLocalitatiAsync(judetId.Value);
@@ -158,13 +158,13 @@ public class LocationDependentState
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error changing judet to {JudetId}", judetId);
-            ErrorMessage = "Eroare la schimbarea județului";
+            ErrorMessage = "Eroare la schimbarea judetului";
             NotifyStateChanged();
         }
     }
 
     /// <summary>
-    /// Schimbă localitatea selectată
+    /// Schimba localitatea selectata
     /// </summary>
     public void ChangeLocalitate(int? localitateId, string? localitateName)
     {
@@ -183,7 +183,7 @@ public class LocationDependentState
     }
 
     /// <summary>
-    /// Setează județul pe baza numelui (pentru editare)
+    /// Seteaza judetul pe baza numelui (pentru editare)
     /// </summary>
     public async Task SetJudetByNameAsync(string? judetName)
     {
@@ -197,7 +197,7 @@ public class LocationDependentState
     }
 
     /// <summary>
-    /// Setează localitatea pe baza numelui (pentru editare)
+    /// Seteaza localitatea pe baza numelui (pentru editare)
     /// </summary>
     public void SetLocalitateByName(string? localitateName)
     {
@@ -211,7 +211,7 @@ public class LocationDependentState
     }
 
     /// <summary>
-    /// Resetează starea componentei
+    /// Reseteaza starea componentei
     /// </summary>
     public void Reset()
     {
@@ -223,7 +223,7 @@ public class LocationDependentState
     }
 
     /// <summary>
-    /// Notifică UI-ul despre schimbările de state
+    /// Notifica UI-ul despre schimbarile de state
     /// </summary>
     private void NotifyStateChanged()
     {

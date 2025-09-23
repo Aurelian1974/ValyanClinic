@@ -1,56 +1,56 @@
 ﻿# 🐛 DEBUGGING VIZUAL PENTRU DROPDOWN-URI
 
-## ✅ **Ce am făcut:**
+## ✅ **Ce am facut:**
 
-1. **Adăugat import în `_Imports.razor`:**
+1. **Adaugat import in `_Imports.razor`:**
    ```razor
    @using ValyanClinic.Components.Shared
    ```
 
-2. **Adăugat debug box în `LocationDependentGridDropdowns.razor`:**
-   - Box galben cu border roșu pentru a vedea dacă componenta se renderizează
-   - Afișează count-ul de județe și starea de loading
+2. **Adaugat debug box in `LocationDependentGridDropdowns.razor`:**
+   - Box galben cu border rosu pentru a vedea daca componenta se renderizeaza
+   - Afiseaza count-ul de judete si starea de loading
 
-## 🧪 **PAȘII DE TESTARE:**
+## 🧪 **PAsII DE TESTARE:**
 
-### **1. Accesează aplicația:**
+### **1. Acceseaza aplicatia:**
 - Browser: `https://localhost:7164`
-- Personal → Adaugă Personal
+- Personal → Adauga Personal
 
-### **2. Caută debug box-ul:**
-**Trebuie să vezi în secțiunea "Adresa de Domiciliu":**
+### **2. Cauta debug box-ul:**
+**Trebuie sa vezi in sectiunea "Adresa de Domiciliu":**
 
 ```
 🐛 DEBUG: LocationDependentGridDropdowns RENDERED
-Judete count: [număr] | IsLoadingJudete: [true/false]
+Judete count: [numar] | IsLoadingJudete: [true/false]
 ErrorMessage: [mesaj sau gol]
 ```
 
 ## 📊 **Scenarii posibile:**
 
 ### ✅ **SCENARIU 1: Debug box APARE**
-- **Înseamnă:** Componenta se renderizează
-- **Următorul pas:** Verifică de ce dropdown-urile nu sunt vizibile
-- **Ce să urmărești:** Count-ul de județe și mesajele de eroare
+- **inseamna:** Componenta se renderizeaza
+- **Urmatorul pas:** Verifica de ce dropdown-urile nu sunt vizibile
+- **Ce sa urmaresti:** Count-ul de judete si mesajele de eroare
 
 ### ❌ **SCENARIU 2: Debug box NU APARE**
-- **Înseamnă:** Componenta nu se renderizează deloc
+- **inseamna:** Componenta nu se renderizeaza deloc
 - **Probleme posibile:**
-  - Import lipsă în `_Imports.razor`
-  - Problema de namespace în `AdaugaEditezaPersonal.razor`
-  - Componenta nu se compilează
+  - Import lipsa in `_Imports.razor`
+  - Problema de namespace in `AdaugaEditezaPersonal.razor`
+  - Componenta nu se compileaza
 
 ### 🔄 **SCENARIU 3: Debug box apare dar "Judete count: 0"**
-- **Înseamnă:** Componenta se renderizează dar nu încarcă date
-- **Următorul pas:** Verifică logurile pentru erori de bază de date
+- **inseamna:** Componenta se renderizeaza dar nu incarca date
+- **Urmatorul pas:** Verifica logurile pentru erori de baza de date
 
-## 🎯 **TESTEAZĂ ACUM:**
+## 🎯 **TESTEAZa ACUM:**
 
 1. **Restart browser** (Ctrl+F5 pentru clear cache)
-2. **Navighează:** Personal → Adaugă Personal  
-3. **Scroll down** la secțiunea "Adresa de Domiciliu"
-4. **Caută box-ul galben/roșu de debug**
+2. **Navigheaza:** Personal → Adauga Personal  
+3. **Scroll down** la sectiunea "Adresa de Domiciliu"
+4. **Cauta box-ul galben/rosu de debug**
 
-**Spune-mi exact ce vezi în acel box de debug!** 
+**Spune-mi exact ce vezi in acel box de debug!** 
 
-Dacă nu vezi deloc box-ul, înseamnă că problema e în namespace sau componenta nu se găsește.
+Daca nu vezi deloc box-ul, inseamna ca problema e in namespace sau componenta nu se gaseste.

@@ -5,7 +5,7 @@ using PersonalMedicalModel = ValyanClinic.Domain.Models.PersonalMedical;
 namespace ValyanClinic.Components.Pages.Administrare.Personal;
 
 /// <summary>
-/// Models și helper classes pentru pagina PersonalMedical
+/// Models si helper classes pentru pagina PersonalMedical
 /// Similar cu PersonalModels dar adaptat pentru PersonalMedical cu departamente din DB
 /// </summary>
 public class PersonalMedicalModels
@@ -20,7 +20,7 @@ public class PersonalMedicalModels
     public List<FilterOption<bool?>> StatusFilterOptions { get; set; } = new();
     public List<string> ActivityPeriodOptions { get; } = new()
     {
-        "", "Ultima zi", "Ultima săptămână", "Ultima lună", "Ultimele 3 luni", "Ultimul an"
+        "", "Ultima zi", "Ultima saptamana", "Ultima luna", "Ultimele 3 luni", "Ultimul an"
     };
 
     public void SetPersonalMedical(List<PersonalMedicalModel> personalMedical)
@@ -37,7 +37,7 @@ public class PersonalMedicalModels
             new FilterOption<string?>(null, "Toate departamentele")
         };
 
-        // Grupează departamentele unice după nume
+        // Grupeaza departamentele unice dupa nume
         var uniqueDepartments = departamenteMedicale
             .Where(d => !string.IsNullOrWhiteSpace(d.Nume))
             .GroupBy(d => d.Nume)
@@ -49,10 +49,10 @@ public class PersonalMedicalModels
             DepartmentFilterOptions.Add(new FilterOption<string?>(dept.Nume, dept.DisplayName));
         }
 
-        // Poziție filter options - din enum-uri (singura excepție pentru PersonalMedical)
+        // Pozitie filter options - din enum-uri (singura exceptie pentru PersonalMedical)
         PozitieFilterOptions = new List<FilterOption<PozitiePersonalMedical?>>
         {
-            new FilterOption<PozitiePersonalMedical?>(null, "Toate pozițiile")
+            new FilterOption<PozitiePersonalMedical?>(null, "Toate pozitiile")
         };
 
         foreach (PozitiePersonalMedical pozitie in Enum.GetValues<PozitiePersonalMedical>())
@@ -94,7 +94,7 @@ public class PersonalMedicalModels
             filtered = filtered.Where(p => p.MatchesDepartament(state.SelectedDepartment));
         }
 
-        // Poziție filter
+        // Pozitie filter
         if (state.SelectedPozitie.HasValue)
         {
             filtered = filtered.Where(p => p.MatchesPozitie(state.SelectedPozitie));
@@ -117,7 +117,7 @@ public class PersonalMedicalModels
             PersonalID = Guid.NewGuid(),
             EsteActiv = true,
             DataCreare = DateTime.Now,
-            Pozitie = PozitiePersonalMedical.AsistentMedical // Poziție implicită
+            Pozitie = PozitiePersonalMedical.AsistentMedical // Pozitie implicita
         };
     }
 
@@ -146,7 +146,7 @@ public class PersonalMedicalModels
     }
 
     /// <summary>
-    /// Helper classes pentru filtrarea și afișarea datelor
+    /// Helper classes pentru filtrarea si afisarea datelor
     /// </summary>
     public class FilterOption<T>
     {
@@ -161,7 +161,7 @@ public class PersonalMedicalModels
     }
 
     /// <summary>
-    /// Metode helper pentru validări și business logic specifice medicale
+    /// Metode helper pentru validari si business logic specifice medicale
     /// </summary>
     public static class PersonalMedicalValidationHelpers
     {
@@ -190,7 +190,7 @@ public class PersonalMedicalModels
                 errors.Add("Prenumele este obligatoriu");
 
             if (!ValidateNumarLicenta(model.NumarLicenta, model.Pozitie))
-                errors.Add($"Numărul de licență este obligatoriu pentru poziția {model.Pozitie?.GetDisplayName()}");
+                errors.Add($"Numarul de licenta este obligatoriu pentru pozitia {model.Pozitie?.GetDisplayName()}");
 
             if (!string.IsNullOrWhiteSpace(model.Email) && !IsValidEmail(model.Email))
                 errors.Add("Formatul email-ului este invalid");

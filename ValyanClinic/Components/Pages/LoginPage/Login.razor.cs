@@ -5,8 +5,8 @@ using ValyanClinic.Application.Services;
 namespace ValyanClinic.Components.Pages.LoginPage;
 
 /// <summary>
-/// Business Logic pentru Login.razor - REFACTORIZAT ?I ORGANIZAT ÎN FOLDER
-/// Separat de markup, folose?te Rich Services ?i FluentValidation
+/// Business Logic pentru Login.razor - REFACTORIZAT ?I ORGANIZAT iN FOLDER
+/// Separat de markup, folosete Rich Services ?i FluentValidation
 /// </summary>
 public partial class Login : ComponentBase
 {
@@ -14,7 +14,7 @@ public partial class Login : ComponentBase
     [Inject] private IAuthenticationService AuthService { get; set; } = default!;
     [Inject] private IUserSessionService SessionService { get; set; } = default!;
 
-    // State Management separat în acela?i folder
+    // State Management separat in acelai folder
     private LoginState _state = new();
 
     // Lifecycle Events
@@ -31,7 +31,7 @@ public partial class Login : ComponentBase
         {
             if (!_state.CanAttemptLogin())
             {
-                await ShowError("Nu se poate procesa cererea de autentificare în acest moment.");
+                await ShowError("Nu se poate procesa cererea de autentificare in acest moment.");
                 return;
             }
 
@@ -47,7 +47,7 @@ public partial class Login : ComponentBase
         catch (Exception ex)
         {
             Console.WriteLine($"ERROR: Login failed with exception: {ex.Message}");
-            await ShowError("A ap?rut o eroare la autentificare. V? rug?m s? încerca?i din nou.");
+            await ShowError("A aprut o eroare la autentificare. V? rugm s? incercai din nou.");
         }
         finally
         {
@@ -93,23 +93,23 @@ public partial class Login : ComponentBase
                 break;
                 
             case LoginFailureReason.AccountDisabled:
-                await ShowError("Contul este inactiv. Contacta?i administratorul.");
+                await ShowError("Contul este inactiv. Contactai administratorul.");
                 break;
                 
             case LoginFailureReason.TooManyAttempts:
                 _state.IncrementLoginAttempts();
-                await ShowError($"Prea multe încerc?ri. Încerc?ri r?mase: {5 - _state.LoginAttempts}");
+                await ShowError($"Prea multe incercri. incercri rmase: {5 - _state.LoginAttempts}");
                 break;
                 
             case LoginFailureReason.InvalidCredentials:
                 _state.IncrementLoginAttempts();
                 var remaining = 5 - _state.LoginAttempts;
-                await ShowError($"Date de autentificare incorecte. Încerc?ri r?mase: {remaining}");
+                await ShowError($"Date de autentificare incorecte. incercri rmase: {remaining}");
                 break;
                 
             case LoginFailureReason.SystemError:
             default:
-                await ShowError(result.ErrorMessage ?? "A ap?rut o eroare de sistem.");
+                await ShowError(result.ErrorMessage ?? "A aprut o eroare de sistem.");
                 break;
         }
     }
@@ -148,12 +148,12 @@ public partial class Login : ComponentBase
 
     private async Task HandleForgotPassword()
     {
-        await ShowInfo("Func?ionalitatea de resetare a parolei va fi implementat? în curând. Contacta?i administratorul pentru asisten??.");
+        await ShowInfo("Funcionalitatea de resetare a parolei va fi implementat? in curand. Contactai administratorul pentru asisten??.");
     }
 
     private async Task ShowContactSupport()
     {
-        await ShowInfo("Pentru suport tehnic, contacta?i echipa ValyanMed la support@valyanmed.ro sau +40 123 456 789.");
+        await ShowInfo("Pentru suport tehnic, contactai echipa ValyanMed la support@valyanmed.ro sau +40 123 456 789.");
     }
 
     #endregion
@@ -162,17 +162,17 @@ public partial class Login : ComponentBase
 
     private async Task CheckExistingSession()
     {
-        // În viitor: Check localStorage/cookie pentru sesiune existent?
+        // in viitor: Check localStorage/cookie pentru sesiune existent?
         Console.WriteLine("DEBUG: Checking for existing user session...");
         await Task.CompletedTask;
     }
 
     private async Task SaveUserSession(UserSession userSession)
     {
-        // Salvez sesiunea în serviciul de sesiuni
+        // Salvez sesiunea in serviciul de sesiuni
         var sessionToken = await SessionService.CreateSessionAsync(userSession);
         
-        // În viitor: Salvez token-ul în localStorage pentru persisten??
+        // in viitor: Salvez token-ul in localStorage pentru persisten??
         // await JSRuntime.InvokeVoidAsync("localStorage.setItem", "sessionToken", sessionToken);
         
         Console.WriteLine($"DEBUG: Session saved with token for user: {userSession.Username}");
@@ -199,7 +199,7 @@ public partial class Login : ComponentBase
 
     private async Task ShowInfo(string message)
     {
-        // Pentru moment, folosesc console.log, în viitor toast notifications
+        // Pentru moment, folosesc console.log, in viitor toast notifications
         Console.WriteLine($"INFO: {message}");
         await Task.CompletedTask;
     }

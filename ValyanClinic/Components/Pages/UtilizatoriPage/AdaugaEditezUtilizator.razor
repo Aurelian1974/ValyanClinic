@@ -23,7 +23,7 @@
         <div class="add-edit-user-loading-container">
             <div class="add-edit-user-loading-indicator">
                 <i class="fas fa-spinner fa-spin"></i>
-                <span>Se încarc?...</span>
+                <span>Se incarc?...</span>
             </div>
         </div>
     }
@@ -38,7 +38,7 @@
                     <div class="add-edit-user-form-section">
                         <h3 class="add-edit-user-section-title">
                             <i class="fas fa-id-card"></i>
-                            Informa?ii Personale
+                            Informaii Personale
                         </h3>
                         
                         <div class="add-edit-user-form-row">
@@ -47,7 +47,7 @@
                                     Nume <span class="add-edit-user-required">*</span>
                                 </label>
                                 <SfTextBox @bind-Value="CurrentUser.FirstName" 
-                                          Placeholder="Introduce?i numele"
+                                          Placeholder="Introducei numele"
                                           CssClass="form-control">
                                 </SfTextBox>
                                 <ValidationMessage For="@(() => CurrentUser.FirstName)" class="add-edit-user-validation-error" />
@@ -58,7 +58,7 @@
                                     Prenume <span class="add-edit-user-required">*</span>
                                 </label>
                                 <SfTextBox @bind-Value="CurrentUser.LastName" 
-                                          Placeholder="Introduce?i prenumele"
+                                          Placeholder="Introducei prenumele"
                                           CssClass="form-control">
                                 </SfTextBox>
                                 <ValidationMessage For="@(() => CurrentUser.LastName)" class="add-edit-user-validation-error" />
@@ -92,7 +92,7 @@
                     <div class="add-edit-user-form-section">
                         <h3 class="add-edit-user-section-title">
                             <i class="fas fa-user-cog"></i>
-                            Informa?ii Cont
+                            Informaii Cont
                         </h3>
                         
                         <div class="add-edit-user-form-row">
@@ -109,7 +109,7 @@
                             
                             <div class="add-edit-user-form-group">
                                 <label class="add-edit-user-form-label">
-                                    Rol în Sistem <span class="add-edit-user-required">*</span>
+                                    Rol in Sistem <span class="add-edit-user-required">*</span>
                                 </label>
                                 <SfDropDownList TItem="UserRole" TValue="UserRole" 
                                                @bind-Value="CurrentUser.Role"
@@ -151,7 +151,7 @@
                     <div class="add-edit-user-form-section">
                         <h3 class="add-edit-user-section-title">
                             <i class="fas fa-building"></i>
-                            Informa?ii Organiza?ionale
+                            Informaii Organizaionale
                         </h3>
                         
                         <div class="add-edit-user-form-row">
@@ -167,7 +167,7 @@
                             </div>
                             
                             <div class="add-edit-user-form-group">
-                                <label class="add-edit-user-form-label">Func?ia</label>
+                                <label class="add-edit-user-form-label">Funcia</label>
                                 <SfTextBox @bind-Value="CurrentUser.JobTitle" 
                                           Placeholder="ex: Medic Specialist, Asistent Medical"
                                           CssClass="form-control">

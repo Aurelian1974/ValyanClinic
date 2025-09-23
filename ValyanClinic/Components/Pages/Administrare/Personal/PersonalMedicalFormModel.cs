@@ -14,7 +14,7 @@ public class PersonalMedicalFormModel
     // Identificatori
     public Guid PersonalID { get; set; } = Guid.NewGuid();
 
-    // Date personale de bază
+    // Date personale de baza
     [Required(ErrorMessage = "Numele este obligatoriu")]
     public string Nume { get; set; } = "";
 
@@ -33,21 +33,21 @@ public class PersonalMedicalFormModel
     [Phone(ErrorMessage = "Formatul telefonului este invalid")]
     public string? Telefon { get; set; }
 
-    // Departament și poziție
+    // Departament si pozitie
     public string? Departament { get; set; } // Text pentru compatibilitate
 
-    [Required(ErrorMessage = "Poziția este obligatorie")]
+    [Required(ErrorMessage = "Pozitia este obligatorie")]
     public PozitiePersonalMedical? Pozitie { get; set; }
 
     // Status
     public bool EsteActiv { get; set; } = true;
 
-    // Relații cu departamente medicale (FK-uri din tabela Departamente)
+    // Relatii cu departamente medicale (FK-uri din tabela Departamente)
     public Guid? CategorieID { get; set; }
     public Guid? SpecializareID { get; set; }
     public Guid? SubspecializareID { get; set; }
 
-    // Lookup values pentru afișare (populate din JOIN-uri)
+    // Lookup values pentru afisare (populate din JOIN-uri)
     public string? CategorieName { get; set; }
     public string? SpecializareName { get; set; }
     public string? SubspecializareName { get; set; }
@@ -55,14 +55,14 @@ public class PersonalMedicalFormModel
     // Metadata
     public DateTime DataCreare { get; set; } = DateTime.Now;
 
-    // Computed properties pentru validări și afișare
+    // Computed properties pentru validari si afisare
     public string NumeComplet => $"{Nume} {Prenume}";
     public bool EsteDoctorSauAsistent => 
         Pozitie == PozitiePersonalMedical.Doctor || 
         Pozitie == PozitiePersonalMedical.AsistentMedical;
     public bool AreNevieDeLicenta => EsteDoctorSauAsistent;
 
-    // Metode de conversie către și din PersonalMedicalModel
+    // Metode de conversie catre si din PersonalMedicalModel
     public static PersonalMedicalFormModel FromPersonalMedical(PersonalMedicalModel personalMedical)
     {
         return new PersonalMedicalFormModel
@@ -114,7 +114,7 @@ public class PersonalMedicalFormModel
         };
     }
 
-    // Validări specifice pentru PersonalMedical
+    // Validari specifice pentru PersonalMedical
     public List<string> GetValidationErrors()
     {
         var errors = new List<string>();
@@ -126,22 +126,22 @@ public class PersonalMedicalFormModel
             errors.Add("Prenumele este obligatoriu");
 
         if (!Pozitie.HasValue)
-            errors.Add("Poziția este obligatorie");
+            errors.Add("Pozitia este obligatorie");
 
-        // Validare licență medicală pentru doctori și asistenți
+        // Validare licenta medicala pentru doctori si asistenti
         if (AreNevieDeLicenta && string.IsNullOrWhiteSpace(NumarLicenta))
-            errors.Add($"Numărul de licență este obligatoriu pentru poziția {Pozitie?.GetDisplayName()}");
+            errors.Add($"Numarul de licenta este obligatoriu pentru pozitia {Pozitie?.GetDisplayName()}");
 
         if (!string.IsNullOrWhiteSpace(NumarLicenta) && NumarLicenta.Length < 5)
-            errors.Add("Numărul de licență trebuie să aibă cel puțin 5 caractere");
+            errors.Add("Numarul de licenta trebuie sa aiba cel putin 5 caractere");
 
         // Validare email
         if (!string.IsNullOrWhiteSpace(Email) && !IsValidEmail(Email))
             errors.Add("Formatul email-ului este invalid");
 
-        // Validare pentru specializare completă (opțional, dar recomandat)
+        // Validare pentru specializare completa (optional, dar recomandat)
         if (AreNevieDeLicenta && !CategorieID.HasValue)
-            errors.Add("Categoria medicală este recomandată pentru doctori și asistenți");
+            errors.Add("Categoria medicala este recomandata pentru doctori si asistenti");
 
         return errors;
     }
@@ -151,7 +151,7 @@ public class PersonalMedicalFormModel
         return GetValidationErrors().Count == 0;
     }
 
-    // Metode helper pentru validări
+    // Metode helper pentru validari
     private static bool IsValidEmail(string email)
     {
         try
@@ -165,7 +165,7 @@ public class PersonalMedicalFormModel
         }
     }
 
-    // Metode pentru gestionarea specializărilor medicale
+    // Metode pentru gestionarea specializarilor medicale
     public void SetSpecializareCompleta(Guid? categorieId, Guid? specializareId, Guid? subspecializareId,
         string? categorieName = null, string? specializareName = null, string? subspecializareName = null)
     {
@@ -189,15 +189,15 @@ public class PersonalMedicalFormModel
         SubspecializareName = null;
     }
 
-    // Metode pentru gestionarea pozițiilor cu validări automatice
+    // Metode pentru gestionarea pozitiilor cu validari automatice
     public void SetPozitie(PozitiePersonalMedical? pozitie)
     {
         Pozitie = pozitie;
 
-        // Dacă poziția nu necesită licență, șterge licența existentă (opțional)
+        // Daca pozitia nu necesita licenta, sterge licenta existenta (optional)
         if (pozitie.HasValue && !pozitie.Value.RequiresLicensaMedicala())
         {
-            // Opțional: șterge licența pentru pozițiile care nu o necesită
+            // Optional: sterge licenta pentru pozitiile care nu o necesita
             // NumarLicenta = null;
         }
     }
@@ -267,13 +267,13 @@ public class PersonalMedicalDropdownOption<T>
 public static class PersonalMedicalFormModelExtensions
 {
     /// <summary>
-    /// Crează o listă de opțiuni dropdown pentru poziții medicale
+    /// Creaza o lista de optiuni dropdown pentru pozitii medicale
     /// </summary>
     public static List<PersonalMedicalDropdownOption<PozitiePersonalMedical?>> GetPozitieOptions()
     {
         var options = new List<PersonalMedicalDropdownOption<PozitiePersonalMedical?>>
         {
-            new(null, "Selectează poziția...")
+            new(null, "Selecteaza pozitia...")
         };
 
         foreach (PozitiePersonalMedical pozitie in Enum.GetValues<PozitiePersonalMedical>())
@@ -286,7 +286,7 @@ public static class PersonalMedicalFormModelExtensions
     }
 
     /// <summary>
-    /// Crează o listă de opțiuni dropdown pentru status
+    /// Creaza o lista de optiuni dropdown pentru status
     /// </summary>
     public static List<PersonalMedicalDropdownOption<bool>> GetStatusOptions()
     {
@@ -298,7 +298,7 @@ public static class PersonalMedicalFormModelExtensions
     }
 
     /// <summary>
-    /// Validează o instanță de PersonalMedicalFormModel
+    /// Valideaza o instanta de PersonalMedicalFormModel
     /// </summary>
     public static (bool IsValid, List<string> Errors) ValidatePersonalMedicalFormModel(
         this PersonalMedicalFormModel model)

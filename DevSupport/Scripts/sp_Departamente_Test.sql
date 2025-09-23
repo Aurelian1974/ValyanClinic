@@ -1,6 +1,6 @@
 -- =============================================
 -- TEST SCRIPT pentru Stored Procedures Departamente
--- Verific? func?ionalitatea sp_Departamente_GetByTip ?i sp_Departamente_GetAll
+-- Verific? funcionalitatea sp_Departamente_GetByTip ?i sp_Departamente_GetAll
 -- =============================================
 
 -- Cleanup and setup test data
@@ -76,14 +76,14 @@ BEGIN
     (NEWID(), 'Chirurgie General?', 'Medical'),
     (NEWID(), 'Radiologie', 'Medical'),
     (NEWID(), 'Laborator', 'Medical'),
-    (NEWID(), 'Administra?ie', 'Administrativ'),
+    (NEWID(), 'Administraie', 'Administrativ'),
     (NEWID(), 'Financiar-Contabilitate', 'Administrativ'),
     (NEWID(), 'Resurse Umane', 'Administrativ'),
     (NEWID(), 'IT ?i Informatic?', 'Tehnic'),
     (NEWID(), 'Mentenan??', 'Tehnic'),
     (NEWID(), 'Securitate', 'Tehnic'),
     (NEWID(), 'Cur??enie', 'Servicii'),
-    (NEWID(), 'Alimenta?ie', 'Servicii'),
+    (NEWID(), 'Alimentaie', 'Servicii'),
     (NEWID(), 'Transport', 'Servicii')
     
     PRINT '? Sample data inserted successfully!'
@@ -283,14 +283,14 @@ SELECT
     Nume,
     Tip,
     CASE 
-        WHEN Nume LIKE '%?%' OR Nume LIKE '%â%' OR Nume LIKE '%î%' OR 
+        WHEN Nume LIKE '%?%' OR Nume LIKE '%a%' OR Nume LIKE '%i%' OR 
              Nume LIKE '%?%' OR Nume LIKE '%?%' THEN 'Contains Romanian diacritics'
         WHEN Nume LIKE '%-%' THEN 'Contains hyphens'
         WHEN Nume LIKE '% %' THEN 'Contains spaces'
         ELSE 'Standard characters'
     END as CharacterType
 FROM Departamente
-WHERE Nume LIKE '%?%' OR Nume LIKE '%â%' OR Nume LIKE '%î%' OR 
+WHERE Nume LIKE '%?%' OR Nume LIKE '%a%' OR Nume LIKE '%i%' OR 
       Nume LIKE '%?%' OR Nume LIKE '%?%' OR Nume LIKE '%-%'
 ORDER BY CharacterType, Nume
 
@@ -310,14 +310,14 @@ DECLARE @UniqueTypes INT
 SELECT @UniqueTypes = COUNT(DISTINCT Tip) FROM Departamente
 
 PRINT '?? TEST SUMMARY:'
-PRINT '   • Total Departments: ' + CAST(@TotalDepartments AS VARCHAR(10))
-PRINT '   • Unique Types: ' + CAST(@UniqueTypes AS VARCHAR(10))
+PRINT '   â€¢ Total Departments: ' + CAST(@TotalDepartments AS VARCHAR(10))
+PRINT '   â€¢ Unique Types: ' + CAST(@UniqueTypes AS VARCHAR(10))
 
 -- Show breakdown by type
 PRINT ''
 PRINT '?? Departments by Type:'
 SELECT 
-    '   • ' + Tip + ': ' + CAST(COUNT(*) AS VARCHAR(10)) + ' departments' as Summary
+    '   â€¢ ' + Tip + ': ' + CAST(COUNT(*) AS VARCHAR(10)) + ' departments' as Summary
 FROM Departamente
 GROUP BY Tip
 ORDER BY COUNT(*) DESC
@@ -334,8 +334,8 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_Departament
 
 PRINT ''
 PRINT '?? STORED PROCEDURES STATUS:'
-PRINT '   • sp_Departamente_GetByTip: ' + CASE WHEN @SP1Exists = 1 THEN '? EXISTS' ELSE '? MISSING' END
-PRINT '   • sp_Departamente_GetAll: ' + CASE WHEN @SP2Exists = 1 THEN '? EXISTS' ELSE '? MISSING' END
+PRINT '   â€¢ sp_Departamente_GetByTip: ' + CASE WHEN @SP1Exists = 1 THEN '? EXISTS' ELSE '? MISSING' END
+PRINT '   â€¢ sp_Departamente_GetAll: ' + CASE WHEN @SP2Exists = 1 THEN '? EXISTS' ELSE '? MISSING' END
 
 IF @SP1Exists = 1 AND @SP2Exists = 1
 BEGIN
@@ -354,10 +354,10 @@ END
 -- Final recommendations
 PRINT ''
 PRINT '?? RECOMMENDATIONS:'
-PRINT '   • Consider adding indexes on Tip column for better performance'
-PRINT '   • Implement data validation constraints at database level'
-PRINT '   • Consider adding CreatedDate and ModifiedDate columns for auditing'
-PRINT '   • Regular maintenance: Update statistics and check for data consistency'
+PRINT '   â€¢ Consider adding indexes on Tip column for better performance'
+PRINT '   â€¢ Implement data validation constraints at database level'
+PRINT '   â€¢ Consider adding CreatedDate and ModifiedDate columns for auditing'
+PRINT '   â€¢ Regular maintenance: Update statistics and check for data consistency'
 
 PRINT ''
 PRINT '?? Testing completed successfully!'

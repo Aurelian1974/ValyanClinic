@@ -21,21 +21,21 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
         
-        -- Verificare existen?a
+        -- Verificare existena
         IF NOT EXISTS (SELECT 1 FROM PersonalMedical WHERE PersonalID = @PersonalID)
         BEGIN
-            THROW 50003, 'Personalul medical nu a fost g?sit.', 1;
+            THROW 50003, 'Personalul medical nu a fost gsit.', 1;
         END
         
         -- Verificare unicitate Email ?i NumarLicenta (exclude ID-ul curent)
         IF @Email IS NOT NULL AND EXISTS (SELECT 1 FROM PersonalMedical WHERE Email = @Email AND PersonalID != @PersonalID)
         BEGIN
-            THROW 50001, 'Email-ul exist? deja în baza de date.', 1;
+            THROW 50001, 'Email-ul exist? deja in baza de date.', 1;
         END
         
         IF @NumarLicenta IS NOT NULL AND EXISTS (SELECT 1 FROM PersonalMedical WHERE NumarLicenta = @NumarLicenta AND PersonalID != @PersonalID)
         BEGIN
-            THROW 50002, 'Num?rul de licen?? exist? deja în baza de date.', 1;
+            THROW 50002, 'Numrul de licen?? exist? deja in baza de date.', 1;
         END
         
         UPDATE PersonalMedical SET

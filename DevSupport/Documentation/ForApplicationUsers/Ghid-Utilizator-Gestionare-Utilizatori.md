@@ -1,6 +1,6 @@
 ﻿# Ghid Utilizator - Gestionarea Utilizatorilor
 
-**Aplicație:** ValyanMed - Sistem de Management Clinic  
+**Aplicatie:** ValyanMed - Sistem de Management Clinic  
 **Modul:** Gestionare Utilizatori  
 **Creat:** Septembrie 2025  
 **Actualizat:** Septembrie 2025  
@@ -8,109 +8,109 @@
 
 ---
 
-## Prezentare Generală
+## Prezentare Generala
 
-Modulul de Gestionare Utilizatori vă permite să administrați conturile personalului din clinică. Puteți vizualiza, adăuga, modifica și gestiona utilizatorii sistemului ValyanMed într-un mod simplu și eficient.
+Modulul de Gestionare Utilizatori va permite sa administrati conturile personalului din clinica. Puteti vizualiza, adauga, modifica si gestiona utilizatorii sistemului ValyanMed intr-un mod simplu si eficient.
 
-### Ce puteți face în acest modul
+### Ce puteti face in acest modul
 - **Vizualizarea listei** complete de utilizatori
-- **Căutarea și filtrarea** utilizatorilor după diverse criterii
-- **Adăugarea** de utilizatori noi în sistem
-- **Modificarea informațiilor** utilizatorilor existenți
+- **Cautarea si filtrarea** utilizatorilor dupa diverse criterii
+- **Adaugarea** de utilizatori noi in sistem
+- **Modificarea informatiilor** utilizatorilor existenti
 - **Vizualizarea detaliilor** complete ale unui utilizator
-- **Gestionarea rolurilor** și permisiunilor
-- **Monitorizarea activității** utilizatorilor
+- **Gestionarea rolurilor** si permisiunilor
+- **Monitorizarea activitatii** utilizatorilor
 
 ---
 
 ## Accesarea Modulului
 
-### Cum să ajungeți la Gestionarea Utilizatorilor
+### Cum sa ajungeti la Gestionarea Utilizatorilor
 
-1. **Conectați-vă** în aplicația ValyanMed
-2. **Din meniul principal**, căutați secțiunea "Utilizatori"
-3. **Apăsați pe "Gestionare Utilizatori"**
+1. **Conectati-va** in aplicatia ValyanMed
+2. **Din meniul principal**, cautati sectiunea "Utilizatori"
+3. **Apasati pe "Gestionare Utilizatori"**
 4. Se va deschide pagina cu lista utilizatorilor
 
 ### Verificarea permisiunilor
-Pentru a accesa acest modul, trebuie să aveți unul dintre rolurile:
-- ✅ **Administrator** - Acces complet la toate funcțiile
-- ✅ **Manager** - Poate vizualiza și modifica utilizatorii din departamentul său
+Pentru a accesa acest modul, trebuie sa aveti unul dintre rolurile:
+- ✅ **Administrator** - Acces complet la toate functiile
+- ✅ **Manager** - Poate vizualiza si modifica utilizatorii din departamentul sau
 - ❌ **Utilizator standard** - Nu are acces la acest modul
 
 ---
 
-## Înțelegerea Interfeței
+## intelegerea Interfetei
 
 ### Antetul paginii
 
-#### Titlul și descrierea
+#### Titlul si descrierea
 - **"Gestionare Utilizatori"** - Titlul principal al paginii
-- **Descrierea** explică scopul paginii: "Administrează utilizatorii sistemului ValyanMed"
+- **Descrierea** explica scopul paginii: "Administreaza utilizatorii sistemului ValyanMed"
 
-#### Butoanele de acțiune
-- **"Adaugă Utilizator"** 🆕 - Pentru crearea unui utilizator nou
-- **"Actualizează"** 🔄 - Pentru reîncărcarea listei de utilizatori
+#### Butoanele de actiune
+- **"Adauga Utilizator"** 🆕 - Pentru crearea unui utilizator nou
+- **"Actualizeaza"** 🔄 - Pentru reincarcarea listei de utilizatori
 
 ### Statisticile utilizatorilor
 
-În partea de sus a paginii veți vedea **8 carduri cu statistici**:
+in partea de sus a paginii veti vedea **8 carduri cu statistici**:
 
-| Statistica | Ce înseamnă |
+| Statistica | Ce inseamna |
 |------------|-------------|
-| **Total Utilizatori** | Numărul total de conturi din sistem |
-| **Utilizatori Activi** | Conturi care sunt în prezent active |
-| **Medici** | Numărul de utilizatori cu rolul de Medic |
-| **Asistente Medicale** | Numărul de asistente înregistrate |
-| **Administratori** | Numărul de administratori de sistem |
+| **Total Utilizatori** | Numarul total de conturi din sistem |
+| **Utilizatori Activi** | Conturi care sunt in prezent active |
+| **Medici** | Numarul de utilizatori cu rolul de Medic |
+| **Asistente Medicale** | Numarul de asistente inregistrate |
+| **Administratori** | Numarul de administratori de sistem |
 | **Personal Inactiv** | Conturi dezactivate temporar |
-| **Conectări Astăzi** | Câți utilizatori s-au conectat astăzi |
-| **Utilizatori Noi** | Conturi create în ultima săptămână |
+| **Conectari Astazi** | Cati utilizatori s-au conectat astazi |
+| **Utilizatori Noi** | Conturi create in ultima saptamana |
 
 ---
 
-## Sistemul de Filtrare Avansată
+## Sistemul de Filtrare Avansata
 
 ### Activarea filtrelor
 
-1. **Căutați panoul "Filtrare Avansată"** sub statistici
-2. **Apăsați pe "Arată Filtrele"** pentru a deschide opțiunile
-3. **Panoul se va extinde** și veți vedea toate opțiunile de filtrare
+1. **Cautati panoul "Filtrare Avansata"** sub statistici
+2. **Apasati pe "Arata Filtrele"** pentru a deschide optiunile
+3. **Panoul se va extinde** si veti vedea toate optiunile de filtrare
 
 ### Tipurile de filtre disponibile
 
-#### 🔍 Căutare text globală
-- **Căutați după**: Nume, prenume, email, username
-- **Introduceți textul** în câmpul "Caută în nume, email, username..."
-- **Rezultatele** se actualizează automat în timp real
+#### 🔍 Cautare text globala
+- **Cautati dupa**: Nume, prenume, email, username
+- **Introduceti textul** in campul "Cauta in nume, email, username..."
+- **Rezultatele** se actualizeaza automat in timp real
 
-#### 👤 Filtru după rol
-- **Alegeți din listă**: Toate rolurile, Administrator, Medic, Asistent Medical, etc.
-- **Selectați "Toate rolurile"** pentru a elimina filtrul
+#### 👤 Filtru dupa rol
+- **Alegeti din lista**: Toate rolurile, Administrator, Medic, Asistent Medical, etc.
+- **Selectati "Toate rolurile"** pentru a elimina filtrul
 
-#### ✅ Filtru după status
-- **Opțiuni disponibile**: Activ, Inactiv, Suspendat, Blocat
-- **Selectați "Toate statusurile"** pentru a elimina filtrul
+#### ✅ Filtru dupa status
+- **Optiuni disponibile**: Activ, Inactiv, Suspendat, Blocat
+- **Selectati "Toate statusurile"** pentru a elimina filtrul
 
-#### 🏢 Filtru după departament
-- **Alegeți departamentul**: Cardiologie, Chirurgie, Radiologie, etc.
-- **Lista se actualizează** cu departamentele active din clinică
+#### 🏢 Filtru dupa departament
+- **Alegeti departamentul**: Cardiologie, Chirurgie, Radiologie, etc.
+- **Lista se actualizeaza** cu departamentele active din clinica
 
-#### ⏰ Filtru după perioada de activitate
-- **Opțiuni temporale**: Astăzi, Săptămâna trecută, Luna trecută, etc.
-- **Filtrează utilizatorii** după ultima lor conectare
+#### ⏰ Filtru dupa perioada de activitate
+- **Optiuni temporale**: Astazi, Saptamana trecuta, Luna trecuta, etc.
+- **Filtreaza utilizatorii** dupa ultima lor conectare
 
 ### Aplicarea filtrelor
 
-1. **Setați filtrele dorite** folosind dropdown-urile
-2. **Apăsați "Aplică Filtrele"** pentru a activa filtrarea
-3. **Rezultatele** se vor actualiza în tabelul de utilizatori
-4. **Veți vedea** "Rezultate: X din Y utilizatori" pentru feedback
+1. **Setati filtrele dorite** folosind dropdown-urile
+2. **Apasati "Aplica Filtrele"** pentru a activa filtrarea
+3. **Rezultatele** se vor actualiza in tabelul de utilizatori
+4. **Veti vedea** "Rezultate: X din Y utilizatori" pentru feedback
 
-### Curățarea filtrelor
+### Curatarea filtrelor
 
-- **Apăsați "Curăță Filtrele"** pentru a elimina toate filtrele
-- **Sau selectați "Toate..."** în fiecare dropdown individual
+- **Apasati "Curata Filtrele"** pentru a elimina toate filtrele
+- **Sau selectati "Toate..."** in fiecare dropdown individual
 
 ---
 
@@ -118,52 +118,52 @@ Pentru a accesa acest modul, trebuie să aveți unul dintre rolurile:
 
 ### Coloanele din tabel
 
-| Coloană | Ce afișează | Funcții speciale |
+| Coloana | Ce afiseaza | Functii speciale |
 |---------|-------------|------------------|
-| **ID** | Numărul unic al utilizatorului | Nu se poate modifica |
-| **Nume** | Numele de familie | Se poate sorta și filtra |
-| **Prenume** | Prenumele utilizatorului | Se poate sorta și filtra |
+| **ID** | Numarul unic al utilizatorului | Nu se poate modifica |
+| **Nume** | Numele de familie | Se poate sorta si filtra |
+| **Prenume** | Prenumele utilizatorului | Se poate sorta si filtra |
 | **Email** | Adresa de email | Link pentru a trimite email |
-| **Username** | Numele de utilizator pentru conectare | Se poate căuta |
-| **Telefon** | Numărul de telefon | Format românesc |
-| **Rol** | Rolul în sistem | Cu badge colorat |
-| **Departament** | Departamentul de apartenență | Se poate grupa |
+| **Username** | Numele de utilizator pentru conectare | Se poate cauta |
+| **Telefon** | Numarul de telefon | Format romanesc |
+| **Rol** | Rolul in sistem | Cu badge colorat |
+| **Departament** | Departamentul de apartenenta | Se poate grupa |
 | **Status** | Starea contului | Cu indicator colorat |
-| **Funcția** | Postul ocupat în clinică | Text liber |
-| **Data Creării** | Când a fost creat contul | Format dd.mm.yyyy |
+| **Functia** | Postul ocupat in clinica | Text liber |
+| **Data Crearii** | Cand a fost creat contul | Format dd.mm.yyyy |
 | **Ultima Autent.** | Ultima conectare | Relativ (ex: "2 zile") |
-| **Acțiuni** | Butoane pentru acțiuni | Nu se poate sorta |
+| **Actiuni** | Butoane pentru actiuni | Nu se poate sorta |
 
-### Funcții avansate ale tabelului
+### Functii avansate ale tabelului
 
 #### 📊 Sortarea datelor
-- **Apăsați pe antetul coloanei** pentru sortare crescătoare
-- **Apăsați din nou** pentru sortare descrescătoare
-- **A treia apăsare** elimină sortarea
+- **Apasati pe antetul coloanei** pentru sortare crescatoare
+- **Apasati din nou** pentru sortare descrescatoare
+- **A treia apasare** elimina sortarea
 
 #### 🔍 Filtrarea coloanelor
-- **Fiecare coloană** are propriul filtru în antet
-- **Introduceți textul** pentru filtrare rapidă
-- **Filtrele Excel** sunt disponibile pentru filtrare avansată
+- **Fiecare coloana** are propriul filtru in antet
+- **Introduceti textul** pentru filtrare rapida
+- **Filtrele Excel** sunt disponibile pentru filtrare avansata
 
 #### 📑 Gruparea datelor
-- **Trageți antetul coloanei** în zona "Grupează aici"
-- **Datele se vor grupa** după coloana selectată
-- **Puteți grupa după multiple coloane** simultan
+- **Trageti antetul coloanei** in zona "Grupeaza aici"
+- **Datele se vor grupa** dupa coloana selectata
+- **Puteti grupa dupa multiple coloane** simultan
 
 #### 🔄 Reordonarea coloanelor
-- **Trageți antetul coloanei** la poziția dorită
+- **Trageti antetul coloanei** la pozitia dorita
 - **Ordinea se va salva** pentru sesiunile viitoare
 
 #### 📏 Redimensionarea coloanelor
-- **Trageți marginea** coloanei pentru redimensionare
-- **Dublu-click pe margine** pentru redimensionare automată
+- **Trageti marginea** coloanei pentru redimensionare
+- **Dublu-click pe margine** pentru redimensionare automata
 
 ### Paginarea rezultatelor
 
-- **Sus-dreapta tabelului**: Puteți alege numărul de înregistrări pe pagină
-- **Opțiuni disponibile**: 10, 20, 50, 100, Toate
-- **Navigarea**: Folosiți butoanele < > pentru schimbarea paginilor
+- **Sus-dreapta tabelului**: Puteti alege numarul de inregistrari pe pagina
+- **Optiuni disponibile**: 10, 20, 50, 100, Toate
+- **Navigarea**: Folositi butoanele < > pentru schimbarea paginilor
 
 ---
 
@@ -171,103 +171,103 @@ Pentru a accesa acest modul, trebuie să aveți unul dintre rolurile:
 
 ### Deschiderea ferestrei de detalii
 
-1. **În coloana "Acțiuni"** căutați butonul albastru cu iconița ochiului 👁️
-2. **Apăsați pe acest buton** pentru utilizatorul dorit
-3. **Se va deschide o fereastră modală** cu toate detaliile
+1. **in coloana "Actiuni"** cautati butonul albastru cu iconita ochiului 👁️
+2. **Apasati pe acest buton** pentru utilizatorul dorit
+3. **Se va deschide o fereastra modala** cu toate detaliile
 
-### Ce veți vedea în fereastra de detalii
+### Ce veti vedea in fereastra de detalii
 
-#### 📋 Card "Informații Personale"
-- **Nume și prenume** complet
+#### 📋 Card "Informatii Personale"
+- **Nume si prenume** complet
 - **Adresa de email** de contact
-- **Numărul de telefon** (dacă este specificat)
+- **Numarul de telefon** (daca este specificat)
 
-#### 👤 Card "Informații Cont"
+#### 👤 Card "Informatii Cont"
 - **Username-ul** pentru conectare
-- **ID-ul unic** în sistem
-- **Rolul** în sistem cu badge colorat
+- **ID-ul unic** in sistem
+- **Rolul** in sistem cu badge colorat
 - **Statusul** contului cu indicator vizual
 
-#### 🏢 Card "Informații Organizaționale"
-- **Departamentul** de apartenență
-- **Funcția** ocupată în clinică
+#### 🏢 Card "Informatii Organizationale"
+- **Departamentul** de apartenenta
+- **Functia** ocupata in clinica
 
-#### ⏰ Card "Informații Temporale"
-- **Data creării** contului
-- **Ultima autentificare** în sistem
-- **Statutul activității** recente (ex: "Activ astăzi")
-- **Vechimea în sistem** calculată automat
+#### ⏰ Card "Informatii Temporale"
+- **Data crearii** contului
+- **Ultima autentificare** in sistem
+- **Statutul activitatii** recente (ex: "Activ astazi")
+- **Vechimea in sistem** calculata automat
 
-#### 🛡️ Card "Permisiuni și Securitate"
-- **Lista completă** a permisiunilor utilizatorului
-- **Permisiuni universale**: Accesul de bază la sistem
-- **Permisiuni pe rol**: Specifice funcției (ex: Administrare pentru Admin)
+#### 🛡️ Card "Permisiuni si Securitate"
+- **Lista completa** a permisiunilor utilizatorului
+- **Permisiuni universale**: Accesul de baza la sistem
+- **Permisiuni pe rol**: Specifice functiei (ex: Administrare pentru Admin)
 - **Permisiuni medicale**: Pentru personal medical
 
-### Închiderea ferestrei
+### inchiderea ferestrei
 
-- **Apăsați pe X** din colțul din dreapta-sus
-- **Apăsați "Închide"** din josul ferestrei
-- **Apăsați tasta Escape** de pe tastatură
+- **Apasati pe X** din coltul din dreapta-sus
+- **Apasati "inchide"** din josul ferestrei
+- **Apasati tasta Escape** de pe tastatura
 
 ---
 
-## Adăugarea unui Utilizator Nou
+## Adaugarea unui Utilizator Nou
 
-### Pornirea procesului de adăugare
+### Pornirea procesului de adaugare
 
-1. **În antetul paginii** apăsați pe "Adaugă Utilizator"
-2. **Se va deschide** o fereastră pentru introducerea datelor
-3. **Titlul ferestrei** va fi "Adaugă Utilizator Nou"
+1. **in antetul paginii** apasati pe "Adauga Utilizator"
+2. **Se va deschide** o fereastra pentru introducerea datelor
+3. **Titlul ferestrei** va fi "Adauga Utilizator Nou"
 
 ### Completarea formularului
 
-#### 📋 Secțiunea "Informații Personale"
+#### 📋 Sectiunea "Informatii Personale"
 
-**Câmpurile obligatorii** (marcate cu *):
+**Campurile obligatorii** (marcate cu *):
 - **Nume*** - Numele de familie (ex: Popescu)
 - **Prenume*** - Prenumele (ex: Maria)  
 - **Email*** - Adresa de email (ex: maria.popescu@valyanmed.ro)
 
-**Câmpurile opționale**:
-- **Telefon** - Numărul de telefon (ex: 0723456789)
+**Campurile optionale**:
+- **Telefon** - Numarul de telefon (ex: 0723456789)
 
-#### 👤 Secțiunea "Informații Cont"
+#### 👤 Sectiunea "Informatii Cont"
 
-**Câmpurile obligatorii**:
+**Campurile obligatorii**:
 - **Username*** - Numele pentru conectare (ex: maria.popescu)
-- **Rol în Sistem*** - Alegeți din listă: Administrator, Medic, Asistent Medical, etc.
+- **Rol in Sistem*** - Alegeti din lista: Administrator, Medic, Asistent Medical, etc.
 
-**Câmpurile opționale**:
-- **Status** - În mod normal rămâne "Activ"
+**Campurile optionale**:
+- **Status** - in mod normal ramane "Activ"
 
-#### 🏢 Secțiunea "Informații Organizaționale"
+#### 🏢 Sectiunea "Informatii Organizationale"
 
-**Câmpurile opționale**:
-- **Departament** - Alegeți din lista departamentelor active
-- **Funcția** - Descrierea postului (ex: "Medic Specialist Cardiologie")
+**Campurile optionale**:
+- **Departament** - Alegeti din lista departamentelor active
+- **Functia** - Descrierea postului (ex: "Medic Specialist Cardiologie")
 
 ### Validarea datelor
 
-#### Mesaje de validare pe măsură ce completați:
-- **Nume și prenume**: Trebuie să aibă între 2-50 caractere
-- **Email**: Trebuie să aibă format valid (ceva@domeniu.ro)
+#### Mesaje de validare pe masura ce completati:
+- **Nume si prenume**: Trebuie sa aiba intre 2-50 caractere
+- **Email**: Trebuie sa aiba format valid (ceva@domeniu.ro)
 - **Username**: Nu poate fi deja folosit de alt utilizator
-- **Telefon**: Trebuie să aibă format românesc valid
+- **Telefon**: Trebuie sa aiba format romanesc valid
 
 #### Mesaje de eroare comune:
 - ❌ **"Acest username este deja utilizat"**
-- ❌ **"Acest email este deja înregistrat"**
+- ❌ **"Acest email este deja inregistrat"**
 - ❌ **"Format email invalid"**
 - ❌ **"Numele este obligatoriu"**
 
 ### Salvarea utilizatorului
 
-1. **Verificați** că toate câmpurile obligatorii sunt completate
-2. **Apăsați "Creează Utilizatorul"** din josul ferestrei
-3. **Așteptați** confirmarea "Se salvează..."
-4. **În caz de succes** utilizatorul va apărea în listă
-5. **În caz de eroare** veți vedea mesajul explicativ
+1. **Verificati** ca toate campurile obligatorii sunt completate
+2. **Apasati "Creeaza Utilizatorul"** din josul ferestrei
+3. **Asteptati** confirmarea "Se salveaza..."
+4. **in caz de succes** utilizatorul va aparea in lista
+5. **in caz de eroare** veti vedea mesajul explicativ
 
 ---
 
@@ -275,34 +275,34 @@ Pentru a accesa acest modul, trebuie să aveți unul dintre rolurile:
 
 ### Pornirea procesului de modificare
 
-1. **În coloana "Acțiuni"** căutați butonul portocaliu cu iconița creion ✏️
-2. **Apăsați pe acest buton** pentru utilizatorul dorit
-3. **Se va deschide** o fereastră cu datele precompletate
+1. **in coloana "Actiuni"** cautati butonul portocaliu cu iconita creion ✏️
+2. **Apasati pe acest buton** pentru utilizatorul dorit
+3. **Se va deschide** o fereastra cu datele precompletate
 
 ### Modificarea datelor
 
-- **Toate câmpurile** vor fi completate cu informațiile curente
-- **Modificați** doar câmpurile pe care doriți să le schimbați
-- **Validarea** se face la fel ca la adăugare
+- **Toate campurile** vor fi completate cu informatiile curente
+- **Modificati** doar campurile pe care doriti sa le schimbati
+- **Validarea** se face la fel ca la adaugare
 
-### Restricții pentru modificare
+### Restrictii pentru modificare
 
-#### Ce NU puteți modifica:
-- **ID-ul utilizatorului** - Este fix și unic
-- **Data creării** - Este istorică și nu se schimbă
+#### Ce NU puteti modifica:
+- **ID-ul utilizatorului** - Este fix si unic
+- **Data crearii** - Este istorica si nu se schimba
 - **Datele de audit** - Sunt generate automat
 
-#### Ce puteți modifica cu restricții:
-- **Rolul** - Doar dacă aveți permisiuni superioare
+#### Ce puteti modifica cu restrictii:
+- **Rolul** - Doar daca aveti permisiuni superioare
 - **Statusul** - Doar administratorii pot suspenda/bloca
-- **Departamentul** - Doar în departamentele pentru care aveți drepturi
+- **Departamentul** - Doar in departamentele pentru care aveti drepturi
 
-### Salvarea modificărilor
+### Salvarea modificarilor
 
-1. **Faceți modificările** necesare în formular
-2. **Apăsați "Actualizează Utilizatorul"** din josul ferestrei
-3. **Confirmați modificările** dacă vi se cere
-4. **Utilizatorul actualizat** va apărea în listă cu noile date
+1. **Faceti modificarile** necesare in formular
+2. **Apasati "Actualizeaza Utilizatorul"** din josul ferestrei
+3. **Confirmati modificarile** daca vi se cere
+4. **Utilizatorul actualizat** va aparea in lista cu noile date
 
 ---
 
@@ -310,135 +310,135 @@ Pentru a accesa acest modul, trebuie să aveți unul dintre rolurile:
 
 ### Exportul rezultatelor filtrate
 
-1. **Aplicați filtrele** după criteriile dorite
-2. **În panoul de filtrare** apăsați "Exportă Rezultate"
-3. **Alegeți formatul**: Excel, PDF, sau CSV
-4. **Fișierul se va descărca** automat în browser
+1. **Aplicati filtrele** dupa criteriile dorite
+2. **in panoul de filtrare** apasati "Exporta Rezultate"
+3. **Alegeti formatul**: Excel, PDF, sau CSV
+4. **Fisierul se va descarca** automat in browser
 
-### Ce conține exportul
+### Ce contine exportul
 
 - **Toate coloanele vizibile** din tabel
-- **Doar rândurile filtrate** (nu toți utilizatorii)
-- **Formatare păstrată** pentru roluri și statusuri
+- **Doar randurile filtrate** (nu toti utilizatorii)
+- **Formatare pastrata** pentru roluri si statusuri
 - **Date actualizate** la momentul exportului
 
-### Utilizarea fișierului exportat
+### Utilizarea fisierului exportat
 
-- **Excel**: Pentru analize și rapoarte avansate
-- **PDF**: Pentru imprimare și arhivare
-- **CSV**: Pentru import în alte sisteme
+- **Excel**: Pentru analize si rapoarte avansate
+- **PDF**: Pentru imprimare si arhivare
+- **CSV**: Pentru import in alte sisteme
 
 ---
 
-## Situații Speciale și Erori
+## Situatii Speciale si Erori
 
 ### Utilizatori cu probleme
 
-#### 🔒 Utilizatori blocați
-**De ce se întâmplă**: Prea multe încercări greșite de conectare
-**Ce să faceți**:
-1. Editați utilizatorul
-2. Schimbați statusul la "Activ"
-3. Informați utilizatorul să își schimbe parola
+#### 🔒 Utilizatori blocati
+**De ce se intampla**: Prea multe incercari gresite de conectare
+**Ce sa faceti**:
+1. Editati utilizatorul
+2. Schimbati statusul la "Activ"
+3. Informati utilizatorul sa isi schimbe parola
 
-#### ⏸️ Utilizatori suspendați
-**De ce se întâmplă**: Suspendare administrativă temporară
-**Ce să faceți**:
-1. Verificați motivul suspendării
-2. Editați utilizatorul dacă este cazul
-3. Schimbați statusul la "activ" după rezolvarea problemei
+#### ⏸️ Utilizatori suspendati
+**De ce se intampla**: Suspendare administrativa temporara
+**Ce sa faceti**:
+1. Verificati motivul suspendarii
+2. Editati utilizatorul daca este cazul
+3. Schimbati statusul la "activ" dupa rezolvarea problemei
 
 #### ❌ Utilizatori inactivi
-**De ce se întâmplă**: Nu s-au mai conectat de mult timp
-**Ce să faceți**:
-1. Verificați dacă mai lucrează în clinică
-2. Contactați utilizatorul pentru clarificare
-3. Dezactivați contul dacă nu mai este necesar
+**De ce se intampla**: Nu s-au mai conectat de mult timp
+**Ce sa faceti**:
+1. Verificati daca mai lucreaza in clinica
+2. Contactati utilizatorul pentru clarificare
+3. Dezactivati contul daca nu mai este necesar
 
-### Mesaje de eroare în aplicație
+### Mesaje de eroare in aplicatie
 
-#### "Nu aveți permisiuni pentru această acțiune"
-**Cauza**: Rolul dvs. nu permite această operațiune
-**Soluția**: Contactați administratorul pentru acordarea permisiunilor
+#### "Nu aveti permisiuni pentru aceasta actiune"
+**Cauza**: Rolul dvs. nu permite aceasta operatiune
+**Solutia**: Contactati administratorul pentru acordarea permisiunilor
 
-#### "Utilizatorul nu poate fi șters"
-**Cauza**: Utilizatorul are înregistrări asociate în sistem
-**Soluția**: Dezactivați contul în loc să-l ștergeți
+#### "Utilizatorul nu poate fi sters"
+**Cauza**: Utilizatorul are inregistrari asociate in sistem
+**Solutia**: Dezactivati contul in loc sa-l stergeti
 
 #### "Sesiunea a expirat"
-**Cauza**: Ați stat prea mult timp inactiv
-**Soluția**: Reconectați-vă și reluați operațiunea
+**Cauza**: Ati stat prea mult timp inactiv
+**Solutia**: Reconectati-va si reluati operatiunea
 
 ---
 
-## Sfaturi și Bune Practici
+## Sfaturi si Bune Practici
 
 ### Pentru organizarea utilizatorilor
 
 #### ✅ Bune practici:
-- **Folosiți convenții** pentru username-uri (ex: nume.prenume)
-- **Asignați rolurile** cu atenție și doar personalului autorizat
-- **Verificați periodic** utilizatorii inactivi
-- **Mențineți datele** actualizate (telefon, departament, funcție)
-- **Folosiți funcția de export** pentru raportări regulate
+- **Folositi conventii** pentru username-uri (ex: nume.prenume)
+- **Asignati rolurile** cu atentie si doar personalului autorizat
+- **Verificati periodic** utilizatorii inactivi
+- **Mentineti datele** actualizate (telefon, departament, functie)
+- **Folositi functia de export** pentru raportari regulate
 
-#### ❌ Ce să evitați:
-- **Nu creați conturi** pentru personal temporar pe perioade scurte
-- **Nu lăsați conturi active** pentru persoane care nu mai lucrează
-- **Nu dați drepturi de administrator** decât unde este strict necesar
-- **Nu folosiți același email** pentru mai multe conturi
+#### ❌ Ce sa evitati:
+- **Nu creati conturi** pentru personal temporar pe perioade scurte
+- **Nu lasati conturi active** pentru persoane care nu mai lucreaza
+- **Nu dati drepturi de administrator** decat unde este strict necesar
+- **Nu folositi acelasi email** pentru mai multe conturi
 
 ### Pentru securitate
 
-- **Verificați periodic** lista administratorilor
-- **Monitorizați utilizatorii** care nu s-au mai conectat recent
-- **Informați personalul** să își schimbe parolele regulat
-- **Raportați imediat** activitatea suspectă
+- **Verificati periodic** lista administratorilor
+- **Monitorizati utilizatorii** care nu s-au mai conectat recent
+- **Informati personalul** sa isi schimbe parolele regulat
+- **Raportati imediat** activitatea suspecta
 
 ---
 
-## Întrebări Frecvente
+## intrebari Frecvente
 
-### 1. De câți utilizatori am nevoie pentru clinica mea?
-**Răspuns:** Creați câte un cont pentru fiecare persoană care va lucra cu sistemul. Nu împărțiți conturile între mai multe persoane.
+### 1. De cati utilizatori am nevoie pentru clinica mea?
+**Raspuns:** Creati cate un cont pentru fiecare persoana care va lucra cu sistemul. Nu impartiti conturile intre mai multe persoane.
 
-### 2. Pot să schimb rolul unui utilizator după ce l-am creat?
-**Răspuns:** Da, puteți modifica rolul editând utilizatorul, dar verificați că aveți permisiuni pentru rolul pe care doriți să-l asignați.
+### 2. Pot sa schimb rolul unui utilizator dupa ce l-am creat?
+**Raspuns:** Da, puteti modifica rolul editand utilizatorul, dar verificati ca aveti permisiuni pentru rolul pe care doriti sa-l asignati.
 
-### 3. Ce se întâmplă dacă șterg din greșeală un utilizator?
-**Răspuns:** În majoritatea cazurilor nu puteți șterge, doar dezactiva. Contactați administratorul pentru recuperarea datelor.
+### 3. Ce se intampla daca sterg din greseala un utilizator?
+**Raspuns:** in majoritatea cazurilor nu puteti sterge, doar dezactiva. Contactati administratorul pentru recuperarea datelor.
 
-### 4. Pot să văd parola unui utilizator?
-**Răspuns:** Nu, parolele sunt criptate și nu pot fi vizualizate. Puteți doar să resetați parola unui utilizator.
+### 4. Pot sa vad parola unui utilizator?
+**Raspuns:** Nu, parolele sunt criptate si nu pot fi vizualizate. Puteti doar sa resetati parola unui utilizator.
 
-### 5. De ce nu văd toți utilizatorii în listă?
-**Răspuns:** Poate aveți filtre aplicate sau nu aveți permisiuni pentru anumite departamente. Verificați setările de filtrare.
+### 5. De ce nu vad toti utilizatorii in lista?
+**Raspuns:** Poate aveti filtre aplicate sau nu aveti permisiuni pentru anumite departamente. Verificati setarile de filtrare.
 
-### 6. Cum știu când un utilizator s-a conectat ultima dată?
-**Răspuns:** Coloana "Ultima Autent." din tabel arată această informație. Pentru detalii, deschideți profilul utilizatorului.
+### 6. Cum stiu cand un utilizator s-a conectat ultima data?
+**Raspuns:** Coloana "Ultima Autent." din tabel arata aceasta informatie. Pentru detalii, deschideti profilul utilizatorului.
 
 ---
 
 ## Contactarea Suportului
 
-### Când să contactați suportul:
-- **Nu puteți accesa** modulul de gestionare utilizatori
-- **Întâmpinați erori** la salvarea utilizatorilor
-- **Aveți întrebări** despre permisiuni și roluri
-- **Trebuie să recuperați** date șterse accidental
-- **Observați activitate neobișnuită** în lista utilizatorilor
+### Cand sa contactati suportul:
+- **Nu puteti accesa** modulul de gestionare utilizatori
+- **intampinati erori** la salvarea utilizatorilor
+- **Aveti intrebari** despre permisiuni si roluri
+- **Trebuie sa recuperati** date sterse accidental
+- **Observati activitate neobisnuita** in lista utilizatorilor
 
-### Informații de furnizat:
-1. **Numele dvs. și rolul** în sistem
-2. **Acțiunea** pe care încercați să o faceți
-3. **Mesajul de eroare** exact (faceți o poză)
-4. **Utilizatorul** asupra căruia lucrați (dacă e cazul)
-5. **Browserul** și versiunea folosite
+### Informatii de furnizat:
+1. **Numele dvs. si rolul** in sistem
+2. **Actiunea** pe care incercati sa o faceti
+3. **Mesajul de eroare** exact (faceti o poza)
+4. **Utilizatorul** asupra caruia lucrati (daca e cazul)
+5. **Browserul** si versiunea folosite
 
 ---
 
-*Acest ghid vă ajută să gestionați eficient utilizatorii din sistemul ValyanMed. Pentru întrebări specifice sau probleme tehnice, nu ezitați să contactați echipa de suport.*
+*Acest ghid va ajuta sa gestionati eficient utilizatorii din sistemul ValyanMed. Pentru intrebari specifice sau probleme tehnice, nu ezitati sa contactati echipa de suport.*
 
 **Versiune document:** 1.0  
-**Data actualizării:** Septembrie 2025  
+**Data actualizarii:** Septembrie 2025  
 **Autor:** Echipa ValyanMed

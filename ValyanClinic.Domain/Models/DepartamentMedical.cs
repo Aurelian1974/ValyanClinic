@@ -2,12 +2,12 @@
 
 /// <summary>
 /// Model pentru departamentele medicale din tabela Departamente
-/// IMPORTANT: Aceasta este o clasă pentru date din DB, NU un enum static
-/// Departamentele se încarcă dinamic din sp_Departamente_GetByTip cu @Tip = 'Medical'
+/// IMPORTANT: Aceasta este o clasa pentru date din DB, NU un enum static
+/// Departamentele se incarca dinamic din sp_Departamente_GetByTip cu @Tip = 'Medical'
 /// </summary>
 public class DepartamentMedical
 {
-    // Proprietăți din baza de date
+    // Proprietati din baza de date
     public Guid DepartamentID { get; set; }
     public string Nume { get; set; } = string.Empty;
     public string Tip { get; set; } = string.Empty;
@@ -15,14 +15,14 @@ public class DepartamentMedical
     // Computed Properties pentru UI
     public string DisplayName => Nume;
     
-    // Proprietăți pentru dropdown-uri și UI
+    // Proprietati pentru dropdown-uri si UI
     public string Value => DepartamentID.ToString();
     public string Text => Nume;
     
-    // Proprietăți pentru validări și business logic
+    // Proprietati pentru validari si business logic
     public bool IsMedical => string.Equals(Tip, "Medical", StringComparison.OrdinalIgnoreCase);
     
-    // Metode pentru comparare și egalitate
+    // Metode pentru comparare si egalitate
     public override bool Equals(object? obj)
     {
         if (obj is DepartamentMedical other)
@@ -42,7 +42,7 @@ public class DepartamentMedical
         return DisplayName;
     }
     
-    // Factory methods pentru crearea instanțelor
+    // Factory methods pentru crearea instantelor
     public static DepartamentMedical Create(Guid departamentId, string nume, string tip = "Medical")
     {
         return new DepartamentMedical
@@ -53,7 +53,7 @@ public class DepartamentMedical
         };
     }
     
-    // Metode pentru validări
+    // Metode pentru validari
     public bool IsValid()
     {
         return DepartamentID != Guid.Empty && 
@@ -61,7 +61,7 @@ public class DepartamentMedical
                !string.IsNullOrWhiteSpace(Tip);
     }
     
-    // Metode pentru căutare și filtrare
+    // Metode pentru cautare si filtrare
     public bool MatchesSearchText(string? searchText)
     {
         if (string.IsNullOrWhiteSpace(searchText)) return true;
@@ -98,7 +98,7 @@ public class DepartamentMedicalOption
 
 /// <summary>
 /// Container pentru toate tipurile de departamente medicale
-/// Folosit pentru gruparea categoriilor, specializărilor și subspecializărilor
+/// Folosit pentru gruparea categoriilor, specializarilor si subspecializarilor
 /// </summary>
 public class DepartamenteMedicaleContainer
 {
@@ -107,7 +107,7 @@ public class DepartamenteMedicaleContainer
     public List<DepartamentMedical> Subspecializari { get; set; } = new();
     public List<DepartamentMedical> ToateDepartamentele { get; set; } = new();
     
-    // Metode pentru găsirea departamentelor după tip
+    // Metode pentru gasirea departamentelor dupa tip
     public DepartamentMedical? FindCategorie(Guid id) => 
         Categorii.FirstOrDefault(c => c.DepartamentID == id);
         
@@ -120,7 +120,7 @@ public class DepartamenteMedicaleContainer
     public DepartamentMedical? FindAny(Guid id) => 
         ToateDepartamentele.FirstOrDefault(d => d.DepartamentID == id);
         
-    // Proprietăți pentru statistici și informații
+    // Proprietati pentru statistici si informatii
     public int TotalCategorii => Categorii.Count;
     public int TotalSpecializari => Specializari.Count;
     public int TotalSubspecializari => Subspecializari.Count;
@@ -129,7 +129,7 @@ public class DepartamenteMedicaleContainer
     public bool IsEmpty => TotalDepartamente == 0;
     public bool HasData => !IsEmpty;
     
-    // Metode pentru validări
+    // Metode pentru validari
     public bool IsValidConfiguration()
     {
         return TotalCategorii > 0 && TotalSpecializari > 0;

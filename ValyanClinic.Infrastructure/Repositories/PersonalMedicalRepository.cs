@@ -235,7 +235,7 @@ public class PersonalMedicalRepository : IPersonalMedicalRepository
 
             if (result == null)
             {
-                throw new InvalidOperationException($"Personal medical cu ID {personalMedical.PersonalID} nu a fost găsit pentru eventuală actualizare");
+                throw new InvalidOperationException($"Personal medical cu ID {personalMedical.PersonalID} nu a fost gasit pentru eventuala actualizare");
             }
 
             var mappedResult = MapDtoToPersonalMedical(result);
@@ -264,7 +264,7 @@ public class PersonalMedicalRepository : IPersonalMedicalRepository
             var hasActiveAppointments = await CheckActiveAppointmentsAsync(id);
             if (hasActiveAppointments)
             {
-                throw new InvalidOperationException("Nu se poate șterge personalul medical cu programări active");
+                throw new InvalidOperationException("Nu se poate sterge personalul medical cu programari active");
             }
 
             await EnsureConnectionOpenAsync();
@@ -581,7 +581,7 @@ public class PersonalMedicalRepository : IPersonalMedicalRepository
         if (string.IsNullOrWhiteSpace(value))
             return null;
 
-        // Pentru PozitiePersonalMedical, folosim metoda robustă de parsing
+        // Pentru PozitiePersonalMedical, folosim metoda robusta de parsing
         if (typeof(T) == typeof(PozitiePersonalMedical))
         {
             var enumResult = PozitiePersonalMedicalExtensions.ParseFromDatabase(value);

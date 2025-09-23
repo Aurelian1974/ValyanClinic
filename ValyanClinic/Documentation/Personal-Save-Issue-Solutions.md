@@ -1,22 +1,22 @@
-﻿# Diagnostic și Soluții pentru Problema de Salvare Personal
+﻿# Diagnostic si Solutii pentru Problema de Salvare Personal
 
-## 🔍 Probleme Identificate și Soluții Implementate
+## 🔍 Probleme Identificate si Solutii Implementate
 
-### **Problema 1: Debugging Insuficient în Repository**
-**Simptome:** Nu știam exact ce parametri se trimit la stored procedure  
-**Soluție:** Am adăugat logging detaliat în `MapPersonalToParameters`:
+### **Problema 1: Debugging Insuficient in Repository**
+**Simptome:** Nu stiam exact ce parametri se trimit la stored procedure  
+**Solutie:** Am adaugat logging detaliat in `MapPersonalToParameters`:
 
 ```csharp
 Console.WriteLine($"DEBUG MapPersonalToParameters: Mapping critical parameters:");
 Console.WriteLine($"DEBUG MapPersonalToParameters: - @Cod_Angajat = '{personal.Cod_Angajat}'");
 Console.WriteLine($"DEBUG MapPersonalToParameters: - @CNP = '{personal.CNP}'");
 Console.WriteLine($"DEBUG MapPersonalToParameters: - @Nume = '{personal.Nume}'");
-// ... și alți parametri critici
+// ... si alti parametri critici
 ```
 
-### **Problema 2: Verificare Stored Procedure Inexistentă**
-**Simptome:** Posibil ca sp_Personal_Create să nu existe în baza de date  
-**Soluție:** Am adăugat verificare explicită înainte de apel:
+### **Problema 2: Verificare Stored Procedure Inexistenta**
+**Simptome:** Posibil ca sp_Personal_Create sa nu existe in baza de date  
+**Solutie:** Am adaugat verificare explicita inainte de apel:
 
 ```csharp
 var testCall = await _connection.QueryAsync(
@@ -26,8 +26,8 @@ Console.WriteLine($"DEBUG: sp_Personal_Create found: {testCall.Any()}");
 ```
 
 ### **Problema 3: Timeout Prea Mic**
-**Simptome:** Stored procedure-ul se execută încet și timeout-ul default e prea mic  
-**Soluție:** Am crescut timeout-ul la 2 minute:
+**Simptome:** Stored procedure-ul se executa incet si timeout-ul default e prea mic  
+**Solutie:** Am crescut timeout-ul la 2 minute:
 
 ```csharp
 var result = await _connection.QueryFirstAsync<PersonalDto>(
@@ -39,7 +39,7 @@ var result = await _connection.QueryFirstAsync<PersonalDto>(
 
 ### **Problema 4: SQL Exception Handling Insuficient**
 **Simptome:** Erorile SQL nu erau detaliate suficient  
-**Soluție:** Am adăugat logging specific pentru SQL exceptions:
+**Solutie:** Am adaugat logging specific pentru SQL exceptions:
 
 ```csharp
 if (ex is Microsoft.Data.SqlClient.SqlException sqlEx)
@@ -52,47 +52,47 @@ if (ex is Microsoft.Data.SqlClient.SqlException sqlEx)
 }
 ```
 
-### **Problema 5: Lipsă Metodă de Test Database**
-**Simptome:** Nu aveam mod să testez conectivitatea și funcționalitatea DB  
-**Soluție:** Am creat `TestDatabaseConnectionAsync()` care verifică:
+### **Problema 5: Lipsa Metoda de Test Database**
+**Simptome:** Nu aveam mod sa testez conectivitatea si functionalitatea DB  
+**Solutie:** Am creat `TestDatabaseConnectionAsync()` care verifica:
 
-- ✅ Conectivitatea de bază
+- ✅ Conectivitatea de baza
 - ✅ Numele bazei de date 
-- ✅ Existența tabelei Personal
-- ✅ Existența stored procedures
+- ✅ Existenta tabelei Personal
+- ✅ Existenta stored procedures
 - ✅ Structura tabelei Personal
 - ✅ Posibilitatea de insert/delete direct
 
-### **Problema 6: Lipsă Endpoint de Test**
-**Simptome:** Nu aveam mod să testez via API  
-**Soluție:** Am adăugat endpoint `/api/admin/test-database`:
+### **Problema 6: Lipsa Endpoint de Test**
+**Simptome:** Nu aveam mod sa testez via API  
+**Solutie:** Am adaugat endpoint `/api/admin/test-database`:
 
 ```http
 POST /api/admin/test-database
 ```
 
-## 🧪 Cum să Testezi Acum
+## 🧪 Cum sa Testezi Acum
 
-### **Pas 1: Pornește aplicația**
+### **Pas 1: Porneste aplicatia**
 ```bash
 dotnet run
 ```
 
-### **Pas 2: Testează conectivitatea bazei de date**
+### **Pas 2: Testeaza conectivitatea bazei de date**
 ```http
 POST https://localhost:7164/api/admin/test-database
 ```
 
-### **Pas 3: Încearcă să salvezi un personal**
-1. Navighează la `/administrare/personal`
-2. Apasă "Adaugă Personal"
-3. Completează formularul
-4. Apasă "Creează Personal"
+### **Pas 3: incearca sa salvezi un personal**
+1. Navigheaza la `/administrare/personal`
+2. Apasa "Adauga Personal"
+3. Completeaza formularul
+4. Apasa "Creeaza Personal"
 
-### **Pas 4: Monitorizează log-urile**
-**În Browser Console (F12):**
+### **Pas 4: Monitorizeaza log-urile**
+**in Browser Console (F12):**
 ```
-Caută pentru:
+Cauta pentru:
 - DEBUG HandleFinalSubmit: Starting final submit process
 - DEBUG SavePersonal: Starting save process
 - DEBUG CreatePersonalAsync: ENTRY
@@ -101,15 +101,15 @@ Caută pentru:
 - DEBUG PersonalRepository.CreateAsync: Calling stored procedure
 ```
 
-**În Visual Studio Output:**
+**in Visual Studio Output:**
 ```
 View → Output → "ASP.NET Core Web Server"
-Caută pentru Logger.LogInformation messages
+Cauta pentru Logger.LogInformation messages
 ```
 
 ## 🎯 Fluxul Complet de Debugging
 
-### **Fluxul Așteptat (SUCCESS):**
+### **Fluxul Asteptat (SUCCESS):**
 ```
 1. DEBUG HandleFinalSubmit: Starting final submit process
 2. DEBUG HandleFinalSubmit: Form validation passed
@@ -126,35 +126,35 @@ Caută pentru Logger.LogInformation messages
 13. DEBUG CreatePersonalAsync: SUCCESS - Personal created with ID [GUID]
 ```
 
-### **Puncte de Eșec Posibile:**
+### **Puncte de Esec Posibile:**
 
-#### **Eșec la Pas 6:** Database Connection
+#### **Esec la Pas 6:** Database Connection
 ```
 ERROR EnsureConnectionOpenAsync: Failed to ensure connection is open
-→ Verifică că SQL Server rulează pe TS1828\ERP
-→ Verifică connection string din appsettings.json
+→ Verifica ca SQL Server ruleaza pe TS1828\ERP
+→ Verifica connection string din appsettings.json
 ```
 
-#### **Eșec la Pas 7:** Missing Table
+#### **Esec la Pas 7:** Missing Table
 ```
 DEBUG EnsureConnectionOpenAsync: Personal table exists: False
-→ Rulează scripturile SQL din DevSupport/Scripts/
-→ Creează tabela Personal
+→ Ruleaza scripturile SQL din DevSupport/Scripts/
+→ Creeaza tabela Personal
 ```
 
-#### **Eșec la Pas 9:** Missing Stored Procedure
+#### **Esec la Pas 9:** Missing Stored Procedure
 ```
 DEBUG PersonalRepository.CreateAsync: sp_Personal_Create found: False
-→ Rulează SP_Personal_Create.sql
-→ Verifică permisiunile de execuție
+→ Ruleaza SP_Personal_Create.sql
+→ Verifica permisiunile de executie
 ```
 
-#### **Eșec la Pas 11:** SQL Execution Error
+#### **Esec la Pas 11:** SQL Execution Error
 ```
 ERROR PersonalRepository.CreateAsync: SQL Error Number: [Number]
-→ Verifică parametrii trimisi la SP
-→ Verifică constrangeri unique (CNP, Cod_Angajat)
-→ Verifică valorile NULL pentru câmpuri obligatorii
+→ Verifica parametrii trimisi la SP
+→ Verifica constrangeri unique (CNP, Cod_Angajat)
+→ Verifica valorile NULL pentru campuri obligatorii
 ```
 
 ## 🔧 Comenzi Utile pentru Debugging
@@ -164,7 +164,7 @@ ERROR PersonalRepository.CreateAsync: SQL Error Number: [Number]
 curl -X POST https://localhost:7164/api/admin/test-database
 ```
 
-### **Verifică Log Status:**
+### **Verifica Log Status:**
 ```bash
 curl -X GET https://localhost:7164/api/admin/logs-status
 ```
@@ -174,14 +174,14 @@ curl -X GET https://localhost:7164/api/admin/logs-status
 curl -X POST https://localhost:7164/api/admin/cleanup-logs
 ```
 
-## 📊 Următorii Pași
+## 📊 Urmatorii Pasi
 
-1. **Rulează testul de database** via API endpoint
-2. **Verifică toate log-urile** în console browser
-3. **Identifică exact punctul de eșec** din fluxul de mai sus
-4. **Raportează rezultatele** pentru investigare ulterioară
+1. **Ruleaza testul de database** via API endpoint
+2. **Verifica toate log-urile** in console browser
+3. **Identifica exact punctul de esec** din fluxul de mai sus
+4. **Raporteaza rezultatele** pentru investigare ulterioara
 
-**🎉 Acum ai toate instrumentele necesare pentru a identifica și rezolva problema de salvare!**
+**🎉 Acum ai toate instrumentele necesare pentru a identifica si rezolva problema de salvare!**
 
 ---
 

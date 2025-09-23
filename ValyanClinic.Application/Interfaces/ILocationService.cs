@@ -3,7 +3,7 @@
 namespace ValyanClinic.Application.Interfaces;
 
 /// <summary>
-/// Interface simplificată pentru serviciul de locații
+/// Interface simplificata pentru serviciul de locatii
 /// </summary>
 public interface ILocationService
 {
@@ -14,7 +14,7 @@ public interface ILocationService
 }
 
 /// <summary>
-/// Model simplificat pentru opțiuni dropdown
+/// Model simplificat pentru optiuni dropdown
 /// </summary>
 public record LocationOption(int Id, string Name)
 {
@@ -25,7 +25,7 @@ public record LocationOption(int Id, string Name)
 }
 
 /// <summary>
-/// Clasa pentru opțiunile dropdown - versiune simplificată
+/// Clasa pentru optiunile dropdown - versiune simplificata
 /// </summary>
 public class DropdownOption<T>
 {
