@@ -34,5 +34,8 @@
     <ProjectReference Include="..\ValyanClinic.Application\ValyanClinic.Application.csproj" />
     <ProjectReference Include="..\ValyanClinic.Infrastructure\ValyanClinic.Infrastructure.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Application\Models\" />
+  </ItemGroup>
 
 </Project>

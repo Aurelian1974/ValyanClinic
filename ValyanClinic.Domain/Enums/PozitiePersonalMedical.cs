@@ -4,6 +4,7 @@ namespace ValyanClinic.Domain.Enums;
 
 /// <summary>
 /// Enumerare pentru pozițiile personalului medical în clinică
+/// Valorile sunt mapate pentru a corespunde cu datele din baza de date
 /// </summary>
 public enum PozitiePersonalMedical
 {
@@ -63,6 +64,85 @@ public static class PozitiePersonalMedicalExtensions
     }
 
     /// <summary>
+    /// Parsează o valoare string sau numerică către enum PozitiePersonalMedical
+    /// Această metodă este robustă și poate parsa atât nume, cât și valori numerice
+    /// </summary>
+    /// <param name="value">Valoarea de parsare (string nume sau număr)</param>
+    /// <returns>Enum-ul corespunzător sau null dacă nu se poate parsa</returns>
+    public static PozitiePersonalMedical? ParseFromDatabase(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+
+        // Încercăm să parsăm ca număr mai întâi
+        if (int.TryParse(value.Trim(), out var numericValue))
+        {
+            if (Enum.IsDefined(typeof(PozitiePersonalMedical), numericValue))
+            {
+                return (PozitiePersonalMedical)numericValue;
+            }
+        }
+
+        // Încercăm să parsăm ca string - prin numele enum-ului
+        if (Enum.TryParse<PozitiePersonalMedical>(value.Trim(), true, out var enumResult))
+        {
+            return enumResult;
+        }
+
+        // Încercăm să găsim prin display name
+        foreach (PozitiePersonalMedical pozitie in Enum.GetValues<PozitiePersonalMedical>())
+        {
+            if (string.Equals(pozitie.GetDisplayName(), value.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                return pozitie;
+            }
+        }
+
+        // Mapări comune pentru compatibilitate cu datele existente din baza de date
+        var mappings = new Dictionary<string, PozitiePersonalMedical>(StringComparer.OrdinalIgnoreCase)
+        {
+            // Variante comune pentru Doctor
+            { "Medic", PozitiePersonalMedical.Doctor },
+            { "Dr", PozitiePersonalMedical.Doctor },
+            { "Medic Specialist", PozitiePersonalMedical.Doctor },
+            { "Medic Generalist", PozitiePersonalMedical.Doctor },
+            
+            // Variante comune pentru Asistent Medical
+            { "Asistent", PozitiePersonalMedical.AsistentMedical },
+            { "Asistenta", PozitiePersonalMedical.AsistentMedical },
+            { "Asistenta Medicala", PozitiePersonalMedical.AsistentMedical },
+            { "Nurse", PozitiePersonalMedical.AsistentMedical },
+            
+            // Variante comune pentru Tehnician Medical
+            { "Tehnician", PozitiePersonalMedical.TehnicianMedical },
+            { "Technician", PozitiePersonalMedical.TehnicianMedical },
+            { "Tehnician de Laborator", PozitiePersonalMedical.TehnicianMedical },
+            
+            // Variante comune pentru Recepționer Medical
+            { "Receptioner", PozitiePersonalMedical.ReceptionerMedical },
+            { "Receptie", PozitiePersonalMedical.ReceptionerMedical },
+            { "Front Desk", PozitiePersonalMedical.ReceptionerMedical },
+            
+            // Variante comune pentru Radiolog
+            { "Medic Radiolog", PozitiePersonalMedical.Radiolog },
+            { "Specialist Radiologie", PozitiePersonalMedical.Radiolog },
+            
+            // Variante comune pentru Laborant
+            { "Lab Technician", PozitiePersonalMedical.Laborant },
+            { "Analist", PozitiePersonalMedical.Laborant },
+            { "Biolog", PozitiePersonalMedical.Laborant }
+        };
+
+        if (mappings.TryGetValue(value.Trim(), out var mappedResult))
+        {
+            return mappedResult;
+        }
+
+        // Nu s-a putut parsa
+        return null;
+    }
+
+    /// <summary>
     /// Returnează toate pozițiile disponibile ca listă de perechi nume-valoare
     /// </summary>
     /// <returns>Lista pozițiilor cu numele și valorile lor</returns>
@@ -81,7 +161,8 @@ public static class PozitiePersonalMedicalExtensions
     public static bool RequiresLicensaMedicala(this PozitiePersonalMedical pozitie)
     {
         return pozitie == PozitiePersonalMedical.Doctor || 
-               pozitie == PozitiePersonalMedical.AsistentMedical;
+               pozitie == PozitiePersonalMedical.AsistentMedical ||
+               pozitie == PozitiePersonalMedical.Radiolog;
     }
 
     /// <summary>
@@ -120,5 +201,26 @@ public static class PozitiePersonalMedicalExtensions
             PozitiePersonalMedical.Laborant => "fa-vials",
             _ => "fa-user"
         };
+    }
+
+    /// <summary>
+    /// Convertește enum-ul la format string pentru salvare în baza de date
+    /// </summary>
+    /// <param name="pozitie">Poziția de convertit</param>
+    /// <returns>Reprezentarea string pentru baza de date</returns>
+    public static string ToDatabase(this PozitiePersonalMedical pozitie)
+    {
+        // Salvăm ca număr pentru consistență
+        return ((int)pozitie).ToString();
+    }
+
+    /// <summary>
+    /// Validează dacă o poziție este validă pentru operațiuni medicale
+    /// </summary>
+    /// <param name="pozitie">Poziția de validat</param>
+    /// <returns>True dacă poziția este validă</returns>
+    public static bool IsValidMedicalPosition(this PozitiePersonalMedical pozitie)
+    {
+        return Enum.IsDefined(typeof(PozitiePersonalMedical), pozitie);
     }
 }

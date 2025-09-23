@@ -1,709 +1,513 @@
 ﻿/* ==========================================================================
-   ADMINISTRARE PERSONAL MEDICAL - TEMA MEDICALĂ
-   Adaptat din administrare-personal.css cu theme medical específic
+   DESIGN COMPACT ȘI PROFESIONAL - PERSONAL MEDICAL PAGE
+   UNIFIED BLUE THEME - CONSISTENT WITH ADMINISTRARE-PERSONAL.CSS
    ========================================================================== */
 
-/* ==========================================================================
-   MEDICAL COLOR PALETTE - GREEN MEDICAL THEME
-   ========================================================================== */
-:root {
-    --medical-primary: #10b981;      /* Emerald green */
-    --medical-primary-dark: #059669;  /* Dark emerald */
-    --medical-primary-light: #34d399; /* Light emerald */
-    --medical-primary-pale: #ecfdf5;  /* Very light emerald */
-    
-    --medical-secondary: #16a34a;     /* Green */
-    --medical-accent: #22c55e;        /* Bright green */
-    --medical-warning: #f59e0b;       /* Amber */
-    --medical-danger: #ef4444;        /* Red */
-    --medical-info: #3b82f6;          /* Blue */
-}
-
-/* ==========================================================================
-   MAIN CONTAINER - MEDICAL THEME
-   ========================================================================== */
-html body .personal-medical-page-container {
-    padding: var(--space-xl) !important;
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
-    min-height: 100vh !important;
-    box-sizing: border-box !important;
-}
-
-/* ==========================================================================
-   PAGE HEADER - MEDICAL STYLE
-   ========================================================================== */
-html body .personal-medical-page-header {
-    background: linear-gradient(135deg, var(--medical-primary) 0%, var(--medical-primary-dark) 100%) !important;
-    border-radius: var(--radius-lg) !important;
-    padding: var(--space-xl) !important;
-    margin-bottom: var(--space-xl) !important;
-    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3) !important;
-    position: relative !important;
-    overflow: hidden !important;
-}
-
-html body .personal-medical-page-header::before {
-    content: '' !important;
-    position: absolute !important;
-    top: -50% !important;
-    right: -50% !important;
-    width: 200% !important;
-    height: 200% !important;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 50%) !important;
-    animation: medical-pulse 4s ease-in-out infinite !important;
-    pointer-events: none !important;
-}
-
-@keyframes medical-pulse {
-    0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.3; }
-    50% { transform: scale(1.1) rotate(180deg); opacity: 0.1; }
-}
-
-html body .personal-medical-page-header .header-content {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: flex-start !important;
-    position: relative !important;
-    z-index: 2 !important;
-}
-
-html body .personal-medical-page-title {
-    font-size: var(--text-3xl) !important;
-    font-weight: var(--font-bold) !important;
-    color: white !important;
-    margin: 0 0 var(--space-sm) 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: var(--space-md) !important;
-}
-
-html body .personal-medical-page-title i {
-    background: rgba(255, 255, 255, 0.2) !important;
-    padding: var(--space-md) !important;
-    border-radius: var(--radius-md) !important;
-    backdrop-filter: blur(10px) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+/* Container principal - ADAPTAT PENTRU LAYOUT CORECT */
+.personal-medical-page-container {
+  position: absolute; /* CHANGED from fixed */
+  top: 0; /* RESET - layout-ul gestionează offsetul */
+  left: 0; /* RESET - layout-ul gestionează offsetul */
+  right: 0; /* PĂSTRAT pentru margin */
+  bottom: 0; /* PĂSTRAT pentru margin */
+  width: 100%; /* CHANGED to full width within parent */
+  height: 100%; /* CHANGED to full height within parent */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* INCREASED for better spacing */
+  padding: 20px; /* INCREASED for better spacing */
+  overflow: hidden;
+  box-sizing: border-box;
+  background: transparent; /* CHANGED - let parent handle background */
+}
+
+/* Header - UNIFIED BLUE THEME */
+.personal-medical-page-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  padding: 20px 24px; /* REDUCED from 24px 28px */
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 123, 255, 0.15);
+  flex-shrink: 0;
+  min-height: 70px; /* REDUCED from 90px */
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  height: 100%;
+}
+
+.header-text {
+  flex: 1;
+}
+
+.personal-medical-page-title {
+  font-size: 24px; /* REDUCED from 26px */
+  font-weight: 700;
+  margin: 0 0 6px 0; /* REDUCED from 8px */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  line-height: 1.2;
+}
+
+.personal-medical-page-title i {
+  font-size: 22px; /* REDUCED from 24px */
+}
+
+.personal-medical-page-subtitle {
+  font-size: 14px; /* REDUCED from 15px */
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.4;
+  max-width: 700px;
+}
+
+.personal-medical-header-actions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+  align-items: center; /* ADDED for proper alignment */
+}
+
+.personal-medical-header-actions .btn {
+  padding: 10px 18px; /* REDUCED from 12px 20px */
+  font-size: 13px; /* REDUCED from 14px */
+  font-weight: 500;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  text-decoration: none;
+  min-width: 140px; /* REDUCED from 150px */
+  justify-content: center;
+}
+
+.personal-medical-header-actions .btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+/* Container Grid - IMPROVED */
+.personal-medical-grid-container {
+  background: white;
+  border: 1px solid #e1e8ff;
+  border-radius: 16px; /* INCREASED */
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); /* IMPROVED shadow */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-html body .personal-medical-page-subtitle {
-    color: rgba(255, 255, 255, 0.9) !important;
-    font-size: var(--text-lg) !important;
-    margin: 0 !important;
-    font-weight: var(--font-medium) !important;
+/* Grid Syncfusion - IMPROVED STYLING */
+.personal-medical-grid-container .e-grid {
+  height: 100% !important;
+  border: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  font-family: inherit !important;
 }
 
-/* Header Actions - Medical Style */
-html body .personal-medical-header-actions {
-    display: flex !important;
-    gap: var(--space-md) !important;
-    align-items: center !important;
+.personal-medical-grid-container .e-grid .e-gridheader {
+  flex-shrink: 0 !important;
+  background: #f8faff !important;
+  border-bottom: 1px solid #e1e8ff !important;
 }
 
-html body .personal-medical-header-actions .btn {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: white !important;
-    backdrop-filter: blur(10px) !important;
-    transition: all 0.3s ease !important;
+.personal-medical-grid-container .e-grid .e-headercell {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  padding: 11px 8px !important; /* REDUCED from 12px - saves 2px total per header */
+  border-right: 1px solid #f1f5f9 !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.personal-medical-grid-container .e-grid .e-gridcontent {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+.personal-medical-grid-container .e-grid .e-row:hover {
+  background: #f8faff !important;
 }
 
-html body .personal-medical-header-actions .btn:hover {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(255, 255, 255, 0.5) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+.personal-medical-grid-container .e-grid .e-rowcell {
+  font-size: 13px !important;
+  padding: 9px 8px !important; /* REDUCED from 10px - saves 2px total per row */
+  border-right: 1px solid #f8fafc !important;
+  border-bottom: 1px solid #f8fafc !important;
+  vertical-align: middle !important;
 }
 
-html body .personal-medical-header-actions .btn-outline-success {
-    background: var(--medical-secondary) !important;
-    border-color: var(--medical-accent) !important;
+/* Medical-specific badges - BLUE THEME */
+.pozitie-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-html body .personal-medical-header-actions .btn-outline-success:hover {
-    background: var(--medical-accent) !important;
-    border-color: white !important;
+.pozitie-badge.pozitie-doctor {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
 }
 
-/* ==========================================================================
-   STATISTICS CARDS - MEDICAL THEME
-   ========================================================================== */
-html body .personal-medical-stats-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-    gap: var(--space-lg) !important;
-    margin-bottom: var(--space-xl) !important;
+.pozitie-badge.pozitie-asistentmedical {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: white;
 }
 
-html body .personal-medical-stat-card {
-    background: white !important;
-    border-radius: var(--radius-lg) !important;
-    padding: var(--space-xl) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    position: relative !important;
-    overflow: hidden !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: var(--space-lg) !important;
+.pozitie-badge.pozitie-tehnicianmedical {
+  background: linear-gradient(135deg, #6f42c1, #5a32a3);
+  color: white;
 }
 
-html body .personal-medical-stat-card::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 4px !important;
-    height: 100% !important;
-    background: var(--medical-primary) !important;
+.pozitie-badge.pozitie-receptionermedical {
+  background: linear-gradient(135deg, #fd7e14, #e8590c);
+  color: white;
 }
 
-html body .personal-medical-stat-card.primary::before {
-    background: var(--medical-primary) !important;
+.pozitie-badge.pozitie-radiolog {
+  background: linear-gradient(135deg, #6610f2, #520dc2);
+  color: white;
 }
 
-html body .personal-medical-stat-card.success::before {
-    background: var(--medical-accent) !important;
+.pozitie-badge.pozitie-laborant {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
 }
 
-html body .personal-medical-stat-card.danger::before {
-    background: var(--medical-danger) !important;
+.departament-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: #e3f2fd;
+  color: #1565c0;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid #bbdefb;
 }
 
-html body .personal-medical-stat-card.info::before {
-    background: var(--medical-info) !important;
+/* Action buttons - LEFT ALIGNED BUT VISUALLY CENTERED */
+.action-buttons.medical-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-start; /* LEFT align to prevent Grid auto-sizing */
+  align-items: center;
+  width: 100%;
+  max-width: 120px;
+  padding: 0 8px; /* INCREASED left padding for visual balance */
+  box-sizing: border-box;
 }
 
-html body .personal-medical-stat-card.warning::before {
-    background: var(--medical-warning) !important;
+.medical-actions .btn-action {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
-html body .personal-medical-stat-card.secondary::before {
-    background: var(--medical-secondary) !important;
+.medical-actions .btn-action:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-html body .personal-medical-stat-card:hover {
-    transform: translateY(-4px) scale(1.02) !important;
-    box-shadow: 0 16px 48px rgba(16, 185, 129, 0.2) !important;
+.medical-actions .btn-view {
+  background: #3b82f6;
+  color: white;
 }
 
-html body .personal-medical-stat-card .stat-icon {
-    width: 60px !important;
-    height: 60px !important;
-    border-radius: var(--radius-md) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: linear-gradient(135deg, var(--medical-primary), var(--medical-primary-light)) !important;
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3) !important;
+.medical-actions .btn-view:hover {
+  background: #2563eb;
 }
 
-html body .personal-medical-stat-card .stat-icon i {
-    font-size: var(--text-xl) !important;
-    color: white !important;
+.medical-actions .btn-edit {
+  background: #f59e0b;
+  color: white;
 }
 
-html body .personal-medical-stat-card .stat-content {
-    flex: 1 !important;
+.medical-actions .btn-edit:hover {
+  background: #d97706;
 }
 
-html body .personal-medical-stat-number {
-    font-size: var(--text-3xl) !important;
-    font-weight: var(--font-bold) !important;
-    color: var(--text-primary) !important;
-    line-height: 1 !important;
-    margin-bottom: var(--space-xs) !important;
+.medical-actions .btn-delete {
+  background: #ef4444;
+  color: white;
 }
 
-html body .personal-medical-stat-label {
-    color: var(--text-secondary) !important;
-    font-size: var(--text-sm) !important;
-    font-weight: var(--font-medium) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
+.medical-actions .btn-delete:hover {
+  background: #dc2626;
 }
 
-/* ==========================================================================
-   ADVANCED FILTER PANEL - MEDICAL THEME
-   ========================================================================== */
-html body .personal-medical-advanced-filter-panel {
-    background: white !important;
-    border-radius: var(--radius-lg) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
-    margin-bottom: var(--space-xl) !important;
-    overflow: hidden !important;
-    border: 1px solid var(--medical-primary-pale) !important;
+/* Status badges - CONSISTENT WITH MAIN THEME */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px; /* INCREASED */
+  border-radius: 10px; /* INCREASED */
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px; /* INCREASED */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* ADDED shadow */
 }
 
-html body .personal-medical-advanced-filter-panel .filter-panel-header {
-    background: linear-gradient(90deg, var(--medical-primary-pale), rgba(16, 185, 129, 0.05)) !important;
-    padding: var(--space-lg) var(--space-xl) !important;
-    border-bottom: 1px solid var(--medical-primary-pale) !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
+.status-badge.status-activ {
+  background: #dcfce7;
+  color: #166534;
 }
 
-html body .personal-medical-advanced-filter-panel .filter-panel-header h3 {
-    margin: 0 !important;
-    font-size: var(--text-lg) !important;
-    font-weight: var(--font-semibold) !important;
-    color: var(--medical-primary-dark) !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: var(--space-sm) !important;
+.status-badge.status-inactiv {
+  background: #fef2f2;
+  color: #991b1b;
 }
 
-html body .personal-medical-advanced-filter-panel .filter-panel-header h3 i {
-    color: var(--medical-primary) !important;
+/* Loading indicator - BLUE THEME */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #6b7280;
 }
 
-html body .personal-medical-advanced-filter-panel .filter-panel-content {
-    padding: var(--space-xl) !important;
+.loading-indicator i {
+  font-size: 40px; /* INCREASED */
+  margin-bottom: 20px; /* INCREASED */
+  color: #007bff;
+  animation: spin 1s linear infinite; /* ADDED animation */
 }
 
-html body .personal-medical-advanced-filter-panel .filter-row {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: var(--space-lg) !important;
-    margin-bottom: var(--space-lg) !important;
+.loading-indicator .text-success {
+  color: #007bff !important; /* CHANGED from green to blue */
 }
 
-html body .personal-medical-advanced-filter-panel .filter-group {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: var(--space-sm) !important;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-html body .personal-medical-advanced-filter-panel .filter-label {
-    font-size: var(--text-sm) !important;
-    font-weight: var(--font-semibold) !important;
-    color: var(--medical-primary-dark) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
+/* Modal styling - BLUE THEME */
+.modal-header-content.medical-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-html body .personal-medical-advanced-filter-panel .filter-actions {
-    display: flex !important;
-    gap: var(--space-md) !important;
-    padding-top: var(--space-lg) !important;
-    border-top: 1px solid var(--border-light) !important;
+.modal-header-content.medical-header .modal-header-icon {
+  font-size: 24px;
+  color: #007bff;
 }
 
-html body .personal-medical-advanced-filter-panel .filter-actions .btn-success {
-    background: var(--medical-primary) !important;
-    border-color: var(--medical-primary-dark) !important;
+.modal-header-content .modal-header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
 }
 
-html body .personal-medical-advanced-filter-panel .filter-actions .btn-success:hover {
-    background: var(--medical-primary-dark) !important;
-    border-color: var(--medical-primary-light) !important;
-    transform: translateY(-1px) !important;
+.modal-header-content .modal-header-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 400;
 }
 
-html body .personal-medical-advanced-filter-panel .filter-results-summary {
-    margin-top: var(--space-lg) !important;
-    padding: var(--space-md) !important;
-    background: var(--medical-primary-pale) !important;
-    border-radius: var(--radius-md) !important;
-    border-left: 4px solid var(--medical-primary) !important;
+.modal-footer-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 16px 24px;
+  background: #f8fafc;
+  border-top: 1px solid #e5e7eb;
+  position: sticky;
+  bottom: 0;
+  margin: 0 -24px -24px -24px;
 }
 
-html body .personal-medical-advanced-filter-panel .results-count {
-    color: var(--medical-primary-dark) !important;
-    font-weight: var(--font-semibold) !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: var(--space-sm) !important;
+.modal-footer-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  background: none;
 }
 
-html body .personal-medical-advanced-filter-panel .filtered-indicator {
-    background: var(--medical-primary) !important;
-    color: white !important;
-    padding: var(--space-xs) var(--space-sm) !important;
-    border-radius: var(--radius-md) !important;
-    font-size: var(--text-xs) !important;
-    font-weight: var(--font-semibold) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: var(--space-xs) !important;
+.modal-footer-actions .btn-success {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border: none;
 }
 
-/* ==========================================================================
-   GRID CONTAINER - MEDICAL THEME
-   ========================================================================== */
-html body .personal-medical-grid-container {
-    background: white !important;
-    border-radius: var(--radius-lg) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
-    overflow: hidden !important;
-    border: 1px solid var(--medical-primary-pale) !important;
+.modal-footer-actions .btn-success:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
-/* Grid Loading */
-html body .personal-medical-grid-container .loading-indicator {
-    color: var(--medical-primary) !important;
+.modal-footer-actions .btn-secondary {
+  background: #f8fafc;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
 }
 
-html body .personal-medical-grid-container .loading-indicator .text-success {
-    color: var(--medical-primary) !important;
+.modal-footer-actions .btn-secondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
 }
 
-/* ==========================================================================
-   MEDICAL BADGES AND INDICATORS
-   ========================================================================== */
-
-/* Position Badges - Medical Specific */
-html body .pozitie-badge {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: var(--space-xs) !important;
-    padding: var(--space-xs) var(--space-sm) !important;
-    border-radius: var(--radius-md) !important;
-    font-size: var(--text-xs) !important;
-    font-weight: var(--font-semibold) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-}
-
-html body .pozitie-badge.pozitie-doctor {
-    background: linear-gradient(135deg, var(--medical-primary), var(--medical-primary-dark)) !important;
-    color: white !important;
-    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.4) !important;
-}
-
-html body .pozitie-badge.pozitie-asistentmedical {
-    background: linear-gradient(135deg, var(--medical-accent), var(--medical-secondary)) !important;
-    color: white !important;
-    box-shadow: 0 3px 12px rgba(34, 197, 94, 0.4) !important;
-}
-
-html body .pozitie-badge.pozitie-tehnicianmedical {
-    background: linear-gradient(135deg, var(--medical-info), #2563eb) !important;
-    color: white !important;
-    box-shadow: 0 3px 12px rgba(59, 130, 246, 0.4) !important;
-}
-
-html body .pozitie-badge.pozitie-receptionermedical {
-    background: linear-gradient(135deg, var(--medical-warning), #d97706) !important;
-    color: white !important;
-    box-shadow: 0 3px 12px rgba(245, 158, 11, 0.4) !important;
-}
-
-html body .pozitie-badge.pozitie-radiolog {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
-    color: white !important;
-    box-shadow: 0 3px 12px rgba(139, 92, 246, 0.4) !important;
-}
-
-html body .pozitie-badge.pozitie-laborant {
-    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-    color: white !important;
-    box-shadow: 0 3px 12px rgba(245, 158, 11, 0.4) !important;
-}
-
-/* Departament Badge - Medical */
-html body .departament-badge {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: var(--space-xs) !important;
-    padding: var(--space-xs) var(--space-sm) !important;
-    background: var(--medical-primary-pale) !important;
-    color: var(--medical-primary-dark) !important;
-    border-radius: var(--radius-sm) !important;
-    font-size: var(--text-xs) !important;
-    font-weight: var(--font-medium) !important;
-    border: 1px solid var(--medical-primary-light) !important;
-}
-
-/* Status Badge - Medical */
-html body .status-badge.status-activ {
-    background: linear-gradient(135deg, var(--medical-accent), var(--medical-secondary)) !important;
-    color: white !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: var(--space-xs) !important;
-    padding: var(--space-xs) var(--space-sm) !important;
-    border-radius: var(--radius-md) !important;
-    font-size: var(--text-xs) !important;
-    font-weight: var(--font-semibold) !important;
-    box-shadow: 0 3px 12px rgba(34, 197, 94, 0.3) !important;
-}
-
-html body .status-badge.status-inactiv {
-    background: linear-gradient(135deg, var(--medical-danger), #dc2626) !important;
-    color: white !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: var(--space-xs) !important;
-    padding: var(--space-xs) var(--space-sm) !important;
-    border-radius: var(--radius-md) !important;
-    font-size: var(--text-xs) !important;
-    font-weight: var(--font-semibold) !important;
-    box-shadow: 0 3px 12px rgba(239, 68, 68, 0.3) !important;
-}
-
-/* ==========================================================================
-   ACTION BUTTONS - MEDICAL THEME
-   ========================================================================== */
-html body .action-buttons.medical-actions .btn-action {
-    background: rgba(16, 185, 129, 0.1) !important;
-    color: var(--medical-primary) !important;
-    border: 1px solid var(--medical-primary-light) !important;
-    transition: all 0.2s ease !important;
-}
-
-html body .action-buttons.medical-actions .btn-action:hover {
-    background: var(--medical-primary) !important;
-    color: white !important;
-    border-color: var(--medical-primary-dark) !important;
-    transform: translateY(-1px) scale(1.05) !important;
-}
-
-html body .action-buttons.medical-actions .btn-view:hover {
-    background: var(--medical-info) !important;
-    border-color: #2563eb !important;
-}
-
-html body .action-buttons.medical-actions .btn-edit:hover {
-    background: var(--medical-warning) !important;
-    border-color: #d97706 !important;
-}
-
-html body .action-buttons.medical-actions .btn-delete:hover {
-    background: var(--medical-danger) !important;
-    border-color: #dc2626 !important;
-}
-
-/* ==========================================================================
-   KEBAB MENU - MEDICAL THEME
-   ========================================================================== */
-html body .personal-medical-page-container .kebab-menu-container {
-    position: relative !important;
-}
-
-html body .personal-medical-page-container .kebab-menu-btn {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: white !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: var(--radius-md) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    backdrop-filter: blur(10px) !important;
-    transition: all 0.3s ease !important;
-}
-
-html body .personal-medical-page-container .kebab-menu-btn:hover {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(255, 255, 255, 0.5) !important;
-    transform: rotate(90deg) scale(1.1) !important;
-}
-
-html body .personal-medical-page-container .kebab-menu-dropdown {
-    position: absolute !important;
-    top: calc(100% + 8px) !important;
-    right: 0 !important;
-    background: white !important;
-    border-radius: var(--radius-md) !important;
-    box-shadow: 0 16px 48px rgba(16, 185, 129, 0.2) !important;
-    border: 1px solid var(--medical-primary-pale) !important;
-    min-width: 220px !important;
-    z-index: 1000 !important;
-    overflow: hidden !important;
-    animation: medical-slide-down 0.3s ease !important;
+.modal-footer-actions .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
-@keyframes medical-slide-down {
-    from {
-        opacity: 0;
-        transform: translateY(-10px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+/* Placeholder content styling */
+.placeholder-content {
+  padding: 24px;
+  text-align: center;
+  color: #6b7280;
 }
 
-html body .personal-medical-page-container .kebab-menu-item {
-    width: 100% !important;
-    padding: var(--space-md) var(--space-lg) !important;
-    background: transparent !important;
-    border: none !important;
-    color: var(--text-primary) !important;
-    font-size: var(--text-sm) !important;
-    font-weight: var(--font-medium) !important;
-    text-align: left !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: var(--space-md) !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    position: relative !important;
+.placeholder-content h3 {
+  color: #1e293b;
+  margin-bottom: 16px;
 }
 
-html body .personal-medical-page-container .kebab-menu-item:hover {
-    background: var(--medical-primary-pale) !important;
-    color: var(--medical-primary-dark) !important;
-    padding-left: calc(var(--space-lg) + 4px) !important;
+.placeholder-content p {
+  margin-bottom: 24px;
+  line-height: 1.6;
 }
 
-html body .personal-medical-page-container .kebab-menu-item i {
-    width: 16px !important;
-    color: var(--medical-primary) !important;
-    transition: all 0.2s ease !important;
+.personal-medical-details {
+  text-align: left;
+  background: #f8faff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e1e8ff;
+  margin-top: 20px;
 }
 
-html body .personal-medical-page-container .kebab-menu-item:hover i {
-    color: var(--medical-primary-dark) !important;
-    transform: scale(1.1) !important;
+.personal-medical-details p {
+  margin: 8px 0;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 8px;
 }
 
-html body .personal-medical-page-container .kebab-check {
-    margin-left: auto !important;
-    color: var(--medical-accent) !important;
-    font-weight: var(--font-bold) !important;
+.personal-medical-details strong {
+  color: #1e293b;
+  min-width: 120px;
 }
 
-/* ==========================================================================
-   MODAL DIALOGS - MEDICAL THEME
-   ========================================================================== */
-html body .personal-medical-dialog .modal-header-content.medical-header {
-    background: linear-gradient(135deg, var(--medical-primary), var(--medical-primary-dark)) !important;
-    color: white !important;
+.editing-info,
+.adding-info {
+  background: #f8faff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e1e8ff;
+  margin-top: 16px;
 }
 
-html body .personal-medical-dialog .modal-header-content.medical-header .modal-header-icon {
-    background: rgba(255, 255, 255, 0.2) !important;
-    backdrop-filter: blur(10px) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+.editing-info h4,
+.adding-info h4 {
+  color: #007bff;
+  margin-bottom: 12px;
 }
 
-html body .personal-medical-dialog .modal-footer-actions .btn-success {
-    background: var(--medical-primary) !important;
-    border-color: var(--medical-primary-dark) !important;
+.form-placeholder {
+  background: #f8fafc;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 40px;
+  margin: 20px 0;
+  color: #6b7280;
 }
 
-html body .personal-medical-dialog .modal-footer-actions .btn-success:hover {
-    background: var(--medical-primary-dark) !important;
-    border-color: var(--medical-primary-light) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+/* RESPONSIVE - IMPROVED */
+@media (max-width: 1200px) {
+  .personal-medical-page-container {
+    padding: 16px;
+    gap: 12px;
+  }
 }
 
-/* ==========================================================================
-   RESPONSIVE DESIGN - MEDICAL THEME
-   ========================================================================== */
 @media (max-width: 768px) {
-    html body .personal-medical-page-container {
-        padding: var(--space-lg) !important;
-    }
-
-    html body .personal-medical-stats-grid {
-        grid-template-columns: 1fr !important;
-        gap: var(--space-md) !important;
-    }
-
-    html body .personal-medical-advanced-filter-panel .filter-row {
-        grid-template-columns: 1fr !important;
-        gap: var(--space-md) !important;
-    }
-
-    html body .personal-medical-page-header .header-content {
-        flex-direction: column !important;
-        gap: var(--space-lg) !important;
-        text-align: center !important;
-    }
-
-    html body .personal-medical-header-actions {
-        justify-content: center !important;
-        flex-wrap: wrap !important;
-    }
+  .personal-medical-page-container {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .personal-medical-page-header {
+    padding: 20px;
+  }
+  
+  .personal-medical-page-title {
+    font-size: 22px;
+  }
+  
+  .personal-medical-header-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .personal-medical-header-actions .btn {
+    min-width: 120px;
+    font-size: 13px;
+    padding: 10px 16px;
+  }
 }
 
 @media (max-width: 480px) {
-    html body .personal-medical-page-title {
-        font-size: var(--text-2xl) !important;
-    }
-
-    html body .personal-medical-page-subtitle {
-        font-size: var(--text-base) !important;
-    }
-
-    html body .personal-medical-stat-card {
-        padding: var(--space-lg) !important;
-        flex-direction: column !important;
-        text-align: center !important;
-    }
-
-    html body .personal-medical-stat-card .stat-icon {
-        width: 50px !important;
-        height: 50px !important;
-    }
-}
-
-/* ==========================================================================
-   ACCESSIBILITY - MEDICAL THEME
-   ========================================================================== */
-@media (prefers-reduced-motion: reduce) {
-    html body .personal-medical-page-container * {
-        animation: none !important;
-        transition: none !important;
-    }
-}
-
-@media (prefers-contrast: high) {
-    html body .personal-medical-page-container {
-        --medical-primary: #0d9488 !important;
-        --medical-primary-dark: #0f766e !important;
-    }
-
-    html body .personal-medical-stat-card {
-        border: 2px solid var(--medical-primary) !important;
-    }
-
-    html body .pozitie-badge,
-    html body .status-badge,
-    html body .departament-badge {
-        border: 2px solid currentColor !important;
-    }
-}
-
-/* ==========================================================================
-   SYNCFUSION OVERRIDES - MEDICAL THEME
-   ========================================================================== */
-html body .personal-medical-grid-container .e-grid .e-headercell {
-    background: var(--medical-primary-pale) !important;
-    color: var(--medical-primary-dark) !important;
-    font-weight: var(--font-semibold) !important;
-}
-
-html body .personal-medical-grid-container .e-grid .e-row:hover {
-    background: rgba(16, 185, 129, 0.05) !important;
-}
-
-html body .personal-medical-grid-container .e-grid .e-selectionbackground {
-    background: rgba(16, 185, 129, 0.1) !important;
-}
-
-/* Toast notifications - Medical theme */
-html body .e-toast.modal-toast {
-    border-left: 4px solid var(--medical-primary) !important;
-}
-
-html body .e-toast.e-toast-success {
-    border-left-color: var(--medical-accent) !important;
-}
-
-html body .e-toast.e-toast-danger {
-    border-left-color: var(--medical-danger) !important;
-}
-
-html body .e-toast.e-toast-warning {
-    border-left-color: var(--medical-warning) !important;
-}
-
-html body .e-toast.e-toast-info {
-    border-left-color: var(--medical-info) !important;
+  .personal-medical-page-container {
+    padding: 8px;
+  }
+  
+  .personal-medical-page-title {
+    font-size: 20px;
+  }
 }

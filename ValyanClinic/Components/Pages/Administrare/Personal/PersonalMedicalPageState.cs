@@ -7,6 +7,7 @@ namespace ValyanClinic.Components.Pages.Administrare.Personal;
 /// <summary>
 /// State management class pentru pagina PersonalMedical
 /// Similar cu PersonalPageState dar adaptat pentru PersonalMedical cu departamente din DB
+/// SIMPLIFIED VERSION - Removed kebab menu and advanced filtering
 /// </summary>
 public class PersonalMedicalPageState
 {
@@ -17,7 +18,6 @@ public class PersonalMedicalPageState
 
     // Data - folosind PersonalMedical în loc de Personal
     public PersonalMedicalPagedResult? PagedResult { get; set; }
-    public PersonalMedicalStatistics? Statistics { get; set; }
     public PersonalMedicalDropdownOptions? DropdownOptions { get; set; }
 
     // Modal state pentru PersonalMedical
@@ -33,17 +33,11 @@ public class PersonalMedicalPageState
     public int PageSize { get; set; } = 20;
     public int[] PageSizes { get; } = { 10, 20, 50, 100 };
 
-    // Filtering specific pentru PersonalMedical
-    public bool ShowAdvancedFilters { get; set; } = false; // Start hidden
+    // Filtering specific pentru PersonalMedical - BASIC ONLY
     public string? SearchText { get; set; }
     public string? SelectedDepartment { get; set; } // String pentru departamente din DB
     public PozitiePersonalMedical? SelectedPozitie { get; set; } // Enum pentru poziții
     public bool? SelectedStatus { get; set; } // Bool pentru EsteActiv
-    public string? SelectedActivityPeriod { get; set; }
-
-    // UI State
-    public bool ShowStatistics { get; set; } = false; // Start hidden
-    public bool ShowKebabMenu { get; set; } = false;
 
     // Departamente medicale options - DIN DB, nu enum-uri
     public List<DepartamentFilterItem> DepartmentOptions { get; set; } = new();
@@ -62,7 +56,7 @@ public class PersonalMedicalPageState
         new(false, "Inactiv")
     };
 
-    // Computed properties
+    // Computed properties - SIMPLIFIED
     public bool IsAnyFilterActive => 
         !string.IsNullOrEmpty(SearchText) || 
         !string.IsNullOrEmpty(SelectedDepartment) || 
@@ -107,7 +101,6 @@ public class PersonalMedicalPageState
         SelectedDepartment = null;
         SelectedPozitie = null;
         SelectedStatus = null;
-        SelectedActivityPeriod = null;
         CurrentPage = 1;
     }
 
@@ -194,31 +187,6 @@ public class PersonalMedicalPagedResult
     public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
     public bool HasPreviousPage => PageNumber > 1;
     public bool HasNextPage => PageNumber < TotalPages;
-}
-
-/// <summary>
-/// Models pentru statistici - PersonalMedical specific
-/// </summary>
-public class PersonalMedicalStatistics
-{
-    public int TotalPersonalMedical { get; set; }
-    public int PersonalMedicalActiv { get; set; }
-    public int PersonalMedicalInactiv { get; set; }
-    public int Doctori { get; set; }
-    public int AsistentiMedicali { get; set; }
-    public int AltPersonalMedical { get; set; }
-    public int DepartamenteMedicale { get; set; }
-    public int PersonalCuLicenta { get; set; }
-    public int PersonalFaraLicenta { get; set; }
-
-    // Computed properties
-    public double ProcentPersonalActiv => TotalPersonalMedical > 0 
-        ? (double)PersonalMedicalActiv / TotalPersonalMedical * 100 
-        : 0;
-
-    public double ProcentDoctoriSiAsistenti => TotalPersonalMedical > 0 
-        ? (double)(Doctori + AsistentiMedicali) / TotalPersonalMedical * 100 
-        : 0;
 }
 
 /// <summary>

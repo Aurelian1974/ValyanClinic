@@ -17,6 +17,9 @@
 
 <PageTitle>Administrare Personal Medical - ValyanMed</PageTitle>
 
+@* INCLUDE CSS SPECIFIC PENTRU PERSONAL MEDICAL PAGE *@
+<link href="~/css/pages/administrare-personal-medical.css" rel="stylesheet" />
+
 @* ADD NAVIGATION COMPONENT AS RECOMMENDED IN USAGE GUIDE *@
 <PersonalMedicalNavigation />
 
@@ -54,197 +57,12 @@
                     <i class="fas fa-sync-alt"></i>
                     <span class="btn-text">Actualizeaza</span>
                 </button>
-                
-                @* Kebab Menu Button *@
-                <div class="kebab-menu-container">
-                    <button class="btn btn-outline-secondary kebab-menu-btn" 
-                            @onclick="ToggleKebabMenu"
-                            @onclick:stopPropagation="true"
-                            aria-label="Meniu opțiuni"
-                            aria-expanded="@_state.ShowKebabMenu.ToString().ToLower()"
-                            aria-haspopup="true">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                    
-                    @if (_state.ShowKebabMenu)
-                    {
-                        <div class="kebab-menu-dropdown" 
-                             @onclick:stopPropagation="true"
-                             role="menu"
-                             aria-label="Opțiuni disponibile">
-                            <button class="kebab-menu-item" 
-                                    @onclick="() => ToggleStatistics()"
-                                    role="menuitem"
-                                    aria-label="Comută afișarea statisticilor">
-                                <i class="fas fa-chart-bar"></i>
-                                <span>Statistici</span>
-                                @if (_state.ShowStatistics)
-                                {
-                                    <i class="fas fa-check kebab-check" aria-label="Activat"></i>
-                                }
-                            </button>
-                            <button class="kebab-menu-item" 
-                                    @onclick="() => ToggleAdvancedFilters()"
-                                    role="menuitem"
-                                    aria-label="Comută afișarea filtrelor avansate">
-                                <i class="fas fa-filter"></i>
-                                <span>Filtrare Avansata</span>
-                                @if (_state.ShowAdvancedFilters)
-                                {
-                                    <i class="fas fa-check kebab-check" aria-label="Activat"></i>
-                                }
-                            </button>
-                        </div>
-                    }
-                </div>
             </div>
         </div>
     </div>
 
-    @* Statistics Cards - CONDITIONAL DISPLAY WITH MEDICAL THEME *@
-    @if (!_state.IsLoading && _state.ShowStatistics)
-    {
-        <div class="personal-medical-stats-grid">
-            @foreach (var stat in _models.PersonalMedicalStatistics)
-            {
-                <div class="personal-medical-stat-card @stat.ColorClass">
-                    <div class="stat-icon">
-                        <i class="@stat.IconClass"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="personal-medical-stat-number">@stat.Value</div>
-                        <div class="personal-medical-stat-label">@stat.Label</div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-
     @* Toast Notification *@
     <SfToast @ref="ToastRef" Title="ValyanMed - Personal Medical" Target="body" NewestOnTop="true" ShowProgressBar="true"></SfToast>
-
-    @* Advanced Filter Panel - CONDITIONAL DISPLAY WITH MEDICAL THEME *@
-    @if (_state.ShowAdvancedFilters)
-    {
-        <div class="personal-medical-advanced-filter-panel">
-            <div class="filter-panel-header">
-                <h3>
-                    <i class="fas fa-filter"></i>
-                    Filtrare Avansata Personal Medical
-                </h3>
-                <button class="btn btn-secondary btn-sm" @onclick="() => ToggleAdvancedFilters()">
-                    <i class="fas fa-chevron-up"></i>
-                    <span>Ascunde Filtrele</span>
-                </button>
-            </div>
-            
-            <div class="filter-panel-content">
-                @* First row - Departament, Pozitie, Status *@
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label">Departament Medical:</label>
-                        <SfDropDownList TItem="DepartamentFilterItem" TValue="string" 
-                                       DataSource="@_state.DepartmentOptions" 
-                                       @bind-Value="@_state.SelectedDepartment"
-                                       Placeholder="Toate departamentele medicale"
-                                       AllowFiltering="true"
-                                       PopupHeight="200px"
-                                       Width="200px">
-                            <DropDownListFieldSettings Text="Text" Value="Value" />
-                            <DropDownListEvents TItem="DepartamentFilterItem" TValue="string" ValueChange="OnDepartmentFilterChanged" />
-                        </SfDropDownList>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Pozitie:</label>
-                        <SfDropDownList TItem="PozitieFilterItem" TValue="PozitiePersonalMedical?" 
-                                       DataSource="@_state.PozitieOptions" 
-                                       @bind-Value="@_state.SelectedPozitie"
-                                       Placeholder="Toate pozițiile"
-                                       AllowFiltering="true"
-                                       PopupHeight="200px"
-                                       Width="180px">
-                            <DropDownListFieldSettings Text="Text" Value="Value" />
-                            <DropDownListEvents TItem="PozitieFilterItem" TValue="PozitiePersonalMedical?" ValueChange="OnPozitieFilterChanged" />
-                        </SfDropDownList>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Status:</label>
-                        <SfDropDownList TItem="StatusFilterItem" TValue="bool?" 
-                                       DataSource="@_state.StatusOptions" 
-                                       @bind-Value="@_state.SelectedStatus"
-                                       Placeholder="Toate statusurile"
-                                       AllowFiltering="true"
-                                       PopupHeight="150px"
-                                       Width="150px">
-                            <DropDownListFieldSettings Text="Text" Value="Value" />
-                            <DropDownListEvents TItem="StatusFilterItem" TValue="bool?" ValueChange="OnStatusFilterChanged" />
-                        </SfDropDownList>
-                    </div>
-                </div>
-                
-                @* Second row - Search text, Activity period *@
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label">Cautare text:</label>
-                        <SfTextBox @bind-Value="@_state.SearchText" 
-                                  Placeholder="Cauta in nume, email, specializare, licenta..."
-                                  Width="300px"
-                                  ShowClearButton="true">
-                            <TextBoxEvents ValueChange="OnSearchTextChanged" />
-                        </SfTextBox>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Perioada activitate:</label>
-                        <SfDropDownList TItem="string" TValue="string" 
-                                       DataSource="@_models.ActivityPeriodOptions" 
-                                       @bind-Value="@_state.SelectedActivityPeriod"
-                                       Placeholder="Orice perioada"
-                                       Width="180px">
-                            <DropDownListEvents TItem="string" TValue="string" ValueChange="OnActivityPeriodChanged" />
-                        </SfDropDownList>
-                    </div>
-                    
-                    @* Empty space for layout balance *@
-                    <div class="filter-group"></div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button class="btn btn-success btn-sm" @onclick="ApplyAdvancedFilters">
-                        <i class="fas fa-check"></i>
-                        <span>Aplica Filtrele</span>
-                    </button>
-                    <button class="btn btn-secondary btn-sm" @onclick="ClearAdvancedFilters">
-                        <i class="fas fa-times"></i>
-                        <span>Curata Filtrele</span>
-                    </button>
-                    <button class="btn btn-info btn-sm" @onclick="ExportFilteredData">
-                        <i class="fas fa-download"></i>
-                        <span>Exporta Rezultate</span>
-                    </button>
-                </div>
-                
-                @* Filter Results Summary *@
-                <div class="filter-results-summary">
-                    <div class="results-info">
-                        <span class="results-count">
-                            <i class="fas fa-user-md"></i>
-                            Rezultate: <strong>@_models.FilteredPersonalMedical.Count</strong> din <strong>@_models.PersonalMedical.Count</strong> personal medical
-                        </span>
-                        @if (_state.IsAnyFilterActive)
-                        {
-                            <span class="filtered-indicator">
-                                <i class="fas fa-filter"></i>
-                                Filtrare activa
-                            </span>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
 
     @* Main DataGrid - ADAPTED FOR MEDICAL STAFF *@
     @if (_state.IsLoading)
@@ -314,11 +132,18 @@
                         <Template>
                             @{                                               
                                 var personalMedical = context as PersonalMedicalModel;
-                                if (personalMedical != null)
+                                if (personalMedical != null && personalMedical.Pozitie.HasValue)
                                 {
-                                    <span class="pozitie-badge pozitie-@personalMedical.Pozitie.ToString().ToLower()">
-                                        <i class="@GetPozitieIcon(personalMedical.Pozitie ?? PozitiePersonalMedical.AsistentMedical)"></i>
-                                        @(personalMedical.Pozitie?.GetDisplayName() ?? "Nespecificat")
+                                    <span class="pozitie-badge pozitie-@((personalMedical.Pozitie.Value).ToString().ToLower())">
+                                        <i class="@GetPozitieIcon(personalMedical.Pozitie.Value)"></i>
+                                        @personalMedical.Pozitie.Value.GetDisplayName()
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="pozitie-badge pozitie-nedefinit">
+                                        <i class="fas fa-user"></i>
+                                        Nedefinit
                                     </span>
                                 }
                             }
@@ -344,13 +169,13 @@
                     <GridColumn Field="@nameof(PersonalMedicalModel.EsteActiv)" HeaderText="Status" Width="70" 
                                AllowFiltering="true" AllowReordering="true">
                         <Template>
-                            @{                                               
-                                var personalMedical = context as PersonalMedicalModel;
-                                <span class="status-badge status-@(personalMedical!.EsteActiv ? "activ" : "inactiv")">
-                                    <i class="fas @(personalMedical.EsteActiv ? "fa-check-circle" : "fa-times-circle")"></i>
-                                    @personalMedical.StatusDisplay
-                                </span>
-                            }
+                        @{                                               
+                            var personalMedical = context as PersonalMedicalModel;
+                            <span class="status-badge status-@(personalMedical!.EsteActiv ? "activ" : "inactiv")">
+                                <i class="fas @(personalMedical.EsteActiv ? "fa-check-circle" : "fa-times-circle")"></i>
+                                @personalMedical.StatusDisplay
+                            </span>
+                        }
                         </Template>
                     </GridColumn>
                                

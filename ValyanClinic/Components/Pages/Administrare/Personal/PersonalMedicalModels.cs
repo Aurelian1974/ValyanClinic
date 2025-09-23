@@ -12,7 +12,6 @@ public class PersonalMedicalModels
 {
     public List<PersonalMedicalModel> PersonalMedical { get; set; } = new();
     public List<PersonalMedicalModel> FilteredPersonalMedical { get; set; } = new();
-    public List<StatisticCard> PersonalMedicalStatistics { get; set; } = new();
     public int[] PageSizes { get; } = { 10, 20, 50, 100 };
 
     // Filter options - IMPORTANT: Departamente din DB, nu enum-uri
@@ -28,55 +27,6 @@ public class PersonalMedicalModels
     {
         PersonalMedical = personalMedical;
         FilteredPersonalMedical = personalMedical;
-        CalculateStatistics();
-    }
-
-    public void CalculateStatistics()
-    {
-        if (PersonalMedical == null || !PersonalMedical.Any())
-        {
-            PersonalMedicalStatistics = CreateEmptyStatistics();
-            return;
-        }
-
-        var totalPersonalMedical = PersonalMedical.Count;
-        var personalMedicalActiv = PersonalMedical.Count(p => p.EsteActiv);
-        var personalMedicalInactiv = PersonalMedical.Count(p => !p.EsteActiv);
-
-        // Statistici pe departamente medicale
-        var departamenteMedicaleCount = PersonalMedical
-            .Where(p => !string.IsNullOrWhiteSpace(p.DepartamentDisplay))
-            .GroupBy(p => p.DepartamentDisplay)
-            .Count();
-
-        // Doctori și asistenți (poziții medicale principale)
-        var doctoriSiAsistenti = PersonalMedical.Count(p => p.EsteDoctorSauAsistent);
-
-        // Personal nou adăugat (ultima lună)
-        var personalNou = PersonalMedical.Count(p => p.DataCreare > DateTime.Now.AddMonths(-1));
-
-        PersonalMedicalStatistics = new List<StatisticCard>
-        {
-            new("Total Personal Medical", totalPersonalMedical, "fas fa-user-md", "primary"),
-            new("Personal Activ", personalMedicalActiv, "fas fa-user-check", "success"),
-            new("Personal Inactiv", personalMedicalInactiv, "fas fa-user-times", "danger"),
-            new("Doctori & Asistenți", doctoriSiAsistenti, "fas fa-stethoscope", "info"),
-            new("Departamente Medicale", departamenteMedicaleCount, "fas fa-hospital", "warning"),
-            new("Adăugat recent", personalNou, "fas fa-user-plus", "secondary")
-        };
-    }
-
-    private List<StatisticCard> CreateEmptyStatistics()
-    {
-        return new List<StatisticCard>
-        {
-            new("Total Personal Medical", 0, "fas fa-user-md", "primary"),
-            new("Personal Activ", 0, "fas fa-user-check", "success"),
-            new("Personal Inactiv", 0, "fas fa-user-times", "danger"),
-            new("Doctori & Asistenți", 0, "fas fa-stethoscope", "info"),
-            new("Departamente Medicale", 0, "fas fa-hospital", "warning"),
-            new("Adăugat recent", 0, "fas fa-user-plus", "secondary")
-        };
     }
 
     public void InitializeFilterOptions(List<DepartamentMedical> departamenteMedicale)
@@ -208,22 +158,6 @@ public class PersonalMedicalModels
 
         public T Value { get; set; }
         public string Text { get; set; }
-    }
-
-    public class StatisticCard
-    {
-        public StatisticCard(string label, int value, string iconClass, string colorClass)
-        {
-            Label = label;
-            Value = value;
-            IconClass = iconClass;
-            ColorClass = colorClass;
-        }
-
-        public string Label { get; set; }
-        public int Value { get; set; }
-        public string IconClass { get; set; }
-        public string ColorClass { get; set; }
     }
 
     /// <summary>

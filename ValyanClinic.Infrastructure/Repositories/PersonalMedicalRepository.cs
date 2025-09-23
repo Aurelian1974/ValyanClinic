@@ -2,7 +2,6 @@
 using Dapper;
 using ValyanClinic.Domain.Models;
 using ValyanClinic.Domain.Enums;
-using ValyanClinic.Domain.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace ValyanClinic.Infrastructure.Repositories;
@@ -149,7 +148,7 @@ public class PersonalMedicalRepository : IPersonalMedicalRepository
             parameters.Add("@Telefon", personalMedical.Telefon?.Trim());
             parameters.Add("@Email", personalMedical.Email?.Trim()?.ToLowerInvariant());
             parameters.Add("@Departament", personalMedical.Departament?.Trim());
-            parameters.Add("@Pozitie", personalMedical.Pozitie?.ToString());
+            parameters.Add("@Pozitie", personalMedical.Pozitie?.ToDatabase());
             parameters.Add("@EsteActiv", personalMedical.EsteActiv);
             parameters.Add("@CategorieID", personalMedical.CategorieID);
             parameters.Add("@SpecializareID", personalMedical.SpecializareID);
@@ -222,7 +221,7 @@ public class PersonalMedicalRepository : IPersonalMedicalRepository
             parameters.Add("@Telefon", personalMedical.Telefon?.Trim());
             parameters.Add("@Email", personalMedical.Email?.Trim()?.ToLowerInvariant());
             parameters.Add("@Departament", personalMedical.Departament?.Trim());
-            parameters.Add("@Pozitie", personalMedical.Pozitie?.ToString());
+            parameters.Add("@Pozitie", personalMedical.Pozitie?.ToDatabase());
             parameters.Add("@EsteActiv", personalMedical.EsteActiv);
             parameters.Add("@CategorieID", personalMedical.CategorieID);
             parameters.Add("@SpecializareID", personalMedical.SpecializareID);
@@ -565,7 +564,7 @@ public class PersonalMedicalRepository : IPersonalMedicalRepository
             Telefon = dto.Telefon,
             Email = dto.Email,
             Departament = dto.Departament,
-            Pozitie = ParseEnum<PozitiePersonalMedical>(dto.Pozitie),
+            Pozitie = PozitiePersonalMedicalExtensions.ParseFromDatabase(dto.Pozitie),
             EsteActiv = dto.EsteActiv,
             DataCreare = dto.DataCreare,
             CategorieID = dto.CategorieID,
@@ -582,7 +581,15 @@ public class PersonalMedicalRepository : IPersonalMedicalRepository
         if (string.IsNullOrWhiteSpace(value))
             return null;
 
-        return Enum.TryParse<T>(value, true, out var result) ? result : null;
+        // Pentru PozitiePersonalMedical, folosim metoda robustă de parsing
+        if (typeof(T) == typeof(PozitiePersonalMedical))
+        {
+            var enumResult = PozitiePersonalMedicalExtensions.ParseFromDatabase(value);
+            return enumResult.HasValue ? (T)(object)enumResult.Value : null;
+        }
+
+        // Pentru alte enum-uri, folosim parsing-ul standard
+        return Enum.TryParse<T>(value, true, out var parseResult) ? parseResult : null;
     }
 
     #endregion

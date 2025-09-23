@@ -4,8 +4,6 @@ using Microsoft.Extensions.Logging;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Popups;
-using Syncfusion.Blazor.DropDowns;
-using Syncfusion.Blazor.Inputs;
 using ValyanClinic.Application.Services;
 using ValyanClinic.Domain.Models;
 using ValyanClinic.Domain.Enums;
@@ -16,10 +14,7 @@ namespace ValyanClinic.Components.Pages.Administrare.Personal;
 
 /// <summary>
 /// Business Logic pentru AdministrarePersonal.razor
-/// EXEMPLU DE UTILIZARE A FUNCȚIONALITĂȚILOR CRITICE IMPLEMENTATE:
-/// - Memory leak prevention prin proper disposal
-/// - DataGrid state persistence prin SimpleGridStateService  
-/// - Error handling robust
+/// SIMPLIFIED VERSION - Removed kebab menu and advanced filtering functionality
 /// </summary>
 public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
 {
@@ -33,9 +28,9 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
     protected SfDialog? PersonalDetailModal;
     protected SfDialog? AddEditPersonalModal;
     protected SfToast? ToastRef;
-    protected SfToast? ModalToastRef; // TOAST PENTRU MODAL
+    protected SfToast? ModalToastRef;
 
-    // State Management - FOLOSIM CLASA EXISTENTA DIN SIGNATURE
+    // State Management
     private PersonalPageState _state = new();
     private PersonalModels _models = new();
     private bool _disposed = false;
@@ -116,9 +111,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
             var personalData = await PersonalService.GetPersonalAsync(searchRequest);
             _models.SetPersonal(personalData.Data.ToList());
 
-            // Load statistics
-            _state.Statistics = await PersonalService.GetStatisticsAsync();
-
             // Load dropdown options
             _state.DropdownOptions = await PersonalService.GetDropdownOptionsAsync();
 
@@ -151,7 +143,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
 
     #endregion
 
-    #region Grid State Management - CRITICAL FUNCTIONALITY
+    #region Grid State Management
 
     private Dictionary<string, object> CaptureGridSettings()
     {
@@ -211,82 +203,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         _models.InitializeFilterOptions();
     }
 
-    private async Task OnDepartmentFilterChanged(ChangeEventArgs<Departament?, PersonalModels.FilterOption<Departament?>> args)
-    {
-        _state.SelectedDepartmentFilter = args.Value;
-        _state.SelectedDepartment = args.Value?.ToString() ?? "";
-        await ApplyAdvancedFilters();
-    }
-
-    private async Task OnStatusFilterChanged(ChangeEventArgs<StatusAngajat?, PersonalModels.FilterOption<StatusAngajat?>> args)
-    {
-        _state.SelectedStatusFilter = args.Value;
-        _state.SelectedStatus = args.Value?.ToString() ?? "";
-        await ApplyAdvancedFilters();
-    }
-
-    private async Task OnSearchTextChanged(ChangedEventArgs args)
-    {
-        _state.SearchText = args.Value ?? "";
-        await ApplyAdvancedFilters();
-    }
-
-    private async Task OnActivityPeriodChanged(ChangeEventArgs<string, string> args)
-    {
-        _state.SelectedActivityPeriod = args.Value ?? "";
-        await ApplyAdvancedFilters();
-    }
-
-    private async Task ApplyAdvancedFilters()
-    {
-        try
-        {
-            var filteredPersonal = _models.ApplyFilters(_state);
-
-            if (GridRef != null)
-            {
-                GridRef.DataSource = filteredPersonal;
-                await GridRef.Refresh();
-            }
-
-            await ShowToast("Filtru aplicat",
-                $"Gasite {filteredPersonal.Count} rezultate din {_models.Personal.Count} angajati",
-                "e-toast-info");
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error applying filters");
-            await ShowToast("Eroare", "Eroare la aplicarea filtrelor", "e-toast-danger");
-        }
-    }
-
-    private async Task ClearAdvancedFilters()
-    {
-        _state.ClearFilters();
-
-        if (GridRef != null)
-        {
-            GridRef.DataSource = _models.Personal;
-            await GridRef.Refresh();
-        }
-
-        await ShowToast("Filtre curatate", "Toate filtrele au fost eliminate", "e-toast-success");
-        StateHasChanged();
-    }
-
-    private async Task ExportFilteredData()
-    {
-        try
-        {
-            await ShowToast("Export", "Functia de export va fi implementata in viitor", "e-toast-info");
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Export error");
-            await ShowToast("Eroare Export", "Eroare la exportul datelor", "e-toast-danger");
-        }
-    }
-
     #endregion
 
     #region Personal Detail Modal
@@ -299,16 +215,10 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
             _state.SelectedPersonal = personal;
             _state.IsModalVisible = true;
             StateHasChanged();
-
-            // ELIMINAT TOAST-UL DIN PĂRINTE - CAUZA PROBLEMEI
-            // await ShowToast("Detalii", $"Afisare detalii pentru {personal.NumeComplet}", "e-toast-info");
-            
-            // Toast-ul va fi afișat în modal prin ModalToastRef dacă este necesar
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error showing personal detail modal");
-            // DOAR pentru erori folosim toast-ul global
             await ShowToast("Eroare", "Eroare la afisarea detaliilor", "e-toast-danger");
         }
     }
@@ -373,9 +283,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
 
             Logger.LogInformation("✅ Add personal modal state set - IsAddEditModalVisible: {IsVisible}, EditingPersonal created", 
                 _state.IsAddEditModalVisible);
-
-            // ELIMINAT TOAST-UL CARE SE BLUEAZĂ
-            // await ShowToast("Personal nou", "Completeaza formularul pentru a adauga personal nou", "e-toast-info");
         }
         catch (Exception ex)
         {
@@ -394,9 +301,6 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
             _state.SelectedPersonalForEdit = personal;
             _state.IsAddEditModalVisible = true;
             StateHasChanged();
-
-            // ELIMINAT TOAST-UL CARE SE BLUEAZĂ
-            // await ShowToast("Editare personal", $"Modificati informatiile pentru {personal.NumeComplet}", "e-toast-info");
         }
         catch (Exception ex)
         {
@@ -581,7 +485,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
     }
 
     /// <summary>
-    /// Afișează toast în contextul modalului - SOLUȚIA PENTRU TOAST BLURAT
+    /// Afișează toast în contextul modalului
     /// </summary>
     private async Task ShowModalToast(string title, string content, string cssClass = "e-toast-info")
     {
@@ -614,91 +518,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
 
     #endregion
 
-    #region Kebab Menu Management - V4 BASIC FUNCTIONAL
-
-    private void ToggleKebabMenu()
-    {
-        try
-        {
-            var previousState = _state.ShowKebabMenu;
-            _state.ShowKebabMenu = !_state.ShowKebabMenu;
-            
-            Logger.LogInformation("🔘 Kebab menu toggled: {PreviousState} → {NewState}", 
-                previousState, _state.ShowKebabMenu);
-            
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "❌ Critical error toggling kebab menu");
-            _state.ShowKebabMenu = false;
-            StateHasChanged();
-        }
-    }
-
-    private void ToggleStatistics()
-    {
-        try
-        {
-            var previousState = _state.ShowStatistics;
-            _state.ShowStatistics = !_state.ShowStatistics;
-            _state.ShowKebabMenu = false; // Close kebab menu
-            
-            Logger.LogInformation("📊 Statistics toggled: {PreviousState} → {NewState}", 
-                previousState, _state.ShowStatistics);
-            
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "❌ Error toggling statistics");
-            _state.ShowKebabMenu = false;
-            StateHasChanged();
-        }
-    }
-
-    private void ToggleAdvancedFilters()
-    {
-        try
-        {
-            var previousState = _state.ShowAdvancedFilters;
-            _state.ShowAdvancedFilters = !_state.ShowAdvancedFilters;
-            _state.ShowKebabMenu = false; // Close kebab menu
-            
-            Logger.LogInformation("🔍 Advanced filters toggled: {PreviousState} → {NewState}", 
-                previousState, _state.ShowAdvancedFilters);
-            
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "❌ Error toggling advanced filters");
-            _state.ShowKebabMenu = false;
-            StateHasChanged();
-        }
-    }
-
-    // Close menu when clicking elsewhere - will be handled by CSS hover or simple timeout
-    private async Task CloseKebabMenuAfterDelay()
-    {
-        try
-        {
-            await Task.Delay(3000); // Auto-close after 3 seconds
-            if (_state.ShowKebabMenu)
-            {
-                _state.ShowKebabMenu = false;
-                StateHasChanged();
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogDebug(ex, "Auto-close kebab menu cancelled or failed");
-        }
-    }
-
-    #endregion
-
-    #region IAsyncDisposable - CRITICAL MEMORY LEAK PREVENTION
+    #region IAsyncDisposable - Memory Leak Prevention
 
     public async ValueTask DisposeAsync()
     {
@@ -708,7 +528,7 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
         {
             _disposed = true;
 
-            // 1. Salvează starea grid-ului înainte de dispose - CRITICAL FUNCTIONALITY
+            // 1. Salvează starea grid-ului înainte de dispose
             if (GridRef != null)
             {
                 var currentSettings = CaptureGridSettings();
@@ -716,12 +536,12 @@ public partial class AdministrarePersonal : ComponentBase, IAsyncDisposable
                 Logger.LogDebug("Grid settings saved on disposal");
             }
 
-            // 2. Manual disposal pentru componentele Syncfusion - MEMORY LEAK PREVENTION
+            // 2. Manual disposal pentru componentele Syncfusion
             GridRef?.Dispose();
             PersonalDetailModal?.Dispose();  
             AddEditPersonalModal?.Dispose();
             ToastRef?.Dispose();
-            ModalToastRef?.Dispose(); // DISPOSE PENTRU MODAL TOAST
+            ModalToastRef?.Dispose();
 
             Logger.LogDebug("AdministrarePersonal disposed successfully");
         }

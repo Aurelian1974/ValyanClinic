@@ -250,9 +250,48 @@ public class PersonalMedicalService : IPersonalMedicalService
         {
             _logger.LogInformation("Getting personal medical statistics");
 
+            // Get basic statistics first
             var basicStats = await _personalMedicalRepository.GetStatisticsAsync();
-            var distributiePerDepartament = await _personalMedicalRepository.GetDistributiePerDepartamentAsync();
-            var distributiePerSpecializare = await _personalMedicalRepository.GetDistributiePerSpecializareAsync();
+            
+            // Try to get distribution data, but handle gracefully if stored procedures are missing
+            Dictionary<string, int> distributiePerDepartament = new();
+            Dictionary<string, int> distributiePerSpecializare = new();
+            
+            try
+            {
+                distributiePerDepartament = await _personalMedicalRepository.GetDistributiePerDepartamentAsync();
+                _logger.LogDebug("Successfully loaded department distribution statistics");
+            }
+            catch (Microsoft.Data.SqlClient.SqlException sqlEx) when (sqlEx.Number == 2812) // Could not find stored procedure
+            {
+                _logger.LogWarning("Distribution per department stored procedure missing (sp_PersonalMedical_GetDistributiePerDepartament). Using empty distribution.");
+                distributiePerDepartament = new Dictionary<string, int>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to load department distribution, using empty distribution");
+                distributiePerDepartament = new Dictionary<string, int>();
+            }
+            
+            try
+            {
+                distributiePerSpecializare = await _personalMedicalRepository.GetDistributiePerSpecializareAsync();
+                _logger.LogDebug("Successfully loaded specialization distribution statistics");
+            }
+            catch (Microsoft.Data.SqlClient.SqlException sqlEx) when (sqlEx.Number == 2812) // Could not find stored procedure
+            {
+                _logger.LogWarning("Distribution per specialization stored procedure missing (sp_PersonalMedical_GetDistributiePerSpecializare). Using empty distribution.");
+                distributiePerSpecializare = new Dictionary<string, int>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to load specialization distribution, using empty distribution");
+                distributiePerSpecializare = new Dictionary<string, int>();
+            }
+            
+            _logger.LogInformation("Personal medical statistics loaded successfully. Basic stats: Total={Total}, Active={Active}, Doctors={Doctors}, Distributions: Departments={DeptCount}, Specializations={SpecCount}", 
+                basicStats.TotalPersonalMedical, basicStats.PersonalMedicalActiv, basicStats.TotalDoctori, 
+                distributiePerDepartament.Count, distributiePerSpecializare.Count);
             
             return new PersonalMedicalStatistics(
                 basicStats.TotalPersonalMedical,

@@ -7,6 +7,7 @@ namespace ValyanClinic.Components.Pages.Administrare.Personal;
 /// <summary>
 /// State management class pentru pagina Personal
 /// Centralizare state logic conform best practices
+/// SIMPLIFIED VERSION - Removed kebab menu and advanced filtering
 /// </summary>
 public class PersonalPageState
 {
@@ -17,7 +18,6 @@ public class PersonalPageState
 
     // Data
     public PersonalPagedResult? PagedResult { get; set; }
-    public ValyanClinic.Application.Services.PersonalStatistics? Statistics { get; set; }
     public ValyanClinic.Application.Services.PersonalDropdownOptions? DropdownOptions { get; set; }
 
     // Modal state
@@ -33,18 +33,12 @@ public class PersonalPageState
     public int PageSize { get; set; } = 20;
     public int[] PageSizes { get; } = { 10, 20, 50, 100 };
 
-    // Filtering
-    public bool ShowAdvancedFilters { get; set; } = false; // CHANGED: Start hidden
+    // Basic filtering only
     public string? SearchText { get; set; }
     public string? SelectedDepartment { get; set; }
     public string? SelectedStatus { get; set; }
     public Departament? SelectedDepartmentFilter { get; set; }
     public StatusAngajat? SelectedStatusFilter { get; set; }
-    public string? SelectedActivityPeriod { get; set; }
-
-    // UI State - NEW PROPERTIES
-    public bool ShowStatistics { get; set; } = false; // Start hidden
-    public bool ShowKebabMenu { get; set; } = false;
 
     // Status options
     public List<StatusItem> StatusOptions { get; } = new()
@@ -54,7 +48,7 @@ public class PersonalPageState
         new("Inactiv", "Inactiv")
     };
 
-    // Computed properties
+    // Computed properties - SIMPLIFIED
     public bool IsAnyFilterActive => 
         !string.IsNullOrEmpty(SearchText) || 
         !string.IsNullOrEmpty(SelectedDepartment) || 
@@ -85,7 +79,6 @@ public class PersonalPageState
         SelectedStatus = null;
         SelectedDepartmentFilter = null;
         SelectedStatusFilter = null;
-        SelectedActivityPeriod = null;
         CurrentPage = 1;
     }
 

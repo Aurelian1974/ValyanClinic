@@ -32,7 +32,7 @@
         </div>
     }
 
-    @* Page Header - UPDATED WITH KEBAB MENU *@
+    @* Page Header - SIMPLIFIED WITHOUT KEBAB MENU *@
     <div class="personal-page-header">
         <div class="header-content">
             <div class="header-text">
@@ -54,181 +54,14 @@
                     <i class="fas fa-sync-alt"></i>
                     <span class="btn-text">Actualizeaza</span>
                 </button>
-                
-                @* Kebab Menu Button *@
-                <div class="kebab-menu-container">
-                    <button class="btn btn-outline-secondary kebab-menu-btn" 
-                            @onclick="ToggleKebabMenu"
-                            @onclick:stopPropagation="true"
-                            aria-label="Meniu opțiuni"
-                            aria-expanded="@_state.ShowKebabMenu.ToString().ToLower()"
-                            aria-haspopup="true">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                    
-                    @if (_state.ShowKebabMenu)
-                    {
-                        <div class="kebab-menu-dropdown" 
-                             @onclick:stopPropagation="true"
-                             role="menu"
-                             aria-label="Opțiuni disponibile">
-                            <button class="kebab-menu-item" 
-                                    @onclick="() => ToggleStatistics()"
-                                    role="menuitem"
-                                    aria-label="Comută afișarea statisticilor">
-                                <i class="fas fa-chart-bar"></i>
-                                <span>Statistici</span>
-                                @if (_state.ShowStatistics)
-                                {
-                                    <i class="fas fa-check kebab-check" aria-label="Activat"></i>
-                                }
-                            </button>
-                            <button class="kebab-menu-item" 
-                                    @onclick="() => ToggleAdvancedFilters()"
-                                    role="menuitem"
-                                    aria-label="Comută afișarea filtrelor avansate">
-                                <i class="fas fa-filter"></i>
-                                <span>Filtrare Avansata</span>
-                                @if (_state.ShowAdvancedFilters)
-                                {
-                                    <i class="fas fa-check kebab-check" aria-label="Activat"></i>
-                                }
-                            </button>
-                        </div>
-                    }
-                </div>
             </div>
         </div>
     </div>
 
-    @* Statistics Cards - CONDITIONAL DISPLAY *@
-    @if (!_state.IsLoading && _state.ShowStatistics)
-    {
-        <div class="personal-stats-grid">
-            @foreach (var stat in _models.PersonalStatistics)
-            {
-                <div class="personal-stat-card">
-                    <div class="personal-stat-number">@stat.Value</div>
-                    <div class="personal-stat-label">@stat.Label</div>
-                </div>
-            }
-        </div>
-    }
-
     @* Toast Notification *@
     <SfToast @ref="ToastRef" Title="ValyanMed" Target="body" NewestOnTop="true" ShowProgressBar="true"></SfToast>
 
-    @* Advanced Filter Panel - CONDITIONAL DISPLAY *@
-    @if (_state.ShowAdvancedFilters)
-    {
-        <div class="personal-advanced-filter-panel">
-            <div class="filter-panel-header">
-                <h3>
-                    <i class="fas fa-filter"></i>
-                    Filtrare Avansata
-                </h3>
-                <button class="btn btn-secondary btn-sm" @onclick="() => ToggleAdvancedFilters()">
-                    <i class="fas fa-chevron-up"></i>
-                    <span>Ascunde Filtrele</span>
-                </button>
-            </div>
-            
-            <div class="filter-panel-content">
-                @* First row - Departament, Status, Search *@
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label">Departament:</label>
-                        <SfDropDownList TItem="PersonalModels.FilterOption<Departament?>" TValue="Departament?" 
-                                       DataSource="@_models.DepartmentFilterOptions" 
-                                       @bind-Value="@_state.SelectedDepartmentFilter"
-                                       Placeholder="Toate departamentele"
-                                       AllowFiltering="true"
-                                       PopupHeight="200px"
-                                       Width="180px">
-                            <DropDownListFieldSettings Text="Text" Value="Value" />
-                            <DropDownListEvents TItem="PersonalModels.FilterOption<Departament?>" TValue="Departament?" ValueChange="OnDepartmentFilterChanged" />
-                        </SfDropDownList>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Status:</label>
-                        <SfDropDownList TItem="PersonalModels.FilterOption<StatusAngajat?>" TValue="StatusAngajat?" 
-                                       DataSource="@_models.StatusFilterOptions" 
-                                       @bind-Value="@_state.SelectedStatusFilter"
-                                       Placeholder="Toate statusurile"
-                                       AllowFiltering="true"
-                                       PopupHeight="200px"
-                                       Width="150px">
-                            <DropDownListFieldSettings Text="Text" Value="Value" />
-                            <DropDownListEvents TItem="PersonalModels.FilterOption<StatusAngajat?>" TValue="StatusAngajat?" ValueChange="OnStatusFilterChanged" />
-                        </SfDropDownList>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Cautare text:</label>
-                        <SfTextBox @bind-Value="@_state.SearchText" 
-                                  Placeholder="Cauta in nume, prenume, email..."
-                                  Width="250px"
-                                  ShowClearButton="true">
-                            <TextBoxEvents ValueChange="OnSearchTextChanged" />
-                        </SfTextBox>
-                    </div>
-                </div>
-                
-                @* Second row - Additional filters *@
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label">Perioada activitate:</label>
-                        <SfDropDownList TItem="string" TValue="string" 
-                                       DataSource="@_models.ActivityPeriodOptions" 
-                                       @bind-Value="@_state.SelectedActivityPeriod"
-                                       Placeholder="Orice perioada"
-                                       Width="180px">
-                            <DropDownListEvents TItem="string" TValue="string" ValueChange="OnActivityPeriodChanged" />
-                        </SfDropDownList>
-                    </div>
-                    
-                    @* Empty spaces for layout balance *@
-                    <div class="filter-group"></div>
-                    <div class="filter-group"></div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button class="btn btn-primary btn-sm" @onclick="ApplyAdvancedFilters">
-                        <i class="fas fa-check"></i>
-                        <span>Aplica Filtrele</span>
-                    </button>
-                    <button class="btn btn-secondary btn-sm" @onclick="ClearAdvancedFilters">
-                        <i class="fas fa-times"></i>
-                        <span>Curata Filtrele</span>
-                    </button>
-                    <button class="btn btn-info btn-sm" @onclick="ExportFilteredData">
-                        <i class="fas fa-download"></i>
-                        <span>Exporta Rezultate</span>
-                    </button>
-                </div>
-                
-                @* Filter Results Summary *@
-                <div class="filter-results-summary">
-                    <div class="results-info">
-                        <span class="results-count">
-                            <i class="fas fa-search"></i>
-                            Rezultate: <strong>@_models.FilteredPersonal.Count</strong> din <strong>@_models.Personal.Count</strong> angajati
-                        </span>
-                        @if (_state.IsAnyFilterActive)
-                        {
-                            <span class="filtered-indicator">
-                                <i class="fas fa-filter"></i>
-                                Filtrare activa
-                            </span>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-
-    @* Main DataGrid - SIMILAR CU UTILIZATORI *@
+    @* Main DataGrid - WITHOUT ADVANCED FILTERING *@
     @if (_state.IsLoading)
     {
         <div class="personal-grid-container">

@@ -1,11 +1,9 @@
 ﻿/**
- * JavaScript Helper Functions pentru ValyanClinic - V2 ENHANCED
- * Funcții de utilitare pentru interacțiunea cu componentele Blazor
- * Reparat kebab menu click outside detection și event handling
+ * JavaScript Helper Functions pentru ValyanClinic - V6 CLEAN
+ * Simplified utility functions - removed kebab menu functionality
  */
 
-// Global state pentru tracking event handlers
-window.valyanClinicEventHandlers = window.valyanClinicEventHandlers || [];
+// Global debug flag
 window.valyanClinicDebug = true; // Set to false in production
 
 function debugLog(message, ...args) {
@@ -14,212 +12,191 @@ function debugLog(message, ...args) {
     }
 }
 
-// Funcție principală pentru kebab menu click outside detection - ENHANCED
-window.addClickEventListener = (dotnetRef) => {
-    try {
-        debugLog('Adding click event listener for kebab menu');
-        
-        // Remove any existing listeners first to prevent duplicates
-        window.removeEventListeners();
-        
-        const clickHandler = (event) => {
-            try {
-                // Check if click is outside kebab menu elements
-                const kebabContainer = event.target.closest('.kebab-menu-container');
-                const kebabDropdown = event.target.closest('.kebab-menu-dropdown');
-                
-                // If click is not inside kebab menu elements, close the menu
-                if (!kebabContainer && !kebabDropdown) {
-                    debugLog('Click detected outside kebab menu, closing menu');
-                    dotnetRef.invokeMethodAsync('CloseKebabMenu');
-                } else {
-                    debugLog('Click detected inside kebab menu, keeping open');
-                }
-            } catch (error) {
-                console.warn('[ValyanClinic] Failed to invoke CloseKebabMenu:', error);
-            }
-        };
-        
-        // Add event listener with passive option for better performance
-        document.addEventListener('click', clickHandler, { 
-            passive: true, 
-            capture: true // Use capture to ensure we catch events early
-        });
-        
-        // Store reference for cleanup
-        window.valyanClinicEventHandlers.push({ 
-            type: 'click', 
-            handler: clickHandler,
-            element: document,
-            options: { passive: true, capture: true }
-        });
-        
-        debugLog('Click event listener added successfully');
-        return true;
-        
-    } catch (error) {
-        console.error('[ValyanClinic] Failed to add click event listener:', error);
-        return false;
-    }
-};
+// Enhanced DOM readiness check
+function isDOMReady() {
+    return typeof window !== 'undefined' && 
+           typeof document !== 'undefined' && 
+           document.readyState === 'complete' &&
+           typeof document.addEventListener === 'function';
+}
 
-// Enhanced escape key handler pentru kebab menu
-window.addEscapeKeyListener = (dotnetRef) => {
-    try {
-        debugLog('Adding escape key listener for kebab menu');
-        
-        const escapeHandler = (event) => {
-            if (event.key === 'Escape' || event.keyCode === 27) {
-                try {
-                    debugLog('Escape key pressed, closing kebab menu');
-                    dotnetRef.invokeMethodAsync('CloseKebabMenu');
-                } catch (error) {
-                    console.warn('[ValyanClinic] Failed to invoke CloseKebabMenu on escape:', error);
-                }
-            }
-        };
-        
-        document.addEventListener('keydown', escapeHandler, { passive: true });
-        
-        window.valyanClinicEventHandlers.push({
-            type: 'keydown',
-            handler: escapeHandler,
-            element: document,
-            options: { passive: true }
-        });
-        
-        debugLog('Escape key listener added successfully');
-        return true;
-        
-    } catch (error) {
-        console.error('[ValyanClinic] Failed to add escape key listener:', error);
-        return false;
-    }
-};
-
-// Enhanced cleanup function with better error handling
-window.removeEventListeners = () => {
-    try {
-        debugLog('Removing event listeners, count:', window.valyanClinicEventHandlers.length);
-        
-        if (window.valyanClinicEventHandlers && window.valyanClinicEventHandlers.length > 0) {
-            window.valyanClinicEventHandlers.forEach((handler, index) => {
-                try {
-                    const element = handler.element || document;
-                    element.removeEventListener(handler.type, handler.handler, handler.options);
-                    debugLog(`Removed event listener ${index + 1}:`, handler.type);
-                } catch (error) {
-                    console.warn(`[ValyanClinic] Failed to remove event listener ${index + 1}:`, error);
-                }
-            });
-            
-            window.valyanClinicEventHandlers = [];
-            debugLog('All event listeners removed successfully');
-        } else {
-            debugLog('No event listeners to remove');
+// Wait for DOM to be ready with timeout
+function waitForDOMReady(timeout = 5000) {
+    return new Promise((resolve) => {
+        if (isDOMReady()) {
+            resolve(true);
+            return;
         }
-    } catch (error) {
-        console.error('[ValyanClinic] Failed to remove event listeners:', error);
-    }
-};
 
-// Focus trap pentru accessibility - NEW FEATURE
-window.addFocusTrap = (kebabMenuSelector = '.kebab-menu-dropdown') => {
+        const startTime = Date.now();
+        const checkInterval = setInterval(() => {
+            if (isDOMReady()) {
+                clearInterval(checkInterval);
+                resolve(true);
+            } else if (Date.now() - startTime > timeout) {
+                clearInterval(checkInterval);
+                resolve(false);
+            }
+        }, 50);
+    });
+}
+
+// ========================================
+// FORM UTILITIES
+// ========================================
+
+/**
+ * Form submission helpers - Safe alternatives to requestSubmit()
+ */
+window.submitFormSafely = async (formId) => {
     try {
-        const menuElement = document.querySelector(kebabMenuSelector);
-        if (!menuElement) {
-            debugLog('Kebab menu element not found for focus trap:', kebabMenuSelector);
+        const domReady = await waitForDOMReady();
+        if (!domReady) {
+            console.warn('[ValyanClinic] DOM not ready, cannot submit form');
             return false;
         }
-        
-        const focusableElements = menuElement.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        
-        if (focusableElements.length === 0) {
-            debugLog('No focusable elements found in kebab menu');
-            return false;
-        }
-        
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-        
-        const focusTrapHandler = (event) => {
-            if (event.key === 'Tab') {
-                if (event.shiftKey) {
-                    if (document.activeElement === firstElement) {
-                        event.preventDefault();
-                        lastElement.focus();
-                    }
-                } else {
-                    if (document.activeElement === lastElement) {
-                        event.preventDefault();
-                        firstElement.focus();
-                    }
-                }
-            }
-        };
-        
-        menuElement.addEventListener('keydown', focusTrapHandler);
-        firstElement.focus();
-        
-        window.valyanClinicEventHandlers.push({
-            type: 'keydown',
-            handler: focusTrapHandler,
-            element: menuElement,
-            options: {}
-        });
-        
-        debugLog('Focus trap added successfully for kebab menu');
-        return true;
-        
-    } catch (error) {
-        console.error('[ValyanClinic] Failed to add focus trap:', error);
-        return false;
-    }
-};
 
-// Form submission helpers (safer alternatives to document.getElementById().requestSubmit())
-window.submitFormSafely = (formId) => {
-    try {
         const form = document.getElementById(formId);
         if (form) {
-            // Use form.submit() instead of requestSubmit() for better compatibility
             form.submit();
+            debugLog('Form submitted successfully:', formId);
             return true;
         } else {
-            console.warn(`Form with ID '${formId}' not found`);
+            console.warn(`[ValyanClinic] Form with ID '${formId}' not found`);
             return false;
         }
     } catch (error) {
-        console.error('Error submitting form:', error);
+        console.error('[ValyanClinic] Error submitting form:', error);
         return false;
     }
 };
 
-// Alternative form validation and submission
-window.validateAndSubmitForm = (formId) => {
+/**
+ * Form validation and submission with HTML5 validation
+ */
+window.validateAndSubmitForm = async (formId) => {
     try {
+        const domReady = await waitForDOMReady();
+        if (!domReady) {
+            console.warn('[ValyanClinic] DOM not ready, cannot validate form');
+            return false;
+        }
+
         const form = document.getElementById(formId);
         if (!form) {
-            console.warn(`Form with ID '${formId}' not found`);
+            console.warn(`[ValyanClinic] Form with ID '${formId}' not found`);
             return false;
         }
         
         // Check if form has HTML5 validation
         if (form.checkValidity && !form.checkValidity()) {
             form.reportValidity();
+            debugLog('Form validation failed:', formId);
             return false;
         }
         
         // If validation passes, submit the form
         form.submit();
+        debugLog('Form validated and submitted successfully:', formId);
         return true;
         
     } catch (error) {
-        console.error('Error validating and submitting form:', error);
+        console.error('[ValyanClinic] Error validating and submitting form:', error);
         return false;
     }
 };
 
-debugLog('ValyanClinic JavaScript helpers loaded successfully - V2 ENHANCED');
+// ========================================
+// PERFORMANCE MONITORING
+// ========================================
+
+/**
+ * Simple performance measurement for any operation
+ */
+window.measurePerformance = (operationName, operation) => {
+    const startTime = performance.now();
+    
+    try {
+        const result = operation();
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        
+        debugLog(`Performance: ${operationName} completed in ${duration.toFixed(2)}ms`);
+        
+        return { result, duration };
+    } catch (error) {
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        
+        console.error(`[ValyanClinic] Error in ${operationName} after ${duration.toFixed(2)}ms:`, error);
+        throw error;
+    }
+};
+
+// ========================================
+// SCROLL UTILITIES
+// ========================================
+
+/**
+ * Smooth scroll to element
+ */
+window.scrollToElement = (selector) => {
+    try {
+        const element = document.querySelector(selector);
+        if (element) {
+            element.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('[ValyanClinic] Error scrolling to element:', error);
+        return false;
+    }
+};
+
+// ========================================
+// FOCUS MANAGEMENT
+// ========================================
+
+/**
+ * Focus management for accessibility
+ */
+window.focusElement = (selector) => {
+    try {
+        const element = document.querySelector(selector);
+        if (element && element.focus) {
+            element.focus();
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('[ValyanClinic] Error focusing element:', error);
+        return false;
+    }
+};
+
+// ========================================
+// INITIALIZATION
+// ========================================
+
+// Initialize when DOM is loaded
+(async function initializeValyanClinicHelpers() {
+    debugLog('Initializing ValyanClinic JavaScript helpers - V6 CLEAN');
+    
+    const domReady = await waitForDOMReady(10000); // 10 second timeout
+    if (domReady) {
+        debugLog('✅ ValyanClinic JavaScript helpers loaded successfully - DOM ready');
+        debugLog('📋 Available features:');
+        debugLog('  - Form submission utilities');
+        debugLog('  - Performance monitoring tools');
+        debugLog('  - Scroll and focus utilities');
+    } else {
+        console.warn('⚠️ ValyanClinic JavaScript helpers loaded but DOM not ready within timeout');
+        console.warn('Some features may not be available');
+    }
+})();
+
+debugLog('ValyanClinic JavaScript helpers loaded - V6 CLEAN - Kebab menu functionality removed');

@@ -12,7 +12,6 @@ public class PersonalModels
 {
     public List<PersonalModel> Personal { get; set; } = new();
     public List<PersonalModel> FilteredPersonal { get; set; } = new();
-    public List<StatisticCard> PersonalStatistics { get; set; } = new();
     public int[] PageSizes { get; } = { 10, 20, 50, 100 };
 
     // Filter options
@@ -27,49 +26,6 @@ public class PersonalModels
     {
         Personal = personal;
         FilteredPersonal = personal;
-        CalculateStatistics();
-    }
-
-    public void CalculateStatistics()
-    {
-        if (Personal == null || !Personal.Any())
-        {
-            PersonalStatistics = CreateEmptyStatistics();
-            return;
-        }
-
-        var totalPersonal = Personal.Count;
-        var personalActiv = Personal.Count(p => p.Status_Angajat == StatusAngajat.Activ);
-        var personalInactiv = Personal.Count(p => p.Status_Angajat == StatusAngajat.Inactiv);
-
-        // Statistici pe departamente
-        var departamenteCount = Personal.GroupBy(p => p.Departament)
-            .Where(g => g.Key.HasValue)
-            .Count();
-
-        // Angajati nou adaugati (ultima luna)
-        var angajatiNoi = Personal.Count(p => p.Data_Crearii > DateTime.Now.AddMonths(-1));
-
-        PersonalStatistics = new List<StatisticCard>
-        {
-            new("Total Personal", totalPersonal, "fas fa-users", "primary"),
-            new("Personal Activ", personalActiv, "fas fa-user-check", "success"),
-            new("Personal Inactiv", personalInactiv, "fas fa-user-times", "danger"),
-            new("Departamente", departamenteCount, "fas fa-building", "info"),
-            new("Angajati noi", angajatiNoi, "fas fa-user-plus", "warning")
-        };
-    }
-
-    private List<StatisticCard> CreateEmptyStatistics()
-    {
-        return new List<StatisticCard>
-        {
-            new("Total Personal", 0, "fas fa-users", "primary"),
-            new("Personal Activ", 0, "fas fa-user-check", "success"),
-            new("Personal Inactiv", 0, "fas fa-user-times", "danger"),
-            new("Departamente", 0, "fas fa-building", "info"),
-            new("Angajati noi", 0, "fas fa-user-plus", "warning")
-        };
     }
 
     public void InitializeFilterOptions()
@@ -232,21 +188,5 @@ public class PersonalModels
 
         public T Value { get; set; }
         public string Text { get; set; }
-    }
-
-    public class StatisticCard
-    {
-        public StatisticCard(string label, int value, string iconClass, string colorClass)
-        {
-            Label = label;
-            Value = value;
-            IconClass = iconClass;
-            ColorClass = colorClass;
-        }
-
-        public string Label { get; set; }
-        public int Value { get; set; }
-        public string IconClass { get; set; }
-        public string ColorClass { get; set; }
     }
 }
