@@ -1,0 +1,215 @@
+﻿/* ========================================
+   Header - Scoped CSS - Temă Pastelată cu Breadcrumb
+   ======================================== */
+
+.app-header {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width, 280px);
+    width: calc(100vw - var(--sidebar-width, 280px));
+    height: 55px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 999;
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Breadcrumb Styles */
+.breadcrumb-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.breadcrumb-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.breadcrumb-item:not(.active):not(.non-clickable) {
+    cursor: pointer;
+}
+
+.breadcrumb-item:not(.active):not(.non-clickable):hover {
+    background: #eff6ff;
+    color: #3b82f6;
+}
+
+.breadcrumb-item.active {
+    color: #3b82f6;
+    font-weight: 600;
+    background: #dbeafe;
+}
+
+.breadcrumb-item.non-clickable {
+    color: #94a3b8;
+    cursor: default;
+}
+
+.breadcrumb-item i {
+    font-size: 12px;
+}
+
+.breadcrumb-separator {
+    font-size: 9px;
+    color: #cbd5e1;
+}
+
+.btn-toggle-sidebar {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #64748b;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn-toggle-sidebar:hover {
+    background: #dbeafe;
+    color: #60a5fa;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.btn-icon {
+    position: relative;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #64748b;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-icon:hover {
+    background: #dbeafe;
+    color: #60a5fa;
+}
+
+.btn-icon .badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: linear-gradient(135deg, #fca5a5 0%, #f87171 100%);
+    color: white;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 5px;
+    border-radius: 8px;
+    min-width: 16px;
+    text-align: center;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-profile:hover {
+    background: #dbeafe;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #bfdbfe;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    line-height: 1.2;
+}
+
+.user-role {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.2;
+}
+
+.user-profile i {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .user-info {
+        display: none;
+    }
+
+    .breadcrumb-item span {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-header {
+        left: 0;
+        width: 100vw;
+        padding: 0 12px;
+        height: 50px;
+    }
+
+    .breadcrumb-item span {
+        display: none;
+    }
+
+    .breadcrumb-item i {
+        font-size: 14px;
+    }
+    
+    .btn-icon {
+        padding: 6px;
+        font-size: 16px;
+    }
+}

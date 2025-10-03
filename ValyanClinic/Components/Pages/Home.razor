@@ -1,0 +1,172 @@
+﻿@page "/"
+
+<PageTitle>ValyanClinic - Acasa</PageTitle>
+
+<div class="home-container">
+    <div class="welcome-section">
+        <div class="welcome-header">
+            <div>
+                <h1>👋 Bună, Dr. Admin!</h1>
+                <p class="subtitle">Iată o privire de ansamblu asupra activității de astăzi</p>
+            </div>
+            <div class="date-info">
+                <i class="fas fa-calendar-day"></i>
+                <span>@DateTime.Now.ToString("dddd, dd MMMM yyyy")</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card stat-primary">
+            <div class="stat-icon">
+                <i class="fas fa-user-injured"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Pacienți Astăzi</h3>
+                <div class="stat-number">42</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    12% față de ieri
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-success">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Programări</h3>
+                <div class="stat-number">28</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    8% săptămâna aceasta
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-warning">
+            <div class="stat-icon">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Personal Activ</h3>
+                <div class="stat-number">15</div>
+                <div class="stat-change neutral">
+                    <i class="fas fa-minus"></i>
+                    Fără modificări
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-info">
+            <div class="stat-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Venituri Lunare</h3>
+                <div class="stat-number">125K</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    18% față de luna trecută
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-cards">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-icon primary">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Administrare Personal</h3>
+            </div>
+            <p>Gestionează angajații clinicii, adaugă sau modifică informații</p>
+            <a href="/administrare/personal" class="card-link">
+                Acceseaza Modulul
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-icon success">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h3>Personal Medical</h3>
+            </div>
+            <p>Administrează personalul medical și specializările acestuia</p>
+            <a href="/administrare/personal-medical" class="card-link">
+                Acceseaza Modulul
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-icon warning">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>Programări</h3>
+            </div>
+            <p>Gestionează programările și calendarul clinicii</p>
+            <a href="/programari" class="card-link">
+                Acceseaza Modulul
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-icon info">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Rapoarte & Statistici</h3>
+            </div>
+            <p>Vizualizează rapoarte detaliate și analize statistice</p>
+            <a href="/rapoarte/statistici" class="card-link">
+                Acceseaza Modulul
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-card">
+            <h3>
+                <i class="fas fa-rocket"></i>
+                Tehnologii Utilizate
+            </h3>
+            <ul class="tech-list">
+                <li><i class="fas fa-check-circle"></i> .NET 9 Blazor</li>
+                <li><i class="fas fa-check-circle"></i> Clean Architecture + CQRS</li>
+                <li><i class="fas fa-check-circle"></i> Syncfusion Components</li>
+                <li><i class="fas fa-check-circle"></i> Dapper + SQL Server</li>
+                <li><i class="fas fa-check-circle"></i> MediatR Pattern</li>
+                <li><i class="fas fa-check-circle"></i> FluentValidation</li>
+            </ul>
+        </div>
+
+        <div class="info-card">
+            <h3>
+                <i class="fas fa-heartbeat"></i>
+                Monitorizare Sistem
+            </h3>
+            <div class="health-links">
+                <a href="/health" class="health-link" target="_blank">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <span>Health Check Report</span>
+                </a>
+                <a href="/health-json" class="health-link" target="_blank">
+                    <i class="fas fa-code"></i>
+                    <span>JSON Response</span>
+                </a>
+                <a href="/health-ui" class="health-link" target="_blank">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Monitoring Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,25 +1,8 @@
-﻿<Router AppAssembly="typeof(Program).Assembly">
+﻿@using Microsoft.AspNetCore.Components.Routing
+
+<Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        @* Check if user is trying to access login page *@
-        @if (routeData.PageType.Name == "Login")
-        {
-            <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.EmptyLayout)" />
-        }
-        else
-        {
-            @* For all other pages, use main layout *@
-            <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        }
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        <RouteView RouteData="@routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
-    <NotFound>
-        <PageTitle>Pagina nu a fost gasita</PageTitle>
-        <LayoutView Layout="@typeof(Layout.MainLayout)">
-            <div style="text-align: center; padding: 2rem;">
-                <h1>404 - Pagina nu a fost gasita</h1>
-                <p>Ne pare rau, pagina solicitata nu exista.</p>
-                <a href="/" class="btn btn-primary">Inapoi la Acasa</a>
-            </div>
-        </LayoutView>
-    </NotFound>
 </Router>

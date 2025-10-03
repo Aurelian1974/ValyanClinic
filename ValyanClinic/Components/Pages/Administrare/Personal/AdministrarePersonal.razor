@@ -1,270 +1,262 @@
 ﻿@page "/administrare/personal"
 @rendermode InteractiveServer
-@using ValyanClinic.Application.Services
-@using ValyanClinic.Domain.Models
-@using ValyanClinic.Domain.Enums
+@using ValyanClinic.Application.Features.PersonalManagement.Queries.GetPersonalList
+@using MediatR
 @using Syncfusion.Blazor.Grids
-@using Syncfusion.Blazor.Buttons
-@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.DropDowns
-@using Syncfusion.Blazor.Popups
-@using Syncfusion.Blazor.SplitButtons
-@using GridSelectionType = Syncfusion.Blazor.Grids.SelectionType
-@using GridSelectionMode = Syncfusion.Blazor.Grids.SelectionMode
-@using GridSortDirection = Syncfusion.Blazor.Grids.SortDirection
-@using GridFilterType = Syncfusion.Blazor.Grids.FilterType
-@using PersonalModel = ValyanClinic.Domain.Models.Personal
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
 
-<PageTitle>Administrare Personal - ValyanMed</PageTitle>
+<PageTitle>Administrare Personal</PageTitle>
 
-@* INCLUDE CSS SPECIFIC PENTRU PERSONAL PAGE *@
-<link href="~/css/pages/administrare-personal.css" rel="stylesheet" />
-
-<div class="personal-page-container">
-    
-    @* Error Display *@
-    @if (_state.HasError)
-    {
-        <div class="alert alert-danger d-flex align-items-center">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <div class="flex-1">@_state.ErrorMessage</div>
-            <button class="btn-close" @onclick="_state.ClearError" aria-label="Close"></button>
-        </div>
-    }
-
-    @* Page Header - SIMPLIFIED WITHOUT KEBAB MENU *@
-    <div class="personal-page-header">
-        <div class="header-content">
-            <div class="header-text">
-                <h1 class="personal-page-title">
-                    <i class="fas fa-users"></i>
-                    Administrare Personal
-                </h1>
-                <p class="personal-page-subtitle">
-                    Gestioneaza personalul clinicii - functii administrative si de suport
-                </p>
-            </div>
-            
-            <div class="personal-header-actions">
-                <button class="btn btn-outline-primary" @onclick="ShowAddPersonalModal">
-                    <i class="fas fa-plus"></i>
-                    <span class="btn-text">Adauga Personal</span>
-                </button>
-                <button class="btn btn-outline-secondary" @onclick="RefreshData">
-                    <i class="fas fa-sync-alt"></i>
-                    <span class="btn-text">Actualizeaza</span>
-                </button>
-            </div>
+<div class="personal-container">
+    <div class="personal-header">
+        <h1>
+            <i class="fas fa-users"></i>
+            Administrare Personal
+        </h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" @onclick="HandleAddNew">
+                <i class="fas fa-plus"></i>
+                Adauga Personal
+            </button>
+            <button class="btn btn-secondary" @onclick="HandleRefresh">
+                <i class="fas fa-sync-alt"></i>
+                Reincarca
+            </button>
         </div>
     </div>
 
-    @* Main DataGrid - WITHOUT ADVANCED FILTERING *@
-    @if (_state.IsLoading)
+    @if (IsLoading)
     {
-        <div class="personal-grid-container">
-            <div class="loading-indicator text-center p-5">
-                <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
-                <div class="mt-3">Se incarca personalul...</div>
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Se incarca...</span>
             </div>
+            <p>Se incarca datele...</p>
+        </div>
+    }
+    else if (HasError)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            @ErrorMessage
         </div>
     }
     else
     {
-        <div class="personal-grid-container">
-            <SfGrid @ref="GridRef" DataSource="@_models.FilteredPersonal" 
-                    AllowPaging="true" 
-                    AllowSorting="true" 
+        <!-- Page Size Selector -->
+        <div class="page-size-selector">
+            <div class="selector-wrapper">
+                <div class="page-size-controls">
+                    <label class="selector-label">
+                        <i class="fas fa-list"></i>
+                        Inregistrari per pagina:
+                    </label>
+                    <SfDropDownList TValue="int" TItem="PageSizeOption" 
+                                   DataSource="@PageSizeOptions" 
+                                   Value="@CurrentPageSize"
+                                   ValueChanged="@OnPageSizeChanged"
+                                   CssClass="page-size-dropdown"
+                                   Width="100px">
+                        <DropDownListFieldSettings Text="Text" Value="Value"/>
+                    </SfDropDownList>
+                </div>
+                <div class="total-records">
+                    <i class="fas fa-database"></i>
+                    <span>Total: <strong>@AllPersonalList.Count</strong> inregistrari</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <SfGrid DataSource="@PagedPersonalList"
+                    Height="100%"
+                    AllowPaging="false"
+                    AllowSorting="true"
                     AllowFiltering="true"
-                    AllowGrouping="true"
-                    AllowSelection="true"
-                    AllowReordering="true"
                     AllowResizing="true"
-                    ShowColumnMenu="true">
+                    AllowTextWrap="true"
+                    GridLines="GridLine.Both">
                 
-                @* Grid Events *@
-                <GridEvents TValue="PersonalModel" 
-                           RowSelected="RowSelected"
-                           RowDeselected="RowDeselected">
+                <GridFilterSettings Type="FilterType.Menu"></GridFilterSettings>
+                
+                <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
+                
+                <GridEvents TValue="PersonalListDto" 
+                           RowSelected="OnRowSelected"
+                           CommandClicked="OnCommandClicked">
                 </GridEvents>
-
-                @* Selection Settings *@
-                <GridSelectionSettings Type="GridSelectionType.Multiple" Mode="GridSelectionMode.Row"></GridSelectionSettings>
-
-                @* Page Settings *@
-                <GridPageSettings PageSize="10" PageSizes="@_models.PageSizes"></GridPageSettings>
-
-                @* Sort Settings *@
-                <GridSortSettings AllowUnsort="true">
-                    <GridSortColumns>
-                        <GridSortColumn Field="Nume" Direction="GridSortDirection.Ascending"></GridSortColumn>
-                    </GridSortColumns>
-                </GridSortSettings>
-
-                @* Filter Settings *@
-                <GridFilterSettings Type="GridFilterType.Excel" 
-                                  Mode="FilterBarMode.Immediate"
-                                  ShowFilterBarStatus="true"
-                                  ImmediateModeDelay="500">
-                </GridFilterSettings>
-
-                @* Group Settings *@
-                <GridGroupSettings ShowDropArea="true" ShowToggleButton="true" ShowGroupedColumn="true">
-                    <GridGroupColumns>
-                        <GridGroupColumn Field="Departament"></GridGroupColumn>
-                    </GridGroupColumns>
-                </GridGroupSettings>
-
-                @* Columns Definition - WITH ACTIONS COLUMN *@
+                
                 <GridColumns>
-                    <GridColumn Field="@nameof(PersonalModel.Cod_Angajat)" HeaderText="Cod" Width="80" TextAlign="TextAlign.Center" 
-                               IsPrimaryKey="false" AllowFiltering="true" AllowReordering="false"></GridColumn>
-                    <GridColumn Field="@nameof(PersonalModel.Nume)" HeaderText="Nume" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(PersonalModel.Prenume)" HeaderText="Prenume" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(PersonalModel.Email_Personal)" HeaderText="Email" Width="150" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(PersonalModel.Telefon_Personal)" HeaderText="Telefon" Width="90" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                    <GridColumn Field="@nameof(PersonalModel.Functia)" HeaderText="Functia" Width="100" AllowFiltering="true" AllowReordering="true"></GridColumn>
-                               
-                    <GridColumn Field="@nameof(PersonalModel.Departament)" HeaderText="Departament" Width="100" 
-                               AllowFiltering="true" AllowReordering="true">
+                    <GridColumn Field="@nameof(PersonalListDto.Cod_Angajat)" 
+                               HeaderText="Cod" 
+                               Width="100"
+                               IsPrimaryKey="true">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalListDto.Nume)" 
+                               HeaderText="Nume" 
+                               Width="150">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalListDto.Prenume)" 
+                               HeaderText="Prenume" 
+                               Width="150">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalListDto.CNP)" 
+                               HeaderText="CNP" 
+                               Width="130">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalListDto.Telefon_Personal)" 
+                               HeaderText="Telefon" 
+                               Width="120">
                         <Template>
-                            @{                                               
-                                var personal = context as PersonalModel;
-                                <span>@GetDepartamentDisplay(personal!.Departament)</span>
+                            @{
+                                var personal = (context as PersonalListDto);
+                                if (!string.IsNullOrEmpty(personal?.Telefon_Personal))
+                                {
+                                    <a href="tel:@personal.Telefon_Personal" class="phone-link">
+                                        <i class="fas fa-phone"></i>
+                                        @personal.Telefon_Personal
+                                    </a>
+                                }
                             }
                         </Template>
                     </GridColumn>
-                               
-                    <GridColumn Field="@nameof(PersonalModel.Status_Angajat)" HeaderText="Status" Width="70" 
-                               AllowFiltering="true" AllowReordering="true">
+                    
+                    <GridColumn Field="@nameof(PersonalListDto.Email_Personal)" 
+                               HeaderText="Email" 
+                               Width="200">
                         <Template>
-                            @{                                               
-                                var personal = context as PersonalModel;
-                                <span class="status-badge status-@personal!.Status_Angajat.ToString().ToLower()">
-                                    @GetStatusDisplay(personal.Status_Angajat)
+                            @{
+                                var personal = (context as PersonalListDto);
+                                if (!string.IsNullOrEmpty(personal?.Email_Personal))
+                                {
+                                    <a href="mailto:@personal.Email_Personal" class="email-link">
+                                        <i class="fas fa-envelope"></i>
+                                        @personal.Email_Personal
+                                    </a>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalListDto.Functia)" 
+                               HeaderText="Functie" 
+                               Width="150">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalListDto.Departament)" 
+                               HeaderText="Departament" 
+                               Width="150">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalListDto.Status_Angajat)" 
+                               HeaderText="Status" 
+                               Width="100">
+                        <Template>
+                            @{
+                                var personal = (context as PersonalListDto);
+                                var statusClass = personal?.Status_Angajat == "Activ" ? "status-active" : "status-inactive";
+                                <span class="status-badge @statusClass">
+                                    @personal?.Status_Angajat
                                 </span>
                             }
                         </Template>
                     </GridColumn>
-                               
-                    <GridColumn Field="@nameof(PersonalModel.Data_Crearii)" HeaderText="Data Crearii" Width="90" 
-                               Format="dd.MM.yyyy" Type="ColumnType.Date" AllowFiltering="true" AllowReordering="true"></GridColumn>
                     
-                    @* Actions Column with Dropdown - FIXED CONFIGURATION *@
-                    <GridColumn HeaderText="Actiuni" Width="70" AllowFiltering="false" AllowSorting="false" 
-                               AllowReordering="false" AllowResizing="false" TextAlign="TextAlign.Center">
-                        <Template>
-                            @{
-                                var personal = context as PersonalModel;
-                                <div class="action-dropdown-container">
-                                    <SfDropDownButton Content="" 
-                                                    CssClass="action-dropdown-btn" 
-                                                    IconCss="fas fa-ellipsis-v"
-                                                    Target="body">
-                                        <DropDownButtonEvents ItemSelected="@((args) => OnActionSelected(args, personal!))" />
-                                        <DropDownMenuItems>
-                                            <DropDownMenuItem Id="view" Text="Vizualizeaza" IconCss="fas fa-eye"></DropDownMenuItem>
-                                            <DropDownMenuItem Id="edit" Text="Editeaza" IconCss="fas fa-edit"></DropDownMenuItem>
-                                            <DropDownMenuItem Id="delete" Text="Sterge" IconCss="fas fa-trash"></DropDownMenuItem>
-                                        </DropDownMenuItems>
-                                    </SfDropDownButton>
-                                </div>
-                            }
-                        </Template>
+                    <GridColumn HeaderText="Actiuni" Width="180" TextAlign="TextAlign.Center">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.None" 
+                                             ButtonOption="@(new CommandButtonOptions() 
+                                             { 
+                                                 Content = "Vizualizeaza", 
+                                                 CssClass = "e-flat btn-view",
+                                                 IconCss = "fas fa-eye"
+                                             })">
+                            </GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.None" 
+                                             ButtonOption="@(new CommandButtonOptions() 
+                                             { 
+                                                 Content = "Editeaza", 
+                                                 CssClass = "e-flat btn-edit",
+                                                 IconCss = "fas fa-edit"
+                                             })">
+                            </GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.None" 
+                                             ButtonOption="@(new CommandButtonOptions() 
+                                             { 
+                                                 Content = "Sterge", 
+                                                 CssClass = "e-flat btn-delete",
+                                                 IconCss = "fas fa-trash"
+                                             })">
+                            </GridCommandColumn>
+                        </GridCommandColumns>
                     </GridColumn>
                 </GridColumns>
             </SfGrid>
         </div>
+
+        <!-- Custom Pager -->
+        <div class="custom-pager">
+            <div class="pager-info">
+                <i class="fas fa-info-circle"></i>
+                <span>Pagina @GetCurrentPage() din @GetTotalPages()</span>
+                <span class="separator">|</span>
+                <span>Afisate @GetDisplayedRecordsStart()-@GetDisplayedRecordsEnd() din @AllPersonalList.Count</span>
+            </div>
+            <div class="pager-controls">
+                <button class="pager-btn @(GetCurrentPage() == 1 ? "disabled" : "")" 
+                        @onclick="() => GoToPage(1)" 
+                        disabled="@(GetCurrentPage() == 1)"
+                        title="Prima pagina">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                <button class="pager-btn @(GetCurrentPage() == 1 ? "disabled" : "")" 
+                        @onclick="() => GoToPage(GetCurrentPage() - 1)" 
+                        disabled="@(GetCurrentPage() == 1)"
+                        title="Pagina anterioara">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+                
+                @for (int i = GetPagerStart(); i <= GetPagerEnd(); i++)
+                {
+                    int pageNum = i;
+                    <button class="pager-btn page-number @(GetCurrentPage() == pageNum ? "active" : "")" 
+                            @onclick="() => GoToPage(pageNum)">
+                        @pageNum
+                    </button>
+                }
+                
+                <button class="pager-btn @(GetCurrentPage() == GetTotalPages() ? "disabled" : "")" 
+                        @onclick="() => GoToPage(GetCurrentPage() + 1)" 
+                        disabled="@(GetCurrentPage() == GetTotalPages())"
+                        title="Pagina urmatoare">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+                <button class="pager-btn @(GetCurrentPage() == GetTotalPages() ? "disabled" : "")" 
+                        @onclick="() => GoToPage(GetTotalPages())" 
+                        disabled="@(GetCurrentPage() == GetTotalPages())"
+                        title="Ultima pagina">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+            </div>
+            <div class="jump-to-page">
+                <span>Sari la:</span>
+                <input type="number" @bind="jumpToPageNumber" @onkeypress="OnJumpToPageKeyPress" 
+                       min="1" max="@GetTotalPages()" class="page-input" />
+                <button class="pager-btn" @onclick="JumpToPage" title="Sari la pagina">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
     }
-
-    @* Personal Detail Modal *@
-    <SfDialog @ref="PersonalDetailModal" 
-              Width="900px" 
-              Height="700px"
-              IsModal="true" 
-              Visible="@_state.IsModalVisible"
-              ShowCloseIcon="true"
-              AllowDragging="true"
-              CssClass="personal-dialog detail-dialog"
-              AnimationSettings="@DialogAnimation">
-        
-        <DialogEvents Closed="OnModalClosed" />
-        <DialogTemplates>
-            <Header>
-                <div class="modal-header-content">
-                    <i class="fas fa-user-circle modal-header-icon"></i>
-                    <div>
-                        <h3 class="modal-header-title">@_state.SelectedPersonal?.NumeComplet</h3>
-                        <p class="modal-header-subtitle">Detalii personal</p>
-                    </div>
-                </div>
-            </Header>
-            <Content>
-                @if (_state.SelectedPersonal != null)
-                {
-                    <VizualizeazaPersonal PersonalData="@_state.SelectedPersonal" />
-                }
-            </Content>
-            <FooterTemplate>
-                <div class="modal-footer-actions">
-                    <button class="btn btn-primary" @onclick="EditPersonalFromModal">
-                        <i class="fas fa-edit"></i> Editeaza Personal
-                    </button>
-                    <button class="btn btn-secondary" @onclick="ClosePersonalDetailModal">
-                        <i class="fas fa-times"></i> Inchide
-                    </button>
-                </div>
-            </FooterTemplate>
-        </DialogTemplates>
-    </SfDialog>
-
-    @* Add/Edit Personal Modal - USING SEPARATE COMPONENT *@
-    <SfDialog @ref="AddEditPersonalModal" 
-              Width="900px" 
-              Height="700px"
-              IsModal="true" 
-              Visible="@_state.IsAddEditModalVisible"
-              ShowCloseIcon="true"
-              AllowDragging="true"
-              CssClass="personal-dialog edit-dialog"
-              AnimationSettings="@DialogAnimation">
-        <DialogEvents Closed="OnAddEditModalClosed" />
-        <DialogTemplates>
-            <Header>
-                <div class="modal-header-content">
-                    <i class="fas fa-user-plus modal-header-icon"></i>
-                    <div>
-                        <h3 class="modal-header-title">@_state.GetModalTitle()</h3>
-                        <p class="modal-header-subtitle">@_state.GetModalSubtitle()</p>
-                    </div>
-                </div>
-            </Header>
-            <Content>
-                @if (_state.IsEditMode && _state.EditingPersonal != null)
-                {
-                    <AdaugaEditezaPersonal @ref="_currentFormComponent" 
-                                          EditingPersonal="@_state.EditingPersonal"
-                                          OnSave="@SavePersonal" 
-                                          OnCancel="@CloseAddEditModal" />
-                }
-                else
-                {
-                    <AdaugaEditezaPersonal @ref="_currentFormComponent" 
-                                          OnSave="@SavePersonal" 
-                                          OnCancel="@CloseAddEditModal" />
-                }
-            </Content>
-            <FooterTemplate>
-                <div class="modal-footer-actions">
-                    <button class="btn btn-primary" @onclick="HandleFormSubmit" disabled="@_state.IsLoading">
-                        <i class="fas fa-save"></i>
-                        @(_state.IsEditMode ? "Actualizeaza Personal" : "Adauga Personal")
-                    </button>
-                    <button class="btn btn-secondary" @onclick="CloseAddEditModal" disabled="@_state.IsLoading">
-                        <i class="fas fa-times"></i>
-                        Anuleaza
-                    </button>
-                </div>
-            </FooterTemplate>
-        </DialogTemplates>
-    </SfDialog>
 </div>
+
+@* Toast pentru notificari *@
+<SfToast @ref="ToastRef" Title="@ToastTitle" Content="@ToastContent" CssClass="@ToastCssClass">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>

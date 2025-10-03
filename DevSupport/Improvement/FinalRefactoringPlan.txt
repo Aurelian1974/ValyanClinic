@@ -1,0 +1,312 @@
+IMPORTANT - toate acestea trebuie instalare si configurare initiala dupa stergere
+	1.Vom folosi Syncfusion
+		  "Syncfusion": {
+			"LicenseKey": "Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXZfcXRUR2lcVUV2V0BWYEg="
+	2.Nu vom avea diacritice in cod sau in pagini
+	3.Nu vom crea documentii decat la final cand terminam o pagina sau o componenta
+	4.Vom folosi in mod obligatoriu Dapper
+	5.Nu vom folosi sql queries in cod doar proceduri stocate
+	6.Vom folosi Microsoft SQL Server ca si baza de date
+	7.Serilog - Structured Logging
+	8.MediatR - CQRS și Vertical Slices
+	9.FluentValidation - Validare Avansată
+	10.AutoMapper - Object Mapping
+	11.Health Checks - Monitoring și Diagnostics
+	12.ResponseCaching - Performance Optimization
+	13.ASP.NET Core Identity + JWT
+	14.AUDIT TRAIL ȘI COMPLIANCE
+	15.BACKUP ȘI DISASTER RECOVERY
+	16.SEARCH ȘI INDEXING (pentru căutare rapidă)
+	17.ASP.NET Core Data Protection API 
+
+📋 PARTEA 1: CE PĂSTRĂM (Backup și Configurații)
+
+A. Fișiere CRITICE de Păstrat
+✅ PĂSTRĂM (Backup obligatoriu):
+
+1. Configurații Esențiale:
+   ├── .gitignore
+   ├── ValyanClinic.sln
+   ├── README.md
+   ├── appsettings.json (connection strings)
+   ├── appsettings.Development.json
+   └── appsettings.Production.json
+
+2. Database Scripts:
+   └── DevSupport/Scripts/
+       ├── Database_Schema.sql
+       ├── StoredProcedures/*.sql
+       └── SeedData.sql
+
+3. Documentație:
+   └── DevSupport/Documentation/
+       └── Plan_refactoring.txt (acest document)
+
+
+B. Backup Strategy
+
+# PASUL 1: Creează branch de backup
+git checkout master
+git branch backup-pre-refactor
+git push origin backup-pre-refactor
+
+# PASUL 2: Creează tag pentru versiune curentă
+git tag v1.0-pre-refactor
+git push origin v1.0-pre-refactor
+
+# PASUL 3: Backup local extern
+robocopy "D:\Lucru\CMS" "D:\Backup\ValyanClinic-$(Get-Date -Format 'yyyy-MM-dd')" /E /XD .git bin obj
+
+🗑️ PARTEA 2: ȘTERGERE COMPLETĂ (Clean Slate)
+A. Structura de Șters COMPLET
+
+❌ ȘTERGEM COMPLET (păstrăm doar .sln și .gitignore):
+
+ValyanClinic/                              ← Păstrăm doar .csproj
+├── Components/                            ← ȘTERGE tot
+├── wwwroot/                               ← ȘTERGE tot (reconstruim)
+├── Properties/                            ← Păstrăm
+├── Program.cs                             ← ȘTERGE (rescriem)
+└── appsettings.*.json                     ← Păstrăm (copie backup)
+
+ValyanClinic.Domain/                       ← Păstrăm proiectul
+├── Models/                                ← ȘTERGE tot (rescriem)
+├── Enums/                                 ← ȘTERGE tot (rescriem)
+└── Interfaces/                            ← ȘTERGE tot (rescriem)
+
+ValyanClinic.Application/                  ← Păstrăm proiectul
+├── Services/                              ← ȘTERGE tot (rescriem)
+├── DTOs/                                  ← ȘTERGE tot (rescriem)
+├── Validators/                            ← ȘTERGE tot (rescriem)
+└── Common/                                ← Păstrăm Result.cs
+
+ValyanClinic.Infrastructure/               ← Păstrăm proiectul
+├── Repositories/                          ← Păstrăm parțial (Dapper + SPs)
+└── Data/                                  ← Păstrăm connection factory
+
+DevSupport/                                ← Păstrăm tot
+
+🏗️ PARTEA 3: STRUCTURA FINALĂ (După Ștergere)
+A. Structura Minimă Rămasă
+
+D:\Lucru\CMS\
+├── .git/                                  ✅ Păstrat
+├── .gitignore                             ✅ Păstrat
+├── ValyanClinic.sln                       ✅ Păstrat
+│
+├── ValyanClinic/                          ✅ Proiect gol
+│   ├── ValyanClinic.csproj                ✅ Păstrat
+│   ├── Properties/                        ✅ Păstrat
+│   ├── appsettings.json                   ✅ Păstrat (backup)
+│   ├── appsettings.Development.json       ✅ Păstrat (backup)
+│   └── wwwroot/                           📁 GOL (reconstruim)
+│
+├── ValyanClinic.Domain/                   ✅ Proiect gol
+│   └── ValyanClinic.Domain.csproj         ✅ Păstrat
+│
+├── ValyanClinic.Application/              ✅ Proiect gol
+│   ├── ValyanClinic.Application.csproj    ✅ Păstrat
+│   └── Common/
+│       └── Result.cs                      ✅ Păstrat
+│
+├── ValyanClinic.Infrastructure/           ✅ Parțial păstrat
+│   ├── ValyanClinic.Infrastructure.csproj ✅ Păstrat
+│   ├── Repositories/
+│   │   └── BaseRepository.cs              ✅ Păstrat (Dapper)
+│   └── Data/
+│       └── DbConnectionFactory.cs         ✅ Păstrat
+│
+└── DevSupport/                            ✅ Păstrat complet
+    
+	
+🎨 PARTEA 4: ARHITECTURA NOUĂ (Clean + Vertical Slices)
+A. Structura Hibridă Finală
+D:\Lucru\CMS\
+│
+├── ValyanClinic/                          🎯 Blazor Server (.NET 9)
+│   ├── Program.cs                         ✨ NOU (rescriem)
+│   ├── appsettings.json                   ✅ Păstrat
+│   │
+│   ├── Components/                        ✨ NOU - Reconstruim
+│   │   ├── App.razor
+│   │   ├── Routes.razor
+│   │   │
+│   │   ├── Layout/
+│   │   │   ├── MainLayout.razor
+│   │   │   ├── MainLayout.razor.css       ✨ Scoped CSS
+│   │   │   ├── NavMenu.razor
+│   │   │   └── NavMenu.razor.css          ✨ Scoped CSS
+│   │   │
+│   │   ├── Pages/
+│   │   │   ├── Administrare/
+│   │   │   │   └── Personal/
+│   │   │   │       ├── AdministrarePersonal.razor
+│   │   │   │       ├── AdministrarePersonal.razor.cs
+│   │   │   │       ├── AdministrarePersonal.razor.css    ✨ Scoped
+│   │   │   │       ├── AdaugaEditezaPersonal.razor
+│   │   │   │       ├── AdaugaEditezaPersonal.razor.css   ✨ Scoped
+│   │   │   │       ├── VizualizeazaPersonal.razor
+│   │   │   │       └── VizualizeazaPersonal.razor.css    ✨ Scoped
+│   │   │   │
+│   │   │   ├── Utilizatori/
+│   │   │   │   ├── GestioneazaUtilizatori.razor
+│   │   │   │   └── GestioneazaUtilizatori.razor.css     ✨ Scoped
+│   │   │   │
+│   │   │   └── Auth/
+│   │   │       ├── Login.razor
+│   │   │       └── Login.razor.css                       ✨ Scoped
+│   │   │
+│   │   └── Shared/
+│   │       ├── LoadingSpinner.razor
+│   │       ├── LoadingSpinner.razor.css                  ✨ Scoped
+│   │       └── LocationDropdowns.razor
+│   │           └── LocationDropdowns.razor.css           ✨ Scoped
+│   │
+│   ├── wwwroot/
+│   │   └── css/
+│   │       ├── variables.css              ✨ Design tokens
+│   │       ├── base.css                   ✨ Reset + base
+│   │       └── app.css                    ✨ Imports only
+│   │
+│   └── HealthChecks/                      ✨ NOU
+│       ├── DatabaseHealthCheck.cs
+│       └── CacheHealthCheck.cs
+│
+├── ValyanClinic.Domain/                   🎯 Domain Layer (Clean Architecture)
+│   │
+│   ├── Entities/                          ✨ NOU - Domain Models
+│   │   ├── Personal.cs
+│   │   ├── Patient.cs
+│   │   └── User.cs
+│   │
+│   ├── Enums/                             ✨ NOU - îmbunătățite
+│   │   ├── StatusAngajat.cs
+│   │   ├── Departament.cs -- le vom lua din baza de date
+│   │   ├── StareCivila.cs
+│   │   └── PozitiiMedicale.cs -- le vom lua din baza de date
+│   │
+│   ├── Events/                            ✨ NOU - Domain Events
+│   │   ├── IDomainEvent.cs
+│   │   ├── DomainEventBase.cs
+│   │   ├── PersonalCreatedEvent.cs
+│   │   ├── PersonalUpdatedEvent.cs
+│   │   └── PersonalDeletedEvent.cs
+│   │
+│   ├── Interfaces/                        ✨ NOU
+│   │   ├── Repositories/
+│   │   │   ├── IPersonalRepository.cs
+│   │   │   └── IPatientRepository.cs
+│   │   │
+│   │   └── Services/
+│   │       └── IDomainEventDispatcher.cs
+│   │
+│   └── ValueObjects/                      ✨ NOU (optional)
+│       ├── CNP.cs
+│       ├── EmailAddress.cs
+│       └── PhoneNumber.cs
+│
+├── ValyanClinic.Application/              🎯 Application Layer
+│   │
+│   ├── Features/                          ✨ NOU - Vertical Slices
+│   │   │
+│   │   ├── PersonalManagement/
+│   │   │   ├── Commands/
+│   │   │   │   ├── CreatePersonal/
+│   │   │   │   │   ├── CreatePersonalCommand.cs
+│   │   │   │   │   ├── CreatePersonalCommandHandler.cs
+│   │   │   │   │   └── CreatePersonalCommandValidator.cs
+│   │   │   │   │
+│   │   │   │   ├── UpdatePersonal/
+│   │   │   │   │   ├── UpdatePersonalCommand.cs
+│   │   │   │   │   ├── UpdatePersonalCommandHandler.cs
+│   │   │   │   │   └── UpdatePersonalCommandValidator.cs
+│   │   │   │   │
+│   │   │   │   └── DeletePersonal/
+│   │   │   │       ├── DeletePersonalCommand.cs
+│   │   │   │       └── DeletePersonalCommandHandler.cs
+│   │   │   │
+│   │   │   ├── Queries/
+│   │   │   │   ├── GetPersonalList/
+│   │   │   │   │   ├── GetPersonalListQuery.cs
+│   │   │   │   │   ├── GetPersonalListQueryHandler.cs
+│   │   │   │   │   └── PersonalListDto.cs
+│   │   │   │   │
+│   │   │   │   ├── GetPersonalById/
+│   │   │   │   │   ├── GetPersonalByIdQuery.cs
+│   │   │   │   │   ├── GetPersonalByIdQueryHandler.cs
+│   │   │   │   │   └── PersonalDetailDto.cs
+│   │   │   │   │
+│   │   │   │   └── GetPersonalStatistics/
+│   │   │   │       ├── GetPersonalStatisticsQuery.cs
+│   │   │   │       └── GetPersonalStatisticsQueryHandler.cs
+│   │   │   │
+│   │   │   ├── Common/
+│   │   │   │   ├── PersonalMappings.cs
+│   │   │   │   └── PersonalBusinessRules.cs
+│   │   │   │
+│   │   │   └── EventHandlers/
+│   │   │       ├── PersonalCreatedEventHandler.cs
+│   │   │       ├── PersonalUpdatedEventHandler.cs
+│   │   │       └── AuditLogEventHandler.cs
+│   │   │
+│   │   ├── PatientManagement/             ✨ Similar structure - doar placeholdere
+│   │   ├── UserManagement/                ✨ Similar structure - doar placeholdere
+│   │   └── AppointmentManagement/         ✨ Similar structure - doar placeholdere
+│   │
+│   ├── Common/                            ✅ Păstrat + îmbunătățit
+│   │   ├── Results/
+│   │   │   ├── Result.cs
+│   │   │   ├── ResultT.cs
+│   │   │   ├── PagedResult.cs
+│   │   │   └── ValidationResult.cs
+│   │   │
+│   │   ├── Behaviors/                     ✨ NOU - MediatR behaviors
+│   │   │   ├── ValidationBehavior.cs
+│   │   │   ├── LoggingBehavior.cs
+│   │   │   └── CachingBehavior.cs
+│   │   │
+│   │   └── Exceptions/                    ✨ NOU
+│   │       ├── ValidationException.cs
+│   │       ├── NotFoundException.cs
+│   │       └── BusinessRuleException.cs
+│   │
+│   ├── Validators/                        ✨ NOU - Shared validators
+│   │   ├── CNPValidator.cs
+│   │   ├── EmailValidator.cs
+│   │   └── PhoneValidator.cs
+│   │
+│   └── Interfaces/                        ✨ NOU
+│       ├── ICacheService.cs
+│       └── IAuditService.cs
+│
+├── ValyanClinic.Infrastructure/           🎯 Infrastructure Layer
+│   │
+│   ├── Repositories/                      ✅ Păstrat + îmbunătățit
+│   │   ├── BaseRepository.cs              ✅ Păstrat (Dapper base)
+│   │   ├── PersonalRepository.cs          ✨ Rescris cu best practices
+│   │   ├── PatientRepository.cs
+│   │   └── UserRepository.cs
+│   │
+│   ├── Data/                              ✅ Păstrat
+│   │   ├── DbConnectionFactory.cs         ✅ Păstrat
+│   │   └── DapperTypeHandlers/            ✨ NOU
+│   │       └── GuidTypeHandler.cs
+│   │
+│   ├── Caching/                           ✨ NOU
+│   │   ├── MemoryCacheService.cs
+│   │   └── DistributedCacheService.cs
+│   │
+│   ├── Logging/                           ✨ NOU
+│   │   └── AuditService.cs
+│   │
+│   └── BackgroundServices/                ✨ NOU
+│       ├── StockMonitoringService.cs
+│       └── DataCleanupService.cs
+│
+└── DevSupport/                            ✅ Păstrat complet
+
+	
+		
+		
+
+

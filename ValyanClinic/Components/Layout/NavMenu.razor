@@ -1,0 +1,207 @@
+﻿@rendermode InteractiveServer
+@using Syncfusion.Blazor.Navigations
+
+<div class="sidebar @(isCollapsed ? "collapsed" : "")" id="main-sidebar">
+    <div class="sidebar-header">
+        <div class="logo-container">
+            <i class="fas fa-clinic-medical logo-icon"></i>
+            @if (!isCollapsed)
+            {
+                <div>
+                    <h2>ValyanClinic</h2>
+                    <p class="subtitle">Sistem Integrat de Management al Clinicii dumneavoastra</p>
+                </div>
+            }
+        </div>
+        <button type="button" class="btn-collapse" @onclick="HandleToggle" title="@(isCollapsed ? "Extinde" : "Restrânge")">
+            <i class="fas @(isCollapsed ? "fa-chevron-right" : "fa-chevron-left")"></i>
+        </button>
+    </div>
+
+    <div class="nav-menu">
+        @* Home - Level 0 *@
+        <div class="nav-item">
+            <a href="/" class="nav-link" title="Acasă">
+                <i class="fas fa-home"></i>
+                @if (!isCollapsed)
+                {
+                    <span>Acasă</span>
+                }
+            </a>
+        </div>
+
+        @* Administrare - Level 1 (Parent) *@
+        <div class="nav-section">
+            @if (!isCollapsed)
+            {
+                <div class="nav-section-header" @onclick="ToggleAdministrare">
+                    <div class="nav-section-title">
+                        <i class="fas fa-cog"></i>
+                        <span>Administrare</span>
+                    </div>
+                    <i class="fas fa-chevron-@(isAdministrareExpanded ? "up" : "down") nav-chevron"></i>
+                </div>
+
+                @* Administrare Personal - Level 2 (Parent + Child of Administrare) *@
+                @if (isAdministrareExpanded)
+                {
+                    <div class="nav-subsection">
+                        <div class="nav-subsection-header" @onclick="ToggleAdministrarePersonal">
+                            <div class="nav-subsection-title">
+                                <i class="fas fa-users-cog"></i>
+                                <span>Administrare Personal</span>
+                            </div>
+                            <i class="fas fa-chevron-@(isAdministrarePersonalExpanded ? "up" : "down") nav-chevron-small"></i>
+                        </div>
+
+                        @* Personal & Personal Medical - Level 3 (Children of Administrare Personal) *@
+                        @if (isAdministrarePersonalExpanded)
+                        {
+                            <div class="nav-sub-items">
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/personal" class="nav-link nav-link-child" title="Personal">
+                                        <i class="fas fa-users"></i>
+                                        <span>Personal</span>
+                                    </a>
+                                </div>
+
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/personal-medical" class="nav-link nav-link-child" title="Personal Medical">
+                                        <i class="fas fa-user-md"></i>
+                                        <span>Personal Medical</span>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                @* Show icon when collapsed *@
+                <div class="nav-item">
+                    <a href="/administrare/personal" class="nav-link" title="Administrare">
+                        <i class="fas fa-cog"></i>
+                    </a>
+                </div>
+            }
+        </div>
+
+        @* Programări - Level 1 (Parent) *@
+        <div class="nav-section">
+            @if (!isCollapsed)
+            {
+                <div class="nav-section-header" @onclick="ToggleProgramari">
+                    <div class="nav-section-title">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Programări</span>
+                    </div>
+                    <i class="fas fa-chevron-@(isProgramariExpanded ? "up" : "down") nav-chevron"></i>
+                </div>
+
+                @if (isProgramariExpanded)
+                {
+                    <div class="nav-items-group">
+                        <div class="nav-item nav-item-child">
+                            <a href="/programari" class="nav-link nav-link-child" title="Calendar">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Calendar</span>
+                            </a>
+                        </div>
+
+                        <div class="nav-item nav-item-child">
+                            <a href="/programari/lista" class="nav-link nav-link-child" title="Lista Programări">
+                                <i class="fas fa-list"></i>
+                                <span>Lista Programări</span>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                @* Show icon when collapsed *@
+                <div class="nav-item">
+                    <a href="/programari" class="nav-link" title="Programări">
+                        <i class="fas fa-calendar-check"></i>
+                    </a>
+                </div>
+            }
+        </div>
+
+        @* Rapoarte - Level 1 *@
+        <div class="nav-section">
+            @if (!isCollapsed)
+            {
+                <div class="nav-section-header" @onclick="ToggleRapoarte">
+                    <div class="nav-section-title">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Rapoarte</span>
+                    </div>
+                    <i class="fas fa-chevron-@(isRapoarteExpanded ? "up" : "down") nav-chevron"></i>
+                </div>
+
+                @if (isRapoarteExpanded)
+                {
+                    <div class="nav-items-group">
+                        <div class="nav-item nav-item-child">
+                            <a href="/rapoarte/statistici" class="nav-link nav-link-child" title="Statistici">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Statistici</span>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                @* Show icon when collapsed *@
+                <div class="nav-item">
+                    <a href="/rapoarte/statistici" class="nav-link" title="Rapoarte">
+                        <i class="fas fa-chart-bar"></i>
+                    </a>
+                </div>
+            }
+        </div>
+
+        @* Monitorizare - Level 1 *@
+        <div class="nav-section">
+            @if (!isCollapsed)
+            {
+                <div class="nav-section-header" @onclick="ToggleMonitorizare">
+                    <div class="nav-section-title">
+                        <i class="fas fa-heart-pulse"></i>
+                        <span>Monitorizare</span>
+                    </div>
+                    <i class="fas fa-chevron-@(isMonitorizareExpanded ? "up" : "down") nav-chevron"></i>
+                </div>
+
+                @if (isMonitorizareExpanded)
+                {
+                    <div class="nav-items-group">
+                        <div class="nav-item nav-item-child">
+                            <a href="/health" class="nav-link nav-link-child" target="_blank" title="Health Check">
+                                <i class="fas fa-heartbeat"></i>
+                                <span>Health Check</span>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                @* Show icon when collapsed *@
+                <div class="nav-item">
+                    <a href="/health" class="nav-link" title="Monitorizare" target="_blank">
+                        <i class="fas fa-heart-pulse"></i>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* Debug info *@
+@*     <div style="position: absolute; bottom: 10px; left: 10px; color: white; font-size: 12px; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 4px; z-index: 9999;">
+        Collapsed: @isCollapsed | Clicks: @clickCount
+    </div> *@
+</div>

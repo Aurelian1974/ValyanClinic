@@ -1,0 +1,101 @@
+﻿/* ========================================
+   CSS Variables (Design Tokens) - Temă Albastră Pastelată
+   ======================================== */
+:root {
+    /* Culori Primare - Albastru Pastelat */
+    --primary-color: #60a5fa;
+    --primary-dark: #3b82f6;
+    --primary-darker: #2563eb;
+    --primary-light: #93c5fd;
+    --primary-lighter: #bfdbfe;
+    
+    /* Culori Secundare Pastelate */
+    --secondary-color: #94a3b8;
+    --success-color: #6ee7b7;
+    --danger-color: #fca5a5;
+    --warning-color: #fcd34d;
+    --info-color: #7dd3fc;
+    
+    /* Text Colors */
+    --text-color: #334155;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --text-light: #cbd5e1;
+    
+    /* Background Colors - Mai deschise */
+    --background-color: #f8fafc;
+    --background-secondary: #f1f5f9;
+    --background-light: #eff6ff;
+    --background-white: #ffffff;
+    
+    /* Border Colors - Pastelate */
+    --border-color: #e2e8f0;
+    --border-light: #f1f5f9;
+    
+    /* Gradient Backgrounds - Pastelate */
+    --gradient-primary: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    --gradient-blue: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #93c5fd 100%);
+    --gradient-dark-blue: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
+    
+    /* Typography */
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+    
+    --line-height-base: 1.5;
+    --line-height-tight: 1.25;
+    --line-height-relaxed: 1.75;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;    /* 4px */
+    --spacing-sm: 0.5rem;     /* 8px */
+    --spacing-md: 1rem;       /* 16px */
+    --spacing-lg: 1.5rem;     /* 24px */
+    --spacing-xl: 2rem;       /* 32px */
+    --spacing-2xl: 3rem;      /* 48px */
+    
+    /* Border Radius */
+    --border-radius-sm: 0.375rem;
+    --border-radius: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --border-radius-xl: 1rem;
+    --border-radius-full: 9999px;
+    
+    /* Shadows - Mai subtile */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --shadow-xl: 0 15px 40px rgba(0, 0, 0, 0.1);
+    --shadow-blue: 0 4px 12px rgba(96, 165, 250, 0.3);
+    --shadow-blue-lg: 0 10px 30px rgba(96, 165, 250, 0.2);
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    
+    /* Z-Index */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* Dark mode support (optional for future) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: #f1f5f9;
+        --background-color: #0f172a;
+        --background-secondary: #1e293b;
+        --border-color: #334155;
+    }
+}
