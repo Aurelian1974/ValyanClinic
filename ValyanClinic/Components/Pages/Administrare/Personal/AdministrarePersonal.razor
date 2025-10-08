@@ -1,10 +1,12 @@
 ﻿@page "/administrare/personal"
 @rendermode InteractiveServer
 @using ValyanClinic.Application.Features.PersonalManagement.Queries.GetPersonalList
+@using ValyanClinic.Services.DataGrid
 @using MediatR
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 
 <PageTitle>Administrare Personal</PageTitle>
@@ -45,7 +47,7 @@
     }
     else
     {
-        <!-- Page Size Selector -->
+        <!-- Page Size Selector & Search -->
         <div class="page-size-selector">
             <div class="selector-wrapper">
                 <div class="page-size-controls">
@@ -53,66 +55,313 @@
                         <i class="fas fa-list"></i>
                         Inregistrari per pagina:
                     </label>
-                    <SfDropDownList TValue="int" TItem="PageSizeOption" 
-                                   DataSource="@PageSizeOptions" 
-                                   Value="@CurrentPageSize"
-                                   ValueChanged="@OnPageSizeChanged"
+                    <SfDropDownList TValue="int" 
+                                   TItem="PageSizeOption"
+                                   DataSource="@PageSizeOptions"
+                                   @bind-Value="@CurrentPageSize"
                                    CssClass="page-size-dropdown"
-                                   Width="100px">
+                                   Width="80px"
+                                   PopupHeight="200px"
+                                   EnablePersistence="false">
                         <DropDownListFieldSettings Text="Text" Value="Value"/>
                     </SfDropDownList>
                 </div>
+                
+                <div class="search-and-filter">
+                    <div class="global-search">
+                        <SfTextBox Placeholder="Cautare rapida..."
+                                  @bind-Value="@GlobalSearchText"
+                                  CssClass="search-input"
+                                  ShowClearButton="true">
+                            <TextBoxPrefixIcon IconCss="fas fa-search"></TextBoxPrefixIcon>
+                            <TextBoxEvents ValueChange="@OnGlobalSearchInput"></TextBoxEvents>
+                        </SfTextBox>
+                    </div>
+                    <button class="btn-filter @(IsAdvancedFilterExpanded ? "active" : "")" 
+                            @onclick="ToggleAdvancedFilter"
+                            title="Filtre avansate">
+                        <i class="fas fa-filter"></i>
+                        <span>Filtre</span>
+                        @if (ActiveFiltersCount > 0)
+                        {
+                            <span class="filter-badge">@ActiveFiltersCount</span>
+                        }
+                        <i class="fas fa-chevron-@(IsAdvancedFilterExpanded ? "up" : "down") chevron-icon"></i>
+                    </button>
+                </div>
+                
                 <div class="total-records">
                     <i class="fas fa-database"></i>
-                    <span>Total: <strong>@AllPersonalList.Count</strong> inregistrari</span>
+                    <span>Total: <strong>@TotalRecords</strong> inregistrari</span>
+                    @if (ActiveFiltersCount > 0)
+                    {
+                        <span class="filtered-info">(filtrate)</span>
+                    }
                 </div>
             </div>
         </div>
 
+        <!-- Advanced Filter Panel -->
+        <div class="advanced-filter-panel @(IsAdvancedFilterExpanded ? "expanded" : "")">
+            <div class="filter-content">
+                <div class="filter-grid">
+                    <!-- Status Filter -->
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-circle-check"></i>
+                            Status
+                        </label>
+                        <SfDropDownList TValue="string" 
+                                       TItem="FilterOption"
+                                       DataSource="@StatusOptions"
+                                       @bind-Value="@FilterStatus"
+                                       Placeholder="Toate statusurile"
+                                       CssClass="filter-dropdown"
+                                       AllowFiltering="false"
+                                       ShowClearButton="false"
+                                       EnablePersistence="false"
+                                       IgnoreAccent="true">
+                            <DropDownListFieldSettings Text="Text" Value="Value"/>
+                        </SfDropDownList>
+                    </div>
+
+                    <!-- Departament Filter -->
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-building"></i>
+                            Departament
+                        </label>
+                        <SfDropDownList TValue="string" 
+                                       TItem="FilterOption"
+                                       DataSource="@DepartamentOptions"
+                                       @bind-Value="@FilterDepartament"
+                                       Placeholder="Toate departamentele"
+                                       CssClass="filter-dropdown"
+                                       AllowFiltering="false"
+                                       ShowClearButton="false"
+                                       EnablePersistence="false"
+                                       IgnoreAccent="true">
+                            <DropDownListFieldSettings Text="Text" Value="Value"/>
+                        </SfDropDownList>
+                    </div>
+
+                    <!-- Functie Filter -->
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-user-tie"></i>
+                            Functie
+                        </label>
+                        <SfDropDownList TValue="string" 
+                                       TItem="FilterOption"
+                                       DataSource="@FunctieOptions"
+                                       @bind-Value="@FilterFunctie"
+                                       Placeholder="Toate functiile"
+                                       CssClass="filter-dropdown"
+                                       AllowFiltering="false"
+                                       ShowClearButton="false"
+                                       EnablePersistence="false"
+                                       IgnoreAccent="true">
+                            <DropDownListFieldSettings Text="Text" Value="Value"/>
+                        </SfDropDownList>
+                    </div>
+
+                    <!-- Judet Filter -->
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Judet
+                        </label>
+                        <SfDropDownList TValue="string" 
+                                       TItem="FilterOption"
+                                       DataSource="@JudetOptions"
+                                       @bind-Value="@FilterJudet"
+                                       Placeholder="Toate judetele"
+                                       CssClass="filter-dropdown"
+                                       AllowFiltering="true"
+                                       ShowClearButton="false"
+                                       EnablePersistence="false"
+                                       IgnoreAccent="true"
+                                       FilterBarPlaceholder="Cauta...">
+                            <DropDownListFieldSettings Text="Text" Value="Value"/>
+                        </SfDropDownList>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn-filter-action btn-clear" @onclick="ClearAllFilters" disabled="@(ActiveFiltersCount == 0)">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Sterge Filtre (@ActiveFiltersCount)</span>
+                    </button>
+                    <button class="btn-filter-action btn-apply" @onclick="ApplyFilters">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Aplica Filtre</span>
+                    </button>
+                </div>
+
+                @if (ActiveFiltersCount > 0)
+                {
+                    <div class="active-filters">
+                        <span class="active-filters-label">
+                            <i class="fas fa-filter"></i>
+                            Filtre active:
+                        </span>
+                        <div class="filter-chips">
+                            @if (!string.IsNullOrEmpty(GlobalSearchText))
+                            {
+                                <span class="filter-chip">
+                                    Cautare: @GlobalSearchText
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(GlobalSearchText))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(FilterStatus))
+                            {
+                                <span class="filter-chip">
+                                    Status: @FilterStatus
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterStatus))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(FilterDepartament))
+                            {
+                                <span class="filter-chip">
+                                    Departament: @FilterDepartament
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterDepartament))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(FilterFunctie))
+                            {
+                                <span class="filter-chip">
+                                    Functie: @FilterFunctie
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterFunctie))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(FilterJudet))
+                            {
+                                <span class="filter-chip">
+                                    Judet: @FilterJudet
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterJudet))"></i>
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Action Toolbar -->
+        <div class="action-toolbar @(SelectedPersonal != null ? "active" : "")">
+            <div class="toolbar-info">
+                @if (SelectedPersonal != null)
+                {
+                    <div class="selected-item-info">
+                        <i class="fas fa-user-check"></i>
+                        <span class="selected-label">Selectat:</span>
+                        <strong>@SelectedPersonal.NumeComplet</strong>
+                        <span class="selected-badge">@SelectedPersonal.Functia</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-selection-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selecteaza un angajat pentru a activa actiunile</span>
+                    </div>
+                }
+            </div>
+            <div class="toolbar-actions">
+                <button class="toolbar-btn btn-view" 
+                        @onclick="() => HandleViewSelected()"
+                        disabled="@(SelectedPersonal == null)"
+                        title="Vizualizeaza detalii">
+                    <i class="fas fa-eye"></i>
+                    <span>Vizualizeaza</span>
+                </button>
+                <button class="toolbar-btn btn-edit" 
+                        @onclick="() => HandleEditSelected()"
+                        disabled="@(SelectedPersonal == null)"
+                        title="Editeaza informatii">
+                    <i class="fas fa-edit"></i>
+                    <span>Editeaza</span>
+                </button>
+                <button class="toolbar-btn btn-delete" 
+                        @onclick="() => HandleDeleteSelected()"
+                        disabled="@(SelectedPersonal == null)"
+                        title="Sterge angajat">
+                    <i class="fas fa-trash"></i>
+                    <span>Sterge</span>
+                </button>
+            </div>
+        </div>
+
         <div class="grid-container">
-            <SfGrid DataSource="@PagedPersonalList"
+            <SfGrid @ref="GridRef"
+                    @key="@($"grid-{CurrentPageSize}-{CurrentPage}")"
+                    DataSource="@CurrentPageData"
                     Height="100%"
                     AllowPaging="false"
                     AllowSorting="true"
                     AllowFiltering="true"
                     AllowResizing="true"
+                    AllowReordering="true"
+                    AllowGrouping="true"
                     AllowTextWrap="true"
+                    ShowColumnChooser="true"
                     GridLines="GridLine.Both">
                 
-                <GridFilterSettings Type="FilterType.Menu"></GridFilterSettings>
+                <GridFilterSettings Type="FilterType.Excel"></GridFilterSettings>
+                
+                <GridGroupSettings ShowDropArea="true" 
+                                  ShowGroupedColumn="true"
+                                  ShowUngroupButton="true"
+                                  Columns="@InitialGroupColumns">
+                </GridGroupSettings>
                 
                 <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
                 
                 <GridEvents TValue="PersonalListDto" 
                            RowSelected="OnRowSelected"
-                           CommandClicked="OnCommandClicked">
+                           RowDeselected="OnRowDeselected">
                 </GridEvents>
                 
                 <GridColumns>
                     <GridColumn Field="@nameof(PersonalListDto.Cod_Angajat)" 
                                HeaderText="Cod" 
                                Width="100"
-                               IsPrimaryKey="true">
+                               IsPrimaryKey="true"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="true">
                     </GridColumn>
                     
                     <GridColumn Field="@nameof(PersonalListDto.Nume)" 
                                HeaderText="Nume" 
-                               Width="150">
+                               Width="150"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="true">
                     </GridColumn>
                     
                     <GridColumn Field="@nameof(PersonalListDto.Prenume)" 
                                HeaderText="Prenume" 
-                               Width="150">
+                               Width="150"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="true">
                     </GridColumn>
                     
                     <GridColumn Field="@nameof(PersonalListDto.CNP)" 
                                HeaderText="CNP" 
-                               Width="130">
+                               Width="130"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
                     </GridColumn>
                     
                     <GridColumn Field="@nameof(PersonalListDto.Telefon_Personal)" 
                                HeaderText="Telefon" 
-                               Width="120">
+                               Width="120"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
                         <Template>
                             @{
                                 var personal = (context as PersonalListDto);
@@ -129,7 +378,10 @@
                     
                     <GridColumn Field="@nameof(PersonalListDto.Email_Personal)" 
                                HeaderText="Email" 
-                               Width="200">
+                               Width="200"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
                         <Template>
                             @{
                                 var personal = (context as PersonalListDto);
@@ -146,17 +398,26 @@
                     
                     <GridColumn Field="@nameof(PersonalListDto.Functia)" 
                                HeaderText="Functie" 
-                               Width="150">
+                               Width="150"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="true">
                     </GridColumn>
                     
                     <GridColumn Field="@nameof(PersonalListDto.Departament)" 
                                HeaderText="Departament" 
-                               Width="150">
+                               Width="150"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="true">
                     </GridColumn>
                     
                     <GridColumn Field="@nameof(PersonalListDto.Status_Angajat)" 
                                HeaderText="Status" 
-                               Width="100">
+                               Width="100"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="true">
                         <Template>
                             @{
                                 var personal = (context as PersonalListDto);
@@ -166,35 +427,6 @@
                                 </span>
                             }
                         </Template>
-                    </GridColumn>
-                    
-                    <GridColumn HeaderText="Actiuni" Width="180" TextAlign="TextAlign.Center">
-                        <GridCommandColumns>
-                            <GridCommandColumn Type="CommandButtonType.None" 
-                                             ButtonOption="@(new CommandButtonOptions() 
-                                             { 
-                                                 Content = "Vizualizeaza", 
-                                                 CssClass = "e-flat btn-view",
-                                                 IconCss = "fas fa-eye"
-                                             })">
-                            </GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.None" 
-                                             ButtonOption="@(new CommandButtonOptions() 
-                                             { 
-                                                 Content = "Editeaza", 
-                                                 CssClass = "e-flat btn-edit",
-                                                 IconCss = "fas fa-edit"
-                                             })">
-                            </GridCommandColumn>
-                            <GridCommandColumn Type="CommandButtonType.None" 
-                                             ButtonOption="@(new CommandButtonOptions() 
-                                             { 
-                                                 Content = "Sterge", 
-                                                 CssClass = "e-flat btn-delete",
-                                                 IconCss = "fas fa-trash"
-                                             })">
-                            </GridCommandColumn>
-                        </GridCommandColumns>
                     </GridColumn>
                 </GridColumns>
             </SfGrid>
@@ -206,7 +438,7 @@
                 <i class="fas fa-info-circle"></i>
                 <span>Pagina @GetCurrentPage() din @GetTotalPages()</span>
                 <span class="separator">|</span>
-                <span>Afisate @GetDisplayedRecordsStart()-@GetDisplayedRecordsEnd() din @AllPersonalList.Count</span>
+                <span>Afisate @GetDisplayedRecordsStart()-@GetDisplayedRecordsEnd() din @TotalRecords</span>
             </div>
             <div class="pager-controls">
                 <button class="pager-btn @(GetCurrentPage() == 1 ? "disabled" : "")" 

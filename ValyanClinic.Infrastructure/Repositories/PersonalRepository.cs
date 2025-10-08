@@ -50,7 +50,7 @@ public class PersonalRepository : BaseRepository, IPersonalRepository
             commandType: System.Data.CommandType.StoredProcedure);
         
         var data = await multi.ReadAsync<Personal>();
-        // Skip count result set for now
+        // Skip count result set for now (used in GetCountAsync)
         return data;
     }
 
@@ -67,9 +67,15 @@ public class PersonalRepository : BaseRepository, IPersonalRepository
             Status = status
         };
         
-        // Daca sp_Personal_GetCount exista
-        var result = await ExecuteScalarAsync<int?>("sp_Personal_GetCount", parameters, cancellationToken);
-        return result ?? 0;
+        using var connection = _connectionFactory.CreateConnection();
+        
+        // sp_Personal_GetCount returneaza un scalar
+        var result = await connection.ExecuteScalarAsync<int>(
+            "sp_Personal_GetCount",
+            parameters,
+            commandType: System.Data.CommandType.StoredProcedure);
+        
+        return result;
     }
 
     public async Task<(string name, int value, string iconClass, string colorClass)[]> GetStatisticsAsync(
