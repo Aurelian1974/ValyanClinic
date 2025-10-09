@@ -65,6 +65,7 @@ try
     // ========================================
     builder.Services.AddScoped<IPersonalRepository, PersonalRepository>();
     builder.Services.AddScoped<IPersonalMedicalRepository, PersonalMedicalRepository>();
+    builder.Services.AddScoped<IOcupatieISCORepository, OcupatieISCORepository>();
 
     // ========================================
     // CACHING

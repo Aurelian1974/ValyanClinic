@@ -69,13 +69,21 @@
                 
                 <div class="search-and-filter">
                     <div class="global-search">
-                        <SfTextBox Placeholder="Cautare rapida..."
-                                  @bind-Value="@GlobalSearchText"
-                                  CssClass="search-input"
-                                  ShowClearButton="true">
-                            <TextBoxPrefixIcon IconCss="fas fa-search"></TextBoxPrefixIcon>
-                            <TextBoxEvents ValueChange="@OnGlobalSearchInput"></TextBoxEvents>
-                        </SfTextBox>
+                        <div class="search-box-wrapper">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" 
+                                   class="search-input"
+                                   placeholder="Cautare rapida..."
+                                   value="@GlobalSearchText"
+                                   @oninput="OnSearchInput"
+                                   @onkeydown="OnSearchKeyDown" />
+                            @if (!string.IsNullOrEmpty(GlobalSearchText))
+                            {
+                                <button class="search-clear-btn" @onclick="ClearSearch" type="button">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            }
+                        </div>
                     </div>
                     <button class="btn-filter @(IsAdvancedFilterExpanded ? "active" : "")" 
                             @onclick="ToggleAdvancedFilter"

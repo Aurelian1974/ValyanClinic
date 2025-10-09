@@ -64,8 +64,9 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     private string? FilterFunctie { get; set; }
     private string? FilterJudet { get; set; }
     
-    // Prevent multiple simultaneous filter triggers
-    private bool IsApplyingFilters { get; set; } = false;
+    // Debounce timer for global search
+    private CancellationTokenSource? _searchDebounceTokenSource;
+    private const int SearchDebounceMs = 500;
 
     // Filter Options - loaded from server
     private List<FilterOption> StatusOptions { get; set; } = new();
@@ -120,7 +121,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     public void Dispose()
     {
-        // Cleanup if needed
+        _searchDebounceTokenSource?.Cancel();
+        _searchDebounceTokenSource?.Dispose();
     }
 
     private async Task LoadData()
@@ -131,8 +133,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
             HasError = false;
             StateHasChanged();
 
-            Logger.LogInformation("Incarcare date personal de la server: Page={Page}, Size={Size}", 
-                CurrentPage, CurrentPageSize);
+            Logger.LogInformation("Incarcare date personal de la server: Page={Page}, Size={Size}, Search='{Search}'", 
+                CurrentPage, CurrentPageSize, GlobalSearchText);
 
             var query = new GetPersonalListQuery
             {
@@ -154,8 +156,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
                 CurrentPageData = result.Value?.ToList() ?? new List<PersonalListDto>();
                 TotalRecords = result.TotalCount;
                 
-                Logger.LogInformation("Date incarcate cu succes: {Count} din {Total} angajati",
-                    CurrentPageData.Count, TotalRecords);
+                Logger.LogInformation("Date incarcate cu succes: {Count} din {Total} angajati pentru search='{Search}'",
+                    CurrentPageData.Count, TotalRecords, GlobalSearchText);
                 
                 // Load filter options only on first load (when we have data)
                 if (!StatusOptions.Any() && CurrentPageData.Any())
@@ -240,16 +242,77 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
             IsAdvancedFilterExpanded ? "Expanded" : "Collapsed");
     }
 
-    private async Task OnGlobalSearchInput(ChangeEventArgs<string> args)
+    private void OnSearchInput(ChangeEventArgs e)
     {
-        GlobalSearchText = args.Value ?? string.Empty;
-        Logger.LogInformation("Global search text changed: {SearchText}", GlobalSearchText);
+        var newValue = e.Value?.ToString() ?? string.Empty;
         
-        // Debounce - așteaptă 300ms înainte de a aplica căutarea
-        await Task.Delay(300);
+        // Previne bucla infinita - nu face nimic daca valoarea nu s-a schimbat
+        if (newValue == GlobalSearchText)
+            return;
         
-        // Reset la prima pagină și aplică filtrele
+        GlobalSearchText = newValue;
+        
+        Logger.LogInformation("Search input changed: '{SearchText}'", GlobalSearchText);
+        
+        // Anulează task-ul anterior de debounce
+        _searchDebounceTokenSource?.Cancel();
+        _searchDebounceTokenSource?.Dispose();
+        _searchDebounceTokenSource = new CancellationTokenSource();
+
+        var localToken = _searchDebounceTokenSource.Token;
+
+        // Executa search dupa debounce
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(SearchDebounceMs, localToken);
+                
+                if (!localToken.IsCancellationRequested)
+                {
+                    Logger.LogInformation("Executing search for: '{SearchText}'", GlobalSearchText);
+                    
+                    await InvokeAsync(async () =>
+                    {
+                        CurrentPage = 1;
+                        jumpToPageNumber = 1;
+                        await LoadData();
+                    });
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                Logger.LogDebug("Search cancelled - user still typing");
+            }
+        }, localToken);
+    }
+
+    private async Task OnSearchKeyDown(KeyboardEventArgs e)
+    {
+        // Daca apasa Enter, executa imediat cautarea fara debounce
+        if (e.Key == "Enter")
+        {
+            _searchDebounceTokenSource?.Cancel();
+            
+            Logger.LogInformation("Enter pressed - executing immediate search: '{SearchText}'", GlobalSearchText);
+            
+            CurrentPage = 1;
+            jumpToPageNumber = 1;
+            await LoadData();
+        }
+    }
+
+    private async Task ClearSearch()
+    {
+        Logger.LogInformation("Clearing search text");
+        
+        // Anulează orice search in curs
+        _searchDebounceTokenSource?.Cancel();
+        
+        GlobalSearchText = string.Empty;
         CurrentPage = 1;
+        jumpToPageNumber = 1;
+        
         await LoadData();
     }
 

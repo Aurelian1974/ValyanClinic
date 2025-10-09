@@ -27,6 +27,8 @@ public class PersonalRepository : BaseRepository, IPersonalRepository
         string? searchText = null,
         string? departament = null,
         string? status = null,
+        string? functie = null,
+        string? judet = null,
         string sortColumn = "Nume",
         string sortDirection = "ASC",
         CancellationToken cancellationToken = default)
@@ -38,6 +40,8 @@ public class PersonalRepository : BaseRepository, IPersonalRepository
             SearchText = searchText,
             Departament = departament,
             Status = status,
+            Functie = functie,
+            Judet = judet,
             SortColumn = sortColumn,
             SortDirection = sortDirection
         };
@@ -58,13 +62,17 @@ public class PersonalRepository : BaseRepository, IPersonalRepository
         string? searchText = null,
         string? departament = null,
         string? status = null,
+        string? functie = null,
+        string? judet = null,
         CancellationToken cancellationToken = default)
     {
         var parameters = new
         {
             SearchText = searchText,
             Departament = departament,
-            Status = status
+            Status = status,
+            Functie = functie,
+            Judet = judet
         };
         
         using var connection = _connectionFactory.CreateConnection();

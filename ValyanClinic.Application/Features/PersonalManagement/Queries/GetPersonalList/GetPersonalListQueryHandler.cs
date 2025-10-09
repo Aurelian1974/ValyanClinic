@@ -26,9 +26,9 @@ public class GetPersonalListQueryHandler : IRequestHandler<GetPersonalListQuery,
         try
         {
             _logger.LogInformation(
-                "Obtin lista de personal: Page={Page}, Size={Size}, Search={Search}, Status={Status}, Dept={Dept}, Sort={Sort} {Dir}",
+                "Obtin lista de personal: Page={Page}, Size={Size}, Search={Search}, Status={Status}, Dept={Dept}, Functie={Functie}, Judet={Judet}, Sort={Sort} {Dir}",
                 request.PageNumber, request.PageSize, request.GlobalSearchText, 
-                request.FilterStatus, request.FilterDepartament, 
+                request.FilterStatus, request.FilterDepartament, request.FilterFunctie, request.FilterJudet,
                 request.SortColumn, request.SortDirection);
 
             // Get total count first (for pagination metadata)
@@ -36,6 +36,8 @@ public class GetPersonalListQueryHandler : IRequestHandler<GetPersonalListQuery,
                 searchText: request.GlobalSearchText,
                 departament: request.FilterDepartament,
                 status: request.FilterStatus,
+                functie: request.FilterFunctie,
+                judet: request.FilterJudet,
                 cancellationToken: cancellationToken);
 
             // If no results, return empty paged result
@@ -56,6 +58,8 @@ public class GetPersonalListQueryHandler : IRequestHandler<GetPersonalListQuery,
                 searchText: request.GlobalSearchText,
                 departament: request.FilterDepartament,
                 status: request.FilterStatus,
+                functie: request.FilterFunctie,
+                judet: request.FilterJudet,
                 sortColumn: request.SortColumn,
                 sortDirection: request.SortDirection,
                 cancellationToken: cancellationToken);
