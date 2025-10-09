@@ -24,13 +24,14 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     // Toast reference
     private SfToast? ToastRef;
 
-    // Server-side paging state
-    private List<PersonalListDto> CurrentPageData { get; set; } = new();
+    // Data for Syncfusion Grid (all data loaded once)
+    private List<PersonalListDto> AllPersonalData { get; set; } = new();
+    private List<PersonalListDto> OriginalData { get; set; } = new();
     private int TotalRecords { get; set; } = 0;
-    private int CurrentPage { get; set; } = 1;
-    private int CurrentPageSize { get; set; } = 20;
-    private string CurrentSortColumn { get; set; } = "Nume";
-    private string CurrentSortDirection { get; set; } = "ASC";
+    
+    // Page settings for Syncfusion Grid
+    private int DefaultPageSize { get; set; } = 20;
+    private int[] PageSizeArray = { 10, 20, 50, 100 };
     
     private PersonalListDto? SelectedPersonal { get; set; }
 
@@ -38,23 +39,6 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     private bool IsLoading { get; set; } = true;
     private bool HasError { get; set; } = false;
     private string? ErrorMessage { get; set; }
-    
-    private int jumpToPageNumber { get; set; } = 1;
-    
-    // Track previous page size to detect changes
-    private int _previousPageSize = 20;
-
-    // Grouping initial columns (empty by default - user can group manually)
-    private string[] InitialGroupColumns { get; set; } = Array.Empty<string>();
-
-    // Page size options
-    private List<PageSizeOption> PageSizeOptions = new()
-    {
-        new() { Text = "10", Value = 10 },
-        new() { Text = "20", Value = 20 },
-        new() { Text = "50", Value = 50 },
-        new() { Text = "100", Value = 100 }
-    };
 
     // Advanced Filter State
     private bool IsAdvancedFilterExpanded { get; set; } = false;
@@ -79,12 +63,6 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     private string ToastContent { get; set; } = string.Empty;
     private string ToastCssClass { get; set; } = string.Empty;
 
-    public class PageSizeOption
-    {
-        public string Text { get; set; } = string.Empty;
-        public int Value { get; set; }
-    }
-
     private int ActiveFiltersCount => 
         (string.IsNullOrEmpty(FilterStatus) ? 0 : 1) +
         (string.IsNullOrEmpty(FilterDepartament) ? 0 : 1) +
@@ -94,28 +72,18 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        Logger.LogInformation("Initializare pagina Administrare Personal cu server-side operations");
-        await LoadData();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        
-        // Verifică dacă page size s-a schimbat
-        if (!firstRender && CurrentPageSize != _previousPageSize && !IsLoading)
+        try
         {
-            Logger.LogInformation("Page size changed detected: {OldSize} -> {NewSize}", 
-                _previousPageSize, CurrentPageSize);
-            
-            _previousPageSize = CurrentPageSize;
-            CurrentPage = 1;
-            jumpToPageNumber = 1;
-            
-            await InvokeAsync(async () =>
-            {
-                await LoadData();
-            });
+            Logger.LogInformation("Initializare pagina Administrare Personal cu Syncfusion Paging");
+            await LoadAllData();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la initializarea componentei");
+            HasError = true;
+            ErrorMessage = $"Eroare la initializare: {ex.Message}";
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 
@@ -125,51 +93,57 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         _searchDebounceTokenSource?.Dispose();
     }
 
-    private async Task LoadData()
+    private async Task LoadAllData()
     {
         try
         {
             IsLoading = true;
             HasError = false;
-            StateHasChanged();
+            ErrorMessage = null;
 
-            Logger.LogInformation("Incarcare date personal de la server: Page={Page}, Size={Size}, Search='{Search}'", 
-                CurrentPage, CurrentPageSize, GlobalSearchText);
+            Logger.LogInformation("Incarcare toate datele personal pentru grid cu paging nativ");
 
+            // Load all data at once (without pagination for client-side operations)
             var query = new GetPersonalListQuery
             {
-                PageNumber = CurrentPage,
-                PageSize = CurrentPageSize,
-                GlobalSearchText = string.IsNullOrWhiteSpace(GlobalSearchText) ? null : GlobalSearchText,
-                FilterStatus = FilterStatus,
-                FilterDepartament = FilterDepartament,
-                FilterFunctie = FilterFunctie,
-                FilterJudet = FilterJudet,
-                SortColumn = CurrentSortColumn,
-                SortDirection = CurrentSortDirection
+                PageNumber = 1,
+                PageSize = int.MaxValue, // Get all records
+                GlobalSearchText = null, // Don't apply server-side search initially
+                FilterStatus = null,
+                FilterDepartament = null,
+                FilterFunctie = null,
+                FilterJudet = null,
+                SortColumn = "Nume", // Default sort
+                SortDirection = "ASC"
             };
 
             var result = await Mediator.Send(query);
 
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Value != null)
             {
-                CurrentPageData = result.Value?.ToList() ?? new List<PersonalListDto>();
-                TotalRecords = result.TotalCount;
+                OriginalData = result.Value.ToList();
+                AllPersonalData = new List<PersonalListDto>(OriginalData);
+                TotalRecords = OriginalData.Count;
                 
-                Logger.LogInformation("Date incarcate cu succes: {Count} din {Total} angajati pentru search='{Search}'",
-                    CurrentPageData.Count, TotalRecords, GlobalSearchText);
+                Logger.LogInformation("Toate datele incarcate cu succes: {Count} angajati", TotalRecords);
                 
-                // Load filter options only on first load (when we have data)
-                if (!StatusOptions.Any() && CurrentPageData.Any())
+                // Load filter options
+                if (OriginalData.Any())
                 {
                     await LoadFilterOptions();
                 }
+
+                // Apply client-side filtering (initially no filters, so shows all data)
+                ApplyClientSideFiltering();
             }
             else
             {
                 HasError = true;
                 ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare necunoscuta" });
                 Logger.LogWarning("Eroare la incarcarea datelor: {Message}", ErrorMessage);
+                AllPersonalData = new List<PersonalListDto>();
+                OriginalData = new List<PersonalListDto>();
+                TotalRecords = 0;
             }
         }
         catch (Exception ex)
@@ -177,12 +151,72 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
             HasError = true;
             ErrorMessage = $"Eroare neasteptata: {ex.Message}";
             Logger.LogError(ex, "Eroare la incarcarea datelor personal");
+            AllPersonalData = new List<PersonalListDto>();
+            OriginalData = new List<PersonalListDto>();
+            TotalRecords = 0;
         }
         finally
         {
             IsLoading = false;
-            jumpToPageNumber = CurrentPage;
             StateHasChanged();
+        }
+    }
+
+    private void ApplyClientSideFiltering()
+    {
+        try
+        {
+            var filteredData = OriginalData.AsEnumerable();
+            
+            // Apply global search
+            if (!string.IsNullOrEmpty(GlobalSearchText))
+            {
+                var searchLower = GlobalSearchText.ToLowerInvariant();
+                filteredData = filteredData.Where(p => 
+                    (p.Nume?.ToLowerInvariant().Contains(searchLower) ?? false) ||
+                    (p.Prenume?.ToLowerInvariant().Contains(searchLower) ?? false) ||
+                    (p.CNP?.ToLowerInvariant().Contains(searchLower) ?? false) ||
+                    (p.Email_Personal?.ToLowerInvariant().Contains(searchLower) ?? false) ||
+                    (p.Telefon_Personal?.ToLowerInvariant().Contains(searchLower) ?? false) ||
+                    (p.Functia?.ToLowerInvariant().Contains(searchLower) ?? false) ||
+                    (p.Departament?.ToLowerInvariant().Contains(searchLower) ?? false)
+                );
+            }
+
+            // Apply specific filters
+            if (!string.IsNullOrEmpty(FilterStatus))
+            {
+                filteredData = filteredData.Where(p => p.Status_Angajat == FilterStatus);
+            }
+
+            if (!string.IsNullOrEmpty(FilterDepartament))
+            {
+                filteredData = filteredData.Where(p => p.Departament == FilterDepartament);
+            }
+
+            if (!string.IsNullOrEmpty(FilterFunctie))
+            {
+                filteredData = filteredData.Where(p => p.Functia == FilterFunctie);
+            }
+
+            if (!string.IsNullOrEmpty(FilterJudet))
+            {
+                filteredData = filteredData.Where(p => p.Judet_Domiciliu == FilterJudet);
+            }
+
+            // Update the grid data source
+            AllPersonalData = filteredData.ToList();
+            TotalRecords = AllPersonalData.Count;
+            
+            Logger.LogInformation("Client-side filtering applied. Rezultate: {Count} din {Total}", 
+                AllPersonalData.Count, OriginalData.Count);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la aplicarea filtrelor client-side");
+            // În caz de eroare, păstrează datele originale
+            AllPersonalData = new List<PersonalListDto>(OriginalData);
+            TotalRecords = OriginalData.Count;
         }
     }
 
@@ -190,49 +224,30 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     {
         try
         {
-            Logger.LogInformation("Incarcare optiuni de filtrare...");
+            Logger.LogInformation("Generare optiuni de filtrare din datele incarcate...");
             
-            // Load all data for filter options (without pagination)
-            var allDataQuery = new GetPersonalListQuery
+            if (OriginalData.Any())
             {
-                PageNumber = 1,
-                PageSize = int.MaxValue // Get all for filters
-            };
-            
-            var result = await Mediator.Send(allDataQuery);
-            
-            if (result.IsSuccess && result.Value != null)
-            {
-                var allData = result.Value.ToList();
+                StatusOptions = FilterOptionsService.GenerateOptions(OriginalData, p => p.Status_Angajat);
+                DepartamentOptions = FilterOptionsService.GenerateOptions(OriginalData, p => p.Departament);
+                FunctieOptions = FilterOptionsService.GenerateOptions(OriginalData, p => p.Functia);
+                JudetOptions = FilterOptionsService.GenerateOptions(OriginalData, p => p.Judet_Domiciliu);
                 
-                // Ensure we have data before generating options
-                if (allData.Any())
-                {
-                    StatusOptions = FilterOptionsService.GenerateOptions(allData, p => p.Status_Angajat);
-                    DepartamentOptions = FilterOptionsService.GenerateOptions(allData, p => p.Departament);
-                    FunctieOptions = FilterOptionsService.GenerateOptions(allData, p => p.Functia);
-                    JudetOptions = FilterOptionsService.GenerateOptions(allData, p => p.Judet_Domiciliu);
-                    
-                    Logger.LogInformation("Optiuni filtrare incarcate: Status={StatusCount}, Dept={DeptCount}, Func={FuncCount}, Judet={JudetCount}",
-                        StatusOptions.Count, DepartamentOptions.Count, FunctieOptions.Count, JudetOptions.Count);
-                    
-                    StateHasChanged();
-                }
-                else
-                {
-                    Logger.LogWarning("No data available for filter options");
-                }
-            }
-            else
-            {
-                Logger.LogWarning("Failed to load data for filter options: {Errors}", 
-                    string.Join(", ", result.Errors ?? new List<string>()));
+                Logger.LogInformation("Optiuni filtrare generate: Status={StatusCount}, Dept={DeptCount}, Func={FuncCount}, Judet={JudetCount}",
+                    StatusOptions.Count, DepartamentOptions.Count, FunctieOptions.Count, JudetOptions.Count);
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Eroare la incarcarea optiunilor de filtrare");
+            Logger.LogError(ex, "Eroare la generarea optiunilor de filtrare");
+            // În caz de eroare, inițializează liste goale
+            StatusOptions = new List<FilterOption>();
+            DepartamentOptions = new List<FilterOption>();
+            FunctieOptions = new List<FilterOption>();
+            JudetOptions = new List<FilterOption>();
         }
+        
+        await Task.CompletedTask;
     }
 
     private void ToggleAdvancedFilter()
@@ -270,19 +285,22 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
                 
                 if (!localToken.IsCancellationRequested)
                 {
-                    Logger.LogInformation("Executing search for: '{SearchText}'", GlobalSearchText);
+                    Logger.LogInformation("Executing client-side search for: '{SearchText}'", GlobalSearchText);
                     
-                    await InvokeAsync(async () =>
+                    await InvokeAsync(() =>
                     {
-                        CurrentPage = 1;
-                        jumpToPageNumber = 1;
-                        await LoadData();
+                        ApplyClientSideFiltering();
+                        StateHasChanged();
                     });
                 }
             }
             catch (TaskCanceledException)
             {
                 Logger.LogDebug("Search cancelled - user still typing");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Eroare la executia search-ului");
             }
         }, localToken);
     }
@@ -296,9 +314,9 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
             
             Logger.LogInformation("Enter pressed - executing immediate search: '{SearchText}'", GlobalSearchText);
             
-            CurrentPage = 1;
-            jumpToPageNumber = 1;
-            await LoadData();
+            ApplyClientSideFiltering();
+            StateHasChanged();
+            await Task.CompletedTask;
         }
     }
 
@@ -310,22 +328,19 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         _searchDebounceTokenSource?.Cancel();
         
         GlobalSearchText = string.Empty;
-        CurrentPage = 1;
-        jumpToPageNumber = 1;
-        
-        await LoadData();
+        ApplyClientSideFiltering();
+        StateHasChanged();
+        await Task.CompletedTask;
     }
 
     private async Task ApplyFilters()
     {
-        Logger.LogInformation("Applying server-side filters: GlobalSearch={Search}, Status={Status}, Dept={Dept}",
+        Logger.LogInformation("Applying client-side filters: GlobalSearch={Search}, Status={Status}, Dept={Dept}",
             GlobalSearchText, FilterStatus, FilterDepartament);
 
-        // Reset to first page when filters change
-        CurrentPage = 1;
-        
-        // Reload data with new filters
-        await LoadData();
+        ApplyClientSideFiltering();
+        StateHasChanged();
+        await Task.CompletedTask;
     }
 
     private async Task ClearAllFilters()
@@ -338,8 +353,9 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         FilterFunctie = null;
         FilterJudet = null;
 
-        CurrentPage = 1;
-        await LoadData();
+        ApplyClientSideFiltering();
+        StateHasChanged();
+        await Task.CompletedTask;
     }
 
     private async Task ClearFilter(string filterName)
@@ -371,8 +387,7 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     private async Task HandleRefresh()
     {
         Logger.LogInformation("Refresh date personal");
-        CurrentPage = 1;
-        await LoadData();
+        await LoadAllData();
         await ShowToast("Succes", "Datele au fost reincarcate cu succes", "e-toast-success");
     }
 
@@ -381,88 +396,6 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         Logger.LogInformation("Navigare catre adaugare personal");
         NavigationManager.NavigateTo("/administrare/personal/adauga");
     }
-
-    #region Server-Side Paging Methods
-
-    private async Task OnPageSizeChanged(int newPageSize)
-    {
-        Logger.LogInformation("Schimbare dimensiune pagina: {OldSize} -> {NewSize}", 
-            CurrentPageSize, newPageSize);
-        
-        CurrentPageSize = newPageSize;
-        CurrentPage = 1;
-        jumpToPageNumber = 1;
-        
-        await LoadData();
-    }
-
-    private int GetCurrentPage() => CurrentPage;
-
-    private int GetTotalPages()
-    {
-        if (TotalRecords == 0 || CurrentPageSize == 0) return 1;
-        return (int)Math.Ceiling((double)TotalRecords / CurrentPageSize);
-    }
-
-    private int GetDisplayedRecordsStart()
-    {
-        if (TotalRecords == 0) return 0;
-        return (CurrentPage - 1) * CurrentPageSize + 1;
-    }
-
-    private int GetDisplayedRecordsEnd()
-    {
-        var end = CurrentPage * CurrentPageSize;
-        return Math.Min(end, TotalRecords);
-    }
-
-    private int GetPagerStart()
-    {
-        var totalPages = GetTotalPages();
-        var start = Math.Max(1, CurrentPage - 2);
-        if (totalPages <= 5) return 1;
-        if (CurrentPage >= totalPages - 2) return Math.Max(1, totalPages - 4);
-        return start;
-    }
-
-    private int GetPagerEnd()
-    {
-        var totalPages = GetTotalPages();
-        if (totalPages <= 5) return totalPages;
-        if (CurrentPage <= 3) return Math.Min(5, totalPages);
-        return Math.Min(totalPages, CurrentPage + 2);
-    }
-
-    private async Task GoToPage(int pageNumber)
-    {
-        if (pageNumber < 1 || pageNumber > GetTotalPages()) return;
-        
-        if (CurrentPage != pageNumber)
-        {
-            Logger.LogInformation("Navigare la pagina {Page}", pageNumber);
-            CurrentPage = pageNumber;
-            jumpToPageNumber = pageNumber;
-            await LoadData();
-        }
-    }
-
-    private async Task JumpToPage()
-    {
-        if (jumpToPageNumber >= 1 && jumpToPageNumber <= GetTotalPages())
-        {
-            await GoToPage(jumpToPageNumber);
-        }
-    }
-
-    private async Task OnJumpToPageKeyPress(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            await JumpToPage();
-        }
-    }
-
-    #endregion
 
     #region Grid Selection Events
 

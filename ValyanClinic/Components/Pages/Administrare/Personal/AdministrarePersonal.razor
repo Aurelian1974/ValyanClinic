@@ -47,65 +47,46 @@
     }
     else
     {
-        <!-- Page Size Selector & Search -->
-        <div class="page-size-selector">
-            <div class="selector-wrapper">
-                <div class="page-size-controls">
-                    <label class="selector-label">
-                        <i class="fas fa-list"></i>
-                        Inregistrari per pagina:
-                    </label>
-                    <SfDropDownList TValue="int" 
-                                   TItem="PageSizeOption"
-                                   DataSource="@PageSizeOptions"
-                                   @bind-Value="@CurrentPageSize"
-                                   CssClass="page-size-dropdown"
-                                   Width="80px"
-                                   PopupHeight="200px"
-                                   EnablePersistence="false">
-                        <DropDownListFieldSettings Text="Text" Value="Value"/>
-                    </SfDropDownList>
-                </div>
-                
-                <div class="search-and-filter">
-                    <div class="global-search">
-                        <div class="search-box-wrapper">
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" 
-                                   class="search-input"
-                                   placeholder="Cautare rapida..."
-                                   value="@GlobalSearchText"
-                                   @oninput="OnSearchInput"
-                                   @onkeydown="OnSearchKeyDown" />
-                            @if (!string.IsNullOrEmpty(GlobalSearchText))
-                            {
-                                <button class="search-clear-btn" @onclick="ClearSearch" type="button">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            }
-                        </div>
-                    </div>
-                    <button class="btn-filter @(IsAdvancedFilterExpanded ? "active" : "")" 
-                            @onclick="ToggleAdvancedFilter"
-                            title="Filtre avansate">
-                        <i class="fas fa-filter"></i>
-                        <span>Filtre</span>
-                        @if (ActiveFiltersCount > 0)
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+            <div class="search-and-filter">
+                <div class="global-search">
+                    <div class="search-box-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               class="search-input"
+                               placeholder="Cautare rapida..."
+                               value="@GlobalSearchText"
+                               @oninput="OnSearchInput"
+                               @onkeydown="OnSearchKeyDown" />
+                        @if (!string.IsNullOrEmpty(GlobalSearchText))
                         {
-                            <span class="filter-badge">@ActiveFiltersCount</span>
+                            <button class="search-clear-btn" @onclick="ClearSearch" type="button">
+                                <i class="fas fa-times"></i>
+                            </button>
                         }
-                        <i class="fas fa-chevron-@(IsAdvancedFilterExpanded ? "up" : "down") chevron-icon"></i>
-                    </button>
+                    </div>
                 </div>
-                
-                <div class="total-records">
-                    <i class="fas fa-database"></i>
-                    <span>Total: <strong>@TotalRecords</strong> inregistrari</span>
+                <button class="btn-filter @(IsAdvancedFilterExpanded ? "active" : "")" 
+                        @onclick="ToggleAdvancedFilter"
+                        title="Filtre avansate">
+                    <i class="fas fa-filter"></i>
+                    <span>Filtre</span>
                     @if (ActiveFiltersCount > 0)
                     {
-                        <span class="filtered-info">(filtrate)</span>
+                        <span class="filter-badge">@ActiveFiltersCount</span>
                     }
-                </div>
+                    <i class="fas fa-chevron-@(IsAdvancedFilterExpanded ? "up" : "down") chevron-icon"></i>
+                </button>
+            </div>
+            
+            <div class="total-records">
+                <i class="fas fa-database"></i>
+                <span>Total: <strong>@TotalRecords</strong> inregistrari</span>
+                @if (ActiveFiltersCount > 0)
+                {
+                    <span class="filtered-info">(filtrate)</span>
+                }
             </div>
         </div>
 
@@ -302,10 +283,9 @@
 
         <div class="grid-container">
             <SfGrid @ref="GridRef"
-                    @key="@($"grid-{CurrentPageSize}-{CurrentPage}")"
-                    DataSource="@CurrentPageData"
+                    DataSource="@AllPersonalData"
                     Height="100%"
-                    AllowPaging="false"
+                    AllowPaging="true"
                     AllowSorting="true"
                     AllowFiltering="true"
                     AllowResizing="true"
@@ -315,12 +295,17 @@
                     ShowColumnChooser="true"
                     GridLines="GridLine.Both">
                 
+                <!-- Paging Settings -->
+                <GridPageSettings PageSize="@DefaultPageSize" 
+                                 PageSizes="@PageSizeArray"
+                                 PageCount="5">
+                </GridPageSettings>
+                
                 <GridFilterSettings Type="FilterType.Excel"></GridFilterSettings>
                 
                 <GridGroupSettings ShowDropArea="true" 
                                   ShowGroupedColumn="true"
-                                  ShowUngroupButton="true"
-                                  Columns="@InitialGroupColumns">
+                                  ShowUngroupButton="true">
                 </GridGroupSettings>
                 
                 <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
@@ -438,60 +423,6 @@
                     </GridColumn>
                 </GridColumns>
             </SfGrid>
-        </div>
-
-        <!-- Custom Pager -->
-        <div class="custom-pager">
-            <div class="pager-info">
-                <i class="fas fa-info-circle"></i>
-                <span>Pagina @GetCurrentPage() din @GetTotalPages()</span>
-                <span class="separator">|</span>
-                <span>Afisate @GetDisplayedRecordsStart()-@GetDisplayedRecordsEnd() din @TotalRecords</span>
-            </div>
-            <div class="pager-controls">
-                <button class="pager-btn @(GetCurrentPage() == 1 ? "disabled" : "")" 
-                        @onclick="() => GoToPage(1)" 
-                        disabled="@(GetCurrentPage() == 1)"
-                        title="Prima pagina">
-                    <i class="fas fa-angle-double-left"></i>
-                </button>
-                <button class="pager-btn @(GetCurrentPage() == 1 ? "disabled" : "")" 
-                        @onclick="() => GoToPage(GetCurrentPage() - 1)" 
-                        disabled="@(GetCurrentPage() == 1)"
-                        title="Pagina anterioara">
-                    <i class="fas fa-angle-left"></i>
-                </button>
-                
-                @for (int i = GetPagerStart(); i <= GetPagerEnd(); i++)
-                {
-                    int pageNum = i;
-                    <button class="pager-btn page-number @(GetCurrentPage() == pageNum ? "active" : "")" 
-                            @onclick="() => GoToPage(pageNum)">
-                        @pageNum
-                    </button>
-                }
-                
-                <button class="pager-btn @(GetCurrentPage() == GetTotalPages() ? "disabled" : "")" 
-                        @onclick="() => GoToPage(GetCurrentPage() + 1)" 
-                        disabled="@(GetCurrentPage() == GetTotalPages())"
-                        title="Pagina urmatoare">
-                    <i class="fas fa-angle-right"></i>
-                </button>
-                <button class="pager-btn @(GetCurrentPage() == GetTotalPages() ? "disabled" : "")" 
-                        @onclick="() => GoToPage(GetTotalPages())" 
-                        disabled="@(GetCurrentPage() == GetTotalPages())"
-                        title="Ultima pagina">
-                    <i class="fas fa-angle-double-right"></i>
-                </button>
-            </div>
-            <div class="jump-to-page">
-                <span>Sari la:</span>
-                <input type="number" @bind="jumpToPageNumber" @onkeypress="OnJumpToPageKeyPress" 
-                       min="1" max="@GetTotalPages()" class="page-input" />
-                <button class="pager-btn" @onclick="JumpToPage" title="Sari la pagina">
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
         </div>
     }
 </div>
