@@ -8,6 +8,7 @@ using MediatR;
 using ValyanClinic.Application.Features.PersonalManagement.Queries.GetPersonalList;
 using ValyanClinic.Services.DataGrid;
 using Microsoft.Extensions.Logging;
+using ValyanClinic.Components.Pages.Administrare.Personal.Modals;
 
 namespace ValyanClinic.Components.Pages.Administrare.Personal;
 
@@ -23,6 +24,9 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     // Toast reference
     private SfToast? ToastRef;
+
+    // Modal references
+    private PersonalViewModal? personalViewModal;
 
     // Data for Syncfusion Grid (all data loaded once)
     private List<PersonalListDto> AllPersonalData { get; set; } = new();
@@ -423,7 +427,13 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         if (SelectedPersonal == null) return;
         
         Logger.LogInformation("Vizualizare personal: {PersonalId}", SelectedPersonal.Id_Personal);
-        NavigationManager.NavigateTo($"/administrare/personal/vizualizeaza/{SelectedPersonal.Id_Personal}");
+        
+        // Open modal instead of navigation
+        if (personalViewModal != null)
+        {
+            await personalViewModal.Open(SelectedPersonal.Id_Personal);
+        }
+        
         await Task.CompletedTask;
     }
 
@@ -474,7 +484,13 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     private async Task HandleView(PersonalListDto personal)
     {
         Logger.LogInformation("Vizualizare personal: {PersonalId}", personal.Id_Personal);
-        NavigationManager.NavigateTo($"/administrare/personal/vizualizeaza/{personal.Id_Personal}");
+        
+        // Open modal instead of navigation
+        if (personalViewModal != null)
+        {
+            await personalViewModal.Open(personal.Id_Personal);
+        }
+        
         await Task.CompletedTask;
     }
 
@@ -505,4 +521,34 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
             await ToastRef.ShowAsync();
         }
     }
+
+    #region Modal Event Handlers
+
+    /// <summary>
+    /// Handler pentru când se solicită editare din modal
+    /// </summary>
+    private async Task HandleEditFromModal(Guid personalId)
+    {
+        Logger.LogInformation("Editare solicitată din modal pentru: {PersonalId}", personalId);
+        NavigationManager.NavigateTo($"/administrare/personal/editeaza/{personalId}");
+        await Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Handler pentru când se solicită ștergere din modal
+    /// </summary>
+    private async Task HandleDeleteFromModal(Guid personalId)
+    {
+        Logger.LogInformation("Ștergere solicitată din modal pentru: {PersonalId}", personalId);
+        
+        var personal = AllPersonalData.FirstOrDefault(p => p.Id_Personal == personalId);
+        if (personal != null)
+        {
+            await ShowToast("Atenție", 
+                $"Funcționalitatea de ștergere pentru {personal.NumeComplet} va fi implementată", 
+                "e-toast-warning");
+        }
+    }
+
+    #endregion
 }

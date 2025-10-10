@@ -7,6 +7,7 @@
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Inputs
+@using ValyanClinic.Components.Pages.Administrare.Personal.Modals
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 
 <PageTitle>Administrare Personal</PageTitle>
@@ -431,3 +432,8 @@
 <SfToast @ref="ToastRef" Title="@ToastTitle" Content="@ToastContent" CssClass="@ToastCssClass">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
+
+@* Modal pentru vizualizare detalii personal *@
+<PersonalViewModal @ref="personalViewModal" 
+                   OnEditRequested="HandleEditFromModal"
+                   OnDeleteRequested="HandleDeleteFromModal" />
