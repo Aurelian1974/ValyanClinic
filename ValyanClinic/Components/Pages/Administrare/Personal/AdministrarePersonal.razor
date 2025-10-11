@@ -8,6 +8,7 @@
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Inputs
 @using ValyanClinic.Components.Pages.Administrare.Personal.Modals
+@using ValyanClinic.Components.Shared.Modals
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 
 <PageTitle>Administrare Personal</PageTitle>
@@ -437,3 +438,11 @@
 <PersonalViewModal @ref="personalViewModal" 
                    OnEditRequested="HandleEditFromModal"
                    OnDeleteRequested="HandleDeleteFromModal" />
+
+@* Modal pentru adaugare/editare personal *@
+<PersonalFormModal @ref="personalFormModal" 
+                   OnPersonalSaved="HandlePersonalSaved" />
+
+@* Modal pentru confirmare stergere *@
+<ConfirmDeleteModal @ref="confirmDeleteModal" 
+                    OnConfirmed="HandleDeleteConfirmed" />

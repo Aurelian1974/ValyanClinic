@@ -15,8 +15,8 @@ public class LocationRepository : BaseRepository, ILocationRepository
 
     public async Task<IEnumerable<(int Id, string Nume)>> GetJudeteAsync(CancellationToken cancellationToken = default)
     {
-        var results = await QueryAsync<LocationDto>("sp_Location_GetJudete", cancellationToken: cancellationToken);
-        return results.Select(x => (x.Id, x.Nume));
+        var results = await QueryAsync<JudetDto>("sp_Location_GetJudete", cancellationToken: cancellationToken);
+        return results.Select(x => (x.IdJudet, x.Nume));
     }
 
     public async Task<IEnumerable<(int Id, string Nume)>> GetLocalitatiByJudetIdAsync(
@@ -24,8 +24,8 @@ public class LocationRepository : BaseRepository, ILocationRepository
         CancellationToken cancellationToken = default)
     {
         var parameters = new { JudetId = judetId };
-        var results = await QueryAsync<LocationDto>("sp_Location_GetLocalitatiByJudetId", parameters, cancellationToken);
-        return results.Select(x => (x.Id, x.Nume));
+        var results = await QueryAsync<LocalitateDto>("sp_Location_GetLocalitatiByJudetId", parameters, cancellationToken);
+        return results.Select(x => (x.IdOras, x.Nume));
     }
 
     public async Task<string?> GetJudetNameByIdAsync(int judetId, CancellationToken cancellationToken = default)
@@ -40,10 +40,16 @@ public class LocationRepository : BaseRepository, ILocationRepository
         return await ExecuteScalarAsync<string>("sp_Location_GetLocalitateNameById", parameters, cancellationToken);
     }
 
-    // DTO pentru mapping
-    private class LocationDto
+    // DTOs pentru mapping cu coloanele din SP-uri
+    private class JudetDto
     {
-        public int Id { get; set; }
+        public int IdJudet { get; set; }
+        public string Nume { get; set; } = string.Empty;
+    }
+
+    private class LocalitateDto
+    {
+        public int IdOras { get; set; }
         public string Nume { get; set; } = string.Empty;
     }
 }

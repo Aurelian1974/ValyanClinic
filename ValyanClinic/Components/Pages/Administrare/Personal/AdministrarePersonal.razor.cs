@@ -6,9 +6,11 @@ using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Inputs;
 using MediatR;
 using ValyanClinic.Application.Features.PersonalManagement.Queries.GetPersonalList;
+using ValyanClinic.Application.Features.PersonalManagement.Commands.DeletePersonal;
 using ValyanClinic.Services.DataGrid;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Components.Pages.Administrare.Personal.Modals;
+using ValyanClinic.Components.Shared.Modals;
 
 namespace ValyanClinic.Components.Pages.Administrare.Personal;
 
@@ -27,6 +29,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     // Modal references
     private PersonalViewModal? personalViewModal;
+    private PersonalFormModal? personalFormModal;
+    private ConfirmDeleteModal? confirmDeleteModal;
 
     // Data for Syncfusion Grid (all data loaded once)
     private List<PersonalListDto> AllPersonalData { get; set; } = new();
@@ -395,10 +399,14 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         await ShowToast("Succes", "Datele au fost reincarcate cu succes", "e-toast-success");
     }
 
-    private void HandleAddNew()
+    private async Task HandleAddNew()
     {
-        Logger.LogInformation("Navigare catre adaugare personal");
-        NavigationManager.NavigateTo("/administrare/personal/adauga");
+        Logger.LogInformation("Deschidere modal pentru adaugare personal");
+        
+        if (personalFormModal != null)
+        {
+            await personalFormModal.OpenForAdd();
+        }
     }
 
     #region Grid Selection Events
@@ -442,7 +450,12 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         if (SelectedPersonal == null) return;
         
         Logger.LogInformation("Editare personal: {PersonalId}", SelectedPersonal.Id_Personal);
-        NavigationManager.NavigateTo($"/administrare/personal/editeaza/{SelectedPersonal.Id_Personal}");
+        
+        if (personalFormModal != null)
+        {
+            await personalFormModal.OpenForEdit(SelectedPersonal.Id_Personal);
+        }
+        
         await Task.CompletedTask;
     }
 
@@ -452,9 +465,10 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         
         Logger.LogInformation("Stergere personal: {PersonalId}", SelectedPersonal.Id_Personal);
         
-        await ShowToast("Atentie", 
-            $"Functionalitatea de stergere pentru {SelectedPersonal.NumeComplet} va fi implementata", 
-            "e-toast-warning");
+        if (confirmDeleteModal != null)
+        {
+            await confirmDeleteModal.Open(SelectedPersonal.Id_Personal, SelectedPersonal.NumeComplet);
+        }
     }
 
     #endregion
@@ -485,7 +499,6 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     {
         Logger.LogInformation("Vizualizare personal: {PersonalId}", personal.Id_Personal);
         
-        // Open modal instead of navigation
         if (personalViewModal != null)
         {
             await personalViewModal.Open(personal.Id_Personal);
@@ -497,7 +510,12 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     private async Task HandleEdit(PersonalListDto personal)
     {
         Logger.LogInformation("Editare personal: {PersonalId}", personal.Id_Personal);
-        NavigationManager.NavigateTo($"/administrare/personal/editeaza/{personal.Id_Personal}");
+        
+        if (personalFormModal != null)
+        {
+            await personalFormModal.OpenForEdit(personal.Id_Personal);
+        }
+        
         await Task.CompletedTask;
     }
 
@@ -505,9 +523,12 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     {
         Logger.LogInformation("Stergere personal: {PersonalId}", personal.Id_Personal);
         
-        await ShowToast("Atentie", 
-            $"Functionalitatea de stergere pentru {personal.NumeComplet} va fi implementata", 
-            "e-toast-warning");
+        if (confirmDeleteModal != null)
+        {
+            await confirmDeleteModal.Open(personal.Id_Personal, personal.NumeComplet);
+        }
+        
+        await Task.CompletedTask;
     }
 
     private async Task ShowToast(string title, string content, string cssClass)
@@ -529,24 +550,73 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     /// </summary>
     private async Task HandleEditFromModal(Guid personalId)
     {
-        Logger.LogInformation("Editare solicitată din modal pentru: {PersonalId}", personalId);
-        NavigationManager.NavigateTo($"/administrare/personal/editeaza/{personalId}");
-        await Task.CompletedTask;
+        Logger.LogInformation("=== HandleEditFromModal called with ID: {PersonalId} ===", personalId);
+        
+        if (personalId == Guid.Empty)
+        {
+            Logger.LogError("=== CRITICAL: Received Guid.Empty in HandleEditFromModal! ===");
+            await ShowToast("Eroare", "ID invalid pentru editare", "e-toast-danger");
+            return;
+        }
+        
+        if (personalFormModal != null)
+        {
+            Logger.LogInformation("=== Calling personalFormModal.OpenForEdit with ID: {PersonalId} ===", personalId);
+            await personalFormModal.OpenForEdit(personalId);
+        }
+        else
+        {
+            Logger.LogError("=== CRITICAL: personalFormModal is NULL! ===");
+            await ShowToast("Eroare", "Modal nu este initializat", "e-toast-danger");
+        }
     }
 
-    /// <summary>
-    /// Handler pentru când se solicită ștergere din modal
-    /// </summary>
     private async Task HandleDeleteFromModal(Guid personalId)
     {
-        Logger.LogInformation("Ștergere solicitată din modal pentru: {PersonalId}", personalId);
+        Logger.LogInformation("Stergere solicitata din modal pentru: {PersonalId}", personalId);
         
         var personal = AllPersonalData.FirstOrDefault(p => p.Id_Personal == personalId);
-        if (personal != null)
+        if (personal != null && confirmDeleteModal != null)
         {
-            await ShowToast("Atenție", 
-                $"Funcționalitatea de ștergere pentru {personal.NumeComplet} va fi implementată", 
-                "e-toast-warning");
+            await confirmDeleteModal.Open(personalId, personal.NumeComplet);
+        }
+    }
+
+    private async Task HandlePersonalSaved()
+    {
+        Logger.LogInformation("Personal salvat cu succes - reincarcam datele");
+        
+        await LoadAllData();
+        await ShowToast("Succes", "Personal salvat cu succes", "e-toast-success");
+    }
+
+    private async Task HandleDeleteConfirmed(Guid personalId)
+    {
+        Logger.LogInformation("Confirmare stergere pentru: {PersonalId}", personalId);
+        
+        try
+        {
+            var command = new DeletePersonalCommand(personalId, "CurrentUser");
+            var result = await Mediator.Send(command);
+            
+            if (result.IsSuccess)
+            {
+                Logger.LogInformation("Personal sters cu succes: {PersonalId}", personalId);
+                
+                await LoadAllData();
+                await ShowToast("Succes", "Personal sters cu succes", "e-toast-success");
+            }
+            else
+            {
+                var errorMsg = string.Join(", ", result.Errors ?? new List<string> { "Eroare necunoscuta" });
+                Logger.LogWarning("Eroare la stergerea personalului: {Errors}", errorMsg);
+                await ShowToast("Eroare", errorMsg, "e-toast-danger");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la stergerea personalului: {PersonalId}", personalId);
+            await ShowToast("Eroare", $"Eroare la stergere: {ex.Message}", "e-toast-danger");
         }
     }
 

@@ -1,0 +1,456 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Components.Pages.Administrare.Personal.Models
+@using Syncfusion.Blazor.DropDowns
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas @(Model.IsEditMode ? "fa-user-edit" : "fa-user-plus")"></i>
+                <h2>@Model.ModalTitle</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" type="button">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Loading data...</p>
+                </div>
+            }
+            else
+            {
+                @if (HasError)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>@ErrorMessage</span>
+                    </div>
+                }
+
+                <EditForm Model="@Model" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="tabs-container">
+                        <div class="tab-buttons">
+                            <button type="button" class="tab-button @(ActiveTab == "personal" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("personal")'>
+                                <i class="fas fa-user"></i>
+                                <span>Date Personale</span>
+                            </button>
+                            <button type="button" class="tab-button @(ActiveTab == "contact" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("contact")'>
+                                <i class="fas fa-address-book"></i>
+                                <span>Contact</span>
+                            </button>
+                            <button type="button" class="tab-button @(ActiveTab == "adresa" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("adresa")'>
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Adresa</span>
+                            </button>
+                            <button type="button" class="tab-button @(ActiveTab == "pozitie-documente" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("pozitie-documente")'>
+                                <i class="fas fa-briefcase"></i>
+                                <span>Pozitie si Documente</span>
+                            </button>
+                        </div>
+
+                        <div class="tab-content">
+                            @if (ActiveTab == "personal")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-id-badge"></i>
+                                            <span>Identificare</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group">
+                                                <label for="cod-angajat">Cod Angajat <span class="required">*</span></label>
+                                                <InputText id="cod-angajat" class="form-control" @bind-Value="Model.Cod_Angajat" />
+                                                <ValidationMessage For="@(() => Model.Cod_Angajat)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="status">Status Angajat <span class="required">*</span></label>
+                                                <InputSelect id="status" class="form-control" @bind-Value="Model.Status_Angajat">
+                                                    <option value="Activ">Activ</option>
+                                                    <option value="Inactiv">Inactiv</option>
+                                                    <option value="Suspendat">Suspendat</option>
+                                                    <option value="Concediu">Concediu</option>
+                                                </InputSelect>
+                                                <ValidationMessage For="@(() => Model.Status_Angajat)" />
+                                            </div>
+                                            
+                                            <div class="form-group full-width">
+                                                <label for="cnp">CNP <span class="required">*</span></label>
+                                                <InputText id="cnp" class="form-control" @bind-Value="Model.CNP" maxlength="13" />
+                                                <ValidationMessage For="@(() => Model.CNP)" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-user-circle"></i>
+                                            <span>Informatii Generale</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group">
+                                                <label for="nume">Nume <span class="required">*</span></label>
+                                                <InputText id="nume" class="form-control" @bind-Value="Model.Nume" />
+                                                <ValidationMessage For="@(() => Model.Nume)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="prenume">Prenume <span class="required">*</span></label>
+                                                <InputText id="prenume" class="form-control" @bind-Value="Model.Prenume" />
+                                                <ValidationMessage For="@(() => Model.Prenume)" />
+                                            </div>
+                                            
+                                            <div class="form-group full-width">
+                                                <label for="nume-anterior">Nume Anterior</label>
+                                                <InputText id="nume-anterior" class="form-control" @bind-Value="Model.Nume_Anterior" />
+                                                <ValidationMessage For="@(() => Model.Nume_Anterior)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="data-nasterii">Data Nasterii <span class="required">*</span></label>
+                                                <SfDatePicker ID="data-nasterii" 
+                                                              TValue="DateTime"
+                                                              CssClass="form-control" 
+                                                              @bind-Value="@Model.Data_Nasterii"
+                                                              Format="dd.MM.yyyy"
+                                                              Placeholder="Selecteaza data"
+                                                              ShowTodayButton="true">
+                                                </SfDatePicker>
+                                                <ValidationMessage For="@(() => Model.Data_Nasterii)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="locul-nasterii">Locul Nasterii</label>
+                                                <InputText id="locul-nasterii" class="form-control" @bind-Value="Model.Locul_Nasterii" />
+                                                <ValidationMessage For="@(() => Model.Locul_Nasterii)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="nationalitate">Nationalitate <span class="required">*</span></label>
+                                                <InputText id="nationalitate" class="form-control" @bind-Value="Model.Nationalitate" />
+                                                <ValidationMessage For="@(() => Model.Nationalitate)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="cetatenie">Cetatenie <span class="required">*</span></label>
+                                                <InputText id="cetatenie" class="form-control" @bind-Value="Model.Cetatenie" />
+                                                <ValidationMessage For="@(() => Model.Cetatenie)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="stare-civila">Stare Civila</label>
+                                                <InputSelect id="stare-civila" class="form-control" @bind-Value="Model.Stare_Civila">
+                                                    <option value="">-- Selecteaza --</option>
+                                                    <option value="Necasatorit/a">Necasatorit/a</option>
+                                                    <option value="Casatorit/a">Casatorit/a</option>
+                                                    <option value="Divortat/a">Divortat/a</option>
+                                                    <option value="Vaduv/a">Vaduv/a</option>
+                                                </InputSelect>
+                                                <ValidationMessage For="@(() => Model.Stare_Civila)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (ActiveTab == "contact")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-phone"></i>
+                                            <span>Telefon</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group">
+                                                <label for="telefon-personal">Telefon Personal</label>
+                                                <InputText id="telefon-personal" class="form-control" @bind-Value="Model.Telefon_Personal" />
+                                                <ValidationMessage For="@(() => Model.Telefon_Personal)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="telefon-serviciu">Telefon Serviciu</label>
+                                                <InputText id="telefon-serviciu" class="form-control" @bind-Value="Model.Telefon_Serviciu" />
+                                                <ValidationMessage For="@(() => Model.Telefon_Serviciu)" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-envelope"></i>
+                                            <span>Email</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group full-width">
+                                                <label for="email-personal">Email Personal</label>
+                                                <InputText id="email-personal" type="email" class="form-control" @bind-Value="Model.Email_Personal" />
+                                                <ValidationMessage For="@(() => Model.Email_Personal)" />
+                                            </div>
+                                            
+                                            <div class="form-group full-width">
+                                                <label for="email-serviciu">Email Serviciu</label>
+                                                <InputText id="email-serviciu" type="email" class="form-control" @bind-Value="Model.Email_Serviciu" />
+                                                <ValidationMessage For="@(() => Model.Email_Serviciu)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (ActiveTab == "adresa")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-home"></i>
+                                            <span>Adresa Domiciliu</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group full-width">
+                                                <label for="adresa-domiciliu">Adresa <span class="required">*</span></label>
+                                                <InputText id="adresa-domiciliu" class="form-control" @bind-Value="Model.Adresa_Domiciliu" />
+                                                <ValidationMessage For="@(() => Model.Adresa_Domiciliu)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="judet-domiciliu">Judet <span class="required">*</span></label>
+                                                <SfDropDownList TValue="string" 
+                                                               TItem="LocationOption"
+                                                               ID="judet-domiciliu"
+                                                               Placeholder="Cauta sau selecteaza judetul"
+                                                               DataSource="@JudeteOptions"
+                                                               @bind-Value="@Model.Judet_Domiciliu"
+                                                               AllowFiltering="true"
+                                                               FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                               ShowClearButton="true"
+                                                               CssClass="form-control">
+                                                    <DropDownListFieldSettings Text="Nume" Value="Nume"></DropDownListFieldSettings>
+                                                    <DropDownListEvents TValue="string" TItem="LocationOption" 
+                                                                       ValueChange="@OnJudetDomiciliuChangedV2">
+                                                    </DropDownListEvents>
+                                                </SfDropDownList>
+                                                <ValidationMessage For="@(() => Model.Judet_Domiciliu)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="oras-domiciliu">Localitate <span class="required">*</span></label>
+                                                <SfDropDownList TValue="string" 
+                                                               TItem="LocationOption"
+                                                               ID="oras-domiciliu"
+                                                               Placeholder="@GetLocalitatiPlaceholder(IsLoadingLocalitatiDomiciliu, LocalitatiDomiciliuOptions.Count)"
+                                                               DataSource="@LocalitatiDomiciliuOptions"
+                                                               @bind-Value="@Model.Oras_Domiciliu"
+                                                               AllowFiltering="true"
+                                                               FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                               ShowClearButton="true"
+                                                               Enabled="@(!IsLoadingLocalitatiDomiciliu && LocalitatiDomiciliuOptions.Count > 0)"
+                                                               CssClass="form-control">
+                                                    <DropDownListFieldSettings Text="Nume" Value="Nume"></DropDownListFieldSettings>
+                                                </SfDropDownList>
+                                                <ValidationMessage For="@(() => Model.Oras_Domiciliu)" />
+                                                @if (LocalitatiDomiciliuOptions.Count == 0 && !string.IsNullOrEmpty(Model.Judet_Domiciliu) && !IsLoadingLocalitatiDomiciliu)
+                                                {
+                                                    <small class="form-text text-muted">Selecteaza mai intai judetul</small>
+                                                }
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="cod-postal-domiciliu">Cod Postal</label>
+                                                <InputText id="cod-postal-domiciliu" class="form-control" @bind-Value="Model.Cod_Postal_Domiciliu" />
+                                                <ValidationMessage For="@(() => Model.Cod_Postal_Domiciliu)" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-map-marked-alt"></i>
+                                            <span>Adresa Resedinta</span>
+                                            @if (!string.IsNullOrEmpty(Model.Judet_Domiciliu))
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-primary ms-auto" 
+                                                        @onclick="CopyDomiciliuToResedinta"
+                                                        title="Copiaza datele de la Domiciliu">
+                                                    <i class="fas fa-copy"></i> Copiaza de la Domiciliu
+                                                </button>
+                                            }
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group full-width">
+                                                <label for="adresa-resedinta">Adresa</label>
+                                                <InputText id="adresa-resedinta" class="form-control" @bind-Value="Model.Adresa_Resedinta" />
+                                                <ValidationMessage For="@(() => Model.Adresa_Resedinta)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="judet-resedinta">Judet</label>
+                                                <SfDropDownList TValue="string" 
+                                                               TItem="LocationOption"
+                                                               ID="judet-resedinta"
+                                                               Placeholder="Cauta sau selecteaza judetul"
+                                                               DataSource="@JudeteOptions"
+                                                               @bind-Value="@Model.Judet_Resedinta"
+                                                               AllowFiltering="true"
+                                                               FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                               ShowClearButton="true"
+                                                               CssClass="form-control">
+                                                    <DropDownListFieldSettings Text="Nume" Value="Nume"></DropDownListFieldSettings>
+                                                    <DropDownListEvents TValue="string" TItem="LocationOption" 
+                                                                       ValueChange="@OnJudetResedintaChangedV2">
+                                                    </DropDownListEvents>
+                                                </SfDropDownList>
+                                                <ValidationMessage For="@(() => Model.Judet_Resedinta)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="oras-resedinta">Localitate</label>
+                                                <SfDropDownList TValue="string" 
+                                                               TItem="LocationOption"
+                                                               ID="oras-resedinta"
+                                                               Placeholder="@GetLocalitatiPlaceholder(IsLoadingLocalitatiResedinta, LocalitatiResedintaOptions.Count)"
+                                                               DataSource="@LocalitatiResedintaOptions"
+                                                               @bind-Value="@Model.Oras_Resedinta"
+                                                               AllowFiltering="true"
+                                                               FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                               ShowClearButton="true"
+                                                               Enabled="@(!IsLoadingLocalitatiResedinta && LocalitatiResedintaOptions.Count > 0)"
+                                                               CssClass="form-control">
+                                                    <DropDownListFieldSettings Text="Nume" Value="Nume"></DropDownListFieldSettings>
+                                                </SfDropDownList>
+                                                <ValidationMessage For="@(() => Model.Oras_Resedinta)" />
+                                                @if (LocalitatiResedintaOptions.Count == 0 && !string.IsNullOrEmpty(Model.Judet_Resedinta) && !IsLoadingLocalitatiResedinta)
+                                                {
+                                                    <small class="form-text text-muted">Selecteaza mai intai judetul</small>
+                                                }
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="cod-postal-resedinta">Cod Postal</label>
+                                                <InputText id="cod-postal-resedinta" class="form-control" @bind-Value="Model.Cod_Postal_Resedinta" />
+                                                <ValidationMessage For="@(() => Model.Cod_Postal_Resedinta)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (ActiveTab == "pozitie-documente")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-briefcase"></i>
+                                            <span>Pozitie Organizationala</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group">
+                                                <label for="functia">Functie <span class="required">*</span></label>
+                                                <InputText id="functia" class="form-control" @bind-Value="Model.Functia" />
+                                                <ValidationMessage For="@(() => Model.Functia)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="departament">Departament</label>
+                                                <InputText id="departament" class="form-control" @bind-Value="Model.Departament" />
+                                                <ValidationMessage For="@(() => Model.Departament)" />
+                                            </div>
+                                            
+                                            <div class="form-group full-width">
+                                                <label for="observatii">Observatii</label>
+                                                <InputTextArea id="observatii" class="form-control" @bind-Value="Model.Observatii" rows="3" />
+                                                <ValidationMessage For="@(() => Model.Observatii)" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-id-card"></i>
+                                            <span>Carte de Identitate</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group">
+                                                <label for="serie-ci">Serie CI</label>
+                                                <InputText id="serie-ci" class="form-control" @bind-Value="Model.Serie_CI" />
+                                                <ValidationMessage For="@(() => Model.Serie_CI)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="numar-ci">Numar CI</label>
+                                                <InputText id="numar-ci" class="form-control" @bind-Value="Model.Numar_CI" />
+                                                <ValidationMessage For="@(() => Model.Numar_CI)" />
+                                            </div>
+                                            
+                                            <div class="form-group full-width">
+                                                <label for="eliberat-ci">Eliberat De</label>
+                                                <InputText id="eliberat-ci" class="form-control" @bind-Value="Model.Eliberat_CI_De" />
+                                                <ValidationMessage For="@(() => Model.Eliberat_CI_De)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="data-eliberare-ci">Data Eliberare</label>
+                                                <SfDatePicker ID="data-eliberare-ci" 
+                                                              TValue="DateTime?"
+                                                              CssClass="form-control" 
+                                                              @bind-Value="@Model.Data_Eliberare_CI"
+                                                              Format="dd.MM.yyyy"
+                                                              Placeholder="Selecteaza data"
+                                                              ShowTodayButton="true">
+                                                </SfDatePicker>
+                                                <ValidationMessage For="@(() => Model.Data_Eliberare_CI)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="valabil-ci-pana">Valabil Pana</label>
+                                                <SfDatePicker ID="valabil-ci-pana" 
+                                                              TValue="DateTime?"
+                                                              CssClass="form-control" 
+                                                              @bind-Value="@Model.Valabil_CI_Pana"
+                                                              Format="dd.MM.yyyy"
+                                                              Placeholder="Selecteaza data"
+                                                              ShowTodayButton="true">
+                                                </SfDatePicker>
+                                                <ValidationMessage For="@(() => Model.Valabil_CI_Pana)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </EditForm>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @onclick="Close" disabled="@IsSaving">
+                <i class="fas fa-times"></i>
+                <span>Anuleaza</span>
+            </button>
+            <button type="button" class="btn btn-primary" @onclick="HandleSubmit" disabled="@IsSaving">
+                @if (IsSaving)
+                {
+                    <span class="spinner-border-sm"></span>
+                    <span>Saving...</span>
+                }
+                else
+                {
+                    <i class="fas fa-save"></i>
+                    <span>@(Model.IsEditMode ? "Actualizeaza" : "Salveaza")</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>

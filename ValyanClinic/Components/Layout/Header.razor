@@ -42,7 +42,7 @@
     </div>
 
     <div class="header-right">
-        <button class="btn-icon" title="Notificări">
+        <button class="btn-icon" title="Notificari">
             <i class="fas fa-bell"></i>
             <span class="badge">3</span>
         </button>
@@ -53,11 +53,11 @@
         </button>
 
         <div class="user-profile">
-            <img src="/images/avatar-default.png" 
+            <img src="@GetUserAvatarUrl()" 
                  alt="User Avatar" 
-                 class="user-avatar"
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-            <div class="user-avatar-fallback" style="display:none; width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, #93c5fd, #60a5fa); color:white; align-items:center; justify-content:center; font-weight:700; font-size:14px;">A</div>
+                 class="@GetAvatarCssClass()"
+                 @ref="avatarImageRef" />
+            <div class="@GetAvatarFallbackCssClass()">@GetUserInitials()</div>
             <div class="user-info">
                 <span class="user-name">@UserName</span>
                 <span class="user-role">@UserRole</span>

@@ -13,19 +13,19 @@
                 </div>
             }
         </div>
-        <button type="button" class="btn-collapse" @onclick="HandleToggle" title="@(isCollapsed ? "Extinde" : "Restrânge")">
-            <i class="fas @(isCollapsed ? "fa-chevron-right" : "fa-chevron-left")"></i>
+        <button type="button" class="btn-collapse" @onclick="HandleToggle" title="@GetCollapseButtonTitle()">
+            <i class="fas @GetCollapseButtonIcon()"></i>
         </button>
     </div>
 
     <div class="nav-menu">
         @* Home - Level 0 *@
         <div class="nav-item">
-            <a href="/" class="nav-link" title="Acasă">
+            <a href="/" class="nav-link" title="Acasa">
                 <i class="fas fa-home"></i>
                 @if (!isCollapsed)
                 {
-                    <span>Acasă</span>
+                    <span>Acasa</span>
                 }
             </a>
         </div>
@@ -87,14 +87,14 @@
             }
         </div>
 
-        @* Programări - Level 1 (Parent) *@
+        @* Programari - Level 1 (Parent) *@
         <div class="nav-section">
             @if (!isCollapsed)
             {
                 <div class="nav-section-header" @onclick="ToggleProgramari">
                     <div class="nav-section-title">
                         <i class="fas fa-calendar-check"></i>
-                        <span>Programări</span>
+                        <span>Programari</span>
                     </div>
                     <i class="fas fa-chevron-@(isProgramariExpanded ? "up" : "down") nav-chevron"></i>
                 </div>
@@ -110,9 +110,9 @@
                         </div>
 
                         <div class="nav-item nav-item-child">
-                            <a href="/programari/lista" class="nav-link nav-link-child" title="Lista Programări">
+                            <a href="/programari/lista" class="nav-link nav-link-child" title="Lista Programari">
                                 <i class="fas fa-list"></i>
-                                <span>Lista Programări</span>
+                                <span>Lista Programari</span>
                             </a>
                         </div>
                     </div>
@@ -122,7 +122,7 @@
             {
                 @* Show icon when collapsed *@
                 <div class="nav-item">
-                    <a href="/programari" class="nav-link" title="Programări">
+                    <a href="/programari" class="nav-link" title="Programari">
                         <i class="fas fa-calendar-check"></i>
                     </a>
                 </div>
@@ -199,9 +199,4 @@
             }
         </div>
     </div>
-
-    @* Debug info *@
-@*     <div style="position: absolute; bottom: 10px; left: 10px; color: white; font-size: 12px; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 4px; z-index: 9999;">
-        Collapsed: @isCollapsed | Clicks: @clickCount
-    </div> *@
 </div>

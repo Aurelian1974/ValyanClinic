@@ -11,6 +11,8 @@ public partial class Header : ComponentBase, IDisposable
     private string UserName = "Dr. Admin";
     private string UserRole = "Administrator";
     private List<BreadcrumbItem> breadcrumbItems = new();
+    private ElementReference avatarImageRef;
+    private bool imageLoadFailed = false;
 
     protected override void OnInitialized()
     {
@@ -37,6 +39,24 @@ public partial class Header : ComponentBase, IDisposable
         var path = uri.AbsolutePath;
         breadcrumbItems = BreadcrumbService.BuildFromPath(path);
     }
+
+    private string GetUserAvatarUrl() => "/images/avatar-default.png";
+
+    private string GetUserInitials()
+    {
+        if (string.IsNullOrEmpty(UserName))
+            return "A";
+
+        var parts = UserName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+
+        return UserName[0].ToString().ToUpper();
+    }
+
+    private string GetAvatarCssClass() => imageLoadFailed ? "user-avatar hidden" : "user-avatar";
+
+    private string GetAvatarFallbackCssClass() => imageLoadFailed ? "user-avatar-fallback visible" : "user-avatar-fallback";
 
     public void Dispose()
     {

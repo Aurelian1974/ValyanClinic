@@ -119,6 +119,10 @@
     color: #60a5fa;
 }
 
+.btn-icon i {
+    font-size: 18px;
+}
+
 .btn-icon .badge {
     position: absolute;
     top: 4px;
@@ -153,6 +157,29 @@
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #bfdbfe;
+}
+
+.user-avatar.hidden {
+    display: none;
+}
+
+.user-avatar-fallback {
+    display: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #93c5fd, #60a5fa);
+    color: white;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-avatar-fallback.visible {
+    display: flex;
 }
 
 .user-info {

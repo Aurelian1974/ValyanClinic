@@ -39,6 +39,10 @@ public partial class NavMenu : ComponentBase
         StateHasChanged();
     }
 
+    private string GetCollapseButtonTitle() => isCollapsed ? "Extinde" : "Restrante";
+
+    private string GetCollapseButtonIcon() => isCollapsed ? "fa-chevron-right" : "fa-chevron-left";
+
     private void ToggleAdministrare()
     {
         if (!isCollapsed)

@@ -66,6 +66,7 @@ try
     builder.Services.AddScoped<IPersonalRepository, PersonalRepository>();
     builder.Services.AddScoped<IPersonalMedicalRepository, PersonalMedicalRepository>();
     builder.Services.AddScoped<IOcupatieISCORepository, OcupatieISCORepository>();
+    builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 
     // ========================================
     // CACHING
@@ -98,6 +99,12 @@ try
     builder.Services.AddScoped(typeof(IDataGridStateService<>), typeof(DataGridStateService<>));
     builder.Services.AddScoped<IFilterOptionsService, FilterOptionsService>();
     builder.Services.AddScoped<IDataFilterService, DataFilterService>();
+
+    // ========================================
+    // BUSINESS SERVICES
+    // ========================================
+    builder.Services.AddScoped<ValyanClinic.Application.Services.IPersonalBusinessService, 
+                                ValyanClinic.Application.Services.PersonalBusinessService>();
 
     // ========================================
     // HEALTH CHECKS
