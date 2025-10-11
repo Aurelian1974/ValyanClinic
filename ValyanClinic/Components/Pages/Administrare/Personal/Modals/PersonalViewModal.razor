@@ -1,0 +1,472 @@
+﻿@using ValyanClinic.Application.Features.PersonalManagement.Queries.GetPersonalById
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-user-circle"></i>
+                <h2>Detalii Personal</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" title="Inchide">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Se incarca...</span>
+                    </div>
+                    <p>Se incarca datele...</p>
+                </div>
+            }
+            else if (HasError)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @ErrorMessage
+                </div>
+            }
+            else if (PersonalData != null)
+            {
+                <div class="tabs-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button @(ActiveTab == "personal" ? "active" : "")" 
+                                @onclick='() => SetActiveTab("personal")'>
+                            <i class="fas fa-user"></i>
+                            Date Personale
+                        </button>
+                        <button class="tab-button @(ActiveTab == "contact" ? "active" : "")" 
+                                @onclick='() => SetActiveTab("contact")'>
+                            <i class="fas fa-address-book"></i>
+                            Contact
+                        </button>
+                        <button class="tab-button @(ActiveTab == "adresa" ? "active" : "")" 
+                                @onclick='() => SetActiveTab("adresa")'>
+                            <i class="fas fa-map-marker-alt"></i>
+                            Adresa
+                        </button>
+                        <button class="tab-button @(ActiveTab == "pozitie-documente" ? "active" : "")" 
+                                @onclick='() => SetActiveTab("pozitie-documente")'>
+                            <i class="fas fa-briefcase"></i>
+                            Pozitie si Documente
+                        </button>
+                        <button class="tab-button @(ActiveTab == "audit" ? "active" : "")" 
+                                @onclick='() => SetActiveTab("audit")'>
+                            <i class="fas fa-history"></i>
+                            Audit
+                        </button>
+                    </div>
+
+                    <div class="tab-content">
+                        @if (ActiveTab == "personal")
+                        {
+                            <div class="tab-pane active">
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-user-circle"></i>
+                                        Informatii Generale
+                                    </h3>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label>Cod Angajat</label>
+                                            <div class="info-value badge-primary">@PersonalData.Cod_Angajat</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Status</label>
+                                            <span class="status-badge @(PersonalData.Status_Angajat == "Activ" ? "status-active" : "status-inactive")">
+                                                @PersonalData.Status_Angajat
+                                            </span>
+                                        </div>
+                                        <div class="info-item full-width">
+                                            <label>Nume Complet</label>
+                                            <div class="info-value primary-text">@PersonalData.NumeComplet</div>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(PersonalData.Nume_Anterior))
+                                        {
+                                            <div class="info-item full-width">
+                                                <label>Nume Anterior</label>
+                                                <div class="info-value">@PersonalData.Nume_Anterior</div>
+                                            </div>
+                                        }
+                                        <div class="info-item">
+                                            <label>CNP</label>
+                                            <div class="info-value">@PersonalData.CNP</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Data Nasterii</label>
+                                            <div class="info-value">@PersonalData.Data_Nasterii.ToString("dd.MM.yyyy")</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Varsta</label>
+                                            <div class="info-value badge-secondary">@CalculeazaVarstaDetaliataFromCNP(PersonalData.CNP)</div>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(PersonalData.Locul_Nasterii))
+                                        {
+                                            <div class="info-item">
+                                                <label>Locul Nasterii</label>
+                                                <div class="info-value">@PersonalData.Locul_Nasterii</div>
+                                            </div>
+                                        }
+                                        <div class="info-item">
+                                            <label>Nationalitate</label>
+                                            <div class="info-value">@PersonalData.Nationalitate</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Cetatenie</label>
+                                            <div class="info-value">@PersonalData.Cetatenie</div>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(PersonalData.Stare_Civila))
+                                        {
+                                            <div class="info-item">
+                                                <label>Stare Civila</label>
+                                                <div class="info-value">@PersonalData.Stare_Civila</div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else if (ActiveTab == "contact")
+                        {
+                            <div class="tab-pane active">
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-phone"></i>
+                                        Telefon
+                                    </h3>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label>Telefon Personal</label>
+                                            @if (!string.IsNullOrEmpty(PersonalData.Telefon_Personal))
+                                            {
+                                                <div class="info-value">
+                                                    <a href="tel:@PersonalData.Telefon_Personal" class="contact-link">
+                                                        <i class="fas fa-phone"></i>
+                                                        @PersonalData.Telefon_Personal
+                                                    </a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="info-value info-value-empty">
+                                                    <i class="fas fa-minus-circle"></i>
+                                                    Nu este inregistrat
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Telefon Serviciu</label>
+                                            @if (!string.IsNullOrEmpty(PersonalData.Telefon_Serviciu))
+                                            {
+                                                <div class="info-value">
+                                                    <a href="tel:@PersonalData.Telefon_Serviciu" class="contact-link">
+                                                        <i class="fas fa-phone-office"></i>
+                                                        @PersonalData.Telefon_Serviciu
+                                                    </a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="info-value info-value-empty">
+                                                    <i class="fas fa-minus-circle"></i>
+                                                    Nu este inregistrat
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-envelope"></i>
+                                        Email
+                                    </h3>
+                                    <div class="info-grid">
+                                        <div class="info-item full-width">
+                                            <label>Email Personal</label>
+                                            @if (!string.IsNullOrEmpty(PersonalData.Email_Personal))
+                                            {
+                                                <div class="info-value">
+                                                    <a href="mailto:@PersonalData.Email_Personal" class="contact-link">
+                                                        <i class="fas fa-envelope"></i>
+                                                        @PersonalData.Email_Personal
+                                                    </a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="info-value info-value-empty">
+                                                    <i class="fas fa-minus-circle"></i>
+                                                    Nu este inregistrat
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="info-item full-width">
+                                            <label>Email Serviciu</label>
+                                            @if (!string.IsNullOrEmpty(PersonalData.Email_Serviciu))
+                                            {
+                                                <div class="info-value">
+                                                    <a href="mailto:@PersonalData.Email_Serviciu" class="contact-link">
+                                                        <i class="fas fa-envelope"></i>
+                                                        @PersonalData.Email_Serviciu
+                                                    </a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="info-value info-value-empty">
+                                                    <i class="fas fa-minus-circle"></i>
+                                                    Nu este inregistrat
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else if (ActiveTab == "adresa")
+                        {
+                            <div class="tab-pane active">
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-home"></i>
+                                        Adresa Domiciliu
+                                    </h3>
+                                    <div class="info-grid">
+                                        <div class="info-item full-width">
+                                            <label>Adresa</label>
+                                            <div class="info-value">@PersonalData.Adresa_Domiciliu</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Oras</label>
+                                            <div class="info-value">@PersonalData.Oras_Domiciliu</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Judet</label>
+                                            <div class="info-value">@PersonalData.Judet_Domiciliu</div>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(PersonalData.Cod_Postal_Domiciliu))
+                                        {
+                                            <div class="info-item">
+                                                <label>Cod Postal</label>
+                                                <div class="info-value">@PersonalData.Cod_Postal_Domiciliu</div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                        Adresa Resedinta
+                                    </h3>
+                                    @if (!string.IsNullOrEmpty(PersonalData.Adresa_Resedinta))
+                                    {
+                                        <div class="info-grid">
+                                            <div class="info-item full-width">
+                                                <label>Adresa</label>
+                                                <div class="info-value">@PersonalData.Adresa_Resedinta</div>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(PersonalData.Oras_Resedinta))
+                                            {
+                                                <div class="info-item">
+                                                    <label>Oras</label>
+                                                    <div class="info-value">@PersonalData.Oras_Resedinta</div>
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(PersonalData.Judet_Resedinta))
+                                            {
+                                                <div class="info-item">
+                                                    <label>Judet</label>
+                                                    <div class="info-value">@PersonalData.Judet_Resedinta</div>
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(PersonalData.Cod_Postal_Resedinta))
+                                            {
+                                                <div class="info-item">
+                                                    <label>Cod Postal</label>
+                                                    <div class="info-value">@PersonalData.Cod_Postal_Resedinta</div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="no-data-message">
+                                            <i class="fas fa-info-circle"></i>
+                                            <p>Nu sunt inregistrate date pentru adresa de resedinta</p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else if (ActiveTab == "pozitie-documente")
+                        {
+                            <div class="tab-pane active">
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-briefcase"></i>
+                                        Pozitie Organizationala
+                                    </h3>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label>Functie</label>
+                                            <div class="info-value badge-primary">@PersonalData.Functia</div>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(PersonalData.Departament))
+                                        {
+                                            <div class="info-item">
+                                                <label>Departament</label>
+                                                <div class="info-value">@PersonalData.Departament</div>
+                                            </div>
+                                        }
+                                        <div class="info-item">
+                                            <label>Status Angajat</label>
+                                            <span class="status-badge @(PersonalData.Status_Angajat == "Activ" ? "status-active" : "status-inactive")">
+                                                @PersonalData.Status_Angajat
+                                            </span>
+                                        </div>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(PersonalData.Observatii))
+                                    {
+                                        <div class="info-grid" style="margin-top: 1rem;">
+                                            <div class="info-item full-width">
+                                                <label>Observatii</label>
+                                                <div class="info-value observation-text">@PersonalData.Observatii</div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-id-card"></i>
+                                        Carte de Identitate
+                                    </h3>
+                                    <div class="info-grid">
+                                        @if (!string.IsNullOrEmpty(PersonalData.Serie_CI))
+                                        {
+                                            <div class="info-item">
+                                                <label>Serie</label>
+                                                <div class="info-value">@PersonalData.Serie_CI</div>
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(PersonalData.Numar_CI))
+                                        {
+                                            <div class="info-item">
+                                                <label>Numar</label>
+                                                <div class="info-value">@PersonalData.Numar_CI</div>
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(PersonalData.Eliberat_CI_De))
+                                        {
+                                            <div class="info-item">
+                                                <label>Eliberat De</label>
+                                                <div class="info-value">@PersonalData.Eliberat_CI_De</div>
+                                            </div>
+                                        }
+                                        @if (PersonalData.Data_Eliberare_CI.HasValue)
+                                        {
+                                            <div class="info-item">
+                                                <label>Data Eliberare</label>
+                                                <div class="info-value">@PersonalData.Data_Eliberare_CI.Value.ToString("dd.MM.yyyy")</div>
+                                            </div>
+                                        }
+                                        <div class="info-item">
+                                            <label>Valabil Pana</label>
+                                            @if (PersonalData.Valabil_CI_Pana.HasValue)
+                                            {
+                                                <div class="info-value @(PersonalData.Valabil_CI_Pana.Value < DateTime.Today ? "text-danger" : "")">
+                                                    @PersonalData.Valabil_CI_Pana.Value.ToString("dd.MM.yyyy")
+                                                    @if (PersonalData.Valabil_CI_Pana.Value < DateTime.Today)
+                                                    {
+                                                        <span class="badge-danger">EXPIRAT</span>
+                                                    }
+                                                    else if (PersonalData.Valabil_CI_Pana.Value < DateTime.Today.AddMonths(3))
+                                                    {
+                                                        <span class="badge-warning">EXPIRA CURAND</span>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="info-value info-value-empty">
+                                                    <i class="fas fa-minus-circle"></i>
+                                                    Nu este inregistrat
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Expira in</label>
+                                            <div class="info-value">
+                                                <span class="@GetExpiraInCssClass(PersonalData.Valabil_CI_Pana)">
+                                                    @CalculeazaExpiraIn(PersonalData.Valabil_CI_Pana)
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else if (ActiveTab == "audit")
+                        {
+                            <div class="tab-pane active">
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-history"></i>
+                                        Informatii Audit
+                                    </h3>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label>Data Crearii</label>
+                                            <div class="info-value">@PersonalData.Data_Crearii.ToString("dd.MM.yyyy HH:mm")</div>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(PersonalData.Creat_De))
+                                        {
+                                            <div class="info-item">
+                                                <label>Creat De</label>
+                                                <div class="info-value">@PersonalData.Creat_De</div>
+                                            </div>
+                                        }
+                                        @if (PersonalData.Data_Ultimei_Modificari.HasValue)
+                                        {
+                                            <div class="info-item">
+                                                <label>Ultima Modificare</label>
+                                                <div class="info-value">@PersonalData.Data_Ultimei_Modificari.Value.ToString("dd.MM.yyyy HH:mm")</div>
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(PersonalData.Modificat_De))
+                                        {
+                                            <div class="info-item">
+                                                <label>Modificat De</label>
+                                                <div class="info-value">@PersonalData.Modificat_De</div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" @onclick="Close">
+                <i class="fas fa-times"></i>
+                Inchide
+            </button>
+            <button class="btn btn-primary" @onclick="HandleEdit" disabled="@(PersonalData == null)">
+                <i class="fas fa-edit"></i>
+                Editeaza
+            </button>
+            <button class="btn btn-danger" @onclick="HandleDelete" disabled="@(PersonalData == null)">
+                <i class="fas fa-trash"></i>
+                Sterge
+            </button>
+        </div>
+    </div>
+</div>

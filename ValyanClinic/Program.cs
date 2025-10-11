@@ -6,6 +6,7 @@ using ValyanClinic.Infrastructure.Repositories;
 using ValyanClinic.Infrastructure.Caching;
 using ValyanClinic.Domain.Interfaces.Repositories;
 using ValyanClinic.Components.Layout;
+using ValyanClinic.Services.DataGrid;
 using MediatR;
 
 // ========================================
@@ -29,10 +30,16 @@ try
     builder.Host.UseSerilog();
 
     // ========================================
-    // BLAZOR SERVICES - SIMPLIFIED
+    // BLAZOR SERVICES - WITH DETAILED ERRORS
     // ========================================
     builder.Services.AddRazorComponents()
-        .AddInteractiveServerComponents();
+        .AddInteractiveServerComponents(options =>
+        {
+            options.DetailedErrors = builder.Environment.IsDevelopment();
+            options.DisconnectedCircuitMaxRetained = 100;
+            options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
+            options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
+        });
 
     // ========================================
     // SYNCFUSION
@@ -58,6 +65,7 @@ try
     // ========================================
     builder.Services.AddScoped<IPersonalRepository, PersonalRepository>();
     builder.Services.AddScoped<IPersonalMedicalRepository, PersonalMedicalRepository>();
+    builder.Services.AddScoped<IOcupatieISCORepository, OcupatieISCORepository>();
 
     // ========================================
     // CACHING
@@ -83,6 +91,13 @@ try
     // LAYOUT SERVICES
     // ========================================
     builder.Services.AddScoped<BreadcrumbService>();
+
+    // ========================================
+    // DATAGRID SERVICES
+    // ========================================
+    builder.Services.AddScoped(typeof(IDataGridStateService<>), typeof(DataGridStateService<>));
+    builder.Services.AddScoped<IFilterOptionsService, FilterOptionsService>();
+    builder.Services.AddScoped<IDataFilterService, DataFilterService>();
 
     // ========================================
     // HEALTH CHECKS

@@ -6,9 +6,9 @@ using ValyanClinic.Domain.Interfaces.Repositories;
 namespace ValyanClinic.Application.Features.PersonalManagement.Queries.GetPersonalList;
 
 /// <summary>
-/// Handler pentru GetPersonalListQuery - ALINIAT CU DB REALA
+/// Handler pentru GetPersonalListQuery cu server-side paging, sorting si filtering
 /// </summary>
-public class GetPersonalListQueryHandler : IRequestHandler<GetPersonalListQuery, Result<IEnumerable<PersonalListDto>>>
+public class GetPersonalListQueryHandler : IRequestHandler<GetPersonalListQuery, PagedResult<PersonalListDto>>
 {
     private readonly IPersonalRepository _personalRepository;
     private readonly ILogger<GetPersonalListQueryHandler> _logger;
@@ -21,17 +21,50 @@ public class GetPersonalListQueryHandler : IRequestHandler<GetPersonalListQuery,
         _logger = logger;
     }
 
-    public async Task<Result<IEnumerable<PersonalListDto>>> Handle(GetPersonalListQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResult<PersonalListDto>> Handle(GetPersonalListQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            _logger.LogInformation("Obtin lista completa de personal");
+            _logger.LogInformation(
+                "Obtin lista de personal: Page={Page}, Size={Size}, Search={Search}, Status={Status}, Dept={Dept}, Functie={Functie}, Judet={Judet}, Sort={Sort} {Dir}",
+                request.PageNumber, request.PageSize, request.GlobalSearchText, 
+                request.FilterStatus, request.FilterDepartament, request.FilterFunctie, request.FilterJudet,
+                request.SortColumn, request.SortDirection);
 
+            // Get total count first (for pagination metadata)
+            var totalCount = await _personalRepository.GetCountAsync(
+                searchText: request.GlobalSearchText,
+                departament: request.FilterDepartament,
+                status: request.FilterStatus,
+                functie: request.FilterFunctie,
+                judet: request.FilterJudet,
+                cancellationToken: cancellationToken);
+
+            // If no results, return empty paged result
+            if (totalCount == 0)
+            {
+                _logger.LogInformation("Nu au fost gasite rezultate");
+                return PagedResult<PersonalListDto>.Success(
+                    Enumerable.Empty<PersonalListDto>(),
+                    request.PageNumber,
+                    request.PageSize,
+                    0);
+            }
+
+            // Get paged data with server-side filtering and sorting
             var personalList = await _personalRepository.GetAllAsync(
-                pageNumber: 1,
-                pageSize: 1000, // Temporary - trebuie adaugat paginare in query
+                pageNumber: request.PageNumber,
+                pageSize: request.PageSize,
+                searchText: request.GlobalSearchText,
+                departament: request.FilterDepartament,
+                status: request.FilterStatus,
+                functie: request.FilterFunctie,
+                judet: request.FilterJudet,
+                sortColumn: request.SortColumn,
+                sortDirection: request.SortDirection,
                 cancellationToken: cancellationToken);
             
+            // Map to DTOs
             var dtoList = personalList.Select(p => new PersonalListDto
             {
                 Id_Personal = p.Id_Personal,
@@ -49,14 +82,21 @@ public class GetPersonalListQueryHandler : IRequestHandler<GetPersonalListQuery,
                 Departament = p.Departament
             }).ToList();
 
-            _logger.LogInformation("Lista de personal obtinuta cu succes: {Count} angajati", dtoList.Count);
+            _logger.LogInformation(
+                "Lista de personal obtinuta cu succes: {Count} din {Total} angajati",
+                dtoList.Count, totalCount);
 
-            return Result<IEnumerable<PersonalListDto>>.Success(dtoList);
+            return PagedResult<PersonalListDto>.Success(
+                dtoList,
+                request.PageNumber,
+                request.PageSize,
+                totalCount,
+                $"S-au gasit {totalCount} angajati");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Eroare la obtinerea listei de personal");
-            return Result<IEnumerable<PersonalListDto>>.Failure($"Eroare la obtinerea listei de angajati: {ex.Message}");
+            return PagedResult<PersonalListDto>.Failure($"Eroare la obtinerea listei de angajati: {ex.Message}");
         }
     }
 }

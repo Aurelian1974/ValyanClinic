@@ -5,7 +5,7 @@
 
 param(
     [Parameter(Mandatory=$false)]
-    [string]$ConfigPath = "..\ValyanClinic\appsettings.json"
+    [string]$ConfigPath = "..\..\..\ValyanClinic\appsettings.json"
 )
 
 Write-Host "========================================" -ForegroundColor Cyan

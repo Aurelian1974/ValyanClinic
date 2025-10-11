@@ -31,13 +31,20 @@ BEGIN
     DECLARE @CountSQL NVARCHAR(MAX);
     DECLARE @WhereClause NVARCHAR(MAX) = ' WHERE 1=1 ';
     
-    -- Construieste WHERE clause dinamic
+    -- Construieste WHERE clause dinamic cu cautare globala extinsa
     IF @SearchText IS NOT NULL AND LEN(@SearchText) > 0
     BEGIN
         SET @WhereClause = @WhereClause + 
             ' AND (Nume LIKE ''%' + @SearchText + '%'' 
                OR Prenume LIKE ''%' + @SearchText + '%'' 
-               OR Email_Personal LIKE ''%' + @SearchText + '%'') ';
+               OR Cod_Angajat LIKE ''%' + @SearchText + '% ''
+               OR CNP LIKE ''%' + @SearchText + '% ''
+               OR Telefon_Personal LIKE ''%' + @SearchText + '% ''
+               OR Telefon_Serviciu LIKE ''%' + @SearchText + '% ''
+               OR Email_Personal LIKE ''%' + @SearchText + '% ''
+               OR Email_Serviciu LIKE ''%' + @SearchText + '% ''
+               OR Functia LIKE ''%' + @SearchText + '% ''
+               OR Departament LIKE ''%' + @SearchText + '%'') ';
     END
     
     IF @Departament IS NOT NULL AND LEN(@Departament) > 0

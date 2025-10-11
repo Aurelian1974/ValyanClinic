@@ -16,6 +16,8 @@ public interface IPersonalRepository
         string? searchText = null,
         string? departament = null,
         string? status = null,
+        string? functie = null,
+        string? judet = null,
         string sortColumn = "Nume",
         string sortDirection = "ASC",
         CancellationToken cancellationToken = default);
@@ -24,6 +26,8 @@ public interface IPersonalRepository
         string? searchText = null,
         string? departament = null,
         string? status = null,
+        string? functie = null,
+        string? judet = null,
         CancellationToken cancellationToken = default);
     
     Task<(string name, int value, string iconClass, string colorClass)[]> GetStatisticsAsync(
