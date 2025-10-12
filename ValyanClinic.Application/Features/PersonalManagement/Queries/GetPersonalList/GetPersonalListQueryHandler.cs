@@ -78,6 +78,7 @@ public class GetPersonalListQueryHandler : IRequestHandler<GetPersonalListQuery,
                 Status_Angajat = p.Status_Angajat,
                 Judet_Domiciliu = p.Judet_Domiciliu,
                 Oras_Domiciliu = p.Oras_Domiciliu,
+                Adresa_Domiciliu = p.Adresa_Domiciliu,
                 Functia = p.Functia,
                 Departament = p.Departament
             }).ToList();

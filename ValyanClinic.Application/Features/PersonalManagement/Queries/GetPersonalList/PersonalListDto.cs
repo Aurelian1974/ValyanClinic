@@ -19,8 +19,13 @@ public class PersonalListDto
     // Informatii despre locatie
     public string Judet_Domiciliu { get; set; } = string.Empty;
     public string Oras_Domiciliu { get; set; } = string.Empty;
+    public string Adresa_Domiciliu { get; set; } = string.Empty;
     
     // Pozitie
     public string Functia { get; set; } = string.Empty;
     public string? Departament { get; set; }
+    
+    public string AdresaCompleta => !string.IsNullOrWhiteSpace(Oras_Domiciliu) || !string.IsNullOrWhiteSpace(Adresa_Domiciliu)
+        ? $"{Oras_Domiciliu}{(!string.IsNullOrWhiteSpace(Oras_Domiciliu) && !string.IsNullOrWhiteSpace(Adresa_Domiciliu) ? ", " : "")}{Adresa_Domiciliu}"
+        : string.Empty;
 }

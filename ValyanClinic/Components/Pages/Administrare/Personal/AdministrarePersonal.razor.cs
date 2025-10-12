@@ -32,14 +32,26 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     private PersonalFormModal? personalFormModal;
     private ConfirmDeleteModal? confirmDeleteModal;
 
-    // Data for Syncfusion Grid (all data loaded once)
-    private List<PersonalListDto> AllPersonalData { get; set; } = new();
-    private List<PersonalListDto> OriginalData { get; set; } = new();
-    private int TotalRecords { get; set; } = 0;
+    // SERVER-SIDE PAGING: Data pentru pagina curenta
+    private List<PersonalListDto> CurrentPageData { get; set; } = new();
     
-    // Page settings for Syncfusion Grid
-    private int DefaultPageSize { get; set; } = 20;
-    private int[] PageSizeArray = { 10, 20, 50, 100 };
+    // SERVER-SIDE PAGING: Metadata
+    private int CurrentPage { get; set; } = 1;
+    private int CurrentPageSize { get; set; } = 20;
+    private int TotalRecords { get; set; } = 0;
+    private int TotalPages => TotalRecords > 0 && CurrentPageSize > 0 
+        ? (int)Math.Ceiling((double)TotalRecords / CurrentPageSize) 
+        : 1;
+    
+    // SERVER-SIDE PAGING: Limits
+    private const int MinPageSize = 10;
+    private const int MaxPageSize = 1000;
+    private const int DefaultPageSizeValue = 20;
+    private int[] PageSizeArray = { 10, 20, 50, 100, 250, 500, 1000 };
+    
+    // SERVER-SIDE SORTING: State
+    private string CurrentSortColumn { get; set; } = "Nume";
+    private string CurrentSortDirection { get; set; } = "ASC";
     
     private PersonalListDto? SelectedPersonal { get; set; }
 
@@ -59,12 +71,14 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     // Debounce timer for global search
     private CancellationTokenSource? _searchDebounceTokenSource;
     private const int SearchDebounceMs = 500;
+    private bool _disposed = false;
 
-    // Filter Options - loaded from server
+    // CACHED Filter Options - loaded once
     private List<FilterOption> StatusOptions { get; set; } = new();
     private List<FilterOption> DepartamentOptions { get; set; } = new();
     private List<FilterOption> FunctieOptions { get; set; } = new();
     private List<FilterOption> JudetOptions { get; set; } = new();
+    private bool FilterOptionsLoaded { get; set; } = false;
 
     // Toast properties
     private string ToastTitle { get; set; } = string.Empty;
@@ -78,12 +92,23 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         (string.IsNullOrEmpty(FilterJudet) ? 0 : 1) +
         (string.IsNullOrEmpty(GlobalSearchText) ? 0 : 1);
 
+    // Pager helper properties
+    private bool HasPreviousPage => CurrentPage > 1;
+    private bool HasNextPage => CurrentPage < TotalPages;
+    private int DisplayedRecordsStart => TotalRecords > 0 ? ((CurrentPage - 1) * CurrentPageSize) + 1 : 0;
+    private int DisplayedRecordsEnd => Math.Min(CurrentPage * CurrentPageSize, TotalRecords);
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Logger.LogInformation("Initializare pagina Administrare Personal cu Syncfusion Paging");
-            await LoadAllData();
+            Logger.LogInformation("Initializare pagina Administrare Personal cu SERVER-SIDE paging");
+            
+            // Load filter options first (cached)
+            await LoadFilterOptionsFromServer();
+            
+            // Load first page
+            await LoadPagedData();
         }
         catch (Exception ex)
         {
@@ -97,11 +122,28 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     public void Dispose()
     {
-        _searchDebounceTokenSource?.Cancel();
-        _searchDebounceTokenSource?.Dispose();
+        if (_disposed) return;
+        
+        try
+        {
+            _searchDebounceTokenSource?.Cancel();
+            _searchDebounceTokenSource?.Dispose();
+            _searchDebounceTokenSource = null;
+            
+            Logger.LogDebug("AdministrarePersonal disposed successfully");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la dispose-ul AdministrarePersonal");
+        }
+        finally
+        {
+            _disposed = true;
+        }
     }
 
-    private async Task LoadAllData()
+    // SERVER-SIDE PAGING: Load data pentru pagina curenta
+    private async Task LoadPagedData()
     {
         try
         {
@@ -109,48 +151,55 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
             HasError = false;
             ErrorMessage = null;
 
-            Logger.LogInformation("Incarcare toate datele personal pentru grid cu paging nativ");
+            // Validate PageSize limits
+            if (CurrentPageSize < MinPageSize) CurrentPageSize = MinPageSize;
+            if (CurrentPageSize > MaxPageSize) CurrentPageSize = MaxPageSize;
 
-            // Load all data at once (without pagination for client-side operations)
+            Logger.LogInformation(
+                "SERVER-SIDE Load: Page={Page}, Size={Size}, Search='{Search}', Filters: Status={Status}, Dept={Dept}, Func={Func}, Judet={Judet}, Sort={Sort} {Dir}",
+                CurrentPage, CurrentPageSize, GlobalSearchText, FilterStatus, FilterDepartament, 
+                FilterFunctie, FilterJudet, CurrentSortColumn, CurrentSortDirection);
+
             var query = new GetPersonalListQuery
             {
-                PageNumber = 1,
-                PageSize = int.MaxValue, // Get all records
-                GlobalSearchText = null, // Don't apply server-side search initially
-                FilterStatus = null,
-                FilterDepartament = null,
-                FilterFunctie = null,
-                FilterJudet = null,
-                SortColumn = "Nume", // Default sort
-                SortDirection = "ASC"
+                PageNumber = CurrentPage,
+                PageSize = CurrentPageSize,
+                GlobalSearchText = string.IsNullOrWhiteSpace(GlobalSearchText) ? null : GlobalSearchText,
+                FilterStatus = FilterStatus,
+                FilterDepartament = FilterDepartament,
+                FilterFunctie = FilterFunctie,
+                FilterJudet = FilterJudet,
+                SortColumn = CurrentSortColumn,
+                SortDirection = CurrentSortDirection
             };
 
             var result = await Mediator.Send(query);
 
-            if (result.IsSuccess && result.Value != null)
+            if (result.IsSuccess)
             {
-                OriginalData = result.Value.ToList();
-                AllPersonalData = new List<PersonalListDto>(OriginalData);
-                TotalRecords = OriginalData.Count;
+                CurrentPageData = result.Value?.ToList() ?? new List<PersonalListDto>();
+                TotalRecords = result.TotalCount;
                 
-                Logger.LogInformation("Toate datele incarcate cu succes: {Count} angajati", TotalRecords);
-                
-                // Load filter options
-                if (OriginalData.Any())
+                // Adjust CurrentPage daca este out of bounds
+                if (TotalPages > 0 && CurrentPage > TotalPages)
                 {
-                    await LoadFilterOptions();
+                    Logger.LogWarning("CurrentPage {Page} > TotalPages {Total}, ajustare la ultima pagina", 
+                        CurrentPage, TotalPages);
+                    CurrentPage = TotalPages;
+                    await LoadPagedData(); // Reload cu pagina corecta
+                    return;
                 }
-
-                // Apply client-side filtering (initially no filters, so shows all data)
-                ApplyClientSideFiltering();
+                
+                Logger.LogInformation(
+                    "SERVER-SIDE Data loaded: Page {Page}/{Total}, Records {Start}-{End} din {TotalRecords}",
+                    CurrentPage, TotalPages, DisplayedRecordsStart, DisplayedRecordsEnd, TotalRecords);
             }
             else
             {
                 HasError = true;
                 ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare necunoscuta" });
                 Logger.LogWarning("Eroare la incarcarea datelor: {Message}", ErrorMessage);
-                AllPersonalData = new List<PersonalListDto>();
-                OriginalData = new List<PersonalListDto>();
+                CurrentPageData = new List<PersonalListDto>();
                 TotalRecords = 0;
             }
         }
@@ -159,8 +208,7 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
             HasError = true;
             ErrorMessage = $"Eroare neasteptata: {ex.Message}";
             Logger.LogError(ex, "Eroare la incarcarea datelor personal");
-            AllPersonalData = new List<PersonalListDto>();
-            OriginalData = new List<PersonalListDto>();
+            CurrentPageData = new List<PersonalListDto>();
             TotalRecords = 0;
         }
         finally
@@ -170,92 +218,55 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         }
     }
 
-    private void ApplyClientSideFiltering()
+    // CACHED Filter Options - incarca o singura data
+    private async Task LoadFilterOptionsFromServer()
     {
+        if (FilterOptionsLoaded) return; // Already loaded
+        
         try
         {
-            var filteredData = OriginalData.AsEnumerable();
+            Logger.LogInformation("Incarcare filter options de pe server (CACHED)...");
             
-            // Apply global search
-            if (!string.IsNullOrEmpty(GlobalSearchText))
+            // Load toate datele DOAR pentru filter options (fara paging)
+            var query = new GetPersonalListQuery
             {
-                var searchLower = GlobalSearchText.ToLowerInvariant();
-                filteredData = filteredData.Where(p => 
-                    (p.Nume?.ToLowerInvariant().Contains(searchLower) ?? false) ||
-                    (p.Prenume?.ToLowerInvariant().Contains(searchLower) ?? false) ||
-                    (p.CNP?.ToLowerInvariant().Contains(searchLower) ?? false) ||
-                    (p.Email_Personal?.ToLowerInvariant().Contains(searchLower) ?? false) ||
-                    (p.Telefon_Personal?.ToLowerInvariant().Contains(searchLower) ?? false) ||
-                    (p.Functia?.ToLowerInvariant().Contains(searchLower) ?? false) ||
-                    (p.Departament?.ToLowerInvariant().Contains(searchLower) ?? false)
-                );
-            }
+                PageNumber = 1,
+                PageSize = int.MaxValue, // Get ALL for filter options
+                GlobalSearchText = null,
+                FilterStatus = null,
+                FilterDepartament = null,
+                FilterFunctie = null,
+                FilterJudet = null,
+                SortColumn = "Nume",
+                SortDirection = "ASC"
+            };
 
-            // Apply specific filters
-            if (!string.IsNullOrEmpty(FilterStatus))
+            var result = await Mediator.Send(query);
+
+            if (result.IsSuccess && result.Value != null && result.Value.Any())
             {
-                filteredData = filteredData.Where(p => p.Status_Angajat == FilterStatus);
-            }
-
-            if (!string.IsNullOrEmpty(FilterDepartament))
-            {
-                filteredData = filteredData.Where(p => p.Departament == FilterDepartament);
-            }
-
-            if (!string.IsNullOrEmpty(FilterFunctie))
-            {
-                filteredData = filteredData.Where(p => p.Functia == FilterFunctie);
-            }
-
-            if (!string.IsNullOrEmpty(FilterJudet))
-            {
-                filteredData = filteredData.Where(p => p.Judet_Domiciliu == FilterJudet);
-            }
-
-            // Update the grid data source
-            AllPersonalData = filteredData.ToList();
-            TotalRecords = AllPersonalData.Count;
-            
-            Logger.LogInformation("Client-side filtering applied. Rezultate: {Count} din {Total}", 
-                AllPersonalData.Count, OriginalData.Count);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Eroare la aplicarea filtrelor client-side");
-            // În caz de eroare, păstrează datele originale
-            AllPersonalData = new List<PersonalListDto>(OriginalData);
-            TotalRecords = OriginalData.Count;
-        }
-    }
-
-    private async Task LoadFilterOptions()
-    {
-        try
-        {
-            Logger.LogInformation("Generare optiuni de filtrare din datele incarcate...");
-            
-            if (OriginalData.Any())
-            {
-                StatusOptions = FilterOptionsService.GenerateOptions(OriginalData, p => p.Status_Angajat);
-                DepartamentOptions = FilterOptionsService.GenerateOptions(OriginalData, p => p.Departament);
-                FunctieOptions = FilterOptionsService.GenerateOptions(OriginalData, p => p.Functia);
-                JudetOptions = FilterOptionsService.GenerateOptions(OriginalData, p => p.Judet_Domiciliu);
+                var allData = result.Value.ToList();
                 
-                Logger.LogInformation("Optiuni filtrare generate: Status={StatusCount}, Dept={DeptCount}, Func={FuncCount}, Judet={JudetCount}",
+                StatusOptions = FilterOptionsService.GenerateOptions(allData, p => p.Status_Angajat);
+                DepartamentOptions = FilterOptionsService.GenerateOptions(allData, p => p.Departament);
+                FunctieOptions = FilterOptionsService.GenerateOptions(allData, p => p.Functia);
+                JudetOptions = FilterOptionsService.GenerateOptions(allData, p => p.Judet_Domiciliu);
+                
+                FilterOptionsLoaded = true;
+                
+                Logger.LogInformation(
+                    "Filter options CACHED: Status={StatusCount}, Dept={DeptCount}, Func={FuncCount}, Judet={JudetCount}",
                     StatusOptions.Count, DepartamentOptions.Count, FunctieOptions.Count, JudetOptions.Count);
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Eroare la generarea optiunilor de filtrare");
-            // În caz de eroare, inițializează liste goale
+            Logger.LogError(ex, "Eroare la incarcarea filter options");
             StatusOptions = new List<FilterOption>();
             DepartamentOptions = new List<FilterOption>();
             FunctieOptions = new List<FilterOption>();
             JudetOptions = new List<FilterOption>();
         }
-        
-        await Task.CompletedTask;
     }
 
     private void ToggleAdvancedFilter()
@@ -269,22 +280,18 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     {
         var newValue = e.Value?.ToString() ?? string.Empty;
         
-        // Previne bucla infinita - nu face nimic daca valoarea nu s-a schimbat
-        if (newValue == GlobalSearchText)
-            return;
+        if (newValue == GlobalSearchText) return;
         
         GlobalSearchText = newValue;
         
         Logger.LogInformation("Search input changed: '{SearchText}'", GlobalSearchText);
         
-        // Anulează task-ul anterior de debounce
         _searchDebounceTokenSource?.Cancel();
         _searchDebounceTokenSource?.Dispose();
         _searchDebounceTokenSource = new CancellationTokenSource();
 
         var localToken = _searchDebounceTokenSource.Token;
 
-        // Executa search dupa debounce
         _ = Task.Run(async () =>
         {
             try
@@ -293,12 +300,12 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
                 
                 if (!localToken.IsCancellationRequested)
                 {
-                    Logger.LogInformation("Executing client-side search for: '{SearchText}'", GlobalSearchText);
+                    Logger.LogInformation("Executing SERVER-SIDE search for: '{SearchText}'", GlobalSearchText);
                     
-                    await InvokeAsync(() =>
+                    await InvokeAsync(async () =>
                     {
-                        ApplyClientSideFiltering();
-                        StateHasChanged();
+                        CurrentPage = 1; // Reset to first page when searching
+                        await LoadPagedData();
                     });
                 }
             }
@@ -315,16 +322,14 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task OnSearchKeyDown(KeyboardEventArgs e)
     {
-        // Daca apasa Enter, executa imediat cautarea fara debounce
         if (e.Key == "Enter")
         {
             _searchDebounceTokenSource?.Cancel();
             
-            Logger.LogInformation("Enter pressed - executing immediate search: '{SearchText}'", GlobalSearchText);
+            Logger.LogInformation("Enter pressed - executing immediate SERVER-SIDE search: '{SearchText}'", GlobalSearchText);
             
-            ApplyClientSideFiltering();
-            StateHasChanged();
-            await Task.CompletedTask;
+            CurrentPage = 1; // Reset to first page
+            await LoadPagedData();
         }
     }
 
@@ -332,23 +337,21 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     {
         Logger.LogInformation("Clearing search text");
         
-        // Anulează orice search in curs
         _searchDebounceTokenSource?.Cancel();
         
         GlobalSearchText = string.Empty;
-        ApplyClientSideFiltering();
-        StateHasChanged();
-        await Task.CompletedTask;
+        CurrentPage = 1;
+        await LoadPagedData();
     }
 
     private async Task ApplyFilters()
     {
-        Logger.LogInformation("Applying client-side filters: GlobalSearch={Search}, Status={Status}, Dept={Dept}",
-            GlobalSearchText, FilterStatus, FilterDepartament);
+        Logger.LogInformation(
+            "Applying SERVER-SIDE filters: GlobalSearch={Search}, Status={Status}, Dept={Dept}, Func={Func}, Judet={Judet}",
+            GlobalSearchText, FilterStatus, FilterDepartament, FilterFunctie, FilterJudet);
 
-        ApplyClientSideFiltering();
-        StateHasChanged();
-        await Task.CompletedTask;
+        CurrentPage = 1; // Reset to first page when filtering
+        await LoadPagedData();
     }
 
     private async Task ClearAllFilters()
@@ -361,9 +364,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         FilterFunctie = null;
         FilterJudet = null;
 
-        ApplyClientSideFiltering();
-        StateHasChanged();
-        await Task.CompletedTask;
+        CurrentPage = 1;
+        await LoadPagedData();
     }
 
     private async Task ClearFilter(string filterName)
@@ -389,13 +391,19 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
                 break;
         }
 
-        await ApplyFilters();
+        CurrentPage = 1;
+        await LoadPagedData();
     }
 
     private async Task HandleRefresh()
     {
-        Logger.LogInformation("Refresh date personal");
-        await LoadAllData();
+        Logger.LogInformation("Refresh date personal - SERVER-SIDE reload");
+        
+        // Clear cached filter options pentru a reincarca cu date noi
+        FilterOptionsLoaded = false;
+        await LoadFilterOptionsFromServer();
+        
+        await LoadPagedData();
         await ShowToast("Succes", "Datele au fost reincarcate cu succes", "e-toast-success");
     }
 
@@ -409,7 +417,88 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         }
     }
 
-    #region Grid Selection Events
+    #region Paging Methods
+
+    private async Task GoToPage(int pageNumber)
+    {
+        if (pageNumber < 1 || pageNumber > TotalPages) return;
+        
+        Logger.LogInformation("Navigare la pagina {Page}", pageNumber);
+        CurrentPage = pageNumber;
+        await LoadPagedData();
+    }
+
+    private async Task GoToFirstPage()
+    {
+        await GoToPage(1);
+    }
+
+    private async Task GoToLastPage()
+    {
+        await GoToPage(TotalPages);
+    }
+
+    private async Task GoToPreviousPage()
+    {
+        if (HasPreviousPage)
+        {
+            await GoToPage(CurrentPage - 1);
+        }
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (HasNextPage)
+        {
+            await GoToPage(CurrentPage + 1);
+        }
+    }
+
+    private async Task OnPageSizeChanged(int newPageSize)
+    {
+        if (newPageSize < MinPageSize || newPageSize > MaxPageSize)
+        {
+            Logger.LogWarning("PageSize invalid: {Size}, using default", newPageSize);
+            newPageSize = DefaultPageSizeValue;
+        }
+        
+        Logger.LogInformation("PageSize changed: {OldSize} -> {NewSize}", CurrentPageSize, newPageSize);
+        
+        CurrentPageSize = newPageSize;
+        CurrentPage = 1; // Reset to first page
+        await LoadPagedData();
+    }
+
+    private async Task OnPageSizeChangedNative(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int newPageSize))
+        {
+            await OnPageSizeChanged(newPageSize);
+        }
+    }
+
+    private (int start, int end) GetPagerRange(int visiblePages = 5)
+    {
+        if (TotalPages <= visiblePages)
+        {
+            return (1, TotalPages);
+        }
+
+        var halfVisible = visiblePages / 2;
+        var start = Math.Max(1, CurrentPage - halfVisible);
+        var end = Math.Min(TotalPages, start + visiblePages - 1);
+
+        if (end - start + 1 < visiblePages)
+        {
+            start = Math.Max(1, end - visiblePages + 1);
+        }
+
+        return (start, end);
+    }
+
+    #endregion
+
+    #region Grid Events - Syncfusion
 
     private void OnRowSelected(RowSelectEventArgs<PersonalListDto> args)
     {
@@ -426,6 +515,31 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         StateHasChanged();
     }
 
+    private async Task OnGridActionBegin(ActionEventArgs<PersonalListDto> args)
+    {
+        // Handle sorting
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.Sorting)
+        {
+            args.Cancel = true; // Cancel client-side sorting
+            
+            if (args is { Data: not null })
+            {
+                var sortingColumns = (args.Data as IEnumerable<object>)?.Cast<dynamic>().ToList();
+                if (sortingColumns?.Any() == true)
+                {
+                    var sortCol = sortingColumns[0];
+                    CurrentSortColumn = sortCol.Name?.ToString() ?? "Nume";
+                    CurrentSortDirection = sortCol.Direction?.ToString()?.ToUpper() ?? "ASC";
+                    
+                    Logger.LogInformation("SERVER-SIDE Sort: {Column} {Direction}", 
+                        CurrentSortColumn, CurrentSortDirection);
+                    
+                    await LoadPagedData();
+                }
+            }
+        }
+    }
+
     #endregion
 
     #region Toolbar Action Methods
@@ -433,102 +547,228 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     private async Task HandleViewSelected()
     {
         if (SelectedPersonal == null) return;
-        
-        Logger.LogInformation("Vizualizare personal: {PersonalId}", SelectedPersonal.Id_Personal);
-        
-        // Open modal instead of navigation
-        if (personalViewModal != null)
-        {
-            await personalViewModal.Open(SelectedPersonal.Id_Personal);
-        }
-        
-        await Task.CompletedTask;
+        await OpenViewModalAsync(SelectedPersonal.Id_Personal, SelectedPersonal.NumeComplet);
     }
 
     private async Task HandleEditSelected()
     {
         if (SelectedPersonal == null) return;
-        
-        Logger.LogInformation("Editare personal: {PersonalId}", SelectedPersonal.Id_Personal);
-        
-        if (personalFormModal != null)
-        {
-            await personalFormModal.OpenForEdit(SelectedPersonal.Id_Personal);
-        }
-        
-        await Task.CompletedTask;
+        await OpenEditModalAsync(SelectedPersonal.Id_Personal, SelectedPersonal.NumeComplet);
     }
 
     private async Task HandleDeleteSelected()
     {
         if (SelectedPersonal == null) return;
-        
-        Logger.LogInformation("Stergere personal: {PersonalId}", SelectedPersonal.Id_Personal);
-        
-        if (confirmDeleteModal != null)
+        await OpenDeleteModalAsync(SelectedPersonal.Id_Personal, SelectedPersonal.NumeComplet);
+    }
+
+    #endregion
+
+    #region Modal Event Handlers
+
+    private async Task HandleEditFromModal(Guid personalId)
+    {
+        if (!ValidatePersonalId(personalId, "HandleEditFromModal"))
         {
-            await confirmDeleteModal.Open(SelectedPersonal.Id_Personal, SelectedPersonal.NumeComplet);
+            await ShowErrorToastAsync("ID invalid pentru editare");
+            return;
+        }
+
+        var personal = CurrentPageData.FirstOrDefault(p => p.Id_Personal == personalId);
+        await OpenEditModalAsync(personalId, personal?.NumeComplet ?? "Unknown");
+    }
+
+    private async Task HandleDeleteFromModal(Guid personalId)
+    {
+        var personal = CurrentPageData.FirstOrDefault(p => p.Id_Personal == personalId);
+        if (personal != null)
+        {
+            await OpenDeleteModalAsync(personalId, personal.NumeComplet);
+        }
+    }
+
+    private async Task HandlePersonalSaved()
+    {
+        LogOperation("Personal salvat", additionalInfo: "Reincarcam datele");
+        
+        // Invalidate cached filter options
+        FilterOptionsLoaded = false;
+        await LoadFilterOptionsFromServer();
+        
+        await LoadPagedData();
+        await ShowSuccessToastAsync("Personal salvat cu succes");
+    }
+
+    private async Task HandleDeleteConfirmed(Guid personalId)
+    {
+        LogOperation("Confirmare stergere", personalId);
+        
+        try
+        {
+            var command = new DeletePersonalCommand(personalId, "CurrentUser");
+            var result = await Mediator.Send(command);
+            
+            if (result.IsSuccess)
+            {
+                LogOperation("Stergere reusita", personalId);
+                
+                // Invalidate cached filter options
+                FilterOptionsLoaded = false;
+                await LoadFilterOptionsFromServer();
+                
+                await LoadPagedData();
+                await ShowSuccessToastAsync("Personal sters cu succes");
+            }
+            else
+            {
+                await HandleOperationFailureAsync("stergere", result.Errors);
+            }
+        }
+        catch (Exception ex)
+        {
+            await HandleOperationExceptionAsync("stergere", personalId, ex);
         }
     }
 
     #endregion
 
-    private async Task OnCommandClicked(CommandClickEventArgs<PersonalListDto> args)
+    #region Helper Methods - Modal Operations
+
+    private async Task OpenViewModalAsync(Guid personalId, string personalName)
     {
-        var personal = args.RowData;
-        var commandName = args.CommandColumn?.ButtonOption?.Content ?? "";
-
-        Logger.LogInformation("Comanda executata: {Command} pentru {PersonalId}", 
-            commandName, personal.Id_Personal);
-
-        switch (commandName)
+        LogOperation("Deschidere View Modal", personalId, personalName);
+        
+        if (personalViewModal == null)
         {
-            case "Vizualizeaza":
-                await HandleView(personal);
-                break;
-            case "Editeaza":
-                await HandleEdit(personal);
-                break;
-            case "Sterge":
-                await HandleDelete(personal);
-                break;
+            await HandleModalNotInitializedAsync("View Modal");
+            return;
+        }
+
+        try
+        {
+            await personalViewModal.Open(personalId);
+        }
+        catch (Exception ex)
+        {
+            await HandleModalOperationExceptionAsync("vizualizare", personalName, ex);
         }
     }
 
-    private async Task HandleView(PersonalListDto personal)
+    private async Task OpenEditModalAsync(Guid personalId, string personalName)
     {
-        Logger.LogInformation("Vizualizare personal: {PersonalId}", personal.Id_Personal);
+        LogOperation("Deschidere Edit Modal", personalId, personalName);
         
-        if (personalViewModal != null)
+        if (personalFormModal == null)
         {
-            await personalViewModal.Open(personal.Id_Personal);
+            await HandleModalNotInitializedAsync("Edit Modal");
+            return;
         }
-        
-        await Task.CompletedTask;
+
+        try
+        {
+            await personalFormModal.OpenForEdit(personalId);
+        }
+        catch (Exception ex)
+        {
+            await HandleModalOperationExceptionAsync("editare", personalName, ex);
+        }
     }
 
-    private async Task HandleEdit(PersonalListDto personal)
+    private async Task OpenDeleteModalAsync(Guid personalId, string personalName)
     {
-        Logger.LogInformation("Editare personal: {PersonalId}", personal.Id_Personal);
+        LogOperation("Deschidere Delete Modal", personalId, personalName);
         
-        if (personalFormModal != null)
+        if (confirmDeleteModal == null)
         {
-            await personalFormModal.OpenForEdit(personal.Id_Personal);
+            await HandleModalNotInitializedAsync("Delete Modal");
+            return;
         }
-        
-        await Task.CompletedTask;
+
+        try
+        {
+            await confirmDeleteModal.Open(personalId, personalName);
+        }
+        catch (Exception ex)
+        {
+            await HandleModalOperationExceptionAsync("stergere", personalName, ex);
+        }
     }
 
-    private async Task HandleDelete(PersonalListDto personal)
+    #endregion
+
+    #region Helper Methods - Error Handling
+
+    private bool ValidatePersonalId(Guid personalId, string context)
     {
-        Logger.LogInformation("Stergere personal: {PersonalId}", personal.Id_Personal);
-        
-        if (confirmDeleteModal != null)
+        if (personalId == Guid.Empty)
         {
-            await confirmDeleteModal.Open(personal.Id_Personal, personal.NumeComplet);
+            Logger.LogError("ID invalid in {Context}: Guid.Empty", context);
+            return false;
         }
-        
-        await Task.CompletedTask;
+        return true;
+    }
+
+    private async Task HandleModalNotInitializedAsync(string modalName)
+    {
+        Logger.LogError("Modal nu este initializat: {ModalName}", modalName);
+        await ShowErrorToastAsync($"{modalName} nu este initializat");
+    }
+
+    private async Task HandleModalOperationExceptionAsync(string operation, string personalName, Exception ex)
+    {
+        Logger.LogError(ex, "Eroare la {Operation} pentru {PersonalName}", operation, personalName);
+        await ShowErrorToastAsync($"Eroare la {operation}: {ex.Message}");
+    }
+
+    private async Task HandleOperationFailureAsync(string operation, List<string>? errors)
+    {
+        var errorMsg = string.Join(", ", errors ?? new List<string> { "Eroare necunoscuta" });
+        Logger.LogWarning("Eroare la {Operation}: {Errors}", operation, errorMsg);
+        await ShowErrorToastAsync(errorMsg);
+    }
+
+    private async Task HandleOperationExceptionAsync(string operation, Guid personalId, Exception ex)
+    {
+        Logger.LogError(ex, "Exceptie la {Operation} pentru {PersonalId}", operation, personalId);
+        await ShowErrorToastAsync($"Eroare la {operation}: {ex.Message}");
+    }
+
+    #endregion
+
+    #region Helper Methods - Logging
+
+    private void LogOperation(string operation, Guid? id = null, string? additionalInfo = null)
+    {
+        if (id.HasValue && !string.IsNullOrEmpty(additionalInfo))
+        {
+            Logger.LogInformation("{Operation}: {PersonalId} - {Info}", operation, id.Value, additionalInfo);
+        }
+        else if (id.HasValue)
+        {
+            Logger.LogInformation("{Operation}: {PersonalId}", operation, id.Value);
+        }
+        else if (!string.IsNullOrEmpty(additionalInfo))
+        {
+            Logger.LogInformation("{Operation}: {Info}", operation, additionalInfo);
+        }
+        else
+        {
+            Logger.LogInformation("{Operation}", operation);
+        }
+    }
+
+    #endregion
+
+    #region Helper Methods - Toast Notifications
+
+    private async Task ShowSuccessToastAsync(string message)
+    {
+        await ShowToast("Succes", message, "e-toast-success");
+    }
+
+    private async Task ShowErrorToastAsync(string message)
+    {
+        await ShowToast("Eroare", message, "e-toast-danger");
     }
 
     private async Task ShowToast(string title, string content, string cssClass)
@@ -540,83 +780,6 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
         if (ToastRef != null)
         {
             await ToastRef.ShowAsync();
-        }
-    }
-
-    #region Modal Event Handlers
-
-    /// <summary>
-    /// Handler pentru când se solicită editare din modal
-    /// </summary>
-    private async Task HandleEditFromModal(Guid personalId)
-    {
-        Logger.LogInformation("=== HandleEditFromModal called with ID: {PersonalId} ===", personalId);
-        
-        if (personalId == Guid.Empty)
-        {
-            Logger.LogError("=== CRITICAL: Received Guid.Empty in HandleEditFromModal! ===");
-            await ShowToast("Eroare", "ID invalid pentru editare", "e-toast-danger");
-            return;
-        }
-        
-        if (personalFormModal != null)
-        {
-            Logger.LogInformation("=== Calling personalFormModal.OpenForEdit with ID: {PersonalId} ===", personalId);
-            await personalFormModal.OpenForEdit(personalId);
-        }
-        else
-        {
-            Logger.LogError("=== CRITICAL: personalFormModal is NULL! ===");
-            await ShowToast("Eroare", "Modal nu este initializat", "e-toast-danger");
-        }
-    }
-
-    private async Task HandleDeleteFromModal(Guid personalId)
-    {
-        Logger.LogInformation("Stergere solicitata din modal pentru: {PersonalId}", personalId);
-        
-        var personal = AllPersonalData.FirstOrDefault(p => p.Id_Personal == personalId);
-        if (personal != null && confirmDeleteModal != null)
-        {
-            await confirmDeleteModal.Open(personalId, personal.NumeComplet);
-        }
-    }
-
-    private async Task HandlePersonalSaved()
-    {
-        Logger.LogInformation("Personal salvat cu succes - reincarcam datele");
-        
-        await LoadAllData();
-        await ShowToast("Succes", "Personal salvat cu succes", "e-toast-success");
-    }
-
-    private async Task HandleDeleteConfirmed(Guid personalId)
-    {
-        Logger.LogInformation("Confirmare stergere pentru: {PersonalId}", personalId);
-        
-        try
-        {
-            var command = new DeletePersonalCommand(personalId, "CurrentUser");
-            var result = await Mediator.Send(command);
-            
-            if (result.IsSuccess)
-            {
-                Logger.LogInformation("Personal sters cu succes: {PersonalId}", personalId);
-                
-                await LoadAllData();
-                await ShowToast("Succes", "Personal sters cu succes", "e-toast-success");
-            }
-            else
-            {
-                var errorMsg = string.Join(", ", result.Errors ?? new List<string> { "Eroare necunoscuta" });
-                Logger.LogWarning("Eroare la stergerea personalului: {Errors}", errorMsg);
-                await ShowToast("Eroare", errorMsg, "e-toast-danger");
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Eroare la stergerea personalului: {PersonalId}", personalId);
-            await ShowToast("Eroare", $"Eroare la stergere: {ex.Message}", "e-toast-danger");
         }
     }
 

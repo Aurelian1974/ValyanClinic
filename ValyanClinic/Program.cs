@@ -7,6 +7,8 @@ using ValyanClinic.Infrastructure.Caching;
 using ValyanClinic.Domain.Interfaces.Repositories;
 using ValyanClinic.Components.Layout;
 using ValyanClinic.Services.DataGrid;
+using ValyanClinic.Services.Caching;
+using ValyanClinic.Services.Security;
 using MediatR;
 
 // ========================================
@@ -73,6 +75,7 @@ try
     // ========================================
     builder.Services.AddMemoryCache();
     builder.Services.AddSingleton<ICacheService, MemoryCacheService>();
+    builder.Services.AddScoped<IQueryCacheService, QueryCacheService>();
 
     // ========================================
     // MEDIATR (CQRS)
@@ -99,6 +102,11 @@ try
     builder.Services.AddScoped(typeof(IDataGridStateService<>), typeof(DataGridStateService<>));
     builder.Services.AddScoped<IFilterOptionsService, FilterOptionsService>();
     builder.Services.AddScoped<IDataFilterService, DataFilterService>();
+
+    // ========================================
+    // SECURITY SERVICES
+    // ========================================
+    builder.Services.AddScoped<IHtmlSanitizerService, HtmlSanitizerService>();
 
     // ========================================
     // BUSINESS SERVICES
