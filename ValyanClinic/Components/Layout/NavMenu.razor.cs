@@ -13,6 +13,7 @@ public partial class NavMenu : ComponentBase
     // Expand/collapse state pentru categorii
     private bool isAdministrareExpanded = false;
     private bool isAdministrarePersonalExpanded = false;
+    private bool isAdministrareClinicaExpanded = false;
     private bool isProgramariExpanded = false;
     private bool isRapoarteExpanded = false;
     private bool isMonitorizareExpanded = false;
@@ -28,6 +29,7 @@ public partial class NavMenu : ComponentBase
         {
             isAdministrareExpanded = false;
             isAdministrarePersonalExpanded = false;
+            isAdministrareClinicaExpanded = false;
             isProgramariExpanded = false;
             isRapoarteExpanded = false;
             isMonitorizareExpanded = false;
@@ -51,6 +53,7 @@ public partial class NavMenu : ComponentBase
             if (!isAdministrareExpanded)
             {
                 isAdministrarePersonalExpanded = false;
+                isAdministrareClinicaExpanded = false;
             }
         }
     }
@@ -60,6 +63,14 @@ public partial class NavMenu : ComponentBase
         if (!isCollapsed && isAdministrareExpanded)
         {
             isAdministrarePersonalExpanded = !isAdministrarePersonalExpanded;
+        }
+    }
+
+    private void ToggleAdministrareClinica()
+    {
+        if (!isCollapsed && isAdministrareExpanded)
+        {
+            isAdministrareClinicaExpanded = !isAdministrareClinicaExpanded;
         }
     }
 
