@@ -87,13 +87,16 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
             Logger.LogInformation("Initializare pagina Administrare Personal Medical");
             await LoadPagedData();
         }
+        catch (ObjectDisposedException ex)
+        {
+            Logger.LogWarning(ex, "Component disposed during initialization (navigation away)");
+        }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Eroare la initializarea componentei");
             HasError = true;
             ErrorMessage = $"Eroare la initializare: {ex.Message}";
             IsLoading = false;
-            StateHasChanged();
         }
     }
 
@@ -121,6 +124,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task LoadPagedData()
     {
+        if (_disposed) return; // Guard check
+
         try
         {
             IsLoading = true;
@@ -155,6 +160,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
             var result = await Mediator.Send(query);
 
+            if (_disposed) return; // Check after async
+
             if (result.IsSuccess)
             {
                 CurrentPageData = result.Value?.ToList() ?? new List<PersonalMedicalListDto>();
@@ -184,23 +191,35 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
                 TotalRecords = 0;
             }
         }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Component disposed while loading data (navigation away)");
+        }
         catch (Exception ex)
         {
-            HasError = true;
-            ErrorMessage = $"Eroare neasteptata: {ex.Message}";
-            Logger.LogError(ex, "Eroare la incarcarea datelor");
-            CurrentPageData = new List<PersonalMedicalListDto>();
-            TotalRecords = 0;
+            if (!_disposed)
+            {
+                HasError = true;
+                ErrorMessage = $"Eroare neasteptata: {ex.Message}";
+                Logger.LogError(ex, "Eroare la incarcarea datelor");
+                CurrentPageData = new List<PersonalMedicalListDto>();
+                TotalRecords = 0;
+            }
         }
         finally
         {
-            IsLoading = false;
-            StateHasChanged();
+            if (!_disposed)
+            {
+                IsLoading = false;
+                StateHasChanged();
+            }
         }
     }
 
     private async Task ClearAllFilters()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Clearing all filters");
         
         GlobalSearchText = string.Empty;
@@ -214,6 +233,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task ClearFilter(string filterName)
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Clearing filter: {FilterName}", filterName);
 
         switch (filterName)
@@ -273,6 +294,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private void ToggleAdvancedFilter()
     {
+        if (_disposed) return;
+        
         IsAdvancedFilterExpanded = !IsAdvancedFilterExpanded;
         Logger.LogInformation("Advanced filter toggled: {State}", 
             IsAdvancedFilterExpanded ? "Expanded" : "Collapsed");
@@ -280,6 +303,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private void OnSearchInput(ChangeEventArgs e)
     {
+        if (_disposed) return;
+        
         var newValue = e.Value?.ToString() ?? string.Empty;
         
         if (newValue == GlobalSearchText) return;
@@ -300,14 +325,17 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
             {
                 await Task.Delay(SearchDebounceMs, localToken);
                 
-                if (!localToken.IsCancellationRequested)
+                if (!localToken.IsCancellationRequested && !_disposed)
                 {
                     Logger.LogInformation("Executing search for: '{SearchText}'", GlobalSearchText);
                     
                     await InvokeAsync(async () =>
                     {
-                        CurrentPage = 1;
-                        await LoadPagedData();
+                        if (!_disposed)
+                        {
+                            CurrentPage = 1;
+                            await LoadPagedData();
+                        }
                     });
                 }
             }
@@ -315,15 +343,24 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
             {
                 Logger.LogDebug("Search cancelled");
             }
+            catch (ObjectDisposedException)
+            {
+                Logger.LogDebug("Component disposed during search");
+            }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Eroare la executia search-ului");
+                if (!_disposed)
+                {
+                    Logger.LogError(ex, "Eroare la executia search-ului");
+                }
             }
         }, localToken);
     }
 
     private async Task OnSearchKeyDown(KeyboardEventArgs e)
     {
+        if (_disposed) return;
+        
         if (e.Key == "Enter")
         {
             _searchDebounceTokenSource?.Cancel();
@@ -337,6 +374,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task ClearSearch()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Clearing search");
         
         _searchDebounceTokenSource?.Cancel();
@@ -348,6 +387,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task ApplyFilters()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation(
             "Applying filters: Search={Search}, Dept={Dept}, Poz={Poz}, Activ={Activ}",
             GlobalSearchText, FilterDepartament, FilterPozitie, FilterEsteActiv);
@@ -358,6 +399,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task HandleRefresh()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Refresh personal medical");
         
         await LoadPagedData();
@@ -366,6 +409,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task HandleAddNew()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Opening modal for ADD PersonalMedical");
         
         if (personalMedicalFormModal != null)
@@ -376,11 +421,7 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task HandleViewSelected()
     {
-        if (SelectedPersonal == null)
-        {
-            await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
-            return;
-        }
+        if (_disposed || SelectedPersonal == null) return;
         
         Logger.LogInformation("Opening View modal for: {PersonalID}", SelectedPersonal.PersonalID);
         
@@ -392,11 +433,7 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task HandleEditSelected()
     {
-        if (SelectedPersonal == null)
-        {
-            await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
-            return;
-        }
+        if (_disposed || SelectedPersonal == null) return;
         
         Logger.LogInformation("Opening Edit modal for: {PersonalID}", SelectedPersonal.PersonalID);
         
@@ -408,11 +445,7 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task HandleDeleteSelected()
     {
-        if (SelectedPersonal == null)
-        {
-            await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
-            return;
-        }
+        if (_disposed || SelectedPersonal == null) return;
         
         Logger.LogInformation("Opening Delete modal for: {PersonalID} - {NumeComplet}", 
             SelectedPersonal.PersonalID, SelectedPersonal.NumeComplet);
@@ -426,6 +459,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
     // Modal event handlers
     private async Task HandleEditFromModal(Guid personalID)
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Edit requested from modal for: {PersonalID}", personalID);
         
         if (personalMedicalFormModal != null)
@@ -436,6 +471,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task HandleDeleteFromModal(Guid personalID)
     {
+        if (_disposed) return;
+        
         var personalMedical = CurrentPageData.FirstOrDefault(p => p.PersonalID == personalID);
         if (personalMedical != null && confirmDeleteModal != null)
         {
@@ -445,6 +482,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task HandlePersonalMedicalSaved()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("PersonalMedical saved - reloading data");
         await LoadPagedData();
         await ShowToast("Succes", "Personal medical salvat cu succes", "e-toast-success");
@@ -452,6 +491,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task HandleDeleteConfirmed(Guid personalID)
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Delete confirmed for: {PersonalID}", personalID);
         
         try
@@ -459,11 +500,13 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
             var command = new DeletePersonalMedicalCommand(personalID, "CurrentUser");
             var result = await Mediator.Send(command);
             
+            if (_disposed) return; // Check after async
+            
             if (result.IsSuccess)
             {
                 Logger.LogInformation("PersonalMedical deleted successfully: {PersonalID}", personalID);
                 await LoadPagedData();
-                await ShowToast("Succes", "Personal medical sters cu succes", "e-toast-success");
+                await ShowToast("Succes", "Personal medical sters cuSucces", "e-toast-success");
             }
             else
             {
@@ -472,15 +515,24 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
                 await ShowToast("Eroare", errorMsg, "e-toast-danger");
             }
         }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Component disposed during delete");
+        }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Exception during delete: {PersonalID}", personalID);
-            await ShowToast("Eroare", $"Eroare la stergere: {ex.Message}", "e-toast-danger");
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Exception during delete: {PersonalID}", personalID);
+                await ShowToast("Eroare", $"Eroare la stergere: {ex.Message}", "e-toast-danger");
+            }
         }
     }
 
     private async Task GoToPage(int pageNumber)
     {
+        if (_disposed) return;
+        
         if (pageNumber < 1 || pageNumber > TotalPages) return;
         
         Logger.LogInformation("Navigare la pagina {Page}", pageNumber);
@@ -516,6 +568,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task OnPageSizeChanged(int newPageSize)
     {
+        if (_disposed) return;
+        
         if (newPageSize < MinPageSize || newPageSize > MaxPageSize)
         {
             Logger.LogWarning("PageSize invalid: {Size}, using default", newPageSize);
@@ -558,6 +612,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private void OnRowSelected(RowSelectEventArgs<PersonalMedicalListDto> args)
     {
+        if (_disposed) return;
+        
         SelectedPersonal = args.Data;
         Logger.LogInformation("Personal medical selectat: {PersonalID} - {NumeComplet}", 
             SelectedPersonal?.PersonalID, SelectedPersonal?.NumeComplet);
@@ -566,6 +622,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private void OnRowDeselected(RowDeselectEventArgs<PersonalMedicalListDto> args)
     {
+        if (_disposed) return;
+        
         SelectedPersonal = null;
         Logger.LogInformation("Selectie anulata");
         StateHasChanged();
@@ -573,6 +631,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task OnGridActionBegin(ActionEventArgs<PersonalMedicalListDto> args)
     {
+        if (_disposed) return;
+        
         if (args.RequestType == Syncfusion.Blazor.Grids.Action.Sorting)
         {
             args.Cancel = true;
@@ -597,6 +657,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private async Task ShowToast(string title, string content, string cssClass)
     {
+        if (_disposed) return;
+        
         ToastTitle = title;
         ToastContent = content;
         ToastCssClass = cssClass;

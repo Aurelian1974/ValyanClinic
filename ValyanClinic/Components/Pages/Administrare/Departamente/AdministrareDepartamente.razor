@@ -6,6 +6,7 @@
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Notifications
 @using ValyanClinic.Components.Shared.Modals
+@using ValyanClinic.Components.Pages.Administrare.Departamente.Modals
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 
 <PageTitle>Administrare Departamente</PageTitle>
@@ -264,3 +265,10 @@
 
 <ConfirmDeleteModal @ref="confirmDeleteModal" 
                     OnConfirmed="HandleDeleteConfirmed" />
+
+<DepartamentFormModal @ref="departamentFormModal"
+                      OnDepartamentSaved="HandleDepartamentSaved" />
+
+<DepartamentViewModal @ref="departamentViewModal"
+                      OnEditRequested="HandleEditFromView"
+                      OnDeleteRequested="HandleDeleteFromView" />

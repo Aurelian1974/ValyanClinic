@@ -1,0 +1,54 @@
+daca mai trebuie ceva adauga, toate denumirile coloanelor trebuie sa inceapa cu majuscula
+    -- Identificare primară
+    pacient_id INT PRIMARY KEY AUTO_INCREMENT,
+    cod_pacient VARCHAR(20) UNIQUE, -- cod intern clinică
+    
+    -- Date personale
+    cnp VARCHAR(13) UNIQUE,
+    nume VARCHAR(100) NOT NULL,
+    prenume VARCHAR(100) NOT NULL,
+    data_nasterii DATE NOT NULL,
+    sex ENUM('M', 'F') NOT NULL,
+    
+    -- Date de contact
+    telefon VARCHAR(15),
+    telefon_secundar VARCHAR(15),
+    email VARCHAR(100),
+    
+    -- Adresă
+    judet VARCHAR(50),
+    localitate VARCHAR(100),
+    adresa VARCHAR(255),
+    cod_postal VARCHAR(10),
+    
+    -- Informații asigurare
+	Asigurat bit,
+    cnp_asigurat VARCHAR(13), -- poate fi diferit de CNP (copii)
+    nr_card_sanatate VARCHAR(20),
+    casa_asigurari VARCHAR(100),
+    asigurat BOOLEAN DEFAULT FALSE,
+    
+    -- Date medicale de bază
+    alergii TEXT,
+    boli_cronice TEXT,
+    medic_familie VARCHAR(150),
+    
+    -- Contact urgență
+    persoana_contact VARCHAR(150),
+    telefon_urgenta VARCHAR(15),
+    relatie_contact VARCHAR(50),
+    
+    -- Informații administrative
+    data_inregistrare DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ultima_vizita DATE,
+    nr_total_vizite INT DEFAULT 0, --va fi o coloana calculata
+    activ BOOLEAN DEFAULT TRUE,
+    observatii TEXT,
+    
+    -- Audit
+    creat_la DATETIME DEFAULT CURRENT_TIMESTAMP,
+    modificat_la DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    creat_de INT, -- user_id
+    modificat_de INT, -- user_id
+    
+

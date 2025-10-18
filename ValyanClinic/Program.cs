@@ -63,12 +63,17 @@ try
         new SqlConnectionFactory(connectionString));
 
     // ========================================
-    // REPOSITORIES
+    // REpositories
     // ========================================
     builder.Services.AddScoped<IPersonalRepository, PersonalRepository>();
     builder.Services.AddScoped<IPersonalMedicalRepository, PersonalMedicalRepository>();
     builder.Services.AddScoped<IOcupatieISCORepository, OcupatieISCORepository>();
     builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+    builder.Services.AddScoped<IDepartamentRepository, DepartamentRepository>();
+    builder.Services.AddScoped<ITipDepartamentRepository, TipDepartamentRepository>();
+    builder.Services.AddScoped<IPozitieRepository, PozitieRepository>();
+    builder.Services.AddScoped<ISpecializareRepository, SpecializareRepository>();
+    builder.Services.AddScoped<IPacientRepository, PacientRepository>();
 
     // ========================================
     // CACHING

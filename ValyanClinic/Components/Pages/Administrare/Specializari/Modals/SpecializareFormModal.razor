@@ -1,0 +1,97 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Components.Pages.Administrare.Specializari.Models
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas @(Model.IsEditMode ? "fa-edit" : "fa-plus-circle")"></i>
+                <h2>@(Model.IsEditMode ? "Editeaza Specializare" : "Adauga Specializare")</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" type="button">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Se incarca datele...</p>
+                </div>
+            }
+            else
+            {
+                @if (HasError)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>@ErrorMessage</span>
+                    </div>
+                }
+
+                <EditForm Model="@Model" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="info-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Informatii Specializare</span>
+                        </h3>
+                        <div class="info-grid">
+                            <div class="form-group full-width">
+                                <label for="denumire">Denumire <span class="required">*</span></label>
+                                <InputText id="denumire" class="form-control" @bind-Value="Model.Denumire" placeholder="Ex: Cardiologie, Neurologie, etc." />
+                                <ValidationMessage For="@(() => Model.Denumire)" />
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="categorie">Categorie</label>
+                                <InputText id="categorie" class="form-control" @bind-Value="Model.Categorie" placeholder="Ex: Chirurgie, Medicina interna, etc." />
+                                <ValidationMessage For="@(() => Model.Categorie)" />
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="descriere">Descriere</label>
+                                <InputTextArea id="descriere" class="form-control" @bind-Value="Model.Descriere" rows="4" placeholder="Descriere detaliata a specializarii..." />
+                                <ValidationMessage For="@(() => Model.Descriere)" />
+                                <small class="form-text text-muted">Maxim 500 caractere</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="este-activ">Status</label>
+                                <InputSelect id="este-activ" class="form-control" @bind-Value="Model.EsteActiv">
+                                    <option value="true">Activ</option>
+                                    <option value="false">Inactiv</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => Model.EsteActiv)" />
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @onclick="Close" disabled="@IsSaving">
+                <i class="fas fa-times"></i>
+                <span>Anuleaza</span>
+            </button>
+            <button type="button" class="btn btn-primary" @onclick="HandleSubmit" disabled="@IsSaving">
+                @if (IsSaving)
+                {
+                    <span class="spinner-border spinner-border-sm"></span>
+                    <span>Se salveaza...</span>
+                }
+                else
+                {
+                    <i class="fas fa-save"></i>
+                    <span>@(Model.IsEditMode ? "Actualizeaza" : "Salveaza")</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>

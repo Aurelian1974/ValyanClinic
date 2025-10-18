@@ -11,6 +11,7 @@ public partial class NavMenu : ComponentBase
     private int clickCount = 0;
     
     // Expand/collapse state pentru categorii
+    private bool isPacientiExpanded = false;
     private bool isAdministrareExpanded = false;
     private bool isAdministrarePersonalExpanded = false;
     private bool isAdministrareClinicaExpanded = false;
@@ -27,6 +28,7 @@ public partial class NavMenu : ComponentBase
         // When collapsing sidebar, collapse all expanded sections
         if (isCollapsed)
         {
+            isPacientiExpanded = false;
             isAdministrareExpanded = false;
             isAdministrarePersonalExpanded = false;
             isAdministrareClinicaExpanded = false;
@@ -44,6 +46,14 @@ public partial class NavMenu : ComponentBase
     private string GetCollapseButtonTitle() => isCollapsed ? "Extinde" : "Restrante";
 
     private string GetCollapseButtonIcon() => isCollapsed ? "fa-chevron-right" : "fa-chevron-left";
+
+    private void TogglePacienti()
+    {
+        if (!isCollapsed)
+        {
+            isPacientiExpanded = !isPacientiExpanded;
+        }
+    }
 
     private void ToggleAdministrare()
     {

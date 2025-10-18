@@ -1,0 +1,334 @@
+﻿/* ===================================
+   DepartamentFormModal - Specific Styles
+   Similar to PersonalFormModal but simpler (no tabs)
+   
+   DEPENDS ON: modal-base.css (loaded globally in app.css)
+   THEME: ALBASTRU PASTELAT (consistent with app)
+   =================================== */
+
+/* Modal Overlay - ALBASTRU Theme */
+.modal-overlay {
+    background: rgba(30, 58, 138, 0.3);
+}
+
+/* Modal Container - ALBASTRU Theme */
+.modal-container {
+    box-shadow: 0 10px 30px rgba(96, 165, 250, 0.2);
+}
+
+/* Modal Header - ALBASTRU Gradient */
+.modal-header {
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.15);
+}
+
+/* Modal Body - Light ALBASTRU Background */
+.modal-body {
+    background: #f8fafc;
+}
+
+.loading-container p {
+    color: #64748b;
+}
+
+/* Info Card */
+.info-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.info-card:last-child {
+    margin-bottom: 0;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin: 0 0 1rem 0;
+    font-size: 1.025rem;
+    font-weight: 600;
+    color: #334155;
+    padding-bottom: 0.625rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.card-title i {
+    color: #60a5fa;
+    font-size: 1.125rem;
+}
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+/* Form Group */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.required {
+    color: #ef4444;
+    font-weight: 700;
+    text-transform: none;
+}
+
+/* Standard Input Controls */
+.form-group ::deep .form-control,
+.form-group ::deep input.form-control,
+.form-group ::deep select.form-control,
+.form-group ::deep textarea.form-control {
+    font-size: 0.9375rem;
+    color: #334155;
+    padding: 0.625rem;
+    background: #f8fafc;
+    border-radius: 7px;
+    border: 1px solid #e2e8f0;
+    min-height: 40px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+}
+
+.form-group ::deep .form-control:hover,
+.form-group ::deep input.form-control:hover,
+.form-group ::deep select.form-control:hover,
+.form-group ::deep textarea.form-control:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.form-group ::deep .form-control:focus,
+.form-group ::deep input.form-control:focus,
+.form-group ::deep select.form-control:focus,
+.form-group ::deep textarea.form-control:focus {
+    outline: none;
+    background: white;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+.form-group ::deep .form-control:disabled,
+.form-group ::deep input.form-control:disabled,
+.form-group ::deep select.form-control:disabled,
+.form-group ::deep textarea.form-control:disabled {
+    background: #f1f5f9;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.form-group ::deep select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.625rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25rem 1.25rem;
+}
+
+.form-group ::deep textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Validation Messages */
+.validation-message {
+    color: #dc2626;
+    font-size: 0.8125rem;
+    margin-top: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-weight: 600;
+}
+
+.validation-message::before {
+    content: "⚠";
+    font-size: 0.9375rem;
+    color: #ef4444;
+}
+
+/* Form Helper Text */
+.form-group small,
+.form-group > small,
+.form-group small.form-text,
+.form-group small.text-muted,
+small.form-text.text-muted,
+.form-text,
+.text-muted {
+    color: #475569 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    margin-top: 0.375rem !important;
+    display: block !important;
+    line-height: 1.4 !important;
+}
+
+.form-group ::deep small,
+.form-group ::deep small.form-text,
+.form-group ::deep small.text-muted,
+.form-group ::deep .form-text,
+.form-group ::deep .text-muted {
+    color: #475569 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+}
+
+::deep .validation-message,
+::deep .field-validation-error,
+::deep .field-validation-valid {
+    color: #dc2626 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+}
+
+/* ===================================
+   SYNCFUSION DROPDOWN STYLING - ALBASTRU
+   =================================== */
+
+/* Dropdown Input Group */
+.form-group ::deep .e-ddl,
+.form-group ::deep .e-dropdownbase,
+.form-group ::deep .e-input-group.e-control-wrapper.e-ddl {
+    font-size: 0.9375rem;
+    background: #f8fafc;
+    border-radius: 7px;
+    border: 1px solid #e2e8f0;
+    min-height: 40px;
+    transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group ::deep .e-ddl:hover,
+.form-group ::deep .e-input-group.e-ddl:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.form-group ::deep .e-ddl.e-input-focus,
+.form-group ::deep .e-input-group.e-ddl.e-input-focus {
+    background: white;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+/* Dropdown Input Field */
+.form-group ::deep .e-ddl .e-input,
+.form-group ::deep .e-input-group.e-ddl .e-input {
+    padding: 0.625rem;
+    padding-right: 2.5rem;
+    background: transparent;
+    border: none;
+    color: #334155;
+    font-size: 0.9375rem;
+    font-family: inherit;
+}
+
+.form-group ::deep .e-ddl .e-input::placeholder {
+    color: #94a3b8;
+}
+
+/* Dropdown Icon */
+.form-group ::deep .e-ddl .e-input-group-icon,
+.form-group ::deep .e-input-group.e-ddl .e-input-group-icon {
+    color: #60a5fa;
+    transition: all 0.2s ease;
+}
+
+.form-group ::deep .e-ddl:hover .e-input-group-icon {
+    color: #3b82f6;
+}
+
+/* Dropdown Popup */
+::deep .e-ddl.e-popup,
+::deep .e-dropdownbase.e-popup {
+    z-index: 10000 !important;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(96, 165, 250, 0.25);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Dropdown List Items */
+::deep .e-ddl .e-list-item,
+::deep .e-dropdownbase .e-list-item {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9375rem;
+    color: #334155;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+::deep .e-ddl .e-list-item:hover,
+::deep .e-dropdownbase .e-list-item:hover {
+    background: #eff6ff;
+    color: #3b82f6;
+}
+
+::deep .e-ddl .e-list-item.e-active,
+::deep .e-dropdownbase .e-list-item.e-active {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
+    font-weight: 600;
+}
+
+/* Scrollbar - ALBASTRU Theme */
+.modal-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #bfdbfe, #93c5fd);
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #93c5fd, #60a5fa);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.875rem;
+    }
+
+    .info-card {
+        padding: 0.875rem;
+    }
+}

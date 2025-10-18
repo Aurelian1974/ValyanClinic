@@ -110,13 +110,17 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
             // Load first page
             await LoadPagedData();
         }
+        catch (ObjectDisposedException ex)
+        {
+            Logger.LogWarning(ex, "Component disposed during initialization (navigation away)");
+            // Don't set error state - user navigated away
+        }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Eroare la initializarea componentei");
             HasError = true;
             ErrorMessage = $"Eroare la initializare: {ex.Message}";
             IsLoading = false;
-            StateHasChanged();
         }
     }
 
@@ -145,6 +149,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     // SERVER-SIDE PAGING: Load data pentru pagina curenta
     private async Task LoadPagedData()
     {
+        if (_disposed) return; // Guard check
+
         try
         {
             IsLoading = true;
@@ -175,6 +181,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
             var result = await Mediator.Send(query);
 
+            if (_disposed) return; // Check after async operation
+
             if (result.IsSuccess)
             {
                 CurrentPageData = result.Value?.ToList() ?? new List<PersonalListDto>();
@@ -203,25 +211,36 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
                 TotalRecords = 0;
             }
         }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Component disposed while loading paged data (navigation away)");
+            // Don't set error state - user navigated away
+        }
         catch (Exception ex)
         {
-            HasError = true;
-            ErrorMessage = $"Eroare neasteptata: {ex.Message}";
-            Logger.LogError(ex, "Eroare la incarcarea datelor personal");
-            CurrentPageData = new List<PersonalListDto>();
-            TotalRecords = 0;
+            if (!_disposed)
+            {
+                HasError = true;
+                ErrorMessage = $"Eroare neasteptata: {ex.Message}";
+                Logger.LogError(ex, "Eroare la incarcarea datelor personal");
+                CurrentPageData = new List<PersonalListDto>();
+                TotalRecords = 0;
+            }
         }
         finally
         {
-            IsLoading = false;
-            StateHasChanged();
+            if (!_disposed)
+            {
+                IsLoading = false;
+                StateHasChanged();
+            }
         }
     }
 
     // CACHED Filter Options - incarca o singura data
     private async Task LoadFilterOptionsFromServer()
     {
-        if (FilterOptionsLoaded) return; // Already loaded
+        if (_disposed || FilterOptionsLoaded) return; // Guard check
         
         try
         {
@@ -243,6 +262,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
             var result = await Mediator.Send(query);
 
+            if (_disposed) return; // Check after async operation
+
             if (result.IsSuccess && result.Value != null && result.Value.Any())
             {
                 var allData = result.Value.ToList();
@@ -259,18 +280,27 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
                     StatusOptions.Count, DepartamentOptions.Count, FunctieOptions.Count, JudetOptions.Count);
             }
         }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Component disposed while loading filter options (navigation away)");
+        }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Eroare la incarcarea filter options");
-            StatusOptions = new List<FilterOption>();
-            DepartamentOptions = new List<FilterOption>();
-            FunctieOptions = new List<FilterOption>();
-            JudetOptions = new List<FilterOption>();
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Eroare la incarcarea filter options");
+                StatusOptions = new List<FilterOption>();
+                DepartamentOptions = new List<FilterOption>();
+                FunctieOptions = new List<FilterOption>();
+                JudetOptions = new List<FilterOption>();
+            }
         }
     }
 
     private void ToggleAdvancedFilter()
     {
+        if (_disposed) return;
+        
         IsAdvancedFilterExpanded = !IsAdvancedFilterExpanded;
         Logger.LogInformation("Advanced filter panel toggled: {State}", 
             IsAdvancedFilterExpanded ? "Expanded" : "Collapsed");
@@ -278,6 +308,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private void OnSearchInput(ChangeEventArgs e)
     {
+        if (_disposed) return;
+        
         var newValue = e.Value?.ToString() ?? string.Empty;
         
         if (newValue == GlobalSearchText) return;
@@ -298,14 +330,17 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
             {
                 await Task.Delay(SearchDebounceMs, localToken);
                 
-                if (!localToken.IsCancellationRequested)
+                if (!localToken.IsCancellationRequested && !_disposed)
                 {
                     Logger.LogInformation("Executing SERVER-SIDE search for: '{SearchText}'", GlobalSearchText);
                     
                     await InvokeAsync(async () =>
                     {
-                        CurrentPage = 1; // Reset to first page when searching
-                        await LoadPagedData();
+                        if (!_disposed)
+                        {
+                            CurrentPage = 1; // Reset to first page when searching
+                            await LoadPagedData();
+                        }
                     });
                 }
             }
@@ -313,15 +348,24 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
             {
                 Logger.LogDebug("Search cancelled - user still typing");
             }
+            catch (ObjectDisposedException)
+            {
+                Logger.LogDebug("Component disposed during search");
+            }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Eroare la executia search-ului");
+                if (!_disposed)
+                {
+                    Logger.LogError(ex, "Eroare la executia search-ului");
+                }
             }
         }, localToken);
     }
 
     private async Task OnSearchKeyDown(KeyboardEventArgs e)
     {
+        if (_disposed) return;
+        
         if (e.Key == "Enter")
         {
             _searchDebounceTokenSource?.Cancel();
@@ -335,6 +379,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task ClearSearch()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Clearing search text");
         
         _searchDebounceTokenSource?.Cancel();
@@ -346,6 +392,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task ApplyFilters()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation(
             "Applying SERVER-SIDE filters: GlobalSearch={Search}, Status={Status}, Dept={Dept}, Func={Func}, Judet={Judet}",
             GlobalSearchText, FilterStatus, FilterDepartament, FilterFunctie, FilterJudet);
@@ -356,6 +404,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task ClearAllFilters()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Clearing all filters");
         
         GlobalSearchText = string.Empty;
@@ -370,6 +420,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task ClearFilter(string filterName)
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Clearing filter: {FilterName}", filterName);
 
         switch (filterName)
@@ -397,6 +449,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task HandleRefresh()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Refresh date personal - SERVER-SIDE reload");
         
         // Clear cached filter options pentru a reincarca cu date noi
@@ -409,6 +463,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task HandleAddNew()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Deschidere modal pentru adaugare personal");
         
         if (personalFormModal != null)
@@ -421,6 +477,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task GoToPage(int pageNumber)
     {
+        if (_disposed) return;
+        
         if (pageNumber < 1 || pageNumber > TotalPages) return;
         
         Logger.LogInformation("Navigare la pagina {Page}", pageNumber);
@@ -456,6 +514,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task OnPageSizeChanged(int newPageSize)
     {
+        if (_disposed) return;
+        
         if (newPageSize < MinPageSize || newPageSize > MaxPageSize)
         {
             Logger.LogWarning("PageSize invalid: {Size}, using default", newPageSize);
@@ -502,6 +562,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private void OnRowSelected(RowSelectEventArgs<PersonalListDto> args)
     {
+        if (_disposed) return;
+        
         SelectedPersonal = args.Data;
         Logger.LogInformation("Personal selectat: {PersonalId} - {NumeComplet}", 
             SelectedPersonal?.Id_Personal, SelectedPersonal?.NumeComplet);
@@ -510,6 +572,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private void OnRowDeselected(RowDeselectEventArgs<PersonalListDto> args)
     {
+        if (_disposed) return;
+        
         SelectedPersonal = null;
         Logger.LogInformation("Selectie anulata");
         StateHasChanged();
@@ -517,6 +581,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task OnGridActionBegin(ActionEventArgs<PersonalListDto> args)
     {
+        if (_disposed) return;
+        
         // Handle sorting
         if (args.RequestType == Syncfusion.Blazor.Grids.Action.Sorting)
         {
@@ -546,19 +612,22 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task HandleViewSelected()
     {
-        if (SelectedPersonal == null) return;
+        if (_disposed || SelectedPersonal == null) return;
+        
         await OpenViewModalAsync(SelectedPersonal.Id_Personal, SelectedPersonal.NumeComplet);
     }
 
     private async Task HandleEditSelected()
     {
-        if (SelectedPersonal == null) return;
+        if (_disposed || SelectedPersonal == null) return;
+        
         await OpenEditModalAsync(SelectedPersonal.Id_Personal, SelectedPersonal.NumeComplet);
     }
 
     private async Task HandleDeleteSelected()
     {
-        if (SelectedPersonal == null) return;
+        if (_disposed || SelectedPersonal == null) return;
+        
         await OpenDeleteModalAsync(SelectedPersonal.Id_Personal, SelectedPersonal.NumeComplet);
     }
 
@@ -568,6 +637,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task HandleEditFromModal(Guid personalId)
     {
+        if (_disposed) return;
+        
         if (!ValidatePersonalId(personalId, "HandleEditFromModal"))
         {
             await ShowErrorToastAsync("ID invalid pentru editare");
@@ -580,6 +651,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task HandleDeleteFromModal(Guid personalId)
     {
+        if (_disposed) return;
+        
         var personal = CurrentPageData.FirstOrDefault(p => p.Id_Personal == personalId);
         if (personal != null)
         {
@@ -589,6 +662,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task HandlePersonalSaved()
     {
+        if (_disposed) return;
+        
         LogOperation("Personal salvat", additionalInfo: "Reincarcam datele");
         
         // Invalidate cached filter options
@@ -601,12 +676,16 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task HandleDeleteConfirmed(Guid personalId)
     {
+        if (_disposed) return;
+        
         LogOperation("Confirmare stergere", personalId);
         
         try
         {
             var command = new DeletePersonalCommand(personalId, "CurrentUser");
             var result = await Mediator.Send(command);
+            
+            if (_disposed) return; // Check after async
             
             if (result.IsSuccess)
             {
@@ -624,9 +703,16 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
                 await HandleOperationFailureAsync("stergere", result.Errors);
             }
         }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Component disposed during delete operation");
+        }
         catch (Exception ex)
         {
-            await HandleOperationExceptionAsync("stergere", personalId, ex);
+            if (!_disposed)
+            {
+                await HandleOperationExceptionAsync("stergere", personalId, ex);
+            }
         }
     }
 
@@ -636,6 +722,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task OpenViewModalAsync(Guid personalId, string personalName)
     {
+        if (_disposed) return;
+        
         LogOperation("Deschidere View Modal", personalId, personalName);
         
         if (personalViewModal == null)
@@ -656,6 +744,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task OpenEditModalAsync(Guid personalId, string personalName)
     {
+        if (_disposed) return;
+        
         LogOperation("Deschidere Edit Modal", personalId, personalName);
         
         if (personalFormModal == null)
@@ -676,6 +766,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task OpenDeleteModalAsync(Guid personalId, string personalName)
     {
+        if (_disposed) return;
+        
         LogOperation("Deschidere Delete Modal", personalId, personalName);
         
         if (confirmDeleteModal == null)
@@ -763,16 +855,24 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task ShowSuccessToastAsync(string message)
     {
-        await ShowToast("Succes", message, "e-toast-success");
+        if (!_disposed)
+        {
+            await ShowToast("Succes", message, "e-toast-success");
+        }
     }
 
     private async Task ShowErrorToastAsync(string message)
     {
-        await ShowToast("Eroare", message, "e-toast-danger");
+        if (!_disposed)
+        {
+            await ShowToast("Eroare", message, "e-toast-danger");
+        }
     }
 
     private async Task ShowToast(string title, string content, string cssClass)
     {
+        if (_disposed) return;
+        
         ToastTitle = title;
         ToastContent = content;
         ToastCssClass = cssClass;

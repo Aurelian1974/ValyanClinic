@@ -15,7 +15,23 @@ public class DepartamentRepository : BaseRepository, IDepartamentRepository
     public async Task<Departament?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var parameters = new { IdDepartament = id };
-        return await QueryFirstOrDefaultAsync<Departament>("sp_Departamente_GetById", parameters, cancellationToken);
+        var dto = await QueryFirstOrDefaultAsync<DepartamentDto>("sp_Departamente_GetById", parameters, cancellationToken);
+        
+        if (dto == null)
+            return null;
+        
+        return new Departament
+        {
+            IdDepartament = dto.IdDepartament,
+            IdTipDepartament = dto.IdTipDepartament,
+            DenumireDepartament = dto.DenumireDepartament,
+            DescriereDepartament = dto.DescriereDepartament,
+            TipDepartament = dto.DenumireTipDepartament != null ? new TipDepartament 
+            { 
+                IdTipDepartament = dto.IdTipDepartament ?? Guid.Empty,
+                DenumireTipDepartament = dto.DenumireTipDepartament 
+            } : null
+        };
     }
 
     public async Task<IEnumerable<Departament>> GetAllAsync(

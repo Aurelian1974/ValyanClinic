@@ -30,6 +30,48 @@
             </a>
         </div>
 
+        @* Pacienti - Level 1 (Parent) *@
+        <div class="nav-section">
+            @if (!isCollapsed)
+            {
+                <div class="nav-section-header" @onclick="TogglePacienti">
+                    <div class="nav-section-title">
+                        <i class="fas fa-user-injured"></i>
+                        <span>Pacienti</span>
+                    </div>
+                    <i class="fas fa-chevron-@(isPacientiExpanded ? "up" : "down") nav-chevron"></i>
+                </div>
+
+                @if (isPacientiExpanded)
+                {
+                    <div class="nav-items-group">
+                        <div class="nav-item nav-item-child">
+                            <a href="/pacienti/vizualizare" class="nav-link nav-link-child" title="Vizualizare Pacienti">
+                                <i class="fas fa-eye"></i>
+                                <span>Vizualizare Pacienti</span>
+                            </a>
+                        </div>
+
+                        <div class="nav-item nav-item-child">
+                            <a href="/pacienti/administrare" class="nav-link nav-link-child" title="Administrare Pacienti">
+                                <i class="fas fa-user-cog"></i>
+                                <span>Administrare Pacienti</span>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                @* Show icon when collapsed *@
+                <div class="nav-item">
+                    <a href="/pacienti/vizualizare" class="nav-link" title="Pacienti">
+                        <i class="fas fa-user-injured"></i>
+                    </a>
+                </div>
+            }
+        </div>
+
         @* Administrare - Level 1 (Parent) *@
         <div class="nav-section">
             @if (!isCollapsed)
@@ -98,6 +140,20 @@
                                     <a href="/administrare/sectii" class="nav-link nav-link-child" title="Sectii">
                                         <i class="fas fa-door-open"></i>
                                         <span>Sectii</span>
+                                    </a>
+                                </div>
+
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/pozitii" class="nav-link nav-link-child" title="Pozitii">
+                                        <i class="fas fa-briefcase"></i>
+                                        <span>Pozitii</span>
+                                    </a>
+                                </div>
+
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/specializari" class="nav-link nav-link-child" title="Specializari">
+                                        <i class="fas fa-user-md"></i>
+                                        <span>Specializari</span>
                                     </a>
                                 </div>
                             </div>

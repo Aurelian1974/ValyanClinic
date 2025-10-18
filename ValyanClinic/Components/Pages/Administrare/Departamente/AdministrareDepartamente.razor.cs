@@ -8,6 +8,7 @@ using ValyanClinic.Application.Features.DepartamentManagement.Commands.DeleteDep
 using ValyanClinic.Services.DataGrid;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Components.Shared.Modals;
+using ValyanClinic.Components.Pages.Administrare.Departamente.Modals;
 
 namespace ValyanClinic.Components.Pages.Administrare.Departamente;
 
@@ -21,6 +22,8 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private SfGrid<DepartamentListDto>? GridRef;
     private SfToast? ToastRef;
     private ConfirmDeleteModal? confirmDeleteModal;
+    private DepartamentFormModal? departamentFormModal;
+    private DepartamentViewModal? departamentViewModal;
 
     private List<DepartamentListDto> CurrentPageData { get; set; } = new();
     
@@ -67,13 +70,16 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             Logger.LogInformation("Initializare pagina Administrare Departamente");
             await LoadPagedData();
         }
+        catch (ObjectDisposedException ex)
+        {
+            Logger.LogWarning(ex, "Component disposed during initialization (navigation away)");
+        }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Eroare la initializarea componentei");
             HasError = true;
             ErrorMessage = $"Eroare la initializare: {ex.Message}";
             IsLoading = false;
-            StateHasChanged();
         }
     }
 
@@ -101,6 +107,8 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     private async Task LoadPagedData()
     {
+        if (_disposed) return; // Guard check
+
         try
         {
             IsLoading = true;
@@ -124,6 +132,8 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             };
 
             var result = await Mediator.Send(query);
+
+            if (_disposed) return; // Check after async
 
             if (result.IsSuccess)
             {
@@ -152,23 +162,35 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
                 TotalRecords = 0;
             }
         }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Component disposed while loading data (navigation away)");
+        }
         catch (Exception ex)
         {
-            HasError = true;
-            ErrorMessage = $"Eroare neasteptata: {ex.Message}";
-            Logger.LogError(ex, "Eroare la incarcarea datelor");
-            CurrentPageData = new List<DepartamentListDto>();
-            TotalRecords = 0;
+            if (!_disposed)
+            {
+                HasError = true;
+                ErrorMessage = $"Eroare neasteptata: {ex.Message}";
+                Logger.LogError(ex, "Eroare la incarcarea datelor");
+                CurrentPageData = new List<DepartamentListDto>();
+                TotalRecords = 0;
+            }
         }
         finally
         {
-            IsLoading = false;
-            StateHasChanged();
+            if (!_disposed)
+            {
+                IsLoading = false;
+                StateHasChanged();
+            }
         }
     }
 
     private void OnSearchInput(ChangeEventArgs e)
     {
+        if (_disposed) return; // Guard check
+        
         var newValue = e.Value?.ToString() ?? string.Empty;
         
         if (newValue == GlobalSearchText) return;
@@ -189,14 +211,17 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             {
                 await Task.Delay(SearchDebounceMs, localToken);
                 
-                if (!localToken.IsCancellationRequested)
+                if (!localToken.IsCancellationRequested && !_disposed)
                 {
                     Logger.LogInformation("Executing search for: '{SearchText}'", GlobalSearchText);
                     
                     await InvokeAsync(async () =>
                     {
-                        CurrentPage = 1;
-                        await LoadPagedData();
+                        if (!_disposed)
+                        {
+                            CurrentPage = 1;
+                            await LoadPagedData();
+                        }
                     });
                 }
             }
@@ -204,15 +229,24 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             {
                 Logger.LogDebug("Search cancelled");
             }
+            catch (ObjectDisposedException)
+            {
+                Logger.LogDebug("Component disposed during search");
+            }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Eroare la executia search-ului");
+                if (!_disposed)
+                {
+                    Logger.LogError(ex, "Eroare la executia search-ului");
+                }
             }
         }, localToken);
     }
 
     private async Task OnSearchKeyDown(KeyboardEventArgs e)
     {
+        if (_disposed) return; // Guard check
+        
         if (e.Key == "Enter")
         {
             _searchDebounceTokenSource?.Cancel();
@@ -226,6 +260,8 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     private async Task ClearSearch()
     {
+        if (_disposed) return; // Guard check
+        
         Logger.LogInformation("Clearing search");
         
         _searchDebounceTokenSource?.Cancel();
@@ -237,6 +273,8 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     private async Task HandleRefresh()
     {
+        if (_disposed) return; // Guard check
+        
         Logger.LogInformation("Refresh departamente");
         
         await LoadPagedData();
@@ -245,36 +283,105 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     private async Task HandleAddNew()
     {
-        Logger.LogInformation("TODO: Opening modal for ADD Departament");
-        await ShowToast("Info", "Functionalitate in dezvoltare", "e-toast-info");
+        if (_disposed) return; // Guard check
+        
+        Logger.LogInformation("Opening modal for ADD Departament");
+        
+        if (departamentFormModal != null)
+        {
+            await departamentFormModal.OpenForAdd();
+        }
     }
 
     private async Task HandleViewSelected()
     {
+        if (_disposed) return; // Guard check
+        
         if (SelectedDepartament == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
             return;
         }
         
-        Logger.LogInformation("TODO: Opening View modal for: {DeptID}", SelectedDepartament.IdDepartament);
-        await ShowToast("Info", "Functionalitate in dezvoltare", "e-toast-info");
+        Logger.LogInformation("Opening View modal for: {DeptID}", SelectedDepartament.IdDepartament);
+        
+        if (departamentViewModal != null)
+        {
+            await departamentViewModal.Open(SelectedDepartament.IdDepartament);
+        }
     }
 
     private async Task HandleEditSelected()
     {
+        if (_disposed) return; // Guard check
+        
         if (SelectedDepartament == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
             return;
         }
         
-        Logger.LogInformation("TODO: Opening Edit modal for: {DeptID}", SelectedDepartament.IdDepartament);
-        await ShowToast("Info", "Functionalitate in dezvoltare", "e-toast-info");
+        Logger.LogInformation("Opening Edit modal for: {DeptID}", SelectedDepartament.IdDepartament);
+        
+        if (departamentFormModal != null)
+        {
+            await departamentFormModal.OpenForEdit(SelectedDepartament.IdDepartament);
+        }
+    }
+
+    private async Task HandleDepartamentSaved()
+    {
+        if (_disposed) return; // Guard check
+        
+        Logger.LogInformation("Departament saved - reloading data");
+        
+        await LoadPagedData();
+        await ShowToast("Succes", "Departament salvat cu succes", "e-toast-success");
+    }
+
+    private async Task HandleEditFromView(Guid departamentId)
+    {
+        if (_disposed) return; // Guard check
+        
+        Logger.LogInformation("Edit requested from View modal for: {DeptID}", departamentId);
+        
+        // Close view modal
+        if (departamentViewModal != null)
+        {
+            await departamentViewModal.Close();
+        }
+        
+        // Open edit modal
+        if (departamentFormModal != null)
+        {
+            await departamentFormModal.OpenForEdit(departamentId);
+        }
+    }
+
+    private async Task HandleDeleteFromView(Guid departamentId)
+    {
+        if (_disposed) return; // Guard check
+        
+        Logger.LogInformation("Delete requested from View modal for: {DeptID}", departamentId);
+        
+        // Close view modal
+        if (departamentViewModal != null)
+        {
+            await departamentViewModal.Close();
+        }
+        
+        // Find departament in list for delete confirmation
+        var departament = CurrentPageData.FirstOrDefault(d => d.IdDepartament == departamentId);
+        if (departament != null && confirmDeleteModal != null)
+        {
+            await confirmDeleteModal.Open(departamentId, departament.DenumireDepartament);
+        }
     }
 
     private async Task HandleDeleteSelected()
     {
+        if (_disposed) return; // Guard check
+        
         if (SelectedDepartament == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
@@ -292,12 +399,16 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     private async Task HandleDeleteConfirmed(Guid id)
     {
+        if (_disposed) return; // Guard check
+        
         Logger.LogInformation("Delete confirmed for: {DeptID}", id);
         
         try
         {
             var command = new DeleteDepartamentCommand(id);
             var result = await Mediator.Send(command);
+            
+            if (_disposed) return; // Check after async
             
             if (result.IsSuccess)
             {
@@ -312,15 +423,24 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
                 await ShowToast("Eroare", errorMsg, "e-toast-danger");
             }
         }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Component disposed during delete");
+        }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Exception during delete: {DeptID}", id);
-            await ShowToast("Eroare", $"Eroare la stergere: {ex.Message}", "e-toast-danger");
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Exception during delete: {DeptID}", id);
+                await ShowToast("Eroare", $"Eroare la stergere: {ex.Message}", "e-toast-danger");
+            }
         }
     }
 
     private async Task GoToPage(int pageNumber)
     {
+        if (_disposed) return; // Guard check
+        
         if (pageNumber < 1 || pageNumber > TotalPages) return;
         
         Logger.LogInformation("Navigare la pagina {Page}", pageNumber);
@@ -398,6 +518,8 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     private void OnRowSelected(RowSelectEventArgs<DepartamentListDto> args)
     {
+        if (_disposed) return; // Guard check
+        
         SelectedDepartament = args.Data;
         Logger.LogInformation("Departament selectat: {DeptID} - {Denumire}", 
             SelectedDepartament?.IdDepartament, SelectedDepartament?.DenumireDepartament);
@@ -406,6 +528,8 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     private void OnRowDeselected(RowDeselectEventArgs<DepartamentListDto> args)
     {
+        if (_disposed) return; // Guard check
+        
         SelectedDepartament = null;
         Logger.LogInformation("Selectie anulata");
         StateHasChanged();
@@ -413,6 +537,8 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     private async Task OnGridActionBegin(ActionEventArgs<DepartamentListDto> args)
     {
+        if (_disposed) return; // Guard check
+        
         if (args.RequestType == Syncfusion.Blazor.Grids.Action.Sorting)
         {
             args.Cancel = true;
@@ -437,6 +563,8 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     private async Task ShowToast(string title, string content, string cssClass)
     {
+        if (_disposed) return; // Guard check
+        
         ToastTitle = title;
         ToastContent = content;
         ToastCssClass = cssClass;

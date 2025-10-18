@@ -55,7 +55,11 @@ public class GetDepartamentListQueryHandler : IRequestHandler<GetDepartamentList
                 "GetDepartamentList SUCCESS: Retrieved {Count} of {Total}",
                 dtoList.Count, totalCount);
 
-            return PagedResult<DepartamentListDto>.Success(dtoList, totalCount);
+            return PagedResult<DepartamentListDto>.Success(
+                dtoList,
+                request.PageNumber,
+                request.PageSize,
+                totalCount);
         }
         catch (Exception ex)
         {
