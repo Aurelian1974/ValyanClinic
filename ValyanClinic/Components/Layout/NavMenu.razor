@@ -42,9 +42,9 @@
                     <i class="fas fa-chevron-@(isAdministrareExpanded ? "up" : "down") nav-chevron"></i>
                 </div>
 
-                @* Administrare Personal - Level 2 (Parent + Child of Administrare) *@
                 @if (isAdministrareExpanded)
                 {
+                    @* Administrare Personal - Level 2 *@
                     <div class="nav-subsection">
                         <div class="nav-subsection-header" @onclick="ToggleAdministrarePersonal">
                             <div class="nav-subsection-title">
@@ -54,7 +54,6 @@
                             <i class="fas fa-chevron-@(isAdministrarePersonalExpanded ? "up" : "down") nav-chevron-small"></i>
                         </div>
 
-                        @* Personal & Personal Medical - Level 3 (Children of Administrare Personal) *@
                         @if (isAdministrarePersonalExpanded)
                         {
                             <div class="nav-sub-items">
@@ -69,6 +68,36 @@
                                     <a href="/administrare/personal-medical" class="nav-link nav-link-child" title="Personal Medical">
                                         <i class="fas fa-user-md"></i>
                                         <span>Personal Medical</span>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @* Administrare Clinica - Level 2 (NOU) *@
+                    <div class="nav-subsection">
+                        <div class="nav-subsection-header" @onclick="ToggleAdministrareClinica">
+                            <div class="nav-subsection-title">
+                                <i class="fas fa-hospital"></i>
+                                <span>Administrare Clinica</span>
+                            </div>
+                            <i class="fas fa-chevron-@(isAdministrareClinicaExpanded ? "up" : "down") nav-chevron-small"></i>
+                        </div>
+
+                        @if (isAdministrareClinicaExpanded)
+                        {
+                            <div class="nav-sub-items">
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/departamente" class="nav-link nav-link-child" title="Departamente">
+                                        <i class="fas fa-building"></i>
+                                        <span>Departamente</span>
+                                    </a>
+                                </div>
+
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/sectii" class="nav-link nav-link-child" title="Sectii">
+                                        <i class="fas fa-door-open"></i>
+                                        <span>Sectii</span>
                                     </a>
                                 </div>
                             </div>
