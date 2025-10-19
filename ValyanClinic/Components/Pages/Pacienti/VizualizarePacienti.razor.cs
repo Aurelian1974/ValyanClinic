@@ -5,7 +5,6 @@ using Syncfusion.Blazor.Notifications;
 using MediatR;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientList;
 using Microsoft.Extensions.Logging;
-using ValyanClinic.Components.Pages.Pacienti.Modals;
 
 namespace ValyanClinic.Components.Pages.Pacienti;
 
@@ -22,7 +21,8 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
     private SfToast? ToastRef;
 
     // Modal references
-    private PacientViewModal? pacientViewModal;
+    private bool ShowViewModal { get; set; }
+    private Guid? SelectedPacientId { get; set; }
 
     // SERVER-SIDE PAGING: Data pentru pagina curenta
     private List<PacientListDto> CurrentPageData { get; set; } = new();
@@ -547,23 +547,27 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
         
         Logger.LogInformation("Deschidere View Modal pentru pacient: {PacientId} - {PacientName}", 
             pacientId, pacientName);
-        
-        if (pacientViewModal == null)
-        {
-            Logger.LogError("Modal nu este initializat: PacientViewModal");
-            await ShowErrorToastAsync("Modalul nu este initializat");
-            return;
-        }
 
         try
         {
-            await pacientViewModal.Open(pacientId);
+            SelectedPacientId = pacientId;
+            ShowViewModal = true;
+            StateHasChanged();
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Eroare la deschiderea modalului pentru {PacientName}", pacientName);
             await ShowErrorToastAsync($"Eroare la vizualizare: {ex.Message}");
         }
+    }
+
+    private async Task HandleModalClosed()
+    {
+        if (_disposed) return;
+        
+        ShowViewModal = false;
+        SelectedPacientId = null;
+        StateHasChanged();
     }
 
     private async Task ShowSuccessToastAsync(string message)

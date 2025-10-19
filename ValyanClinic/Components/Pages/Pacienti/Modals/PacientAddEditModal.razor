@@ -1,0 +1,458 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.PacientManagement.Commands.CreatePacient
+@using ValyanClinic.Application.Features.PacientManagement.Commands.UpdatePacient
+@using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using MediatR
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container modal-large @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-@(IsEditMode ? "user-edit" : "user-plus")"></i>
+                <h2>@(IsEditMode ? "Editare Pacient" : "Adaugare Pacient Nou")</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" title="Inchide">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading && IsEditMode)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Se incarca...</span>
+                    </div>
+                    <p>Se incarca datele pacientului...</p>
+                </div>
+            }
+            else if (HasError)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @ErrorMessage
+                </div>
+            }
+            else
+            {
+                <EditForm Model="FormModel" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <!-- Tabs Navigation -->
+                    <div class="tabs-container">
+                        <div class="tab-buttons">
+                            <button type="button" class="tab-button @(ActiveTab == "personal" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("personal")'>
+                                <i class="fas fa-user"></i>
+                                Date Personale
+                            </button>
+                            <button type="button" class="tab-button @(ActiveTab == "contact" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("contact")'>
+                                <i class="fas fa-address-book"></i>
+                                Contact
+                            </button>
+                            <button type="button" class="tab-button @(ActiveTab == "adresa" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("adresa")'>
+                                <i class="fas fa-map-marker-alt"></i>
+                                Adresa
+                            </button>
+                            <button type="button" class="tab-button @(ActiveTab == "medical" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("medical")'>
+                                <i class="fas fa-heartbeat"></i>
+                                Date Medicale
+                            </button>
+                            <button type="button" class="tab-button @(ActiveTab == "asigurare" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("asigurare")'>
+                                <i class="fas fa-shield-alt"></i>
+                                Asigurare
+                            </button>
+                        </div>
+
+                        <div class="tab-content">
+                            <!-- Tab 1: Date Personale -->
+                            @if (ActiveTab == "personal")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-id-badge"></i>
+                                            <span>Identificare</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group">
+                                                <label for="cod-pacient">Cod Pacient</label>
+                                                <SfTextBox ID="cod-pacient" 
+                                                          @bind-Value="FormModel.Cod_Pacient"
+                                                          Placeholder="Auto-generat"
+                                                          Readonly="@(!IsEditMode)"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <small class="form-text text-muted">Se genereaza automat la salvare</small>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="cnp">CNP</label>
+                                                <SfTextBox ID="cnp" 
+                                                          @bind-Value="FormModel.CNP"
+                                                          Placeholder="1234567890123"
+                                                          MaxLength="13"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.CNP)" />
+                                                <small class="form-text text-muted">Optional - 13 cifre</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-user-circle"></i>
+                                            <span>Informatii Generale</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group">
+                                                <label for="nume"><span class="required">*</span> Nume</label>
+                                                <SfTextBox ID="nume" 
+                                                          @bind-Value="FormModel.Nume"
+                                                          Placeholder="Introduceti numele"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Nume)" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="prenume"><span class="required">*</span> Prenume</label>
+                                                <SfTextBox ID="prenume" 
+                                                          @bind-Value="FormModel.Prenume"
+                                                          Placeholder="Introduceti prenumele"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Prenume)" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="data-nasterii"><span class="required">*</span> Data Nasterii</label>
+                                                <SfDatePicker ID="data-nasterii"
+                                                              TValue="DateTime"
+                                                              CssClass="form-control"
+                                                              @bind-Value="@FormModel.Data_Nasterii"
+                                                              Format="dd.MM.yyyy"
+                                                              Placeholder="Selecteaza data"
+                                                              ShowTodayButton="true">
+                                                </SfDatePicker>
+                                                <ValidationMessage For="@(() => FormModel.Data_Nasterii)" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="sex"><span class="required">*</span> Sex</label>
+                                                <SfDropDownList ID="sex"
+                                                               TValue="string"
+                                                               TItem="string"
+                                                               Placeholder="Selecteaza..."
+                                                               DataSource="@SexOptions"
+                                                               @bind-Value="@FormModel.Sex"
+                                                               CssClass="form-control">
+                                                </SfDropDownList>
+                                                <ValidationMessage For="@(() => FormModel.Sex)" />
+                                            </div>
+                                            <div class="form-group full-width">
+                                                <label class="checkbox-label">
+                                                    <InputCheckbox @bind-Value="FormModel.Activ" />
+                                                    <span>Pacient Activ</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Tab 2: Contact -->
+                            @if (ActiveTab == "contact")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-phone"></i>
+                                            <span>Telefon</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group">
+                                                <label for="telefon">Telefon Principal</label>
+                                                <SfTextBox ID="telefon" 
+                                                          @bind-Value="FormModel.Telefon"
+                                                          Placeholder="0721234567"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Telefon)" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="telefon-secundar">Telefon Secundar</label>
+                                                <SfTextBox ID="telefon-secundar" 
+                                                          @bind-Value="FormModel.Telefon_Secundar"
+                                                          Placeholder="0722345678"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Telefon_Secundar)" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-envelope"></i>
+                                            <span>Email</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group full-width">
+                                                <label for="email">Email</label>
+                                                <SfTextBox ID="email" 
+                                                          @bind-Value="FormModel.Email"
+                                                          Placeholder="email@exemplu.com"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Email)" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-phone-volume"></i>
+                                            <span>Contact Urgenta</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group">
+                                                <label for="persoana-contact">Persoana Contact</label>
+                                                <SfTextBox ID="persoana-contact" 
+                                                          @bind-Value="FormModel.Persoana_Contact"
+                                                          Placeholder="Nume persoana"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Persoana_Contact)" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="relatie">Relatie</label>
+                                                <SfTextBox ID="relatie" 
+                                                          @bind-Value="FormModel.Relatie_Contact"
+                                                          Placeholder="ex: Sotie, Fiu, etc."
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Relatie_Contact)" />
+                                            </div>
+                                            <div class="form-group full-width">
+                                                <label for="telefon-urgenta">Telefon Urgenta</label>
+                                                <SfTextBox ID="telefon-urgenta" 
+                                                          @bind-Value="FormModel.Telefon_Urgenta"
+                                                          Placeholder="0722345678"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Telefon_Urgenta)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Tab 3: Adresa -->
+                            @if (ActiveTab == "adresa")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-home"></i>
+                                            <span>Adresa Completa</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group full-width">
+                                                <label for="adresa">Adresa (Strada, Nr.)</label>
+                                                <SfTextBox ID="adresa" 
+                                                          @bind-Value="FormModel.Adresa"
+                                                          Placeholder="Str. Exemplu nr. 123"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Adresa)" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="localitate">Localitate</label>
+                                                <SfTextBox ID="localitate" 
+                                                          @bind-Value="FormModel.Localitate"
+                                                          Placeholder="Bucuresti"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Localitate)" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="judet">Judet</label>
+                                                <SfDropDownList ID="judet"
+                                                               TValue="string"
+                                                               TItem="string"
+                                                               Placeholder="Selecteaza judet..."
+                                                               DataSource="@JudeteList"
+                                                               @bind-Value="@FormModel.Judet"
+                                                               AllowFiltering="true"
+                                                               FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                               ShowClearButton="true"
+                                                               CssClass="form-control">
+                                                </SfDropDownList>
+                                                <ValidationMessage For="@(() => FormModel.Judet)" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="cod-postal">Cod Postal</label>
+                                                <SfTextBox ID="cod-postal" 
+                                                          @bind-Value="FormModel.Cod_Postal"
+                                                          Placeholder="010101"
+                                                          MaxLength="6"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Cod_Postal)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Tab 4: Date Medicale -->
+                            @if (ActiveTab == "medical")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-heartbeat"></i>
+                                            <span>Informatii Medicale</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group full-width">
+                                                <label for="alergii">Alergii</label>
+                                                <SfTextBox ID="alergii"
+                                                          @bind-Value="FormModel.Alergii"
+                                                          Placeholder="Alergii cunoscute (ex: Penicilina, Polen, etc.)"
+                                                          Multiline="true"
+                                                          RowCount="3"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Alergii)" />
+                                            </div>
+                                            <div class="form-group full-width">
+                                                <label for="boli-cronice">Boli Cronice</label>
+                                                <SfTextBox ID="boli-cronice"
+                                                          @bind-Value="FormModel.Boli_Cronice"
+                                                          Placeholder="Boli cronice diagnosticate"
+                                                          Multiline="true"
+                                                          RowCount="3"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Boli_Cronice)" />
+                                            </div>
+                                            <div class="form-group full-width">
+                                                <label for="medic-familie">Medic de Familie</label>
+                                                <SfTextBox ID="medic-familie" 
+                                                          @bind-Value="FormModel.Medic_Familie"
+                                                          Placeholder="Dr. Nume Prenume"
+                                                          CssClass="form-control">
+                                                </SfTextBox>
+                                                <ValidationMessage For="@(() => FormModel.Medic_Familie)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Tab 5: Asigurare -->
+                            @if (ActiveTab == "asigurare")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-shield-alt"></i>
+                                            <span>Informatii Asigurare</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group full-width">
+                                                <label class="checkbox-label">
+                                                    <InputCheckbox @bind-Value="FormModel.Asigurat" />
+                                                    <span>Pacient Asigurat</span>
+                                                </label>
+                                            </div>
+                                            @if (FormModel.Asigurat)
+                                            {
+                                                <div class="form-group">
+                                                    <label for="cnp-asigurat">CNP Asigurat</label>
+                                                    <SfTextBox ID="cnp-asigurat" 
+                                                              @bind-Value="FormModel.CNP_Asigurat"
+                                                              Placeholder="1234567890123"
+                                                              MaxLength="13"
+                                                              CssClass="form-control">
+                                                    </SfTextBox>
+                                                    <ValidationMessage For="@(() => FormModel.CNP_Asigurat)" />
+                                                    <small class="form-text text-muted">Poate fi diferit de CNP pacient (ex: copii)</small>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="card-sanatate">Nr. Card Sanatate</label>
+                                                    <SfTextBox ID="card-sanatate" 
+                                                              @bind-Value="FormModel.Nr_Card_Sanatate"
+                                                              Placeholder="123456789012"
+                                                              CssClass="form-control">
+                                                    </SfTextBox>
+                                                    <ValidationMessage For="@(() => FormModel.Nr_Card_Sanatate)" />
+                                                </div>
+                                                <div class="form-group full-width">
+                                                    <label for="casa-asigurari">Casa de Asigurari</label>
+                                                    <SfTextBox ID="casa-asigurari" 
+                                                              @bind-Value="FormModel.Casa_Asigurari"
+                                                              Placeholder="CNAS"
+                                                              CssClass="form-control">
+                                                    </SfTextBox>
+                                                    <ValidationMessage For="@(() => FormModel.Casa_Asigurari)" />
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Observatii (vizibil pe toate tab-urile) -->
+                    <div class="observatii-section">
+                        <div class="info-card">
+                            <h3 class="card-title">
+                                <i class="fas fa-comment-alt"></i>
+                                <span>Observatii</span>
+                            </h3>
+                            <div class="info-grid">
+                                <div class="form-group full-width">
+                                    <SfTextBox ID="observatii"
+                                              @bind-Value="FormModel.Observatii"
+                                              Placeholder="Observatii generale despre pacient..."
+                                              Multiline="true"
+                                              RowCount="3"
+                                              CssClass="form-control">
+                                    </SfTextBox>
+                                    <ValidationMessage For="@(() => FormModel.Observatii)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @onclick="Close" disabled="@IsSaving">
+                <i class="fas fa-times"></i>
+                Anuleaza
+            </button>
+            <button type="button" class="btn btn-primary" @onclick="HandleSubmit" disabled="@IsSaving">
+                @if (IsSaving)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                    <span>Se salveaza...</span>
+                }
+                else
+                {
+                    <i class="fas fa-save"></i>
+                    <span>@(IsEditMode ? "Actualizeaza" : "Salveaza")</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>

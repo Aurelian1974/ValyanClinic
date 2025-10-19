@@ -1,0 +1,216 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container modal-large @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-file-medical-alt"></i>
+                <h2>Istoric Medical - @PacientNume</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" title="Inchide">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Se incarca...</span>
+                    </div>
+                    <p>Se incarca istoricul medical...</p>
+                </div>
+            }
+            else if (HasError)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @ErrorMessage
+                </div>
+            }
+            else
+            {
+                <!-- Action Bar -->
+                <div class="action-bar">
+                    <div class="action-bar-left">
+                        <div class="record-count">
+                            <i class="fas fa-notes-medical"></i>
+                            <span>@TotalRecords înregistrări medicale</span>
+                        </div>
+                    </div>
+                    <div class="action-bar-right">
+                        <button class="btn btn-sm btn-success" @onclick="OpenAddRecordModal">
+                            <i class="fas fa-plus"></i>
+                            Adauga Inregistrare
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary" @onclick="ExportToPdf">
+                            <i class="fas fa-file-pdf"></i>
+                            Export PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Timeline Filter Tabs -->
+                <div class="timeline-filters">
+                    <button class="filter-tab @(SelectedFilter == "toate" ? "active" : "")" 
+                            @onclick='() => SetFilter("toate")'>
+                        <i class="fas fa-list"></i>
+                        Toate
+                    </button>
+                    <button class="filter-tab @(SelectedFilter == "consultatii" ? "active" : "")" 
+                            @onclick='() => SetFilter("consultatii")'>
+                        <i class="fas fa-stethoscope"></i>
+                        Consultatii
+                    </button>
+                    <button class="filter-tab @(SelectedFilter == "analize" ? "active" : "")" 
+                            @onclick='() => SetFilter("analize")'>
+                        <i class="fas fa-vial"></i>
+                        Analize
+                    </button>
+                    <button class="filter-tab @(SelectedFilter == "tratamente" ? "active" : "")" 
+                            @onclick='() => SetFilter("tratamente")'>
+                        <i class="fas fa-pills"></i>
+                        Tratamente
+                    </button>
+                    <button class="filter-tab @(SelectedFilter == "interventii" ? "active" : "")" 
+                            @onclick='() => SetFilter("interventii")'>
+                        <i class="fas fa-procedures"></i>
+                        Interventii
+                    </button>
+                </div>
+
+                <!-- Medical Timeline -->
+                <div class="medical-timeline">
+                    @if (FilteredRecords.Any())
+                    {
+                        @foreach (var record in FilteredRecords)
+                        {
+                            <div class="timeline-item @GetRecordTypeClass(record.Type)">
+                                <div class="timeline-marker">
+                                    <i class="fas fa-@GetRecordTypeIcon(record.Type)"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <div class="timeline-title">
+                                            <h4>@record.Title</h4>
+                                            <span class="record-type-badge @GetRecordTypeClass(record.Type)">
+                                                @record.Type
+                                            </span>
+                                        </div>
+                                        <div class="timeline-date">
+                                            <i class="fas fa-calendar"></i>
+                                            @record.Date.ToString("dd MMM yyyy")
+                                            <span class="time">@record.Date.ToString("HH:mm")</span>
+                                        </div>
+                                    </div>
+                                    
+                                    @if (!string.IsNullOrEmpty(record.Doctor))
+                                    {
+                                        <div class="timeline-meta">
+                                            <i class="fas fa-user-md"></i>
+                                            <span>@record.Doctor</span>
+                                        </div>
+                                    }
+
+                                    <div class="timeline-body">
+                                        <p>@record.Description</p>
+                                    </div>
+
+                                    @if (record.Details != null && record.Details.Any())
+                                    {
+                                        <div class="timeline-details">
+                                            @foreach (var detail in record.Details)
+                                            {
+                                                <div class="detail-item">
+                                                    <strong>@detail.Key:</strong>
+                                                    <span>@detail.Value</span>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+
+                                    @if (record.Attachments != null && record.Attachments.Any())
+                                    {
+                                        <div class="timeline-attachments">
+                                            <div class="attachments-label">
+                                                <i class="fas fa-paperclip"></i>
+                                                Atasamente (@record.Attachments.Count)
+                                            </div>
+                                            <div class="attachments-list">
+                                                @foreach (var attachment in record.Attachments)
+                                                {
+                                                    <button class="attachment-item" @onclick="() => ViewAttachment(attachment)">
+                                                        <i class="fas fa-file-@GetFileIcon(attachment.Extension)"></i>
+                                                        <span>@attachment.FileName</span>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="timeline-actions">
+                                        <button class="btn-action" @onclick="() => EditRecord(record)" title="Editeaza">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-action btn-danger" @onclick="() => DeleteRecord(record)" title="Sterge">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-timeline">
+                            <div class="empty-icon">
+                                <i class="fas fa-notes-medical"></i>
+                            </div>
+                            <h3>Nu exista inregistrari medicale</h3>
+                            <p>@(SelectedFilter == "toate" ? "Pacientul nu are inca istoric medical." : $"Nu exista inregistrari de tip '{SelectedFilter}'.")</p>
+                            <button class="btn btn-primary" @onclick="OpenAddRecordModal">
+                                <i class="fas fa-plus"></i>
+                                Adauga Prima Inregistrare
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pagination -->
+                @if (TotalRecords > PageSize)
+                {
+                    <div class="timeline-pagination">
+                        <button class="btn btn-sm btn-outline-secondary" 
+                                @onclick="LoadPreviousPage" 
+                                disabled="@(CurrentPage == 1)">
+                            <i class="fas fa-chevron-left"></i>
+                            Anterioare
+                        </button>
+                        <span class="page-info">
+                            Pagina @CurrentPage din @TotalPages
+                        </span>
+                        <button class="btn btn-sm btn-outline-secondary" 
+                                @onclick="LoadNextPage" 
+                                disabled="@(CurrentPage == TotalPages)">
+                            Urmatoare
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" @onclick="Close">
+                <i class="fas fa-times"></i>
+                Inchide
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Sub-modals -->
+@* Modal pentru adaugare/editare inregistrare medicala *@
+@* Modal pentru vizualizare atasament *@

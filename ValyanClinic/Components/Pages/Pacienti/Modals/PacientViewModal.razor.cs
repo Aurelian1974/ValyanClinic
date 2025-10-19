@@ -17,17 +17,27 @@ public partial class PacientViewModal : ComponentBase
 
     #region Parameters
     /// <summary>
+    /// Vizibilitatea modalului
+    /// </summary>
+    [Parameter] public bool IsVisible { get; set; }
+
+    /// <summary>
+    /// Event callback pentru schimbarea vizibilității
+    /// </summary>
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    /// <summary>
+    /// ID-ul pacientului de vizualizat
+    /// </summary>
+    [Parameter] public Guid? PacientId { get; set; }
+
+    /// <summary>
     /// Event callback cand modalul se inchide
     /// </summary>
     [Parameter] public EventCallback OnClosed { get; set; }
     #endregion
 
     #region State Properties
-    /// <summary>
-    /// Vizibilitatea modalului
-    /// </summary>
-    private bool IsVisible { get; set; }
-
     /// <summary>
     /// Indicator de incarcare date
     /// </summary>
@@ -52,65 +62,15 @@ public partial class PacientViewModal : ComponentBase
     /// Tab-ul activ din modal
     /// </summary>
     private string ActiveTab { get; set; } = "personal";
-
-    /// <summary>
-    /// ID-ul pacientului curent vizualizat
-    /// </summary>
-    private Guid CurrentPacientId { get; set; }
     #endregion
 
-    #region Public Methods
-    /// <summary>
-    /// Deschide modalul pentru vizualizare pacient
-    /// </summary>
-    /// <param name="pacientId">ID-ul pacientului de vizualizat</param>
-    public async Task Open(Guid pacientId)
+    #region Lifecycle Methods
+    protected override async Task OnParametersSetAsync()
     {
-        try
+        if (IsVisible && PacientId.HasValue && PacientId.Value != Guid.Empty)
         {
-            CurrentPacientId = pacientId;
-            IsVisible = true;
-            IsLoading = true;
-            HasError = false;
-            ErrorMessage = string.Empty;
-            PacientData = null;
-            ActiveTab = "personal";
-
-            await InvokeAsync(StateHasChanged);
-
-            await LoadPacientData(pacientId);
+            await LoadPacientData(PacientId.Value);
         }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Eroare la deschiderea modalului pentru pacientul {PacientId}", pacientId);
-            HasError = true;
-            ErrorMessage = $"Eroare la deschiderea modalului: {ex.Message}";
-            IsLoading = false;
-            await InvokeAsync(StateHasChanged);
-        }
-    }
-
-    /// <summary>
-    /// Inchide modalul
-    /// </summary>
-    public async Task Close()
-    {
-        IsVisible = false;
-        await InvokeAsync(StateHasChanged);
-
-        // Notify parent
-        if (OnClosed.HasDelegate)
-        {
-            await OnClosed.InvokeAsync();
-        }
-
-        // Reset state after animation
-        await Task.Delay(300);
-        PacientData = null;
-        IsLoading = false;
-        HasError = false;
-        ErrorMessage = string.Empty;
-        CurrentPacientId = Guid.Empty;
     }
     #endregion
 
@@ -120,6 +80,9 @@ public partial class PacientViewModal : ComponentBase
     /// </summary>
     private async Task LoadPacientData(Guid pacientId)
     {
+        IsLoading = true;
+        HasError = false;
+        
         try
         {
             Logger.LogInformation("Incarca datele pacientului {PacientId} pentru vizualizare", pacientId);
@@ -169,6 +132,29 @@ public partial class PacientViewModal : ComponentBase
     private async Task HandleOverlayClick()
     {
         await Close();
+    }
+
+    /// <summary>
+    /// Inchide modalul
+    /// </summary>
+    private async Task Close()
+    {
+        IsVisible = false;
+        await IsVisibleChanged.InvokeAsync(false);
+
+        // Notify parent
+        if (OnClosed.HasDelegate)
+        {
+            await OnClosed.InvokeAsync();
+        }
+
+        // Reset state after animation
+        await Task.Delay(300);
+        PacientData = null;
+        IsLoading = false;
+        HasError = false;
+        ErrorMessage = string.Empty;
+        ActiveTab = "personal";
     }
     #endregion
 }

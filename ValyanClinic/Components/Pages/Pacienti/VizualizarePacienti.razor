@@ -419,4 +419,7 @@
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
 
-<PacientViewModal @ref="pacientViewModal" />
+<PacientViewModal IsVisible="@ShowViewModal"
+                  IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
+                  PacientId="@SelectedPacientId"
+                  OnClosed="@HandleModalClosed" />
