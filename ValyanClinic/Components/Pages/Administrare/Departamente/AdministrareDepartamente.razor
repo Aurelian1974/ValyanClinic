@@ -1,5 +1,5 @@
 ﻿@page "/administrare/departamente"
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using ValyanClinic.Application.Features.DepartamentManagement.Queries.GetDepartamentList
 @using ValyanClinic.Services.DataGrid
 @using MediatR
@@ -147,8 +147,8 @@
                     AllowTextWrap="true"
                     ShowColumnChooser="true"
                     GridLines="GridLine.Both"
-                    EnableVirtualization="true"
-                    EnableColumnVirtualization="true"
+                    EnableVirtualization="false"
+                    EnableColumnVirtualization="false"
                     RowHeight="34">
                 
                 <GridFilterSettings Type="FilterType.Excel"></GridFilterSettings>
@@ -259,7 +259,7 @@
     }
 </div>
 
-<SfToast @ref="ToastRef" Title="@ToastTitle" Content="@ToastContent" CssClass="@ToastCssClass">
+<SfToast @ref="ToastRef">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
 

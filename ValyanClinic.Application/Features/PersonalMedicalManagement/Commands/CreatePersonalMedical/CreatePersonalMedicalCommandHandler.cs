@@ -41,6 +41,7 @@ public class CreatePersonalMedicalCommandHandler : IRequestHandler<CreatePersona
                 Pozitie = request.Pozitie,
                 EsteActiv = request.EsteActiv,
                 CategorieID = request.CategorieID,
+                PozitieID = request.PozitieID,
                 SpecializareID = request.SpecializareID,
                 SubspecializareID = request.SubspecializareID,
                 DataCreare = DateTime.UtcNow

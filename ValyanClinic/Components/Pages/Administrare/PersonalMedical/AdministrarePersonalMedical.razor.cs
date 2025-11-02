@@ -14,6 +14,10 @@ namespace ValyanClinic.Components.Pages.Administrare.PersonalMedical;
 
 public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 {
+    // CRITICAL: Static lock pentru ABSOLUTE protection
+    private static readonly object _initLock = new object();
+    private static bool _anyInstanceInitializing = false;
+    
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<AdministrarePersonalMedical> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -60,6 +64,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
     private CancellationTokenSource? _searchDebounceTokenSource;
     private const int SearchDebounceMs = 500;
     private bool _disposed = false;
+    private bool _initialized = false;
+    private bool _isInitializing = false;
 
     private List<FilterOption> StatusOptions { get; set; } = new();
     private List<FilterOption> DepartamentOptions { get; set; } = new();
@@ -82,10 +88,35 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        // CRITICAL: GLOBAL lock la nivel de pagină
+        lock (_initLock)
+        {
+            if (_anyInstanceInitializing)
+            {
+                Logger.LogWarning("Another instance is ALREADY initializing - BLOCKING this call");
+                return;
+            }
+            
+            if (_initialized || _isInitializing)
+            {
+                Logger.LogWarning("This instance already initialized/initializing - SKIPPING");
+                return;
+            }
+
+            _isInitializing = true;
+            _anyInstanceInitializing = true;
+        }
+
         try
         {
+            // CRITICAL: Delay pentru a permite componentei anterioare să facă cleanup COMPLET
+            Logger.LogInformation("Waiting for previous component cleanup...");
+            await Task.Delay(200);
+            
             Logger.LogInformation("Initializare pagina Administrare Personal Medical");
             await LoadPagedData();
+            
+            _initialized = true;
         }
         catch (ObjectDisposedException ex)
         {
@@ -98,28 +129,65 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
             ErrorMessage = $"Eroare la initializare: {ex.Message}";
             IsLoading = false;
         }
+        finally
+        {
+            lock (_initLock)
+            {
+                _isInitializing = false;
+                _anyInstanceInitializing = false;
+            }
+        }
     }
 
     public void Dispose()
     {
         if (_disposed) return;
         
+        // Setează flag imediat pentru a bloca noi operații
+        _disposed = true;
+        
+        // CRITICAL: Cleanup SINCRON pentru Syncfusion Grid
         try
         {
+            Logger.LogDebug("AdministrarePersonalMedical disposing - SYNCHRONOUS cleanup");
+            
+            // Dezactivează Grid-ul IMEDIAT
+            if (GridRef != null)
+            {
+                GridRef = null;
+            }
+            
+            // Cancel orice operații în curs
             _searchDebounceTokenSource?.Cancel();
             _searchDebounceTokenSource?.Dispose();
             _searchDebounceTokenSource = null;
             
-            Logger.LogDebug("AdministrarePersonalMedical disposed");
+            // Clear data IMEDIAT
+            CurrentPageData?.Clear();
+            CurrentPageData = new();
+            
+            Logger.LogDebug("AdministrarePersonalMedical disposed - Grid cleared IMMEDIATELY");
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Eroare la dispose");
+            Logger.LogError(ex, "Error in synchronous dispose");
         }
-        finally
+        
+        // Cleanup async pentru JavaScript - delay suplimentar
+        _ = Task.Run(async () =>
         {
-            _disposed = true;
-        }
+            try
+            {
+                // CRITICAL: Delay pentru a permite Syncfusion să termine operațiile DOM
+                await Task.Delay(150);
+                
+                Logger.LogDebug("AdministrarePersonalMedical async cleanup complete");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error in async dispose");
+            }
+        });
     }
 
     private async Task LoadPagedData()

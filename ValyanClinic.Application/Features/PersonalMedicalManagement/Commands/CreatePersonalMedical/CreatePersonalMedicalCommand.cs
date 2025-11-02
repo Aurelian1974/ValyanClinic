@@ -15,6 +15,7 @@ public record CreatePersonalMedicalCommand : IRequest<Result<Guid>>
     public string? Pozitie { get; init; }
     public bool EsteActiv { get; init; } = true;
     public Guid? CategorieID { get; init; }
+    public Guid? PozitieID { get; init; }
     public Guid? SpecializareID { get; init; }
     public Guid? SubspecializareID { get; init; }
 }

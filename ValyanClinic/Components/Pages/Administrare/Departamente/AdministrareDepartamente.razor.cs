@@ -5,7 +5,6 @@ using Syncfusion.Blazor.Notifications;
 using MediatR;
 using ValyanClinic.Application.Features.DepartamentManagement.Queries.GetDepartamentList;
 using ValyanClinic.Application.Features.DepartamentManagement.Commands.DeleteDepartament;
-using ValyanClinic.Services.DataGrid;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Components.Shared.Modals;
 using ValyanClinic.Components.Pages.Administrare.Departamente.Modals;
@@ -14,10 +13,13 @@ namespace ValyanClinic.Components.Pages.Administrare.Departamente;
 
 public partial class AdministrareDepartamente : ComponentBase, IDisposable
 {
+    // CRITICAL: Static lock pentru ABSOLUTE protection
+    private static readonly object _initLock = new object();
+    private static bool _anyInstanceInitializing = false;
+    
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<AdministrareDepartamente> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
-    [Inject] private IFilterOptionsService FilterOptionsService { get; set; } = default!;
 
     private SfGrid<DepartamentListDto>? GridRef;
     private SfToast? ToastRef;
@@ -53,6 +55,8 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private CancellationTokenSource? _searchDebounceTokenSource;
     private const int SearchDebounceMs = 500;
     private bool _disposed = false;
+    private bool _initialized = false;
+    private bool _isInitializing = false;
 
     private string ToastTitle { get; set; } = string.Empty;
     private string ToastContent { get; set; } = string.Empty;
@@ -65,10 +69,35 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        // CRITICAL: GLOBAL lock la nivel de pagină
+        lock (_initLock)
+        {
+            if (_anyInstanceInitializing)
+            {
+                Logger.LogWarning("Another instance is ALREADY initializing - BLOCKING this call");
+                return;
+            }
+            
+            if (_initialized || _isInitializing)
+            {
+                Logger.LogWarning("This instance already initialized/initializing - SKIPPING");
+                return;
+            }
+
+            _isInitializing = true;
+            _anyInstanceInitializing = true;
+        }
+
         try
         {
+            // CRITICAL: Delay pentru a permite componentei anterioare să facă cleanup COMPLET
+            Logger.LogInformation("Waiting for previous component cleanup...");
+            await Task.Delay(200);
+            
             Logger.LogInformation("Initializare pagina Administrare Departamente");
             await LoadPagedData();
+            
+            _initialized = true;
         }
         catch (ObjectDisposedException ex)
         {
@@ -81,28 +110,65 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             ErrorMessage = $"Eroare la initializare: {ex.Message}";
             IsLoading = false;
         }
+        finally
+        {
+            lock (_initLock)
+            {
+                _isInitializing = false;
+                _anyInstanceInitializing = false;
+            }
+        }
     }
 
     public void Dispose()
     {
         if (_disposed) return;
         
+        // Setează flag imediat pentru a bloca noi operații
+        _disposed = true;
+        
+        // CRITICAL: Cleanup SINCRON pentru Syncfusion Grid - IMEDIAT
         try
         {
+            Logger.LogDebug("AdministrareDepartamente disposing - SYNCHRONOUS cleanup");
+            
+            // Dezactivează Grid-ul IMEDIAT
+            if (GridRef != null)
+            {
+                GridRef = null;
+            }
+            
+            // Cancel orice operații în curs
             _searchDebounceTokenSource?.Cancel();
             _searchDebounceTokenSource?.Dispose();
             _searchDebounceTokenSource = null;
             
-            Logger.LogDebug("AdministrareDepartamente disposed");
+            // Clear data IMEDIAT
+            CurrentPageData?.Clear();
+            CurrentPageData = new();
+            
+            Logger.LogDebug("AdministrareDepartamente disposed - Grid cleared IMMEDIATELY");
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Eroare la dispose");
+            Logger.LogError(ex, "Error in synchronous dispose");
         }
-        finally
+        
+        // Cleanup async pentru JavaScript - delay suplimentar
+        _ = Task.Run(async () =>
         {
-            _disposed = true;
-        }
+            try
+            {
+                // CRITICAL: Delay pentru a permite Syncfusion să termine operațiile DOM
+                await Task.Delay(150);
+                
+                Logger.LogDebug("AdministrareDepartamente async cleanup complete");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error in async dispose");
+            }
+        });
     }
 
     private async Task LoadPagedData()
@@ -182,7 +248,7 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             if (!_disposed)
             {
                 IsLoading = false;
-                StateHasChanged();
+                await InvokeAsync(StateHasChanged);
             }
         }
     }
@@ -335,7 +401,14 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
         
         Logger.LogInformation("Departament saved - reloading data");
         
+        // CRITICAL: Delay pentru a permite modal-ului să se închidă complet
+        await Task.Delay(300);
+        
+        if (_disposed) return; // Check again after delay
+        
         await LoadPagedData();
+        
+        // Toast doar după ce modal este închis și datele sunt reîncărcate
         await ShowToast("Succes", "Departament salvat cu succes", "e-toast-success");
     }
 
@@ -565,13 +638,36 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     {
         if (_disposed) return; // Guard check
         
-        ToastTitle = title;
-        ToastContent = content;
-        ToastCssClass = cssClass;
-
-        if (ToastRef != null)
+        if (ToastRef == null)
         {
-            await ToastRef.ShowAsync();
+            Logger.LogWarning("ToastRef is null, cannot show toast");
+            return;
+        }
+
+        try
+        {
+            // CRITICAL: Folosește ToastModel pentru a asigura că datele sunt transmise corect
+            var toastModel = new ToastModel
+            {
+                Title = title,
+                Content = content,
+                CssClass = cssClass,
+                ShowCloseButton = true,
+                Timeout = 3000
+            };
+
+            Logger.LogDebug("Showing toast: Title='{Title}', Content='{Content}', CssClass='{CssClass}'", 
+                title, content, cssClass);
+
+            await ToastRef.ShowAsync(toastModel);
+        }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Toast reference disposed");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error showing toast");
         }
     }
 }

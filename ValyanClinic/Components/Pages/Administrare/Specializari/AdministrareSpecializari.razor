@@ -1,5 +1,5 @@
 ﻿@page "/administrare/specializari"
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using ValyanClinic.Application.Features.SpecializareManagement.Queries.GetSpecializareList
 @using ValyanClinic.Services.DataGrid
 @using MediatR
@@ -8,6 +8,7 @@
 @using ValyanClinic.Components.Shared.Modals
 @using ValyanClinic.Components.Pages.Administrare.Specializari.Modals
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
+@implements IDisposable
 
 <PageTitle>Administrare Specializari</PageTitle>
 
@@ -137,74 +138,84 @@
             </select>
         </div>
 
-        <div class="grid-container">
-            <SfGrid @ref="GridRef"
-                    DataSource="@CurrentPageData"
-                    Height="100%"
-                    AllowPaging="false"
-                    AllowSorting="true"
-                    AllowFiltering="false"
-                    AllowResizing="true"
-                    AllowReordering="true"
-                    AllowGrouping="false"
-                    AllowTextWrap="true"
-                    ShowColumnChooser="true"
-                    GridLines="GridLine.Both"
-                    EnableVirtualization="true"
-                    EnableColumnVirtualization="true"
-                    RowHeight="34">
-                
-                <GridFilterSettings Type="FilterType.Excel"></GridFilterSettings>
-                
-                <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
-                
-                <GridEvents TValue="SpecializareListDto" 
-                           RowSelected="OnRowSelected"
-                           RowDeselected="OnRowDeselected"
-                           OnActionBegin="OnGridActionBegin">
-                </GridEvents>
-                
-                <GridColumns>
-                    <GridColumn Field="@nameof(SpecializareListDto.Id)" 
-                               HeaderText="ID" 
-                               Width="100"
-                               IsPrimaryKey="true"
-                               Visible="false">
-                    </GridColumn>
+        @if (CurrentPageData != null && CurrentPageData.Any())
+        {
+            <div class="grid-container">
+                <SfGrid @ref="GridRef"
+                        DataSource="@CurrentPageData"
+                        Height="100%"
+                        AllowPaging="false"
+                        AllowSorting="true"
+                        AllowFiltering="false"
+                        AllowResizing="true"
+                        AllowReordering="true"
+                        AllowGrouping="false"
+                        AllowTextWrap="true"
+                        ShowColumnChooser="true"
+                        GridLines="GridLine.Both"
+                        EnableVirtualization="false"
+                        EnableColumnVirtualization="false"
+                        RowHeight="34">
                     
-                    <GridColumn Field="@nameof(SpecializareListDto.Denumire)" 
-                               HeaderText="Denumire Specializare" 
-                               Width="300">
-                    </GridColumn>
+                    <GridFilterSettings Type="FilterType.Excel"></GridFilterSettings>
                     
-                    <GridColumn Field="@nameof(SpecializareListDto.Categorie)" 
-                               HeaderText="Categorie" 
-                               Width="200">
-                    </GridColumn>
+                    <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
                     
-                    <GridColumn Field="@nameof(SpecializareListDto.Descriere)" 
-                               HeaderText="Descriere" 
-                               Width="400">
-                    </GridColumn>
+                    <GridEvents TValue="SpecializareListDto" 
+                               RowSelected="OnRowSelected"
+                               RowDeselected="OnRowDeselected"
+                               OnActionBegin="OnGridActionBegin">
+                    </GridEvents>
                     
-                    <GridColumn Field="@nameof(SpecializareListDto.EsteActiv)" 
-                               HeaderText="Status" 
-                               Width="120">
-                        <Template>
-                            @{
-                                var specializare = context as SpecializareListDto;
-                                if (specializare != null)
-                                {
-                                    <span class="badge @(specializare.EsteActiv ? "badge-success" : "badge-danger")">
-                                        @(specializare.EsteActiv ? "Activ" : "Inactiv")
-                                    </span>
+                    <GridColumns>
+                        <GridColumn Field="@nameof(SpecializareListDto.Id)" 
+                                   HeaderText="ID" 
+                                   Width="100"
+                                   IsPrimaryKey="true"
+                                   Visible="false">
+                        </GridColumn>
+                        
+                        <GridColumn Field="@nameof(SpecializareListDto.Denumire)" 
+                                   HeaderText="Denumire Specializare" 
+                                   Width="300">
+                        </GridColumn>
+                        
+                        <GridColumn Field="@nameof(SpecializareListDto.Categorie)" 
+                                   HeaderText="Categorie" 
+                                   Width="200">
+                        </GridColumn>
+                        
+                        <GridColumn Field="@nameof(SpecializareListDto.Descriere)" 
+                                   HeaderText="Descriere" 
+                                   Width="400">
+                        </GridColumn>
+                        
+                        <GridColumn Field="@nameof(SpecializareListDto.EsteActiv)" 
+                                   HeaderText="Status" 
+                                   Width="120">
+                            <Template>
+                                @{
+                                    var specializare = context as SpecializareListDto;
+                                    if (specializare != null)
+                                    {
+                                        <span class="badge @(specializare.EsteActiv ? "badge-success" : "badge-danger")">
+                                            @(specializare.EsteActiv ? "Activ" : "Inactiv")
+                                        </span>
+                                    }
                                 }
-                            }
-                        </Template>
-                    </GridColumn>
-                </GridColumns>
-            </SfGrid>
-        </div>
+                            </Template>
+                        </GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </div>
+        }
+        else
+        {
+            <div class="no-data-container">
+                <i class="fas fa-inbox"></i>
+                <p>Nu există date disponibile</p>
+            </div>
+        }
 
         <div class="custom-pager">
             <div class="pager-info">

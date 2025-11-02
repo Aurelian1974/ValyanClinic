@@ -15,6 +15,7 @@ public class PersonalMedicalDetailDto
     public bool? EsteActiv { get; set; }
     public DateTime? DataCreare { get; set; }
     public Guid? CategorieID { get; set; }
+    public Guid? PozitieID { get; set; }
     public Guid? SpecializareID { get; set; }
     public Guid? SubspecializareID { get; set; }
     public string? CategorieName { get; set; }

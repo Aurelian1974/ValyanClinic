@@ -16,6 +16,7 @@ public record UpdatePersonalMedicalCommand : IRequest<Result<bool>>
     public string? Pozitie { get; init; }
     public bool EsteActiv { get; init; } = true;
     public Guid? CategorieID { get; init; }
+    public Guid? PozitieID { get; init; }
     public Guid? SpecializareID { get; init; }
     public Guid? SubspecializareID { get; init; }
 }

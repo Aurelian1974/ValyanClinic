@@ -1,26 +1,31 @@
-﻿/* Modal Overlay - Violet Theme */
+﻿/* ===================================
+   PersonalMedicalViewModal - Blue Theme
+   Consistent with application theme
+   =================================== */
+
+/* Modal Overlay - Blue Theme */
 .modal-overlay {
-    background: rgba(118, 75, 162, 0.3);
+    background: rgba(30, 58, 138, 0.3);
 }
 
-/* Modal Container - Violet Theme */
+/* Modal Container - Blue Theme */
 .modal-container {
-    box-shadow: 0 10px 30px rgba(118, 75, 162, 0.2);
+    box-shadow: 0 10px 30px rgba(96, 165, 250, 0.2);
 }
 
-/* Modal Header - Violet Gradient */
+/* Modal Header - Blue Gradient */
 .modal-header {
-    background: linear-gradient(135deg, #b794f4 0%, #9f7aea 100%);
-    box-shadow: 0 2px 8px rgba(159, 122, 234, 0.15);
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.15);
 }
 
-/* Modal Body - Light Violet Background */
+/* Modal Body - Light Blue Background */
 .modal-body {
-    background: #faf5ff;
+    background: #f8fafc;
 }
 
 .loading-container p {
-    color: #6b46c1;
+    color: #64748b;
 }
 
 /* Tabs Container */
@@ -34,7 +39,7 @@
 .tab-buttons {
     display: flex;
     gap: 0.375rem;
-    border-bottom: 2px solid #e9d8fd;
+    border-bottom: 2px solid #e2e8f0;
     flex-wrap: wrap;
     background: white;
     padding: 0.375rem 0.875rem;
@@ -45,7 +50,7 @@
     background: transparent;
     border: none;
     padding: 0.625rem 1rem;
-    color: #6b46c1;
+    color: #64748b;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -60,14 +65,14 @@
 }
 
 .tab-button:hover {
-    color: #9f7aea;
-    background: #faf5ff;
+    color: #60a5fa;
+    background: #eff6ff;
 }
 
 .tab-button.active {
-    color: #9f7aea;
-    border-bottom-color: #9f7aea;
-    background: #faf5ff;
+    color: #60a5fa;
+    border-bottom-color: #60a5fa;
+    background: #eff6ff;
     font-weight: 600;
 }
 
@@ -105,8 +110,8 @@
     border-radius: 10px;
     padding: 1.25rem;
     margin-bottom: 1.25rem;
-    box-shadow: 0 2px 8px rgba(159, 122, 234, 0.08);
-    border: 1px solid #e9d8fd;
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.08);
+    border: 1px solid #e2e8f0;
 }
 
 .info-card:last-child {
@@ -120,13 +125,13 @@
     margin: 0 0 1rem 0;
     font-size: 1.025rem;
     font-weight: 600;
-    color: #44337a;
+    color: #334155;
     padding-bottom: 0.625rem;
-    border-bottom: 2px solid #e9d8fd;
+    border-bottom: 2px solid #e2e8f0;
 }
 
 .card-title i {
-    color: #9f7aea;
+    color: #60a5fa;
     font-size: 1.125rem;
 }
 
@@ -150,7 +155,7 @@
 .info-item label {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #6b46c1;
+    color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin: 0;
@@ -158,11 +163,11 @@
 
 .info-value {
     font-size: 0.9375rem;
-    color: #44337a;
+    color: #334155;
     padding: 0.625rem;
-    background: #faf5ff;
+    background: #f8fafc;
     border-radius: 7px;
-    border: 1px solid #e9d8fd;
+    border: 1px solid #e2e8f0;
     min-height: 40px;
     display: flex;
     align-items: center;
@@ -170,13 +175,13 @@
 }
 
 .info-value:hover {
-    background: #f3e8ff;
-    border-color: #d6bcfa;
+    background: #eff6ff;
+    border-color: #bfdbfe;
 }
 
 .info-value.primary-text {
     font-weight: 600;
-    color: #9f7aea;
+    color: #3b82f6;
     font-size: 1.0625rem;
 }
 
@@ -213,13 +218,14 @@
 }
 
 .badge-primary {
-    background: linear-gradient(135deg, #b794f4, #9f7aea);
+    background: linear-gradient(135deg, #93c5fd, #60a5fa);
     color: white;
 }
 
 .badge-primary:hover {
-    background: linear-gradient(135deg, #9f7aea, #805ad5);
-    box-shadow: 0 3px 6px rgba(159, 122, 234, 0.3);
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    box-shadow: 0 3px 6px rgba(96, 165, 250, 0.3);
+    transform: translateY(-1px);
 }
 
 .badge-secondary {
@@ -266,7 +272,7 @@
 
 /* Contact Links */
 .contact-link {
-    color: #9f7aea;
+    color: #60a5fa;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -276,7 +282,7 @@
 }
 
 .contact-link:hover {
-    color: #805ad5;
+    color: #3b82f6;
     text-decoration: underline;
     transform: translateX(3px);
 }
@@ -285,13 +291,13 @@
     font-size: 0.8125rem;
 }
 
-/* Scrollbar - Violet Theme */
+/* Scrollbar - Blue Theme */
 .modal-body::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #d6bcfa, #b794f4);
+    background: linear-gradient(135deg, #bfdbfe, #93c5fd);
 }
 
 .modal-body::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #b794f4, #9f7aea);
+    background: linear-gradient(135deg, #93c5fd, #60a5fa);
 }
 
 /* Responsive Adjustments */

@@ -1,18 +1,16 @@
 ﻿-- ========================================
 -- Stored Procedure: sp_PersonalMedical_GetById
 -- Database: ValyanMed
--- Created: 09/22/2025 20:33:24
--- Modified: 09/22/2025 20:33:24
--- Generat: 2025-10-18 08:40:46
+-- FIXED: Corectate numele coloanelor din Departamente
 -- ========================================
 
 USE [ValyanMed]
 GO
 
 -- =============================================
--- SP pentru ob?inerea unui personal medical dup? ID
+-- SP pentru obținerea unui personal medical după ID
 -- =============================================
-CREATE   PROCEDURE [dbo].[sp_PersonalMedical_GetById]
+CREATE OR ALTER PROCEDURE [dbo].[sp_PersonalMedical_GetById]
     @PersonalID UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -33,13 +31,15 @@ BEGIN
         pm.CategorieID,
         pm.SpecializareID,
         pm.SubspecializareID,
-        d1.Nume AS CategorieName,
-        d2.Nume AS SpecializareName,
-        d3.Nume AS SubspecializareName
+        -- FIXED: Folosește numele corecte de coloane
+        d1.DenumireDepartament AS CategorieName,
+        d2.DenumireDepartament AS SpecializareName,
+        d3.DenumireDepartament AS SubspecializareName
     FROM PersonalMedical pm
-    LEFT JOIN Departamente d1 ON pm.CategorieID = d1.DepartamentID
-    LEFT JOIN Departamente d2 ON pm.SpecializareID = d2.DepartamentID
-    LEFT JOIN Departamente d3 ON pm.SubspecializareID = d3.DepartamentID
+    -- FIXED: Folosește IdDepartament în loc de DepartamentID
+    LEFT JOIN Departamente d1 ON pm.CategorieID = d1.IdDepartament
+    LEFT JOIN Departamente d2 ON pm.SpecializareID = d2.IdDepartament
+    LEFT JOIN Departamente d3 ON pm.SubspecializareID = d3.IdDepartament
     WHERE pm.PersonalID = @PersonalID;
 END;
 GO

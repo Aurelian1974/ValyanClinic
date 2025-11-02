@@ -8,14 +8,20 @@ using ValyanClinic.Application.Features.SpecializareManagement.Commands.DeleteSp
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Components.Shared.Modals;
 using ValyanClinic.Components.Pages.Administrare.Specializari.Modals;
+using Microsoft.JSInterop;
 
 namespace ValyanClinic.Components.Pages.Administrare.Specializari;
 
 public partial class AdministrareSpecializari : ComponentBase, IDisposable
 {
+    // CRITICAL: Static lock pentru ABSOLUTE protection
+    private static readonly object _initLock = new object();
+    private static bool _anyInstanceInitializing = false;
+    
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<AdministrareSpecializari> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
     private SfGrid<SpecializareListDto>? GridRef;
     private SfToast? ToastRef;
@@ -51,6 +57,9 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
     private CancellationTokenSource? _searchDebounceTokenSource;
     private const int SearchDebounceMs = 500;
     private bool _disposed = false;
+    private bool _initialized = false;
+    private bool _isInitializing = false;
+    private const string PageRefreshKey = "specializari_page"; // Unique key pentru această pagină
 
     private string ToastTitle { get; set; } = string.Empty;
     private string ToastContent { get; set; } = string.Empty;
@@ -63,10 +72,39 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        // CRITICAL: GLOBAL lock la nivel de pagină
+        lock (_initLock)
+        {
+            if (_anyInstanceInitializing)
+            {
+                Logger.LogWarning("Another instance is ALREADY initializing - BLOCKING this call");
+                return;
+            }
+            
+            if (_initialized || _isInitializing)
+            {
+                Logger.LogWarning("This instance already initialized/initializing - SKIPPING");
+                return;
+            }
+
+            _isInitializing = true;
+            _anyInstanceInitializing = true;
+        }
+
         try
         {
+            // CRITICAL: Delay pentru a permite componentei anterioare să facă cleanup COMPLET
+            Logger.LogInformation("Waiting for previous component cleanup...");
+            await Task.Delay(200);
+            
             Logger.LogInformation("Initializare pagina Administrare Specializari");
             await LoadPagedData();
+            
+            _initialized = true;
+        }
+        catch (ObjectDisposedException ex)
+        {
+            Logger.LogWarning(ex, "Component disposed during initialization (navigation away)");
         }
         catch (Exception ex)
         {
@@ -74,7 +112,14 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
             HasError = true;
             ErrorMessage = $"Eroare la initializare: {ex.Message}";
             IsLoading = false;
-            StateHasChanged();
+        }
+        finally
+        {
+            lock (_initLock)
+            {
+                _isInitializing = false;
+                _anyInstanceInitializing = false;
+            }
         }
     }
 
@@ -82,26 +127,55 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
     {
         if (_disposed) return;
         
+        // Setează flag imediat pentru a bloca noi operații
+        _disposed = true;
+        
+        // CRITICAL: Cleanup SINCRON pentru Syncfusion Grid
         try
         {
+            // Dezactivează Grid-ul IMEDIAT
+            if (GridRef != null)
+            {
+                GridRef = null;
+            }
+            
+            // Cancel orice operații în curs
             _searchDebounceTokenSource?.Cancel();
             _searchDebounceTokenSource?.Dispose();
             _searchDebounceTokenSource = null;
             
-            Logger.LogDebug("AdministrareSpecializari disposed");
+            // Clear data IMEDIAT
+            CurrentPageData?.Clear();
+            CurrentPageData = new();
+            
+            Logger.LogDebug("AdministrareSpecializari disposed - Grid cleared IMMEDIATELY");
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Eroare la dispose");
+            Logger.LogError(ex, "Error in synchronous dispose");
         }
-        finally
+        
+        // Cleanup async pentru JavaScript
+        _ = Task.Run(async () =>
         {
-            _disposed = true;
-        }
+            try
+            {
+                // CRITICAL: Delay pentru a permite Syncfusion să termine operațiile DOM
+                await Task.Delay(150);
+                
+                Logger.LogDebug("AdministrareSpecializari async cleanup complete");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error in async dispose");
+            }
+        });
     }
 
     private async Task LoadPagedData()
     {
+        if (_disposed) return;
+
         try
         {
             IsLoading = true;
@@ -125,6 +199,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
             };
 
             var result = await Mediator.Send(query);
+
+            if (_disposed) return;
 
             if (result.IsSuccess)
             {
@@ -153,23 +229,35 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
                 TotalRecords = 0;
             }
         }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Component disposed while loading data (navigation away)");
+        }
         catch (Exception ex)
         {
-            HasError = true;
-            ErrorMessage = $"Eroare neasteptata: {ex.Message}";
-            Logger.LogError(ex, "Eroare la incarcarea datelor");
-            CurrentPageData = new List<SpecializareListDto>();
-            TotalRecords = 0;
+            if (!_disposed)
+            {
+                HasError = true;
+                ErrorMessage = $"Eroare neasteptata: {ex.Message}";
+                Logger.LogError(ex, "Eroare la incarcarea datelor");
+                CurrentPageData = new List<SpecializareListDto>();
+                TotalRecords = 0;
+            }
         }
         finally
         {
-            IsLoading = false;
-            StateHasChanged();
+            if (!_disposed)
+            {
+                IsLoading = false;
+                await InvokeAsync(StateHasChanged);
+            }
         }
     }
 
     private void OnSearchInput(ChangeEventArgs e)
     {
+        if (_disposed) return;
+        
         var newValue = e.Value?.ToString() ?? string.Empty;
         
         if (newValue == GlobalSearchText) return;
@@ -190,14 +278,17 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
             {
                 await Task.Delay(SearchDebounceMs, localToken);
                 
-                if (!localToken.IsCancellationRequested)
+                if (!localToken.IsCancellationRequested && !_disposed)
                 {
                     Logger.LogInformation("Executing search for: '{SearchText}'", GlobalSearchText);
                     
                     await InvokeAsync(async () =>
                     {
-                        CurrentPage = 1;
-                        await LoadPagedData();
+                        if (!_disposed)
+                        {
+                            CurrentPage = 1;
+                            await LoadPagedData();
+                        }
                     });
                 }
             }
@@ -205,15 +296,24 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
             {
                 Logger.LogDebug("Search cancelled");
             }
+            catch (ObjectDisposedException)
+            {
+                Logger.LogDebug("Component disposed during search");
+            }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Eroare la executia search-ului");
+                if (!_disposed)
+                {
+                    Logger.LogError(ex, "Eroare la executia search-ului");
+                }
             }
         }, localToken);
     }
 
     private async Task OnSearchKeyDown(KeyboardEventArgs e)
     {
+        if (_disposed) return;
+        
         if (e.Key == "Enter")
         {
             _searchDebounceTokenSource?.Cancel();
@@ -227,6 +327,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task ClearSearch()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Clearing search");
         
         _searchDebounceTokenSource?.Cancel();
@@ -238,6 +340,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task HandleRefresh()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Refresh specializari");
         
         await LoadPagedData();
@@ -246,6 +350,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task HandleAddNew()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Opening modal for ADD Specializare");
         
         if (specializareFormModal != null)
@@ -256,6 +362,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task HandleViewSelected()
     {
+        if (_disposed) return;
+        
         if (SelectedSpecializare == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
@@ -272,6 +380,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task HandleEditSelected()
     {
+        if (_disposed) return;
+        
         if (SelectedSpecializare == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
@@ -288,6 +398,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task HandleSpecializareSaved()
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Specializare saved - reloading data");
         
         await LoadPagedData();
@@ -296,6 +408,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task HandleEditFromView(Guid specializareId)
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Edit requested from View modal for: {Id}", specializareId);
         
         if (specializareViewModal != null)
@@ -311,6 +425,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task HandleDeleteFromView(Guid specializareId)
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Delete requested from View modal for: {Id}", specializareId);
         
         if (specializareViewModal != null)
@@ -327,6 +443,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task HandleDeleteSelected()
     {
+        if (_disposed) return;
+        
         if (SelectedSpecializare == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
@@ -344,12 +462,16 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task HandleDeleteConfirmed(Guid id)
     {
+        if (_disposed) return;
+        
         Logger.LogInformation("Delete confirmed for: {Id}", id);
         
         try
         {
             var command = new DeleteSpecializareCommand(id);
             var result = await Mediator.Send(command);
+
+            if (_disposed) return;
             
             if (result.IsSuccess)
             {
@@ -364,15 +486,24 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
                 await ShowToast("Eroare", errorMsg, "e-toast-danger");
             }
         }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Component disposed during delete");
+        }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Exception during delete: {Id}", id);
-            await ShowToast("Eroare", $"Eroare la stergere: {ex.Message}", "e-toast-danger");
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Exception during delete: {Id}", id);
+                await ShowToast("Eroare", $"Eroare la stergere: {ex.Message}", "e-toast-danger");
+            }
         }
     }
 
     private async Task GoToPage(int pageNumber)
     {
+        if (_disposed) return;
+        
         if (pageNumber < 1 || pageNumber > TotalPages) return;
         
         Logger.LogInformation("Navigare la pagina {Page}", pageNumber);
@@ -408,6 +539,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task OnPageSizeChanged(int newPageSize)
     {
+        if (_disposed) return;
+        
         if (newPageSize < MinPageSize || newPageSize > MaxPageSize)
         {
             Logger.LogWarning("PageSize invalid: {Size}, using default", newPageSize);
@@ -450,6 +583,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private void OnRowSelected(RowSelectEventArgs<SpecializareListDto> args)
     {
+        if (_disposed) return;
+        
         SelectedSpecializare = args.Data;
         Logger.LogInformation("Specializare selectata: {Id} - {Denumire}", 
             SelectedSpecializare?.Id, SelectedSpecializare?.Denumire);
@@ -458,6 +593,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private void OnRowDeselected(RowDeselectEventArgs<SpecializareListDto> args)
     {
+        if (_disposed) return;
+        
         SelectedSpecializare = null;
         Logger.LogInformation("Selectie anulata");
         StateHasChanged();
@@ -465,6 +602,8 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task OnGridActionBegin(ActionEventArgs<SpecializareListDto> args)
     {
+        if (_disposed) return;
+        
         if (args.RequestType == Syncfusion.Blazor.Grids.Action.Sorting)
         {
             args.Cancel = true;
@@ -489,13 +628,22 @@ public partial class AdministrareSpecializari : ComponentBase, IDisposable
 
     private async Task ShowToast(string title, string content, string cssClass)
     {
+        if (_disposed) return;
+        
         ToastTitle = title;
         ToastContent = content;
         ToastCssClass = cssClass;
 
         if (ToastRef != null)
         {
-            await ToastRef.ShowAsync();
+            try
+            {
+                await ToastRef.ShowAsync();
+            }
+            catch (ObjectDisposedException)
+            {
+                Logger.LogDebug("Toast reference disposed");
+            }
         }
     }
 }

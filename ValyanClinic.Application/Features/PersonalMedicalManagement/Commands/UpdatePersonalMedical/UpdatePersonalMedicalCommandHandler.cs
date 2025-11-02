@@ -44,6 +44,7 @@ public class UpdatePersonalMedicalCommandHandler : IRequestHandler<UpdatePersona
             existing.Pozitie = request.Pozitie;
             existing.EsteActiv = request.EsteActiv;
             existing.CategorieID = request.CategorieID;
+            existing.PozitieID = request.PozitieID;
             existing.SpecializareID = request.SpecializareID;
             existing.SubspecializareID = request.SubspecializareID;
 
