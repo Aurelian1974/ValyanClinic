@@ -1,0 +1,425 @@
+﻿@page "/pacienti/vizualizare"
+@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientList
+@using MediatR
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.DropDowns
+@using ValyanClinic.Components.Pages.Pacienti.Modals
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+
+<PageTitle>Vizualizare Pacienti</PageTitle>
+
+<div class="pacienti-container">
+    <div class="pacienti-header">
+        <h1>
+            <i class="fas fa-user-injured"></i>
+            Vizualizare Pacienti
+        </h1>
+        <div class="header-actions">
+            <button class="btn btn-secondary" @onclick="HandleRefresh">
+                <i class="fas fa-sync-alt"></i>
+                Reincarca
+            </button>
+        </div>
+    </div>
+
+    @if (IsLoading && !DataLoaded)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Se incarca...</span>
+            </div>
+            <p>Se incarca datele...</p>
+        </div>
+    }
+    else if (HasError)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            @ErrorMessage
+        </div>
+    }
+    else
+    {
+        <div class="search-filter-section">
+            <div class="search-and-filter">
+                <div class="global-search">
+                    <div class="search-box-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               class="search-input"
+                               placeholder="Cautare rapida (nume, prenume, CNP, telefon, email)..."
+                               value="@GlobalSearchText"
+                               @oninput="OnSearchInput"
+                               @onkeydown="OnSearchKeyDown" />
+                        @if (!string.IsNullOrEmpty(GlobalSearchText))
+                        {
+                            <button class="search-clear-btn" @onclick="ClearSearch" type="button">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+                <button class="btn-filter @(IsAdvancedFilterExpanded ? "active" : "")" 
+                        @onclick="ToggleAdvancedFilter"
+                        title="Filtre avansate">
+                    <i class="fas fa-filter"></i>
+                    <span>Filtre</span>
+                    @if (ActiveFiltersCount > 0)
+                    {
+                        <span class="filter-badge">@ActiveFiltersCount</span>
+                    }
+                    <i class="fas fa-chevron-@(IsAdvancedFilterExpanded ? "up" : "down") chevron-icon"></i>
+                </button>
+            </div>
+            
+            <div class="total-records">
+                <i class="fas fa-database"></i>
+                <span>Total: <strong>@TotalRecords</strong> pacienti</span>
+                @if (ActiveFiltersCount > 0)
+                {
+                    <span class="filtered-info">(filtrate)</span>
+                }
+            </div>
+        </div>
+
+        <div class="advanced-filter-panel @(IsAdvancedFilterExpanded ? "expanded" : "")">
+            <div class="filter-content">
+                <div class="filter-grid">
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Judet
+                        </label>
+                        <SfDropDownList TValue="string" 
+                                       TItem="FilterOption"
+                                       DataSource="@JudetOptions"
+                                       @bind-Value="@FilterJudet"
+                                       Placeholder="Toate judetele"
+                                       CssClass="filter-dropdown"
+                                       AllowFiltering="true"
+                                       ShowClearButton="false"
+                                       EnablePersistence="false"
+                                       IgnoreAccent="true"
+                                       FilterBarPlaceholder="Cauta...">
+                            <DropDownListFieldSettings Text="Text" Value="Value"/>
+                        </SfDropDownList>
+                    </div>
+
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-shield-alt"></i>
+                            Asigurat
+                        </label>
+                        <SfDropDownList TValue="string" 
+                                       TItem="FilterOption"
+                                       DataSource="@AsiguratOptions"
+                                       @bind-Value="@FilterAsigurat"
+                                       Placeholder="Toate statusurile"
+                                       CssClass="filter-dropdown"
+                                       AllowFiltering="false"
+                                       ShowClearButton="false"
+                                       EnablePersistence="false"
+                                       IgnoreAccent="true">
+                            <DropDownListFieldSettings Text="Text" Value="Value"/>
+                        </SfDropDownList>
+                    </div>
+
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-circle-check"></i>
+                            Status
+                        </label>
+                        <SfDropDownList TValue="string" 
+                                       TItem="FilterOption"
+                                       DataSource="@StatusOptions"
+                                       @bind-Value="@FilterStatus"
+                                       Placeholder="Toate statusurile"
+                                       CssClass="filter-dropdown"
+                                       AllowFiltering="false"
+                                       ShowClearButton="false"
+                                       EnablePersistence="false"
+                                       IgnoreAccent="true">
+                            <DropDownListFieldSettings Text="Text" Value="Value"/>
+                        </SfDropDownList>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn-filter-action btn-clear" @onclick="ClearAllFilters" disabled="@(ActiveFiltersCount == 0)">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Sterge Filtre (@ActiveFiltersCount)</span>
+                    </button>
+                    <button class="btn-filter-action btn-apply" @onclick="ApplyFilters">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Aplica Filtre</span>
+                    </button>
+                </div>
+
+                @if (ActiveFiltersCount > 0)
+                {
+                    <div class="active-filters">
+                        <span class="active-filters-label">
+                            <i class="fas fa-filter"></i>
+                            Filtre active:
+                        </span>
+                        <div class="filter-chips">
+                            @if (!string.IsNullOrEmpty(GlobalSearchText))
+                            {
+                                <span class="filter-chip">
+                                    Cautare: @GlobalSearchText
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(GlobalSearchText))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(FilterJudet))
+                            {
+                                <span class="filter-chip">
+                                    Judet: @FilterJudet
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterJudet))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(FilterAsigurat))
+                            {
+                                <span class="filter-chip">
+                                    Asigurat: @FilterAsigurat
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterAsigurat))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(FilterStatus))
+                            {
+                                <span class="filter-chip">
+                                    Status: @FilterStatus
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterStatus))"></i>
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="action-toolbar @(SelectedPacient != null ? "active" : "")">
+            <div class="toolbar-info">
+                @if (SelectedPacient != null)
+                {
+                    <div class="selected-item-info">
+                        <i class="fas fa-user-check"></i>
+                        <span class="selected-label">Selectat:</span>
+                        <strong>@SelectedPacient.NumeComplet</strong>
+                        <span class="selected-badge">@SelectedPacient.Cod_Pacient</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-selection-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selecteaza un pacient pentru a vizualiza detaliile</span>
+                    </div>
+                }
+            </div>
+            <div class="toolbar-actions">
+                <button class="toolbar-btn btn-view" 
+                        @onclick="() => HandleViewSelected()"
+                        disabled="@(SelectedPacient == null)"
+                        title="Vizualizeaza detalii">
+                    <i class="fas fa-eye"></i>
+                    <span>Vizualizeaza Detalii</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <SfGrid @ref="GridRef"
+                    DataSource="@CurrentPageData"
+                    Height="100%"
+                    AllowPaging="true"
+                    AllowSorting="true"
+                    AllowFiltering="true"
+                    AllowResizing="true"
+                    AllowReordering="true"
+                    AllowTextWrap="true"
+                    ShowColumnChooser="true"
+                    GridLines="GridLine.Both">
+                
+                <GridPageSettings PageSize="@CurrentPageSize" 
+                                 PageCount="5" 
+                                 PageSizes="@PageSizeArray">
+                </GridPageSettings>
+                
+                <GridFilterSettings Type="FilterType.Excel"></GridFilterSettings>
+                
+                <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
+                
+                <GridEvents TValue="PacientListDto" 
+                           RowSelected="OnRowSelected"
+                           RowDeselected="OnRowDeselected"
+                           OnActionBegin="OnGridActionBegin"
+                           OnActionComplete="OnGridActionComplete">
+                </GridEvents>
+                
+                <GridColumns>
+                    <GridColumn Field="@nameof(PacientListDto.Cod_Pacient)" 
+                               HeaderText="Cod Pacient" 
+                               Width="130"
+                               IsPrimaryKey="true">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.NumeComplet)" 
+                               HeaderText="Nume si Prenume" 
+                               Width="200">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.CNP)" 
+                               HeaderText="CNP" 
+                               Width="130">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Data_Nasterii)" 
+                               HeaderText="Data Nasterii" 
+                               Width="120"
+                               Format="dd.MM.yyyy"
+                               Type="ColumnType.Date">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Varsta)" 
+                               HeaderText="Varsta" 
+                               Width="80"
+                               TextAlign="TextAlign.Center">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                <span class="badge badge-info">@pacient?.Varsta ani</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Sex)" 
+                               HeaderText="Sex" 
+                               Width="80"
+                               TextAlign="TextAlign.Center">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                var sexIcon = pacient?.Sex == "M" ? "fa-mars" : "fa-venus";
+                                var sexColor = pacient?.Sex == "M" ? "text-primary" : "text-danger";
+                                <i class="fas @sexIcon @sexColor"></i>
+                                <span class="ms-1">@pacient?.Sex</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Telefon)" 
+                               HeaderText="Telefon" 
+                               Width="120">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                if (!string.IsNullOrEmpty(pacient?.Telefon))
+                                {
+                                    <a href="tel:@pacient.Telefon" class="phone-link">
+                                        <i class="fas fa-phone"></i>
+                                        @pacient.Telefon
+                                    </a>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Email)" 
+                               HeaderText="Email" 
+                               Width="200">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                if (!string.IsNullOrEmpty(pacient?.Email))
+                                {
+                                    <a href="mailto:@pacient.Email" class="email-link">
+                                        <i class="fas fa-envelope"></i>
+                                        @pacient.Email
+                                    </a>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Localitate)" 
+                               HeaderText="Localitate" 
+                               Width="150">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Judet)" 
+                               HeaderText="Judet" 
+                               Width="120">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Asigurat)" 
+                               HeaderText="Asigurat" 
+                               Width="100"
+                               TextAlign="TextAlign.Center">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                if (pacient != null)
+                                {
+                                    <span class="badge @(pacient.Asigurat ? "badge-success" : "badge-secondary")">
+                                        <i class="fas fa-@(pacient.Asigurat ? "check" : "times")"></i>
+                                        @(pacient.Asigurat ? "Da" : "Nu")
+                                    </span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Casa_Asigurari)" 
+                               HeaderText="Casa Asigurari" 
+                               Width="150">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Ultima_Vizita)" 
+                               HeaderText="Ultima Vizita" 
+                               Width="120"
+                               Format="dd.MM.yyyy"
+                               Type="ColumnType.Date">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Nr_Total_Vizite)" 
+                               HeaderText="Nr. Vizite" 
+                               Width="100"
+                               TextAlign="TextAlign.Center">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                <span class="badge badge-info">@pacient?.Nr_Total_Vizite</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Activ)" 
+                               HeaderText="Status" 
+                               Width="100"
+                               TextAlign="TextAlign.Center">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                var statusClass = pacient?.Activ == true ? "status-active" : "status-inactive";
+                                <span class="status-badge @statusClass">
+                                    @(pacient?.Activ == true ? "Activ" : "Inactiv")
+                                </span>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </div>
+    }
+</div>
+
+<SfToast @ref="ToastRef" Title="@ToastTitle" Content="@ToastContent" CssClass="@ToastCssClass">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
+
+<PacientViewModal IsVisible="@ShowViewModal"
+                  IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
+                  PacientId="@SelectedPacientId"
+                  OnClosed="@HandleModalClosed" />

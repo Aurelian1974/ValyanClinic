@@ -1,0 +1,60 @@
+﻿@rendermode InteractiveServer
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container modal-small @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header modal-header-warning">
+            <div class="modal-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h2>@Title</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" title="Inchide">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="confirm-message">
+                <div class="confirm-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <p>@Message</p>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" @onclick="Close">
+                <i class="fas fa-times"></i>
+                Anuleaza
+            </button>
+            <button class="btn btn-danger" @onclick="HandleConfirm">
+                <i class="fas fa-check"></i>
+                Confirma
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public EventCallback OnConfirmed { get; set; }
+    [Parameter] public string Title { get; set; } = "Confirmare";
+    [Parameter] public string Message { get; set; } = "Sunteți sigur?";
+
+    private async Task HandleConfirm()
+    {
+        await OnConfirmed.InvokeAsync();
+        await Close();
+    }
+
+    private async Task HandleOverlayClick()
+    {
+        await Close();
+    }
+
+    private async Task Close()
+    {
+        IsVisible = false;
+        await IsVisibleChanged.InvokeAsync(false);
+    }
+}

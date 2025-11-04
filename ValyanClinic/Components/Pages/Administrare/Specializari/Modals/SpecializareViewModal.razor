@@ -1,0 +1,156 @@
+﻿@rendermode InteractiveServer
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Detalii Specializare</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" title="Inchide">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Se incarca...</span>
+                    </div>
+                    <p>Se incarca datele...</p>
+                </div>
+            }
+            else if (HasError)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @ErrorMessage
+                </div>
+            }
+            else if (SpecializareData != null)
+            {
+                <div class="info-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        Informatii Specializare
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item full-width">
+                            <label>Denumire Specializare</label>
+                            <div class="info-value primary-text">@SpecializareData.Denumire</div>
+                        </div>
+                        
+                        <div class="info-item full-width">
+                            <label>Categorie</label>
+                            @if (!string.IsNullOrEmpty(SpecializareData.Categorie))
+                            {
+                                <div class="info-value">@SpecializareData.Categorie</div>
+                            }
+                            else
+                            {
+                                <div class="info-value info-value-empty">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Nu este inregistrata
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="info-item full-width">
+                            <label>Descriere</label>
+                            @if (!string.IsNullOrEmpty(SpecializareData.Descriere))
+                            {
+                                <div class="info-value description-text">@SpecializareData.Descriere</div>
+                            }
+                            else
+                            {
+                                <div class="info-value info-value-empty">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Nu este inregistrata
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Status</label>
+                            <div class="info-value">
+                                <span class="@(SpecializareData.EsteActiv ? "badge-success" : "badge-danger")">
+                                    @(SpecializareData.EsteActiv ? "Activ" : "Inactiv")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-info-circle"></i>
+                        Informatii Tehnice
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>ID Specializare</label>
+                            <div class="info-value technical-text">@SpecializareData.Id.ToString()</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Data Crearii</label>
+                            <div class="info-value">@SpecializareData.DataCrearii.ToString("dd.MM.yyyy HH:mm")</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Creat De</label>
+                            @if (!string.IsNullOrEmpty(SpecializareData.CreatDe))
+                            {
+                                <div class="info-value">@SpecializareData.CreatDe</div>
+                            }
+                            else
+                            {
+                                <div class="info-value info-value-empty">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Nu este specificat
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Data Ultimei Modificari</label>
+                            <div class="info-value">@SpecializareData.DataUltimeiModificari.ToString("dd.MM.yyyy HH:mm")</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Modificat De</label>
+                            @if (!string.IsNullOrEmpty(SpecializareData.ModificatDe))
+                            {
+                                <div class="info-value">@SpecializareData.ModificatDe</div>
+                            }
+                            else
+                            {
+                                <div class="info-value info-value-empty">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Nu este specificat
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" @onclick="Close">
+                <i class="fas fa-times"></i>
+                Inchide
+            </button>
+            <button class="btn btn-primary" @onclick="HandleEdit" disabled="@(SpecializareData == null)">
+                <i class="fas fa-edit"></i>
+                Editeaza
+            </button>
+            <button class="btn btn-danger" @onclick="HandleDelete" disabled="@(SpecializareData == null)">
+                <i class="fas fa-trash"></i>
+                Sterge
+            </button>
+        </div>
+    </div>
+</div>

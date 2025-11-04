@@ -1,100 +1,92 @@
 ﻿-- ========================================
 -- Stored Procedure: sp_Personal_Create
 -- Database: ValyanMed
--- Created: 09/16/2025 08:50:17
--- Modified: 09/16/2025 08:50:17
--- Generat: 2025-10-08 16:36:44
+-- Created: 10/12/2025 09:05:43
+-- Modified: 10/12/2025 09:05:43
+-- Generat: 2025-10-18 08:40:46
 -- ========================================
 
 USE [ValyanMed]
 GO
 
--- SP pentru crearea unei noi persoane
-CREATE PROCEDURE [dbo].[sp_Personal_Create]
-    @Cod_Angajat VARCHAR(20),
-    @CNP VARCHAR(13),
+
+CREATE PROCEDURE sp_Personal_Create
+    @Id_Personal UNIQUEIDENTIFIER = NULL,
+    @Cod_Angajat NVARCHAR(50),
+    @CNP NVARCHAR(13),
     @Nume NVARCHAR(100),
     @Prenume NVARCHAR(100),
     @Nume_Anterior NVARCHAR(100) = NULL,
-    @Data_Nasterii DATE,
-    @Locul_Nasterii NVARCHAR(200) = NULL,
+    @Data_Nasterii DATETIME,
+    @Locul_Nasterii NVARCHAR(100) = NULL,
     @Nationalitate NVARCHAR(50) = 'Romana',
     @Cetatenie NVARCHAR(50) = 'Romana',
-    @Telefon_Personal VARCHAR(20) = NULL,
-    @Telefon_Serviciu VARCHAR(20) = NULL,
-    @Email_Personal VARCHAR(100) = NULL,
-    @Email_Serviciu VARCHAR(100) = NULL,
-    @Adresa_Domiciliu NVARCHAR(MAX),
-    @Judet_Domiciliu NVARCHAR(50),
+    @Telefon_Personal NVARCHAR(20) = NULL,
+    @Telefon_Serviciu NVARCHAR(20) = NULL,
+    @Email_Personal NVARCHAR(255) = NULL,
+    @Email_Serviciu NVARCHAR(255) = NULL,
+    @Adresa_Domiciliu NVARCHAR(500),
+    @Judet_Domiciliu NVARCHAR(100),
     @Oras_Domiciliu NVARCHAR(100),
-    @Cod_Postal_Domiciliu VARCHAR(10) = NULL,
-    @Adresa_Resedinta NVARCHAR(MAX) = NULL,
-    @Judet_Resedinta NVARCHAR(50) = NULL,
+    @Cod_Postal_Domiciliu NVARCHAR(10) = NULL,
+    @Adresa_Resedinta NVARCHAR(500) = NULL,
+    @Judet_Resedinta NVARCHAR(100) = NULL,
     @Oras_Resedinta NVARCHAR(100) = NULL,
-    @Cod_Postal_Resedinta VARCHAR(10) = NULL,
-    @Stare_Civila NVARCHAR(100) = NULL,
-    @Functia NVARCHAR(100),
+    @Cod_Postal_Resedinta NVARCHAR(10) = NULL,
+    @Stare_Civila NVARCHAR(50) = NULL,
+    @Functia NVARCHAR(150),
     @Departament NVARCHAR(100) = NULL,
-    @Serie_CI VARCHAR(10) = NULL,
-    @Numar_CI VARCHAR(20) = NULL,
+    @Serie_CI NVARCHAR(10) = NULL,
+    @Numar_CI NVARCHAR(20) = NULL,
     @Eliberat_CI_De NVARCHAR(100) = NULL,
-    @Data_Eliberare_CI DATE = NULL,
-    @Valabil_CI_Pana DATE = NULL,
+    @Data_Eliberare_CI DATETIME = NULL,
+    @Valabil_CI_Pana DATETIME = NULL,
     @Status_Angajat NVARCHAR(50) = 'Activ',
     @Observatii NVARCHAR(MAX) = NULL,
-    @Creat_De NVARCHAR(50)
+    @Creat_De NVARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
-    BEGIN TRY
-        BEGIN TRANSACTION;
+    
+    -- Generate GUID if not provided
+    IF @Id_Personal IS NULL OR @Id_Personal = '00000000-0000-0000-0000-000000000000'
+        SET @Id_Personal = NEWID();
         
-        DECLARE @NewId UNIQUEIDENTIFIER = NEWID();
-        DECLARE @CurrentDate DATETIME2 = GETDATE(); -- Folose?te ora local? pentru consisten??
-        
-        -- Verificare unicitate CNP si Cod_Angajat
-        IF EXISTS (SELECT 1 FROM Personal WHERE CNP = @CNP)
-        BEGIN
-            THROW 50001, 'CNP-ul exista deja in baza de date.', 1;
-        END
-        
-        IF EXISTS (SELECT 1 FROM Personal WHERE Cod_Angajat = @Cod_Angajat)
-        BEGIN
-            THROW 50002, 'Codul de angajat exista deja in baza de date.', 1;
-        END
-        
-        INSERT INTO Personal (
-            Id_Personal, Cod_Angajat, CNP, Nume, Prenume, Nume_Anterior,
-            Data_Nasterii, Locul_Nasterii, Nationalitate, Cetatenie,
-            Telefon_Personal, Telefon_Serviciu, Email_Personal, Email_Serviciu,
-            Adresa_Domiciliu, Judet_Domiciliu, Oras_Domiciliu, Cod_Postal_Domiciliu,
-            Adresa_Resedinta, Judet_Resedinta, Oras_Resedinta, Cod_Postal_Resedinta,
-            Stare_Civila, Functia, Departament,
-            Serie_CI, Numar_CI, Eliberat_CI_De, Data_Eliberare_CI, Valabil_CI_Pana,
-            Status_Angajat, Observatii, 
-            Data_Crearii, Data_Ultimei_Modificari, Creat_De, Modificat_De
-        ) VALUES (
-            @NewId, @Cod_Angajat, @CNP, @Nume, @Prenume, @Nume_Anterior,
-            @Data_Nasterii, @Locul_Nasterii, @Nationalitate, @Cetatenie,
-            @Telefon_Personal, @Telefon_Serviciu, @Email_Personal, @Email_Serviciu,
-            @Adresa_Domiciliu, @Judet_Domiciliu, @Oras_Domiciliu, @Cod_Postal_Domiciliu,
-            @Adresa_Resedinta, @Judet_Resedinta, @Oras_Resedinta, @Cod_Postal_Resedinta,
-            @Stare_Civila, @Functia, @Departament,
-            @Serie_CI, @Numar_CI, @Eliberat_CI_De, @Data_Eliberare_CI, @Valabil_CI_Pana,
-            @Status_Angajat, @Observatii, 
-            @CurrentDate, @CurrentDate, @Creat_De, @Creat_De
-        );
-        
-        COMMIT TRANSACTION;
-        
-        -- Returnare persoana creata
-        EXEC sp_Personal_GetById @NewId;
-        
-    END TRY
-    BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK TRANSACTION;
-        THROW;
-    END CATCH
-END;
+    DECLARE @Data_Crearii DATETIME = GETUTCDATE();
+    
+    -- ✅ DIRECT INSERT - NO DYNAMIC SQL
+    INSERT INTO Personal (
+        Id_Personal, Cod_Angajat, CNP, Nume, Prenume, Nume_Anterior,
+        Data_Nasterii, Locul_Nasterii, Nationalitate, Cetatenie,
+        Telefon_Personal, Telefon_Serviciu, Email_Personal, Email_Serviciu,
+        Adresa_Domiciliu, Judet_Domiciliu, Oras_Domiciliu, Cod_Postal_Domiciliu,
+        Adresa_Resedinta, Judet_Resedinta, Oras_Resedinta, Cod_Postal_Resedinta,
+        Stare_Civila, Functia, Departament, Serie_CI, Numar_CI, Eliberat_CI_De,
+        Data_Eliberare_CI, Valabil_CI_Pana, Status_Angajat, Observatii,
+        Data_Crearii, Data_Ultimei_Modificari, Creat_De, Modificat_De
+    ) VALUES (
+        @Id_Personal, @Cod_Angajat, @CNP, @Nume, @Prenume, @Nume_Anterior,
+        @Data_Nasterii, @Locul_Nasterii, @Nationalitate, @Cetatenie,
+        @Telefon_Personal, @Telefon_Serviciu, @Email_Personal, @Email_Serviciu,
+        @Adresa_Domiciliu, @Judet_Domiciliu, @Oras_Domiciliu, @Cod_Postal_Domiciliu,
+        @Adresa_Resedinta, @Judet_Resedinta, @Oras_Resedinta, @Cod_Postal_Resedinta,
+        @Stare_Civila, @Functia, @Departament, @Serie_CI, @Numar_CI, @Eliberat_CI_De,
+        @Data_Eliberare_CI, @Valabil_CI_Pana, @Status_Angajat, @Observatii,
+        @Data_Crearii, @Data_Crearii, @Creat_De, @Creat_De
+    );
+    
+    -- Return created record
+    SELECT 
+        Id_Personal, Cod_Angajat, CNP, Nume, Prenume, Nume_Anterior,
+        Data_Nasterii, Locul_Nasterii, Nationalitate, Cetatenie,
+        Telefon_Personal, Telefon_Serviciu, Email_Personal, Email_Serviciu,
+        Adresa_Domiciliu, Judet_Domiciliu, Oras_Domiciliu, Cod_Postal_Domiciliu,
+        Adresa_Resedinta, Judet_Resedinta, Oras_Resedinta, Cod_Postal_Resedinta,
+        Stare_Civila, Functia, Departament, Serie_CI, Numar_CI, Eliberat_CI_De,
+        Data_Eliberare_CI, Valabil_CI_Pana, Status_Angajat, Observatii,
+        Data_Crearii, Data_Ultimei_Modificari, Creat_De, Modificat_De
+    FROM Personal 
+    WHERE Id_Personal = @Id_Personal;
+END
+
 GO

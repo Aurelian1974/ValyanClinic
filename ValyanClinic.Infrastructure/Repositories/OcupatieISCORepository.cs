@@ -57,17 +57,8 @@ public class OcupatieISCORepository : BaseRepository, IOcupatieISCORepository
             EsteActiv = esteActiv
         };
 
-        // Folosește stored procedure pentru count sau direct COUNT din GetAll
-        using var connection = _connectionFactory.CreateConnection();
-        var result = await connection.ExecuteScalarAsync<int>(
-            "SELECT COUNT(*) FROM Ocupatii_ISCO08 WHERE " +
-            "(@SearchText IS NULL OR Denumire_Ocupatie LIKE '%' + @SearchText + '%' OR Cod_ISCO LIKE '%' + @SearchText + '%') " +
-            "AND (@NivelIerarhic IS NULL OR Nivel_Ierarhic = @NivelIerarhic) " +
-            "AND (@GrupaMajora IS NULL OR Grupa_Majora = @GrupaMajora) " +
-            "AND (@EsteActiv IS NULL OR Este_Activ = @EsteActiv)",
-            parameters);
-
-        return result;
+        // FOLOSIM STORED PROCEDURE in loc de SQL inline
+        return await ExecuteScalarAsync<int>("sp_Ocupatii_ISCO08_GetCount", parameters, cancellationToken);
     }
 
     public async Task<OcupatieISCO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -193,22 +184,13 @@ public class OcupatieISCORepository : BaseRepository, IOcupatieISCORepository
 
     public async Task<bool> IsUniqueAsync(string codISCO, Guid? excludeId = null, CancellationToken cancellationToken = default)
     {
-        using var connection = _connectionFactory.CreateConnection();
-        var query = "SELECT COUNT(*) FROM Ocupatii_ISCO08 WHERE Cod_ISCO = @CodISCO" +
-                   (excludeId.HasValue ? " AND Id != @ExcludeId" : "");
+        var parameters = new { CodISCO = codISCO, ExcludeId = excludeId };
         
-        object parameters;
-        if (excludeId.HasValue)
-        {
-            parameters = new { CodISCO = codISCO, ExcludeId = excludeId.Value };
-        }
-        else
-        {
-            parameters = new { CodISCO = codISCO };
-        }
+        // FOLOSIM STORED PROCEDURE in loc de SQL inline
+        var exists = await ExecuteScalarAsync<int>("sp_Ocupatii_ISCO08_CheckUnique", parameters, cancellationToken);
         
-        var count = await connection.ExecuteScalarAsync<int>(query, parameters);
-        return count == 0;
+        // SP returneaza 1 daca exista (duplicate), 0 daca e unic
+        return exists == 0; // true = unique (nu exista duplicate)
     }
 
     #region DTOs pentru maparea rezultatelor

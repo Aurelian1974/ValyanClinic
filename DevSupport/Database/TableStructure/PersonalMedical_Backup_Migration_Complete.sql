@@ -1,7 +1,7 @@
 ﻿-- ========================================
 -- Tabel: PersonalMedical_Backup_Migration
 -- Database: ValyanMed
--- Generat: 2025-10-08 16:36:43
+-- Generat: 2025-10-18 08:40:45
 -- Coloane: 11
 -- Primary Keys: 0
 -- Foreign Keys: 0

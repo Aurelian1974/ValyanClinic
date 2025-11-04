@@ -1,0 +1,227 @@
+﻿/* ===================================
+   ConfirmDeleteModal - Specific Styles
+   Only delete confirmation-specific styles
+   
+   DEPENDS ON: modal-base.css (loaded globally in app.css)
+   This file contains only styles specific to ConfirmDeleteModal
+   =================================== */
+
+/* Modal Overlay - Red/Danger Theme */
+.modal-overlay {
+    background: rgba(220, 38, 38, 0.3);
+}
+
+/* Modal Container - Danger Theme */
+.modal-container {
+    box-shadow: 0 10px 40px rgba(220, 38, 38, 0.3);
+    max-width: 500px;
+    border: 2px solid #fca5a5;
+}
+
+/* Modal Header - Red Gradient */
+.modal-header {
+    background: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+/* Modal Body - Light Red Background */
+.modal-body {
+    padding: 2rem 1.75rem;
+    background: #fef2f2;
+}
+
+.loading-container p {
+    color: #991b1b;
+    font-weight: 600;
+}
+
+/* Error Actions */
+.error-actions {
+    display: flex;
+    gap: 0.875rem;
+    justify-content: center;
+}
+
+/* Warning Content */
+.warning-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.25rem;
+}
+
+.warning-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #fca5a5, #ef4444);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.warning-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.warning-content h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #991b1b;
+}
+
+.warning-text {
+    font-size: 1.0625rem;
+    color: #334155;
+    margin: 0;
+}
+
+.warning-text strong {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.warning-subtext {
+    font-size: 0.9375rem;
+    color: #64748b;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Confirmation Input */
+.confirmation-input {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    text-align: left;
+}
+
+.confirmation-input label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.confirmation-input label strong {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid #fca5a5;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input:disabled {
+    background: #f8fafc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Countdown Info */
+.countdown-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 8px;
+    color: #92400e;
+    font-size: 0.9375rem;
+    font-weight: 600;
+}
+
+.countdown-info i {
+    font-size: 1rem;
+}
+
+.countdown-info strong {
+    color: #f59e0b;
+    font-size: 1.125rem;
+}
+
+/* Validation Error */
+.validation-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    color: #991b1b;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.validation-error i {
+    font-size: 1rem;
+}
+
+.validation-error strong {
+    font-weight: 700;
+}
+
+/* Modal Footer - Red Theme */
+.modal-footer {
+    border-top: 1px solid #fee2e2;
+}
+
+/* Scrollbar - Red Theme */
+.modal-body::-webkit-scrollbar-track {
+    background: #fef2f2;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #fca5a5, #ef4444);
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .error-actions {
+        flex-direction: column;
+    }
+
+    .error-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .warning-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .warning-icon i {
+        font-size: 2rem;
+    }
+
+    .warning-content h3 {
+        font-size: 1.25rem;
+    }
+}

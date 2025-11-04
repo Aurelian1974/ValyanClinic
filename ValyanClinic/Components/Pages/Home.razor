@@ -6,12 +6,12 @@
     <div class="welcome-section">
         <div class="welcome-header">
             <div>
-                <h1>👋 Bună, Dr. Admin!</h1>
-                <p class="subtitle">Iată o privire de ansamblu asupra activității de astăzi</p>
+                <h1>👋 Buna, Dr. Admin!</h1>
+                <p class="subtitle">Iata o privire de ansamblu asupra activitatii de astazi</p>
             </div>
             <div class="date-info">
                 <i class="fas fa-calendar-day"></i>
-                <span>@DateTime.Now.ToString("dddd, dd MMMM yyyy")</span>
+                <span>@GetCurrentDate()</span>
             </div>
         </div>
     </div>
@@ -22,11 +22,11 @@
                 <i class="fas fa-user-injured"></i>
             </div>
             <div class="stat-content">
-                <h3>Pacienți Astăzi</h3>
-                <div class="stat-number">42</div>
+                <h3>Pacienti Astazi</h3>
+                <div class="stat-number">@PatientsTodayCount</div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i>
-                    12% față de ieri
+                    @PatientsTodayGrowth% fata de ieri
                 </div>
             </div>
         </div>
@@ -36,11 +36,11 @@
                 <i class="fas fa-calendar-check"></i>
             </div>
             <div class="stat-content">
-                <h3>Programări</h3>
-                <div class="stat-number">28</div>
+                <h3>Programari</h3>
+                <div class="stat-number">@AppointmentsCount</div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i>
-                    8% săptămâna aceasta
+                    @AppointmentsGrowth% saptamana aceasta
                 </div>
             </div>
         </div>
@@ -51,10 +51,10 @@
             </div>
             <div class="stat-content">
                 <h3>Personal Activ</h3>
-                <div class="stat-number">15</div>
+                <div class="stat-number">@ActiveStaffCount</div>
                 <div class="stat-change neutral">
                     <i class="fas fa-minus"></i>
-                    Fără modificări
+                    Fara modificari
                 </div>
             </div>
         </div>
@@ -65,10 +65,10 @@
             </div>
             <div class="stat-content">
                 <h3>Venituri Lunare</h3>
-                <div class="stat-number">125K</div>
+                <div class="stat-number">@MonthlyRevenue</div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i>
-                    18% față de luna trecută
+                    @RevenueGrowth% fata de luna trecuta
                 </div>
             </div>
         </div>
@@ -82,7 +82,7 @@
                 </div>
                 <h3>Administrare Personal</h3>
             </div>
-            <p>Gestionează angajații clinicii, adaugă sau modifică informații</p>
+            <p>Gestioneaza angajatii clinicii, adauga sau modifica informatii</p>
             <a href="/administrare/personal" class="card-link">
                 Acceseaza Modulul
                 <i class="fas fa-arrow-right"></i>
@@ -96,7 +96,7 @@
                 </div>
                 <h3>Personal Medical</h3>
             </div>
-            <p>Administrează personalul medical și specializările acestuia</p>
+            <p>Administreaza personalul medical si specializarile acestuia</p>
             <a href="/administrare/personal-medical" class="card-link">
                 Acceseaza Modulul
                 <i class="fas fa-arrow-right"></i>
@@ -108,9 +108,9 @@
                 <div class="card-icon warning">
                     <i class="fas fa-calendar-alt"></i>
                 </div>
-                <h3>Programări</h3>
+                <h3>Programari</h3>
             </div>
-            <p>Gestionează programările și calendarul clinicii</p>
+            <p>Gestioneaza programarile si calendarul clinicii</p>
             <a href="/programari" class="card-link">
                 Acceseaza Modulul
                 <i class="fas fa-arrow-right"></i>
@@ -124,7 +124,7 @@
                 </div>
                 <h3>Rapoarte & Statistici</h3>
             </div>
-            <p>Vizualizează rapoarte detaliate și analize statistice</p>
+            <p>Vizualizeaza rapoarte detaliate si analize statistice</p>
             <a href="/rapoarte/statistici" class="card-link">
                 Acceseaza Modulul
                 <i class="fas fa-arrow-right"></i>

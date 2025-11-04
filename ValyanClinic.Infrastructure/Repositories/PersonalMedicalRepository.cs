@@ -27,16 +27,6 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
         return await GetByIdAsync(personalId, cancellationToken);
     }
 
-    public async Task<IEnumerable<PersonalMedical>> GetByDepartamentIdAsync(
-        int departamentId,
-        CancellationToken cancellationToken = default)
-    {
-        // In DB, Departament este string, nu ID
-        // Aceasta metoda nu mai are sens cu structura curenta
-        // Returnam toate si filtram in Application layer daca e nevoie
-        return await GetAllAsync(cancellationToken: cancellationToken);
-    }
-
     public async Task<IEnumerable<PersonalMedical>> GetAllAsync(
         int pageNumber = 1,
         int pageSize = 20,
@@ -70,6 +60,37 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
         var data = await multi.ReadAsync<PersonalMedical>();
         // Skip count result set
         return data;
+    }
+
+    public async Task<int> GetCountAsync(
+        string? searchText = null,
+        string? departament = null,
+        string? pozitie = null,
+        bool? esteActiv = null,
+        CancellationToken cancellationToken = default)
+    {
+        var parameters = new
+        {
+            PageNumber = 1,
+            PageSize = 1,
+            SearchText = searchText,
+            Departament = departament,
+            Pozitie = pozitie,
+            EsteActiv = esteActiv,
+            SortColumn = "Nume",
+            SortDirection = "ASC"
+        };
+        
+        using var connection = _connectionFactory.CreateConnection();
+        using var multi = await connection.QueryMultipleAsync(
+            "sp_PersonalMedical_GetAll",
+            parameters,
+            commandType: System.Data.CommandType.StoredProcedure);
+        
+        await multi.ReadAsync<PersonalMedical>();
+        
+        var countResult = await multi.ReadFirstOrDefaultAsync<CountResult>();
+        return countResult?.TotalCount ?? 0;
     }
 
     public async Task<Guid> CreateAsync(PersonalMedical personalMedical, CancellationToken cancellationToken = default)
@@ -132,5 +153,10 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
     private class SuccessResult
     {
         public int Success { get; set; }
+    }
+
+    private class CountResult
+    {
+        public int TotalCount { get; set; }
     }
 }

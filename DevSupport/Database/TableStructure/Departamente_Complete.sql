@@ -1,10 +1,10 @@
 ﻿-- ========================================
 -- Tabel: Departamente
 -- Database: ValyanMed
--- Generat: 2025-10-08 16:36:41
--- Coloane: 3
+-- Generat: 2025-10-18 08:40:44
+-- Coloane: 4
 -- Primary Keys: 1
--- Foreign Keys: 0
+-- Foreign Keys: 1
 -- Indexes: 0
 -- ========================================
 
@@ -20,10 +20,17 @@ END
 GO
 
 -- Create table
-CREATE TABLE dbo.Departamente (    [DepartamentID] UNIQUEIDENTIFIER  NOT NULL,
-    [Nume] NVARCHAR(200)  NOT NULL,
-    [Tip] NVARCHAR(50)  NOT NULL,
-    ,CONSTRAINT [PK_Departamente] PRIMARY KEY ([DepartamentID])
+CREATE TABLE dbo.Departamente (    [IdDepartament] UNIQUEIDENTIFIER  NOT NULL,
+    [IdTipDepartament] UNIQUEIDENTIFIER  NULL,
+    [DenumireDepartament] VARCHAR(200)  NOT NULL,
+    [DescriereDepartament] VARCHAR(500)  NULL,
+    ,CONSTRAINT [PK_Departamente] PRIMARY KEY ([IdDepartament])
 )
 GO
-PRINT 'Tabel Departamente creat cu succes cu 3 coloane.'
+
+-- Foreign Keys
+ALTER TABLE dbo.Departamente
+ADD CONSTRAINT [FK_Departamente_TipDepartament] FOREIGN KEY ([IdTipDepartament]) 
+    REFERENCES dbo.[TipDepartament] ([IdTipDepartament]) ON DELETE CASCADE ON UPDATE CASCADE
+GO
+PRINT 'Tabel Departamente creat cu succes cu 4 coloane.'

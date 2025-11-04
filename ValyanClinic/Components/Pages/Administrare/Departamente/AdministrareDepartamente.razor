@@ -1,0 +1,274 @@
+﻿@page "/administrare/departamente"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using ValyanClinic.Application.Features.DepartamentManagement.Queries.GetDepartamentList
+@using ValyanClinic.Services.DataGrid
+@using MediatR
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Notifications
+@using ValyanClinic.Components.Shared.Modals
+@using ValyanClinic.Components.Pages.Administrare.Departamente.Modals
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+
+<PageTitle>Administrare Departamente</PageTitle>
+
+<div class="departamente-container">
+    <div class="departamente-header">
+        <h1>
+            <i class="fas fa-building"></i>
+            Administrare Departamente
+        </h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" @onclick="HandleAddNew">
+                <i class="fas fa-plus"></i>
+                Adauga Departament
+            </button>
+            <button class="btn btn-secondary" @onclick="HandleRefresh">
+                <i class="fas fa-sync-alt"></i>
+                Reincarca
+            </button>
+        </div>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Se incarca...</span>
+            </div>
+            <p>Se incarca datele...</p>
+        </div>
+    }
+    else if (HasError)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            @ErrorMessage
+        </div>
+    }
+    else
+    {
+        <div class="search-filter-section">
+            <div class="search-and-filter">
+                <div class="global-search">
+                    <div class="search-box-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               class="search-input"
+                               placeholder="Cautare rapida..."
+                               value="@GlobalSearchText"
+                               @oninput="OnSearchInput"
+                               @onkeydown="OnSearchKeyDown" />
+                        @if (!string.IsNullOrEmpty(GlobalSearchText))
+                        {
+                            <button class="search-clear-btn" @onclick="ClearSearch" type="button">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+            
+            <div class="total-records">
+                <i class="fas fa-database"></i>
+                <span>Total: <strong>@TotalRecords</strong> departamente</span>
+            </div>
+        </div>
+
+        <div class="action-toolbar @(SelectedDepartament != null ? "active" : "")">
+            <div class="toolbar-info">
+                @if (SelectedDepartament != null)
+                {
+                    <div class="selected-item-info">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="selected-label">Selectat:</span>
+                        <strong>@SelectedDepartament.DenumireDepartament</strong>
+                        @if (!string.IsNullOrEmpty(SelectedDepartament.DenumireTipDepartament))
+                        {
+                            <span class="selected-badge">@SelectedDepartament.DenumireTipDepartament</span>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="no-selection-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selecteaza un departament pentru a activa actiunile</span>
+                    </div>
+                }
+            </div>
+            <div class="toolbar-actions">
+                <button class="toolbar-btn btn-view" 
+                        @onclick="() => HandleViewSelected()"
+                        disabled="@(SelectedDepartament == null)"
+                        title="Vizualizeaza detalii">
+                    <i class="fas fa-eye"></i>
+                    <span>Vizualizeaza</span>
+                </button>
+                <button class="toolbar-btn btn-edit" 
+                        @onclick="() => HandleEditSelected()"
+                        disabled="@(SelectedDepartament == null)"
+                        title="Editeaza informatii">
+                    <i class="fas fa-edit"></i>
+                    <span>Editeaza</span>
+                </button>
+                <button class="toolbar-btn btn-delete" 
+                        @onclick="() => HandleDeleteSelected()"
+                        disabled="@(SelectedDepartament == null)"
+                        title="Sterge departament">
+                    <i class="fas fa-trash"></i>
+                    <span>Sterge</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="page-size-selector">
+            <label>
+                <i class="fas fa-list"></i>
+                Inregistrari per pagina:
+            </label>
+            <select @onchange="OnPageSizeChangedNative" class="page-size-select" value="@CurrentPageSize">
+                @foreach (var size in PageSizeArray)
+                {
+                    <option value="@size" selected="@(size == CurrentPageSize)">@size</option>
+                }
+            </select>
+        </div>
+
+        <div class="grid-container">
+            <SfGrid @ref="GridRef"
+                    DataSource="@CurrentPageData"
+                    Height="100%"
+                    AllowPaging="false"
+                    AllowSorting="true"
+                    AllowFiltering="false"
+                    AllowResizing="true"
+                    AllowReordering="true"
+                    AllowGrouping="false"
+                    AllowTextWrap="true"
+                    ShowColumnChooser="true"
+                    GridLines="GridLine.Both"
+                    EnableVirtualization="false"
+                    EnableColumnVirtualization="false"
+                    RowHeight="34">
+                
+                <GridFilterSettings Type="FilterType.Excel"></GridFilterSettings>
+                
+                <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
+                
+                <GridEvents TValue="DepartamentListDto" 
+                           RowSelected="OnRowSelected"
+                           RowDeselected="OnRowDeselected"
+                           OnActionBegin="OnGridActionBegin">
+                </GridEvents>
+                
+                <GridColumns>
+                    <GridColumn Field="@nameof(DepartamentListDto.IdDepartament)" 
+                               HeaderText="ID" 
+                               Width="100"
+                               IsPrimaryKey="true"
+                               Visible="false"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(DepartamentListDto.DenumireDepartament)" 
+                               HeaderText="Denumire Departament" 
+                               Width="300"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(DepartamentListDto.DenumireTipDepartament)" 
+                               HeaderText="Tip Departament" 
+                               Width="200"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(DepartamentListDto.DescriereDepartament)" 
+                               HeaderText="Descriere" 
+                               Width="400"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </div>
+
+        <div class="custom-pager">
+            <div class="pager-info">
+                <span class="pager-text">
+                    <i class="fas fa-info-circle"></i>
+                    Pagina <strong>@CurrentPage</strong> din <strong>@TotalPages</strong>
+                </span>
+                <span class="pager-text">
+                    <i class="fas fa-list-ol"></i>
+                    Afisate <strong>@DisplayedRecordsStart-@DisplayedRecordsEnd</strong> din <strong>@TotalRecords</strong>
+                </span>
+            </div>
+            
+            <div class="pager-controls">
+                <button class="pager-btn pager-btn-first" 
+                        @onclick="GoToFirstPage" 
+                        disabled="@(!HasPreviousPage)"
+                        title="Prima pagina">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                
+                <button class="pager-btn pager-btn-prev" 
+                        @onclick="GoToPreviousPage" 
+                        disabled="@(!HasPreviousPage)"
+                        title="Pagina anterioara">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+                
+                @{
+                    var (start, end) = GetPagerRange(5);
+                    for (int i = start; i <= end; i++)
+                    {
+                        int pageNum = i;
+                        var isActive = pageNum == CurrentPage;
+                        <button class="pager-btn pager-btn-number @(isActive ? "active" : "")" 
+                                @onclick="() => GoToPage(pageNum)"
+                                disabled="@isActive"
+                                title="Pagina @pageNum">
+                            @pageNum
+                        </button>
+                    }
+                }
+                
+                <button class="pager-btn pager-btn-next" 
+                        @onclick="GoToNextPage" 
+                        disabled="@(!HasNextPage)"
+                        title="Pagina urmatoare">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+                
+                <button class="pager-btn pager-btn-last" 
+                        @onclick="GoToLastPage" 
+                        disabled="@(!HasNextPage)"
+                        title="Ultima pagina">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+<SfToast @ref="ToastRef">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
+
+<ConfirmDeleteModal @ref="confirmDeleteModal" 
+                    OnConfirmed="HandleDeleteConfirmed" />
+
+<DepartamentFormModal @ref="departamentFormModal"
+                      OnDepartamentSaved="HandleDepartamentSaved" />
+
+<DepartamentViewModal @ref="departamentViewModal"
+                      OnEditRequested="HandleEditFromView"
+                      OnDeleteRequested="HandleDeleteFromView" />

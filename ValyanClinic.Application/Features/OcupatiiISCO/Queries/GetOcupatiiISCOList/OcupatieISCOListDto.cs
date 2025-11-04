@@ -66,52 +66,45 @@ public class OcupatieISCOListDto
     /// </summary>
     public string? CreatDe { get; set; }
 
-    // Computed properties pentru UI
+    // Computed properties pentru UI - folosim helper class
 
     /// <summary>
     /// Formatarea scurtă a ID-ului GUID pentru afișare
     /// </summary>
-    public string IdScurt => Id.ToString("N")[..8].ToUpper();
+    public string IdScurt => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.GetIdScurt(Id);
 
     /// <summary>
     /// Codul și denumirea concatenate pentru afișare
     /// </summary>
-    public string CodSiDenumire => $"{CodISCO} - {DenumireOcupatie}";
+    public string CodSiDenumire => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.GetCodSiDenumire(CodISCO, DenumireOcupatie);
 
     /// <summary>
     /// Numele nivelului ierarhic pentru afișare
     /// </summary>
-    public string NumeNivelIerarhic => NivelIerarhic switch
-    {
-        1 => "Grupa Majoră",
-        2 => "Subgrupa",
-        3 => "Grupa Minoră",
-        4 => "Ocupație",
-        _ => "Necunoscut"
-    };
+    public string NumeNivelIerarhic => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.GetNumeNivelIerarhic(NivelIerarhic);
 
     /// <summary>
     /// Indentarea pentru afișarea ierarhică
     /// </summary>
-    public string IndentareIerarhica => new string(' ', (NivelIerarhic - 1) * 4);
+    public string IndentareIerarhica => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.GetIndentareIerarhica(NivelIerarhic);
 
     /// <summary>
     /// Verifică dacă este o grupă (nu ocupație finală)
     /// </summary>
-    public bool EsteGrupa => NivelIerarhic < 4;
+    public bool EsteGrupa => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.EsteGrupa(NivelIerarhic);
 
     /// <summary>
     /// Verifică dacă este ocupație finală
     /// </summary>
-    public bool EsteOcupatieFinal => NivelIerarhic == 4;
+    public bool EsteOcupatieFinal => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.EsteOcupatieFinal(NivelIerarhic);
 
     /// <summary>
     /// Status badge text pentru UI
     /// </summary>
-    public string StatusText => EsteActiv ? "Activ" : "Inactiv";
+    public string StatusText => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.GetStatusText(EsteActiv);
 
     /// <summary>
     /// Status badge CSS class pentru UI
     /// </summary>
-    public string StatusCssClass => EsteActiv ? "badge-success" : "badge-danger";
+    public string StatusCssClass => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.GetStatusCssClass(EsteActiv);
 }

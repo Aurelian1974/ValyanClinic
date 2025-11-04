@@ -1,0 +1,223 @@
+﻿@rendermode InteractiveServer
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas @(Model.IsEditMode ? "fa-user-md-edit" : "fa-user-md-plus")"></i>
+                <h2>@(Model.IsEditMode ? "Editeaza Personal Medical" : "Adauga Personal Medical")</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" type="button">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Se incarca datele...</p>
+                </div>
+            }
+            else
+            {
+                @if (HasError)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>@ErrorMessage</span>
+                    </div>
+                }
+
+                <EditForm Model="@Model" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="tabs-container">
+                        <div class="tab-buttons">
+                            <button type="button" class="tab-button @(ActiveTab == "date-generale" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("date-generale")'>
+                                <i class="fas fa-user"></i>
+                                <span>Date Generale</span>
+                            </button>
+                            <button type="button" class="tab-button @(ActiveTab == "contact" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("contact")'>
+                                <i class="fas fa-phone"></i>
+                                <span>Contact</span>
+                            </button>
+                            <button type="button" class="tab-button @(ActiveTab == "pozitie-specializare" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("pozitie-specializare")'>
+                                <i class="fas fa-briefcase"></i>
+                                <span>Pozitie si Specializare</span>
+                            </button>
+                        </div>
+
+                        <div class="tab-content">
+                            @if (ActiveTab == "date-generale")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-user-circle"></i>
+                                            <span>Informatii Generale</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group">
+                                                <label for="nume">Nume <span class="required">*</span></label>
+                                                <InputText id="nume" class="form-control" @bind-Value="Model.Nume" />
+                                                <ValidationMessage For="@(() => Model.Nume)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="prenume">Prenume <span class="required">*</span></label>
+                                                <InputText id="prenume" class="form-control" @bind-Value="Model.Prenume" />
+                                                <ValidationMessage For="@(() => Model.Prenume)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="numar-licenta">Numar Licenta</label>
+                                                <InputText id="numar-licenta" class="form-control" @bind-Value="Model.NumarLicenta" 
+                                                          placeholder="ex: MED123456" />
+                                                <ValidationMessage For="@(() => Model.NumarLicenta)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="status">Status <span class="required">*</span></label>
+                                                <InputSelect id="status" class="form-control" @bind-Value="Model.EsteActiv">
+                                                    <option value="true">Activ</option>
+                                                    <option value="false">Inactiv</option>
+                                                </InputSelect>
+                                                <ValidationMessage For="@(() => Model.EsteActiv)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (ActiveTab == "contact")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-phone"></i>
+                                            <span>Date de Contact</span>
+                                        </h3>
+                                        <div class="info-grid">
+                                            <div class="form-group full-width">
+                                                <label for="telefon">Telefon</label>
+                                                <InputText id="telefon" type="tel" class="form-control" @bind-Value="Model.Telefon" 
+                                                          placeholder="ex: 0740123456" />
+                                                <ValidationMessage For="@(() => Model.Telefon)" />
+                                            </div>
+                                            
+                                            <div class="form-group full-width">
+                                                <label for="email">Email</label>
+                                                <InputText id="email" type="email" class="form-control" @bind-Value="Model.Email" 
+                                                          placeholder="ex: doctor@valyanmed.ro" />
+                                                <ValidationMessage For="@(() => Model.Email)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (ActiveTab == "pozitie-specializare")
+                            {
+                                <div class="tab-pane active">
+                                    <div class="info-card">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-briefcase"></i>
+                                            <span>Pozitie Organizationala</span>
+                                        </h3>
+                                        
+                                        @if (IsLoadingLookups)
+                                        {
+                                            <div class="loading-container-small">
+                                                <span class="spinner-border spinner-border-sm"></span>
+                                                <span>Se incarca optiunile...</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="info-grid">
+                                                <div class="form-group">
+                                                    <label for="departament">Departament</label>
+                                                    <SfDropDownList TValue="Guid?" 
+                                                                   TItem="LookupOption"
+                                                                   ID="departament"
+                                                                   Placeholder="Selecteaza departamentul"
+                                                                   DataSource="@DepartamenteOptions"
+                                                                   @bind-Value="@Model.DepartamentID"
+                                                                   AllowFiltering="true"
+                                                                   FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                                   ShowClearButton="true"
+                                                                   CssClass="form-control">
+                                                        <DropDownListFieldSettings Text="Nume" Value="Id"></DropDownListFieldSettings>
+                                                    </SfDropDownList>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label for="pozitie">Pozitie <span class="required">*</span></label>
+                                                    <SfDropDownList TValue="Guid?" 
+                                                                   TItem="LookupOption"
+                                                                   ID="pozitie"
+                                                                   Placeholder="Selecteaza pozitia"
+                                                                   DataSource="@PozitiiOptions"
+                                                                   @bind-Value="@Model.PozitieID"
+                                                                   AllowFiltering="true"
+                                                                   FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                                   ShowClearButton="true"
+                                                                   CssClass="form-control">
+                                                        <DropDownListFieldSettings Text="Nume" Value="Id"></DropDownListFieldSettings>
+                                                    </SfDropDownList>
+                                                    <ValidationMessage For="@(() => Model.PozitieID)" />
+                                                </div>
+                                                
+                                                <div class="form-group full-width">
+                                                    <label for="specializare">Specializare</label>
+                                                    <SfDropDownList TValue="Guid?" 
+                                                                   TItem="LookupOption"
+                                                                   ID="specializare"
+                                                                   Placeholder="Selecteaza specializarea"
+                                                                   DataSource="@SpecializariOptions"
+                                                                   @bind-Value="@Model.SpecializareID"
+                                                                   AllowFiltering="true"
+                                                                   FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                                   ShowClearButton="true"
+                                                                   CssClass="form-control">
+                                                        <DropDownListFieldSettings Text="Nume" Value="Id"></DropDownListFieldSettings>
+                                                    </SfDropDownList>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </EditForm>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @onclick="Close" disabled="@IsSaving">
+                <i class="fas fa-times"></i>
+                <span>Anuleaza</span>
+            </button>
+            <button type="button" class="btn btn-primary" @onclick="HandleSubmit" disabled="@IsSaving">
+                @if (IsSaving)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                    <span>Se salveaza...</span>
+                }
+                else
+                {
+                    <i class="fas fa-save"></i>
+                    <span>@(Model.IsEditMode ? "Actualizeaza" : "Salveaza")</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>

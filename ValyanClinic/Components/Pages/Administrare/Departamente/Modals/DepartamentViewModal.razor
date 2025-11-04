@@ -1,0 +1,119 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.DepartamentManagement.Queries.GetDepartamentById
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-building"></i>
+                <h2>Detalii Departament</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" title="Inchide">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Se incarca...</span>
+                    </div>
+                    <p>Se incarca datele...</p>
+                </div>
+            }
+            else if (HasError)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @ErrorMessage
+                </div>
+            }
+            else if (DepartamentData != null)
+            {
+                <div class="info-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-building"></i>
+                        Informatii Departament
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item full-width">
+                            <label>Denumire Departament</label>
+                            <div class="info-value primary-text">@DepartamentData.DenumireDepartament</div>
+                        </div>
+                        
+                        <div class="info-item full-width">
+                            <label>Tip Departament</label>
+                            @if (!string.IsNullOrEmpty(DepartamentData.DenumireTipDepartament))
+                            {
+                                <div class="info-value badge-secondary">
+                                    <i class="fas fa-tag"></i>
+                                    @DepartamentData.DenumireTipDepartament
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="info-value info-value-empty">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Nu este specificat
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="info-item full-width">
+                            <label>Descriere</label>
+                            @if (!string.IsNullOrEmpty(DepartamentData.DescriereDepartament))
+                            {
+                                <div class="info-value description-text">@DepartamentData.DescriereDepartament</div>
+                            }
+                            else
+                            {
+                                <div class="info-value info-value-empty">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Nu este inregistrata
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-info-circle"></i>
+                        Informatii Tehnice
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>ID Departament</label>
+                            <div class="info-value technical-text">@DepartamentData.IdDepartament.ToString()</div>
+                        </div>
+                        
+                        @if (DepartamentData.IdTipDepartament.HasValue)
+                        {
+                            <div class="info-item">
+                                <label>ID Tip Departament</label>
+                                <div class="info-value technical-text">@DepartamentData.IdTipDepartament.Value.ToString()</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" @onclick="Close">
+                <i class="fas fa-times"></i>
+                Inchide
+            </button>
+            <button class="btn btn-primary" @onclick="HandleEdit" disabled="@(DepartamentData == null)">
+                <i class="fas fa-edit"></i>
+                Editeaza
+            </button>
+            <button class="btn btn-danger" @onclick="HandleDelete" disabled="@(DepartamentData == null)">
+                <i class="fas fa-trash"></i>
+                Sterge
+            </button>
+        </div>
+    </div>
+</div>

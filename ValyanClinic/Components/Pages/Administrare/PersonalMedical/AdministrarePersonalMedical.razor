@@ -1,0 +1,474 @@
+﻿@page "/administrare/personal-medical"
+@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalList
+@using ValyanClinic.Services.DataGrid
+@using MediatR
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.DropDowns
+@using ValyanClinic.Components.Pages.Administrare.PersonalMedical.Modals
+@using ValyanClinic.Components.Shared.Modals
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+
+<PageTitle>Administrare Personal Medical</PageTitle>
+
+<div class="personal-medical-container">
+    <div class="personal-medical-header">
+        <h1>
+            <i class="fas fa-user-md"></i>
+            Administrare Personal Medical
+        </h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" @onclick="HandleAddNew">
+                <i class="fas fa-plus"></i>
+                Adauga Personal Medical
+            </button>
+            <button class="btn btn-secondary" @onclick="HandleRefresh">
+                <i class="fas fa-sync-alt"></i>
+                Reincarca
+            </button>
+        </div>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Se incarca...</span>
+            </div>
+            <p>Se incarca datele...</p>
+        </div>
+    }
+    else if (HasError)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            @ErrorMessage
+        </div>
+    }
+    else
+    {
+        <div class="search-filter-section">
+            <div class="search-and-filter">
+                <div class="global-search">
+                    <div class="search-box-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               class="search-input"
+                               placeholder="Cautare rapida..."
+                               value="@GlobalSearchText"
+                               @oninput="OnSearchInput"
+                               @onkeydown="OnSearchKeyDown" />
+                        @if (!string.IsNullOrEmpty(GlobalSearchText))
+                        {
+                            <button class="search-clear-btn" @onclick="ClearSearch" type="button">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+                <button class="btn-filter @(IsAdvancedFilterExpanded ? "active" : "")" 
+                        @onclick="ToggleAdvancedFilter"
+                        title="Filtre avansate">
+                    <i class="fas fa-filter"></i>
+                    <span>Filtre</span>
+                    @if (ActiveFiltersCount > 0)
+                    {
+                        <span class="filter-badge">@ActiveFiltersCount</span>
+                    }
+                    <i class="fas fa-chevron-@(IsAdvancedFilterExpanded ? "up" : "down") chevron-icon"></i>
+                </button>
+            </div>
+            
+            <div class="total-records">
+                <i class="fas fa-database"></i>
+                <span>Total: <strong>@TotalRecords</strong> inregistrari</span>
+                @if (ActiveFiltersCount > 0)
+                {
+                    <span class="filtered-info">(filtrate)</span>
+                }
+            </div>
+        </div>
+
+        <div class="advanced-filter-panel @(IsAdvancedFilterExpanded ? "expanded" : "")">
+            <div class="filter-content">
+                <div class="filter-grid">
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-circle-check"></i>
+                            Status
+                        </label>
+                        <SfDropDownList TValue="string" 
+                                       TItem="FilterOption"
+                                       DataSource="@StatusOptions"
+                                       @bind-Value="@FilterEsteActiv"
+                                       Placeholder="Toate statusurile"
+                                       CssClass="filter-dropdown"
+                                       AllowFiltering="false"
+                                       ShowClearButton="false"
+                                       EnablePersistence="false"
+                                       IgnoreAccent="true">
+                            <DropDownListFieldSettings Text="Text" Value="Value"/>
+                        </SfDropDownList>
+                    </div>
+
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-building"></i>
+                            Departament
+                        </label>
+                        <SfDropDownList TValue="string" 
+                                       TItem="FilterOption"
+                                       DataSource="@DepartamentOptions"
+                                       @bind-Value="@FilterDepartament"
+                                       Placeholder="Toate departamentele"
+                                       CssClass="filter-dropdown"
+                                       AllowFiltering="false"
+                                       ShowClearButton="false"
+                                       EnablePersistence="false"
+                                       IgnoreAccent="true">
+                            <DropDownListFieldSettings Text="Text" Value="Value"/>
+                        </SfDropDownList>
+                    </div>
+
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-user-tie"></i>
+                            Pozitie
+                        </label>
+                        <SfDropDownList TValue="string" 
+                                       TItem="FilterOption"
+                                       DataSource="@PozitieOptions"
+                                       @bind-Value="@FilterPozitie"
+                                       Placeholder="Toate pozitiile"
+                                       CssClass="filter-dropdown"
+                                       AllowFiltering="false"
+                                       ShowClearButton="false"
+                                       EnablePersistence="false"
+                                       IgnoreAccent="true">
+                            <DropDownListFieldSettings Text="Text" Value="Value"/>
+                        </SfDropDownList>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn-filter-action btn-clear" @onclick="ClearAllFilters" disabled="@(ActiveFiltersCount == 0)">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Sterge Filtre (@ActiveFiltersCount)</span>
+                    </button>
+                    <button class="btn-filter-action btn-apply" @onclick="ApplyFilters">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Aplica Filtre</span>
+                    </button>
+                </div>
+
+                @if (ActiveFiltersCount > 0)
+                {
+                    <div class="active-filters">
+                        <span class="active-filters-label">
+                            <i class="fas fa-filter"></i>
+                            Filtre active:
+                        </span>
+                        <div class="filter-chips">
+                            @if (!string.IsNullOrEmpty(GlobalSearchText))
+                            {
+                                <span class="filter-chip">
+                                    Cautare: @GlobalSearchText
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(GlobalSearchText))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(FilterEsteActiv))
+                            {
+                                <span class="filter-chip">
+                                    Status: @FilterEsteActiv
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterEsteActiv))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(FilterDepartament))
+                            {
+                                <span class="filter-chip">
+                                    Departament: @FilterDepartament
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterDepartament))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(FilterPozitie))
+                            {
+                                <span class="filter-chip">
+                                    Pozitie: @FilterPozitie
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterPozitie))"></i>
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="action-toolbar @(SelectedPersonal != null ? "active" : "")">
+            <div class="toolbar-info">
+                @if (SelectedPersonal != null)
+                {
+                    <div class="selected-item-info">
+                        <i class="fas fa-user-check"></i>
+                        <span class="selected-label">Selectat:</span>
+                        <strong>@SelectedPersonal.NumeComplet</strong>
+                        <span class="selected-badge">@SelectedPersonal.Pozitie</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-selection-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selecteaza un personal medical pentru a activa actiunile</span>
+                    </div>
+                }
+            </div>
+            <div class="toolbar-actions">
+                <button class="toolbar-btn btn-view" 
+                        @onclick="() => HandleViewSelected()"
+                        disabled="@(SelectedPersonal == null)"
+                        title="Vizualizeaza detalii">
+                    <i class="fas fa-eye"></i>
+                    <span>Vizualizeaza</span>
+                </button>
+                <button class="toolbar-btn btn-edit" 
+                        @onclick="() => HandleEditSelected()"
+                        disabled="@(SelectedPersonal == null)"
+                        title="Editeaza informatii">
+                    <i class="fas fa-edit"></i>
+                    <span>Editeaza</span>
+                </button>
+                <button class="toolbar-btn btn-delete" 
+                        @onclick="() => HandleDeleteSelected()"
+                        disabled="@(SelectedPersonal == null)"
+                        title="Sterge personal medical">
+                    <i class="fas fa-trash"></i>
+                    <span>Sterge</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="page-size-selector">
+            <label>
+                <i class="fas fa-list"></i>
+                Inregistrari per pagina:
+            </label>
+            <select @onchange="OnPageSizeChangedNative" class="page-size-select" value="@CurrentPageSize">
+                @foreach (var size in PageSizeArray)
+                {
+                    <option value="@size" selected="@(size == CurrentPageSize)">@size</option>
+                }
+            </select>
+        </div>
+
+        <div class="grid-container">
+            <SfGrid @ref="GridRef"
+                    DataSource="@CurrentPageData"
+                    Height="100%"
+                    AllowPaging="false"
+                    AllowSorting="true"
+                    AllowFiltering="false"
+                    AllowResizing="true"
+                    AllowReordering="true"
+                    AllowGrouping="false"
+                    AllowTextWrap="true"
+                    ShowColumnChooser="true"
+                    GridLines="GridLine.Both"
+                    EnableVirtualization="true"
+                    EnableColumnVirtualization="true"
+                    RowHeight="34">
+                
+                <GridFilterSettings Type="FilterType.Excel"></GridFilterSettings>
+                
+                <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
+                
+                <GridEvents TValue="PersonalMedicalListDto" 
+                           RowSelected="OnRowSelected"
+                           RowDeselected="OnRowDeselected"
+                           OnActionBegin="OnGridActionBegin">
+                </GridEvents>
+                
+                <GridColumns>
+                    <GridColumn Field="@nameof(PersonalMedicalListDto.PersonalID)" 
+                               HeaderText="ID" 
+                               Width="100"
+                               IsPrimaryKey="true"
+                               Visible="false"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalMedicalListDto.NumeComplet)" 
+                               HeaderText="Nume si Prenume" 
+                               Width="200"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalMedicalListDto.Specializare)" 
+                               HeaderText="Specializare" 
+                               Width="180"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalMedicalListDto.NumarLicenta)" 
+                               HeaderText="Numar Licenta" 
+                               Width="150"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalMedicalListDto.Telefon)" 
+                               HeaderText="Telefon" 
+                               Width="120"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                        <Template>
+                            @{
+                                var personal = (context as PersonalMedicalListDto);
+                                if (!string.IsNullOrEmpty(personal?.Telefon))
+                                {
+                                    <a href="tel:@personal.Telefon" class="phone-link">
+                                        <i class="fas fa-phone"></i>
+                                        @personal.Telefon
+                                    </a>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalMedicalListDto.Email)" 
+                               HeaderText="Email" 
+                               Width="200"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                        <Template>
+                            @{
+                                var personal = (context as PersonalMedicalListDto);
+                                if (!string.IsNullOrEmpty(personal?.Email))
+                                {
+                                    <a href="mailto:@personal.Email" class="email-link">
+                                        <i class="fas fa-envelope"></i>
+                                        @personal.Email
+                                    </a>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalMedicalListDto.Pozitie)" 
+                               HeaderText="Pozitie" 
+                               Width="150"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalMedicalListDto.Departament)" 
+                               HeaderText="Departament" 
+                               Width="150"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalMedicalListDto.EsteActiv)" 
+                               HeaderText="Status" 
+                               Width="100"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                        <Template>
+                            @{
+                                var personal = (context as PersonalMedicalListDto);
+                                var statusClass = personal?.EsteActiv == true ? "status-active" : "status-inactive";
+                                <span class="status-badge @statusClass">
+                                    @(personal?.EsteActiv == true ? "Activ" : "Inactiv")
+                                </span>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </div>
+
+        <div class="custom-pager">
+            <div class="pager-info">
+                <span class="pager-text">
+                    <i class="fas fa-info-circle"></i>
+                    Pagina <strong>@CurrentPage</strong> din <strong>@TotalPages</strong>
+                </span>
+                <span class="pager-text">
+                    <i class="fas fa-list-ol"></i>
+                    Afisate <strong>@DisplayedRecordsStart-@DisplayedRecordsEnd</strong> din <strong>@TotalRecords</strong>
+                </span>
+            </div>
+            
+            <div class="pager-controls">
+                <button class="pager-btn pager-btn-first" 
+                        @onclick="GoToFirstPage" 
+                        disabled="@(!HasPreviousPage)"
+                        title="Prima pagina">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                
+                <button class="pager-btn pager-btn-prev" 
+                        @onclick="GoToPreviousPage" 
+                        disabled="@(!HasPreviousPage)"
+                        title="Pagina anterioara">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+                
+                @{
+                    var (start, end) = GetPagerRange(5);
+                    for (int i = start; i <= end; i++)
+                    {
+                        int pageNum = i;
+                        var isActive = pageNum == CurrentPage;
+                        <button class="pager-btn pager-btn-number @(isActive ? "active" : "")" 
+                                @onclick="() => GoToPage(pageNum)"
+                                disabled="@isActive"
+                                title="Pagina @pageNum">
+                            @pageNum
+                        </button>
+                    }
+                }
+                
+                <button class="pager-btn pager-btn-next" 
+                        @onclick="GoToNextPage" 
+                        disabled="@(!HasNextPage)"
+                        title="Pagina urmatoare">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+                
+                <button class="pager-btn pager-btn-last" 
+                        @onclick="GoToLastPage" 
+                        disabled="@(!HasNextPage)"
+                        title="Ultima pagina">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+<SfToast @ref="ToastRef" Title="@ToastTitle" Content="@ToastContent" CssClass="@ToastCssClass">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
+
+<PersonalMedicalViewModal @ref="personalMedicalViewModal" 
+                          OnEditRequested="HandleEditFromModal"
+                          OnDeleteRequested="HandleDeleteFromModal" />
+
+<PersonalMedicalFormModal @ref="personalMedicalFormModal" 
+                          OnPersonalMedicalSaved="HandlePersonalMedicalSaved" />
+
+<ConfirmDeleteModal @ref="confirmDeleteModal" 
+                    OnConfirmed="HandleDeleteConfirmed" />

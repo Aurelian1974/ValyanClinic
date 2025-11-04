@@ -22,6 +22,13 @@ public interface IPersonalMedicalRepository
         string sortDirection = "ASC",
         CancellationToken cancellationToken = default);
     
+    Task<int> GetCountAsync(
+        string? searchText = null,
+        string? departament = null,
+        string? pozitie = null,
+        bool? esteActiv = null,
+        CancellationToken cancellationToken = default);
+    
     // Commands
     Task<Guid> CreateAsync(PersonalMedical personalMedical, CancellationToken cancellationToken = default);
     Task<bool> UpdateAsync(PersonalMedical personalMedical, CancellationToken cancellationToken = default);

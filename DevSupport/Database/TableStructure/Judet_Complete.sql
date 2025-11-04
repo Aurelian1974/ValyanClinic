@@ -1,7 +1,7 @@
 ﻿-- ========================================
 -- Tabel: Judet
 -- Database: ValyanMed
--- Generat: 2025-10-08 16:36:41
+-- Generat: 2025-10-18 08:40:45
 -- Coloane: 7
 -- Primary Keys: 1
 -- Foreign Keys: 0

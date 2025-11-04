@@ -159,50 +159,43 @@ public class OcupatieISCO
     [InverseProperty(nameof(Parinte))]
     public virtual ICollection<OcupatieISCO> Copii { get; set; } = new List<OcupatieISCO>();
 
-    // Computed properties pentru utilizare în UI
+    // Computed properties pentru utilizare în UI - folosim helper class
 
     /// <summary>
     /// Codul și denumirea concatenate pentru afișare
     /// </summary>
     [NotMapped]
-    public string CodSiDenumire => $"{CodISCO} - {DenumireOcupatie}";
+    public string CodSiDenumire => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.GetCodSiDenumire(CodISCO, DenumireOcupatie);
 
     /// <summary>
     /// Numele nivelului ierarhic pentru afișare
     /// </summary>
     [NotMapped]
-    public string NumeNivelIerarhic => NivelIerarhic switch
-    {
-        1 => "Grupa Majoră",
-        2 => "Subgrupa", 
-        3 => "Grupa Minoră",
-        4 => "Ocupație",
-        _ => "Necunoscut"
-    };
+    public string NumeNivelIerarhic => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.GetNumeNivelIerarhic(NivelIerarhic);
 
     /// <summary>
     /// Indentarea pentru afișarea ierarhică în UI
     /// </summary>
     [NotMapped]
-    public string IndentareIerarhica => new string(' ', (NivelIerarhic - 1) * 4);
+    public string IndentareIerarhica => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.GetIndentareIerarhica(NivelIerarhic);
 
     /// <summary>
     /// Verifică dacă ocupația este o grupă (nu o ocupație finală)
     /// </summary>
     [NotMapped]
-    public bool EsteGrupa => NivelIerarhic < 4;
+    public bool EsteGrupa => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.EsteGrupa(NivelIerarhic);
 
     /// <summary>
     /// Verifică dacă ocupația este la nivelul cel mai detaliat
     /// </summary>
     [NotMapped]
-    public bool EsteOcupatieFinal => NivelIerarhic == 4;
+    public bool EsteOcupatieFinal => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.EsteOcupatieFinal(NivelIerarhic);
 
     /// <summary>
     /// String format scurt pentru ID-ul GUID (primele 8 caractere)
     /// </summary>
     [NotMapped]
-    public string IdScurt => Id.ToString("N")[..8].ToUpper();
+    public string IdScurt => ValyanClinic.Domain.Helpers.OcupatieISCOHelper.GetIdScurt(Id);
 
     /// <summary>
     /// Override pentru afișarea string-ului reprezentativ

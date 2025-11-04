@@ -1,0 +1,209 @@
+﻿@if (IsVisible)
+{
+    <div class="modal-overlay visible" @onclick="HandleOverlayClick">
+        <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-user-md"></i>
+                    <h2>Detalii Personal Medical</h2>
+                </div>
+                <button class="btn-close" @onclick="Close" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                @if (IsLoading)
+                {
+                    <div class="loading-container">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Se incarca...</span>
+                        </div>
+                        <p>Se incarca datele...</p>
+                    </div>
+                }
+                else if (HasError)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        @ErrorMessage
+                    </div>
+                }
+                else if (PersonalMedicalData != null)
+                {
+                    <div class="tabs-container">
+                        <div class="tab-buttons">
+                            <button class="tab-button @(ActiveTab == "date" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("date")'>
+                                <i class="fas fa-id-card"></i>
+                                <span>Date Generale</span>
+                            </button>
+                            <button class="tab-button @(ActiveTab == "contact" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("contact")'>
+                                <i class="fas fa-phone"></i>
+                                <span>Contact</span>
+                            </button>
+                            <button class="tab-button @(ActiveTab == "pozitie" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("pozitie")'>
+                                <i class="fas fa-briefcase"></i>
+                                <span>Pozitie</span>
+                            </button>
+                        </div>
+
+                        <div class="tab-content">
+                            <div class="tab-pane @(ActiveTab == "date" ? "active" : "")">
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-user"></i>
+                                        Informatii Generale
+                                    </h3>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label>Nume Complet</label>
+                                            <div class="info-value primary-text">@PersonalMedicalData.NumeComplet</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Status</label>
+                                            <div class="info-value">
+                                                <span class="status-badge @(PersonalMedicalData.EsteActiv == true ? "status-active" : "status-inactive")">
+                                                    @(PersonalMedicalData.EsteActiv == true ? "Activ" : "Inactiv")
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Specializare</label>
+                                            <div class="info-value @(string.IsNullOrEmpty(PersonalMedicalData.Specializare) ? "info-value-empty" : "")">
+                                                @if (!string.IsNullOrEmpty(PersonalMedicalData.Specializare))
+                                                {
+                                                    @PersonalMedicalData.Specializare
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    <span>Necompletat</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Numar Licenta</label>
+                                            <div class="info-value @(string.IsNullOrEmpty(PersonalMedicalData.NumarLicenta) ? "info-value-empty" : "")">
+                                                @if (!string.IsNullOrEmpty(PersonalMedicalData.NumarLicenta))
+                                                {
+                                                    <span class="badge-primary">@PersonalMedicalData.NumarLicenta</span>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    <span>Necompletat</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane @(ActiveTab == "contact" ? "active" : "")">
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-address-book"></i>
+                                        Date de Contact
+                                    </h3>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label>Telefon</label>
+                                            <div class="info-value @(string.IsNullOrEmpty(PersonalMedicalData.Telefon) ? "info-value-empty" : "")">
+                                                @if (!string.IsNullOrEmpty(PersonalMedicalData.Telefon))
+                                                {
+                                                    <a href="tel:@PersonalMedicalData.Telefon" class="contact-link">
+                                                        <i class="fas fa-phone"></i>
+                                                        @PersonalMedicalData.Telefon
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    <span>Necompletat</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Email</label>
+                                            <div class="info-value @(string.IsNullOrEmpty(PersonalMedicalData.Email) ? "info-value-empty" : "")">
+                                                @if (!string.IsNullOrEmpty(PersonalMedicalData.Email))
+                                                {
+                                                    <a href="mailto:@PersonalMedicalData.Email" class="contact-link">
+                                                        <i class="fas fa-envelope"></i>
+                                                        @PersonalMedicalData.Email
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    <span>Necompletat</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane @(ActiveTab == "pozitie" ? "active" : "")">
+                                <div class="info-card">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-building"></i>
+                                        Detalii Pozitie
+                                    </h3>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <label>Departament</label>
+                                            <div class="info-value @(string.IsNullOrEmpty(PersonalMedicalData.Departament) ? "info-value-empty" : "")">
+                                                @if (!string.IsNullOrEmpty(PersonalMedicalData.Departament))
+                                                {
+                                                    @PersonalMedicalData.Departament
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    <span>Necompletat</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label>Pozitie</label>
+                                            <div class="info-value @(string.IsNullOrEmpty(PersonalMedicalData.Pozitie) ? "info-value-empty" : "")">
+                                                @if (!string.IsNullOrEmpty(PersonalMedicalData.Pozitie))
+                                                {
+                                                    <span class="badge-secondary">@PersonalMedicalData.Pozitie</span>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    <span>Necompletat</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" @onclick="Close" type="button">
+                    <i class="fas fa-times"></i>
+                    <span>Inchide</span>
+                </button>
+                <button class="btn btn-warning" @onclick="HandleEdit" type="button">
+                    <i class="fas fa-edit"></i>
+                    <span>Editeaza</span>
+                </button>
+                <button class="btn btn-danger" @onclick="HandleDelete" type="button">
+                    <i class="fas fa-trash"></i>
+                    <span>Sterge</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,230 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container modal-large @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-folder-open"></i>
+                <h2>Documente Medicale - @PacientNume</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" title="Inchide">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Se incarca...</span>
+                    </div>
+                    <p>Se incarca documentele...</p>
+                </div>
+            }
+            else if (HasError)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @ErrorMessage
+                </div>
+            }
+            else
+            {
+                <!-- Action Bar -->
+                <div class="documents-action-bar">
+                    <div class="storage-info">
+                        <div class="storage-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="storage-details">
+                            <div class="storage-label">Spatiu Utilizat</div>
+                            <div class="storage-value">@FormatFileSize(TotalStorageUsed) / 500 MB</div>
+                            <div class="storage-bar">
+                                <div class="storage-progress" style="width: @StoragePercentage%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-sm btn-success" @onclick="OpenUploadModal">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            Incarca Document
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary" @onclick="DownloadAll">
+                            <i class="fas fa-download"></i>
+                            Descarca Tot
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Tabs -->
+                <div class="category-tabs">
+                    <button class="category-tab @(SelectedCategory == "toate" ? "active" : "")"
+                            @onclick='() => SetCategory("toate")'>
+                        <i class="fas fa-th-large"></i>
+                        Toate (@AllDocuments.Count)
+                    </button>
+                    <button class="category-tab @(SelectedCategory == "rezultate" ? "active" : "")"
+                            @onclick='() => SetCategory("rezultate")'>
+                        <i class="fas fa-vial"></i>
+                        Rezultate Analize (@GetCategoryCount("rezultate"))
+                    </button>
+                    <button class="category-tab @(SelectedCategory == "imagistica" ? "active" : "")"
+                            @onclick='() => SetCategory("imagistica")'>
+                        <i class="fas fa-x-ray"></i>
+                        Imagistica (@GetCategoryCount("imagistica"))
+                    </button>
+                    <button class="category-tab @(SelectedCategory == "retete" ? "active" : "")"
+                            @onclick='() => SetCategory("retete")'>
+                        <i class="fas fa-prescription"></i>
+                        Retete (@GetCategoryCount("retete"))
+                    </button>
+                    <button class="category-tab @(SelectedCategory == "rapoarte" ? "active" : "")"
+                            @onclick='() => SetCategory("rapoarte")'>
+                        <i class="fas fa-file-medical"></i>
+                        Rapoarte (@GetCategoryCount("rapoarte"))
+                    </button>
+                    <button class="category-tab @(SelectedCategory == "altele" ? "active" : "")"
+                            @onclick='() => SetCategory("altele")'>
+                        <i class="fas fa-file-alt"></i>
+                        Altele (@GetCategoryCount("altele"))
+                    </button>
+                </div>
+
+                <!-- View Mode Toggle -->
+                <div class="view-toggle">
+                    <label>Vizualizare:</label>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn @(ViewMode == "grid" ? "active" : "")"
+                                @onclick='() => ViewMode = "grid"'>
+                            <i class="fas fa-th"></i>
+                            Grid
+                        </button>
+                        <button class="toggle-btn @(ViewMode == "list" ? "active" : "")"
+                                @onclick='() => ViewMode = "list"'>
+                            <i class="fas fa-list"></i>
+                            Lista
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Documents Grid/List -->
+                @if (FilteredDocuments.Any())
+                {
+                    @if (ViewMode == "grid")
+                    {
+                        <div class="documents-grid">
+                            @foreach (var doc in FilteredDocuments)
+                            {
+                                <div class="document-card @GetCategoryClass(doc.Category)">
+                                    <div class="document-preview">
+                                        <i class="fas fa-file-@GetFileTypeIcon(doc.FileType)"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <h4 class="document-title" title="@doc.FileName">@doc.FileName</h4>
+                                        <div class="document-meta">
+                                            <span class="category-badge @GetCategoryClass(doc.Category)">
+                                                @doc.Category
+                                            </span>
+                                            <span class="file-size">@FormatFileSize(doc.FileSize)</span>
+                                        </div>
+                                        <div class="document-date">
+                                            <i class="fas fa-calendar"></i>
+                                            @doc.UploadDate.ToString("dd MMM yyyy")
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(doc.Description))
+                                        {
+                                            <p class="document-description">@doc.Description</p>
+                                        }
+                                    </div>
+                                    <div class="document-actions">
+                                        <button class="action-btn" @onclick="() => ViewDocument(doc)" title="Vizualizeaza">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @onclick="() => DownloadDocument(doc)" title="Descarca">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                        <button class="action-btn" @onclick="() => ShareDocument(doc)" title="Trimite">
+                                            <i class="fas fa-share-alt"></i>
+                                        </button>
+                                        <button class="action-btn btn-danger" @onclick="() => DeleteDocument(doc)" title="Sterge">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="documents-list">
+                            @foreach (var doc in FilteredDocuments)
+                            {
+                                <div class="document-row @GetCategoryClass(doc.Category)">
+                                    <div class="row-icon">
+                                        <i class="fas fa-file-@GetFileTypeIcon(doc.FileType)"></i>
+                                    </div>
+                                    <div class="row-info">
+                                        <h4 class="row-title">@doc.FileName</h4>
+                                        <div class="row-meta">
+                                            <span class="category-badge @GetCategoryClass(doc.Category)">@doc.Category</span>
+                                            <span class="file-size">@FormatFileSize(doc.FileSize)</span>
+                                            <span class="upload-date">
+                                                <i class="fas fa-calendar"></i>
+                                                @doc.UploadDate.ToString("dd MMM yyyy HH:mm")
+                                            </span>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(doc.Description))
+                                        {
+                                            <p class="row-description">@doc.Description</p>
+                                        }
+                                    </div>
+                                    <div class="row-actions">
+                                        <button class="action-btn" @onclick="() => ViewDocument(doc)">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn" @onclick="() => DownloadDocument(doc)">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                        <button class="action-btn" @onclick="() => ShareDocument(doc)">
+                                            <i class="fas fa-share-alt"></i>
+                                        </button>
+                                        <button class="action-btn btn-danger" @onclick="() => DeleteDocument(doc)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-documents">
+                        <div class="empty-icon">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <h3>Nu exista documente</h3>
+                        <p>@(SelectedCategory == "toate" ? "Pacientul nu are documente incarcate." : $"Nu exista documente in categoria '{SelectedCategory}'.")</p>
+                        <button class="btn btn-primary" @onclick="OpenUploadModal">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            Incarca Primul Document
+                        </button>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" @onclick="Close">
+                <i class="fas fa-times"></i>
+                Inchide
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Sub-modals -->
+@* Modal pentru upload document *@
+@* Modal pentru preview document *@

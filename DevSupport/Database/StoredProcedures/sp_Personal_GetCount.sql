@@ -1,9 +1,9 @@
 ﻿-- ========================================
 -- Stored Procedure: sp_Personal_GetCount
 -- Database: ValyanMed
--- Created: 10/08/2025 15:35:56
--- Modified: 10/08/2025 15:35:56
--- Generat: 2025-10-08 16:36:44
+-- Created: 10/12/2025 09:05:43
+-- Modified: 10/12/2025 09:05:43
+-- Generat: 2025-10-18 08:40:46
 -- ========================================
 
 USE [ValyanMed]
@@ -15,57 +15,29 @@ CREATE PROCEDURE sp_Personal_GetCount
     @Departament NVARCHAR(100) = NULL,
     @Status NVARCHAR(50) = NULL,
     @Functie NVARCHAR(150) = NULL,
-    @Judet NVARCHAR(100) = NULL           -- ✨ NOU PARAMETRU
+    @Judet NVARCHAR(100) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
     
-    DECLARE @WhereClause NVARCHAR(MAX) = ' WHERE 1=1 ';
-    DECLARE @CountSQL NVARCHAR(MAX);
-    
-    -- Global search
-    IF @SearchText IS NOT NULL AND LEN(@SearchText) > 0
-    BEGIN
-        SET @WhereClause = @WhereClause + 
-            ' AND (
-                Nume LIKE ''%' + @SearchText + '%'' 
-                OR Prenume LIKE ''%' + @SearchText + '%'' 
-                OR Cod_Angajat LIKE ''%' + @SearchText + '%''
-                OR CNP LIKE ''%' + @SearchText + '%''
-                OR Telefon_Personal LIKE ''%' + @SearchText + '%''
-                OR Telefon_Serviciu LIKE ''%' + @SearchText + '%''
-                OR Email_Personal LIKE ''%' + @SearchText + '%''
-                OR Email_Serviciu LIKE ''%' + @SearchText + '%''
-                OR Functia LIKE ''%' + @SearchText + '%''
-                OR Departament LIKE ''%' + @SearchText + '%''
-            ) ';
-    END
-    
-    -- Specific filters
-    IF @Departament IS NOT NULL AND LEN(@Departament) > 0
-    BEGIN
-        SET @WhereClause = @WhereClause + ' AND Departament = ''' + @Departament + ''' ';
-    END
-    
-    IF @Status IS NOT NULL AND LEN(@Status) > 0
-    BEGIN
-        SET @WhereClause = @WhereClause + ' AND Status_Angajat = ''' + @Status + ''' ';
-    END
-    
-    IF @Functie IS NOT NULL AND LEN(@Functie) > 0
-    BEGIN
-        SET @WhereClause = @WhereClause + ' AND Functia = ''' + @Functie + ''' ';
-    END
-    
-    -- ✨ NOU FILTRU JUDET
-    IF @Judet IS NOT NULL AND LEN(@Judet) > 0
-    BEGIN
-        SET @WhereClause = @WhereClause + ' AND Judet_Domiciliu = ''' + @Judet + ''' ';
-    END
-    
-    SET @CountSQL = 'SELECT COUNT(*) FROM Personal ' + @WhereClause;
-    
-    EXEC sp_executesql @CountSQL;
+    -- ✅ PARAMETERIZED QUERY - NO DYNAMIC SQL NEEDED
+    SELECT COUNT(*) AS TotalCount
+    FROM Personal
+    WHERE 1=1
+        AND (@SearchText IS NULL OR (
+            Nume LIKE '%' + @SearchText + '%' 
+            OR Prenume LIKE '%' + @SearchText + '%'
+            OR Cod_Angajat LIKE '%' + @SearchText + '%'
+            OR CNP LIKE '%' + @SearchText + '%'
+            OR Telefon_Personal LIKE '%' + @SearchText + '%'
+            OR Email_Personal LIKE '%' + @SearchText + '%'
+            OR Functia LIKE '%' + @SearchText + '%'
+            OR Departament LIKE '%' + @SearchText + '%'
+        ))
+        AND (@Departament IS NULL OR Departament = @Departament)
+        AND (@Status IS NULL OR Status_Angajat = @Status)
+        AND (@Functie IS NULL OR Functia = @Functie)
+        AND (@Judet IS NULL OR Judet_Domiciliu = @Judet);
 END
 
 GO

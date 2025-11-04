@@ -5,9 +5,8 @@
 @using MediatR
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Notifications
-@using Syncfusion.Blazor.DropDowns
-@using Syncfusion.Blazor.Inputs
 @using ValyanClinic.Components.Pages.Administrare.Personal.Modals
+@using ValyanClinic.Components.Shared.Modals
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
 
 <PageTitle>Administrare Personal</PageTitle>
@@ -48,7 +47,6 @@
     }
     else
     {
-        <!-- Search and Filter Section -->
         <div class="search-filter-section">
             <div class="search-and-filter">
                 <div class="global-search">
@@ -91,11 +89,9 @@
             </div>
         </div>
 
-        <!-- Advanced Filter Panel -->
         <div class="advanced-filter-panel @(IsAdvancedFilterExpanded ? "expanded" : "")">
             <div class="filter-content">
                 <div class="filter-grid">
-                    <!-- Status Filter -->
                     <div class="filter-item">
                         <label class="filter-label">
                             <i class="fas fa-circle-check"></i>
@@ -115,7 +111,6 @@
                         </SfDropDownList>
                     </div>
 
-                    <!-- Departament Filter -->
                     <div class="filter-item">
                         <label class="filter-label">
                             <i class="fas fa-building"></i>
@@ -135,7 +130,6 @@
                         </SfDropDownList>
                     </div>
 
-                    <!-- Functie Filter -->
                     <div class="filter-item">
                         <label class="filter-label">
                             <i class="fas fa-user-tie"></i>
@@ -155,7 +149,6 @@
                         </SfDropDownList>
                     </div>
 
-                    <!-- Judet Filter -->
                     <div class="filter-item">
                         <label class="filter-label">
                             <i class="fas fa-map-marker-alt"></i>
@@ -237,7 +230,6 @@
             </div>
         </div>
 
-        <!-- Action Toolbar -->
         <div class="action-toolbar @(SelectedPersonal != null ? "active" : "")">
             <div class="toolbar-info">
                 @if (SelectedPersonal != null)
@@ -282,38 +274,44 @@
             </div>
         </div>
 
+        <div class="page-size-selector">
+            <label>
+                <i class="fas fa-list"></i>
+                Inregistrari per pagina:
+            </label>
+            <select @onchange="OnPageSizeChangedNative" class="page-size-select" value="@CurrentPageSize">
+                @foreach (var size in PageSizeArray)
+                {
+                    <option value="@size" selected="@(size == CurrentPageSize)">@size</option>
+                }
+            </select>
+        </div>
+
         <div class="grid-container">
             <SfGrid @ref="GridRef"
-                    DataSource="@AllPersonalData"
+                    DataSource="@CurrentPageData"
                     Height="100%"
-                    AllowPaging="true"
+                    AllowPaging="false"
                     AllowSorting="true"
-                    AllowFiltering="true"
+                    AllowFiltering="false"
                     AllowResizing="true"
                     AllowReordering="true"
-                    AllowGrouping="true"
+                    AllowGrouping="false"
                     AllowTextWrap="true"
                     ShowColumnChooser="true"
-                    GridLines="GridLine.Both">
-                
-                <!-- Paging Settings -->
-                <GridPageSettings PageSize="@DefaultPageSize" 
-                                 PageSizes="@PageSizeArray"
-                                 PageCount="5">
-                </GridPageSettings>
+                    GridLines="GridLine.Both"
+                    EnableVirtualization="true"
+                    EnableColumnVirtualization="true"
+                    RowHeight="34">
                 
                 <GridFilterSettings Type="FilterType.Excel"></GridFilterSettings>
-                
-                <GridGroupSettings ShowDropArea="true" 
-                                  ShowGroupedColumn="true"
-                                  ShowUngroupButton="true">
-                </GridGroupSettings>
                 
                 <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
                 
                 <GridEvents TValue="PersonalListDto" 
                            RowSelected="OnRowSelected"
-                           RowDeselected="OnRowDeselected">
+                           RowDeselected="OnRowDeselected"
+                           OnActionBegin="OnGridActionBegin">
                 </GridEvents>
                 
                 <GridColumns>
@@ -323,23 +321,15 @@
                                IsPrimaryKey="true"
                                AllowReordering="true"
                                AllowResizing="true"
-                               AllowGrouping="true">
+                               AllowGrouping="false">
                     </GridColumn>
                     
-                    <GridColumn Field="@nameof(PersonalListDto.Nume)" 
-                               HeaderText="Nume" 
-                               Width="150"
+                    <GridColumn Field="@nameof(PersonalListDto.NumeComplet)" 
+                               HeaderText="Nume si Prenume" 
+                               Width="200"
                                AllowReordering="true"
                                AllowResizing="true"
-                               AllowGrouping="true">
-                    </GridColumn>
-                    
-                    <GridColumn Field="@nameof(PersonalListDto.Prenume)" 
-                               HeaderText="Prenume" 
-                               Width="150"
-                               AllowReordering="true"
-                               AllowResizing="true"
-                               AllowGrouping="true">
+                               AllowGrouping="false">
                     </GridColumn>
                     
                     <GridColumn Field="@nameof(PersonalListDto.CNP)" 
@@ -395,7 +385,7 @@
                                Width="150"
                                AllowReordering="true"
                                AllowResizing="true"
-                               AllowGrouping="true">
+                               AllowGrouping="false">
                     </GridColumn>
                     
                     <GridColumn Field="@nameof(PersonalListDto.Departament)" 
@@ -403,7 +393,23 @@
                                Width="150"
                                AllowReordering="true"
                                AllowResizing="true"
-                               AllowGrouping="true">
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalListDto.Judet_Domiciliu)" 
+                               HeaderText="Judet" 
+                               Width="120"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PersonalListDto.AdresaCompleta)" 
+                               HeaderText="Adresa" 
+                               Width="250"
+                               AllowReordering="true"
+                               AllowResizing="true"
+                               AllowGrouping="false">
                     </GridColumn>
                     
                     <GridColumn Field="@nameof(PersonalListDto.Status_Angajat)" 
@@ -411,7 +417,7 @@
                                Width="100"
                                AllowReordering="true"
                                AllowResizing="true"
-                               AllowGrouping="true">
+                               AllowGrouping="false">
                         <Template>
                             @{
                                 var personal = (context as PersonalListDto);
@@ -425,15 +431,77 @@
                 </GridColumns>
             </SfGrid>
         </div>
+
+        <div class="custom-pager">
+            <div class="pager-info">
+                <span class="pager-text">
+                    <i class="fas fa-info-circle"></i>
+                    Pagina <strong>@CurrentPage</strong> din <strong>@TotalPages</strong>
+                </span>
+                <span class="pager-text">
+                    <i class="fas fa-list-ol"></i>
+                    Afisate <strong>@DisplayedRecordsStart-@DisplayedRecordsEnd</strong> din <strong>@TotalRecords</strong>
+                </span>
+            </div>
+            
+            <div class="pager-controls">
+                <button class="pager-btn pager-btn-first" 
+                        @onclick="GoToFirstPage" 
+                        disabled="@(!HasPreviousPage)"
+                        title="Prima pagina">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                
+                <button class="pager-btn pager-btn-prev" 
+                        @onclick="GoToPreviousPage" 
+                        disabled="@(!HasPreviousPage)"
+                        title="Pagina anterioara">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+                
+                @{
+                    var (start, end) = GetPagerRange(5);
+                    for (int i = start; i <= end; i++)
+                    {
+                        int pageNum = i;
+                        var isActive = pageNum == CurrentPage;
+                        <button class="pager-btn pager-btn-number @(isActive ? "active" : "")" 
+                                @onclick="() => GoToPage(pageNum)"
+                                disabled="@isActive"
+                                title="Pagina @pageNum">
+                            @pageNum
+                        </button>
+                    }
+                }
+                
+                <button class="pager-btn pager-btn-next" 
+                        @onclick="GoToNextPage" 
+                        disabled="@(!HasNextPage)"
+                        title="Pagina urmatoare">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+                
+                <button class="pager-btn pager-btn-last" 
+                        @onclick="GoToLastPage" 
+                        disabled="@(!HasNextPage)"
+                        title="Ultima pagina">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+            </div>
+        </div>
     }
 </div>
 
-@* Toast pentru notificari *@
 <SfToast @ref="ToastRef" Title="@ToastTitle" Content="@ToastContent" CssClass="@ToastCssClass">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
 
-@* Modal pentru vizualizare detalii personal *@
 <PersonalViewModal @ref="personalViewModal" 
                    OnEditRequested="HandleEditFromModal"
                    OnDeleteRequested="HandleDeleteFromModal" />
+
+<PersonalFormModal @ref="personalFormModal" 
+                   OnPersonalSaved="HandlePersonalSaved" />
+
+<ConfirmDeleteModal @ref="confirmDeleteModal" 
+                    OnConfirmed="HandleDeleteConfirmed" />

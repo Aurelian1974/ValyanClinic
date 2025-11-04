@@ -13,21 +13,63 @@
                 </div>
             }
         </div>
-        <button type="button" class="btn-collapse" @onclick="HandleToggle" title="@(isCollapsed ? "Extinde" : "Restrânge")">
-            <i class="fas @(isCollapsed ? "fa-chevron-right" : "fa-chevron-left")"></i>
+        <button type="button" class="btn-collapse" @onclick="HandleToggle" title="@GetCollapseButtonTitle()">
+            <i class="fas @GetCollapseButtonIcon()"></i>
         </button>
     </div>
 
     <div class="nav-menu">
         @* Home - Level 0 *@
         <div class="nav-item">
-            <a href="/" class="nav-link" title="Acasă">
+            <a href="/" class="nav-link" title="Acasa">
                 <i class="fas fa-home"></i>
                 @if (!isCollapsed)
                 {
-                    <span>Acasă</span>
+                    <span>Acasa</span>
                 }
             </a>
+        </div>
+
+        @* Pacienti - Level 1 (Parent) *@
+        <div class="nav-section">
+            @if (!isCollapsed)
+            {
+                <div class="nav-section-header" @onclick="TogglePacienti">
+                    <div class="nav-section-title">
+                        <i class="fas fa-user-injured"></i>
+                        <span>Pacienti</span>
+                    </div>
+                    <i class="fas fa-chevron-@(isPacientiExpanded ? "up" : "down") nav-chevron"></i>
+                </div>
+
+                @if (isPacientiExpanded)
+                {
+                    <div class="nav-items-group">
+                        <div class="nav-item nav-item-child">
+                            <a href="/pacienti/vizualizare" class="nav-link nav-link-child" title="Vizualizare Pacienti">
+                                <i class="fas fa-eye"></i>
+                                <span>Vizualizare Pacienti</span>
+                            </a>
+                        </div>
+
+                        <div class="nav-item nav-item-child">
+                            <a href="/pacienti/administrare" class="nav-link nav-link-child" title="Administrare Pacienti">
+                                <i class="fas fa-user-cog"></i>
+                                <span>Administrare Pacienti</span>
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                @* Show icon when collapsed *@
+                <div class="nav-item">
+                    <a href="/pacienti/vizualizare" class="nav-link" title="Pacienti">
+                        <i class="fas fa-user-injured"></i>
+                    </a>
+                </div>
+            }
         </div>
 
         @* Administrare - Level 1 (Parent) *@
@@ -42,9 +84,9 @@
                     <i class="fas fa-chevron-@(isAdministrareExpanded ? "up" : "down") nav-chevron"></i>
                 </div>
 
-                @* Administrare Personal - Level 2 (Parent + Child of Administrare) *@
                 @if (isAdministrareExpanded)
                 {
+                    @* Administrare Personal - Level 2 *@
                     <div class="nav-subsection">
                         <div class="nav-subsection-header" @onclick="ToggleAdministrarePersonal">
                             <div class="nav-subsection-title">
@@ -54,7 +96,6 @@
                             <i class="fas fa-chevron-@(isAdministrarePersonalExpanded ? "up" : "down") nav-chevron-small"></i>
                         </div>
 
-                        @* Personal & Personal Medical - Level 3 (Children of Administrare Personal) *@
                         @if (isAdministrarePersonalExpanded)
                         {
                             <div class="nav-sub-items">
@@ -74,6 +115,50 @@
                             </div>
                         }
                     </div>
+
+                    @* Administrare Clinica - Level 2 (NOU) *@
+                    <div class="nav-subsection">
+                        <div class="nav-subsection-header" @onclick="ToggleAdministrareClinica">
+                            <div class="nav-subsection-title">
+                                <i class="fas fa-hospital"></i>
+                                <span>Administrare Clinica</span>
+                            </div>
+                            <i class="fas fa-chevron-@(isAdministrareClinicaExpanded ? "up" : "down") nav-chevron-small"></i>
+                        </div>
+
+                        @if (isAdministrareClinicaExpanded)
+                        {
+                            <div class="nav-sub-items">
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/departamente" class="nav-link nav-link-child" title="Departamente">
+                                        <i class="fas fa-building"></i>
+                                        <span>Departamente</span>
+                                    </a>
+                                </div>
+
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/sectii" class="nav-link nav-link-child" title="Sectii">
+                                        <i class="fas fa-door-open"></i>
+                                        <span>Sectii</span>
+                                    </a>
+                                </div>
+
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/pozitii" class="nav-link nav-link-child" title="Pozitii">
+                                        <i class="fas fa-briefcase"></i>
+                                        <span>Pozitii</span>
+                                    </a>
+                                </div>
+
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/specializari" class="nav-link nav-link-child" title="Specializari">
+                                        <i class="fas fa-user-md"></i>
+                                        <span>Specializari</span>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
                 }
             }
             else
@@ -87,14 +172,14 @@
             }
         </div>
 
-        @* Programări - Level 1 (Parent) *@
+        @* Programari - Level 1 (Parent) *@
         <div class="nav-section">
             @if (!isCollapsed)
             {
                 <div class="nav-section-header" @onclick="ToggleProgramari">
                     <div class="nav-section-title">
                         <i class="fas fa-calendar-check"></i>
-                        <span>Programări</span>
+                        <span>Programari</span>
                     </div>
                     <i class="fas fa-chevron-@(isProgramariExpanded ? "up" : "down") nav-chevron"></i>
                 </div>
@@ -110,9 +195,9 @@
                         </div>
 
                         <div class="nav-item nav-item-child">
-                            <a href="/programari/lista" class="nav-link nav-link-child" title="Lista Programări">
+                            <a href="/programari/lista" class="nav-link nav-link-child" title="Lista Programari">
                                 <i class="fas fa-list"></i>
-                                <span>Lista Programări</span>
+                                <span>Lista Programari</span>
                             </a>
                         </div>
                     </div>
@@ -122,7 +207,7 @@
             {
                 @* Show icon when collapsed *@
                 <div class="nav-item">
-                    <a href="/programari" class="nav-link" title="Programări">
+                    <a href="/programari" class="nav-link" title="Programari">
                         <i class="fas fa-calendar-check"></i>
                     </a>
                 </div>
@@ -199,9 +284,4 @@
             }
         </div>
     </div>
-
-    @* Debug info *@
-@*     <div style="position: absolute; bottom: 10px; left: 10px; color: white; font-size: 12px; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 4px; z-index: 9999;">
-        Collapsed: @isCollapsed | Clicks: @clickCount
-    </div> *@
 </div>

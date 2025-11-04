@@ -11,8 +11,10 @@ public partial class NavMenu : ComponentBase
     private int clickCount = 0;
     
     // Expand/collapse state pentru categorii
+    private bool isPacientiExpanded = false;
     private bool isAdministrareExpanded = false;
     private bool isAdministrarePersonalExpanded = false;
+    private bool isAdministrareClinicaExpanded = false;
     private bool isProgramariExpanded = false;
     private bool isRapoarteExpanded = false;
     private bool isMonitorizareExpanded = false;
@@ -26,8 +28,10 @@ public partial class NavMenu : ComponentBase
         // When collapsing sidebar, collapse all expanded sections
         if (isCollapsed)
         {
+            isPacientiExpanded = false;
             isAdministrareExpanded = false;
             isAdministrarePersonalExpanded = false;
+            isAdministrareClinicaExpanded = false;
             isProgramariExpanded = false;
             isRapoarteExpanded = false;
             isMonitorizareExpanded = false;
@@ -39,6 +43,18 @@ public partial class NavMenu : ComponentBase
         StateHasChanged();
     }
 
+    private string GetCollapseButtonTitle() => isCollapsed ? "Extinde" : "Restrante";
+
+    private string GetCollapseButtonIcon() => isCollapsed ? "fa-chevron-right" : "fa-chevron-left";
+
+    private void TogglePacienti()
+    {
+        if (!isCollapsed)
+        {
+            isPacientiExpanded = !isPacientiExpanded;
+        }
+    }
+
     private void ToggleAdministrare()
     {
         if (!isCollapsed)
@@ -47,6 +63,7 @@ public partial class NavMenu : ComponentBase
             if (!isAdministrareExpanded)
             {
                 isAdministrarePersonalExpanded = false;
+                isAdministrareClinicaExpanded = false;
             }
         }
     }
@@ -56,6 +73,14 @@ public partial class NavMenu : ComponentBase
         if (!isCollapsed && isAdministrareExpanded)
         {
             isAdministrarePersonalExpanded = !isAdministrarePersonalExpanded;
+        }
+    }
+
+    private void ToggleAdministrareClinica()
+    {
+        if (!isCollapsed && isAdministrareExpanded)
+        {
+            isAdministrareClinicaExpanded = !isAdministrareClinicaExpanded;
         }
     }
 

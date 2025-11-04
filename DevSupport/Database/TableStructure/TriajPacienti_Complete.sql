@@ -1,7 +1,7 @@
 ﻿-- ========================================
 -- Tabel: TriajPacienti
 -- Database: ValyanMed
--- Generat: 2025-10-08 16:36:44
+-- Generat: 2025-10-18 08:40:46
 -- Coloane: 7
 -- Primary Keys: 1
 -- Foreign Keys: 2

@@ -1,0 +1,332 @@
+﻿@page "/pacienti/administrare"
+@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientList
+@using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
+@using ValyanClinic.Components.Pages.Pacienti.Modals
+@using Syncfusion.Blazor.Grids
+@using MediatR
+
+<PageTitle>Administrare Pacienti</PageTitle>
+
+<div class="admin-pacienti-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-icon">
+                    <i class="fas fa-users-cog"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Administrare Pacienti</h1>
+                    <p class="header-subtitle">Gestionare completa baza de date pacienti</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary btn-add" @onclick="OpenAddModal">
+                    <i class="fas fa-user-plus"></i>
+                    Adauga Pacient Nou
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label>Cautare</label>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           class="form-control" 
+                           placeholder="Nume, prenume, CNP, telefon..."
+                           @bind="SearchText"
+                           @bind:event="oninput"
+                           @onkeyup="HandleSearchKeyUp" />
+                    @if (!string.IsNullOrEmpty(SearchText))
+                    {
+                        <button class="btn-clear" @onclick="ClearSearch">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    }
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Status</label>
+                <select class="form-select" @bind="FilterActiv" @bind:after="ApplyFilters">
+                    <option value="">Toti</option>
+                    <option value="true">Activ</option>
+                    <option value="false">Inactiv</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Asigurare</label>
+                <select class="form-select" @bind="FilterAsigurat" @bind:after="ApplyFilters">
+                    <option value="">Toti</option>
+                    <option value="true">Asigurat</option>
+                    <option value="false">Neasigurat</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Judet</label>
+                <select class="form-select" @bind="FilterJudet" @bind:after="ApplyFilters">
+                    <option value="">Toate judetele</option>
+                    @foreach (var judet in JudeteList)
+                    {
+                        <option value="@judet">@judet</option>
+                    }
+                </select>
+            </div>
+        </div>
+        @if (HasActiveFilters)
+        {
+            <div class="filter-actions">
+                <button class="btn btn-outline-secondary btn-sm" @onclick="ClearAllFilters">
+                    <i class="fas fa-filter-circle-xmark"></i>
+                    Sterge toate filtrele
+                </button>
+            </div>
+        }
+    </div>
+
+    <!-- Data Grid Section -->
+    <div class="data-grid-section">
+        @if (IsLoading)
+        {
+            <div class="loading-overlay">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Se incarca...</span>
+                </div>
+                <p>Se incarca datele...</p>
+            </div>
+        }
+        else if (HasError)
+        {
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                @ErrorMessage
+            </div>
+        }
+        else if (FilteredPacienti == null || !FilteredPacienti.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-users-slash"></i>
+                </div>
+                <h3>Nu s-au gasit pacienti</h3>
+                <p>@(HasActiveFilters ? "Incercati sa modificati filtrele aplicate." : "Incearca sa adaugi primul pacient.")</p>
+                @if (!HasActiveFilters)
+                {
+                    <button class="btn btn-primary" @onclick="OpenAddModal">
+                        <i class="fas fa-user-plus"></i>
+                        Adauga Pacient Nou
+                    </button>
+                }
+            </div>
+        }
+        else
+        {
+            <SfGrid @ref="GridRef"
+                    DataSource="@FilteredPacienti"
+                    AllowPaging="true"
+                    AllowSorting="true"
+                    AllowFiltering="false"
+                    AllowResizing="true"
+                    GridLines="GridLine.Both"
+                    Height="100%">
+                
+                <GridPageSettings PageSize="25" PageSizes="@(new int[] { 10, 25, 50, 100 })"></GridPageSettings>
+                
+                <GridColumns>
+                    <GridColumn Field="@nameof(PacientListDto.Cod_Pacient)" 
+                               HeaderText="Cod Pacient" 
+                               Width="130">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                <span class="badge badge-code">@pacient?.Cod_Pacient</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.NumeComplet)" 
+                               HeaderText="Nume Complet" 
+                               Width="200">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                <div class="patient-info">
+                                    <i class="fas fa-@(pacient?.Sex == "M" ? "mars" : "venus") sex-icon sex-@(pacient?.Sex.ToLower())"></i>
+                                    <span class="patient-name">@pacient?.NumeComplet</span>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.CNP)" 
+                               HeaderText="CNP" 
+                               Width="140">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Varsta)" 
+                               HeaderText="Varsta" 
+                               Width="90" 
+                               TextAlign="TextAlign.Center">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                <span>@pacient?.Varsta ani</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Telefon)" 
+                               HeaderText="Telefon" 
+                               Width="130">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                if (!string.IsNullOrEmpty(pacient?.Telefon))
+                                {
+                                    <a href="tel:@pacient.Telefon" class="phone-link">
+                                        <i class="fas fa-phone"></i>
+                                        @pacient.Telefon
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Email)" 
+                               HeaderText="Email" 
+                               Width="200">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                if (!string.IsNullOrEmpty(pacient?.Email))
+                                {
+                                    <a href="mailto:@pacient.Email" class="email-link">
+                                        <i class="fas fa-envelope"></i>
+                                        @pacient.Email
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Judet)" 
+                               HeaderText="Judet" 
+                               Width="120">
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Asigurat)" 
+                               HeaderText="Asigurat" 
+                               Width="110" 
+                               TextAlign="TextAlign.Center">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                if (pacient != null)
+                                {
+                                    if (pacient.Asigurat)
+                                    {
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-check-circle"></i> Da
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-secondary">
+                                            <i class="fas fa-times-circle"></i> Nu
+                                        </span>
+                                    }
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn Field="@nameof(PacientListDto.Activ)" 
+                               HeaderText="Status" 
+                               Width="100" 
+                               TextAlign="TextAlign.Center">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                <span class="badge @(pacient?.Activ == true ? "badge-active" : "badge-inactive")">
+                                    @(pacient?.Activ == true ? "Activ" : "Inactiv")
+                                </span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+                    <GridColumn HeaderText="Actiuni" Width="250" TextAlign="TextAlign.Center">
+                        <Template>
+                            @{
+                                var pacient = (context as PacientListDto);
+                                <div class="action-buttons">
+                                    <button class="btn btn-sm btn-view" 
+                                            @onclick="() => OpenViewModal(pacient!.Id)"
+                                            title="Vizualizeaza detalii">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-edit" 
+                                            @onclick="() => OpenEditModal(pacient!.Id)"
+                                            title="Editeaza">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-history" 
+                                            @onclick="() => OpenHistoryModal(pacient!.Id)"
+                                            title="Istoric medical">
+                                        <i class="fas fa-file-medical-alt"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-documents" 
+                                            @onclick="() => OpenDocumentsModal(pacient!.Id)"
+                                            title="Documente">
+                                        <i class="fas fa-folder-open"></i>
+                                    </button>
+                                    <button class="btn btn-sm @(pacient!.Activ ? "btn-delete" : "btn-activate")" 
+                                            @onclick="() => ToggleStatusConfirm(pacient)"
+                                            title="@(pacient.Activ ? "Dezactiveaza" : "Activeaza")">
+                                        <i class="fas fa-@(pacient.Activ ? "ban" : "check")"></i>
+                                    </button>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+    </div>
+</div>
+
+<!-- Modals -->
+<PacientAddEditModal IsVisible="@ShowAddEditModal"
+                     IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowAddEditModal = value))"
+                     PacientId="@SelectedPacientId"
+                     OnSaved="@HandleModalSaved" />
+
+<PacientViewModal IsVisible="@ShowViewModal"
+                  IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
+                  PacientId="@SelectedPacientId" />
+
+<PacientHistoryModal IsVisible="@ShowHistoryModal"
+                     IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowHistoryModal = value))"
+                     PacientId="@SelectedPacientId" />
+
+<PacientDocumentsModal IsVisible="@ShowDocumentsModal"
+                       IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowDocumentsModal = value))"
+                       PacientId="@SelectedPacientId" />
+
+<ConfirmDeleteModal IsVisible="@ShowDeleteModal"
+                    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowDeleteModal = value))"
+                    Title="Confirmare Stergere"
+                    Message="@DeleteConfirmMessage"
+                    OnConfirmed="@HandleDeleteConfirmed" />
