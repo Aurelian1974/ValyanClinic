@@ -1,0 +1,166 @@
+﻿@using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalList
+@using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Commands.AddRelatie
+@using MediatR
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using SfFilterType = Syncfusion.Blazor.DropDowns.FilterType
+
+<!-- ALWAYS render - control visibility with CSS -->
+<div class="modal-overlay @(IsVisible ? "visible" : "")" 
+     style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: @(IsVisible ? "flex" : "none"); align-items: center; justify-content: center;"
+     @onclick="Close">
+  
+    <div class="modal-container modal-md @(IsVisible ? "show" : "")" 
+       style="background: white; border-radius: 14px; max-width: 600px; width: 90%; max-height: 90vh; box-shadow: 0 10px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column;"
+       @onclick:stopPropagation="true">
+        
+        <!-- Header ALBASTRU -->
+        <div class="modal-header" style="background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); color: white; padding: 1.25rem 1.75rem; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center;">
+     <div class="modal-title" style="display: flex; align-items: center; gap: 0.625rem;">
+    <i class="fas fa-plus-circle"></i>
+ <h2 style="margin: 0; font-size: 1.25rem;">Adaugă doctor pentru @PacientNume</h2>
+            </div>
+        <button type="button" class="btn-close" @onclick="Close" style="background: rgba(255,255,255,0.2); border: none; width: 34px; height: 34px; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+    <i class="fas fa-times"></i>
+     </button>
+        </div>
+
+        <div class="modal-body" style="padding: 1.5rem; overflow-y: auto; flex: 1;">
+          @if (IsLoading)
+            {
+     <div class="loading-container" style="text-align: center; padding: 3rem;">
+   <div class="spinner-border text-primary" role="status">
+     <span class="visually-hidden">Se încarcă...</span>
+           </div>
+       <p>Se încarcă...</p>
+                </div>
+          }
+            else if (IsSaving)
+            {
+        <div class="loading-container" style="text-align: center; padding: 3rem;">
+  <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Se salvează...</span>
+        </div>
+         <p>Se salvează...</p>
+           </div>
+            }
+    else
+      {
+  <div class="form-group" style="margin-bottom: 1.5rem;">
+  <label for="doctor-select" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.875rem;">
+         <i class="fas fa-user-md" style="color: #3b82f6;"></i>
+  Selectează doctor <span class="text-danger">*</span>
+        </label>
+            <SfDropDownList TValue="Guid?" 
+      TItem="PersonalMedicalListDto"
+           ID="doctor-select"
+           Placeholder="Caută și selectează un doctor"
+     DataSource="@DoctoriDisponibili"
+           @bind-Value="@SelectedDoctorId"
+        AllowFiltering="true"
+              FilterType="SfFilterType.Contains"
+      CssClass="e-outline">
+             <DropDownListFieldSettings Value="PersonalID" Text="NumeComplet"></DropDownListFieldSettings>
+          <DropDownListTemplates TItem="PersonalMedicalListDto">
+              <ItemTemplate>
+        <div class="doctor-option" style="padding: 0.5rem;">
+   <strong style="display: block; color: #111827;">@context.NumeComplet</strong>
+        @if (!string.IsNullOrEmpty(context.Specializare))
+                 {
+     <small style="color: #6b7280; font-size: 0.8125rem;">@context.Specializare</small>
+         }
+    </div>
+   </ItemTemplate>
+    </DropDownListTemplates>
+   </SfDropDownList>
+          </div>
+
+     <div class="form-group" style="margin-bottom: 1.5rem;">
+         <label for="tip-relatie" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.875rem;">
+ <i class="fas fa-tag" style="color: #3b82f6;"></i>
+     Tip relație <span class="text-danger">*</span>
+   </label>
+    <SfDropDownList TValue="string" 
+       TItem="TipRelatieOption"
+  ID="tip-relatie"
+    Placeholder="Selectează tipul relației"
+           DataSource="@TipuriRelatie"
+      @bind-Value="@TipRelatie"
+  CssClass="e-outline">
+        <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+              </SfDropDownList>
+     </div>
+
+     <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label for="motiv" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.875rem;">
+  <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
+       Motiv asociere
+       </label>
+  <SfTextBox ID="motiv"
+   Placeholder="Ex: Pacient cu probleme cardiace"
+       @bind-Value="@Motiv"
+    CssClass="e-outline"
+         Multiline="true"
+ MaxLength="500">
+                  </SfTextBox>
+  </div>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+    <label for="observatii" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.875rem;">
+      <i class="fas fa-sticky-note" style="color: #3b82f6;"></i>
+      Observații
+         </label>
+      <SfTextBox ID="observatii"
+    Placeholder="Observații suplimentare"
+     @bind-Value="@Observatii"
+        CssClass="e-outline"
+       Multiline="true"
+ MaxLength="1000">
+      </SfTextBox>
+        </div>
+
+     @if (!string.IsNullOrEmpty(ValidationError))
+              {
+ <div class="alert alert-danger" style="padding: 1rem; background: #fee2e2; border: 2px solid #fca5a5; color: #991b1b; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem;">
+      <i class="fas fa-exclamation-triangle"></i>
+          @ValidationError
+      </div>
+    }
+    }
+      </div>
+
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.875rem; padding: 1.25rem 1.75rem; border-top: 2px solid #f3f4f6; border-radius: 0 0 14px 14px;">
+            <button type="button" 
+   class="btn btn-secondary" 
+     @onclick="Close"
+               disabled="@IsSaving"
+        style="padding: 0.625rem 1.25rem; background: linear-gradient(135deg, #94a3b8, #64748b); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(100, 116, 139, 0.3); display: inline-flex; align-items: center; gap: 0.5rem;">
+  <i class="fas fa-times"></i> Anulează
+ </button>
+         <button type="button" 
+ class="btn btn-primary" 
+           @onclick="SaveDoctor"
+    disabled="@(!IsFormValid || IsSaving)"
+         style="padding: 0.625rem 1.25rem; background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); display: inline-flex; align-items: center; gap: 0.5rem; @((!IsFormValid || IsSaving) ? "opacity: 0.5; cursor: not-allowed;" : "")">
+       <i class="fas fa-save"></i> 
+       @(IsSaving ? "Se salvează..." : "Salvează")
+   </button>
+      </div>
+    </div>
+</div>
+
+<!-- ✅ ADDED: Toast pentru notificări -->
+<Syncfusion.Blazor.Notifications.SfToast @ref="ToastRef" />
+
+@code {
+    private Syncfusion.Blazor.Notifications.SfToast? ToastRef;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && ToastRef != null)
+        {
+            NotificationService.RegisterToast(ToastRef);
+   Logger.LogDebug("[AddDoctorToPacientModal] Toast registered successfully");
+        }
+    }
+}

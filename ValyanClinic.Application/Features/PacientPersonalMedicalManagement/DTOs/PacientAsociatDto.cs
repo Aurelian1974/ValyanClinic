@@ -1,0 +1,26 @@
+﻿namespace ValyanClinic.Application.Features.PacientPersonalMedicalManagement.DTOs;
+
+/// <summary>
+/// DTO pentru afisarea unui pacient asociat cu un doctor
+/// </summary>
+public class PacientAsociatDto
+{
+    public Guid RelatieID { get; set; }
+public Guid PacientID { get; set; }
+    public string PacientCod { get; set; } = string.Empty;
+    public string PacientNumeComplet { get; set; } = string.Empty;
+    public string? PacientCNP { get; set; }
+    public DateTime PacientDataNasterii { get; set; }
+    public int PacientVarsta { get; set; }
+    public string? PacientTelefon { get; set; }
+    public string? PacientEmail { get; set; }
+    public string? PacientJudet { get; set; }
+    public string? PacientLocalitate { get; set; }
+    public string? TipRelatie { get; set; }
+    public DateTime DataAsocierii { get; set; }
+    public DateTime? DataDezactivarii { get; set; }
+    public bool EsteActiv { get; set; }
+    public int ZileDeAsociere { get; set; }
+    public string? Observatii { get; set; }
+    public string? Motiv { get; set; }
+}

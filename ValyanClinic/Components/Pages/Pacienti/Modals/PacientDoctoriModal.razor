@@ -1,0 +1,189 @@
+﻿@using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.DTOs
+@using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Queries.GetDoctoriByPacient
+@using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Commands.RemoveRelatie
+@using MediatR
+
+<!-- ALWAYS render - control visibility with CSS -->
+<div class="modal-overlay @(IsVisible ? "visible" : "")" 
+   style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: @(IsVisible ? "flex" : "none"); align-items: center; justify-content: center;"
+     @onclick="Close">
+    
+    <div class="modal-container @(IsVisible ? "show" : "")" 
+     style="background: white; border-radius: 14px; max-width: 900px; width: 90%; max-height: 90vh; box-shadow: 0 10px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column;"
+      @onclick:stopPropagation="true">
+   
+  <!-- Header ALBASTRU (schimbat din violet) -->
+   <div class="modal-header" style="background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); color: white; padding: 1.25rem 1.75rem; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center;">
+       <div class="modal-title" style="display: flex; align-items: center; gap: 0.625rem;">
+ <i class="fas fa-user-md"></i>
+          <h2 style="margin: 0; font-size: 1.375rem;">Doctori asociați - @PacientNume</h2>
+   </div>
+   <button type="button" class="btn-close" @onclick="Close" style="background: rgba(255,255,255,0.2); border: none; width: 34px; height: 34px; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+     <i class="fas fa-times"></i>
+  </button>
+   </div>
+
+        <div class="modal-body" style="padding: 1.5rem; overflow-y: auto; flex: 1;">
+   @if (IsLoading)
+       {
+    <div class="loading-container" style="text-align: center; padding: 3rem;">
+     <div class="spinner-border text-primary" role="status">
+     <span class="visually-hidden">Se încarcă...</span>
+   </div>
+       <p>Se încarcă...</p>
+      </div>
+   }
+      else if (HasError)
+     {
+     <div class="alert alert-danger" style="padding: 1rem; background: #fee2e2; border: 2px solid #fca5a5; color: #991b1b; border-radius: 8px;">
+   <i class="fas fa-exclamation-triangle"></i>
+            @ErrorMessage
+     </div>
+    }
+    else
+{
+<!-- Doctori activi -->
+  <div class="section">
+     <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h4 style="margin: 0; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+         <i class="fas fa-check-circle text-success"></i>
+   Doctori activi (@DoctoriActivi.Count)
+    </h4>
+  <!-- BUTON 1: Adaugă doctor (sus dreapta) - ALBASTRU -->
+        <button class="btn btn-primary btn-sm" @onclick="OpenAddDoctorModal" style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);">
+     <i class="fas fa-plus"></i> Adaugă doctor
+  </button>
+</div>
+
+     @if (DoctoriActivi.Any())
+       {
+           <div class="doctor-cards">
+     @foreach (var doctor in DoctoriActivi)
+   {
+   <div class="doctor-card" style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
+          <div class="doctor-header" style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+    <div>
+        <h5 style="margin: 0; font-size: 1.125rem;">
+     <i class="fas fa-user-md text-primary"></i>
+     @doctor.DoctorNumeComplet
+   </h5>
+ @if (!string.IsNullOrEmpty(doctor.DoctorSpecializare))
+          {
+       <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #6b7280;">@doctor.DoctorSpecializare</p>
+         }
+       </div>
+     @if (!string.IsNullOrEmpty(doctor.TipRelatie))
+        {
+               <span class="badge" style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 6px; background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white;">
+   @doctor.TipRelatie
+  </span>
+    }
+ </div>
+
+        <div class="doctor-info" style="margin: 1rem 0;">
+     <div class="info-row" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; font-size: 0.875rem;">
+    <i class="fas fa-calendar-alt" style="color: #3b82f6;"></i>
+  <span>Asociat: @doctor.DataAsocierii.ToString("dd.MM.yyyy") (@doctor.ZileDeAsociere zile)</span>
+         </div>
+        @if (!string.IsNullOrEmpty(doctor.DoctorTelefon))
+ {
+<div class="info-row" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; font-size: 0.875rem;">
+     <i class="fas fa-phone" style="color: #3b82f6;"></i>
+     <span>@doctor.DoctorTelefon</span>
+</div>
+    }
+     @if (!string.IsNullOrEmpty(doctor.Motiv))
+   {
+        <div class="info-row" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem;">
+   <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
+   <span>@doctor.Motiv</span>
+  </div>
+   }
+     </div>
+
+    <div class="doctor-actions" style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #f3f4f6;">
+      <button class="btn btn-sm btn-danger" @onclick="() => RemoveDoctor(doctor)" style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #fca5a5, #ef4444); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);">
+             <i class="fas fa-times"></i> Dezactivează
+   </button>
+      </div>
+   </div>
+ }
+   </div>
+       }
+          else
+  {
+       <!-- Empty State cu BUTON 2: Adaugă primul doctor (centru) - ALBASTRU -->
+       <div class="empty-state" style="text-align: center; padding: 3rem; color: #6b7280;">
+ <i class="fas fa-user-md fa-3x" style="margin-bottom: 1.5rem; color: #d1d5db;"></i>
+          <p style="font-size: 1.125rem; margin-bottom: 1.5rem; color: #374151;">Nu există doctori activi asociați.</p>
+  <button class="btn btn-primary" @onclick="OpenAddDoctorModal" style="padding: 0.625rem 1.25rem; background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); display: inline-flex; align-items: center; gap: 0.5rem;">
+    <i class="fas fa-plus"></i> Adaugă primul doctor
+      </button>
+</div>
+          }
+            </div>
+
+    <!-- Doctori inactivi (istoric) -->
+ @if (DoctoriInactivi.Any())
+      {
+               <div class="section" style="margin-top: 2rem;">
+       <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+     <h4 style="margin: 0; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+    <i class="fas fa-history text-muted"></i>
+      Istoric relații inactive (@DoctoriInactivi.Count)
+</h4>
+       </div>
+
+       <div class="doctor-cards">
+     @foreach (var doctor in DoctoriInactivi)
+      {
+     <div class="doctor-card" style="background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; opacity: 0.85;">
+   <div class="doctor-header" style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+      <div>
+          <h5 style="margin: 0; font-size: 1.125rem; color: #6b7280;">
+    <i class="fas fa-user-md"></i>
+          @doctor.DoctorNumeComplet
+  </h5>
+   @if (!string.IsNullOrEmpty(doctor.DoctorSpecializare))
+         {
+     <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #6b7280;">@doctor.DoctorSpecializare</p>
+     }
+     </div>
+          <span class="badge" style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 6px; background: #94a3b8; color: white;">INACTIV</span>
+         </div>
+
+           <div class="doctor-info">
+ <div class="info-row" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem;">
+      <i class="fas fa-calendar-alt" style="color: #6b7280;"></i>
+          <span>
+      @doctor.DataAsocierii.ToString("dd.MM.yyyy") -
+    @(doctor.DataDezactivarii?.ToString("dd.MM.yyyy") ?? "N/A")
+          </span>
+    </div>
+    </div>
+     </div>
+      }
+    </div>
+  </div>
+       }
+        }
+        </div>
+
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.875rem; padding: 1.25rem 1.75rem; border-top: 2px solid #f3f4f6; border-radius: 0 0 14px 14px;">
+  <button type="button" class="btn btn-secondary" @onclick="Close" style="padding: 0.625rem 1.25rem; background: linear-gradient(135deg, #94a3b8, #64748b); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(100, 116, 139, 0.3);">
+      <i class="fas fa-times"></i> Închide
+       </button>
+ </div>
+    </div>
+</div>
+
+<!-- Modal adaugare doctor -->
+@if (ShowAddDoctorModal)
+{
+    <AddDoctorToPacientModal 
+        IsVisible="@ShowAddDoctorModal"
+        IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowAddDoctorModal = value))"
+     PacientID="@PacientID"
+    PacientNume="@PacientNume"
+        OnDoctorAdded="OnDoctorAdded" />
+}

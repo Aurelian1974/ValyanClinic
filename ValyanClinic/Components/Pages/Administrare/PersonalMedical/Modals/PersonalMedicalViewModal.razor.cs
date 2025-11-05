@@ -25,85 +25,98 @@ public partial class PersonalMedicalViewModal : ComponentBase
     public async Task Open(Guid personalID)
     {
         try
-        {
-            CurrentPersonalID = personalID;
-            IsVisible = true;
-            IsLoading = true;
-            HasError = false;
-            ErrorMessage = string.Empty;
-            PersonalMedicalData = null;
-            ActiveTab = "date";
+    {
+  CurrentPersonalID = personalID;
+    IsVisible = true;
+ IsLoading = true;
+    HasError = false;
+       ErrorMessage = string.Empty;
+ PersonalMedicalData = null;
+   ActiveTab = "date";
 
-            await InvokeAsync(StateHasChanged);
-            await LoadPersonalMedicalData(personalID);
-        }
+       await InvokeAsync(StateHasChanged);
+  await LoadPersonalMedicalData(personalID);
+   }
         catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error opening modal for PersonalID: {PersonalID}", personalID);
-            HasError = true;
-            ErrorMessage = $"Error opening modal: {ex.Message}";
-            IsLoading = false;
-            await InvokeAsync(StateHasChanged);
+ {
+    Logger.LogError(ex, "Error opening modal for PersonalID: {PersonalID}", personalID);
+    HasError = true;
+    ErrorMessage = $"Error opening modal: {ex.Message}";
+  IsLoading = false;
+   await InvokeAsync(StateHasChanged);
         }
     }
 
     public async Task Close()
     {
-        IsVisible = false;
-        await InvokeAsync(StateHasChanged);
+      IsVisible = false;
+     await InvokeAsync(StateHasChanged);
 
-        if (OnClosed.HasDelegate)
-        {
-            await OnClosed.InvokeAsync();
-        }
+         if (OnClosed.HasDelegate)
+  {
+      await OnClosed.InvokeAsync();
+         }
 
-        await Task.Delay(300);
+       await Task.Delay(300);
+
         PersonalMedicalData = null;
-        IsLoading = false;
-        HasError = false;
-        ErrorMessage = string.Empty;
-        CurrentPersonalID = Guid.Empty;
+      IsLoading = false;
+     HasError = false;
+  ErrorMessage = string.Empty;
+          CurrentPersonalID = Guid.Empty;
+ }
+
+    /// <summary>
+    /// Reîncarcă datele pentru ID-ul curent (folosit după editări)
+    /// </summary>
+    public async Task RefreshData()
+    {
+        if (CurrentPersonalID != Guid.Empty && IsVisible)
+ {
+            Logger.LogInformation("Refreshing data for current PersonalID: {PersonalID}", CurrentPersonalID);
+     await LoadPersonalMedicalData(CurrentPersonalID);
+      }
     }
 
     private async Task LoadPersonalMedicalData(Guid personalID)
     {
-        try
+     try
         {
-            Logger.LogInformation("Loading PersonalMedical data: {PersonalID}", personalID);
+          Logger.LogInformation("Loading PersonalMedical data: {PersonalID}", personalID);
 
-            var query = new GetPersonalMedicalByIdQuery(personalID);
-            var result = await Mediator.Send(query);
+   var query = new GetPersonalMedicalByIdQuery(personalID);
+         var result = await Mediator.Send(query);
 
-            if (result.IsSuccess && result.Value != null)
-            {
-                PersonalMedicalData = result.Value;
-                HasError = false;
-                Logger.LogInformation("Data loaded successfully for {PersonalID}", personalID);
-            }
-            else
-            {
+   if (result.IsSuccess && result.Value != null)
+     {
+ PersonalMedicalData = result.Value;
+   HasError = false;
+  Logger.LogInformation("Data loaded successfully for {PersonalID}", personalID);
+  }
+  else
+   {
                 HasError = true;
-                ErrorMessage = result.Errors?.FirstOrDefault() ?? "Could not load personal medical data";
-                Logger.LogWarning("Failed to load data for {PersonalID}: {Error}", personalID, ErrorMessage);
-            }
+ ErrorMessage = result.Errors?.FirstOrDefault() ?? "Could not load personal medical data";
+        Logger.LogWarning("Failed to load data for {PersonalID}: {Error}", personalID, ErrorMessage);
+      }
         }
         catch (Exception ex)
         {
-            HasError = true;
-            ErrorMessage = $"Error loading data: {ex.Message}";
-            Logger.LogError(ex, "Exception loading data for {PersonalID}", personalID);
-        }
+HasError = true;
+         ErrorMessage = $"Error loading data: {ex.Message}";
+      Logger.LogError(ex, "Exception loading data for {PersonalID}", personalID);
+     }
         finally
         {
-            IsLoading = false;
-            await InvokeAsync(StateHasChanged);
+ IsLoading = false;
+      await InvokeAsync(StateHasChanged);
         }
     }
 
     private void SetActiveTab(string tabName)
     {
-        ActiveTab = tabName;
-        Logger.LogDebug("Tab changed to: {TabName}", tabName);
+ ActiveTab = tabName;
+     Logger.LogDebug("Tab changed to: {TabName}", tabName);
     }
 
     private async Task HandleOverlayClick()
@@ -112,20 +125,21 @@ public partial class PersonalMedicalViewModal : ComponentBase
     }
 
     private async Task HandleEdit()
-    {
-        if (CurrentPersonalID != Guid.Empty)
+ {
+      if (CurrentPersonalID != Guid.Empty)
         {
-            Logger.LogInformation("Edit requested for PersonalID: {PersonalID}", CurrentPersonalID);
-            await OnEditRequested.InvokeAsync(CurrentPersonalID);
-        }
+    Logger.LogInformation("Edit requested for PersonalID: {PersonalID}", CurrentPersonalID);
+    await OnEditRequested.InvokeAsync(CurrentPersonalID);
+    }
     }
 
     private async Task HandleDelete()
     {
         if (CurrentPersonalID != Guid.Empty)
         {
-            Logger.LogInformation("Delete requested for PersonalID: {PersonalID}", CurrentPersonalID);
-            await OnDeleteRequested.InvokeAsync(CurrentPersonalID);
+     
+        Logger.LogInformation("Delete requested for PersonalID: {PersonalID}", CurrentPersonalID);
+        await OnDeleteRequested.InvokeAsync(CurrentPersonalID);
         }
     }
 }

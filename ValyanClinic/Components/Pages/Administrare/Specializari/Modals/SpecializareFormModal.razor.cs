@@ -121,10 +121,15 @@ public partial class SpecializareFormModal : ComponentBase
 
     private async Task HandleOverlayClick()
     {
-        if (!IsSaving)
-        {
-            await Close();
-        }
+        // ❌ DEZACTIVAT: Nu închide modalul la click pe overlay pentru modalele Form
+        // Modalele de tip SpecializareForm conțin date care nu trebuie pierdute
+        // if (!IsSaving)
+        // {
+        //     await Close();
+        // }
+
+        // 📝 OPȚIONAL: Adaugă feedback visual că modalul nu se poate închide pe overlay
+        return;
     }
 
     private async Task HandleSubmit()
@@ -149,7 +154,9 @@ public partial class SpecializareFormModal : ComponentBase
                     EsteActiv = Model.EsteActiv
                 };
 
+                Logger.LogInformation("🔄 Sending UpdateSpecializareCommand for: {Denumire}", command.Denumire);
                 var result = await Mediator.Send(command);
+                Logger.LogInformation("🔄 Received result - IsSuccess: {IsSuccess}", result.IsSuccess);
 
                 if (result.IsSuccess)
                 {
@@ -161,7 +168,8 @@ public partial class SpecializareFormModal : ComponentBase
                 {
                     HasError = true;
                     ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Actualizare esuata" });
-                    Logger.LogWarning("Failed to update: {Error}", ErrorMessage);
+                    Logger.LogWarning("❌ UPDATE FAILED - Errors: {Errors}", string.Join("; ", result.Errors ?? new List<string>()));
+                    Logger.LogInformation("🔄 Setting HasError=true, ErrorMessage='{ErrorMessage}'", ErrorMessage);
                 }
             }
             else
@@ -174,11 +182,18 @@ public partial class SpecializareFormModal : ComponentBase
                     EsteActiv = Model.EsteActiv
                 };
 
+                Logger.LogInformation("🔄 Sending CreateSpecializareCommand for: {Denumire}", command.Denumire);
                 var result = await Mediator.Send(command);
+                Logger.LogInformation("🔄 Received result - IsSuccess: {IsSuccess}", result.IsSuccess);
+
+                if (result.Errors != null && result.Errors.Any())
+                {
+                    Logger.LogInformation("🔄 Result Errors: {Errors}", string.Join("; ", result.Errors));
+                }
 
                 if (result.IsSuccess)
                 {
-                    Logger.LogInformation("Specializare created successfully: {Id}", result.Value);
+                    Logger.LogInformation("✅ CREATE SUCCESS: Specializare created successfully: {Id}", result.Value);
                     await OnSpecializareSaved.InvokeAsync();
                     await Close();
                 }
@@ -186,20 +201,26 @@ public partial class SpecializareFormModal : ComponentBase
                 {
                     HasError = true;
                     ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Creare esuata" });
-                    Logger.LogWarning("Failed to create: {Error}", ErrorMessage);
+                    Logger.LogWarning("❌ CREATE FAILED - Setting UI Error State");
+                    Logger.LogWarning("❌ HasError = {HasError}", HasError);
+                    Logger.LogWarning("❌ ErrorMessage = '{ErrorMessage}'", ErrorMessage);
+                    Logger.LogWarning("❌ Result.Errors = [{Errors}]", string.Join("; ", result.Errors ?? new List<string>()));
                 }
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error submitting form");
+            Logger.LogError(ex, "❌ EXCEPTION in HandleSubmit");
             HasError = true;
             ErrorMessage = $"Eroare: {ex.Message}";
+            Logger.LogError("❌ EXCEPTION - Setting ErrorMessage = '{ErrorMessage}'", ErrorMessage);
         }
         finally
         {
             IsSaving = false;
+            Logger.LogInformation("🔄 FINALLY - IsSaving=false, HasError={HasError}, ErrorMessage='{ErrorMessage}'", HasError, ErrorMessage);
             await InvokeAsync(StateHasChanged);
+            Logger.LogInformation("🔄 FINALLY - StateHasChanged called");
         }
     }
 }

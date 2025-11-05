@@ -8,7 +8,6 @@
 @using ValyanClinic.Components.Shared.Modals
 @using ValyanClinic.Components.Pages.Administrare.Specializari.Modals
 @using FilterType = Syncfusion.Blazor.Grids.FilterType
-@implements IDisposable
 
 <PageTitle>Administrare Specializari</PageTitle>
 
@@ -277,7 +276,7 @@
     }
 </div>
 
-<SfToast @ref="ToastRef" Title="@ToastTitle" Content="@ToastContent" CssClass="@ToastCssClass">
+<SfToast @ref="ToastRef">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
 

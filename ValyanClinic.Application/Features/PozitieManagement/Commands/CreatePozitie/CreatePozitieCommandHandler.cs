@@ -37,16 +37,16 @@ public class CreatePozitieCommandHandler : IRequestHandler<CreatePozitieCommand,
                 ModificatDe = request.CreatDe
             };
 
-            var createdPozitie = await _repository.CreateAsync(pozitie, cancellationToken);
+            var createdId = await _repository.CreateAsync(pozitie, cancellationToken);
 
-            if (createdPozitie == null)
+            if (createdId == Guid.Empty)
             {
                 _logger.LogWarning("Failed to create Pozitie: {Denumire}", request.Denumire);
                 return Result<Guid>.Failure(new List<string> { "Crearea pozitiei a esuat" });
             }
 
-            _logger.LogInformation("Pozitie created successfully: {Id}", createdPozitie.Id);
-            return Result<Guid>.Success(createdPozitie.Id);
+            _logger.LogInformation("Pozitie created successfully: {Id}", createdId);
+            return Result<Guid>.Success(createdId);
         }
         catch (Exception ex)
         {

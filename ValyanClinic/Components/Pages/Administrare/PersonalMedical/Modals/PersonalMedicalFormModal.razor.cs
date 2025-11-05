@@ -106,15 +106,14 @@ public partial class PersonalMedicalFormModal : ComponentBase, IDisposable
                 .OrderBy(p => p.Nume)
                 .ToList();
 
-            // Load Specializari
-            var specializari = await SpecializareRepository.GetAllAsync();
+            // Load Specializari - FOLOSEȘTE NOUA METODĂ PENTRU DROPDOWN
+            var specializariDropdown = await SpecializareRepository.GetDropdownOptionsAsync(esteActiv: true);
             if (_disposed) return;
             
-            SpecializariOptions = specializari
-                .Where(s => s.EsteActiv == true)
-                .Select(s => new LookupOption { Id = s.Id, Nume = s.Denumire })
-                .OrderBy(s => s.Nume)
-                .ToList();
+  SpecializariOptions = specializariDropdown
+       .Select(s => new LookupOption { Id = s.Id, Nume = s.Denumire })
+ .OrderBy(s => s.Nume)
+      .ToList();
 
             Logger.LogInformation("Loaded {DeptCount} departamente, {PozCount} pozitii and {SpecCount} specializari",
                 DepartamenteOptions.Count, PozitiiOptions.Count, SpecializariOptions.Count);
@@ -197,6 +196,16 @@ public partial class PersonalMedicalFormModal : ComponentBase, IDisposable
             {
                 var data = result.Value;
 
+                // ✅ FIX: Log valorile primite din DB pentru debugging
+                Logger.LogInformation("DEBUG OpenForEdit - Date primite din DB:");
+                Logger.LogInformation("PersonalID: {PersonalID}", data.PersonalID);
+                Logger.LogInformation("  Nume: {Nume} {Prenume}", data.Nume, data.Prenume);
+                Logger.LogInformation("  CategorieID: {CategorieID}", data.CategorieID);
+                Logger.LogInformation("  PozitieID: {PozitieID}", data.PozitieID);
+                Logger.LogInformation("  SpecializareID: {SpecializareID}", data.SpecializareID);
+                Logger.LogInformation("  Text fields - Pozitie: '{Pozitie}', Departament: '{Departament}', Specializare: '{Specializare}'", 
+                    data.Pozitie, data.Departament, data.Specializare);
+
                 Model = new PersonalMedicalFormModel
                 {
                     PersonalID = data.PersonalID,
@@ -207,34 +216,64 @@ public partial class PersonalMedicalFormModal : ComponentBase, IDisposable
                     Email = data.Email,
                     EsteActiv = data.EsteActiv ?? true,
                     DepartamentID = data.CategorieID,  // CategorieID mapped to DepartamentID
-                    PozitieID = data.PozitieID,  // Now loaded from DB
+                    PozitieID = data.PozitieID,  // ✅ FIX: ACUM VA FI POPULAT DIN DB!
                     SpecializareID = data.SpecializareID
                 };
 
-                Logger.LogInformation("Data loaded for EDIT mode: {Nume} {Prenume}",
-                    Model.Nume, Model.Prenume);
-            }
-            else
-            {
-                HasError = true;
-                ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele";
-                Logger.LogWarning("Failed to load data: {Error}", ErrorMessage);
-            }
+               // ✅ FIX: Log valorile mapate în model pentru debugging
+                Logger.LogInformation("DEBUG OpenForEdit - Valori mapate în Model:");
+                Logger.LogInformation("  Model.DepartamentID: {DepartamentID}", Model.DepartamentID);
+                Logger.LogInformation("  Model.PozitieID: {PozitieID}", Model.PozitieID);
+                Logger.LogInformation("  Model.SpecializareID: {SpecializareID}", Model.SpecializareID);
 
-            IsLoading = false;
-            await InvokeAsync(StateHasChanged);
-        }
+                // ✅ FIX: Verifică dacă PozitieID există în dropdown options
+                if (Model.PozitieID.HasValue)
+               {
+                 var foundPozitie = PozitiiOptions.FirstOrDefault(p => p.Id == Model.PozitieID.Value);
+                  if (foundPozitie != null)
+                   {
+                Logger.LogInformation("DEBUG OpenForEdit - PozitieID găsit în dropdown: {Id} - '{Nume}'", 
+                    foundPozitie.Id, foundPozitie.Nume);
+                    }
+                  else
+                  {
+               Logger.LogWarning("DEBUG OpenForEdit - PozitieID NU GĂSIT în dropdown options! PozitieID: {PozitieID}", Model.PozitieID);
+ Logger.LogInformation("DEBUG OpenForEdit - Options disponibile ({Count}):", PozitiiOptions.Count);
+                   foreach (var opt in PozitiiOptions.Take(5))
+                   {
+                Logger.LogInformation("  Option: {Id} - '{Nume}'", opt.Id, opt.Nume);
+                }
+                }
+                }
+              else
+               {
+                 Logger.LogWarning("DEBUG OpenForEdit - PozitieID este NULL în data din DB!");
+                }
+
+               Logger.LogInformation("Data loaded for EDIT mode: {Nume} {Prenume}",
+ Model.Nume, Model.Prenume);
+   }
+            else
+   {
+        HasError = true;
+    ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele";
+        Logger.LogWarning("Failed to load data: {Error}", ErrorMessage);
+   }
+
+   IsLoading = false;
+       await InvokeAsync(StateHasChanged);
+     }
         catch (Exception ex)
-        {
+  {
             if (!_disposed)
-            {
+  {
                 Logger.LogError(ex, "Error opening modal for EDIT");
-                HasError = true;
-                ErrorMessage = $"Eroare la incarcarea datelor: {ex.Message}";
-                IsLoading = false;
-                await InvokeAsync(StateHasChanged);
-            }
-        }
+          HasError = true;
+     ErrorMessage = $"Eroare la incarcarea datelor: {ex.Message}";
+     IsLoading = false;
+          await InvokeAsync(StateHasChanged);
+     }
+   }
     }
 
     public async Task Close()
@@ -264,10 +303,13 @@ public partial class PersonalMedicalFormModal : ComponentBase, IDisposable
 
     private async Task HandleOverlayClick()
     {
-        if (!IsSaving && !_disposed)
-        {
-            await Close();
-        }
+        // ❌ DEZACTIVAT: Nu închide modalul la click pe overlay
+        // Acest modal conține date importante care nu trebuie pierdute
+        // await Close();
+        
+        // 📝 OPȚIONAL: Poți adăuga un warning visual că trebuie să folosească butoanele
+   // Pentru moment, nu facem nimic - modalul rămâne deschis
+        return;
     }
 
     private async Task HandleSubmit()
@@ -277,6 +319,7 @@ public partial class PersonalMedicalFormModal : ComponentBase, IDisposable
         try
         {
             Logger.LogInformation("Submitting form: IsEditMode={IsEditMode}", Model.IsEditMode);
+            Logger.LogInformation("Selected PozitieID: {PozitieID}", Model.PozitieID);
 
             IsSaving = true;
             HasError = false;
@@ -285,8 +328,20 @@ public partial class PersonalMedicalFormModal : ComponentBase, IDisposable
 
             // Get selected names for text fields (backwards compatibility)
             var departamentName = DepartamenteOptions.FirstOrDefault(d => d.Id == Model.DepartamentID)?.Nume;
-            var pozitieDisplayName = PozitiiOptions.FirstOrDefault(p => p.Id == Model.PozitieID)?.Nume ?? "Doctor Specialist";
+            
+            // FIX: Nu folosi default value pentru pozitie - permite NULL dacă nu e găsită
+            var pozitieDisplayName = PozitiiOptions.FirstOrDefault(p => p.Id == Model.PozitieID)?.Nume;
+          
             var specializareName = SpecializariOptions.FirstOrDefault(s => s.Id == Model.SpecializareID)?.Nume;
+
+            // Log pentru debugging
+            Logger.LogInformation("Mapping values: Departament={Departament}, Pozitie={Pozitie}, Specializare={Specializare}", 
+                departamentName, pozitieDisplayName, specializareName);
+            Logger.LogInformation("Available Pozitii count: {Count}", PozitiiOptions.Count);
+            if (PozitiiOptions.Count > 0)
+            {
+                Logger.LogInformation("First Pozitie: Id={Id}, Nume={Nume}", PozitiiOptions.First().Id, PozitiiOptions.First().Nume);
+            }
 
             if (Model.IsEditMode)
             {
@@ -300,7 +355,7 @@ public partial class PersonalMedicalFormModal : ComponentBase, IDisposable
                     Telefon = Model.Telefon,
                     Email = Model.Email,
                     Departament = departamentName,  // Text field for display
-                    Pozitie = pozitieDisplayName,  // Text field for display
+                    Pozitie = pozitieDisplayName,  // Text field for display - NOW NULL if not found
                     EsteActiv = Model.EsteActiv,
                     CategorieID = Model.DepartamentID,  // FK to Departamente
                     PozitieID = Model.PozitieID,  // FK to Pozitii
@@ -336,7 +391,7 @@ public partial class PersonalMedicalFormModal : ComponentBase, IDisposable
                     Telefon = Model.Telefon,
                     Email = Model.Email,
                     Departament = departamentName,
-                    Pozitie = pozitieDisplayName,
+                    Pozitie = pozitieDisplayName,  // NOW NULL if not found
                     EsteActiv = Model.EsteActiv,
                     CategorieID = Model.DepartamentID,
                     PozitieID = Model.PozitieID,

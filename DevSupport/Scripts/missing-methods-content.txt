@@ -1,0 +1,192 @@
+﻿
+    // ========================================
+    // RESTORED METHODS - LoadPagedData & Filter Options
+    // ========================================
+    
+    private async Task LoadPagedData()
+    {
+        if (_disposed) return; // Guard check
+
+        try
+  {
+      IsLoading = true;
+      HasError = false;
+    ErrorMessage = null;
+
+       if (CurrentPageSize < MinPageSize) CurrentPageSize = MinPageSize;
+   if (CurrentPageSize > MaxPageSize) CurrentPageSize = MaxPageSize;
+
+ Logger.LogInformation(
+                "SERVER-SIDE Load: Page={Page}, Size={Size}, Search='{Search}', Dept={Dept}, Functie={Functie}, Judet={Judet}, Status={Status}, Sort={Sort} {Dir}",
+       CurrentPage, CurrentPageSize, GlobalSearchText, FilterDepartament, FilterFunctie, FilterJudet, FilterStatus, CurrentSortColumn, CurrentSortDirection);
+
+            var query = new GetPersonalListQuery
+            {
+        PageNumber = CurrentPage,
+           PageSize = CurrentPageSize,
+           GlobalSearchText = string.IsNullOrWhiteSpace(GlobalSearchText) ? null : GlobalSearchText,
+  FilterDepartament = FilterDepartament,
+          FilterFunctie = FilterFunctie,
+       FilterJudet = FilterJudet,
+             FilterStatus = FilterStatus,
+       SortColumn = CurrentSortColumn,
+    SortDirection = CurrentSortDirection
+            };
+
+            var result = await Mediator.Send(query);
+
+     if (_disposed) return; // Check after async
+
+   if (result.IsSuccess)
+      {
+       CurrentPageData = result.Value?.ToList() ?? new List<PersonalListDto>();
+                TotalRecords = result.TotalCount;
+              
+          if (TotalPages > 0 && CurrentPage > TotalPages)
+ {
+   Logger.LogWarning("CurrentPage {Page} > TotalPages {Total}, ajustare", 
+          CurrentPage, TotalPages);
+        CurrentPage = TotalPages;
+         await LoadPagedData();
+            return;
+     }
+      
+       Logger.LogInformation(
+    "Data loaded: Page {Page}/{Total}, Records {Start}-{End} din {TotalRecords}",
+        CurrentPage, TotalPages, DisplayedRecordsStart, DisplayedRecordsEnd, TotalRecords);
+            }
+      else
+   {
+                HasError = true;
+       ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare necunoscuta" });
+        Logger.LogWarning("Eroare la incarcarea datelor: {Message}", ErrorMessage);
+       CurrentPageData = new List<PersonalListDto>();
+       TotalRecords = 0;
+    }
+        }
+        catch (ObjectDisposedException)
+        {
+         Logger.LogDebug("Component disposed while loading data (navigation away)");
+  }
+        catch (Exception ex)
+        {
+          if (!_disposed)
+            {
+      HasError = true;
+     ErrorMessage = $"Eroare neasteptata: {ex.Message}";
+      Logger.LogError(ex, "Eroare la incarcarea datelor");
+  CurrentPageData = new List<PersonalListDto>();
+        TotalRecords = 0;
+      }
+   }
+ finally
+        {
+            if (!_disposed)
+      {
+      IsLoading = false;
+         StateHasChanged();
+            }
+   }
+ }
+
+    private async Task LoadFilterOptionsFromServer()
+    {
+        if (_disposed || FilterOptionsLoaded) return;
+        
+      try
+        {
+     Logger.LogInformation("Loading filter options from server (CACHED)...");
+    
+            var options = await FilterOptionsService.GetFilterOptionsAsync();
+            
+    if (_disposed) return;
+            
+       StatusOptions = options.StatusOptions?.ToList() ?? new List<FilterOption>();
+      DepartamentOptions = options.DepartamentOptions?.ToList() ?? new List<FilterOption>();
+            FunctieOptions = options.FunctieOptions?.ToList() ?? new List<FilterOption>();
+            JudetOptions = options.JudetOptions?.ToList() ?? new List<FilterOption>();
+   
+            FilterOptionsLoaded = true;
+            
+   Logger.LogInformation(
+          "Filter options CACHED: Status={StatusCount}, Dept={DeptCount}, Functie={FunctieCount}, Judet={JudetCount}",
+     StatusOptions.Count, DepartamentOptions.Count, FunctieOptions.Count, JudetOptions.Count);
+        }
+        catch (ObjectDisposedException)
+     {
+        Logger.LogDebug("Component disposed while loading filter options");
+        }
+catch (Exception ex)
+    {
+            if (!_disposed)
+            {
+      Logger.LogError(ex, "Error loading filter options");
+    StatusOptions = new List<FilterOption>();
+    DepartamentOptions = new List<FilterOption>();
+                FunctieOptions = new List<FilterOption>();
+             JudetOptions = new List<FilterOption>();
+       }
+     }
+    }
+
+    private async Task ShowSuccessToastAsync(string message)
+    {
+        if (!_disposed)
+        {
+ await ShowToast("Succes", message, "e-toast-success");
+        }
+    }
+
+    private async Task ShowErrorToastAsync(string message)
+    {
+        if (!_disposed)
+        {
+          await ShowToast("Eroare", message, "e-toast-danger");
+        }
+    }
+
+    private async Task ShowToast(string title, string content, string cssClass)
+    {
+  if (_disposed) return;
+
+        if (ToastRef == null)
+    {
+         Logger.LogWarning("ToastRef is null, cannot show toast");
+    return;
+        }
+
+   try
+    {
+     var toastModel = new ToastModel
+            {
+   Title = title,
+     Content = content,
+  CssClass = cssClass,
+           ShowCloseButton = true,
+                Timeout = 3000
+          };
+
+  Logger.LogDebug("Showing toast: Title='{Title}', Content='{Content}', CssClass='{CssClass}'", 
+      title, content, cssClass);
+
+         await ToastRef.ShowAsync(toastModel);
+      }
+ catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("Toast reference disposed");
+     }
+        catch (Exception ex)
+        {
+      Logger.LogError(ex, "Error showing toast");
+    }
+    }
+
+    // Remaining navigation and grid methods...
+    // (These should already exist in the file, just ensuring proper structure)
+
+    private class FilterOption
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+    }
+}

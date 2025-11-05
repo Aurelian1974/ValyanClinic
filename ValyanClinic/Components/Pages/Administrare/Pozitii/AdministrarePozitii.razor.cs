@@ -25,13 +25,13 @@ public partial class AdministrarePozitii : ComponentBase, IDisposable
 
     private List<PozitieListDto> CurrentPageData { get; set; } = new();
     
-    private int CurrentPage { get; set; } = 1;
+  private int CurrentPage { get; set; } = 1;
     private int CurrentPageSize { get; set; } = 20;
     private int TotalRecords { get; set; } = 0;
     private int TotalPages => TotalRecords > 0 && CurrentPageSize > 0 
         ? (int)Math.Ceiling((double)TotalRecords / CurrentPageSize) 
-        : 1;
-    
+     : 1;
+  
     private const int MinPageSize = 10;
     private const int MaxPageSize = 1000;
     private const int DefaultPageSizeValue = 20;
@@ -49,7 +49,7 @@ public partial class AdministrarePozitii : ComponentBase, IDisposable
     private string GlobalSearchText { get; set; } = string.Empty;
     
     private CancellationTokenSource? _searchDebounceTokenSource;
-    private const int SearchDebounceMs = 500;
+private const int SearchDebounceMs = 500;
     private bool _disposed = false;
 
     private string ToastTitle { get; set; } = string.Empty;
@@ -61,132 +61,196 @@ public partial class AdministrarePozitii : ComponentBase, IDisposable
     private int DisplayedRecordsStart => TotalRecords > 0 ? ((CurrentPage - 1) * CurrentPageSize) + 1 : 0;
     private int DisplayedRecordsEnd => Math.Min(CurrentPage * CurrentPageSize, TotalRecords);
 
+    private static readonly object _initLock = new object();
+    private static bool _isInitializing = false;
+    private static bool _anyInstanceInitializing = false;
+    private bool _initialized = false;
+    
     protected override async Task OnInitializedAsync()
     {
+        // CRITICAL: GLOBAL lock la nivel de pagină
+     lock (_initLock)
+      {
+      if (_anyInstanceInitializing)
+      {
+         Logger.LogWarning("Another instance is ALREADY initializing - BLOCKING this call");
+          return;
+      }
+     
+       if (_initialized || _isInitializing)
+   {
+ Logger.LogWarning("This instance already initialized/initializing - SKIPPING");
+      return;
+     }
+
+    _isInitializing = true;
+  _anyInstanceInitializing = true;
+        }
+
         try
         {
-            Logger.LogInformation("Initializare pagina Administrare Pozitii");
-            await LoadPagedData();
+// CRITICAL: Delay MĂRIT pentru a permite componentei anterioare să facă cleanup COMPLET
+     // Syncfusion Grid necesită timp suplimentar pentru cleanup DOM - mărit de la 300ms la 800ms
+     Logger.LogInformation("Waiting for previous component cleanup...");
+     await Task.Delay(800); // MĂRIT de la 300ms la 800ms pentru Syncfusion Grid cleanup
+    
+      Logger.LogInformation("Initializare pagina Administrare Pozitii");
+   await LoadPagedData();
+  
+_initialized = true;
         }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Eroare la initializarea componentei");
-            HasError = true;
-            ErrorMessage = $"Eroare la initializare: {ex.Message}";
-            IsLoading = false;
-            StateHasChanged();
-        }
+ catch (ObjectDisposedException ex)
+     {
+         Logger.LogWarning(ex, "Component disposed during initialization (navigation away)");
+      }
+      catch (Exception ex)
+ {
+    Logger.LogError(ex, "Eroare la initializarea componentei");
+      HasError = true;
+   ErrorMessage = $"Eroare la initializare: {ex.Message}";
+      IsLoading = false;
+      }
+        finally
+   {
+       lock (_initLock)
+     {
+    _isInitializing = false;
+    _anyInstanceInitializing = false;
     }
-
+        }
+}
     public void Dispose()
     {
         if (_disposed) return;
-        
-        try
+      
+      // Setează flag imediat pentru a bloca noi operații
+        _disposed = true;
+   
+        // CRITICAL: Cleanup SINCRON pentru Syncfusion Grid - FĂRĂ să setăm GridRef = null
+   try
         {
-            _searchDebounceTokenSource?.Cancel();
-            _searchDebounceTokenSource?.Dispose();
+  Logger.LogDebug("AdministrarePozitii disposing - SYNCHRONOUS cleanup");
+
+            // ❌ NU setăm GridRef = null - lăsăm Syncfusion să gestioneze propriul lifecycle
+            // GridRef = null; // ELIMINAT - cauzează probleme cu referințele
+      
+      // Cancel orice operații în curs
+    _searchDebounceTokenSource?.Cancel();
+  _searchDebounceTokenSource?.Dispose();
             _searchDebounceTokenSource = null;
             
-            Logger.LogDebug("AdministrarePozitii disposed");
-        }
+      // Clear data IMEDIAT
+     CurrentPageData?.Clear();
+            CurrentPageData = new();
+       
+    Logger.LogDebug("AdministrarePozitii disposed - Data cleared, GridRef preserved");
+ }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Eroare la dispose");
+      Logger.LogError(ex, "Error in synchronous dispose");
         }
-        finally
-        {
-            _disposed = true;
-        }
+  
+        // CRITICAL: ELIMINAT async cleanup forțat - lăsăm Blazor disposal natural
+        // Nu mai folosim Task.Run cu delay-uri care cauzează race conditions
+        Logger.LogDebug("AdministrarePozitii dispose COMPLETE - Natural Blazor disposal will handle GridRef");
     }
 
     private async Task LoadPagedData()
     {
+        if (_disposed) return; // Guard check
+
         try
-        {
-            IsLoading = true;
-            HasError = false;
-            ErrorMessage = null;
+  {
+     IsLoading = true;
+      HasError = false;
+     ErrorMessage = null;
 
             if (CurrentPageSize < MinPageSize) CurrentPageSize = MinPageSize;
-            if (CurrentPageSize > MaxPageSize) CurrentPageSize = MaxPageSize;
+  if (CurrentPageSize > MaxPageSize) CurrentPageSize = MaxPageSize;
 
-            Logger.LogInformation(
-                "SERVER-SIDE Load: Page={Page}, Size={Size}, Search='{Search}', Sort={Sort} {Dir}",
-                CurrentPage, CurrentPageSize, GlobalSearchText, CurrentSortColumn, CurrentSortDirection);
+    Logger.LogInformation(
+    "SERVER-SIDE Load: Page={Page}, Size={Size}, Search='{Search}', Sort={Sort} {Dir}",
+       CurrentPage, CurrentPageSize, GlobalSearchText, CurrentSortColumn, CurrentSortDirection);
 
-            var query = new GetPozitieListQuery
-            {
-                PageNumber = CurrentPage,
-                PageSize = CurrentPageSize,
+  var query = new GetPozitieListQuery
+{
+     PageNumber = CurrentPage,
+          PageSize = CurrentPageSize,
                 GlobalSearchText = string.IsNullOrWhiteSpace(GlobalSearchText) ? null : GlobalSearchText,
-                SortColumn = CurrentSortColumn,
-                SortDirection = CurrentSortDirection
+SortColumn = CurrentSortColumn,
+    SortDirection = CurrentSortDirection
             };
 
-            var result = await Mediator.Send(query);
+        var result = await Mediator.Send(query);
 
-            if (result.IsSuccess)
-            {
-                CurrentPageData = result.Value?.ToList() ?? new List<PozitieListDto>();
-                TotalRecords = result.TotalCount;
-                
-                if (TotalPages > 0 && CurrentPage > TotalPages)
+if (_disposed) return; // Check after async
+
+      if (result.IsSuccess)
+          {
+       CurrentPageData = result.Value?.ToList() ?? new List<PozitieListDto>();
+       TotalRecords = result.TotalCount;
+      
+             if (TotalPages > 0 && CurrentPage > TotalPages)
                 {
-                    Logger.LogWarning("CurrentPage {Page} > TotalPages {Total}, ajustare", 
-                        CurrentPage, TotalPages);
-                    CurrentPage = TotalPages;
-                    await LoadPagedData();
-                    return;
-                }
-                
-                Logger.LogInformation(
-                    "Data loaded: Page {Page}/{Total}, Records {Start}-{End} din {TotalRecords}",
-                    CurrentPage, TotalPages, DisplayedRecordsStart, DisplayedRecordsEnd, TotalRecords);
-                
-                // Auto-fit columns after data is loaded
-                if (GridRef != null)
-                {
-                    await Task.Delay(100); // Small delay to ensure grid is rendered
-                    await GridRef.AutoFitColumnsAsync(new string[] { "Denumire", "Descriere" });
-                }
-            }
+  Logger.LogWarning("CurrentPage {Page} > TotalPages {Total}, ajustare", 
+        CurrentPage, TotalPages);
+       CurrentPage = TotalPages;
+            await LoadPagedData();
+         return;
+             }
+   
+              Logger.LogInformation(
+              "Data loaded: Page {Page}/{Total}, Records {Start}-{End} din {TotalRecords}",
+           CurrentPage, TotalPages, DisplayedRecordsStart, DisplayedRecordsEnd, TotalRecords);
+       }
             else
-            {
-                HasError = true;
+       {
+    HasError = true;
                 ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare necunoscuta" });
-                Logger.LogWarning("Eroare la incarcarea datelor: {Message}", ErrorMessage);
-                CurrentPageData = new List<PozitieListDto>();
-                TotalRecords = 0;
-            }
-        }
+       Logger.LogWarning("Eroare la incarcarea datelor: {Message}", ErrorMessage);
+     CurrentPageData = new List<PozitieListDto>();
+        TotalRecords = 0;
+    }
+     }
+  catch (ObjectDisposedException)
+  {
+      Logger.LogDebug("Component disposed while loading data (navigation away)");
+      }
         catch (Exception ex)
         {
-            HasError = true;
-            ErrorMessage = $"Eroare neasteptata: {ex.Message}";
-            Logger.LogError(ex, "Eroare la incarcarea datelor");
-            CurrentPageData = new List<PozitieListDto>();
-            TotalRecords = 0;
+      if (!_disposed)
+{
+         HasError = true;
+  ErrorMessage = $"Eroare neasteptata: {ex.Message}";
+  Logger.LogError(ex, "Eroare la incarcarea datelor");
+        CurrentPageData = new List<PozitieListDto>();
+    TotalRecords = 0;
+            }
         }
         finally
         {
-            IsLoading = false;
-            StateHasChanged();
-        }
+        if (!_disposed)
+            {
+    IsLoading = false;
+        await InvokeAsync(StateHasChanged);
+            }
+      }
     }
 
     private void OnSearchInput(ChangeEventArgs e)
     {
-        var newValue = e.Value?.ToString() ?? string.Empty;
+        if (_disposed) return; // Guard check
         
+      var newValue = e.Value?.ToString() ?? string.Empty;
+    
         if (newValue == GlobalSearchText) return;
         
-        GlobalSearchText = newValue;
+     GlobalSearchText = newValue;
+      
+     Logger.LogDebug("Search input changed: '{SearchText}'", GlobalSearchText);
         
-        Logger.LogDebug("Search input changed: '{SearchText}'", GlobalSearchText);
-        
-        _searchDebounceTokenSource?.Cancel();
-        _searchDebounceTokenSource?.Dispose();
+     _searchDebounceTokenSource?.Cancel();
+      _searchDebounceTokenSource?.Dispose();
         _searchDebounceTokenSource = new CancellationTokenSource();
 
         var localToken = _searchDebounceTokenSource.Token;
@@ -194,57 +258,73 @@ public partial class AdministrarePozitii : ComponentBase, IDisposable
         _ = Task.Run(async () =>
         {
             try
-            {
-                await Task.Delay(SearchDebounceMs, localToken);
-                
-                if (!localToken.IsCancellationRequested)
-                {
-                    Logger.LogInformation("Executing search for: '{SearchText}'", GlobalSearchText);
-                    
-                    await InvokeAsync(async () =>
-                    {
-                        CurrentPage = 1;
-                        await LoadPagedData();
-                    });
-                }
-            }
+          {
+     await Task.Delay(SearchDebounceMs, localToken);
+       
+          if (!localToken.IsCancellationRequested && !_disposed)
+ {
+    Logger.LogInformation("Executing search for: '{SearchText}'", GlobalSearchText);
+         
+          await InvokeAsync(async () =>
+    {
+         if (!_disposed)
+     {
+     CurrentPage = 1;
+  await LoadPagedData();
+       }
+           });
+      }
+       }
             catch (TaskCanceledException)
             {
-                Logger.LogDebug("Search cancelled");
-            }
-            catch (Exception ex)
+     Logger.LogDebug("Search cancelled");
+}
+            catch (ObjectDisposedException)
+        {
+        Logger.LogDebug("Component disposed during search");
+}
+   catch (Exception ex)
             {
-                Logger.LogError(ex, "Eroare la executia search-ului");
-            }
+    if (!_disposed)
+         {
+        Logger.LogError(ex, "Eroare la executia search-ului");
+       }
+    }
         }, localToken);
     }
 
     private async Task OnSearchKeyDown(KeyboardEventArgs e)
     {
+        if (_disposed) return; // Guard check
+ 
         if (e.Key == "Enter")
-        {
-            _searchDebounceTokenSource?.Cancel();
-            
-            Logger.LogInformation("Enter pressed - immediate search: '{SearchText}'", GlobalSearchText);
-            
-            CurrentPage = 1;
-            await LoadPagedData();
+      {
+  _searchDebounceTokenSource?.Cancel();
+    
+       Logger.LogInformation("Enter pressed - immediate search: '{SearchText}'", GlobalSearchText);
+   
+    CurrentPage = 1;
+          await LoadPagedData();
         }
     }
 
     private async Task ClearSearch()
     {
+        if (_disposed) return; // Guard check
+        
         Logger.LogInformation("Clearing search");
         
         _searchDebounceTokenSource?.Cancel();
-        
+  
         GlobalSearchText = string.Empty;
-        CurrentPage = 1;
+      CurrentPage = 1;
         await LoadPagedData();
     }
 
     private async Task HandleRefresh()
     {
+        if (_disposed) return; // Guard check
+        
         Logger.LogInformation("Refresh pozitii");
         
         await LoadPagedData();
@@ -253,142 +333,204 @@ public partial class AdministrarePozitii : ComponentBase, IDisposable
 
     private async Task HandleAddNew()
     {
+        if (_disposed) return; // Guard check
+        
         Logger.LogInformation("Opening modal for ADD Pozitie");
         
-        if (pozitieFormModal != null)
+      if (pozitieFormModal != null)
         {
-            await pozitieFormModal.OpenForAdd();
-        }
+  await pozitieFormModal.OpenForAdd();
+    }
     }
 
     private async Task HandleViewSelected()
-    {
-        if (SelectedPozitie == null)
+ {
+     if (_disposed) return; // Guard check
+     
+  if (SelectedPozitie == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
-            return;
+   return;
         }
-        
-        Logger.LogInformation("Opening View modal for: {Id}", SelectedPozitie.Id);
-        
+      
+  Logger.LogInformation("Opening View modal for: {Id}", SelectedPozitie.Id);
+ 
         if (pozitieViewModal != null)
         {
-            await pozitieViewModal.Open(SelectedPozitie.Id);
+  await pozitieViewModal.Open(SelectedPozitie.Id);
         }
     }
 
     private async Task HandleEditSelected()
     {
-        if (SelectedPozitie == null)
+        if (_disposed) return; // Guard check
+        
+      if (SelectedPozitie == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
             return;
         }
         
-        Logger.LogInformation("Opening Edit modal for: {Id}", SelectedPozitie.Id);
+  Logger.LogInformation("Opening Edit modal for: {Id}", SelectedPozitie.Id);
         
-        if (pozitieFormModal != null)
-        {
+     if (pozitieFormModal != null)
+   {
             await pozitieFormModal.OpenForEdit(SelectedPozitie.Id);
         }
     }
 
     private async Task HandlePozitieSaved()
     {
-        Logger.LogInformation("Pozitie saved - reloading data");
-        
-        await LoadPagedData();
-        await ShowToast("Succes", "Pozitie salvata cu succes", "e-toast-success");
+        if (_disposed) return;
+     
+        Logger.LogInformation("🎉 Pozitie saved - FORCING component re-initialization");
+ 
+        try
+        {
+      // 1️⃣ Wait for modal to close completely
+ Logger.LogInformation("⏳ Waiting 700ms for modal close...");
+   await Task.Delay(700);
+ 
+     if (_disposed) return;
+          
+            // 2️⃣ Show loading state
+     IsLoading = true;
+            await InvokeAsync(StateHasChanged);
+      
+// 3️⃣ Force navigation to SAME page (triggers full re-init)
+      Logger.LogInformation("🔄 Force navigation to trigger re-initialization");
+            NavigationManager.NavigateTo("/administrare/pozitii", forceLoad: true);
+      
+        // Note: forceLoad: true forces a FULL page reload, not just component refresh
+            // This clears ALL Blazor state and starts fresh - exactly like F5!
+        }
+        catch (Exception ex)
+        {
+         Logger.LogError(ex, "Error during forced re-initialization");
+      
+       // Fallback: Reload data normally if navigation fails
+        if (!_disposed)
+   {
+         await LoadPagedData();
+          await ShowToast("Succes", "Pozitie salvata cu succes", "e-toast-success");
+ }
+   }
+        finally
+      {
+          if (!_disposed)
+            {
+             IsLoading = false;
+      }
+        }
     }
 
     private async Task HandleEditFromView(Guid pozitieId)
     {
+        if (_disposed) return; // Guard check
+
         Logger.LogInformation("Edit requested from View modal for: {Id}", pozitieId);
         
         if (pozitieViewModal != null)
         {
-            await pozitieViewModal.Close();
+        await pozitieViewModal.Close();
         }
         
         if (pozitieFormModal != null)
         {
-            await pozitieFormModal.OpenForEdit(pozitieId);
+          await pozitieFormModal.OpenForEdit(pozitieId);
         }
     }
 
     private async Task HandleDeleteFromView(Guid pozitieId)
     {
+        if (_disposed) return; // Guard check
+        
         Logger.LogInformation("Delete requested from View modal for: {Id}", pozitieId);
-        
+      
         if (pozitieViewModal != null)
-        {
-            await pozitieViewModal.Close();
+ {
+         await pozitieViewModal.Close();
         }
-        
+    
         var pozitie = CurrentPageData.FirstOrDefault(p => p.Id == pozitieId);
         if (pozitie != null && confirmDeleteModal != null)
-        {
-            await confirmDeleteModal.Open(pozitieId, pozitie.Denumire);
+ {
+          await confirmDeleteModal.Open(pozitieId, pozitie.Denumire);
         }
     }
 
     private async Task HandleDeleteSelected()
     {
-        if (SelectedPozitie == null)
+   if (_disposed) return; // Guard check
+        
+     if (SelectedPozitie == null)
         {
-            await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
+     await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
             return;
         }
         
         Logger.LogInformation("Opening Delete modal for: {Id} - {Denumire}", 
-            SelectedPozitie.Id, SelectedPozitie.Denumire);
-        
+         SelectedPozitie.Id, SelectedPozitie.Denumire);
+    
         if (confirmDeleteModal != null)
-        {
+   {
             await confirmDeleteModal.Open(SelectedPozitie.Id, SelectedPozitie.Denumire);
         }
     }
 
     private async Task HandleDeleteConfirmed(Guid id)
     {
-        Logger.LogInformation("Delete confirmed for: {Id}", id);
+        if (_disposed) return; // Guard check
         
-        try
+        Logger.LogInformation("Delete confirmed for: {Id}", id);
+      
+   try
         {
             var command = new DeletePozitieCommand(id);
-            var result = await Mediator.Send(command);
+ var result = await Mediator.Send(command);
             
-            if (result.IsSuccess)
-            {
-                Logger.LogInformation("Pozitie deleted successfully: {Id}", id);
-                await LoadPagedData();
-                await ShowToast("Succes", "Pozitie stearsa cu succes", "e-toast-success");
+      if (_disposed) return; // Check after async
+            
+     if (result.IsSuccess)
+      {
+         Logger.LogInformation("Pozitie deleted successfully: {Id}", id);
+      await LoadPagedData();
+        await ShowToast("Succes", "Pozitie stearsa cu succes", "e-toast-success");
             }
-            else
-            {
-                var errorMsg = string.Join(", ", result.Errors ?? new List<string> { "Eroare necunoscuta" });
-                Logger.LogWarning("Delete failed: {Error}", errorMsg);
-                await ShowToast("Eroare", errorMsg, "e-toast-danger");
+  else
+   {
+     var errorMsg = string.Join(", ", result.Errors ?? new List<string> { "Eroare necunoscuta" });
+          Logger.LogWarning("Delete failed: {Error}", errorMsg);
+         await ShowToast("Eroare", errorMsg, "e-toast-danger");
             }
+        }
+        catch (ObjectDisposedException)
+        {
+    Logger.LogDebug("Component disposed during delete");
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Exception during delete: {Id}", id);
-            await ShowToast("Eroare", $"Eroare la stergere: {ex.Message}", "e-toast-danger");
-        }
+  if (!_disposed)
+      {
+        Logger.LogError(ex, "Exception during delete: {Id}", id);
+                await ShowToast("Eroare", $"Eroare la stergere: {ex.Message}", "e-toast-danger");
+      }
+      }
     }
 
     private async Task GoToPage(int pageNumber)
     {
-        if (pageNumber < 1 || pageNumber > TotalPages) return;
+      if (_disposed) return; // Guard check
         
+        if (pageNumber < 1 || pageNumber > TotalPages) return;
+      
         Logger.LogInformation("Navigare la pagina {Page}", pageNumber);
-        CurrentPage = pageNumber;
-        await LoadPagedData();
+ CurrentPage = pageNumber;
+      await LoadPagedData();
     }
 
-    private async Task GoToFirstPage()
-    {
+  private async Task GoToFirstPage()
+  {
         await GoToPage(1);
     }
 
@@ -401,50 +543,50 @@ public partial class AdministrarePozitii : ComponentBase, IDisposable
     {
         if (HasPreviousPage)
         {
-            await GoToPage(CurrentPage - 1);
-        }
+      await GoToPage(CurrentPage - 1);
+ }
     }
 
     private async Task GoToNextPage()
     {
         if (HasNextPage)
         {
-            await GoToPage(CurrentPage + 1);
+      await GoToPage(CurrentPage + 1);
         }
     }
 
     private async Task OnPageSizeChanged(int newPageSize)
     {
-        if (newPageSize < MinPageSize || newPageSize > MaxPageSize)
+      if (newPageSize < MinPageSize || newPageSize > MaxPageSize)
         {
-            Logger.LogWarning("PageSize invalid: {Size}, using default", newPageSize);
+  Logger.LogWarning("PageSize invalid: {Size}, using default", newPageSize);
             newPageSize = DefaultPageSizeValue;
         }
-        
+      
         Logger.LogInformation("PageSize changed: {OldSize} -> {NewSize}", CurrentPageSize, newPageSize);
-        
+    
         CurrentPageSize = newPageSize;
-        CurrentPage = 1;
-        await LoadPagedData();
+  CurrentPage = 1;
+ await LoadPagedData();
     }
 
     private async Task OnPageSizeChangedNative(ChangeEventArgs e)
     {
         if (int.TryParse(e.Value?.ToString(), out int newPageSize))
-        {
-            await OnPageSizeChanged(newPageSize);
-        }
+{
+       await OnPageSizeChanged(newPageSize);
+      }
     }
 
     private (int start, int end) GetPagerRange(int visiblePages = 5)
     {
-        if (TotalPages <= visiblePages)
+   if (TotalPages <= visiblePages)
         {
-            return (1, TotalPages);
+  return (1, TotalPages);
         }
 
-        var halfVisible = visiblePages / 2;
-        var start = Math.Max(1, CurrentPage - halfVisible);
+   var halfVisible = visiblePages / 2;
+   var start = Math.Max(1, CurrentPage - halfVisible);
         var end = Math.Min(TotalPages, start + visiblePages - 1);
 
         if (end - start + 1 < visiblePages)
@@ -457,6 +599,8 @@ public partial class AdministrarePozitii : ComponentBase, IDisposable
 
     private void OnRowSelected(RowSelectEventArgs<PozitieListDto> args)
     {
+  if (_disposed) return; // Guard check
+        
         SelectedPozitie = args.Data;
         Logger.LogInformation("Pozitie selectata: {Id} - {Denumire}", 
             SelectedPozitie?.Id, SelectedPozitie?.Denumire);
@@ -465,6 +609,8 @@ public partial class AdministrarePozitii : ComponentBase, IDisposable
 
     private void OnRowDeselected(RowDeselectEventArgs<PozitieListDto> args)
     {
+        if (_disposed) return; // Guard check
+        
         SelectedPozitie = null;
         Logger.LogInformation("Selectie anulata");
         StateHasChanged();
@@ -472,37 +618,64 @@ public partial class AdministrarePozitii : ComponentBase, IDisposable
 
     private async Task OnGridActionBegin(ActionEventArgs<PozitieListDto> args)
     {
-        if (args.RequestType == Syncfusion.Blazor.Grids.Action.Sorting)
+     if (_disposed) return; // Guard check
+    
+  if (args.RequestType == Syncfusion.Blazor.Grids.Action.Sorting)
         {
             args.Cancel = true;
-            
-            if (args is { Data: not null })
-            {
-                var sortingColumns = (args.Data as IEnumerable<object>)?.Cast<dynamic>().ToList();
-                if (sortingColumns?.Any() == true)
-                {
-                    var sortCol = sortingColumns[0];
-                    CurrentSortColumn = sortCol.Name?.ToString() ?? "Denumire";
-                    CurrentSortDirection = sortCol.Direction?.ToString()?.ToUpper() ?? "ASC";
-                    
-                    Logger.LogInformation("Sort: {Column} {Direction}", 
-                        CurrentSortColumn, CurrentSortDirection);
-                    
-                    await LoadPagedData();
-                }
-            }
+     
+    if (args is { Data: not null })
+  {
+       var sortingColumns = (args.Data as IEnumerable<object>)?.Cast<dynamic>().ToList();
+         if (sortingColumns?.Any() == true)
+        {
+       var sortCol = sortingColumns[0];
+           CurrentSortColumn = sortCol.Name?.ToString() ?? "Denumire";
+               CurrentSortDirection = sortCol.Direction?.ToString()?.ToUpper() ?? "ASC";
+      
+         Logger.LogInformation("Sort: {Column} {Direction}", 
+      CurrentSortColumn, CurrentSortDirection);
+        
+        await LoadPagedData();
+       }
+    }
         }
     }
 
     private async Task ShowToast(string title, string content, string cssClass)
     {
-        ToastTitle = title;
-        ToastContent = content;
-        ToastCssClass = cssClass;
-
-        if (ToastRef != null)
+        if (_disposed) return; // Guard check
+ 
+     if (ToastRef == null)
         {
-            await ToastRef.ShowAsync();
+            Logger.LogWarning("ToastRef is null, cannot show toast");
+        return;
+        }
+
+ try
+      {
+  // CRITICAL: Folosește ToastModel pentru a asigura că datele sunt transmise corect
+      var toastModel = new ToastModel
+   {
+     Title = title,
+    Content = content,
+      CssClass = cssClass,
+         ShowCloseButton = true,
+    Timeout = 3000
+            };
+
+     Logger.LogDebug("Showing toast: Title='{Title}', Content='{Content}', CssClass='{CssClass}'", 
+      title, content, cssClass);
+
+    await ToastRef.ShowAsync(toastModel);
+        }
+        catch (ObjectDisposedException)
+        {
+       Logger.LogDebug("Toast reference disposed");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error showing toast");
         }
     }
 }

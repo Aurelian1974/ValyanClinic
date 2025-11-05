@@ -226,6 +226,13 @@
                     <i class="fas fa-eye"></i>
                     <span>Vizualizeaza Detalii</span>
                 </button>
+                <button class="toolbar-btn btn-doctors" 
+                        @onclick="() => HandleManageDoctors()"
+                        disabled="@(SelectedPacient == null)"
+                        title="Gestioneaza doctori">
+                    <i class="fas fa-user-md"></i>
+                    <span>Gestioneaza Doctori</span>
+                </button>
             </div>
         </div>
 
@@ -423,3 +430,8 @@
                   IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
                   PacientId="@SelectedPacientId"
                   OnClosed="@HandleModalClosed" />
+
+<PacientDoctoriModal IsVisible="@ShowDoctoriModal"
+                  IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowDoctoriModal = value))"
+                  PacientID="@SelectedPacientId"
+                  PacientNume="@SelectedPacientNume" />

@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Application\Models\" />
+    <Folder Include="wwwroot\css\modals\" />
   </ItemGroup>
 
 </Project>

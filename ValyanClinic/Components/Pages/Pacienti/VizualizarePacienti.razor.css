@@ -581,6 +581,17 @@
     border-color: #2563eb;
 }
 
+.toolbar-btn.btn-doctors {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+}
+
+.toolbar-btn.btn-doctors:not(:disabled):hover {
+    background: #7c3aed;
+    border-color: #7c3aed;
+}
+
 .toolbar-btn i {
     font-size: 12px;
 }

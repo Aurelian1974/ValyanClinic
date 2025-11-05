@@ -71,7 +71,7 @@ public class PozitieRepository : BaseRepository, IPozitieRepository
         return result;
     }
 
-    public async Task<Pozitie?> CreateAsync(Pozitie pozitie, CancellationToken cancellationToken = default)
+    public async Task<Guid> CreateAsync(Pozitie pozitie, CancellationToken cancellationToken = default)
     {
         var parameters = new
         {
@@ -82,7 +82,7 @@ public class PozitieRepository : BaseRepository, IPozitieRepository
         };
 
         var result = await QueryFirstOrDefaultAsync<PozitieDto>("sp_Pozitii_Create", parameters, cancellationToken);
-        return result != null ? MapToEntity(result) : null;
+        return result?.Id ?? Guid.Empty; // SIMPLU: returnează doar ID ca DepartamentRepository și SpecializareRepository
     }
 
     public async Task<bool> UpdateAsync(Pozitie pozitie, CancellationToken cancellationToken = default)

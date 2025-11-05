@@ -22,7 +22,7 @@ public interface ISpecializareRepository
         bool? esteActiv = null,
         CancellationToken cancellationToken = default);
     
-    Task<Specializare?> CreateAsync(Specializare specializare, CancellationToken cancellationToken = default);
+    Task<Guid> CreateAsync(Specializare specializare, CancellationToken cancellationToken = default);
     Task<bool> UpdateAsync(Specializare specializare, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
     
@@ -32,4 +32,10 @@ public interface ISpecializareRepository
         CancellationToken cancellationToken = default);
         
     Task<IEnumerable<string>> GetCategoriiAsync(CancellationToken cancellationToken = default);
+    
+    // Metodă specializată pentru dropdown-uri (returnează TOATE specializările active)
+    Task<IEnumerable<(Guid Id, string Denumire, string? Categorie)>> GetDropdownOptionsAsync(
+        string? categorie = null,
+        bool esteActiv = true,
+        CancellationToken cancellationToken = default);
 }

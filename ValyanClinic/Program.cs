@@ -160,6 +160,11 @@ try
     builder.Services.AddScoped<IHtmlSanitizerService, HtmlSanitizerService>();
 
     // ========================================
+    // NOTIFICATION SERVICES
+    // ========================================
+    builder.Services.AddScoped<ValyanClinic.Services.INotificationService, ValyanClinic.Services.NotificationService>();
+
+    // ========================================
     // BUSINESS SERVICES
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Application.Services.IPersonalBusinessService, 

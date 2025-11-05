@@ -180,7 +180,13 @@ public partial class DepartamentFormModal : ComponentBase
 
     private async Task HandleOverlayClick()
     {
-        await Close();
+        // ❌ DEZACTIVAT: Nu închide modalul la click pe overlay
+        // Modalele de tip form conțin date importante care nu trebuie pierdute
+      // await Close();
+      
+        // 📝 OPȚIONAL: Poți adăuga un warning visual sau sunet
+  // Pentru moment, nu facem nimic - modalul rămâne deschis
+        return;
     }
 
     private async Task HandleSubmit()

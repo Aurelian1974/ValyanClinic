@@ -120,10 +120,15 @@ public partial class PozitieFormModal : ComponentBase
 
     private async Task HandleOverlayClick()
     {
-        if (!IsSaving)
-        {
-            await Close();
-        }
+        // ❌ DEZACTIVAT: Nu închide modalul la click pe overlay pentru modalele Form
+        // Pentru a proteja datele introduse în formulare
+        // if (!IsSaving)
+        // {
+        //     await Close();
+        // }
+
+        // 📝 OPȚIONAL: Adaugă feedback vizual că modalul nu se poate închide pe overlay
+        return;
     }
 
     private async Task HandleSubmit()

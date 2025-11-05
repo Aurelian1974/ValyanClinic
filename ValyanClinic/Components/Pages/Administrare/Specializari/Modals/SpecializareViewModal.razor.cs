@@ -25,48 +25,31 @@ public partial class SpecializareViewModal : ComponentBase
     {
         try
         {
-            Logger.LogInformation("Opening View modal for Specializare: {Id}", specializareId);
+  Logger.LogInformation("Opening View modal for Specializare: {Id}", specializareId);
 
-            CurrentSpecializareId = specializareId;
-            IsVisible = true;
-            IsLoading = true;
-            HasError = false;
+ CurrentSpecializareId = specializareId;
+ IsVisible = true;
+       IsLoading = true;
+  HasError = false;
             ErrorMessage = string.Empty;
             SpecializareData = null;
 
             await InvokeAsync(StateHasChanged);
-
-            var query = new GetSpecializareByIdQuery(specializareId);
-            var result = await Mediator.Send(query);
-
-            if (result.IsSuccess && result.Value != null)
-            {
-                SpecializareData = result.Value;
-                Logger.LogInformation("Data loaded successfully for View modal");
-            }
-            else
-            {
-                HasError = true;
-                ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele";
-                Logger.LogWarning("Failed to load data: {Error}", ErrorMessage);
-            }
-        }
-        catch (Exception ex)
+            await LoadSpecializareData(specializareId);
+   }
+    catch (Exception ex)
         {
-            Logger.LogError(ex, "Error opening View modal");
-            HasError = true;
-            ErrorMessage = $"Eroare la incarcare: {ex.Message}";
-        }
-        finally
-        {
-            IsLoading = false;
+Logger.LogError(ex, "Error opening View modal for {Id}", specializareId);
+  HasError = true;
+            ErrorMessage = $"Eroare la deschiderea modalului: {ex.Message}";
+     IsLoading = false;
             await InvokeAsync(StateHasChanged);
         }
     }
 
     public async Task Close()
     {
-        Logger.LogInformation("Closing View modal");
+     Logger.LogInformation("Closing View modal");
         IsVisible = false;
         await InvokeAsync(StateHasChanged);
 
@@ -78,10 +61,45 @@ public partial class SpecializareViewModal : ComponentBase
         await Task.Delay(300);
 
         SpecializareData = null;
-        IsLoading = false;
+      IsLoading = false;
         HasError = false;
         ErrorMessage = string.Empty;
-        CurrentSpecializareId = Guid.Empty;
+     CurrentSpecializareId = Guid.Empty;
+    }
+
+    private async Task LoadSpecializareData(Guid specializareId)
+    {
+        try
+        {
+    Logger.LogInformation("Loading Specializare data: {Id}", specializareId);
+
+            var query = new GetSpecializareByIdQuery(specializareId);
+       var result = await Mediator.Send(query);
+
+        if (result.IsSuccess && result.Value != null)
+            {
+     SpecializareData = result.Value;
+         HasError = false;
+              Logger.LogInformation("Data loaded successfully for {Id}", specializareId);
+      }
+   else
+            {
+    HasError = true;
+        ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele";
+           Logger.LogWarning("Failed to load data for {Id}: {Error}", specializareId, ErrorMessage);
+      }
+        }
+        catch (Exception ex)
+        {
+    HasError = true;
+      ErrorMessage = $"Eroare la incarcarea datelor: {ex.Message}";
+Logger.LogError(ex, "Exception loading data for {Id}", specializareId);
+        }
+        finally
+        {
+            IsLoading = false;
+        await InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task HandleOverlayClick()
@@ -95,7 +113,7 @@ public partial class SpecializareViewModal : ComponentBase
 
         if (OnEditRequested.HasDelegate)
         {
-            await OnEditRequested.InvokeAsync(CurrentSpecializareId);
+  await OnEditRequested.InvokeAsync(CurrentSpecializareId);
         }
     }
 
@@ -105,7 +123,7 @@ public partial class SpecializareViewModal : ComponentBase
 
         if (OnDeleteRequested.HasDelegate)
         {
-            await OnDeleteRequested.InvokeAsync(CurrentSpecializareId);
+      await OnDeleteRequested.InvokeAsync(CurrentSpecializareId);
         }
     }
 }

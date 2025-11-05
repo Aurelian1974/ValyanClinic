@@ -26,6 +26,10 @@ public class UpdatePersonalMedicalCommandHandler : IRequestHandler<UpdatePersona
         try
         {
             _logger.LogInformation("Updating PersonalMedical: {PersonalID}", request.PersonalID);
+            
+            // DEBUG: Log incoming request values
+            _logger.LogInformation("Request values: Pozitie='{Pozitie}', PozitieID={PozitieID}", 
+              request.Pozitie, request.PozitieID);
 
             var existing = await _repository.GetByIdAsync(request.PersonalID, cancellationToken);
             if (existing == null)
@@ -34,35 +38,43 @@ public class UpdatePersonalMedicalCommandHandler : IRequestHandler<UpdatePersona
                 return Result<bool>.Failure("Personal medical not found");
             }
 
-            existing.Nume = request.Nume;
-            existing.Prenume = request.Prenume;
-            existing.Specializare = request.Specializare;
-            existing.NumarLicenta = request.NumarLicenta;
-            existing.Telefon = request.Telefon;
-            existing.Email = request.Email;
-            existing.Departament = request.Departament;
-            existing.Pozitie = request.Pozitie;
-            existing.EsteActiv = request.EsteActiv;
-            existing.CategorieID = request.CategorieID;
-            existing.PozitieID = request.PozitieID;
-            existing.SpecializareID = request.SpecializareID;
-            existing.SubspecializareID = request.SubspecializareID;
+            // DEBUG: Log existing values
+            _logger.LogInformation("Existing values: Pozitie='{Pozitie}', PozitieID={PozitieID}", 
+              existing.Pozitie, existing.PozitieID);
 
-            var success = await _repository.UpdateAsync(existing, cancellationToken);
+              existing.Nume = request.Nume;
+             existing.Prenume = request.Prenume;
+         existing.Specializare = request.Specializare;
+      existing.NumarLicenta = request.NumarLicenta;
+                existing.Telefon = request.Telefon;
+     existing.Email = request.Email;
+      existing.Departament = request.Departament;
+                existing.Pozitie = request.Pozitie;
+           existing.EsteActiv = request.EsteActiv;
+                existing.CategorieID = request.CategorieID;
+             existing.PozitieID = request.PozitieID;
+                existing.SpecializareID = request.SpecializareID;
+          existing.SubspecializareID = request.SubspecializareID;
 
-            if (!success)
-            {
-                _logger.LogWarning("Failed to update PersonalMedical: {PersonalID}", request.PersonalID);
+         // DEBUG: Log updated values before save
+                _logger.LogInformation("Updated values before save: Pozitie='{Pozitie}', PozitieID={PozitieID}", 
+        existing.Pozitie, existing.PozitieID);
+
+        var success = await _repository.UpdateAsync(existing, cancellationToken);
+
+        if (!success)
+       {
+           _logger.LogWarning("Failed to update PersonalMedical: {PersonalID}", request.PersonalID);
                 return Result<bool>.Failure("Failed to update personal medical");
             }
 
-            _logger.LogInformation("PersonalMedical updated successfully: {PersonalID}", request.PersonalID);
-            return Result<bool>.Success(true);
+    _logger.LogInformation("PersonalMedical updated successfully: {PersonalID}", request.PersonalID);
+           return Result<bool>.Success(true);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating PersonalMedical: {PersonalID}", request.PersonalID);
-            return Result<bool>.Failure($"Error: {ex.Message}");
-        }
+    _logger.LogError(ex, "Error updating PersonalMedical: {PersonalID}", request.PersonalID);
+           return Result<bool>.Failure($"Error: {ex.Message}");
+         }
     }
 }

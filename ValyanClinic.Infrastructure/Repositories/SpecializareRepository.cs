@@ -2,14 +2,19 @@
 using ValyanClinic.Domain.Entities;
 using ValyanClinic.Domain.Interfaces.Repositories;
 using ValyanClinic.Infrastructure.Data;
+using Microsoft.Extensions.Logging;
+using Microsoft.Data.SqlClient;
 
 namespace ValyanClinic.Infrastructure.Repositories;
 
 public class SpecializareRepository : BaseRepository, ISpecializareRepository
 {
-    public SpecializareRepository(IDbConnectionFactory connectionFactory)
-        : base(connectionFactory)
+    private readonly ILogger<SpecializareRepository> _logger;
+
+    public SpecializareRepository(IDbConnectionFactory connectionFactory, ILogger<SpecializareRepository> logger)
+        : base(connectionFactory, logger)
     {
+        _logger = logger;
     }
 
     public async Task<Specializare?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -75,35 +80,78 @@ public class SpecializareRepository : BaseRepository, ISpecializareRepository
         return result;
     }
 
-    public async Task<Specializare?> CreateAsync(Specializare specializare, CancellationToken cancellationToken = default)
+    public async Task<Guid> CreateAsync(Specializare specializare, CancellationToken cancellationToken = default)
     {
-        var parameters = new
+     try
         {
-            specializare.Denumire,
-            specializare.Categorie,
-            specializare.Descriere,
-            EsteActiv = specializare.EsteActiv,
-            CreatDe = specializare.CreatDe
-        };
+    _logger.LogInformation("Creating Specializare in repository: {Denumire}", specializare.Denumire);
 
-        var result = await QueryFirstOrDefaultAsync<SpecializareDto>("sp_Specializari_Create", parameters, cancellationToken);
-        return result != null ? MapToEntity(result) : null;
+            var parameters = new
+ {
+        specializare.Denumire,
+   specializare.Categorie,
+    specializare.Descriere,
+        EsteActiv = specializare.EsteActiv,
+    CreatDe = specializare.CreatDe
+       };
+
+  _logger.LogInformation("🔄 REPO: About to call QueryFirstOrDefaultAsync...");
+            var result = await QueryFirstOrDefaultAsync<SpecializareDto>("sp_Specializari_Create", parameters, cancellationToken);
+
+            if (result != null)
+       {
+          _logger.LogInformation("Specializare created successfully in repository: {Id}", result.Id);
+      return result.Id; // SIMPLU: returnează doar ID ca DepartamentRepository
+    }
+
+ _logger.LogWarning("CreateAsync returned null result for Specializare: {Denumire}", specializare.Denumire);
+          return Guid.Empty;
+        }
+        catch (Exception ex)
+        {
+   _logger.LogError(ex, "🔥 RAW EXCEPTION in SpecializareRepository.CreateAsync");
+            _logger.LogError("🔥 Exception Type: {Type}", ex.GetType().FullName);
+ _logger.LogError("🔥 Exception Message: {Message}", ex.Message);
+    
+      if (ex is SqlException sqlEx)
+            {
+      _logger.LogError("🔥 SQL Exception Number: {Number}", sqlEx.Number);
+        _logger.LogError("🔥 SQL Exception Class: {Class}", sqlEx.Class);
+     _logger.LogError("🔥 SQL Exception State: {State}", sqlEx.State);
+  }
+          
+          throw; // Re-throw pentru ca BaseRepository să o proceseze
+        }
     }
 
     public async Task<bool> UpdateAsync(Specializare specializare, CancellationToken cancellationToken = default)
     {
-        var parameters = new
+        try
         {
-            specializare.Id,
-            specializare.Denumire,
-            specializare.Categorie,
-            specializare.Descriere,
-            EsteActiv = specializare.EsteActiv,
-            ModificatDe = specializare.ModificatDe
-        };
+            _logger.LogInformation("Updating Specializare in repository: {Id} - {Denumire}", specializare.Id, specializare.Denumire);
+          
+            var parameters = new
+            {
+                specializare.Id,
+                specializare.Denumire,
+                specializare.Categorie,
+                specializare.Descriere,
+                EsteActiv = specializare.EsteActiv,
+                ModificatDe = specializare.ModificatDe
+         };
 
-        var result = await QueryFirstOrDefaultAsync<SpecializareDto>("sp_Specializari_Update", parameters, cancellationToken);
-        return result != null;
+            var result = await QueryFirstOrDefaultAsync<SpecializareDto>("sp_Specializari_Update", parameters, cancellationToken);
+  
+            var success = result != null;
+            _logger.LogInformation("Specializare update result: {Success} for {Id}", success, specializare.Id);
+            
+            return success;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in SpecializareRepository.UpdateAsync for: {Id}", specializare.Id);
+            throw;
+     }
     }
 
     public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
@@ -123,12 +171,12 @@ public class SpecializareRepository : BaseRepository, ISpecializareRepository
             Denumire = denumire,
             ExcludeId = excludeId
         };
-        
+ 
         var result = await QueryFirstOrDefaultAsync<UniquenessCheckResult>(
-            "sp_Specializari_CheckUnique", 
+        "sp_Specializari_CheckUnique", 
             parameters, 
-            cancellationToken);
-        
+  cancellationToken);
+     
         return result?.Denumire_Exists == 1;
     }
 
@@ -136,10 +184,35 @@ public class SpecializareRepository : BaseRepository, ISpecializareRepository
     {
         using var connection = _connectionFactory.CreateConnection();
         var results = await connection.QueryAsync<CategorieDto>(
-            "sp_Specializari_GetCategorii",
-            commandType: System.Data.CommandType.StoredProcedure);
+     "sp_Specializari_GetCategorii",
+   commandType: System.Data.CommandType.StoredProcedure);
+   
+  return results.Select(c => c.Value);
+    }
+
+    // NEW: Metodă specializată pentru dropdown-uri (TOATE specializările active)
+    public async Task<IEnumerable<(Guid Id, string Denumire, string? Categorie)>> GetDropdownOptionsAsync(
+        string? categorie = null,
+        bool esteActiv = true,
+        CancellationToken cancellationToken = default)
+    {
+     var parameters = new
+        {
+            Categorie = categorie,
+            EsteActiv = esteActiv
+        };
         
-        return results.Select(c => c.Value);
+        using var connection = _connectionFactory.CreateConnection();
+        var results = await connection.QueryAsync<DropdownOptionDto>(
+   "sp_Specializari_GetDropdownOptions",
+       parameters,
+   commandType: System.Data.CommandType.StoredProcedure);
+        
+      return results.Select(r => (
+       Id: Guid.Parse(r.Value),
+            Denumire: r.Text,
+            Categorie: r.Categorie
+   ));
     }
 
     private static Specializare MapToEntity(SpecializareDto dto)
@@ -148,33 +221,33 @@ public class SpecializareRepository : BaseRepository, ISpecializareRepository
         {
             Id = dto.Id,
             Denumire = dto.Denumire,
-            Categorie = dto.Categorie,
-            Descriere = dto.Descriere,
-            EsteActiv = dto.Este_Activ,
-            DataCrearii = dto.Data_Crearii,
+        Categorie = dto.Categorie,
+         Descriere = dto.Descriere,
+  EsteActiv = dto.Este_Activ,
+      DataCrearii = dto.Data_Crearii,
             DataUltimeiModificari = dto.Data_Ultimei_Modificari,
             CreatDe = dto.Creat_De,
             ModificatDe = dto.Modificat_De
-        };
+  };
     }
 
     private class SpecializareDto
-    {
-        public Guid Id { get; set; }
-        public string Denumire { get; set; } = string.Empty;
+  {
+     public Guid Id { get; set; }
+  public string Denumire { get; set; } = string.Empty;
         public string? Categorie { get; set; }
         public string? Descriere { get; set; }
-        public bool Este_Activ { get; set; }
+ public bool Este_Activ { get; set; }
         public DateTime Data_Crearii { get; set; }
         public DateTime Data_Ultimei_Modificari { get; set; }
         public string? Creat_De { get; set; }
         public string? Modificat_De { get; set; }
-    }
+ }
 
     private class CategorieDto
     {
         public string Value { get; set; } = string.Empty;
-        public string Text { get; set; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
     }
 
     private class UniquenessCheckResult
@@ -185,5 +258,13 @@ public class SpecializareRepository : BaseRepository, ISpecializareRepository
     private class SuccessResult
     {
         public int Success { get; set; }
+    }
+    
+    // DTO pentru dropdown options SP result
+    private class DropdownOptionDto
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+        public string? Categorie { get; set; }
     }
 }

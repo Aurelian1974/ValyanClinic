@@ -69,6 +69,14 @@
                                 <i class="fas fa-shield-alt"></i>
                                 Asigurare
                             </button>
+                            @if (IsEditMode)
+                            {
+                            <button type="button" class="tab-button @(ActiveTab == "doctori" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("doctori")'>
+                                <i class="fas fa-user-md"></i>
+                                 Doctori (@DoctoriAsociati.Count)
+                              </button>
+                            }
                         </div>
 
                         <div class="tab-content">
@@ -408,11 +416,197 @@
                                     </div>
                                 </div>
                             }
-                        </div>
-                    </div>
 
-                    <!-- Observatii (vizibil pe toate tab-urile) -->
-                    <div class="observatii-section">
+                            <!-- Tab 6: Doctori (doar în EditMode) -->
+                            @if (ActiveTab == "doctori" && IsEditMode)
+                            {
+                                <div class="tab-pane active">
+                                   @if (IsLoadingDoctori)
+                                 {
+  <div class="loading-container" style="text-align: center; padding: 3rem;">
+          <div class="spinner-border text-primary" role="status">
+         <span class="visually-hidden">Se încarcă...</span>
+               </div>
+      <p>Se încarcă doctori...</p>
+        </div>
+          }
+        else if (DoctoriAsociati.Any())
+ {
+         <!-- Doctori activi -->
+  @if (DoctoriActivi.Any())
+                   {
+           <div class="info-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+         <h3 class="card-title" style="margin: 0;">
+    <i class="fas fa-check-circle text-success"></i>
+      Doctori Activi (@DoctoriActivi.Count)
+    </h3>
+           <button type="button" class="btn btn-primary btn-sm" @onclick="OpenAddDoctorModal">
+         <i class="fas fa-plus"></i> Adaugă doctor
+   </button>
+        </div>
+
+          @foreach (var doctor in DoctoriActivi)
+          {
+    <div class="doctor-card" style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
+           <div class="doctor-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+     <div>
+    <h5 style="margin: 0; font-size: 1.125rem; color: #111827;">
+       <i class="fas fa-user-md text-primary"></i>
+    @doctor.DoctorNumeComplet
+       </h5>
+              @if (!string.IsNullOrEmpty(doctor.DoctorSpecializare))
+     {
+ <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #6b7280;">@doctor.DoctorSpecializare</p>
+ }
+      </div>
+        @if (!string.IsNullOrEmpty(doctor.TipRelatie))
+          {
+         <span class="badge @GetBadgeClass(doctor.TipRelatie)" style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 6px;">
+         @doctor.TipRelatie
+         </span>
+          }
+         </div>
+
+        <div class="info-grid" style="gap: 0.75rem;">
+   @if (!string.IsNullOrEmpty(doctor.DoctorTelefon))
+     {
+    <div class="info-item">
+         <label style="font-size: 0.8125rem; color: #6b7280;">Telefon</label>
+         <div class="info-value" style="font-size: 0.875rem;">
+  <a href="tel:@doctor.DoctorTelefon" class="contact-link">
+      <i class="fas fa-phone"></i>
+             @doctor.DoctorTelefon
+             </a>
+       </div>
+             </div>
+       }
+             @if (!string.IsNullOrEmpty(doctor.DoctorEmail))
+     {
+<div class="info-item">
+   <label style="font-size: 0.8125rem; color: #6b7280;">Email</label>
+                 <div class="info-value" style="font-size: 0.875rem;">
+      <a href="mailto:@doctor.DoctorEmail" class="contact-link">
+     <i class="fas fa-envelope"></i>
+     @doctor.DoctorEmail
+           </a>
+   </div>
+  </div>
+        }
+            <div class="info-item">
+            <label style="font-size: 0.8125rem; color: #6b7280;">Data asocierii</label>
+                <div class="info-value" style="font-size: 0.875rem;">
+      @doctor.DataAsocierii.ToString("dd.MM.yyyy") 
+             <span style="color: #6b7280;">(@FormatZile(doctor.ZileDeAsociere))</span>
+         </div>
+           </div>
+        @if (!string.IsNullOrEmpty(doctor.Motiv))
+      {
+      <div class="info-item full-width">
+                 <label style="font-size: 0.8125rem; color: #6b7280;">Motiv asociere</label>
+        <div class="info-value" style="font-size: 0.875rem;">
+       <i class="fas fa-info-circle text-info"></i>
+     @doctor.Motiv
+   </div>
+</div>
+    }
+  </div>
+
+      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #f3f4f6;">
+       <button type="button" class="btn btn-sm btn-danger" @onclick="() => RemoveDoctor(doctor)" style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #fca5a5, #ef4444); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);">
+   <i class="fas fa-times"></i> Dezactivează
+    </button>
+              </div>
+            </div>
+      }
+     </div>
+           }
+
+  <!-- Doctori inactivi (istoric) -->
+       @if (DoctoriInactivi.Any())
+    {
+          <div class="info-card" style="margin-top: 1.5rem;">
+            <h3 class="card-title">
+        <i class="fas fa-history text-muted"></i>
+    Istoric Relații Inactive (@DoctoriInactivi.Count)
+   </h3>
+      @foreach (var doctor in DoctoriInactivi)
+             {
+ <div class="doctor-card-inactive" style="background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
+       <div class="doctor-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+             <div>
+    <h5 style="margin: 0; font-size: 1.125rem; color: #6b7280;">
+         <i class="fas fa-user-md"></i>
+         @doctor.DoctorNumeComplet
+    </h5>
+ @if (!string.IsNullOrEmpty(doctor.DoctorSpecializare))
+     {
+         <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #6b7280;">@doctor.DoctorSpecializare</p>
+                 }
+              </div>
+             <span class="badge badge-secondary" style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 6px; background: #94a3b8; color: white;">INACTIV</span>
+</div>
+
+               <div class="info-grid" style="gap: 0.75rem;">
+ <div class="info-item">
+<label style="font-size: 0.8125rem; color: #6b7280;">Perioada</label>
+        <div class="info-value" style="font-size: 0.875rem; color: #6b7280;">
+    @doctor.DataAsocierii.ToString("dd.MM.yyyy") - 
+           @(doctor.DataDezactivarii?.ToString("dd.MM.yyyy") ?? "N/A")
+       </div>
+     </div>
+    @if (doctor.ZileDeAsociere > 0)
+ {
+    <div class="info-item">
+            <label style="font-size: 0.8125rem; color: #6b7280;">Zile de asociere</label>
+<div class="info-value" style="font-size: 0.875rem; color: #6b7280;">
+     @FormatZile(doctor.ZileDeAsociere)
+         </div>
+  </div>
+     }
+    </div>
+
+    <!-- ✅ ADDED: Acțiuni pentru doctorii inactivi -->
+  <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #e5e7eb; display: flex; gap: 0.75rem;">
+             <button type="button" 
+   class="btn btn-sm btn-success" 
+ @onclick="() => ActivateDoctor(doctor)" 
+  title="Reactivează relația cu acest doctor"
+       style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; transition: all 0.2s ease;">
+                  <i class="fas fa-redo"></i> Reactivează
+         </button>
+       @if (!string.IsNullOrEmpty(doctor.DoctorTelefon))
+        {
+            <a href="tel:@doctor.DoctorTelefon" 
+        class="btn btn-sm btn-outline-secondary"
+      style="padding: 0.5rem 1rem; background: white; color: #6b7280; border: 1px solid #d1d5db; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; text-decoration: none;">
+    <i class="fas fa-phone"></i> Contactează
+        </a>
+          }
+  </div>
+          </div>
+              }
+              </div>
+         }
+         }
+         else
+             {
+         <!-- Empty State -->
+          <div class="empty-state" style="text-align: center; padding: 3rem; color: #6b7280;">
+  <i class="fas fa-user-md fa-3x" style="margin-bottom: 1.5rem; color: #d1d5db;"></i>
+                <p style="font-size: 1.125rem; margin-bottom: 1.5rem; color: #374151;">Nu există doctori asociați acestui pacient.</p>
+      <button type="button" class="btn btn-primary" @onclick="OpenAddDoctorModal" style="padding: 0.625rem 1.25rem; background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); display: inline-flex; align-items: center; gap: 0.5rem;">
+                  <i class="fas fa-plus"></i> Adaugă primul doctor
+      </button>
+      </div>
+            }
+          </div>
+          }
+ </div>
+          </div>
+
+           <!-- Observatii (vizibil pe toate tab-urile) -->
+          <div class="observatii-section">
                         <div class="info-card">
                             <h3 class="card-title">
                                 <i class="fas fa-comment-alt"></i>
@@ -456,3 +650,137 @@
         </div>
     </div>
 </div>
+
+<!-- Modal adaugare doctor (doar când IsEditMode) -->
+@if (IsEditMode && ShowAddDoctorModal)
+{
+    <AddDoctorToPacientModal 
+        IsVisible="@ShowAddDoctorModal"
+        IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowAddDoctorModal = value))"
+        PacientID="@PacientId"
+        PacientNume="@($"{FormModel.Nume} {FormModel.Prenume}")"
+        OnDoctorAdded="OnDoctorAdded" />
+}
+
+<!-- ✅ Toast pentru notificări -->
+<Syncfusion.Blazor.Notifications.SfToast @ref="ToastRef" />
+
+<!-- ✅ Confirm modal pentru dezactivare doctor -->
+@if (ShowConfirmRemoveDoctor && DoctorToRemove != null)
+{
+    <div class="modal-overlay visible" @onclick:stopPropagation>
+        <div class="modal-container modal-small show" @onclick:stopPropagation>
+     <div class="modal-header modal-header-warning">
+      <div class="modal-title">
+           <i class="fas fa-exclamation-triangle"></i>
+    <h2>Confirmare Dezactivare</h2>
+                </div>
+            </div>
+ <div class="modal-body">
+                <div class="confirm-message">
+         <p>Sunteți sigur că doriți să dezactivați relația cu <strong>@DoctorToRemove.DoctorNumeComplet</strong>?</p>
+              <p style="color: #6b7280; font-size: 0.9rem; margin-top: 0.5rem;">
+    Relația va fi marcată ca inactivă și va apărea în istoric.
+        </p>
+        </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @onclick="() => { ShowConfirmRemoveDoctor = false; DoctorToRemove = null; }">
+            <i class="fas fa-times"></i> Anulează
+                </button>
+      <button type="button" class="btn btn-danger" @onclick="HandleRemoveDoctorConfirmed">
+             <i class="fas fa-check"></i> Confirmare
+       </button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ✅ ADDED: Confirm modal pentru reactivare relație doctor-pacient -->
+@if (ShowConfirmActivateDoctor && DoctorToActivate != null)
+{
+    <div class="modal-overlay visible" @onclick:stopPropagation>
+        <div class="modal-container modal-small show" @onclick:stopPropagation>
+            <div class="modal-header modal-header-success">
+      <div class="modal-title">
+            <i class="fas fa-redo"></i>
+       <h2>Confirmare Reactivare</h2>
+   </div>
+   </div>
+      <div class="modal-body">
+   <div class="confirm-message">
+            <p>Sunteți sigur că doriți să reactivați relația cu <strong>@DoctorToActivate.DoctorNumeComplet</strong>?</p>
+     @if (!string.IsNullOrEmpty(DoctorToActivate.DoctorSpecializare))
+               {
+   <p style="color: #6b7280; font-size: 0.9rem; margin-top: 0.5rem;">
+     <i class="fas fa-graduation-cap"></i> @DoctorToActivate.DoctorSpecializare
+   </p>
+ }
+        <p style="color: #059669; font-size: 0.9rem; margin-top: 1rem; background: #d1fae5; padding: 0.75rem; border-radius: 8px; border-left: 4px solid #10b981;">
+ <i class="fas fa-info-circle"></i> Relația va deveni activă și va apărea în lista doctorilor activi.
+         </p>
+  </div>
+            </div>
+  <div class="modal-footer">
+     <button type="button" 
+            class="btn btn-secondary" 
+    @onclick="() => { ShowConfirmActivateDoctor = false; DoctorToActivate = null; }">
+        <i class="fas fa-times"></i> Anulează
+                </button>
+   <button type="button" 
+     class="btn btn-success" 
+               @onclick="HandleActivateDoctorConfirmed"
+         style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+         <i class="fas fa-check"></i> Reactivează
+          </button>
+    </div>
+    </div>
+    </div>
+}
+
+<!-- ✅ Confirm modal pentru adăugare doctori după creare pacient -->
+@if (ShowConfirmAddDoctors)
+{
+    <div class="modal-overlay visible" @onclick:stopPropagation>
+        <div class="modal-container modal-medium show" @onclick:stopPropagation>
+            <div class="modal-header modal-header-success">
+       <div class="modal-title">
+             <i class="fas fa-check-circle"></i>
+      <h2>Pacient Creat Cu Succes!</h2>
+      </div>
+            </div>
+            <div class="modal-body">
+          <div class="confirm-message">
+       <p style="font-size: 1.1rem; margin-bottom: 1rem;">
+             Pacientul <strong>@FormModel.Nume @FormModel.Prenume</strong> a fost creat cu succes!
+      </p>
+    <p style="color: #6b7280;">
+    <i class="fas fa-user-md" style="color: #3b82f6;"></i>
+      Doriți să adăugați doctori asociați acestui pacient acum?
+                 </p>
+            </div>
+            </div>
+            <div class="modal-footer">
+   <button type="button" class="btn btn-secondary" @onclick="HandleAddDoctorsDeclined">
+        <i class="fas fa-times"></i> Nu, mulțumesc
+           </button>
+          <button type="button" class="btn btn-primary" @onclick="HandleAddDoctorsConfirmed">
+    <i class="fas fa-user-plus"></i> Da, adaugă doctori
+       </button>
+        </div>
+        </div>
+    </div>
+}
+
+@code {
+    private Syncfusion.Blazor.Notifications.SfToast? ToastRef;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && ToastRef != null)
+        {
+    NotificationService.RegisterToast(ToastRef);
+ Logger.LogDebug("[PacientAddEditModal] Toast registered successfully");
+        }
+    }
+}

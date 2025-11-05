@@ -20,7 +20,7 @@ public interface IPozitieRepository
         bool? esteActiv = null,
         CancellationToken cancellationToken = default);
     
-    Task<Pozitie?> CreateAsync(Pozitie pozitie, CancellationToken cancellationToken = default);
+    Task<Guid> CreateAsync(Pozitie pozitie, CancellationToken cancellationToken = default);
     Task<bool> UpdateAsync(Pozitie pozitie, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
     

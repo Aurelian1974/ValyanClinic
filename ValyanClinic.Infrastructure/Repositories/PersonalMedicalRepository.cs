@@ -107,6 +107,7 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
             personalMedical.Pozitie,
             personalMedical.EsteActiv,
             personalMedical.CategorieID,
+            personalMedical.PozitieID, // ✅ FIX: Adaugat PozitieID
             personalMedical.SpecializareID,
             personalMedical.SubspecializareID
         };
@@ -131,12 +132,28 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
             personalMedical.Pozitie,
             personalMedical.EsteActiv,
             personalMedical.CategorieID,
+            personalMedical.PozitieID,           // ✅ FIX: Adaugat PozitieID
             personalMedical.SpecializareID,
             personalMedical.SubspecializareID
         };
 
+        // DEBUG: Log parameters for troubleshooting
+        Console.WriteLine($"PersonalMedicalRepository.UpdateAsync called:");
+        Console.WriteLine($"  PersonalID: {personalMedical.PersonalID}");
+        Console.WriteLine($"  Pozitie: '{personalMedical.Pozitie}'");
+        Console.WriteLine($"  PozitieID: {personalMedical.PozitieID}");
+
         // SP returneaza personal medical actualizat
         var result = await QueryFirstOrDefaultAsync<PersonalMedical>("sp_PersonalMedical_Update", parameters, cancellationToken);
+        
+        // DEBUG: Log result
+        Console.WriteLine($"  Update result: {(result != null ? "SUCCESS" : "FAILED")}");
+        if (result != null)
+        {
+            Console.WriteLine($"  Result Pozitie: '{result.Pozitie}'");
+            Console.WriteLine($"  Result PozitieID: {result.PozitieID}");   // ✅ FIX: Log si PozitieID
+        }
+        
         return result != null;
     }
 

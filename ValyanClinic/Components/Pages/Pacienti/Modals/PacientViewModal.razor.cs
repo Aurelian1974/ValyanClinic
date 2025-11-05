@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById;
+using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Queries.GetDoctoriByPacient;
+using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.DTOs;
 
 namespace ValyanClinic.Components.Pages.Pacienti.Modals;
 
@@ -59,6 +61,26 @@ public partial class PacientViewModal : ComponentBase
     private PacientDetailDto? PacientData { get; set; }
 
     /// <summary>
+    /// Lista doctorilor asociați
+    /// </summary>
+    private List<DoctorAsociatDto> DoctoriAsociati { get; set; } = new();
+
+    /// <summary>
+    /// Doctori activi (computed property)
+    /// </summary>
+    private List<DoctorAsociatDto> DoctoriActivi => DoctoriAsociati.Where(d => d.EsteActiv).ToList();
+
+    /// <summary>
+    /// Doctori inactivi (computed property)
+    /// </summary>
+    private List<DoctorAsociatDto> DoctoriInactivi => DoctoriAsociati.Where(d => !d.EsteActiv).ToList();
+
+    /// <summary>
+    /// Indicator de încărcare doctori
+    /// </summary>
+    private bool IsLoadingDoctori { get; set; }
+
+    /// <summary>
     /// Tab-ul activ din modal
     /// </summary>
     private string ActiveTab { get; set; } = "personal";
@@ -95,6 +117,9 @@ public partial class PacientViewModal : ComponentBase
                 PacientData = result.Value;
                 HasError = false;
                 Logger.LogInformation("Date pacient incarcate cu succes pentru {PacientId}", pacientId);
+    
+                // Încarcă și doctorii asociați
+                await LoadDoctoriAsociati(pacientId);
             }
             else
             {
@@ -116,6 +141,42 @@ public partial class PacientViewModal : ComponentBase
             await InvokeAsync(StateHasChanged);
         }
     }
+
+    /// <summary>
+    /// Încarcă lista de doctori asociați pacientului
+    /// </summary>
+    private async Task LoadDoctoriAsociati(Guid pacientId)
+    {
+        IsLoadingDoctori = true;
+     
+        try
+        {
+            Logger.LogInformation("[PacientViewModal] Loading doctori for PacientID: {PacientId}", pacientId);
+         
+            var query = new GetDoctoriByPacientQuery(pacientId, ApenumereActivi: false);
+            var result = await Mediator.Send(query);
+            
+            if (result.IsSuccess && result.Value != null)
+            {
+                DoctoriAsociati = result.Value;
+                Logger.LogInformation("[PacientViewModal] Loaded {Count} doctori", DoctoriAsociati.Count);
+            }
+            else
+            {
+                DoctoriAsociati = new List<DoctorAsociatDto>();
+                Logger.LogWarning("[PacientViewModal] Failed to load doctori: {Error}", result.FirstError);
+            }
+     }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[PacientViewModal] Exception loading doctori");
+            DoctoriAsociati = new List<DoctorAsociatDto>();
+        }
+        finally
+        {
+            IsLoadingDoctori = false;
+        }
+ }
 
     /// <summary>
     /// Seteaza tab-ul activ
@@ -151,10 +212,40 @@ public partial class PacientViewModal : ComponentBase
         // Reset state after animation
         await Task.Delay(300);
         PacientData = null;
+        DoctoriAsociati = new();
         IsLoading = false;
+        IsLoadingDoctori = false;
         HasError = false;
         ErrorMessage = string.Empty;
         ActiveTab = "personal";
+    }
+    
+    /// <summary>
+    /// Returnează clasa CSS pentru badge-ul tipului de relație
+    /// </summary>
+    private string GetBadgeClass(string? tipRelatie)
+    {
+        return tipRelatie switch
+        {
+          "MedicPrimar" => "badge-primary",
+"Specialist" => "badge-info",
+            "MedicConsultant" => "badge-success",
+            "MedicDeGarda" => "badge-warning",
+"MedicFamilie" => "badge-secondary",
+            _ => "badge-secondary"
+        };
+    }
+    
+    /// <summary>
+    /// Formatează numărul de zile în text friendly
+    /// </summary>
+  private string FormatZile(int zile)
+    {
+      if (zile < 30)
+  return $"{zile} zile";
+        if (zile < 365)
+ return $"{zile / 30} luni";
+        return $"{zile / 365} ani";
     }
     #endregion
 }

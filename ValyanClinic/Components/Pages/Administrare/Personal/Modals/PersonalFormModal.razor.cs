@@ -27,6 +27,9 @@ public partial class PersonalFormModal : ComponentBase
     private string ErrorMessage { get; set; } = string.Empty;
     private string ActiveTab { get; set; } = "personal";
     private PersonalFormModel Model { get; set; } = new();
+    
+    // 🔒 Disposed state protection
+    private bool _disposed = false;
 
     // Location dropdown data
     private List<LocationOption> JudeteOptions { get; set; } = new();
@@ -37,7 +40,7 @@ public partial class PersonalFormModal : ComponentBase
     private bool IsLoadingLocalitatiDomiciliu { get; set; }
     private bool IsLoadingLocalitatiResedinta { get; set; }
 
-    // CultureInfo pentru sortare cu diacritice romanesti
+ // CultureInfo pentru sortare cu diacritice romanesti
     private static readonly CultureInfo RomanianCulture = new("ro-RO");
 
     public class LocationOption
@@ -468,26 +471,38 @@ public partial class PersonalFormModal : ComponentBase
 
     public async Task Close()
     {
-        Logger.LogInformation("Closing modal");
+        if (_disposed) return;
+      
+    Logger.LogInformation("Closing modal");
+        
+        // Start CSS animation
         IsVisible = false;
-        await InvokeAsync(StateHasChanged);
+    await InvokeAsync(StateHasChanged);
 
-        if (OnClosed.HasDelegate)
+      if (OnClosed.HasDelegate)
         {
             await OnClosed.InvokeAsync();
         }
 
-        await Task.Delay(300);
-        
-        Model = new PersonalFormModel();
-        LocalitatiDomiciliuOptions.Clear();
-        LocalitatiResedintaOptions.Clear();
-        IsLoadingLocalitatiDomiciliu = false;
-        IsLoadingLocalitatiResedinta = false;
-        IsLoading = false;
-        HasError = false;
-        ErrorMessage = string.Empty;
-        ActiveTab = "personal";
+        // Wait for CSS animation and component cleanup
+        Logger.LogDebug("⏳ Modal cleanup delay (500ms)...");
+        await Task.Delay(500);
+
+        if (!_disposed)
+        {
+      // Clear all data after delay
+            Model = new PersonalFormModel();
+         LocalitatiDomiciliuOptions.Clear();
+    LocalitatiResedintaOptions.Clear();
+            IsLoadingLocalitatiDomiciliu = false;
+            IsLoadingLocalitatiResedinta = false;
+            IsLoading = false;
+            HasError = false;
+          ErrorMessage = string.Empty;
+            ActiveTab = "personal";
+            
+        Logger.LogDebug("✅ Modal cleanup complete");
+      }
     }
 
     private void SetActiveTab(string tabName)
@@ -498,163 +513,172 @@ public partial class PersonalFormModal : ComponentBase
 
     private async Task HandleOverlayClick()
     {
-        await Close();
-    }
+        // ❌ DEZACTIVAT: Nu închide modalul la click pe overlay pentru modalele Form
+        // Pentru a evita pierderea datelor introduse/modificate
+        // await Close();
+  
+        // Pentru modalele View (readonly) se poate păstra închiderea pe overlay
+   return;
+}
 
     private async Task HandleSubmit()
     {
         try
         {
-            Logger.LogInformation("=== START HandleSubmit: IsEditMode={IsEditMode}, Id_Personal={Id} ===", 
-                Model.IsEditMode, Model.Id_Personal);
+  Logger.LogInformation("=== START HandleSubmit: IsEditMode={IsEditMode}, Id_Personal={Id} ===", 
+           Model.IsEditMode, Model.Id_Personal);
             
             IsSaving = true;
-            HasError = false;
-            ErrorMessage = string.Empty;
-            await InvokeAsync(StateHasChanged);
+    HasError = false;
+    ErrorMessage = string.Empty;
+     await InvokeAsync(StateHasChanged);
 
-            if (Model.IsEditMode)
-            {
-                if (!Model.Id_Personal.HasValue || Model.Id_Personal.Value == Guid.Empty)
-                {
-                    Logger.LogError("=== CRITICAL: IsEditMode=true but Id_Personal is invalid! ===");
-                    HasError = true;
-                    ErrorMessage = "ID invalid pentru editare";
-                    IsSaving = false;
-                    await InvokeAsync(StateHasChanged);
-                    return;
-                }
-                
-                Logger.LogInformation("Updating personal with ID: {PersonalId}", Model.Id_Personal.Value);
-                
-                var command = new UpdatePersonalCommand
-                {
-                    Id_Personal = Model.Id_Personal.Value,
+       if (Model.IsEditMode)
+      {
+             if (!Model.Id_Personal.HasValue || Model.Id_Personal.Value == Guid.Empty)
+   {
+    Logger.LogError("=== CRITICAL: IsEditMode=true but Id_Personal is invalid! ===");
+      HasError = true;
+         ErrorMessage = "ID invalid pentru editare";
+     IsSaving = false;
+       await InvokeAsync(StateHasChanged);
+       return;
+       }
+       
+      Logger.LogInformation("Updating personal with ID: {PersonalId}", Model.Id_Personal.Value);
+            
+ var command = new UpdatePersonalCommand
+      {
+          Id_Personal = Model.Id_Personal.Value,
                     Cod_Angajat = Model.Cod_Angajat,
-                    Nume = Model.Nume,
-                    Prenume = Model.Prenume,
-                    Nume_Anterior = Model.Nume_Anterior,
-                    CNP = Model.CNP,
-                    Data_Nasterii = Model.Data_Nasterii,
-                    Locul_Nasterii = Model.Locul_Nasterii,
-                    Nationalitate = Model.Nationalitate,
-                    Cetatenie = Model.Cetatenie,
-                    Telefon_Personal = Model.Telefon_Personal,
-                    Telefon_Serviciu = Model.Telefon_Serviciu,
-                    Email_Personal = Model.Email_Personal,
-                    Email_Serviciu = Model.Email_Serviciu,
-                    Adresa_Domiciliu = Model.Adresa_Domiciliu,
-                    Judet_Domiciliu = Model.Judet_Domiciliu,
-                    Oras_Domiciliu = Model.Oras_Domiciliu,
-                    Cod_Postal_Domiciliu = Model.Cod_Postal_Domiciliu,
-                    Adresa_Resedinta = Model.Adresa_Resedinta,
-                    Judet_Resedinta = Model.Judet_Resedinta,
-                    Oras_Resedinta = Model.Oras_Resedinta,
-                    Cod_Postal_Resedinta = Model.Cod_Postal_Resedinta,
-                    Stare_Civila = Model.Stare_Civila,
-                    Functia = Model.Functia,
-                    Departament = Model.Departament,
-                    Serie_CI = Model.Serie_CI,
-                    Numar_CI = Model.Numar_CI,
-                    Eliberat_CI_De = Model.Eliberat_CI_De,
-                    Data_Eliberare_CI = Model.Data_Eliberare_CI,
-                    Valabil_CI_Pana = Model.Valabil_CI_Pana,
-                    Status_Angajat = Model.Status_Angajat,
-                    Observatii = Model.Observatii,
-                    ModificatDe = "CurrentUser"
+        Nume = Model.Nume,
+        Prenume = Model.Prenume,
+           Nume_Anterior = Model.Nume_Anterior,
+ CNP = Model.CNP,
+Data_Nasterii = Model.Data_Nasterii,
+      Locul_Nasterii = Model.Locul_Nasterii,
+            Nationalitate = Model.Nationalitate,
+           Cetatenie = Model.Cetatenie,
+Telefon_Personal = Model.Telefon_Personal,
+      Telefon_Serviciu = Model.Telefon_Serviciu,
+    Email_Personal = Model.Email_Personal,
+        Email_Serviciu = Model.Email_Serviciu,
+          Adresa_Domiciliu = Model.Adresa_Domiciliu,
+   Judet_Domiciliu = Model.Judet_Domiciliu,
+        Oras_Domiciliu = Model.Oras_Domiciliu,
+ Cod_Postal_Domiciliu = Model.Cod_Postal_Domiciliu,
+    Adresa_Resedinta = Model.Adresa_Resedinta,
+                  Judet_Resedinta = Model.Judet_Resedinta,
+   Oras_Resedinta = Model.Oras_Resedinta,
+     Cod_Postal_Resedinta = Model.Cod_Postal_Resedinta,
+             Stare_Civila = Model.Stare_Civila,
+          Functia = Model.Functia,
+   Departament = Model.Departament,
+           Serie_CI = Model.Serie_CI,
+       Numar_CI = Model.Numar_CI,
+   Eliberat_CI_De = Model.Eliberat_CI_De,
+         Data_Eliberare_CI = Model.Data_Eliberare_CI,
+  Valabil_CI_Pana = Model.Valabil_CI_Pana,
+       Status_Angajat = Model.Status_Angajat,
+Observatii = Model.Observatii,
+        ModificatDe = "CurrentUser"
+};
+
+       var result = await Mediator.Send(command);
+     
+     if (result.IsSuccess)
+     {
+Logger.LogInformation("=== SUCCESS: Personal updated: {PersonalId} ===", Model.Id_Personal);
+         
+     // Trigger parent event - parent will handle navigation/reload
+        if (OnPersonalSaved.HasDelegate)
+ {
+     await OnPersonalSaved.InvokeAsync();
+  }
+          
+                    // Close modal after parent processes the event
+      await Close();
+    }
+        else
+                {
+            HasError = true;
+  ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare la actualizare" });
+ Logger.LogWarning("Failed to update personal: {Error}", ErrorMessage);
+      }
+}
+        else
+            {
+     Logger.LogInformation("Creating new personal");
+    
+     var command = new CreatePersonalCommand
+    {
+        Cod_Angajat = Model.Cod_Angajat,
+         Nume = Model.Nume,
+           Prenume = Model.Prenume,
+        Nume_Anterior = Model.Nume_Anterior,
+        CNP = Model.CNP,
+   Data_Nasterii = Model.Data_Nasterii,
+   Locul_Nasterii = Model.Locul_Nasterii,
+     Nationalitate = Model.Nationalitate,
+     Cetatenie = Model.Cetatenie,
+              Telefon_Personal = Model.Telefon_Personal,
+      Telefon_Serviciu = Model.Telefon_Serviciu,
+        Email_Personal = Model.Email_Personal,
+   Email_Serviciu = Model.Email_Serviciu,
+    Adresa_Domiciliu = Model.Adresa_Domiciliu,
+        Judet_Domiciliu = Model.Judet_Domiciliu,
+    Oras_Domiciliu = Model.Oras_Domiciliu,
+          Cod_Postal_Domiciliu = Model.Cod_Postal_Domiciliu,
+ Adresa_Resedinta = Model.Adresa_Resedinta,
+            Judet_Resedinta = Model.Judet_Resedinta,
+          Oras_Resedinta = Model.Oras_Resedinta,
+       Cod_Postal_Resedinta = Model.Cod_Postal_Resedinta,
+           Stare_Civila = Model.Stare_Civila,
+             Functia = Model.Functia,
+    Departament = Model.Departament,
+           Serie_CI = Model.Serie_CI,
+ Numar_CI = Model.Numar_CI,
+         Eliberat_CI_De = Model.Eliberat_CI_De,
+         Data_Eliberare_CI = Model.Data_Eliberare_CI,
+           Valabil_CI_Pana = Model.Valabil_CI_Pana,
+              Status_Angajat = Model.Status_Angajat,
+   Observatii = Model.Observatii,
+        CreatDe = "CurrentUser"
                 };
 
-                var result = await Mediator.Send(command);
-                
-                if (result.IsSuccess)
-                {
-                    Logger.LogInformation("=== SUCCESS: Personal updated: {PersonalId} ===", Model.Id_Personal);
-                    
-                    if (OnPersonalSaved.HasDelegate)
-                    {
-                        await OnPersonalSaved.InvokeAsync();
-                    }
-                    
-                    await Close();
-                }
-                else
-                {
-                    HasError = true;
-                    ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare la actualizare" });
-                    Logger.LogWarning("Failed to update personal: {Error}", ErrorMessage);
-                }
+       var result = await Mediator.Send(command);
+    
+        if (result.IsSuccess)
+         {
+     Logger.LogInformation("=== SUCCESS: Personal created: {PersonalId} ===", result.Value);
+  
+        // Trigger parent event - parent will handle navigation/reload
+       if (OnPersonalSaved.HasDelegate)
+    {
+        await OnPersonalSaved.InvokeAsync();
             }
-            else
-            {
-                Logger.LogInformation("Creating new personal");
-                
-                var command = new CreatePersonalCommand
-                {
-                    Cod_Angajat = Model.Cod_Angajat,
-                    Nume = Model.Nume,
-                    Prenume = Model.Prenume,
-                    Nume_Anterior = Model.Nume_Anterior,
-                    CNP = Model.CNP,
-                    Data_Nasterii = Model.Data_Nasterii,
-                    Locul_Nasterii = Model.Locul_Nasterii,
-                    Nationalitate = Model.Nationalitate,
-                    Cetatenie = Model.Cetatenie,
-                    Telefon_Personal = Model.Telefon_Personal,
-                    Telefon_Serviciu = Model.Telefon_Serviciu,
-                    Email_Personal = Model.Email_Personal,
-                    Email_Serviciu = Model.Email_Serviciu,
-                    Adresa_Domiciliu = Model.Adresa_Domiciliu,
-                    Judet_Domiciliu = Model.Judet_Domiciliu,
-                    Oras_Domiciliu = Model.Oras_Domiciliu,
-                    Cod_Postal_Domiciliu = Model.Cod_Postal_Domiciliu,
-                    Adresa_Resedinta = Model.Adresa_Resedinta,
-                    Judet_Resedinta = Model.Judet_Resedinta,
-                    Oras_Resedinta = Model.Oras_Resedinta,
-                    Cod_Postal_Resedinta = Model.Cod_Postal_Resedinta,
-                    Stare_Civila = Model.Stare_Civila,
-                    Functia = Model.Functia,
-                    Departament = Model.Departament,
-                    Serie_CI = Model.Serie_CI,
-                    Numar_CI = Model.Numar_CI,
-                    Eliberat_CI_De = Model.Eliberat_CI_De,
-                    Data_Eliberare_CI = Model.Data_Eliberare_CI,
-                    Valabil_CI_Pana = Model.Valabil_CI_Pana,
-                    Status_Angajat = Model.Status_Angajat,
-                    Observatii = Model.Observatii,
-                    CreatDe = "CurrentUser"
-                };
-
-                var result = await Mediator.Send(command);
-                
-                if (result.IsSuccess)
-                {
-                    Logger.LogInformation("=== SUCCESS: Personal created: {PersonalId} ===", result.Value);
-                    
-                    if (OnPersonalSaved.HasDelegate)
-                    {
-                        await OnPersonalSaved.InvokeAsync();
-                    }
-                    
-                    await Close();
-                }
-                else
-                {
-                    HasError = true;
-                    ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare la creare" });
-                    Logger.LogWarning("Failed to create personal: {Error}", ErrorMessage);
-                }
-            }
+ 
+        // Close modal after parent processes the event
+  await Close();
+     }
+     else
+     {
+              HasError = true;
+        ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare la creare" });
+            Logger.LogWarning("Failed to create personal: {Error}", ErrorMessage);
+      }
+}
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "=== ERROR in HandleSubmit ===");
+  Logger.LogError(ex, "=== ERROR in HandleSubmit ===");
             HasError = true;
-            ErrorMessage = $"Eroare la salvare: {ex.Message}";
+        ErrorMessage = $"Eroare la salvare: {ex.Message}";
         }
         finally
         {
             IsSaving = false;
-            await InvokeAsync(StateHasChanged);
+await InvokeAsync(StateHasChanged);
         }
     }
 }

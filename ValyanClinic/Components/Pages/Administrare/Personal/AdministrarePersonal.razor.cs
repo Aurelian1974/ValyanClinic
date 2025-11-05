@@ -16,6 +16,11 @@ namespace ValyanClinic.Components.Pages.Administrare.Personal;
 
 public partial class AdministrarePersonal : ComponentBase, IDisposable
 {
+    // CRITICAL: Static lock pentru ABSOLUTE protection între componente
+    private static readonly object _initLock = new object();
+    private static bool _anyInstanceInitializing = false;
+    private static string? _initializingComponentName = null; // Track CARE componentă inițializează
+    
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<AdministrarePersonal> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -72,6 +77,8 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     private CancellationTokenSource? _searchDebounceTokenSource;
     private const int SearchDebounceMs = 500;
     private bool _disposed = false;
+    private bool _initialized = false;
+    private bool _isInitializing = false;
 
     // CACHED Filter Options - loaded once
     private List<FilterOption> StatusOptions { get; set; } = new();
@@ -100,50 +107,212 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            Logger.LogInformation("Initializare pagina Administrare Personal cu SERVER-SIDE paging");
-            
-            // Load filter options first (cached)
-            await LoadFilterOptionsFromServer();
-            
-            // Load first page
-            await LoadPagedData();
-        }
-        catch (ObjectDisposedException ex)
-        {
-            Logger.LogWarning(ex, "Component disposed during initialization (navigation away)");
-            // Don't set error state - user navigated away
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Eroare la initializarea componentei");
-            HasError = true;
-            ErrorMessage = $"Eroare la initializare: {ex.Message}";
-            IsLoading = false;
-        }
+        var startTime = DateTime.Now;
+  var threadId = Thread.CurrentThread.ManagedThreadId;
+     var componentName = "[AdministrarePersonal]";
+     
+        Logger.LogWarning("🟢 {Component} OnInitializedAsync START - Time: {Time}, Thread: {ThreadId}", 
+        componentName, startTime.ToString("HH:mm:ss.fff"), threadId);
+      
+  // CRITICAL: GLOBAL lock la nivel de aplicație cu retry logic
+   bool canProceed = false;
+        int retryCount = 0;
+  const int maxRetries = 10;
+        
+        while (!canProceed && retryCount < maxRetries)
+{
+            lock (_initLock)
+         {
+          if (_anyInstanceInitializing)
+      {
+         Logger.LogWarning("🔴 {Component} BLOCKED - Another component is initializing: {Other} - Retry {Retry}/{Max} - Time: {Time}", 
+     componentName, _initializingComponentName, retryCount + 1, maxRetries, DateTime.Now.ToString("HH:mm:ss.fff"));
+            }
+      else if (_initialized || _isInitializing)
+         {
+                Logger.LogWarning("🔴 {Component} SKIPPED - This instance already initialized - Time: {Time}", 
+    componentName, DateTime.Now.ToString("HH:mm:ss.fff"));
+      return;
     }
+     else
+ {
+    _isInitializing = true;
+   _anyInstanceInitializing = true;
+       _initializingComponentName = componentName;
+  canProceed = true;
+            
+    Logger.LogWarning("🟡 {Component} Lock acquired - Starting init - Time: {Time}", 
+    componentName, DateTime.Now.ToString("HH:mm:ss.fff"));
+            }
+       }
+
+    if (!canProceed)
+       {
+retryCount++;
+          await Task.Delay(100); // Wait 100ms before retry
+    }
+     }
+     
+        if (!canProceed)
+     {
+         Logger.LogError("❌ {Component} FAILED to acquire lock after {Retries} retries - ABORTING", 
+        componentName, maxRetries);
+   return;
+        }
+
+   try
+{
+       // CRITICAL: Delay MĂRIT pentru siguranță maximă
+    Logger.LogWarning("⏳ {Component} Waiting 1200ms for previous component cleanup - Time: {Time}", 
+    componentName, DateTime.Now.ToString("HH:mm:ss.fff"));
+     
+         await Task.Delay(1200); // MĂRIT de la 800ms la 1200ms
+        
+      Logger.LogWarning("✅ {Component} Delay complete - Time: {Time}, Elapsed: {Elapsed}ms", 
+   componentName, DateTime.Now.ToString("HH:mm:ss.fff"), (DateTime.Now - startTime).TotalMilliseconds);
+     
+            Logger.LogInformation("Initializare pagina Administrare Personal cu SERVER-SIDE paging");
+   
+  // Load filter options first (cached)
+          Logger.LogWarning("📊 {Component} Loading filter options - Time: {Time}", 
+    componentName, DateTime.Now.ToString("HH:mm:ss.fff"));
+        await LoadFilterOptionsFromServer();
+   
+       Logger.LogWarning("📊 {Component} Filter options loaded - Time: {Time}", 
+   componentName, DateTime.Now.ToString("HH:mm:ss.fff"));
+  
+       // Load first page
+          Logger.LogWarning("📄 {Component} Loading paged data - Time: {Time}", 
+ componentName, DateTime.Now.ToString("HH:mm:ss.fff"));
+  await LoadPagedData();
+         
+          Logger.LogWarning("📄 {Component} Paged data loaded - Time: {Time}", 
+    componentName, DateTime.Now.ToString("HH:mm:ss.fff"));
+  
+      _initialized = true;
+     
+      Logger.LogWarning("✅ {Component} OnInitializedAsync COMPLETE - Time: {Time}, Total elapsed: {Elapsed}ms", 
+          componentName, DateTime.Now.ToString("HH:mm:ss.fff"), (DateTime.Now - startTime).TotalMilliseconds);
+  }
+ catch (ObjectDisposedException ex)
+      {
+    Logger.LogWarning("⚠️ {Component} Component disposed during init - Time: {Time}, Message: {Message}", 
+    componentName, DateTime.Now.ToString("HH:mm:ss.fff"), ex.Message);
+    }
+   catch (Exception ex)
+      {
+     Logger.LogError(ex, "❌ {Component} ERROR during init - Time: {Time}", 
+   componentName, DateTime.Now.ToString("HH:mm:ss.fff"));
+    HasError = true;
+     ErrorMessage = $"Eroare la initializare: {ex.Message}";
+   IsLoading = false;
+        }
+ finally
+     {
+ lock (_initLock)
+ {
+ _isInitializing = false;
+       _anyInstanceInitializing = false;
+   _initializingComponentName = null;
+ 
+   Logger.LogWarning("🔓 {Component} Lock released - Time: {Time}", 
+         componentName, DateTime.Now.ToString("HH:mm:ss.fff"));
+      }
+   }
+  }
 
     public void Dispose()
     {
-        if (_disposed) return;
+        var disposeTime = DateTime.Now;
+  var threadId = Thread.CurrentThread.ManagedThreadId;
+     
+      Logger.LogWarning("🔴 [AdministrarePersonal] Dispose START - Time: {Time}, Thread: {ThreadId}, Already disposed: {Disposed}", 
+    disposeTime.ToString("HH:mm:ss.fff"), threadId, _disposed);
         
+        if (_disposed)
+        {
+            Logger.LogWarning("⚠️ [AdministrarePersonal] Already disposed - SKIPPING - Time: {Time}", 
+      DateTime.Now.ToString("HH:mm:ss.fff"));
+            return;
+        }
+        
+        // Setează flag imediat pentru a bloca noi operații
+        _disposed = true;
+        
+        Logger.LogWarning("🚫 [AdministrarePersonal] _disposed flag set to TRUE - Time: {Time}", 
+            DateTime.Now.ToString("HH:mm:ss.fff"));
+ 
+        // CRITICAL: Cleanup SINCRON - Cu logging detaliat pentru debugging
         try
         {
-            _searchDebounceTokenSource?.Cancel();
-            _searchDebounceTokenSource?.Dispose();
-            _searchDebounceTokenSource = null;
+            Logger.LogDebug("🧹 [AdministrarePersonal] SYNC cleanup START - Time: {Time}", 
+     DateTime.Now.ToString("HH:mm:ss.fff"));
+     
+            // 🔍 INVESTIGAȚIE: Log DOM state ÎNAINTE de cleanup
+            Logger.LogWarning("🔍 [AdministrarePersonal] Pre-cleanup state:");
+       Logger.LogWarning("   - GridRef: {GridRefState}", GridRef != null ? "EXISTS" : "NULL");
+ Logger.LogWarning("   - ToastRef: {ToastRefState}", ToastRef != null ? "EXISTS" : "NULL");
+            Logger.LogWarning("   - CurrentPageData count: {DataCount}", CurrentPageData?.Count ?? 0);
+     
+     // Check if modals are still attached
+    Logger.LogWarning("   - personalViewModal: {ViewModalState}", personalViewModal != null ? "EXISTS" : "NULL");
+  Logger.LogWarning("   - personalFormModal: {FormModalState}", personalFormModal != null ? "EXISTS" : "NULL");
+  Logger.LogWarning("   - confirmDeleteModal: {DeleteModalState}", confirmDeleteModal != null ? "EXISTS" : "NULL");
+       
+ // ❌ NU MAI setăm GridRef = null! Lăsăm Blazor să gestioneze
+     // GridRef = null; // REMOVED - causes JavaScript callback errors
             
-            Logger.LogDebug("AdministrarePersonal disposed successfully");
+            if (GridRef != null)
+            {
+                Logger.LogDebug("ℹ️ [AdministrarePersonal] GridRef exists - letting Blazor handle disposal - Time: {Time}", 
+  DateTime.Now.ToString("HH:mm:ss.fff"));
+                
+         // 🔍 INVESTIGAȚIE: Try to log Grid ID if possible
+     try
+     {
+    Logger.LogWarning("   - Grid element ID: personal-grid");
+        }
+        catch (Exception ex)
+     {
+        Logger.LogWarning("   - Could not read Grid ID: {Error}", ex.Message);
+    }
+ }
+            
+// Cancel orice operații în curs
+    if (_searchDebounceTokenSource != null)
+            {
+        Logger.LogDebug("❌ [AdministrarePersonal] Cancelling search token - Time: {Time}", 
+ DateTime.Now.ToString("HH:mm:ss.fff"));
+      _searchDebounceTokenSource?.Cancel();
+                _searchDebounceTokenSource?.Dispose();
+          _searchDebounceTokenSource = null;
+       }
+       
+      // Clear data IMEDIAT
+          var dataCount = CurrentPageData?.Count ?? 0;
+Logger.LogDebug("🗑️ [AdministrarePersonal] Clearing {Count} data items - Time: {Time}", 
+        dataCount, DateTime.Now.ToString("HH:mm:ss.fff"));
+    CurrentPageData?.Clear();
+     CurrentPageData = new();
+            
+       // 🔍 INVESTIGAȚIE: Log state DUPĂ cleanup
+      Logger.LogWarning("🔍 [AdministrarePersonal] Post-cleanup state:");
+          Logger.LogWarning("   - Data cleared: TRUE");
+            Logger.LogWarning("   - CurrentPageData count: {Count}", CurrentPageData?.Count ?? 0);
+            
+      Logger.LogDebug("✅ [AdministrarePersonal] SYNC cleanup COMPLETE - Time: {Time}, Elapsed: {Elapsed}ms", 
+     DateTime.Now.ToString("HH:mm:ss.fff"), (DateTime.Now - disposeTime).TotalMilliseconds);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Eroare la dispose-ul AdministrarePersonal");
-        }
-        finally
-        {
-            _disposed = true;
-        }
+         Logger.LogError(ex, "❌ [AdministrarePersonal] ERROR in sync dispose - Time: {Time}", 
+                DateTime.Now.ToString("HH:mm:ss.fff"));
+  }
+        
+        // CRITICAL: NU MAI AVEM NEVOIE de async cleanup pentru GridRef
+        // Blazor va gestiona disposal-ul componentelor JavaScript automat
+        Logger.LogWarning("🏁 [AdministrarePersonal] Dispose END - Time: {Time}, Total elapsed: {Elapsed}ms (Natural Blazor disposal will handle GridRef)", 
+ DateTime.Now.ToString("HH:mm:ss.fff"), (DateTime.Now - disposeTime).TotalMilliseconds);
     }
 
     // SERVER-SIDE PAGING: Load data pentru pagina curenta
@@ -663,16 +832,53 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
     private async Task HandlePersonalSaved()
     {
         if (_disposed) return;
+      
+ Logger.LogInformation("🎉 Personal salvat - FORCING component re-initialization");
+ 
+        // ❌ NU reîncărcăm doar datele! Asta lasă DOM-ul în stare inconsistentă
+        // ✅ Force COMPLETE re-initialization prin navigare
+
+     // 🔄 STRATEGY: Navigate AWAY și apoi BACK pentru a forța re-render complet
+     try
+    {
+    // 1️⃣ Wait pentru modal să se închidă complet
+    Logger.LogInformation("⏳ Waiting 700ms for modal close...");
+    await Task.Delay(700);
+ 
+         if (_disposed) return;
+          
+      // 2️⃣ Show loading state
+     IsLoading = true;
+     await InvokeAsync(StateHasChanged);
+      
+            // 3️⃣ Force navigation to SAME page (triggers full re-init)
+            Logger.LogInformation("🔄 Force navigation to trigger re-initialization");
+            NavigationManager.NavigateTo("/administrare/personal", forceLoad: true);
         
-        LogOperation("Personal salvat", additionalInfo: "Reincarcam datele");
-        
-        // Invalidate cached filter options
-        FilterOptionsLoaded = false;
-        await LoadFilterOptionsFromServer();
-        
-        await LoadPagedData();
-        await ShowSuccessToastAsync("Personal salvat cu succes");
+            // Note: forceLoad: true forces a FULL page reload, not just component refresh
+     // This clears ALL Blazor state and starts fresh - exactly like F5!
+        }
+        catch (Exception ex)
+        {
+      Logger.LogError(ex, "Error during forced re-initialization");
+      
+            // Fallback: Reload data normally if navigation fails
+  if (!_disposed)
+       {
+ FilterOptionsLoaded = false;
+      await LoadFilterOptionsFromServer();
+   await LoadPagedData();
+                await ShowSuccessToastAsync("Personal salvat cu succes");
     }
+        }
+        finally
+   {
+            if (!_disposed)
+            {
+       IsLoading = false;
+         }
+        }
+ }
 
     private async Task HandleDeleteConfirmed(Guid personalId)
     {
@@ -871,15 +1077,38 @@ public partial class AdministrarePersonal : ComponentBase, IDisposable
 
     private async Task ShowToast(string title, string content, string cssClass)
     {
-        if (_disposed) return;
+        if (_disposed) return; // Guard check
         
-        ToastTitle = title;
-        ToastContent = content;
-        ToastCssClass = cssClass;
-
-        if (ToastRef != null)
+        if (ToastRef == null)
         {
-            await ToastRef.ShowAsync();
+     Logger.LogWarning("ToastRef is null, cannot show toast");
+   return;
+ }
+
+        try
+        {
+            // CRITICAL: Folosește ToastModel pentru a asigura că datele sunt transmise corect
+       var toastModel = new ToastModel
+      {
+       Title = title,
+   Content = content,
+     CssClass = cssClass,
+       ShowCloseButton = true,
+   Timeout = 3000
+ };
+
+   Logger.LogDebug("Showing toast: Title='{Title}', Content='{Content}', CssClass='{CssClass}'", 
+                title, content, cssClass);
+
+            await ToastRef.ShowAsync(toastModel);
+   }
+    catch (ObjectDisposedException)
+       {
+      Logger.LogDebug("Toast reference disposed");
+        }
+        catch (Exception ex)
+ {
+       Logger.LogError(ex, "Error showing toast");
         }
     }
 

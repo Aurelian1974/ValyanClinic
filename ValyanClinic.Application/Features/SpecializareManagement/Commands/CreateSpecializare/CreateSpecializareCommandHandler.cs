@@ -23,7 +23,7 @@ public class CreateSpecializareCommandHandler : IRequestHandler<CreateSpecializa
     {
         try
         {
-            _logger.LogInformation("Creating Specializare: {Denumire}", request.Denumire);
+            _logger.LogInformation("🔄 HANDLER: Creating Specializare: {Denumire}", request.Denumire);
 
             var specializare = new Specializare
             {
@@ -38,20 +38,36 @@ public class CreateSpecializareCommandHandler : IRequestHandler<CreateSpecializa
                 ModificatDe = request.CreatDe
             };
 
-            var createdSpecializare = await _repository.CreateAsync(specializare, cancellationToken);
+            _logger.LogInformation("🔄 HANDLER: Calling repository.CreateAsync...");
+            var createdId = await _repository.CreateAsync(specializare, cancellationToken);
 
-            if (createdSpecializare == null)
+            if (createdId == Guid.Empty)
             {
-                _logger.LogWarning("Failed to create Specializare: {Denumire}", request.Denumire);
+                _logger.LogWarning("❌ HANDLER: Repository returned empty GUID - create failed");
                 return Result<Guid>.Failure(new List<string> { "Crearea specializarii a esuat" });
             }
 
-            _logger.LogInformation("Specializare created successfully: {Id}", createdSpecializare.Id);
-            return Result<Guid>.Success(createdSpecializare.Id);
+            _logger.LogInformation("✅ HANDLER: Specializare created successfully: {Id}", createdId);
+            return Result<Guid>.Success(createdId);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError(ex, "❌ HANDLER: ArgumentException creating Specializare: {Denumire}", request.Denumire);
+            _logger.LogError("❌ HANDLER: ArgumentException Message: {Message}", ex.Message);
+            return Result<Guid>.Failure(new List<string> { ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "❌ HANDLER: InvalidOperationException creating Specializare: {Denumire}", request.Denumire);
+            _logger.LogError("❌ HANDLER: InvalidOperationException Message: {Message}", ex.Message);
+            return Result<Guid>.Failure(new List<string> { ex.Message });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating Specializare: {Denumire}", request.Denumire);
+            _logger.LogError(ex, "❌ HANDLER: Exception creating Specializare: {Denumire}", request.Denumire);
+            _logger.LogError("❌ HANDLER: Exception Type: {Type}", ex.GetType().Name);
+            _logger.LogError("❌ HANDLER: Exception Message: {Message}", ex.Message);
+
             return Result<Guid>.Failure(new List<string> { ex.Message });
         }
     }

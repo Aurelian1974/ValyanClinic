@@ -90,9 +90,10 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
         try
         {
-            // CRITICAL: Delay pentru a permite componentei anterioare să facă cleanup COMPLET
+            // CRITICAL: Delay MĂRIT pentru a permite componentei anterioare să facă cleanup COMPLET
+            // Syncfusion Grid necesită timp suplimentar pentru cleanup DOM - mărit de la 200ms la 800ms
             Logger.LogInformation("Waiting for previous component cleanup...");
-            await Task.Delay(200);
+            await Task.Delay(800); // MĂRIT de la 200ms la 800ms pentru Syncfusion Grid cleanup
             
             Logger.LogInformation("Initializare pagina Administrare Departamente");
             await LoadPagedData();
@@ -397,19 +398,47 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
 
     private async Task HandleDepartamentSaved()
     {
-        if (_disposed) return; // Guard check
+        if (_disposed) return;
+      
+        Logger.LogInformation("🎉 Departament saved - FORCING component re-initialization");
+ 
+        try
+        {
+            // 1️⃣ Wait for modal to close completely
+            Logger.LogInformation("⏳ Waiting 700ms for modal close...");
+            await Task.Delay(700);
+ 
+            if (_disposed) return;
+      
+            // 2️⃣ Show loading state
+            IsLoading = true;
+            await InvokeAsync(StateHasChanged);
+      
+            // 3️⃣ Force navigation to SAME page (triggers full re-init)
+            Logger.LogInformation("🔄 Force navigation to trigger re-initialization");
+         NavigationManager.NavigateTo("/administrare/departamente", forceLoad: true);
         
-        Logger.LogInformation("Departament saved - reloading data");
-        
-        // CRITICAL: Delay pentru a permite modal-ului să se închidă complet
-        await Task.Delay(300);
-        
-        if (_disposed) return; // Check again after delay
-        
-        await LoadPagedData();
-        
-        // Toast doar după ce modal este închis și datele sunt reîncărcate
-        await ShowToast("Succes", "Departament salvat cu succes", "e-toast-success");
+            // Note: forceLoad: true forces a FULL page reload, not just component refresh
+       // This clears ALL Blazor state and starts fresh - exactly like F5!
+        }
+   catch (Exception ex)
+        {
+          Logger.LogError(ex, "Error during forced re-initialization");
+      
+   // Fallback: Reload data normally if navigation fails
+       if (!_disposed)
+        {
+    await LoadPagedData();
+    await ShowToast("Succes", "Departament salvat cu succes", "e-toast-success");
+            }
+        }
+        finally
+        {
+            if (!_disposed)
+            {
+        IsLoading = false;
+  }
+        }
     }
 
     private async Task HandleEditFromView(Guid departamentId)
