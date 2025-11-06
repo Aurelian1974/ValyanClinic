@@ -5,19 +5,14 @@ namespace ValyanClinic.DevSupport
 {
     public class AdminPasswordHashFix
     {
-      // Updated connection string to use ERP instance where ValyanMed exists
-        private const string ConnectionString = "Server=DESKTOP-3Q8HI82\\ERP;Database=ValyanMed;Integrated Security=True;TrustServerCertificate=True;";
+        // Updated connection string to use ERP instance where ValyanMed exists
+  private const string ConnectionString = "Server=DESKTOP-3Q8HI82\\ERP;Database=ValyanMed;Integrated Security=True;TrustServerCertificate=True;";
 
-        // Entry point for console application
-        public static void Main(string[] args)
-        {
-            Execute();
-        }
-
-        // Removed Main method to avoid multiple entry point conflict
-        // Use Execute() instead
- public static void Execute()
-        {
+        // Removed Main method - use Execute() directly or from C# Interactive
+        // Entry point conflict cu Program.cs
+        
+        public static void Execute()
+   {
             Console.WriteLine("============================================");
             Console.WriteLine("VALYANMED - FIX ADMIN PASSWORD HASH");
             Console.WriteLine("============================================");

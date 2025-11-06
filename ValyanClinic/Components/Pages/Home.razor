@@ -1,4 +1,6 @@
 ﻿@page "/dashboard"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@rendermode InteractiveServer
 
 <PageTitle>ValyanClinic - Acasa</PageTitle>
 
@@ -6,7 +8,7 @@
     <div class="welcome-section">
         <div class="welcome-header">
             <div>
-                <h1>👋 Buna, Dr. Admin!</h1>
+                <h1>@UserGreeting</h1>
                 <p class="subtitle">Iata o privire de ansamblu asupra activitatii de astazi</p>
             </div>
             <div class="date-info">

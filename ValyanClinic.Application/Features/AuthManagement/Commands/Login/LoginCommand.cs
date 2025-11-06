@@ -20,6 +20,7 @@ public record LoginCommand : IRequest<Result<LoginResultDto>>
 public class LoginResultDto
 {
     public Guid UtilizatorID { get; set; }
+    public Guid PersonalMedicalID { get; set; } // ✅ NOU: Pentru a afișa datele din PersonalMedical
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Rol { get; set; } = string.Empty;

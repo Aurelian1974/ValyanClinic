@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using ValyanClinic.Application.Features.AuthManagement.Commands.Login;
 using ValyanClinic.Services.Authentication;
 
 namespace ValyanClinic.Components.Pages.Auth;
@@ -15,6 +14,7 @@ public partial class Login : ComponentBase
     [Inject] private ILogger<Login> Logger { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private CustomAuthenticationStateProvider AuthStateProvider { get; set; } = default!;
+    [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; } = default!;
 
     // State
     private LoginFormModel LoginModel { get; set; } = new();
@@ -46,58 +46,49 @@ public partial class Login : ComponentBase
         {
             Logger.LogInformation("Attempting login for user: {Username}", LoginModel.Username);
 
-            var command = new LoginCommand
-            {
-                Username = LoginModel.Username,
-                Password = LoginModel.Password,
-                RememberMe = LoginModel.RememberMe,
-                ResetPasswordOnFirstLogin = LoginModel.ResetPasswordOnFirstLogin
-            };
+            // Call API through JavaScript to ensure cookies are handled properly
+            // NOTE: RememberMe nu se trimite la API - e doar pentru salvare username în localStorage
+            var result = await JSRuntime.InvokeAsync<LoginResult>("ValyanAuth.login",
+                 LoginModel.Username,
+               LoginModel.Password,
+                false, // RememberMe nu mai afectează cookie-ul (e întotdeauna session-only)
+          LoginModel.ResetPasswordOnFirstLogin);
 
-            var result = await Mediator.Send(command);
-
-            if (result.IsSuccess && result.Value != null)
+            if (result?.Success == true && result.Data != null)
             {
                 Logger.LogInformation("Login successful for user: {Username}", LoginModel.Username);
 
-                // ✅ IMPORTANT: Marchează utilizatorul ca autentificat
-                await AuthStateProvider.MarkUserAsAuthenticated(
-                    result.Value.Username,
-                    result.Value.Email,
-                    result.Value.Rol,
-                    result.Value.UtilizatorID);
-
-                // Handle Remember Me
+                // Handle Remember Me - DOAR pentru username în localStorage
                 if (LoginModel.RememberMe)
                 {
                     await SaveUsername(LoginModel.Username);
+                    Logger.LogInformation("Username saved to localStorage (RememberMe checked)");
                 }
                 else
                 {
                     await ClearSavedUsername();
+                    Logger.LogInformation("Username cleared from localStorage (RememberMe unchecked)");
                 }
 
+                // Notify Blazor about authentication change
+                AuthStateProvider.NotifyAuthenticationChanged();
+
                 // Handle Password Reset on First Login
-                if (result.Value.RequiresPasswordReset)
+                if (result.Data.RequiresPasswordReset)
                 {
                     Logger.LogInformation("Password reset required for first login");
-                    // TODO: Navigate to password reset page
-                    // NavigationManager.NavigateTo("/reset-password");
-                    // return;
-
-                    // Temporary: Show message and continue
                     ErrorMessage = "Prima logare - ar trebui redirectionat la resetare parola";
                     await Task.Delay(2000);
                 }
 
-                // ✅ Redirect to dashboard
+                // Redirect to dashboard with full page reload
                 NavigationManager.NavigateTo("/dashboard", forceLoad: true);
             }
             else
             {
-                ErrorMessage = result.FirstError ?? "Eroare la autentificare";
+                ErrorMessage = result?.Message ?? "Eroare la autentificare";
                 Logger.LogWarning("Login failed for user: {Username}, Error: {Error}",
-                LoginModel.Username, ErrorMessage);
+              LoginModel.Username, ErrorMessage);
             }
         }
         catch (Exception ex)
@@ -120,7 +111,6 @@ public partial class Login : ComponentBase
     {
         Logger.LogInformation("Forgot password clicked");
         // TODO: Implement forgot password functionality
-        // NavigationManager.NavigateTo("/forgot-password");
     }
 
     #region LocalStorage Helpers
@@ -177,8 +167,29 @@ public partial class Login : ComponentBase
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Parola trebuie sa aiba intre 6 si 100 de caractere")]
         public string Password { get; set; } = string.Empty;
 
-        public bool RememberMe { get; set; } = true; // Default checked
+        // ✅ RememberMe = Salvează DOAR username-ul în localStorage (pentru convenience)
+        // ❌ NU salvează parola, NU menține sesiunea, NU creează cookie persistent
+        // Cookie-ul de autentificare este ÎNTOTDEAUNA session-only (se șterge la închiderea browser-ului)
+        public bool RememberMe { get; set; } = false;
 
-        public bool ResetPasswordOnFirstLogin { get; set; } = true; // Default checked
+        public bool ResetPasswordOnFirstLogin { get; set; } = true;
+    }
+
+    // DTOs for JavaScript interop
+    private class LoginResult
+    {
+        public bool Success { get; set; }
+        public LoginResponseData? Data { get; set; }
+        public string? Message { get; set; }
+    }
+
+    private class LoginResponseData
+    {
+        public bool Success { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; } = string.Empty;
+        public string Rol { get; } = string.Empty;
+        public Guid UtilizatorID { get; set; }
+        public bool RequiresPasswordReset { get; set; }
     }
 }

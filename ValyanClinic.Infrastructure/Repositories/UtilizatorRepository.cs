@@ -83,7 +83,53 @@ return (items, count);
     public async Task<Utilizator?> GetByIdAsync(Guid utilizatorID, CancellationToken cancellationToken = default)
     {
         var parameters = new { UtilizatorID = utilizatorID };
-        return await QueryFirstOrDefaultAsync<Utilizator>("sp_Utilizatori_GetById", parameters, cancellationToken);
+   
+        // ✅ FIX: Use Dapper multi-mapping to map both Utilizator and PersonalMedical
+        // The SP returns: UtilizatorID, PersonalMedicalID, Username, Email, ..., Nume, Prenume, Specializare, Departament, Pozitie, Telefon, EmailPersonalMedical
+        // After SQL fix, SP now returns Pozitie column as well
+     
+     using var connection = _connectionFactory.CreateConnection();
+   
+        var result = await connection.QueryAsync<Utilizator, PersonalMedicalData, Utilizator>(
+     "sp_Utilizatori_GetById",
+       (utilizator, personalMedical) =>
+ {
+      // Map PersonalMedical navigation property
+        if (personalMedical != null)
+    {
+            utilizator.PersonalMedical = new ValyanClinic.Domain.Entities.PersonalMedical
+        {
+           PersonalID = personalMedical.PersonalMedicalID,
+           Nume = personalMedical.Nume,
+           Prenume = personalMedical.Prenume,
+           Specializare = personalMedical.Specializare,
+           Departament = personalMedical.Departament,
+           Pozitie = personalMedical.Pozitie,
+           Telefon = personalMedical.Telefon,
+           Email = personalMedical.EmailPersonalMedical // ✅ FIX: Use correct property name
+             };
+          }
+    return utilizator;
+         },
+     parameters,
+            splitOn: "Nume", // Split the result set at the "Nume" column (first PersonalMedical column)
+       commandType: System.Data.CommandType.StoredProcedure);
+ 
+        return result.FirstOrDefault();
+    }
+    
+    // ✅ Helper class for mapping PersonalMedical data from SP
+    // NOTE: Property names MUST match the column names returned by the stored procedure EXACTLY
+    private class PersonalMedicalData
+    {
+        public Guid PersonalMedicalID { get; set; }
+        public string Nume { get; set; } = string.Empty;
+        public string Prenume { get; set; } = string.Empty;
+        public string? Specializare { get; set; }
+        public string? Departament { get; set; }
+        public string? Pozitie { get; set; }
+        public string? Telefon { get; set; }
+        public string? EmailPersonalMedical { get; set; } // ✅ FIX: MUST match SP column name exactly
     }
 
     public async Task<Utilizator?> GetByUsernameAsync(string username, CancellationToken cancellationToken = default)

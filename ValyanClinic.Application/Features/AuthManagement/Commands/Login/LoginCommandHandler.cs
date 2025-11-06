@@ -28,70 +28,72 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
     public async Task<Result<LoginResultDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         try
-        {
-            _logger.LogInformation("========== LoginCommandHandler START ==========");
-     _logger.LogInformation("Login attempt for username: {Username}", request.Username);
+ {
+ _logger.LogInformation("========== LoginCommandHandler START ==========");
+      _logger.LogInformation("Login attempt for username: {Username}", request.Username);
 
-     // 1. Găsește utilizatorul după username
-      var utilizator = await _utilizatorRepository.GetByUsernameAsync(request.Username, cancellationToken);
+            // 1. Găsește utilizatorul după username
+            var utilizator = await _utilizatorRepository.GetByUsernameAsync(request.Username, cancellationToken);
 
             if (utilizator == null)
-      {
-                _logger.LogWarning("Login failed: User not found - {Username}", request.Username);
-     return Result<LoginResultDto>.Failure("Nume de utilizator sau parola incorecte");
-}
+            {
+     _logger.LogWarning("Login failed: User not found - {Username}", request.Username);
+ return Result<LoginResultDto>.Failure("Nume de utilizator sau parola incorecte");
+            }
 
        // 2. Verifică dacă utilizatorul este activ
   if (!utilizator.EsteActiv)
+    {
+                _logger.LogWarning("Login failed: User is inactive - {Username}", request.Username);
+       return Result<LoginResultDto>.Failure("Contul este inactiv. Contactati administratorul.");
+     }
+
+          // 3. CRITICAL: Verifică ÎNAINTE de password verification dacă contul este blocat
+            if (utilizator.NumarIncercariEsuate >= 5 || utilizator.DataBlocare.HasValue)
       {
-            _logger.LogWarning("Login failed: User is inactive - {Username}", request.Username);
-return Result<LoginResultDto>.Failure("Contul este inactiv. Contactati administratorul.");
+    _logger.LogWarning("Login failed: Account locked - {Username}, FailedAttempts: {Attempts}, LockDate: {LockDate}", 
+request.Username, utilizator.NumarIncercariEsuate, utilizator.DataBlocare);
+         return Result<LoginResultDto>.Failure("Cont blocat din cauza prea multor incercari esuate. Contactati administratorul sau resetati parola.");
             }
 
-     // 3. Verifică parola (BCrypt face verificarea cu salt-ul inclus în hash)
-    var passwordValid = _passwordHasher.VerifyPassword(request.Password, utilizator.PasswordHash);
+            // 4. Verifică parola (BCrypt face verificarea cu salt-ul inclus în hash)
+          var passwordValid = _passwordHasher.VerifyPassword(request.Password, utilizator.PasswordHash);
 
-  if (!passwordValid)
-   {
-                _logger.LogWarning("Login failed: Invalid password - {Username}", request.Username);
+            if (!passwordValid)
+          {
+      _logger.LogWarning("Login failed: Invalid password - {Username}", request.Username);
 
         // Incrementează încercări eșuate
-        await _utilizatorRepository.IncrementIncercariEsuateAsync(utilizator.UtilizatorID, cancellationToken);
+     await _utilizatorRepository.IncrementIncercariEsuateAsync(utilizator.UtilizatorID, cancellationToken);
 
-   return Result<LoginResultDto>.Failure("Nume de utilizator sau parola incorecte");
-       }
-
-            // 4. Verifică dacă contul este blocat (> 5 încercări eșuate)
-    if (utilizator.NumarIncercariEsuate >= 5)
-            {
-      _logger.LogWarning("Login failed: Account locked due to too many failed attempts - {Username}", request.Username);
-                return Result<LoginResultDto>.Failure("Cont blocat din cauza prea multor incercari esuate. Contactati administratorul.");
+      return Result<LoginResultDto>.Failure("Nume de utilizator sau parola incorecte");
     }
 
-     // 5. Login SUCCESS - Actualizează ultima autentificare
-          await _utilizatorRepository.UpdateUltimaAutentificareAsync(utilizator.UtilizatorID, cancellationToken);
+      // 5. Login SUCCESS - Actualizează ultima autentificare
+    await _utilizatorRepository.UpdateUltimaAutentificareAsync(utilizator.UtilizatorID, cancellationToken);
 
-   _logger.LogInformation("Login successful for user: {Username}, Rol: {Rol}", request.Username, utilizator.Rol);
+            _logger.LogInformation("Login successful for user: {Username}, Rol: {Rol}", request.Username, utilizator.Rol);
 
-          // 6. Creează DTO rezultat
+            // 6. Creează DTO rezultat
         var result = new LoginResultDto
-   {
-    UtilizatorID = utilizator.UtilizatorID,
-        Username = utilizator.Username,
-       Email = utilizator.Email ?? string.Empty,
-          Rol = utilizator.Rol ?? "User",
-             RequiresPasswordReset = request.ResetPasswordOnFirstLogin && utilizator.DataUltimaAutentificare == null
-     };
+            {
+            UtilizatorID = utilizator.UtilizatorID,
+          PersonalMedicalID = utilizator.PersonalMedicalID, // ✅ NOU: Adaugă PersonalMedicalID
+          Username = utilizator.Username,
+          Email = utilizator.Email ?? string.Empty,
+         Rol = utilizator.Rol ?? "User",
+                RequiresPasswordReset = request.ResetPasswordOnFirstLogin && utilizator.DataUltimaAutentificare == null
+   };
 
-  _logger.LogInformation("========== LoginCommandHandler END (SUCCESS) ==========");
+     _logger.LogInformation("========== LoginCommandHandler END (SUCCESS) ==========");
 
             return Result<LoginResultDto>.Success(result, "Autentificare reusita");
-        }
+ }
         catch (Exception ex)
-        {
-     _logger.LogError(ex, "========== LoginCommandHandler EXCEPTION ==========");
-      _logger.LogError("Exception Type: {Type}", ex.GetType().FullName);
-        _logger.LogError("Exception Message: {Message}", ex.Message);
+{
+   _logger.LogError(ex, "========== LoginCommandHandler EXCEPTION ==========");
+         _logger.LogError("Exception Type: {Type}", ex.GetType().FullName);
+    _logger.LogError("Exception Message: {Message}", ex.Message);
 
             return Result<LoginResultDto>.Failure("A aparut o eroare la autentificare. Va rugam incercati din nou.");
         }

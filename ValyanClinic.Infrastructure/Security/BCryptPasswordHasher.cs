@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using BCrypt.Net;
+using Microsoft.Extensions.Logging;
 using ValyanClinic.Domain.Interfaces.Security;
 
 namespace ValyanClinic.Infrastructure.Security;
@@ -12,19 +13,30 @@ namespace ValyanClinic.Infrastructure.Security;
 public class BCryptPasswordHasher : IPasswordHasher
 {
     private const int WorkFactor = 12; // Securitate balansată (2025 standard)
+private readonly ILogger<BCryptPasswordHasher>? _logger;
     
-    /// <summary>
+    public BCryptPasswordHasher(ILogger<BCryptPasswordHasher>? logger = null)
+    {
+        _logger = logger;
+    }
+    
+  /// <summary>
     /// Hash-uiește parola folosind BCrypt Work Factor 12
     /// BCrypt generează automat salt-ul și îl include în hash
     /// </summary>
     public string HashPassword(string password)
- {
+    {
         if (string.IsNullOrEmpty(password))
             throw new ArgumentNullException(nameof(password), "Password cannot be null or empty");
-  
-   // BCrypt.HashPassword generează automat salt și returnează hash complet
-        // Format: $2a$12$[22 chars salt][31 chars hash]
-        return BCrypt.Net.BCrypt.HashPassword(password, WorkFactor);
+      
+     // BCrypt.HashPassword generează automat salt și returnează hash complet
+  // Format: $2a$12$[22 chars salt][31 chars hash]
+  var hash = BCrypt.Net.BCrypt.HashPassword(password, WorkFactor);
+        
+        _logger?.LogDebug("Password hashed successfully. Hash length: {Length}, Prefix: {Prefix}", 
+         hash.Length, hash.Substring(0, Math.Min(7, hash.Length)));
+      
+        return hash;
     }
     
     /// <summary>
@@ -33,22 +45,43 @@ public class BCryptPasswordHasher : IPasswordHasher
     /// </summary>
     public bool VerifyPassword(string password, string hash)
     {
+     _logger?.LogInformation("========== BCryptPasswordHasher.VerifyPassword START ==========");
+        _logger?.LogDebug("Password length: {Length}", password?.Length ?? 0);
+    _logger?.LogDebug("Hash length: {Length}, Prefix: {Prefix}", 
+   hash?.Length ?? 0, 
+            hash?.Substring(0, Math.Min(10, hash?.Length ?? 0)) ?? "NULL");
+     
         if (string.IsNullOrEmpty(password))
-  return false;
-   
-    if (string.IsNullOrEmpty(hash))
-       return false;
-      
-        try
-    {
-      // BCrypt.Verify face verificarea automată (extrage salt din hash)
-     return BCrypt.Net.BCrypt.Verify(password, hash);
+        {
+            _logger?.LogWarning("Password is NULL or empty - verification FAILED");
+     return false;
+      }
+        
+        if (string.IsNullOrEmpty(hash))
+        {
+      _logger?.LogWarning("Hash is NULL or empty - verification FAILED");
+            return false;
         }
-        catch
+        
+        try
+        {
+          // BCrypt.Verify face verificarea automată (extrage salt din hash)
+ var result = BCrypt.Net.BCrypt.Verify(password, hash);
+            
+       _logger?.LogInformation("BCrypt.Verify result: {Result}", result ? "SUCCESS" : "FAILED");
+  _logger?.LogInformation("========== BCryptPasswordHasher.VerifyPassword END ==========");
+       
+            return result;
+ }
+  catch (Exception ex)
         {
             // În caz de hash invalid sau corrupt
-    return false;
-        }
+   _logger?.LogError(ex, "BCrypt.Verify threw exception - Hash may be corrupt or invalid format");
+_logger?.LogError("Exception Type: {Type}", ex.GetType().FullName);
+   _logger?.LogError("Exception Message: {Message}", ex.Message);
+     _logger?.LogInformation("========== BCryptPasswordHasher.VerifyPassword END (EXCEPTION) ==========");
+            return false;
+   }
     }
     
     /// <summary>
