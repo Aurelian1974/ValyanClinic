@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalById;
+using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPacientiByDoctor;
 
 namespace ValyanClinic.Components.Pages.Administrare.PersonalMedical.Modals;
 
@@ -22,49 +23,62 @@ public partial class PersonalMedicalViewModal : ComponentBase
     private string ActiveTab { get; set; } = "date";
     private Guid CurrentPersonalID { get; set; }
 
+    // ✅ ADDED: State pentru pacienți asociați
+    private List<PacientAsociatDto> PacientiAsociati { get; set; } = new();
+    private bool IsLoadingPacienti { get; set; }
+
+    // Computed properties pentru filtrare
+    private List<PacientAsociatDto> PacientiActivi =>
+        PacientiAsociati.Where(p => p.EsteActiv).ToList();
+
+    private List<PacientAsociatDto> PacientiInactivi =>
+        PacientiAsociati.Where(p => !p.EsteActiv).ToList();
+
     public async Task Open(Guid personalID)
     {
         try
-    {
-  CurrentPersonalID = personalID;
-    IsVisible = true;
- IsLoading = true;
-    HasError = false;
-       ErrorMessage = string.Empty;
- PersonalMedicalData = null;
-   ActiveTab = "date";
+        {
+            CurrentPersonalID = personalID;
+            IsVisible = true;
+            IsLoading = true;
+            HasError = false;
+            ErrorMessage = string.Empty;
+            PersonalMedicalData = null;
+            ActiveTab = "date";
+            PacientiAsociati = new(); // ✅ ADDED: Reset listă pacienți
 
-       await InvokeAsync(StateHasChanged);
-  await LoadPersonalMedicalData(personalID);
-   }
+            await InvokeAsync(StateHasChanged);
+            await LoadPersonalMedicalData(personalID);
+        }
         catch (Exception ex)
- {
-    Logger.LogError(ex, "Error opening modal for PersonalID: {PersonalID}", personalID);
-    HasError = true;
-    ErrorMessage = $"Error opening modal: {ex.Message}";
-  IsLoading = false;
-   await InvokeAsync(StateHasChanged);
+        {
+            Logger.LogError(ex, "Error opening modal for PersonalID: {PersonalID}", personalID);
+            HasError = true;
+            ErrorMessage = $"Error opening modal: {ex.Message}";
+            IsLoading = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 
     public async Task Close()
     {
-      IsVisible = false;
-     await InvokeAsync(StateHasChanged);
+        IsVisible = false;
+        await InvokeAsync(StateHasChanged);
 
-         if (OnClosed.HasDelegate)
-  {
-      await OnClosed.InvokeAsync();
-         }
+        if (OnClosed.HasDelegate)
+        {
+            await OnClosed.InvokeAsync();
+        }
 
-       await Task.Delay(300);
+        await Task.Delay(300);
 
         PersonalMedicalData = null;
-      IsLoading = false;
-     HasError = false;
-  ErrorMessage = string.Empty;
-          CurrentPersonalID = Guid.Empty;
- }
+        IsLoading = false;
+        HasError = false;
+        ErrorMessage = string.Empty;
+        CurrentPersonalID = Guid.Empty;
+        PacientiAsociati = new(); // ✅ ADDED: Reset listă pacienți
+    }
 
     /// <summary>
     /// Reîncarcă datele pentru ID-ul curent (folosit după editări)
@@ -72,51 +86,134 @@ public partial class PersonalMedicalViewModal : ComponentBase
     public async Task RefreshData()
     {
         if (CurrentPersonalID != Guid.Empty && IsVisible)
- {
+        {
             Logger.LogInformation("Refreshing data for current PersonalID: {PersonalID}", CurrentPersonalID);
-     await LoadPersonalMedicalData(CurrentPersonalID);
-      }
+            await LoadPersonalMedicalData(CurrentPersonalID);
+
+            // ✅ ADDED: Refresh și lista de pacienți dacă tab-ul este activ
+            if (ActiveTab == "pacienti")
+            {
+                await LoadPacienti();
+            }
+        }
     }
 
     private async Task LoadPersonalMedicalData(Guid personalID)
     {
-     try
+        try
         {
-          Logger.LogInformation("Loading PersonalMedical data: {PersonalID}", personalID);
+            Logger.LogInformation("Loading PersonalMedical data: {PersonalID}", personalID);
 
-   var query = new GetPersonalMedicalByIdQuery(personalID);
-         var result = await Mediator.Send(query);
+            var query = new GetPersonalMedicalByIdQuery(personalID);
+            var result = await Mediator.Send(query);
 
-   if (result.IsSuccess && result.Value != null)
-     {
- PersonalMedicalData = result.Value;
-   HasError = false;
-  Logger.LogInformation("Data loaded successfully for {PersonalID}", personalID);
-  }
-  else
-   {
+            if (result.IsSuccess && result.Value != null)
+            {
+                PersonalMedicalData = result.Value;
+                HasError = false;
+                Logger.LogInformation("Data loaded successfully for {PersonalID}", personalID);
+
+                // ✅ FIX: Încarcă pacienții imediat după încărcarea datelor doctorului
+                // pentru a afișa counter-ul corect în tab
+                await LoadPacienti();
+            }
+            else
+            {
                 HasError = true;
- ErrorMessage = result.Errors?.FirstOrDefault() ?? "Could not load personal medical data";
-        Logger.LogWarning("Failed to load data for {PersonalID}: {Error}", personalID, ErrorMessage);
-      }
+                ErrorMessage = result.Errors?.FirstOrDefault() ?? "Could not load personal medical data";
+                Logger.LogWarning("Failed to load data for {PersonalID}: {Error}", personalID, ErrorMessage);
+            }
         }
         catch (Exception ex)
         {
-HasError = true;
-         ErrorMessage = $"Error loading data: {ex.Message}";
-      Logger.LogError(ex, "Exception loading data for {PersonalID}", personalID);
-     }
+            HasError = true;
+            ErrorMessage = $"Error loading data: {ex.Message}";
+            Logger.LogError(ex, "Exception loading data for {PersonalID}", personalID);
+        }
         finally
         {
- IsLoading = false;
-      await InvokeAsync(StateHasChanged);
+            IsLoading = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 
-    private void SetActiveTab(string tabName)
+    // ✅ ADDED: Metodă pentru încărcarea pacienților
+    private async Task LoadPacienti()
     {
- ActiveTab = tabName;
-     Logger.LogDebug("Tab changed to: {TabName}", tabName);
+        if (CurrentPersonalID == Guid.Empty) return;
+
+        IsLoadingPacienti = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            Logger.LogInformation("Loading pacienti for doctor: {DoctorID}", CurrentPersonalID);
+
+            var query = new GetPacientiByDoctorQuery(CurrentPersonalID);
+            var result = await Mediator.Send(query);
+
+            if (result.IsSuccess && result.Value != null)
+            {
+                PacientiAsociati = result.Value;
+                Logger.LogInformation("Loaded {Count} pacienti for doctor {DoctorID}",
+                    PacientiAsociati.Count, CurrentPersonalID);
+            }
+            else
+            {
+                PacientiAsociati = new();
+                Logger.LogWarning("Failed to load pacienti for doctor {DoctorID}: {Error}",
+                    CurrentPersonalID, result.Errors?.FirstOrDefault());
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading pacienti for doctor {DoctorID}", CurrentPersonalID);
+            PacientiAsociati = new();
+        }
+        finally
+        {
+            IsLoadingPacienti = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task SetActiveTab(string tabName)
+    {
+        ActiveTab = tabName;
+        Logger.LogDebug("Tab changed to: {TabName}", tabName);
+
+        // ✅ UPDATED: Nu mai este nevoie să încărcăm pacienții aici
+        // deoarece sunt încărcați deja la deschiderea modal-ului
+        // Lăsăm codul doar pentru re-fetch manual dacă este necesar
+        // if (tabName == "pacienti" && PacientiAsociati.Count == 0)
+        // {
+        //     await LoadPacienti();
+        // }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    // ✅ ADDED: Helper pentru formatarea zilelor
+    private string FormatZile(int zile)
+    {
+        if (zile < 30)
+            return $"{zile} zile";
+        else if (zile < 365)
+            return $"{zile / 30} luni";
+        else
+            return $"{zile / 365} ani";
+    }
+
+    // ✅ ADDED: Helper pentru clasa badge-ului tip relație
+    private string GetBadgeClass(string? tipRelatie)
+    {
+        return tipRelatie?.ToLower() switch
+        {
+            "medic primar" => "badge-primary",
+            "medic consultant" => "badge-info",
+            "medic specialist" => "badge-success",
+            _ => "badge-secondary"
+        };
     }
 
     private async Task HandleOverlayClick()
@@ -125,21 +222,20 @@ HasError = true;
     }
 
     private async Task HandleEdit()
- {
-      if (CurrentPersonalID != Guid.Empty)
+    {
+        if (CurrentPersonalID != Guid.Empty)
         {
-    Logger.LogInformation("Edit requested for PersonalID: {PersonalID}", CurrentPersonalID);
-    await OnEditRequested.InvokeAsync(CurrentPersonalID);
-    }
+            Logger.LogInformation("Edit requested for PersonalID: {PersonalID}", CurrentPersonalID);
+            await OnEditRequested.InvokeAsync(CurrentPersonalID);
+        }
     }
 
     private async Task HandleDelete()
     {
         if (CurrentPersonalID != Guid.Empty)
         {
-     
-        Logger.LogInformation("Delete requested for PersonalID: {PersonalID}", CurrentPersonalID);
-        await OnDeleteRequested.InvokeAsync(CurrentPersonalID);
+            Logger.LogInformation("Delete requested for PersonalID: {PersonalID}", CurrentPersonalID);
+            await OnDeleteRequested.InvokeAsync(CurrentPersonalID);
         }
     }
 }

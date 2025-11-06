@@ -1,0 +1,138 @@
+﻿@page "/login"
+@rendermode InteractiveServer
+@layout EmptyLayout
+
+<PageTitle>Autentificare - ValyanClinic</PageTitle>
+
+<div class="login-container">
+    <div class="login-card">
+        <!-- Logo & Header -->
+        <div class="login-header">
+      <div class="logo-container">
+     <i class="fas fa-hospital-symbol"></i>
+            </div>
+            <h1>ValyanClinic</h1>
+  <p class="subtitle">Sistem de Management Clinic</p>
+        </div>
+
+      <!-- Error Message -->
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+      {
+  <div class="alert alert-danger fade-in" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+           <span>@ErrorMessage</span>
+     </div>
+        }
+
+        <!-- Login Form -->
+        <EditForm Model="@LoginModel" OnValidSubmit="@HandleLogin" class="login-form">
+<DataAnnotationsValidator />
+
+    <!-- Username Field -->
+     <div class="form-group">
+   <label for="username">
+   <i class="fas fa-user"></i>
+           Nume utilizator
+           </label>
+     <div class="input-wrapper">
+         <input 
+type="text" 
+          id="username"
+      class="form-control"
+          placeholder="Introduceti numele de utilizator"
+      @bind="LoginModel.Username"
+         @bind:event="oninput"
+           disabled="@IsLoading" />
+    </div>
+    <ValidationMessage For="@(() => LoginModel.Username)" class="validation-error" />
+      </div>
+
+ <!-- Password Field -->
+         <div class="form-group">
+    <label for="password">
+    <i class="fas fa-lock"></i>
+      Parola
+                </label>
+      <div class="input-wrapper password-wrapper">
+     <input 
+ type="@(ShowPassword ? "text" : "password")" 
+       id="password"
+         class="form-control"
+  placeholder="Introduceti parola"
+   @bind="LoginModel.Password"
+         @bind:event="oninput"
+   disabled="@IsLoading" />
+      <button 
+             type="button" 
+         class="btn-toggle-password"
+      @onclick="TogglePasswordVisibility"
+           tabindex="-1">
+            <i class="fas @(ShowPassword ? "fa-eye-slash" : "fa-eye")"></i>
+             </button>
+       </div>
+        <ValidationMessage For="@(() => LoginModel.Password)" class="validation-error" />
+            </div>
+
+       <!-- Remember Me & Reset Password Checkboxes -->
+            <div class="checkbox-group">
+    <div class="checkbox-item">
+     <label class="checkbox-label">
+  <input 
+        type="checkbox" 
+  @bind="LoginModel.RememberMe" 
+           disabled="@IsLoading" />
+      <span class="checkbox-text">
+     <i class="fas fa-save"></i>
+   Tine minte nume utilizator
+         </span>
+  </label>
+ </div>
+         
+     <div class="checkbox-item">
+        <label class="checkbox-label">
+  <input 
+      type="checkbox" 
+   @bind="LoginModel.ResetPasswordOnFirstLogin" 
+          disabled="@IsLoading" />
+          <span class="checkbox-text">
+           <i class="fas fa-key"></i>
+     Reseteaza parola la prima logare
+           </span>
+    </label>
+       </div>
+            </div>
+
+            <!-- Login Button -->
+            <button 
+       type="submit" 
+    class="btn btn-primary btn-login"
+      disabled="@IsLoading">
+        @if (IsLoading)
+         {
+          <span class="spinner-border spinner-border-sm" role="status"></span>
+ <span class="ms-2">Se autentifica...</span>
+       }
+         else
+   {
+            <i class="fas fa-sign-in-alt"></i>
+     <span>Autentificare</span>
+         }
+         </button>
+
+ <!-- Additional Links -->
+   <div class="login-footer">
+            <a href="#" class="forgot-password" @onclick:preventDefault @onclick="HandleForgotPassword">
+ <i class="fas fa-question-circle"></i>
+    Ai uitat parola?
+    </a>
+            </div>
+        </EditForm>
+    </div>
+
+    <!-- Background Decorations -->
+ <div class="background-decoration">
+        <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+</div>

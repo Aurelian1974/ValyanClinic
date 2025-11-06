@@ -13,6 +13,7 @@ public partial class Header : ComponentBase, IDisposable
     private List<BreadcrumbItem> breadcrumbItems = new();
     private ElementReference avatarImageRef;
     private bool imageLoadFailed = false;
+    private bool ShowUserMenu = false;
 
     protected override void OnInitialized()
     {
@@ -24,6 +25,7 @@ public partial class Header : ComponentBase, IDisposable
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         UpdateBreadcrumb();
+        ShowUserMenu = false; // Close menu on navigation
         StateHasChanged();
     }
 
@@ -38,6 +40,11 @@ public partial class Header : ComponentBase, IDisposable
         var uri = new Uri(NavigationManager.Uri);
         var path = uri.AbsolutePath;
         breadcrumbItems = BreadcrumbService.BuildFromPath(path);
+    }
+
+    private void ToggleUserMenu()
+    {
+        ShowUserMenu = !ShowUserMenu;
     }
 
     private string GetUserAvatarUrl() => "/images/avatar-default.png";

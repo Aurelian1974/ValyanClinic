@@ -1,0 +1,436 @@
+﻿/* ===================================
+   UtilizatorViewModal - Scoped CSS
+   Read-only modal - Tema Albastru
+   =================================== */
+
+/* Modal Overlay - ALBASTRU Theme */
+.modal-overlay {
+    background: rgba(30, 58, 138, 0.3);
+}
+
+/* Modal Container - ALBASTRU Theme */
+.modal-container {
+    box-shadow: 0 10px 30px rgba(96, 165, 250, 0.2);
+}
+
+/* Modal Header - ALBASTRU Gradient */
+.modal-header {
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.15);
+}
+
+/* Modal Body - Light ALBASTRU Background */
+.modal-body {
+    background: #f8fafc;
+}
+
+.loading-container p {
+    color: #64748b;
+}
+
+/* Tabs Container */
+.tabs-container {
+ display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+}
+
+/* Tab Buttons */
+.tab-buttons {
+    display: flex;
+    gap: 0.375rem;
+    border-bottom: 2px solid #e2e8f0;
+    flex-wrap: wrap;
+    background: white;
+    padding: 0.375rem 0.875rem;
+    border-radius: 8px 8px 0 0;
+}
+
+.tab-button {
+background: transparent;
+    border: none;
+    padding: 0.625rem 1rem;
+    color: #64748b;
+    cursor: pointer;
+  display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    top: 2px;
+    border-radius: 6px 6px 0 0;
+}
+
+.tab-button:hover {
+    color: #60a5fa;
+    background: #eff6ff;
+}
+
+.tab-button.active {
+    color: #60a5fa;
+    border-bottom-color: #60a5fa;
+    background: #eff6ff;
+    font-weight: 600;
+}
+
+.tab-button i {
+    font-size: 0.875rem;
+}
+
+/* Tab Content */
+.tab-content {
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+   transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+   transform: translateY(0);
+    }
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+display: block;
+}
+
+/* Info Card */
+.info-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.info-card:last-child {
+    margin-bottom: 0;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin: 0 0 1rem 0;
+    font-size: 1.025rem;
+    font-weight: 600;
+    color: #334155;
+    padding-bottom: 0.625rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.card-title i {
+    color: #60a5fa;
+    font-size: 1.125rem;
+}
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+/* Info Item */
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-item label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+/* Info Value - Base */
+.info-value {
+    font-size: 0.9375rem;
+color: #334155;
+    padding: 0.625rem;
+  background: #f8fafc;
+    border-radius: 7px;
+    border: 1px solid #e2e8f0;
+    min-height: 40px;
+ display: flex;
+    align-items: center;
+    word-break: break-word;
+    transition: all 0.2s ease;
+}
+
+.info-value:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+/* Info Value - Primary (Emphasized) */
+.info-value.primary-text {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e40af;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-color: #bfdbfe;
+    box-shadow: 0 2px 4px rgba(96, 165, 250, 0.1);
+}
+
+/* Info Value - Technical (IDs, etc) */
+.info-value.technical-text {
+    font-family: 'Courier New', monospace;
+ font-size: 0.8125rem;
+    color: #64748b;
+    background: #f1f5f9;
+}
+
+/* Info Value - Empty State */
+.info-value-empty {
+    color: #94a3b8;
+    font-style: italic;
+    background: #f8fafc;
+  border-style: dashed;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.info-value-empty i {
+    color: #cbd5e1;
+}
+
+/* Contact Links */
+.contact-link {
+    color: #60a5fa;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+}
+
+.contact-link:hover {
+    color: #3b82f6;
+    text-decoration: underline;
+    transform: translateX(3px);
+}
+
+.contact-link i {
+    font-size: 0.8125rem;
+}
+
+/* Status Badges */
+.status-badge {
+ display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.875rem;
+    border-radius: 18px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    gap: 0.375rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.status-badge.status-active {
+    background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+    color: #065f46;
+}
+
+.status-badge.status-inactive {
+    background: linear-gradient(135deg, #fca5a5, #ef4444);
+    color: white;
+}
+
+.status-badge.status-blocked {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #78350f;
+}
+
+/* Role Badges */
+.role-badge {
+    display: inline-block;
+    padding: 0.375rem 0.875rem;
+    border-radius: 12px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+ text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.role-badge.role-administrator {
+background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.role-badge.role-doctor {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.role-badge.role-asistent {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.role-badge.role-receptioner {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.role-badge.role-manager {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+}
+
+.role-badge.role-utilizator {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+}
+
+/* Generic Badges */
+.badge-primary {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
+    font-weight: 600;
+    padding: 0.375rem 0.875rem;
+    border-radius: 12px;
+  border: 1px solid #93c5fd;
+    display: inline-block;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #065f46;
+    font-weight: 600;
+    padding: 0.375rem 0.875rem;
+    border-radius: 12px;
+    border: 1px solid #6ee7b7;
+    display: inline-block;
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #991b1b;
+    font-weight: 600;
+    padding: 0.375rem 0.875rem;
+    border-radius: 12px;
+    border: 1px solid #fca5a5;
+    display: inline-block;
+}
+
+/* Text Colors */
+.text-success {
+    color: #059669;
+}
+
+.text-danger {
+    color: #dc2626;
+}
+
+.text-warning {
+    color: #d97706;
+}
+
+/* Alert */
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+ align-items: center;
+    gap: 0.625rem;
+    font-weight: 500;
+    border: 1px solid;
+}
+
+.alert-danger {
+  background: #fee2e2;
+    color: #991b1b;
+    border-color: #fca5a5;
+}
+
+.alert-danger i {
+    color: #dc2626;
+    font-size: 1.125rem;
+}
+
+/* Loading Container */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  gap: 1rem;
+}
+
+.spinner-border {
+  width: 3rem;
+    height: 3rem;
+    border-width: 0.25rem;
+}
+
+.text-primary {
+    color: #60a5fa !important;
+}
+
+/* Scrollbar - ALBASTRU Theme */
+.modal-body::-webkit-scrollbar {
+  width: 12px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f8fafc;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #bfdbfe, #93c5fd);
+    border-radius: 6px;
+    border: 2px solid #f8fafc;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #93c5fd, #60a5fa);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .tab-buttons {
+      overflow-x: auto;
+        flex-wrap: nowrap;
+        padding: 0.375rem;
+    }
+
+    .tab-button {
+        white-space: nowrap;
+     font-size: 0.8125rem;
+        padding: 0.5rem 0.875rem;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.875rem;
+    }
+
+    .info-card {
+        padding: 0.875rem;
+    }
+}

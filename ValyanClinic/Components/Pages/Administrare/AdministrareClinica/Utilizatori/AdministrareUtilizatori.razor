@@ -1,0 +1,402 @@
+﻿@page "/administrare/administrare-clinica/utilizatori"
+@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.UtilizatorManagement.Queries.GetUtilizatorList
+@using ValyanClinic.Services.DataGrid
+@using MediatR
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.DropDowns
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@using ValyanClinic.Components.Pages.Administrare.AdministrareClinica.Utilizatori.Modals
+
+<PageTitle>Administrare Utilizatori</PageTitle>
+
+<div class="utilizatori-container">
+    <div class="utilizatori-header">
+        <h1>
+            <i class="fas fa-users-cog"></i>
+      Administrare Utilizatori
+        </h1>
+  <div class="header-actions">
+      <button class="btn btn-primary" @onclick="HandleAddNew">
+<i class="fas fa-plus"></i>
+       Adauga Utilizator
+            </button>
+            <button class="btn btn-secondary" @onclick="HandleRefresh">
+   <i class="fas fa-sync-alt"></i>
+  Reincarca
+      </button>
+        </div>
+  </div>
+
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Se incarca...</span>
+            </div>
+            <p>Se incarca datele...</p>
+        </div>
+    }
+    else if (HasError)
+    {
+        <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle"></i>
+            @ErrorMessage
+        </div>
+    }
+ else
+    {
+        <div class="search-filter-section">
+ <div class="search-and-filter">
+       <div class="global-search">
+<div class="search-box-wrapper">
+            <i class="fas fa-search search-icon"></i>
+      <input type="text" 
+    class="search-input"
+   placeholder="Cautare rapida (username, email, nume)..."
+      value="@GlobalSearchText"
+ @oninput="OnSearchInput"
+    @onkeydown="@(e => OnSearchKeyDown(e))" />
+     @if (!string.IsNullOrEmpty(GlobalSearchText))
+       {
+    <button class="search-clear-btn" @onclick="ClearSearch" type="button">
+         <i class="fas fa-times"></i>
+       </button>
+     }
+     </div>
+       </div>
+   <button class="btn-filter @(IsAdvancedFilterExpanded ? "active" : "")" 
+   @onclick="ToggleAdvancedFilter"
+               title="Filtre avansate">
+    <i class="fas fa-filter"></i>
+         <span>Filtre</span>
+                @if (ActiveFiltersCount > 0)
+     {
+       <span class="filter-badge">@ActiveFiltersCount</span>
+        }
+    <i class="fas fa-chevron-@(IsAdvancedFilterExpanded ? "up" : "down") chevron-icon"></i>
+   </button>
+      </div>
+     
+ <div class="total-records">
+                <i class="fas fa-database"></i>
+                <span>Total: <strong>@TotalRecords</strong> utilizatori</span>
+       @if (ActiveFiltersCount > 0)
+      {
+         <span class="filtered-info">(filtrat)</span>
+    }
+            </div>
+        </div>
+
+        <div class="advanced-filter-panel @(IsAdvancedFilterExpanded ? "expanded" : "")">
+   <div class="filter-content">
+    <div class="filter-grid">
+       <div class="filter-item">
+   <label class="filter-label">
+         <i class="fas fa-circle-check"></i>
+  Status
+        </label>
+       <SfDropDownList TValue="string" 
+                  TItem="FilterOption"
+               DataSource="@StatusOptions"
+              @bind-Value="@FilterEsteActiv"
+                Placeholder="Toate statusurile"
+       CssClass="filter-dropdown"
+       AllowFiltering="false"
+ ShowClearButton="false">
+    <DropDownListFieldSettings Text="Text" Value="Value"/>
+      </SfDropDownList>
+     </div>
+
+        <div class="filter-item">
+       <label class="filter-label">
+          <i class="fas fa-user-shield"></i>
+                    Rol
+       </label>
+   <SfDropDownList TValue="string" 
+     TItem="FilterOption"
+          DataSource="@RolOptions"
+@bind-Value="@FilterRol"
+    Placeholder="Toate rolurile"
+       CssClass="filter-dropdown"
+     AllowFiltering="false"
+            ShowClearButton="false">
+         <DropDownListFieldSettings Text="Text" Value="Value"/>
+          </SfDropDownList>
+     </div>
+    </div>
+
+       <div class="filter-actions">
+ <button class="btn-filter-action btn-clear" @onclick="ClearAllFilters" disabled="@(ActiveFiltersCount == 0)">
+       <i class="fas fa-times-circle"></i>
+          <span>Sterge Filtre (@ActiveFiltersCount)</span>
+  </button>
+         <button class="btn-filter-action btn-apply" @onclick="ApplyFilters">
+             <i class="fas fa-check-circle"></i>
+      <span>Aplica Filtre</span>
+  </button>
+        </div>
+
+              @if (ActiveFiltersCount > 0)
+   {
+           <div class="active-filters">
+       <span class="active-filters-label">
+     <i class="fas fa-filter"></i>
+            Filtre active:
+    </span>
+          <div class="filter-chips">
+     @if (!string.IsNullOrEmpty(GlobalSearchText))
+  {
+      <span class="filter-chip">
+  Cautare: @GlobalSearchText
+     <i class="fas fa-times" @onclick="() => ClearFilter(nameof(GlobalSearchText))"></i>
+   </span>
+ }
+         @if (!string.IsNullOrEmpty(FilterEsteActiv))
+      {
+      <span class="filter-chip">
+ Status: @FilterEsteActiv
+       <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterEsteActiv))"></i>
+  </span>
+       }
+              @if (!string.IsNullOrEmpty(FilterRol))
+         {
+   <span class="filter-chip">
+       Rol: @FilterRol
+       <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterRol))"></i>
+          </span>
+      }
+         </div>
+   </div>
+   }
+ </div>
+        </div>
+
+        <div class="action-toolbar @(SelectedUtilizator != null ? "active" : "")">
+          <div class="toolbar-info">
+        @if (SelectedUtilizator != null)
+ {
+   <div class="selected-item-info">
+     <i class="fas fa-user-check"></i>
+          <span class="selected-label">Selectat:</span>
+    <strong>@SelectedUtilizator.Username</strong>
+          <span class="selected-badge">@SelectedUtilizator.Rol</span>
+          </div>
+    }
+        else
+      {
+       <div class="no-selection-info">
+            <i class="fas fa-info-circle"></i>
+     <span>Selecteaza un utilizator pentru a activa actiunile</span>
+               </div>
+             }
+      </div>
+       <div class="toolbar-actions">
+              <button class="toolbar-btn btn-view" 
+       @onclick="HandleViewSelected"
+            disabled="@(SelectedUtilizator == null)"
+  title="Vizualizeaza detalii">
+    <i class="fas fa-eye"></i>
+   <span>Vizualizeaza</span>
+    </button>
+                <button class="toolbar-btn btn-edit" 
+        @onclick="HandleEditSelected"
+   disabled="@(SelectedUtilizator == null)"
+    title="Editeaza informatii">
+     <i class="fas fa-edit"></i>
+         <span>Editeaza</span>
+    </button>
+       <button class="toolbar-btn btn-delete" 
+     @onclick="HandleDeleteSelected"
+disabled="@(SelectedUtilizator == null || (SelectedUtilizator.Username == "Admin"))"
+         title="Sterge utilizator">
+    <i class="fas fa-trash"></i>
+ <span>Sterge</span>
+        </button>
+        </div>
+        </div>
+
+        <div class="page-size-selector">
+     <label>
+         <i class="fas fa-list"></i>
+          Inregistrari per pagina:
+            </label>
+    <select @onchange="OnPageSizeChangedNative" class="page-size-select" value="@CurrentPageSize">
+        @foreach (var size in PageSizeArray)
+       {
+      <option value="@size" selected="@(size == CurrentPageSize)">@size</option>
+    }
+ </select>
+  </div>
+
+        <div class="grid-container">
+     <SfGrid @ref="GridRef"
+           DataSource="@CurrentPageData"
+         Height="100%"
+        AllowPaging="false"
+             AllowSorting="true"
+    AllowFiltering="false"
+   AllowResizing="true"
+        AllowReordering="true"
+      GridLines="GridLine.Both"
+  RowHeight="34">
+      
+           <GridSelectionSettings Type="SelectionType.Single"></GridSelectionSettings>
+     
+       <GridEvents TValue="UtilizatorListDto" 
+   RowSelected="OnRowSelected"
+    RowDeselected="OnRowDeselected">
+                </GridEvents>
+  
+           <GridColumns>
+          <GridColumn Field="@nameof(UtilizatorListDto.UtilizatorID)" 
+           HeaderText="ID" 
+     Width="100"
+                IsPrimaryKey="true"
+           Visible="false">
+           </GridColumn>
+             
+     <GridColumn Field="@nameof(UtilizatorListDto.Username)" 
+          HeaderText="Username" 
+          Width="150">
+           </GridColumn>
+      
+    <GridColumn Field="@nameof(UtilizatorListDto.Email)" 
+         HeaderText="Email" 
+    Width="200">
+                 <Template>
+     @{
+      var utilizator = (context as UtilizatorListDto);
+     if (!string.IsNullOrEmpty(utilizator?.Email))
+      {
+       <a href="mailto:@utilizator.Email" class="email-link">
+          <i class="fas fa-envelope"></i>
+        @utilizator.Email
+         </a>
+            }
+ }
+         </Template>
+        </GridColumn>
+     
+        <GridColumn Field="@nameof(UtilizatorListDto.NumeCompletPersonalMedical)" 
+          HeaderText="Personal Medical" 
+     Width="200">
+      </GridColumn>
+    
+            <GridColumn Field="@nameof(UtilizatorListDto.Rol)" 
+   HeaderText="Rol" 
+          Width="120">
+      <Template>
+      @{
+           var utilizator = (context as UtilizatorListDto);
+      <span class="role-badge role-@utilizator?.Rol.ToLower()">
+ @utilizator?.Rol
+   </span>
+ }
+   </Template>
+      </GridColumn>
+     
+         <GridColumn Field="@nameof(UtilizatorListDto.Specializare)" 
+         HeaderText="Specializare" 
+      Width="150">
+          </GridColumn>
+
+             <GridColumn Field="@nameof(UtilizatorListDto.DataUltimaAutentificare)" 
+       HeaderText="Ultima Autentificare" 
+                Width="160"
+     Format="dd.MM.yyyy HH:mm">
+        </GridColumn>
+       
+        <GridColumn Field="@nameof(UtilizatorListDto.EsteActiv)" 
+   HeaderText="Status" 
+       Width="100">
+   <Template>
+       @{
+          var utilizator = (context as UtilizatorListDto);
+    var statusClass = utilizator?.EsteBlocat == true ? "status-blocked" : 
+         (utilizator?.EsteActiv == true ? "status-active" : "status-inactive");
+     var statusText = utilizator?.StatusText ?? "Necunoscut";
+  <span class="status-badge @statusClass">
+     @statusText
+          </span>
+            }
+   </Template>
+         </GridColumn>
+  </GridColumns>
+        </SfGrid>
+        </div>
+
+        <div class="custom-pager">
+            <div class="pager-info">
+     <span class="pager-text">
+      <i class="fas fa-info-circle"></i>
+            Pagina <strong>@CurrentPage</strong> din <strong>@TotalPages</strong>
+     </span>
+          <span class="pager-text">
+        <i class="fas fa-list-ol"></i>
+           Afisate <strong>@DisplayedRecordsStart-@DisplayedRecordsEnd</strong> din <strong>@TotalRecords</strong>
+           </span>
+            </div>
+            
+            <div class="pager-controls">
+    <button class="pager-btn pager-btn-first" 
+         @onclick="GoToFirstPage" 
+          disabled="@(!HasPreviousPage)"
+        title="Prima pagina">
+     <i class="fas fa-angle-double-left"></i>
+     </button>
+                
+      <button class="pager-btn pager-btn-prev" 
+      @onclick="GoToPreviousPage" 
+      disabled="@(!HasPreviousPage)"
+      title="Pagina anterioara">
+               <i class="fas fa-angle-left"></i>
+    </button>
+             
+                @{
+      var (start, end) = GetPagerRange(5);
+       for (int i = start; i <= end; i++)
+       {
+  int pageNum = i;
+         var isActive = pageNum == CurrentPage;
+            <button class="pager-btn pager-btn-number @(isActive ? "active" : "")" 
+           @onclick="() => GoToPage(pageNum)"
+  disabled="@isActive"
+           title="Pagina @pageNum">
+          @pageNum
+              </button>
+     }
+       }
+             
+       <button class="pager-btn pager-btn-next" 
+       @onclick="GoToNextPage" 
+            disabled="@(!HasNextPage)"
+       title="Pagina urmatoare">
+<i class="fas fa-angle-right"></i>
+   </button>
+         
+     <button class="pager-btn pager-btn-last" 
+        @onclick="GoToLastPage" 
+     disabled="@(!HasNextPage)"
+           title="Ultima pagina">
+         <i class="fas fa-angle-double-right"></i>
+    </button>
+  </div>
+   </div>
+    }
+</div>
+
+<SfToast @ref="ToastRef" Title="@ToastTitle" Content="@ToastContent" CssClass="@ToastCssClass">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
+
+@* Modale pentru CRUD operations *@
+<UtilizatorFormModal @ref="UtilizatorFormModalRef"
+                   OnUtilizatorSaved="HandleUtilizatorSaved"
+        OnClosed="HandleModalClosed" />
+
+<UtilizatorViewModal @ref="UtilizatorViewModalRef"
+           OnEditRequested="HandleEditFromModal"
+        OnDeleteRequested="HandleDeleteFromModal"
+ OnClosed="HandleModalClosed" />

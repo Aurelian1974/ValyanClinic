@@ -1,0 +1,389 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.UtilizatorManagement.Queries.GetUtilizatorById
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+  <div class="modal-header">
+    <div class="modal-title">
+        <i class="fas fa-user-circle"></i>
+   <h2>Detalii Utilizator</h2>
+   </div>
+            <button class="btn-close" @onclick="Close" type="button">
+          <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+       <span class="visually-hidden">Se incarca...</span>
+          </div>
+        <p>Se incarca datele utilizatorului...</p>
+ </div>
+ }
+ else if (HasError)
+    {
+      <div class="alert alert-danger" role="alert">
+  <i class="fas fa-exclamation-triangle"></i>
+        <span>@ErrorMessage</span>
+           </div>
+         }
+ else if (UtilizatorData != null)
+    {
+          <div class="tabs-container">
+<div class="tab-buttons">
+     <button type="button" class="tab-button @(ActiveTab == "general" ? "active" : "")" 
+               @onclick='() => SetActiveTab("general")'>
+       <i class="fas fa-user"></i>
+        <span>Informatii Generale</span>
+        </button>
+   <button type="button" class="tab-button @(ActiveTab == "securitate" ? "active" : "")" 
+    @onclick='() => SetActiveTab("securitate")'>
+           <i class="fas fa-shield-alt"></i>
+        <span>Securitate</span>
+        </button>
+       <button type="button" class="tab-button @(ActiveTab == "personal" ? "active" : "")" 
+          @onclick='() => SetActiveTab("personal")'>
+         <i class="fas fa-id-card"></i>
+     <span>Personal Medical</span>
+               </button>
+       <button type="button" class="tab-button @(ActiveTab == "audit" ? "active" : "")" 
+ @onclick='() => SetActiveTab("audit")'>
+     <i class="fas fa-history"></i>
+       <span>Audit</span>
+       </button>
+           </div>
+
+   <div class="tab-content">
+ @* TAB 1: Informatii Generale *@
+       @if (ActiveTab == "general")
+       {
+            <div class="tab-pane active">
+    <div class="info-card">
+          <h3 class="card-title">
+         <i class="fas fa-id-badge"></i>
+            <span>Identificare</span>
+          </h3>
+      <div class="info-grid">
+     <div class="info-item">
+           <label>ID Utilizator</label>
+          <div class="info-value technical-text">@UtilizatorData.UtilizatorID.ToString().ToUpper()</div>
+    </div>
+      <div class="info-item">
+     <label>Username</label>
+               <div class="info-value primary-text">@UtilizatorData.Username</div>
+          </div>
+     <div class="info-item full-width">
+    <label>Email</label>
+            <div class="info-value">
+     @if (!string.IsNullOrEmpty(UtilizatorData.Email))
+    {
+   <a href="mailto:@UtilizatorData.Email" class="contact-link">
+    <i class="fas fa-envelope"></i>
+     @UtilizatorData.Email
+  </a>
+      }
+              else
+                   {
+  <span class="info-value-empty">
+    <i class="fas fa-minus-circle"></i>
+           Lipseste
+    </span>
+   }
+ </div>
+        </div>
+     </div>
+       </div>
+
+    <div class="info-card">
+<h3 class="card-title">
+     <i class="fas fa-user-shield"></i>
+     <span>Rol si Status</span>
+    </h3>
+     <div class="info-grid">
+     <div class="info-item">
+        <label>Rol</label>
+   <div class="info-value">
+             <span class="role-badge role-@UtilizatorData.Rol.ToLower()">
+      @UtilizatorData.Rol
+    </span>
+   </div>
+             </div>
+      <div class="info-item">
+            <label>Status</label>
+    <div class="info-value">
+     <span class="status-badge @(UtilizatorData.EsteBlocat ? "status-blocked" : (UtilizatorData.EsteActiv ? "status-active" : "status-inactive"))">
+         @(UtilizatorData.EsteBlocat ? "BLOCAT" : (UtilizatorData.EsteActiv ? "ACTIV" : "INACTIV"))
+            </span>
+           </div>
+     </div>
+  </div>
+    </div>
+
+       <div class="info-card">
+  <h3 class="card-title">
+   <i class="fas fa-clock"></i>
+<span>Activitate</span>
+          </h3>
+  <div class="info-grid">
+          <div class="info-item">
+    <label>Data Creare</label>
+         <div class="info-value">@UtilizatorData.DataCreare.ToString("dd.MM.yyyy HH:mm")</div>
+                 </div>
+            <div class="info-item">
+        <label>Ultima Autentificare</label>
+ <div class="info-value">
+    @if (UtilizatorData.DataUltimaAutentificare.HasValue)
+    {
+          @UtilizatorData.DataUltimaAutentificare.Value.ToString("dd.MM.yyyy HH:mm")
+       }
+   else
+       {
+           <span class="info-value-empty">
+     <i class="fas fa-minus-circle"></i>
+       Nu s-a autentificat niciodata
+     </span>
+               }
+          </div>
+         </div>
+    </div>
+      </div>
+    </div>
+       }
+
+@* TAB 2: Securitate *@
+        @if (ActiveTab == "securitate")
+   {
+          <div class="tab-pane active">
+       <div class="info-card">
+           <h3 class="card-title">
+             <i class="fas fa-key"></i>
+           <span>Parola</span>
+     </h3>
+     <div class="info-grid">
+    <div class="info-item full-width">
+    <label>PasswordHash (BCrypt)</label>
+         <div class="info-value technical-text" style="word-break: break-all;">
+          @if (!string.IsNullOrEmpty(UtilizatorData.TokenResetareParola))
+           {
+       <span>••••••••••••••••••••••••</span>
+   }
+    else
+  {
+             <span>BCrypt Work Factor 12 (60 chars)</span>
+          }
+          </div>
+ </div>
+         </div>
+      </div>
+
+     <div class="info-card">
+         <h3 class="card-title">
+  <i class="fas fa-shield-alt"></i>
+            <span>Securitate Cont</span>
+     </h3>
+  <div class="info-grid">
+       <div class="info-item">
+                <label>Incercari Esuate</label>
+         <div class="info-value">
+  <span class="@(UtilizatorData.NumarIncercariEsuate > 0 ? "text-warning" : "")">
+            @UtilizatorData.NumarIncercariEsuate
+     @if (UtilizatorData.NumarIncercariEsuate >= 5)
+  {
+    <i class="fas fa-exclamation-triangle text-danger"></i>
+       }
+        </span>
+            </div>
+      </div>
+     <div class="info-item">
+        <label>Data Blocare</label>
+    <div class="info-value">
+    @if (UtilizatorData.DataBlocare.HasValue)
+    {
+   <span class="text-danger">
+             <i class="fas fa-lock"></i>
+             @UtilizatorData.DataBlocare.Value.ToString("dd.MM.yyyy HH:mm")
+             </span>
+      }
+  else
+   {
+    <span class="text-success">
+          <i class="fas fa-check-circle"></i>
+ Nu este blocat
+ </span>
+        }
+           </div>
+   </div>
+        </div>
+       </div>
+
+    @if (!string.IsNullOrEmpty(UtilizatorData.TokenResetareParola))
+    {
+  <div class="info-card">
+           <h3 class="card-title">
+      <i class="fas fa-redo"></i>
+         <span>Reset Parola</span>
+       </h3>
+       <div class="info-grid">
+               <div class="info-item">
+         <label>Token Activ</label>
+    <div class="info-value">
+    <span class="@(UtilizatorData.TokenEsteValid ? "badge-success" : "badge-danger")">
+             @(UtilizatorData.TokenEsteValid ? "VALID" : "EXPIRAT")
+   </span>
+                    </div>
+              </div>
+      <div class="info-item">
+         <label>Data Expirare Token</label>
+           <div class="info-value">
+   @if (UtilizatorData.DataExpirareToken.HasValue)
+            {
+    @UtilizatorData.DataExpirareToken.Value.ToString("dd.MM.yyyy HH:mm")
+        }
+   </div>
+        </div>
+    </div>
+      </div>
+              }
+ </div>
+          }
+
+         @* TAB 3: Personal Medical *@
+               @if (ActiveTab == "personal")
+             {
+                <div class="tab-pane active">
+          <div class="info-card">
+             <h3 class="card-title">
+     <i class="fas fa-user-md"></i>
+     <span>Date Personal Medical</span>
+   </h3>
+         <div class="info-grid">
+             <div class="info-item full-width">
+          <label>Nume Complet</label>
+        <div class="info-value primary-text">@UtilizatorData.NumeCompletPersonalMedical</div>
+           </div>
+            <div class="info-item">
+        <label>Nume</label>
+         <div class="info-value">@(UtilizatorData.Nume ?? "-")</div>
+</div>
+<div class="info-item">
+  <label>Prenume</label>
+           <div class="info-value">@(UtilizatorData.Prenume ?? "-")</div>
+  </div>
+    <div class="info-item full-width">
+    <label>Specializare</label>
+      <div class="info-value">
+              @if (!string.IsNullOrEmpty(UtilizatorData.Specializare))
+          {
+      <span class="badge-primary">@UtilizatorData.Specializare</span>
+    }
+     else
+ {
+      <span class="info-value-empty">
+          <i class="fas fa-minus-circle"></i>
+   Lipseste
+           </span>
+   }
+          </div>
+                </div>
+        <div class="info-item">
+      <label>Departament</label>
+              <div class="info-value">@(UtilizatorData.Departament ?? "-")</div>
+         </div>
+ <div class="info-item">
+          <label>Pozitie</label>
+            <div class="info-value">@(UtilizatorData.Pozitie ?? "-")</div>
+           </div>
+               <div class="info-item">
+     <label>Telefon</label>
+          <div class="info-value">
+       @if (!string.IsNullOrEmpty(UtilizatorData.Telefon))
+        {
+     <a href="tel:@UtilizatorData.Telefon" class="contact-link">
+           <i class="fas fa-phone"></i>
+            @UtilizatorData.Telefon
+ </a>
+ }
+        else
+           {
+ <span>-</span>
+  }
+              </div>
+            </div>
+ <div class="info-item">
+             <label>Email Personal Medical</label>
+       <div class="info-value">
+      @if (!string.IsNullOrEmpty(UtilizatorData.EmailPersonalMedical))
+        {
+    <a href="mailto:@UtilizatorData.EmailPersonalMedical" class="contact-link">
+    <i class="fas fa-envelope"></i>
+          @UtilizatorData.EmailPersonalMedical
+ </a>
+          }
+ else
+             {
+            <span>-</span>
+         }
+      </div>
+     </div>
+     </div>
+       </div>
+              </div>
+       }
+
+             @* TAB 4: Audit *@
+    @if (ActiveTab == "audit")
+  {
+           <div class="tab-pane active">
+       <div class="info-card">
+              <h3 class="card-title">
+          <i class="fas fa-history"></i>
+     <span>Istoric Modificari</span>
+</h3>
+              <div class="info-grid">
+      <div class="info-item">
+    <label>Creat De</label>
+  <div class="info-value">@(UtilizatorData.CreatDe ?? "System")</div>
+              </div>
+      <div class="info-item">
+    <label>Data Crearii</label>
+         <div class="info-value">@UtilizatorData.DataCrearii.ToString("dd.MM.yyyy HH:mm:ss")</div>
+    </div>
+          <div class="info-item">
+       <label>Modificat De</label>
+            <div class="info-value">@(UtilizatorData.ModificatDe ?? "-")</div>
+            </div>
+       <div class="info-item">
+    <label>Data Ultimei Modificari</label>
+ <div class="info-value">@UtilizatorData.DataUltimeiModificari.ToString("dd.MM.yyyy HH:mm:ss")</div>
+           </div>
+           </div>
+   </div>
+  </div>
+    }
+           </div>
+         </div>
+    }
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @onclick="Close">
+          <i class="fas fa-times"></i>
+      <span>Inchide</span>
+   </button>
+    @if (UtilizatorData != null && UtilizatorData.Username != "Admin")
+          {
+         <button type="button" class="btn btn-primary" @onclick="HandleEdit">
+   <i class="fas fa-edit"></i>
+     <span>Editeaza</span>
+      </button>
+                <button type="button" class="btn btn-danger" @onclick="HandleDelete">
+           <i class="fas fa-trash"></i>
+   <span>Sterge</span>
+            </button>
+   }
+        </div>
+    </div>
+</div>

@@ -5,19 +5,20 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     
-    <!-- Dezactivam build-ul pentru acest proiect - este doar pentru documentatie -->
+    <!-- ✅ ENABLE pentru AdminPasswordHashFix utility -->
     <IsPackable>false</IsPackable>
     <IsPublishable>false</IsPublishable>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- COMMENTED OUT to allow compilation of AdminPasswordHashFix.cs -->
+    <!-- <GenerateAssemblyInfo>false</GenerateAssemblyInfo> -->
     <UseCommonOutputDirectory>false</UseCommonOutputDirectory>
   </PropertyGroup>
 
   <!-- Include toate fisierele ca Content pentru a fi vizibile in Solution Explorer -->
   <ItemGroup>
-    <Content Include="Documentation\**\*.*" />
+  <Content Include="Documentation\**\*.*" />
     <Content Include="Scripts\**\*.*" />
     <Content Include="Improvement\**\*.*" />
-    <Content Include="SQLScripts\**\*.*" />
+  <Content Include="SQLScripts\**\*.*" />
   </ItemGroup>
 
   <!-- Exclude folder-urile obj si bin -->
@@ -27,14 +28,23 @@
     <EmbeddedResource Remove="obj\**" />
     <None Remove="obj\**" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="AdminPasswordHashFix.csproj" />
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+ <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    
+    <!-- ✨ ADĂUGATE pentru AdminPasswordHashFix utility -->
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
   </ItemGroup>
 
 </Project>

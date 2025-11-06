@@ -1,0 +1,227 @@
+﻿@rendermode InteractiveServer
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+     <div class="modal-title">
+                <i class="fas @(Model.IsEditMode ? "fa-user-edit" : "fa-user-plus")"></i>
+          <h2>@(Model.IsEditMode ? "Editeaza Utilizator" : "Adauga Utilizator")</h2>
+    </div>
+   <button class="btn-close" @onclick="Close" type="button">
+        <i class="fas fa-times"></i>
+   </button>
+        </div>
+
+        <div class="modal-body">
+ @if (IsLoading)
+   {
+    <div class="loading-container">
+               <div class="spinner-border text-primary" role="status">
+  <span class="visually-hidden">Loading...</span>
+     </div>
+        <p>Se incarca datele...</p>
+     </div>
+   }
+    else
+  {
+            @if (HasError)
+{
+      <div class="alert alert-danger" role="alert">
+           <i class="fas fa-exclamation-triangle"></i>
+     <span>@ErrorMessage</span>
+     </div>
+          }
+
+                <EditForm Model="@Model" OnValidSubmit="HandleSubmit">
+         <DataAnnotationsValidator />
+     
+         <div class="tabs-container">
+              <div class="tab-buttons">
+          <button type="button" class="tab-button @(ActiveTab == "date-utilizator" ? "active" : "")" 
+    @onclick='() => SetActiveTab("date-utilizator")'>
+            <i class="fas fa-user"></i>
+   <span>Date Utilizator</span>
+                 </button>
+       <button type="button" class="tab-button @(ActiveTab == "securitate" ? "active" : "")" 
+     @onclick='() => SetActiveTab("securitate")'>
+      <i class="fas fa-lock"></i>
+     <span>Securitate</span>
+         </button>
+           </div>
+
+     <div class="tab-content">
+         @* TAB 1: Date Utilizator *@
+             @if (ActiveTab == "date-utilizator")
+       {
+<div class="tab-pane active">
+              <div class="info-card">
+            <h3 class="card-title">
+          <i class="fas fa-user-circle"></i>
+         <span>Informatii Utilizator</span>
+         </h3>
+         <div class="info-grid">
+     @* Personal Medical Dropdown (Autocomplete) *@
+        <div class="form-group full-width">
+      <label for="personal-medical">Personal Medical <span class="required">*</span></label>
+           <SfDropDownList TValue="Guid?" 
+             TItem="PersonalMedicalOption"
+   ID="personal-medical"
+            Placeholder="Selecteaza Personal Medical"
+      DataSource="@PersonalMedicalOptions"
+      @bind-Value="@Model.PersonalMedicalID"
+AllowFiltering="true"
+      FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+              ShowClearButton="false"
+      CssClass="form-control"
+              Enabled="@(!Model.IsEditMode)">
+                   <DropDownListFieldSettings Text="DisplayName" Value="Id"></DropDownListFieldSettings>
+  </SfDropDownList>
+         <ValidationMessage For="@(() => Model.PersonalMedicalID)" />
+       </div>
+          
+    <div class="form-group">
+      <label for="username">Username <span class="required">*</span></label>
+    <InputText id="username" class="form-control" @bind-Value="Model.Username" />
+  <ValidationMessage For="@(() => Model.Username)" />
+          </div>
+          
+     <div class="form-group">
+     <label for="email">Email <span class="required">*</span></label>
+      <InputText id="email" type="email" class="form-control" @bind-Value="Model.Email" />
+     <ValidationMessage For="@(() => Model.Email)" />
+            </div>
+        
+       <div class="form-group">
+           <label for="rol">Rol <span class="required">*</span></label>
+   <SfDropDownList TValue="string" 
+    TItem="RolOption"
+           ID="rol"
+         Placeholder="Selecteaza rolul"
+      DataSource="@RolOptions"
+    @bind-Value="@Model.Rol"
+    AllowFiltering="false"
+ShowClearButton="false"
+           CssClass="form-control">
+    <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
+  </SfDropDownList>
+       <ValidationMessage For="@(() => Model.Rol)" />
+         </div>
+       
+       <div class="form-group">
+  <label for="status">Status <span class="required">*</span></label>
+   <InputCheckbox id="status" @bind-Value="Model.EsteActiv" />
+           <span class="checkbox-label">Activ</span>
+</div>
+       </div>
+        </div>
+           </div>
+          }
+          
+ @* TAB 2: Securitate *@
+      @if (ActiveTab == "securitate")
+      {
+    <div class="tab-pane active">
+     <div class="info-card">
+    <h3 class="card-title">
+       <i class="fas fa-shield-alt"></i>
+<span>Parola si Securitate</span>
+      </h3>
+        
+          @if (!Model.IsEditMode)
+  {
+            @* ADD MODE - Password required *@
+           <div class="alert alert-info mb-3">
+     <i class="fas fa-info-circle"></i>
+         Pentru utilizator nou, parola este obligatorie.
+              </div>
+        }
+  else
+           {
+        @* EDIT MODE - Password optional *@
+   <div class="alert alert-warning mb-3">
+     <i class="fas fa-exclamation-triangle"></i>
+     Lasa parola goala daca nu doresti sa o schimbi.
+         </div>
+          }
+                    
+<div class="info-grid">
+           <div class="form-group full-width">
+             <label for="password">
+          Parola 
+   @if (!Model.IsEditMode)
+     {
+          <span class="required">*</span>
+         }
+         </label>
+          <div class="password-input-group">
+          <InputText id="password" 
+            type="@(ShowPassword ? "text" : "password")" 
+              class="form-control" 
+         @bind-Value="Model.Password" 
+ placeholder="Minim 8 caractere" />
+  <button type="button" 
+      class="btn-toggle-password" 
+         @onclick="TogglePasswordVisibility"
+          title="@(ShowPassword ? "Ascunde parola" : "Arata parola")">
+        <i class="fas fa-@(ShowPassword ? "eye-slash" : "eye")"></i>
+ </button>
+  </div>
+     <ValidationMessage For="@(() => Model.Password)" />
+            </div>
+             
+          <div class="form-group full-width">
+    <div class="password-actions">
+           <button type="button" 
+      class="btn btn-secondary btn-generate" 
+     @onclick="GenerateRandomPassword">
+   <i class="fas fa-key"></i>
+                     Genereaza Parola
+    </button>
+   @if (!string.IsNullOrEmpty(GeneratedPassword))
+   {
+<div class="generated-password-display">
+          <label>Parola generata:</label>
+         <code>@GeneratedPassword</code>
+      <button type="button" 
+     class="btn-copy" 
+           @onclick="CopyPasswordToClipboard"
+       title="Copiaza in clipboard">
+       <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      }
+     </div>
+       </div>
+           </div>
+   </div>
+           </div>
+     }
+         </div>
+         </div>
+           </EditForm>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @onclick="Close" disabled="@IsSaving">
+       <i class="fas fa-times"></i>
+         <span>Anuleaza</span>
+            </button>
+        <button type="button" class="btn btn-primary" @onclick="HandleSubmit" disabled="@IsSaving">
+          @if (IsSaving)
+ {
+ <span class="spinner-border spinner-border-sm" role="status"></span>
+           <span>Se salveaza...</span>
+      }
+           else
+       {
+        <i class="fas fa-save"></i>
+    <span>@(Model.IsEditMode ? "Actualizeaza" : "Salveaza")</span>
+        }
+            </button>
+        </div>
+  </div>
+</div>

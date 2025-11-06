@@ -48,6 +48,12 @@
                                 <i class="fas fa-briefcase"></i>
                                 <span>Pozitie</span>
                             </button>
+                            <!-- ✅ ADDED: Tab Pacienți -->
+                            <button class="tab-button @(ActiveTab == "pacienti" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("pacienti")'>
+                                <i class="fas fa-users"></i>
+                                <span>Pacienți (@PacientiAsociati.Count)</span>
+                            </button>
                         </div>
 
                         <div class="tab-content">
@@ -184,6 +190,161 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+
+                            <!-- ✅ ADDED: Tab Pacienți -->
+                            <div class="tab-pane @(ActiveTab == "pacienti" ? "active" : "")">
+                                @if (IsLoadingPacienti)
+                                {
+                                    <div class="loading-container" style="text-align: center; padding: 3rem;">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Se încarcă...</span>
+                                        </div>
+                                        <p>Se încarcă pacienți...</p>
+                                    </div>
+                                }
+                                else if (PacientiAsociati.Any())
+                                {
+                                    <!-- Pacienți activi -->
+                                    @if (PacientiActivi.Any())
+                                    {
+                                        <div class="info-card">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                                Pacienți Activi (@PacientiActivi.Count)
+                                            </h3>
+                                            @foreach (var pacient in PacientiActivi)
+                                            {
+                                                <div class="pacient-card" style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
+                                                    <div class="pacient-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                                        <div>
+                                                            <h5 style="margin: 0; font-size: 1.125rem; color: #111827;">
+                                                                <i class="fas fa-user-injured text-primary"></i>
+                                                                @pacient.PacientNumeComplet
+                                                            </h5>
+                                                            @if (!string.IsNullOrEmpty(pacient.PacientCNP))
+                                                            {
+                                                                <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #6b7280;">CNP: @pacient.PacientCNP</p>
+                                                            }
+                                                        </div>
+                                                        @if (!string.IsNullOrEmpty(pacient.TipRelatie))
+                                                        {
+                                                            <span class="badge @GetBadgeClass(pacient.TipRelatie)" style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 6px;">
+                                                                @pacient.TipRelatie
+                                                            </span>
+                                                        }
+                                                    </div>
+
+                                                    <div class="info-grid" style="gap: 0.75rem;">
+                                                        <div class="info-item">
+                                                            <label style="font-size: 0.8125rem; color: #6b7280;">Vârstă</label>
+                                                            <div class="info-value" style="font-size: 0.875rem;">
+                                                                @pacient.PacientVarsta ani (@pacient.PacientSex)
+                                                            </div>
+                                                        </div>
+                                                        @if (!string.IsNullOrEmpty(pacient.PacientTelefon))
+                                                        {
+                                                            <div class="info-item">
+                                                                <label style="font-size: 0.8125rem; color: #6b7280;">Telefon</label>
+                                                                <div class="info-value" style="font-size: 0.875rem;">
+                                                                    <a href="tel:@pacient.PacientTelefon" class="contact-link">
+                                                                        <i class="fas fa-phone"></i>
+                                                                        @pacient.PacientTelefon
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        @if (!string.IsNullOrEmpty(pacient.PacientEmail))
+                                                        {
+                                                            <div class="info-item">
+                                                                <label style="font-size: 0.8125rem; color: #6b7280;">Email</label>
+                                                                <div class="info-value" style="font-size: 0.875rem;">
+                                                                    <a href="mailto:@pacient.PacientEmail" class="contact-link">
+                                                                        <i class="fas fa-envelope"></i>
+                                                                        @pacient.PacientEmail
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        <div class="info-item">
+                                                            <label style="font-size: 0.8125rem; color: #6b7280;">Data asocierii</label>
+                                                            <div class="info-value" style="font-size: 0.875rem;">
+                                                                @pacient.DataAsocierii.ToString("dd.MM.yyyy") 
+                                                                <span style="color: #6b7280;">(@FormatZile(pacient.ZileDeAsociere))</span>
+                                                            </div>
+                                                        </div>
+                                                        @if (!string.IsNullOrEmpty(pacient.Motiv))
+                                                        {
+                                                            <div class="info-item full-width">
+                                                                <label style="font-size: 0.8125rem; color: #6b7280;">Motiv asociere</label>
+                                                                <div class="info-value" style="font-size: 0.875rem;">
+                                                                    <i class="fas fa-info-circle text-info"></i>
+                                                                    @pacient.Motiv
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+
+                                    <!-- Pacienți inactivi (istoric) -->
+                                    @if (PacientiInactivi.Any())
+                                    {
+                                        <div class="info-card" style="margin-top: 1.5rem;">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-history text-muted"></i>
+                                                Istoric Relații Inactive (@PacientiInactivi.Count)
+                                            </h3>
+                                            @foreach (var pacient in PacientiInactivi)
+                                            {
+                                                <div class="pacient-card-inactive" style="background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
+                                                    <div class="pacient-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                                        <div>
+                                                            <h5 style="margin: 0; font-size: 1.125rem; color: #6b7280;">
+                                                                <i class="fas fa-user-injured"></i>
+                                                                @pacient.PacientNumeComplet
+                                                            </h5>
+                                                            @if (!string.IsNullOrEmpty(pacient.PacientCNP))
+                                                            {
+                                                                <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #6b7280;">CNP: @pacient.PacientCNP</p>
+                                                            }
+                                                        </div>
+                                                        <span class="badge badge-secondary" style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 6px; background: #94a3b8; color: white;">INACTIV</span>
+                                                    </div>
+
+                                                    <div class="info-grid" style="gap: 0.75rem;">
+                                                        <div class="info-item">
+                                                            <label style="font-size: 0.8125rem; color: #6b7280;">Perioadă</label>
+                                                            <div class="info-value" style="font-size: 0.875rem; color: #6b7280;">
+                                                                @pacient.DataAsocierii.ToString("dd.MM.yyyy") - 
+                                                                @(pacient.DataDezactivarii?.ToString("dd.MM.yyyy") ?? "N/A")
+                                                            </div>
+                                                        </div>
+                                                        @if (pacient.ZileDeAsociere > 0)
+                                                        {
+                                                            <div class="info-item">
+                                                                <label style="font-size: 0.8125rem; color: #6b7280;">Zile de asociere</label>
+                                                                <div class="info-value" style="font-size: 0.875rem; color: #6b7280;">
+                                                                    @FormatZile(pacient.ZileDeAsociere)
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <!-- Empty State -->
+                                    <div class="empty-state" style="text-align: center; padding: 3rem; color: #6b7280;">
+                                        <i class="fas fa-users fa-3x" style="margin-bottom: 1.5rem; color: #d1d5db;"></i>
+                                        <p style="font-size: 1.125rem; margin-bottom: 0; color: #374151;">Nu există pacienți asociați acestui doctor.</p>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

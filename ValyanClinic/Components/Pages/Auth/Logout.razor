@@ -1,0 +1,65 @@
+﻿@page "/logout"
+@rendermode InteractiveServer
+@layout EmptyLayout
+
+<PageTitle>Deconectare...</PageTitle>
+
+<div class="logout-container">
+    <div class="logout-card">
+        <div class="logout-icon">
+            <i class="fas fa-sign-out-alt"></i>
+   </div>
+        <h2>Te deconectam...</h2>
+   <p>Vei fi redirectionat catre pagina de login in cateva secunde.</p>
+    <div class="spinner-border text-primary" role="status">
+  <span class="visually-hidden">Se deconecteaza...</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    .logout-container {
+        min-height: 100vh;
+        display: flex;
+ align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+  }
+
+    .logout-card {
+        background: white;
+  padding: 50px;
+   border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(96, 165, 250, 0.2);
+        text-align: center;
+        max-width: 400px;
+    }
+
+  .logout-icon {
+  width: 80px;
+   height: 80px;
+        margin: 0 auto 20px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+     border-radius: 50%;
+   display: flex;
+   align-items: center;
+        justify-content: center;
+    }
+
+ .logout-icon i {
+        font-size: 40px;
+        color: white;
+    }
+
+    .logout-card h2 {
+        font-size: 24px;
+    font-weight: 700;
+     color: #334155;
+   margin-bottom: 10px;
+    }
+
+    .logout-card p {
+     color: #64748b;
+   margin-bottom: 30px;
+    }
+</style>

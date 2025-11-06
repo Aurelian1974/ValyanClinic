@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Components.Authorization;
 using Serilog;
 using Syncfusion.Blazor;
 using ValyanClinic.Infrastructure.Data;
@@ -10,6 +11,7 @@ using ValyanClinic.Services.DataGrid;
 using ValyanClinic.Services.Caching;
 using ValyanClinic.Services.Security;
 using ValyanClinic.Services.Blazor;
+using ValyanClinic.Services.Authentication;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using MediatR;
 
@@ -46,6 +48,14 @@ try
             options.MaxBufferedUnacknowledgedRenderBatches = 20;
         });
 
+    // ========================================
+    // AUTHENTICATION & AUTHORIZATION
+    // ========================================
+    builder.Services.AddAuthorizationCore();
+    builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+  builder.Services.AddScoped<CustomAuthenticationStateProvider>(sp => 
+        (CustomAuthenticationStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
+    
     // ========================================
     // CIRCUIT HANDLER - Pentru gestionarea reconectărilor
     // ========================================
@@ -120,6 +130,7 @@ try
     builder.Services.AddScoped<IPozitieRepository, PozitieRepository>();
     builder.Services.AddScoped<ISpecializareRepository, SpecializareRepository>();
     builder.Services.AddScoped<IPacientRepository, PacientRepository>();
+    builder.Services.AddScoped<IUtilizatorRepository, UtilizatorRepository>(); // ✅ NOU
 
     // ========================================
     // CACHING
@@ -158,6 +169,7 @@ try
     // SECURITY SERVICES
     // ========================================
     builder.Services.AddScoped<IHtmlSanitizerService, HtmlSanitizerService>();
+    builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.Security.IPasswordHasher, ValyanClinic.Infrastructure.Security.BCryptPasswordHasher>(); // ✅ NOU - BCrypt
 
     // ========================================
     // NOTIFICATION SERVICES

@@ -52,7 +52,7 @@
             <span class="badge">5</span>
         </button>
 
-        <div class="user-profile">
+        <div class="user-profile" @onclick="ToggleUserMenu">
             <img src="@GetUserAvatarUrl()" 
                  alt="User Avatar" 
                  class="@GetAvatarCssClass()"
@@ -63,6 +63,32 @@
                 <span class="user-role">@UserRole</span>
             </div>
             <i class="fas fa-chevron-down"></i>
+      
+            @if (ShowUserMenu)
+            {
+                <div class="user-dropdown" @onclick:stopPropagation>
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-info">
+                            <strong>@UserName</strong>
+                            <small>@UserRole</small>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="/profile" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>Profil</span>
+                    </a>
+                    <a href="/settings" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Setari</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="/logout" class="dropdown-item logout-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Deconectare</span>
+                    </a>
+                </div>
+            }
         </div>
     </div>
 </header>
