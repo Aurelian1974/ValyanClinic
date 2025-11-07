@@ -1,0 +1,95 @@
+﻿/* Audit Log - Scoped CSS */
+/* Tema: Albastru Pastelat */
+
+.page-container {
+ padding: 1.5rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+  min-height: 100vh;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #93c5fd, #60a5fa);
+    padding: 1.25rem 1.75rem;
+  border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(96, 165, 250, 0.15);
+}
+
+.page-title {
+    color: white;
+    margin: 0;
+    font-size: 1.375rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.filters-panel {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.filter-row {
+    display: flex;
+  gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    flex: 1;
+  min-width: 200px;
+}
+
+.filter-item label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.875rem;
+}
+
+.audit-grid {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.badge-action {
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    background: #bfdbfe;
+    color: #1e40af;
+}
+
+.badge-success {
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  background: #a7f3d0;
+    color: #065f46;
+}
+
+.badge-danger {
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+ background: #fca5a5;
+    color: #991b1b;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}

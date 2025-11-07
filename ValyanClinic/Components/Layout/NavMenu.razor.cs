@@ -15,6 +15,7 @@ public partial class NavMenu : ComponentBase
     private bool isAdministrareExpanded = false;
     private bool isAdministrarePersonalExpanded = false;
     private bool isAdministrareClinicaExpanded = false;
+    private bool isSetariGeneraleExpanded = false;
     private bool isProgramariExpanded = false;
     private bool isRapoarteExpanded = false;
     private bool isMonitorizareExpanded = false;
@@ -32,6 +33,7 @@ public partial class NavMenu : ComponentBase
             isAdministrareExpanded = false;
             isAdministrarePersonalExpanded = false;
             isAdministrareClinicaExpanded = false;
+            isSetariGeneraleExpanded = false;
             isProgramariExpanded = false;
             isRapoarteExpanded = false;
             isMonitorizareExpanded = false;
@@ -64,6 +66,7 @@ public partial class NavMenu : ComponentBase
             {
                 isAdministrarePersonalExpanded = false;
                 isAdministrareClinicaExpanded = false;
+                isSetariGeneraleExpanded = false;
             }
         }
     }
@@ -81,6 +84,14 @@ public partial class NavMenu : ComponentBase
         if (!isCollapsed && isAdministrareExpanded)
         {
             isAdministrareClinicaExpanded = !isAdministrareClinicaExpanded;
+        }
+    }
+
+    private void ToggleSetariGenerale()
+    {
+        if (!isCollapsed && isAdministrareExpanded)
+        {
+            isSetariGeneraleExpanded = !isSetariGeneraleExpanded;
         }
     }
 

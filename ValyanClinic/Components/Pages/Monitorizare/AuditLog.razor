@@ -1,0 +1,99 @@
+﻿@page "/monitorizare/audit-log"
+@using ValyanClinic.Application.Features.Settings.Queries.GetAuditLogs
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Buttons
+@attribute [Authorize]
+
+<PageTitle>Audit Log - ValyanClinic</PageTitle>
+
+<div class="page-container">
+    <div class="page-header">
+        <h3 class="page-title">
+   <i class="fas fa-clipboard-list"></i>
+       Jurnal Audit (Istoric Actiuni)
+        </h3>
+    </div>
+
+    <div class="filters-panel">
+        <div class="filter-row">
+            <div class="filter-item">
+        <label>Actiune:</label>
+     <SfDropDownList TValue="string" TItem="string" 
+          @bind-Value="@SelectedAction"
+   DataSource="@ActionTypes"
+          Placeholder="Toate actiunile">
+ </SfDropDownList>
+     </div>
+            <div class="filter-item">
+   <label>Data Start:</label>
+   <SfDatePicker TValue="DateTime?" @bind-Value="@DataStart"></SfDatePicker>
+         </div>
+        <div class="filter-item">
+           <label>Data Sfarsit:</label>
+ <SfDatePicker TValue="DateTime?" @bind-Value="@DataEnd"></SfDatePicker>
+       </div>
+    <div class="filter-item">
+ <SfButton CssClass="e-primary" OnClick="ApplyFilters">
+            <i class="fas fa-filter"></i> Filtreaza
+    </SfButton>
+         </div>
+        </div>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status"></div>
+    </div>
+    }
+    else
+    {
+        <div class="audit-grid">
+            <SfGrid @ref="GridRef" 
+      DataSource="@AuditLogs"
+ AllowPaging="true"
+              AllowSorting="true">
+      <GridPageSettings PageSize="50"></GridPageSettings>
+          <GridColumns>
+              <GridColumn Field="@nameof(AuditLogDto.DataActiune)" 
+    HeaderText="Data" 
+               Format="dd/MM/yyyy HH:mm:ss"
+             Width="170"></GridColumn>
+             <GridColumn Field="@nameof(AuditLogDto.UserName)" 
+          HeaderText="Utilizator" 
+           Width="150"></GridColumn>
+       <GridColumn Field="@nameof(AuditLogDto.Actiune)" 
+         HeaderText="Actiune" 
+Width="120">
+              <Template>
+ @{
+
+      var log = (context as AuditLogDto);
+     <span class="badge-action">@log?.Actiune</span>
+        }
+</Template>
+  </GridColumn>
+   <GridColumn Field="@nameof(AuditLogDto.Entitate)" 
+ HeaderText="Entitate" 
+  Width="120"></GridColumn>
+    <GridColumn Field="@nameof(AuditLogDto.StatusActiune)" 
+HeaderText="Status" 
+             Width="100">
+         <Template>
+          @{
+         var log = (context as AuditLogDto);
+                 var badgeClass = log?.StatusActiune == "Success" ? "badge-success" : "badge-danger";
+  <span class="@badgeClass">@log?.StatusActiune</span>
+           }
+   </Template>
+              </GridColumn>
+       <GridColumn Field="@nameof(AuditLogDto.AdresaIP)" 
+         HeaderText="IP" 
+       Width="130"></GridColumn>
+    </GridColumns>
+         </SfGrid>
+        </div>
+    }
+</div>

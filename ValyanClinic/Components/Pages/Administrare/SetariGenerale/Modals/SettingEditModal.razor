@@ -1,0 +1,167 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.Settings.Queries.GetSystemSettings
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+   <div class="modal-title">
+ <i class="fas fa-edit"></i>
+       <h2>Editare Setare</h2>
+  </div>
+      <button class="btn-close" @onclick="Close" type="button">
+     <i class="fas fa-times"></i>
+        </button>
+   </div>
+
+        <div class="modal-body">
+    @if (IsLoading)
+       {
+<div class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+       <span class="visually-hidden">Loading...</span>
+         </div>
+     <p>Se incarca datele...</p>
+       </div>
+       }
+       else
+     {
+      @if (HasError)
+       {
+      <div class="alert alert-danger" role="alert">
+     <i class="fas fa-exclamation-triangle"></i>
+        <span>@ErrorMessage</span>
+         </div>
+       }
+
+  @if (CurrentSetting != null)
+       {
+    <div class="info-card">
+         <h3 class="card-title">
+   <i class="fas fa-info-circle"></i>
+          <span>Informatii Setare</span>
+   </h3>
+  <div class="info-grid">
+   <div class="form-group">
+      <label>Categorie</label>
+         <input type="text" class="form-control" value="@CurrentSetting.Categorie" readonly />
+       </div>
+    
+  <div class="form-group">
+      <label>Cheie</label>
+         <input type="text" class="form-control" value="@CurrentSetting.Cheie" readonly />
+ </div>
+      
+      <div class="form-group full-width">
+     <label>Descriere</label>
+  <SfTextBox @bind-Value="@EditableDescriere" 
+      Placeholder="Descriere setare..."
+    Multiline="true"
+ CssClass="form-control textarea-control">
+      </SfTextBox>
+       </div>
+       
+       @if (!string.IsNullOrEmpty(CurrentSetting.ValoareDefault))
+   {
+       <div class="form-group">
+    <label>Valoare Implicita</label>
+  <input type="text" class="form-control" value="@CurrentSetting.ValoareDefault" readonly />
+       </div>
+        }
+    
+        <div class="form-group">
+        <label>Tip Date</label>
+ <input type="text" class="form-control badge-input" value="@CurrentSetting.TipDate" readonly />
+       </div>
+        </div>
+     </div>
+
+       <div class="info-card">
+ <h3 class="card-title">
+    <i class="fas fa-pencil-alt"></i>
+       <span>Valoare Noua</span>
+       </h3>
+   <div class="info-grid">
+      <div class="form-group full-width">
+   <label>Valoare <span class="required">*</span></label>
+      
+       @if (IsBooleanType(CurrentSetting.TipDate))
+   {
+  <SfDropDownList TValue="string" 
+         TItem="BooleanOptionModel" 
+        @bind-Value="@NewValue"
+       DataSource="@BooleanOptionsWithLabels"
+     Placeholder="Selecteaza valoarea..."
+    CssClass="form-control">
+       <DropDownListFieldSettings Text="Label" Value="Value"></DropDownListFieldSettings>
+     </SfDropDownList>
+        }
+else if (IsIntegerType(CurrentSetting.TipDate))
+      {
+  @* ✅ SIMPLIFICAT: Numeric input FĂRĂ săgeți (ShowSpinButton="false") *@
+    <SfNumericTextBox TValue="int?" 
+         Value="@(int.TryParse(NewValue, out var val) ? val : (int?)null)"
+        ValueChange="@((Syncfusion.Blazor.Inputs.ChangeEventArgs<int?> args) => NewValue = args.Value?.ToString() ?? string.Empty)"
+         Placeholder="Introduceti valoarea numerica..."
+       CssClass="form-control"
+        ShowSpinButton="false"
+     FloatLabelType="FloatLabelType.Never"
+       Format="n0"
+    Min="0">
+      </SfNumericTextBox>
+   }
+      else
+     {
+  <SfTextBox @bind-Value="@NewValue" 
+     Placeholder="Introduceti valoarea..."
+      CssClass="form-control">
+     </SfTextBox>
+    }
+       </div>
+      </div>
+</div>
+      }
+  }
+      </div>
+
+        <div class="modal-footer">
+       <button type="button" class="btn btn-secondary" @onclick="Close" disabled="@IsSaving">
+ <i class="fas fa-times"></i>
+     <span>Anuleaza</span>
+       </button>
+      <button type="button" class="btn btn-primary" @onclick="SaveSetting" disabled="@IsSaving">
+      @if (IsSaving)
+    {
+       <span class="spinner-border spinner-border-sm"></span>
+     <span>Se salveaza...</span>
+       }
+       else
+     {
+        <i class="fas fa-save"></i>
+        <span>Salveaza</span>
+       }
+   </button>
+    </div>
+    </div>
+</div>
+
+@code {
+    // ✅ Helper methods pentru detectare tip date
+    private bool IsBooleanType(string? tipDate)
+    {
+        if (string.IsNullOrEmpty(tipDate)) return false;
+        
+  return tipDate.Equals("bool", StringComparison.OrdinalIgnoreCase) ||
+    tipDate.Equals("Boolean", StringComparison.OrdinalIgnoreCase);
+    }
+    
+    private bool IsIntegerType(string? tipDate)
+    {
+   if (string.IsNullOrEmpty(tipDate)) return false;
+      
+        return tipDate.Equals("int", StringComparison.OrdinalIgnoreCase) ||
+   tipDate.Equals("Integer", StringComparison.OrdinalIgnoreCase) ||
+   tipDate.Equals("int32", StringComparison.OrdinalIgnoreCase);
+    }
+}

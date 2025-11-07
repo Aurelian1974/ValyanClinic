@@ -10,17 +10,17 @@
 ## 🎯 Categorii Principale de Setări
 
 ### 1️⃣ **AUTENTIFICARE ȘI SECURITATE**
-- [ ] Politici parole (lungime minimă, complexitate, expirare)
+- [x] Politici parole (lungime minimă, complexitate, expirare)
 - [ ] Autentificare multi-factor (2FA/MFA)
-- [ ] Timeout sesiune utilizator (inactivitate)
-- [ ] Lockout cont după N încercări eșuate
+- [x] Timeout sesiune utilizator (inactivitate)
+- [x] Lockout cont după N încercări eșuate
 - [ ] IP whitelisting/blacklisting
-- [ ] Audit log pentru accesări sistem
+- [x] Audit log pentru accesări sistem
 - [ ] Politici de criptare date sensibile (CNP, date medicale)
 - [ ] GDPR compliance settings (consimțământ prelucrare date)
-- [ ] **Securitate parolă implicită pentru conturi noi**
+- [x] **Securitate parolă implicită pentru conturi noi**
 - [ ] **Forțare schimbare parolă la prima autentificare**
-- [ ] **Istoric parole (nu permite refolosirea ultimelor N parole)**
+- [x] **Istoric parole (nu permite refolosirea ultimelor N parole)**
 - [ ] **Sign-out automat la inactivitate (toate dispozitivele)**
 - [ ] **Sesiuni concurente maxime per utilizator**
 - [ ] **Restricții orare acces (program de lucru)**
@@ -478,9 +478,9 @@
 
 ### Database Tables
 ```sql
--- Tabele noi necesare:
-- Setari_Sistem (global settings - JSON blob pentru flexibilitate)
-- Setari_Utilizator (per-user preferences - JSON blob)
+-- Tabele noi necesare (Key-Value Pattern - EAV):
+- Setari_Sistem (Categorie, Cheie, Valoare, TipDate, Descriere, ValoareDefault, EsteEditabil)
+- Setari_Utilizator (UtilizatorID, Categorie, Cheie, Valoare, TipDate)
 - Roluri (role definitions)
 - Permisiuni (permissions matrix)
 - Roluri_Permisiuni (many-to-many)

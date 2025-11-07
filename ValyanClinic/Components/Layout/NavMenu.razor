@@ -166,6 +166,29 @@
                             </div>
                         }
                     </div>
+
+                    @* Setari Generale - Level 2 (NOU - Phase1) *@
+                    <div class="nav-subsection">
+                        <div class="nav-subsection-header" @onclick="ToggleSetariGenerale">
+                            <div class="nav-subsection-title">
+                                <i class="fas fa-cogs"></i>
+                                <span>Setari Generale</span>
+                            </div>
+                            <i class="fas fa-chevron-@(isSetariGeneraleExpanded ? "up" : "down") nav-chevron-small"></i>
+                        </div>
+
+                        @if (isSetariGeneraleExpanded)
+                        {
+                            <div class="nav-sub-items">
+                                <div class="nav-item nav-item-child">
+                                    <a href="/administrare/setari-generale/setari-autentificare" class="nav-link nav-link-child" title="Setari Autentificare">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span>Setari Autentificare</span>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
                 }
             }
             else
@@ -275,6 +298,20 @@
                             <a href="/health" class="nav-link nav-link-child" target="_blank" title="Health Check">
                                 <i class="fas fa-heartbeat"></i>
                                 <span>Health Check</span>
+                            </a>
+                        </div>
+
+                        <div class="nav-item nav-item-child">
+                            <a href="/monitorizare/audit-log" class="nav-link nav-link-child" title="Audit Log">
+                                <i class="fas fa-clipboard-list"></i>
+                                <span>Audit Log</span>
+                            </a>
+                        </div>
+
+                        <div class="nav-item nav-item-child">
+                            <a href="/monitorizare/sesiuni-active" class="nav-link nav-link-child" title="Sesiuni Active">
+                                <i class="fas fa-users"></i>
+                                <span>Sesiuni Active</span>
                             </a>
                         </div>
                     </div>

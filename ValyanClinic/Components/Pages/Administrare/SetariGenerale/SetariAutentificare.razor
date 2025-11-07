@@ -1,0 +1,83 @@
+﻿@page "/administrare/setari-generale/setari-autentificare"
+@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.Settings.Queries.GetSystemSettings
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Buttons
+@using ValyanClinic.Components.Pages.Administrare.SetariGenerale.Modals
+@attribute [Authorize]
+
+<PageTitle>Setari Autentificare - ValyanClinic</PageTitle>
+
+<div class="page-container">
+    <div class="page-header">
+<h3 class="page-title">
+            <i class="fas fa-shield-alt"></i>
+       Setari Autentificare si Securitate
+        </h3>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+     <span class="visually-hidden">Loading...</span>
+  </div>
+     </div>
+    }
+ else
+    {
+        <div class="settings-grid">
+            <SfGrid @ref="GridRef" 
+        DataSource="@Settings" 
+  AllowPaging="false"
+    AllowSorting="true"
+     AllowFiltering="false">
+ <GridColumns>
+        <GridColumn Field="@nameof(SystemSettingDto.Categorie)" 
+           HeaderText="Categorie" 
+          Width="150"></GridColumn>
+  <GridColumn Field="@nameof(SystemSettingDto.Cheie)" 
+         HeaderText="Setare" 
+              Width="250"></GridColumn>
+         <GridColumn Field="@nameof(SystemSettingDto.Valoare)" 
+       HeaderText="Valoare" 
+  Width="150">
+            <Template>
+        @{
+          var setting = (context as SystemSettingDto);
+     <span class="setting-value">@setting?.Valoare</span>
+               }
+ </Template>
+              </GridColumn>
+           <GridColumn Field="@nameof(SystemSettingDto.Descriere)" 
+    HeaderText="Descriere" 
+         Width="300"></GridColumn>
+         <GridColumn HeaderText="Actiuni" 
+      Width="120" 
+    TextAlign="TextAlign.Center">
+         <Template>
+        @{
+
+var setting = (context as SystemSettingDto);
+          if (setting?.EsteEditabil == true)
+       {
+       <SfButton CssClass="e-small e-info" 
+       OnClick="() => OpenEditDialog(setting)">
+            <i class="fas fa-edit"></i> Editeaza
+  </SfButton>
+ }
+            else
+    {
+             <span class="text-muted"><i class="fas fa-lock"></i> Blocat</span>
+        }
+     }
+</Template>
+    </GridColumn>
+       </GridColumns>
+ </SfGrid>
+      </div>
+    }
+</div>
+
+@* MODAL COMPONENT ONLY - No inline modal *@
+<SettingEditModal @ref="EditModalRef" OnSettingSaved="HandleSettingSaved" />

@@ -223,7 +223,12 @@ try
     builder.Services.AddScoped<IPozitieRepository, PozitieRepository>();
     builder.Services.AddScoped<ISpecializareRepository, SpecializareRepository>();
     builder.Services.AddScoped<IPacientRepository, PacientRepository>();
-    builder.Services.AddScoped<IUtilizatorRepository, UtilizatorRepository>(); // ✅ NOU
+    builder.Services.AddScoped<IUtilizatorRepository, UtilizatorRepository>();
+    
+    // Phase1 Settings Repositories
+    builder.Services.AddScoped<ISystemSettingsRepository, ValyanClinic.Infrastructure.Repositories.Settings.SystemSettingsRepository>();
+    builder.Services.AddScoped<IAuditLogRepository, ValyanClinic.Infrastructure.Repositories.Settings.AuditLogRepository>();
+    builder.Services.AddScoped<IUserSessionRepository, ValyanClinic.Infrastructure.Repositories.Settings.UserSessionRepository>();
 
     // ========================================
     // CACHING
