@@ -223,7 +223,8 @@ try
     builder.Services.AddScoped<IPozitieRepository, PozitieRepository>();
     builder.Services.AddScoped<ISpecializareRepository, SpecializareRepository>();
     builder.Services.AddScoped<IPacientRepository, PacientRepository>();
-    builder.Services.AddScoped<IUtilizatorRepository, UtilizatorRepository>();
+  builder.Services.AddScoped<IUtilizatorRepository, UtilizatorRepository>();
+    builder.Services.AddScoped<IProgramareRepository, ProgramareRepository>(); // ✅ NOU - Programari
     
     // Phase1 Settings Repositories
     builder.Services.AddScoped<ISystemSettingsRepository, ValyanClinic.Infrastructure.Repositories.Settings.SystemSettingsRepository>();
@@ -276,6 +277,11 @@ try
     // NOTIFICATION SERVICES
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Services.INotificationService, ValyanClinic.Services.NotificationService>();
+
+    // ========================================
+    // EXPORT SERVICES
+    // ========================================
+    builder.Services.AddScoped<ValyanClinic.Services.Export.IExcelExportService, ValyanClinic.Services.Export.ExcelExportService>();
 
     // ========================================
     // BUSINESS SERVICES

@@ -1,0 +1,376 @@
+﻿@page "/monitorizare/sesiuni-active"
+@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.UserSessions.Queries.GetActiveSessions
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Notifications
+
+<PageTitle>Sesiuni Active - ValyanClinic</PageTitle>
+
+<!-- ✅ Toast Component pentru notificări -->
+<SfToast @ref="ToastRef" />
+
+<div class="page-container">
+    <div class="page-header">
+        <div class="header-content">
+  <div class="title-section">
+   <i class="fas fa-users-cog"></i>
+       <div>
+     <h1>Sesiuni Active</h1>
+     <p class="subtitle">Monitorizare și gestionare sesiuni utilizatori</p>
+        </div>
+  </div>
+   
+            <div class="header-actions">
+ <button class="btn btn-secondary" @onclick="HandleRefresh" disabled="@IsLoading">
+        <i class="fas fa-sync-alt @(IsLoading ? "fa-spin" : "")"></i>
+  <span>Actualizează</span>
+      </button>
+            </div>
+        </div>
+    </div>
+
+    @if (HasError)
+    {
+        <div class="alert alert-danger">
+         <i class="fas fa-exclamation-triangle"></i>
+ <span>@ErrorMessage</span>
+      </div>
+    }
+
+    <!-- Statistics Cards -->
+    <div class="statistics-row">
+      <div class="stat-card stat-primary">
+        <div class="stat-icon">
+   <i class="fas fa-circle-notch fa-spin" style="color: #10b981;"></i>
+    </div>
+       <div class="stat-content">
+      <div class="stat-value">@TotalActive</div>
+  <div class="stat-label">Sesiuni Active</div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-warning">
+    <div class="stat-icon">
+          <i class="fas fa-clock"></i>
+      </div>
+            <div class="stat-content">
+         <div class="stat-value">@ExpiraInCurand</div>
+         <div class="stat-label">Expiră în curând</div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-info">
+     <div class="stat-icon">
+        <i class="fas fa-history"></i>
+            </div>
+            <div class="stat-content">
+   <div class="stat-value">@InactiviAzi</div>
+                <div class="stat-label">Închise astăzi</div>
+         </div>
+        </div>
+
+ <div class="stat-card stat-secondary">
+            <div class="stat-icon">
+     <i class="fas fa-sync-alt"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">@RefreshIntervalSeconds s</div>
+                <div class="stat-label">Auto-refresh</div>
+     </div>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="filter-toolbar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <SfTextBox @bind-Value="@GlobalSearchText"
+     Placeholder="Caută după utilizator, email, IP, browser..."
+           CssClass="search-input"
+     Input="@(async (e) => await HandleSearch(e.Value))">
+            </SfTextBox>
+  @if (!string.IsNullOrWhiteSpace(GlobalSearchText))
+            {
+    <button class="btn-clear-search" @onclick="HandleClearSearch">
+ <i class="fas fa-times"></i>
+           </button>
+            }
+        </div>
+
+    <div class="filter-actions">
+   <button class="btn btn-filter @(ShowOnlyExpiring ? "active" : "")" 
+ @onclick="HandleToggleExpiringFilter">
+          <i class="fas fa-hourglass-half"></i>
+         <span>Doar expiră în curând</span>
+ </button>
+        </div>
+    </div>
+
+    <!-- Sessions Grid -->
+    <div class="grid-container">
+        @if (IsLoading && !ActiveSessions.Any())
+        {
+    <div class="loading-overlay">
+            <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Se încarcă...</span>
+     </div>
+        <p>Se încarcă sesiunile active...</p>
+            </div>
+        }
+     else
+        {
+      <SfGrid DataSource="@ActiveSessions"
+       AllowPaging="true"
+       AllowSorting="true"
+           AllowFiltering="false"
+ GridLines="GridLine.Both">
+          
+ <GridPageSettings PageSize="20"></GridPageSettings>
+ 
+  <GridColumns>
+      <GridColumn Field="@nameof(ActiveSessionDto.Username)" 
+             HeaderText="Utilizator" 
+               Width="150">
+ <Template>
+     @{
+                var session = (context as ActiveSessionDto)!;
+        <div class="user-cell">
+     <div class="user-avatar">
+           <i class="fas fa-user"></i>
+       </div>
+   <div class="user-info">
+     <div class="user-name">@session.Username</div>
+        <div class="user-role">@session.Rol</div>
+        </div>
+     </div>
+       }
+            </Template>
+            </GridColumn>
+
+   <GridColumn Field="@nameof(ActiveSessionDto.Email)" 
+HeaderText="Email" 
+      Width="200">
+   </GridColumn>
+
+    <GridColumn HeaderText="Device" Width="120">
+          <Template>
+  @{
+   var session = (context as ActiveSessionDto)!;
+        <div class="device-cell">
+   <i class="fas @session.DeviceIcon"></i>
+                     <i class="fab @session.BrowserIcon"></i>
+             </div>
+          }
+      </Template>
+    </GridColumn>
+
+   <GridColumn Field="@nameof(ActiveSessionDto.AdresaIP)" 
+     HeaderText="IP Address" 
+      Width="130">
+    <Template>
+    @{
+   var session = (context as ActiveSessionDto)!;
+         <code class="ip-address">@session.AdresaIP</code>
+         }
+  </Template>
+   </GridColumn>
+
+          <GridColumn HeaderText="Status" Width="150">
+        <Template>
+          @{
+       var session = (context as ActiveSessionDto)!;
+<span class="badge @session.StatusBadgeClass">
+       @session.StatusText
+    </span>
+ }
+            </Template>
+     </GridColumn>
+
+       <GridColumn HeaderText="Activitate" Width="140">
+         <Template>
+                @{
+         var session = (context as ActiveSessionDto)!;
+          <div class="activity-cell">
+   <div class="activity-label">Activ:</div>
+   <div class="activity-value">@session.DurataActivitate</div>
+       <div class="activity-label">Inactiv:</div>
+         <div class="activity-value">@session.DurataInactivitate</div>
+   </div>
+       }
+ </Template>
+       </GridColumn>
+
+           <GridColumn HeaderText="Expiră în" Width="100">
+         <Template>
+  @{
+              var session = (context as ActiveSessionDto)!;
+   <div class="expire-cell @(session.ExpiraInCurând ? "expiring" : "")">
+    <i class="fas fa-clock"></i>
+      <span>@session.TimeToExpire</span>
+       </div>
+                 }
+    </Template>
+ </GridColumn>
+
+  <GridColumn HeaderText="Acțiuni" Width="120" TextAlign="TextAlign.Center">
+      <Template>
+  @{
+           var session = (context as ActiveSessionDto)!;
+  <div class="action-buttons">
+           <button class="btn-action btn-view" 
+          @onclick="() => HandleViewDetails(session)"
+              title="Vezi detalii">
+         <i class="fas fa-eye"></i>
+    </button>
+    <button class="btn-action btn-end" 
+     @onclick="() => HandleEndSession(session)"
+title="Închide sesiune">
+  <i class="fas fa-power-off"></i>
+    </button>
+       </div>
+                  }
+          </Template>
+      </GridColumn>
+             </GridColumns>
+            </SfGrid>
+ }
+    </div>
+</div>
+
+<!-- Details Modal -->
+@if (ShowDetailsModal && SelectedSession != null)
+{
+    <div class="modal-overlay" @onclick="CloseDetailsModal">
+        <div class="modal-container" @onclick:stopPropagation>
+    <div class="modal-header">
+      <h3>
+            <i class="fas fa-info-circle"></i>
+  Detalii Sesiune
+       </h3>
+<button class="btn-close" @onclick="CloseDetailsModal">
+          <i class="fas fa-times"></i>
+      </button>
+      </div>
+  
+            <div class="modal-body">
+           <div class="detail-group">
+     <label>Utilizator</label>
+         <div class="detail-value">
+           <i class="fas fa-user"></i>
+           @SelectedSession.Username (@SelectedSession.Rol)
+         </div>
+                </div>
+
+        <div class="detail-group">
+           <label>Email</label>
+           <div class="detail-value">
+     <i class="fas fa-envelope"></i>
+     @SelectedSession.Email
+     </div>
+    </div>
+
+         <div class="detail-group">
+   <label>IP Address</label>
+  <div class="detail-value">
+   <i class="fas fa-network-wired"></i>
+          <code>@SelectedSession.AdresaIP</code>
+    </div>
+     </div>
+
+           <div class="detail-group">
+          <label>User Agent</label>
+     <div class="detail-value small-text">
+  @(SelectedSession.UserAgent ?? "N/A")
+    </div>
+              </div>
+
+      <div class="detail-group">
+       <label>Dispozitiv</label>
+            <div class="detail-value">
+  <i class="fas @SelectedSession.DeviceIcon"></i>
+   @(SelectedSession.Dispozitiv ?? "Necunoscut")
+           </div>
+            </div>
+
+     <div class="detail-row">
+     <div class="detail-group">
+    <label>Data Creării</label>
+      <div class="detail-value">
+@SelectedSession.DataCreare.ToString("dd.MM.yyyy HH:mm:ss")
+         </div>
+         </div>
+
+       <div class="detail-group">
+  <label>Ultima Activitate</label>
+     <div class="detail-value">
+        @SelectedSession.DataUltimaActivitate.ToString("dd.MM.yyyy HH:mm:ss")
+        </div>
+          </div>
+    </div>
+
+                <div class="detail-group">
+            <label>Data Expirării</label>
+     <div class="detail-value">
+              @SelectedSession.DataExpirare.ToString("dd.MM.yyyy HH:mm:ss")
+        </div>
+          </div>
+
+             <div class="detail-group">
+       <label>Status</label>
+   <div class="detail-value">
+       <span class="badge @SelectedSession.StatusBadgeClass">
+                  @SelectedSession.StatusText
+          </span>
+           </div>
+     </div>
+       </div>
+
+   <div class="modal-footer">
+  <button class="btn btn-secondary" @onclick="CloseDetailsModal">
+    <i class="fas fa-times"></i>
+           Închide
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- End Session Confirmation Modal -->
+@if (ShowEndSessionModal && SelectedSession != null)
+{
+    <div class="modal-overlay" @onclick="CancelEndSession">
+        <div class="modal-container small" @onclick:stopPropagation>
+       <div class="modal-header danger">
+   <h3>
+        <i class="fas fa-exclamation-triangle"></i>
+      Confirmare Închidere Sesiune
+    </h3>
+      <button class="btn-close" @onclick="CancelEndSession">
+     <i class="fas fa-times"></i>
+     </button>
+         </div>
+        
+            <div class="modal-body">
+                <p class="confirm-text">
+         Ești sigur că vrei să închizi sesiunea pentru <strong>@SelectedSession.Username</strong>?
+           </p>
+          <p class="warning-text">
+          <i class="fas fa-info-circle"></i>
+         Utilizatorul va fi deconectat imediat și va trebui să se autentifice din nou.
+        </p>
+            </div>
+
+        <div class="modal-footer">
+              <button class="btn btn-secondary" @onclick="CancelEndSession">
+     <i class="fas fa-times"></i>
+                Anulează
+     </button>
+      <button class="btn btn-danger" @onclick="ConfirmEndSession">
+   <i class="fas fa-power-off"></i>
+     Închide Sesiunea
+  </button>
+       </div>
+        </div>
+    </div>
+}

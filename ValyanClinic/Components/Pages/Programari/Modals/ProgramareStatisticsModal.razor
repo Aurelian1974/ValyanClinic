@@ -1,0 +1,185 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.ProgramareManagement.DTOs
+@using Syncfusion.Blazor.Charts
+
+<div class="modal statistics-modal @(IsVisible ? "show" : "")" style="display: @(IsVisible ? "block" : "none")" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+<h5 class="modal-title">
+        <i class="fas fa-chart-pie"></i>
+        Statistici Programări
+   </h5>
+    <button type="button" class="btn-close" @onclick="CloseModal" aria-label="Close"></button>
+       </div>
+
+      <div class="modal-body">
+       @if (IsLoading)
+            {
+                <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+    <p>Se încarcă statisticile...</p>
+ </div>
+              }
+            else if (Statistics != null)
+    {
+    <!-- Filters Section -->
+            <div class="stats-filters mb-4">
+               <div class="row g-3">
+    <div class="col-md-4">
+     <label class="form-label">De la data:</label>
+               <input type="date" class="form-control" @bind="FilterDataStart" @bind:after="LoadStatistics" />
+    </div>
+     <div class="col-md-4">
+        <label class="form-label">Până la data:</label>
+ <input type="date" class="form-control" @bind="FilterDataEnd" @bind:after="LoadStatistics" />
+        </div>
+     <div class="col-md-4">
+       <label class="form-label">Doctor:</label>
+         <select class="form-select" @bind="FilterDoctorID" @bind:after="LoadStatistics">
+           <option value="">Toți medicii</option>
+    @foreach (var doctor in DoctorsList)
+   {
+            <option value="@doctor.PersonalID">Dr. @doctor.Nume @doctor.Prenume</option>
+              }
+         </select>
+   </div>
+    </div>
+         </div>
+
+       <!-- Summary Cards -->
+  <div class="stats-cards mb-4">
+            <div class="row g-3">
+        <div class="col-md-3">
+ <div class="stat-card stat-card-primary">
+       <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+    <div class="stat-content">
+       <div class="stat-value">@Statistics.TotalProgramari</div>
+        <div class="stat-label">Total Programări</div>
+          </div>
+</div>
+    </div>
+                <div class="col-md-3">
+   <div class="stat-card stat-card-success">
+              <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+           <div class="stat-content">
+     <div class="stat-value">@Statistics.RataPrezentare%</div>
+               <div class="stat-label">Rată Prezentare</div>
+       </div>
+   </div>
+         </div>
+          <div class="col-md-3">
+             <div class="stat-card stat-card-warning">
+        <div class="stat-icon"><i class="fas fa-user-md"></i></div>
+             <div class="stat-content">
+      <div class="stat-value">@Statistics.MediciActivi</div>
+              <div class="stat-label">Medici Activi</div>
+          </div>
+             </div>
+    </div>
+    <div class="col-md-3">
+          <div class="stat-card stat-card-info">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+      <div class="stat-content">
+   <div class="stat-value">@Statistics.PacientiUnici</div>
+  <div class="stat-label">Pacienți Unici</div>
+        </div>
+       </div>
+         </div>
+          </div>
+        </div>
+
+      <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="row g-3">
+      <!-- Pie Chart: Status -->
+             <div class="col-md-6">
+    <div class="chart-container">
+    <h6 class="chart-title">Distribuție pe Status</h6>
+          <SfAccumulationChart>
+           <AccumulationChartSeriesCollection>
+     <AccumulationChartSeries DataSource="@GetStatusData()"
+         XName="Status"
+       YName="Count"
+              InnerRadius="40%"
+           Palettes="@(new string[] { "#94a3b8", "#3b82f6", "#1e40af", "#f59e0b", "#10b981", "#ef4444", "#1f2937" })">
+          <AccumulationDataLabelSettings Visible="true" Name="Status" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
+     </AccumulationChartSeries>
+   </AccumulationChartSeriesCollection>
+       <AccumulationChartLegendSettings Visible="true" Position="LegendPosition.Bottom"></AccumulationChartLegendSettings>
+        </SfAccumulationChart>
+         </div>
+           </div>
+
+                    <!-- Bar Chart: Tip Programare -->
+    <div class="col-md-6">
+            <div class="chart-container">
+     <h6 class="chart-title">Distribuție pe Tip</h6>
+              <SfChart>
+             <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+                   <ChartSeriesCollection>
+   <ChartSeries DataSource="@GetTipData()"
+  XName="Tip"
+           YName="Count"
+ Type="ChartSeriesType.Column"
+        Fill="#3b82f6">
+     <ChartMarker>
+        <ChartDataLabel Visible="true" Position="Syncfusion.Blazor.Charts.LabelPosition.Top"></ChartDataLabel>
+         </ChartMarker>
+     </ChartSeries>
+     </ChartSeriesCollection>
+                </SfChart>
+      </div>
+    </div>
+     </div>
+
+     <!-- Additional Stats Table -->
+   <div class="stats-table mt-4">
+   <h6 class="mb-3"><i class="fas fa-table"></i> Detalii Statistici</h6>
+          <table class="table table-sm table-hover">
+               <tbody>
+           <tr>
+    <td><strong>Programate:</strong></td>
+                <td>@Statistics.Programate</td>
+       <td><strong>Confirmate:</strong></td>
+       <td>@Statistics.Confirmate</td>
+                 </tr>
+        <tr>
+<td><strong>Finalizate:</strong></td>
+       <td>@Statistics.Finalizate</td>
+                <td><strong>Anulate:</strong></td>
+     <td>@Statistics.Anulate</td>
+          </tr>
+        <tr>
+           <td><strong>Nu s-au prezentat:</strong></td>
+    <td>@Statistics.NoShow</td>
+  <td><strong>Durată medie:</strong></td>
+        <td>@Statistics.DurataMedieMinute min</td>
+       </tr>
+            </tbody>
+       </table>
+         </div>
+         </div>
+         }
+        else
+       {
+           <div class="text-center py-5">
+      <p class="text-muted">Nu sunt date disponibile pentru perioada selectată.</p>
+     </div>
+     }
+            </div>
+
+            <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @onclick="CloseModal">
+ <i class="fas fa-times"></i>
+  Închide
+              </button>
+            </div>
+        </div>
+</div>
+</div>
+
+@if (IsVisible)
+{
+    <div class="modal-backdrop show" @onclick="CloseModal"></div>
+}

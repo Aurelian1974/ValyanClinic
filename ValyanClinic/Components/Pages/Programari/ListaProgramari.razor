@@ -1,0 +1,460 @@
+﻿@page "/programari/lista"
+@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.ProgramareManagement.DTOs
+@using ValyanClinic.Components.Pages.Programari.Modals
+@using Syncfusion.Blazor.Grids
+@using MediatR
+
+<PageTitle>Lista Programări</PageTitle>
+
+<div class="lista-programari-container">
+    <!-- Header Section -->
+    <div class="programari-header">
+        <h1>
+    <i class="fas fa-calendar-check"></i>
+            Lista Programări
+</h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" @onclick="OpenAddModal">
+          <i class="fas fa-calendar-plus"></i>
+            Adaugă Programare Nouă
+            </button>
+  <button class="btn btn-secondary" @onclick="ExportToExcel" disabled="@IsLoading">
+        <i class="fas fa-file-excel"></i>
+     Export Excel
+   </button>
+    <button class="btn btn-secondary" @onclick="OpenStatisticsModal">
+             <i class="fas fa-chart-pie"></i>
+             Statistici
+ </button>
+        </div>
+    </div>
+
+    <!-- ✅ NOU: Search + Filter Button Section (ca Personal Medical) -->
+    <div class="search-filter-section">
+ <div class="search-and-filter">
+        <div class="global-search">
+             <div class="search-box-wrapper">
+   <i class="fas fa-search search-icon"></i>
+             <input type="text" 
+         class="search-input"
+       placeholder="Căutare rapidă (pacient, doctor, observații)..."
+              value="@SearchText"
+      @oninput="@((e) => { SearchText = e.Value?.ToString(); HandleSearchKeyUp(); })"
+  @onkeydown="HandleSearchKeyUp" />
+ @if (!string.IsNullOrEmpty(SearchText))
+          {
+     <button class="search-clear-btn" @onclick="ClearSearch" type="button">
+    <i class="fas fa-times"></i>
+       </button>
+       }
+       </div>
+            </div>
+        <button class="btn-filter @(IsAdvancedFilterExpanded ? "active" : "")" 
+ @onclick="ToggleAdvancedFilter"
+        title="Filtre avansate">
+    <i class="fas fa-filter"></i>
+          <span>Filtre</span>
+  @{
+     var activeCount = (FilterDoctorID.HasValue ? 1 : 0) +
+       (FilterPacientID.HasValue ? 1 : 0) +
+      (FilterDataStart.HasValue ? 1 : 0) +
+           (FilterDataEnd.HasValue ? 1 : 0) +
+    (!string.IsNullOrEmpty(FilterStatus) ? 1 : 0) +
+                (!string.IsNullOrEmpty(FilterTipProgramare) ? 1 : 0);
+          }
+                @if (activeCount > 0)
+        {
+          <span class="filter-badge">@activeCount</span>
+        }
+      <i class="fas fa-chevron-@(IsAdvancedFilterExpanded ? "up" : "down") chevron-icon"></i>
+          </button>
+        </div>
+        
+        <div class="total-records">
+            <i class="fas fa-database"></i>
+    <span>Total: <strong>@(FilteredProgramari?.Count ?? 0)</strong> programări</span>
+   @if (activeCount > 0)
+   {
+      <span class="filtered-info">(filtrate)</span>
+   }
+     </div>
+ </div>
+
+    <!-- ✅ NOU: Advanced Filter Panel (expandable) -->
+    <div class="advanced-filter-panel @(IsAdvancedFilterExpanded ? "expanded" : "")">
+    <div class="filter-content">
+   <div class="filters-grid">
+         <!-- Coloana 1: Doctor + Pacient -->
+         <div class="filter-column">
+               <div class="filter-group">
+     <label class="filter-label">
+    <i class="fas fa-user-md"></i>
+         Doctor
+                 </label>
+            <select class="form-select" @bind="FilterDoctorID" @bind:after="ApplyFilters">
+     <option value="">Toți medicii</option>
+     @foreach (var doctor in DoctorsList)
+     {
+ <option value="@doctor.PersonalID">Dr. @doctor.Nume @doctor.Prenume - @doctor.Specializare</option>
+         }
+   </select>
+          </div>
+
+              <div class="filter-group">
+     <label class="filter-label">
+<i class="fas fa-user-injured"></i>
+                Pacient
+         </label>
+        <select class="form-select" @bind="FilterPacientID" @bind:after="ApplyFilters">
+ <option value="">Toți pacienții</option>
+       @foreach (var pacient in PacientiList)
+     {
+       <option value="@pacient.Id">@pacient.Nume @pacient.Prenume (CNP: @pacient.CNP)</option>
+             }
+   </select>
+     </div>
+       </div>
+
+       <!-- Coloana 2: Date -->
+     <div class="filter-column">
+          <div class="filter-group">
+       <label class="filter-label">
+          <i class="fas fa-calendar-day"></i>
+ De la data
+     </label>
+              <input type="date" class="form-control" @bind="FilterDataStart" @bind:after="ApplyFilters" />
+    </div>
+    
+         <div class="filter-group">
+      <label class="filter-label">
+  <i class="fas fa-calendar-day"></i>
+     Până la data
+      </label>
+             <input type="date" class="form-control" @bind="FilterDataEnd" @bind:after="ApplyFilters" />
+        </div>
+       </div>
+
+     <!-- Coloana 3: Status + Tip -->
+   <div class="filter-column">
+   <div class="filter-group">
+       <label class="filter-label">
+   <i class="fas fa-circle-check"></i>
+      Status
+   </label>
+        <select class="form-select" @bind="FilterStatus" @bind:after="ApplyFilters">
+         <option value="">Toate statusurile</option>
+  <option value="Programata">Programată</option>
+           <option value="Confirmata">Confirmată</option>
+     <option value="CheckedIn">Check-in efectuat</option>
+        <option value="InConsultatie">În consultație</option>
+      <option value="Finalizata">Finalizată</option>
+  <option value="Anulata">Anulată</option>
+    <option value="NoShow">Nu s-a prezentat</option>
+                </select>
+ </div>
+
+     <div class="filter-group">
+        <label class="filter-label">
+   <i class="fas fa-stethoscope"></i>
+                    Tip Programare
+    </label>
+             <select class="form-select" @bind="FilterTipProgramare" @bind:after="ApplyFilters">
+            <option value="">Toate tipurile</option>
+  <option value="ConsultatieInitiala">Consultație Inițială</option>
+        <option value="ControlPeriodic">Control Periodic</option>
+    <option value="Consultatie">Consultație</option>
+       <option value="Investigatie">Investigație</option>
+   <option value="Procedura">Procedură</option>
+          <option value="Urgenta">Urgență</option>
+        <option value="Telemedicina">Telemedicină</option>
+     <option value="LaDomiciliu">La Domiciliu</option>
+      </select>
+               </div>
+             </div>
+     </div>
+
+          <div class="filter-actions">
+    <button class="btn-filter-action btn-clear" @onclick="ClearAllFilters" disabled="@(activeCount == 0)">
+        <i class="fas fa-times-circle"></i>
+      <span>Șterge Filtre (@activeCount)</span>
+         </button>
+     <button class="btn-filter-action btn-apply" @onclick="ApplyFilters">
+           <i class="fas fa-check-circle"></i>
+          <span>Aplică Filtre</span>
+         </button>
+          </div>
+
+         @if (activeCount > 0)
+            {
+                <div class="active-filters">
+     <span class="active-filters-label">
+       <i class="fas fa-filter"></i>
+      Filtre active:
+   </span>
+ <div class="filter-chips">
+     @if (!string.IsNullOrEmpty(SearchText))
+         {
+     <span class="filter-chip">
+             Căutare: @SearchText
+  <i class="fas fa-times" @onclick="() => { SearchText = null; ApplyFilters(); }"></i>
+              </span>
+      }
+            @if (FilterDoctorID.HasValue)
+               {
+       var doctor = DoctorsList.FirstOrDefault(d => d.PersonalID == FilterDoctorID.Value);
+            <span class="filter-chip">
+      Doctor: @doctor?.Nume @doctor?.Prenume
+   <i class="fas fa-times" @onclick="() => { FilterDoctorID = null; ApplyFilters(); }"></i>
+    </span>
+           }
+ @if (FilterPacientID.HasValue)
+             {
+           var pacient = PacientiList.FirstOrDefault(p => p.Id == FilterPacientID.Value);
+         <span class="filter-chip">
+          Pacient: @pacient?.Nume @pacient?.Prenume
+          <i class="fas fa-times" @onclick="() => { FilterPacientID = null; ApplyFilters(); }"></i>
+   </span>
+            }
+       @if (FilterDataStart.HasValue)
+          {
+         <span class="filter-chip">
+     De la: @FilterDataStart.Value.ToString("dd.MM.yyyy")
+  <i class="fas fa-times" @onclick="() => { FilterDataStart = null; ApplyFilters(); }"></i>
+          </span>
+             }
+@if (FilterDataEnd.HasValue)
+            {
+   <span class="filter-chip">
+  Până la: @FilterDataEnd.Value.ToString("dd.MM.yyyy")
+          <i class="fas fa-times" @onclick="() => { FilterDataEnd = null; ApplyFilters(); }"></i>
+        </span>
+    }
+         @if (!string.IsNullOrEmpty(FilterStatus))
+                {
+       <span class="filter-chip">
+     Status: @GetStatusDisplay(FilterStatus)
+          <i class="fas fa-times" @onclick="() => { FilterStatus = null; ApplyFilters(); }"></i>
+         </span>
+             }
+    @if (!string.IsNullOrEmpty(FilterTipProgramare))
+    {
+    <span class="filter-chip">
+  Tip: @GetTipProgramareDisplay(FilterTipProgramare)
+      <i class="fas fa-times" @onclick="() => { FilterTipProgramare = null; ApplyFilters(); }"></i>
+             </span>
+           }
+       </div>
+            </div>
+            }
+        </div>
+    </div>
+
+  <!-- Data Grid Section -->
+    <div class="data-grid-section">
+   @if (IsLoading)
+    {
+ <div class="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+   <span class="visually-hidden">Se încarcă...</span>
+      </div>
+      <p>Se încarcă programările...</p>
+ </div>
+        }
+  else if (HasError)
+        {
+   <div class="alert alert-danger" role="alert">
+         <i class="fas fa-exclamation-triangle"></i>
+    @ErrorMessage
+ </div>
+        }
+   else if (FilteredProgramari == null || !FilteredProgramari.Any())
+        {
+   <div class="empty-state">
+         <div class="empty-icon">
+<i class="fas fa-calendar-times"></i>
+   </div>
+       <h3>Nu s-au găsit programări</h3>
+   <p>@(HasActiveFilters ? "Încercați să modificați filtrele aplicate." : "Începeți prin a adăuga prima programare.")</p>
+       @if (!HasActiveFilters)
+          {
+           <button class="btn btn-primary" @onclick="OpenAddModal">
+        <i class="fas fa-calendar-plus"></i>
+    Adaugă Programare Nouă
+</button>
+      }
+   </div>
+        }
+ else
+     {
+<SfGrid @ref="GridRef"
+   DataSource="@FilteredProgramari"
+           AllowPaging="true"
+         AllowSorting="true"
+            AllowFiltering="false"
+      AllowResizing="true"
+             GridLines="GridLine.Both"
+      Height="100%">
+     
+    <GridPageSettings PageSize="25" PageSizes="@(new int[] { 10, 25, 50, 100 })"></GridPageSettings>
+       
+      <GridColumns>
+  <GridColumn Field="@nameof(ProgramareListDto.DataProgramare)" 
+           HeaderText="Data & Ora" 
+          Width="180">
+     <Template>
+  @{
+           var programare = (context as ProgramareListDto);
+     <div class="datetime-cell">
+    <div class="date">@programare?.DataProgramare.ToString("dd.MM.yyyy")</div>
+     <div class="time">@programare?.OraInceput.ToString(@"hh\:mm") - @programare?.OraSfarsit.ToString(@"hh\:mm")</div>
+     </div>
+            }
+ </Template>
+         </GridColumn>
+          
+     <GridColumn Field="@nameof(ProgramareListDto.PacientNumeComplet)" 
+     HeaderText="Pacient" 
+Width="200">
+  <Template>
+   @{
+             var programare = (context as ProgramareListDto);
+   <div class="pacient-cell">
+ <i class="fas fa-user-injured"></i>
+        <span>@programare?.PacientNumeComplet</span>
+      </div>
+       }
+            </Template>
+             </GridColumn>
+               
+  <GridColumn Field="@nameof(ProgramareListDto.DoctorNumeComplet)" 
+HeaderText="Doctor" 
+         Width="200">
+     <Template>
+            @{
+  var programare = (context as ProgramareListDto);
+<div class="doctor-cell">
+            <div class="doctor-name">Dr. @programare?.DoctorNumeComplet</div>
+      <div class="doctor-spec">@programare?.DoctorSpecializare</div>
+       </div>
+        }
+</Template>
+   </GridColumn>
+   
+     <GridColumn Field="@nameof(ProgramareListDto.TipProgramare)" 
+        HeaderText="Tip" 
+     Width="150" 
+        TextAlign="TextAlign.Center">
+    <Template>
+     @{
+ var programare = (context as ProgramareListDto);
+  <span class="badge badge-@programare?.TipProgramareColor">
+               @GetTipProgramareDisplay(programare?.TipProgramare)
+    </span>
+  }
+            </Template>
+       </GridColumn>
+      
+            <GridColumn Field="@nameof(ProgramareListDto.Status)" 
+  HeaderText="Status" 
+ Width="140" 
+        TextAlign="TextAlign.Center">
+      <Template>
+       @{
+    var programare = (context as ProgramareListDto);
+  <span class="badge badge-@programare?.StatusColor">
+    @GetStatusDisplay(programare?.Status)
+    </span>
+}
+   </Template>
+ </GridColumn>
+     
+   <GridColumn Field="@nameof(ProgramareListDto.DurataMinute)" 
+          HeaderText="Durata" 
+    Width="100" 
+      TextAlign="TextAlign.Center">
+<Template>
+     @{
+  var programare = (context as ProgramareListDto);
+   <span>@programare?.DurataMinute min</span>
+        }
+              </Template>
+        </GridColumn>
+       
+        <GridColumn Field="@nameof(ProgramareListDto.ObservatiiScurte)" 
+   HeaderText="Observații" 
+    Width="200">
+    <Template>
+         @{
+   var programare = (context as ProgramareListDto);
+      if (!string.IsNullOrEmpty(programare?.Observatii))
+   {
+               <span title="@programare.Observatii">@programare.ObservatiiScurte</span>
+  }
+ else
+               {
+            <span class="text-muted">-</span>
+        }
+       }
+              </Template>
+     </GridColumn>
+ 
+       <GridColumn HeaderText="Acțiuni" Width="200" TextAlign="TextAlign.Center">
+      <Template>
+            @{
+        var programare = (context as ProgramareListDto);
+       <div class="action-buttons">
+   <button class="btn btn-sm btn-view" 
+     @onclick="() => OpenViewModal(programare!.ProgramareID)"
+     title="Vizualizează detalii">
+        <i class="fas fa-eye"></i>
+  </button>
+    @if (CanEditProgramare(programare!.Status))
+       {
+ <button class="btn btn-sm btn-edit" 
+ @onclick="() => OpenEditModal(programare.ProgramareID)"
+  title="Editează">
+       <i class="fas fa-edit"></i>
+ </button>
+ }
+     @if (CanCancelProgramare(programare.Status))
+     {
+   <button class="btn btn-sm btn-cancel" 
+@onclick="() => OpenCancelModal(programare)"
+          title="Anulează">
+  <i class="fas fa-ban"></i>
+      </button>
+  }
+        <button class="btn btn-sm btn-print" 
+    @onclick="() => PrintProgramare(programare.ProgramareID)"
+    title="Printează">
+       <i class="fas fa-print"></i>
+  </button>
+              </div>
+    }
+  </Template>
+     </GridColumn>
+   </GridColumns>
+    </SfGrid>
+        }
+    </div>
+</div>
+
+<!-- Modals -->
+<ProgramareAddEditModal IsVisible="@ShowAddEditModal"
+     IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowAddEditModal = value))"
+        ProgramareId="@SelectedProgramareId"
+         OnSaved="@HandleModalSaved" />
+
+<ProgramareViewModal IsVisible="@ShowViewModal"
+ IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
+     ProgramareId="@(SelectedProgramareId ?? Guid.Empty)"
+ OnEditRequested="@HandleEditRequested" />
+
+<ConfirmCancelModal IsVisible="@ShowCancelModal"
+    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowCancelModal = value))"
+   Message="@CancelConfirmMessage"
+    OnConfirmed="@HandleCancelConfirmed" />
+
+<ProgramareStatisticsModal IsVisible="@ShowStatisticsModal"
+   IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowStatisticsModal = value))" />

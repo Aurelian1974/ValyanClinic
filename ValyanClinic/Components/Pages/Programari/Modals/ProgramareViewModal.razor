@@ -1,0 +1,228 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.ProgramareManagement.DTOs
+
+<div class="modal programare-view-modal @(IsVisible ? "show" : "")" style="display: @(IsVisible ? "block" : "none")" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+ <div class="modal-header">
+                <h5 class="modal-title">
+       <i class="fas fa-eye"></i>
+   Detalii Programare
+      </h5>
+            <button type="button" class="btn-close" @onclick="CloseModal" aria-label="Close"></button>
+   </div>
+
+       <div class="modal-body">
+         @if (IsLoading)
+      {
+        <div class="text-center py-5">
+       <div class="spinner-border text-primary" role="status">
+   <span class="visually-hidden">Se încarcă...</span>
+ </div>
+  </div>
+         }
+     else if (Programare != null)
+    {
+    <div class="detail-sections">
+     <!-- Informații Programare -->
+       <div class="detail-section">
+     <h6 class="section-title">
+          <i class="fas fa-calendar-check text-primary"></i>
+       Informații Programare
+              </h6>
+     <div class="detail-grid">
+      <div class="detail-item">
+      <span class="detail-label">Data:</span>
+         <span class="detail-value">@Programare.DataProgramare.ToString("dd.MM.yyyy (dddd)")</span>
+       </div>
+    <div class="detail-item">
+        <span class="detail-label">Interval orar:</span>
+              <span class="detail-value">@Programare.OraInceput.ToString(@"hh\:mm") - @Programare.OraSfarsit.ToString(@"hh\:mm")</span>
+    </div>
+        <div class="detail-item">
+           <span class="detail-label">Durata:</span>
+        <span class="detail-value">@Programare.DurataMinute minute</span>
+         </div>
+    <div class="detail-item">
+    <span class="detail-label">Tip programare:</span>
+        <span class="detail-value">
+     @if (!string.IsNullOrEmpty(Programare.TipProgramare))
+    {
+ <span class="badge badge-@GetTipProgramareBadgeClass(Programare.TipProgramare)">
+       @GetTipProgramareDisplay(Programare.TipProgramare)
+      </span>
+ }
+       else
+    {
+      <span class="text-muted">-</span>
+}
+     </span>
+        </div>
+      <div class="detail-item">
+        <span class="detail-label">Status:</span>
+  <span class="detail-value">
+         <span class="badge badge-@GetStatusBadgeClass(Programare.Status)">
+         @GetStatusDisplay(Programare.Status)
+         </span>
+        </span>
+ </div>
+              </div>
+     </div>
+
+        <!-- Informații Pacient -->
+        <div class="detail-section">
+       <h6 class="section-title">
+ <i class="fas fa-user-injured text-success"></i>
+         Pacient
+          </h6>
+    <div class="detail-grid">
+  <div class="detail-item">
+      <span class="detail-label">Nume complet:</span>
+        <span class="detail-value font-weight-bold">@Programare.PacientNumeComplet</span>
+          </div>
+              <div class="detail-item">
+       <span class="detail-label">CNP:</span>
+   <span class="detail-value">@Programare.PacientCNP</span>
+     </div>
+      <div class="detail-item">
+       <span class="detail-label">Telefon:</span>
+    <span class="detail-value">
+      @if (!string.IsNullOrEmpty(Programare.PacientTelefon))
+        {
+     <a href="tel:@Programare.PacientTelefon" class="link-primary">
+        <i class="fas fa-phone"></i> @Programare.PacientTelefon
+       </a>
+     }
+        else
+         {
+  <span class="text-muted">-</span>
+     }
+    </span>
+           </div>
+      <div class="detail-item">
+     <span class="detail-label">Email:</span>
+     <span class="detail-value">
+     @if (!string.IsNullOrEmpty(Programare.PacientEmail))
+        {
+      <a href="mailto:@Programare.PacientEmail" class="link-primary">
+        <i class="fas fa-envelope"></i> @Programare.PacientEmail
+      </a>
+       }
+         else
+    {
+       <span class="text-muted">-</span>
+    }
+      </span>
+  </div>
+  </div>
+   </div>
+
+        <!-- Informații Doctor -->
+     <div class="detail-section">
+       <h6 class="section-title">
+          <i class="fas fa-user-md text-info"></i>
+    Doctor
+</h6>
+ <div class="detail-grid">
+   <div class="detail-item">
+   <span class="detail-label">Nume complet:</span>
+           <span class="detail-value font-weight-bold">Dr. @Programare.DoctorNumeComplet</span>
+     </div>
+    <div class="detail-item">
+      <span class="detail-label">Specializare:</span>
+       <span class="detail-value">@Programare.DoctorSpecializare</span>
+      </div>
+     <div class="detail-item">
+        <span class="detail-label">Telefon:</span>
+       <span class="detail-value">
+    @if (!string.IsNullOrEmpty(Programare.DoctorTelefon))
+      {
+      <a href="tel:@Programare.DoctorTelefon" class="link-primary">
+       <i class="fas fa-phone"></i> @Programare.DoctorTelefon
+     </a>
+      }
+     else
+       {
+       <span class="text-muted">-</span>
+       }
+      </span>
+     </div>
+    </div>
+       </div>
+
+     <!-- Observații -->
+     <div class="detail-section">
+      <h6 class="section-title">
+       <i class="fas fa-comment-dots text-warning"></i>
+     Observații
+   </h6>
+     <div class="observatii-box">
+   @if (!string.IsNullOrEmpty(Programare.Observatii))
+     {
+        <p class="mb-0">@Programare.Observatii</p>
+       }
+       else
+    {
+       <p class="text-muted mb-0"><em>Fără observații</em></p>
+        }
+      </div>
+   </div>
+
+        <!-- Audit Trail -->
+    <div class="detail-section">
+<h6 class="section-title">
+       <i class="fas fa-history text-secondary"></i>
+        Audit Trail
+      </h6>
+      <div class="detail-grid">
+    <div class="detail-item">
+<span class="detail-label">Creat de:</span>
+      <span class="detail-value">@Programare.CreatDeNumeComplet</span>
+     </div>
+   <div class="detail-item">
+     <span class="detail-label">Data creării:</span>
+          <span class="detail-value">@Programare.DataCreare.ToString("dd.MM.yyyy HH:mm")</span>
+    </div>
+          @if (Programare.DataUltimeiModificari.HasValue)
+         {
+       <div class="detail-item">
+       <span class="detail-label">Data modificării:</span>
+        <span class="detail-value">@Programare.DataUltimeiModificari.Value.ToString("dd.MM.yyyy HH:mm")</span>
+   </div>
+}
+       </div>
+            </div>
+   </div>
+       }
+      else
+        {
+    <div class="text-center py-5">
+      <p class="text-muted">
+      <i class="fas fa-exclamation-circle"></i>
+         Nu s-au putut încărca detaliile programării.
+        </p>
+    </div>
+       }
+  </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" @onclick="CloseModal">
+    <i class="fas fa-times"></i>
+     Închide
+        </button>
+       @if (Programare != null && CanEditProgramare(Programare.Status))
+    {
+        <button type="button" class="btn btn-primary" @onclick="OpenEditMode">
+      <i class="fas fa-edit"></i>
+      Editează
+   </button>
+   }
+   </div>
+ </div>
+ </div>
+</div>
+
+@if (IsVisible)
+{
+<div class="modal-backdrop show" @onclick="CloseModal"></div>
+}

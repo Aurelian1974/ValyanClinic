@@ -1,0 +1,254 @@
+﻿/* Statistics Modal - Scoped CSS */
+
+/* Modal Base Styles - CRITICAL pentru overlay */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+  width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+}
+
+.modal.show {
+    display: block !important;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+  left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-backdrop.show {
+    opacity: 1;
+}
+
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 1.75rem auto;
+ pointer-events: none;
+}
+
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    outline: 0;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 3.5rem);
+}
+
+.modal-dialog-scrollable {
+    height: calc(100% - 3.5rem);
+}
+
+.modal-dialog-scrollable .modal-content {
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.modal-dialog-scrollable .modal-body {
+    overflow-y: auto;
+}
+
+.statistics-modal .modal-dialog {
+    max-width: 1200px;
+}
+
+.statistics-modal .modal-header {
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+ color: white;
+    border-bottom: none;
+  padding: 20px 30px;
+}
+
+.statistics-modal .modal-title {
+    display: flex;
+    align-items: center;
+  gap: 10px;
+    font-size: 20px;
+font-weight: 600;
+}
+
+.statistics-modal .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.statistics-modal .modal-body {
+    padding: 30px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/* Filters */
+.stats-filters {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Summary Cards */
+.stats-cards {
+    margin: 20px 0;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+  align-items: center;
+    gap: 15px;
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+    font-size: 36px;
+    width: 60px;
+  height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+border-radius: 12px;
+}
+
+.stat-card-primary .stat-icon {
+    background: #dbeafe;
+    color: #3b82f6;
+}
+
+.stat-card-success .stat-icon {
+    background: #d1fae5;
+    color: #10b981;
+}
+
+.stat-card-warning .stat-icon {
+    background: #fef3c7;
+    color: #f59e0b;
+}
+
+.stat-card-info .stat-icon {
+    background: #e0e7ff;
+    color: #6366f1;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Charts */
+.charts-section {
+ margin-top: 30px;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    height: 400px;
+}
+
+.chart-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+/* Stats Table */
+.stats-table {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.stats-table h6 {
+    font-size: 16px;
+ font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stats-table table {
+    margin-bottom: 0;
+}
+
+.stats-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.stats-table td:first-child,
+.stats-table td:nth-child(3) {
+    width: 200px;
+color: #64748b;
+}
+
+.stats-table td:nth-child(2),
+.stats-table td:nth-child(4) {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .statistics-modal .modal-dialog {
+        max-width: 95%;
+    margin: 10px auto;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .chart-container {
+      height: 300px;
+    }
+}

@@ -1,0 +1,137 @@
+﻿@page "/programari"
+@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.ProgramareManagement.DTOs
+@using ValyanClinic.Components.Pages.Programari.Modals
+
+<PageTitle>Calendar Programări</PageTitle>
+
+<div class="calendar-programari-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <div class="header-content">
+      <div class="header-left">
+          <div class="header-icon">
+       <i class="fas fa-calendar-alt"></i>
+        </div>
+    <div class="header-text">
+     <h1>Calendar Programări</h1>
+ <p class="header-subtitle">Vizualizare programări în format calendar</p>
+     </div>
+   </div>
+ <div class="header-actions">
+     <button class="btn btn-primary btn-add" @onclick="OpenAddModal">
+        <i class="fas fa-calendar-plus"></i>
+     Adaugă Programare Nouă
+   </button>
+      <button class="btn btn-outline-primary" @onclick="NavigateToList">
+       <i class="fas fa-list"></i>
+   Vedere Listă
+        </button>
+</div>
+        </div>
+    </div>
+
+ <!-- Filters Section -->
+    <div class="filters-section">
+        <div class="filters-compact">
+  <div class="filter-group">
+       <label>Doctor</label>
+      <select class="form-select" @bind="FilterDoctorID" @bind:after="LoadCalendarData">
+   <option value="">Toți medicii</option>
+        @foreach (var doctor in DoctorsList)
+    {
+       <option value="@doctor.PersonalID">Dr. @doctor.Nume @doctor.Prenume</option>
+       }
+   </select>
+         </div>
+        <div class="filter-group">
+      <label>Data</label>
+  <input type="date" class="form-control" @bind="SelectedDate" @bind:after="LoadCalendarData" />
+      </div>
+  <div class="filter-group">
+      <button class="btn btn-outline-secondary" @onclick="GoToToday">
+     <i class="fas fa-calendar-day"></i>
+      Azi
+   </button>
+     </div>
+ </div>
+ </div>
+
+ <!-- Calendar View - Simple Weekly Grid -->
+ <div class="calendar-view">
+ @if (IsLoading)
+ {
+   <div class="loading-overlay">
+    <div class="spinner-border text-primary"></div>
+    <p>Se încarcă programările...</p>
+   </div>
+ }
+    else
+     {
+       <div class="weekly-calendar">
+            <!-- Header: Days of Week -->
+<div class="calendar-header">
+      @for (int i = 0; i < 5; i++)
+        {
+   var date = GetWeekStart().AddDays(i);
+      <div class="day-header @(date.Date == DateTime.Today ? "today" : "")">
+       <div class="day-name">@date.ToString("dddd")</div>
+          <div class="day-date">@date.ToString("dd MMM")</div>
+       </div>
+ }
+       </div>
+
+    <!-- Time Slots Grid -->
+     <div class="calendar-grid">
+       @for (int hour = 7; hour <= 20; hour++)
+       {
+    <div class="time-row">
+         <div class="time-label">@($"{hour:D2}:00")</div>
+          @for (int day = 0; day < 5; day++)
+         {
+         var date = GetWeekStart().AddDays(day);
+        var slot = GetSlotProgramari(date, hour);
+       
+     <div class="time-slot @(slot.Any() ? "has-programari" : "")">
+       @foreach (var programare in slot)
+    {
+       <div class="programare-item badge-@programare.StatusColor" 
+ @onclick="() => OpenViewModal(programare.ProgramareID)">
+     <div class="programare-time">@programare.OraInceput.ToString(@"hh\:mm")</div>
+  <div class="programare-pacient">@GetShortName(programare.PacientNumeComplet)</div>
+      <div class="programare-doctor-mini">@GetDoctorInitials(programare.DoctorNumeComplet)</div>
+       </div>
+    }
+     </div>
+       }
+     </div>
+   }
+    </div>
+  </div>
+
+      <!-- Legend -->
+ <div class="calendar-legend">
+     <h6>Legendă Statusuri:</h6>
+      <div class="legend-items">
+ <span class="legend-item"><span class="badge badge-secondary"></span> Programată</span>
+     <span class="legend-item"><span class="badge badge-info"></span> Confirmată</span>
+   <span class="legend-item"><span class="badge badge-primary"></span> Check-in</span>
+     <span class="legend-item"><span class="badge badge-warning"></span> În consultație</span>
+      <span class="legend-item"><span class="badge badge-success"></span> Finalizată</span>
+  <span class="legend-item"><span class="badge badge-danger"></span> Anulată</span>
+     </div>
+      </div>
+   }
+    </div>
+</div>
+
+<!-- Modals -->
+<ProgramareAddEditModal IsVisible="@ShowAddEditModal"
+    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowAddEditModal = value))"
+     ProgramareId="@SelectedProgramareId"
+  OnSaved="@HandleModalSaved" />
+
+<ProgramareViewModal IsVisible="@ShowViewModal"
+     IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
+    ProgramareId="@(SelectedProgramareId ?? Guid.Empty)"
+     OnEditRequested="@HandleEditRequested" />

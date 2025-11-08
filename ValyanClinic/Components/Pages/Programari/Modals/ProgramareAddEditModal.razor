@@ -1,0 +1,276 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.ProgramareManagement.DTOs
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using SyncfusionFilterType = Syncfusion.Blazor.DropDowns.FilterType
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+           <i class="fas fa-calendar-plus"></i>
+       <h2>@(IsEditMode ? "Editare Programare" : "Programare Nouă")</h2>
+         </div>
+        <button type="button" class="btn-close" @onclick="CloseModal" aria-label="Close">
+     <i class="fas fa-times"></i>
+   </button>
+   </div>
+
+  <div class="modal-body">
+  @if (IsLoading)
+   {
+        <div class="loading-container">
+             <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Se încarcă...</span>
+              </div>
+        <p>Se încarcă datele...</p>
+           </div>
+   }
+   else
+         {
+  @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+           <div class="alert alert-danger">
+               <i class="fas fa-exclamation-circle"></i>
+            @ErrorMessage
+          </div>
+       }
+
+         @if (Model == null)
+      {
+          <div class="alert alert-warning">
+         <i class="fas fa-exclamation-triangle"></i>
+          <strong>Avertisment:</strong> Modelul nu s-a inițializat corect. Vă rugăm să închideți și să redeschideți modalul.
+       </div>
+                }
+                else
+          {
+  <EditForm Model="@Model" OnValidSubmit="@HandleSubmit">
+   <DataAnnotationsValidator />
+
+      @if (HasConflict)
+       {
+     <div class="alert alert-danger conflict-alert">
+        <i class="fas fa-exclamation-triangle"></i>
+ <strong>Atenție!</strong> Medicul @ConflictDoctorName are deja o programare în intervalul selectat.
+        Vă rugăm să alegeți un alt interval orar.
+      </div>
+}
+
+ <div class="form-row-2cols">
+     <!-- Coloana Stânga -->
+      <div class="form-column">
+     <!-- Pacient -->
+          <div class="form-group">
+        <label class="form-label">
+ <i class="fas fa-user-injured"></i>
+     Pacient <span class="text-danger">*</span>
+       </label>
+            @if (PacientiList.Any())
+    {
+      <SfDropDownList TValue="Guid" 
+      TItem="PacientDropdownDto"
+        DataSource="@PacientiList"
+   Value="@Model.PacientID"
+Placeholder="Selectează pacient..."
+ CssClass="@GetValidationClass(nameof(Model.PacientID))"
+Enabled="@(!IsEditMode)"
+     ShowClearButton="true"
+        AllowFiltering="true"
+              FilterType="SyncfusionFilterType.Contains"
+            PopupHeight="300px">
+                <DropDownListFieldSettings Value="Id" Text="NumeComplet" />
+   <DropDownListEvents TValue="Guid" TItem="PacientDropdownDto" ValueChange="@OnPacientChanged" />
+               </SfDropDownList>
+       }
+    else
+     {
+             <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+       Nu sunt pacienți disponibili.
+       </div>
+      }
+  <ValidationMessage For="@(() => Model.PacientID)" />
+             </div>
+
+      <!-- Doctor -->
+        <div class="form-group">
+ <label class="form-label">
+          <i class="fas fa-user-md"></i>
+   Doctor <span class="text-danger">*</span>
+ </label>
+             @if (DoctorsList.Any())
+              {
+              <SfDropDownList TValue="Guid" 
+      TItem="DoctorDropdownDto"
+      DataSource="@DoctorsList"
+        Value="@Model.DoctorID"
+              Placeholder="Selectează doctor..."
+CssClass="@GetValidationClass(nameof(Model.DoctorID))"
+         ShowClearButton="true"
+     AllowFiltering="true"
+         FilterType="SyncfusionFilterType.Contains"
+           PopupHeight="300px">
+   <DropDownListFieldSettings Value="PersonalID" Text="NumeComplet" />
+     <DropDownListEvents TValue="Guid" TItem="DoctorDropdownDto" ValueChange="@OnDoctorChanged" />
+       </SfDropDownList>
+       }
+  else
+             {
+           <div class="alert alert-warning">
+  <i class="fas fa-exclamation-triangle"></i>
+        Nu sunt doctori disponibili.
+    </div>
+     }
+         <ValidationMessage For="@(() => Model.DoctorID)" />
+         </div>
+
+     <!-- Data Programare -->
+   <div class="form-group">
+   <label class="form-label">
+        <i class="fas fa-calendar"></i>
+              Data Programare <span class="text-danger">*</span>
+  </label>
+      <SfDatePicker TValue="DateTime" 
+    @bind-Value="@Model.DataProgramare"
+    Placeholder="Selectează data..."
+     Format="dd.MM.yyyy"
+   Min="@DateTime.Today"
+           Max="@DateTime.Today.AddYears(1)"
+ CssClass="@GetValidationClass(nameof(Model.DataProgramare))"
+           ShowClearButton="false"
+       AllowEdit="true"
+   FirstDayOfWeek="1">
+     <DatePickerEvents TValue="DateTime" ValueChange="@OnDataProgramareChanged" />
+        </SfDatePicker>
+     <ValidationMessage For="@(() => Model.DataProgramare)" />
+     </div>
+
+    <!-- Ora Început -->
+     <div class="form-group">
+       <label class="form-label">
+    <i class="fas fa-clock"></i>
+             Ora Început <span class="text-danger">*</span>
+  </label>
+   <SfTimePicker TValue="DateTime?" 
+   Value="@GetTimeAsDateTime(Model.OraInceput)"
+          Placeholder="Selectează ora..."
+   Format="HH:mm"
+ Step="15"
+     CssClass="@GetValidationClass(nameof(Model.OraInceput))"
+               ShowClearButton="false"
+    AllowEdit="true">
+        <TimePickerEvents TValue="DateTime?" ValueChange="@OnOraInceputChangedV2" />
+          </SfTimePicker>
+     <ValidationMessage For="@(() => Model.OraInceput)" />
+        </div>
+          </div>
+
+        <!-- Coloană Dreapta -->
+    <div class="form-column">
+               <!-- Ora Sfârșit -->
+          <div class="form-group">
+       <label class="form-label">
+            <i class="fas fa-clock"></i>
+    Ora Sfârșit <span class="text-danger">*</span>
+    </label>
+    <SfTimePicker TValue="DateTime?" 
+             Value="@GetTimeAsDateTime(Model.OraSfarsit)"
+   Placeholder="Selectează ora..."
+   Format="HH:mm"
+              Step="15"
+      CssClass="@GetValidationClass(nameof(Model.OraSfarsit))"
+ ShowClearButton="false"
+               AllowEdit="true">
+               <TimePickerEvents TValue="DateTime?" ValueChange="@OnOraSfarsitChangedV2" />
+     </SfTimePicker>
+     <small class="form-text text-muted">
+      Durata: @DurataMinute min
+  </small>
+         <ValidationMessage For="@(() => Model.OraSfarsit)" />
+          </div>
+
+            <!-- Tip Programare -->
+        <div class="form-group">
+           <label class="form-label">
+<i class="fas fa-stethoscope"></i>
+                  Tip Programare
+         </label>
+    <SfDropDownList TValue="string" 
+      TItem="TipProgramareOption"
+     DataSource="@TipProgramareOptions"
+      @bind-Value="@Model.TipProgramare"
+       Placeholder="Selectează tip..."
+              ShowClearButton="true"
+          AllowFiltering="false">
+      <DropDownListFieldSettings Value="Value" Text="Text" />
+ <DropDownListEvents TValue="string" TItem="TipProgramareOption" ValueChange="@OnTipProgramareChanged" />
+          </SfDropDownList>
+       </div>
+
+  <!-- Status (doar în Edit mode) -->
+      @if (IsEditMode)
+     {
+  <div class="form-group">
+               <label class="form-label">
+        <i class="fas fa-info-circle"></i>
+   Status <span class="text-danger">*</span>
+     </label>
+          <SfDropDownList TValue="string" 
+ TItem="StatusOption"
+DataSource="@StatusOptions"
+             @bind-Value="@Model.Status"
+           Placeholder="Selectează status..."
+  CssClass="@GetValidationClass(nameof(Model.Status))"
+       ShowClearButton="false"
+   AllowFiltering="false">
+          <DropDownListFieldSettings Value="Value" Text="Text" />
+ </SfDropDownList>
+              <ValidationMessage For="@(() => Model.Status)" />
+             </div>
+   }
+
+       <!-- Observații -->
+<div class="form-group">
+     <label class="form-label">
+            <i class="fas fa-comment-dots"></i>
+           Observații
+                </label>
+           <SfTextBox @bind-Value="@Model.Observatii"
+  Multiline="true"
+    Placeholder="Notițe despre programare..."
+             MaxLength="1000"
+   Rows="4"
+     ShowCharacterCount="true">
+              </SfTextBox>
+                </div>
+         </div>
+                </div>
+
+      <ValidationSummary />
+            </EditForm>
+             }
+  }
+      </div>
+
+    <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" @onclick="CloseModal" disabled="@IsSaving">
+           <i class="fas fa-times"></i>
+          Anulează
+   </button>
+     <button type="button" class="btn btn-primary" @onclick="HandleSubmit" disabled="@(IsSaving || HasConflict || !IsFormValid)">
+                @if (IsSaving)
+           {
+     <span class="spinner-border spinner-border-sm"></span>
+         }
+       else
+         {
+      <i class="fas fa-save"></i>
+      }
+       @(IsEditMode ? "Actualizează" : "Creează") Programare
+            </button>
+        </div>
+  </div>
+</div>

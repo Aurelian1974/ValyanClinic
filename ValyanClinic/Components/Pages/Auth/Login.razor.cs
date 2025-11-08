@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Services.Authentication;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Components.Pages.Auth;
 
@@ -15,6 +16,7 @@ public partial class Login : ComponentBase
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private CustomAuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; } = default!;
+    [Inject] private IUserSessionRepository UserSessionRepository { get; set; } = default!;
 
     // State
     private LoginFormModel LoginModel { get; set; } = new();
@@ -58,6 +60,32 @@ public partial class Login : ComponentBase
             {
                 Logger.LogInformation("Login successful for user: {Username}", LoginModel.Username);
 
+                // ✅ CREARE SESIUNE ÎN BAZA DE DATE
+                try
+                {
+                    var httpContext = HttpContextAccessor.HttpContext;
+                    var adresaIP = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                    var userAgent = httpContext?.Request.Headers["User-Agent"].ToString() ?? "Unknown";
+                    var dispozitiv = GetDeviceType(userAgent);
+
+                    Logger.LogInformation("Creating session in database for user: {Username}, IP: {IP}",
+                        LoginModel.Username, adresaIP);
+
+                    var (sessionId, sessionToken) = await UserSessionRepository.CreateAsync(
+                         result.Data.UtilizatorID,
+                     adresaIP,
+                     userAgent,
+                         dispozitiv);
+
+                    Logger.LogInformation("Session created successfully: {SessionID}, Token: {Token}",
+                  sessionId, sessionToken);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Error creating user session in database");
+                    // Nu blocăm login-ul dacă sesiunea nu se creează - doar logăm eroarea
+                }
+
                 // Handle Remember Me - DOAR pentru username în localStorage
                 if (LoginModel.RememberMe)
                 {
@@ -100,6 +128,22 @@ public partial class Login : ComponentBase
         {
             IsLoading = false;
         }
+    }
+
+    // ✅ Helper pentru detectare tip dispozitiv
+    private string GetDeviceType(string userAgent)
+    {
+        if (string.IsNullOrEmpty(userAgent)) return "Desktop";
+
+        var ua = userAgent.ToLower();
+
+        if (ua.Contains("mobile") || ua.Contains("android") || ua.Contains("iphone"))
+            return "Mobile";
+
+        if (ua.Contains("tablet") || ua.Contains("ipad"))
+            return "Tablet";
+
+        return "Desktop";
     }
 
     private void TogglePasswordVisibility()

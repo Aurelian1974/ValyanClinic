@@ -1,0 +1,39 @@
+﻿@rendermode InteractiveServer
+
+<div class="modal confirm-cancel-modal @(IsVisible ? "show" : "")" style="display: @(IsVisible ? "block" : "none")" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+   <div class="modal-content">
+    <div class="modal-header bg-danger">
+      <h5 class="modal-title text-white">
+   <i class="fas fa-exclamation-triangle"></i>
+       Confirmare Anulare Programare
+      </h5>
+       </div>
+   
+            <div class="modal-body">
+ <p class="confirm-message">@Message</p>
+        
+         <div class="alert alert-warning">
+   <i class="fas fa-info-circle"></i>
+       <strong>Atenție:</strong> Această acțiune va marca programarea ca "Anulată" și nu poate fi reversată.
+        </div>
+          </div>
+            
+        <div class="modal-footer">
+  <button type="button" class="btn btn-secondary" @onclick="Cancel">
+          <i class="fas fa-times"></i>
+ Nu, păstrează
+      </button>
+                <button type="button" class="btn btn-danger" @onclick="Confirm">
+            <i class="fas fa-ban"></i>
+Da, anulează programarea
+        </button>
+   </div>
+     </div>
+    </div>
+</div>
+
+@if (IsVisible)
+{
+    <div class="modal-backdrop show" @onclick="Cancel"></div>
+}
