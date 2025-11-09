@@ -22,6 +22,10 @@ public partial class ProgramareAddEditModal : ComponentBase
     [Parameter] public Guid? ProgramareId { get; set; }
     [Parameter] public EventCallback OnSaved { get; set; }
 
+    // ✅ ADDED: Parametri pentru pre-fill data/ora din cell click
+    [Parameter] public DateTime? PrefilledStartTime { get; set; }
+    [Parameter] public DateTime? PrefilledEndTime { get; set; }
+
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private INotificationService NotificationService { get; set; } = default!;
     [Inject] private ILogger<ProgramareAddEditModal> Logger { get; set; } = default!;
@@ -29,11 +33,15 @@ public partial class ProgramareAddEditModal : ComponentBase
 
     private bool IsEditMode => ProgramareId.HasValue;
     private bool IsLoading = false;
- private bool IsSaving = false;
+    private bool IsSaving = false;
     private bool HasConflict = false;
-    private string ConflictDoctorName = string.Empty;
+private string ConflictDoctorName = string.Empty;
     private string ErrorMessage = string.Empty;
-    private bool IsFormValid => Model != null && Model.PacientID != Guid.Empty && Model.DoctorID != Guid.Empty;
+    
+    // ✅ UPDATED: Validare formular permite PacientID gol pentru SlotBlocat
+    private bool IsFormValid => Model != null && 
+           (Model.TipProgramare == "SlotBlocat" || Model.PacientID != Guid.Empty) && 
+         Model.DoctorID != Guid.Empty;
 
     private CreateProgramareDto? Model { get; set; }
     private List<PacientDropdownDto> PacientiList = new();
@@ -51,7 +59,8 @@ public partial class ProgramareAddEditModal : ComponentBase
   new() { Value = "Procedura", Text = "Procedură (60 min)" },
      new() { Value = "Urgenta", Text = "Urgență (15 min)" },
         new() { Value = "Telemedicina", Text = "Telemedicină (20 min)" },
-  new() { Value = "LaDomiciliu", Text = "La Domiciliu (60 min)" }
+  new() { Value = "LaDomiciliu", Text = "La Domiciliu (60 min)" },
+  new() { Value = "SlotBlocat", Text = "🚫 Blocat (pauză/întâlnire)" }
     };
 
     private List<StatusOption> StatusOptions = new()
@@ -223,23 +232,59 @@ Observatii = programare.Observatii
 
     private async Task InitializeNewProgramareAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var userIdClaim = authState.User.FindFirst("PersonalMedicalID");
 
-   Guid userId = Guid.Empty;
+        Guid userId = Guid.Empty;
         if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var parsedUserId))
         {
-        userId = parsedUserId;
+            userId = parsedUserId;
         }
 
-   Model = new CreateProgramareDto
+        // ✅ Use prefilled values if available (from cell click), otherwise use defaults
+        DateTime dataProgramare;
+      TimeSpan oraInceput;
+        TimeSpan oraSfarsit;
+
+        if (PrefilledStartTime.HasValue && PrefilledEndTime.HasValue)
+     {
+       // Use values from cell click
+            dataProgramare = PrefilledStartTime.Value.Date;
+            oraInceput = PrefilledStartTime.Value.TimeOfDay;
+     oraSfarsit = PrefilledEndTime.Value.TimeOfDay;
+            
+            Logger.LogInformation("✅ Using prefilled values from cell click: {Date} {Start}-{End}",
+          dataProgramare.ToString("yyyy-MM-dd"), oraInceput, oraSfarsit);
+        }
+        else
+        {
+     // Use defaults (today, 9:00-9:30)
+            dataProgramare = DateTime.Today;
+            oraInceput = new TimeSpan(9, 0, 0);
+   oraSfarsit = new TimeSpan(9, 30, 0);
+            
+Logger.LogInformation("Using default values: Today 9:00-9:30");
+      }
+
+        Model = new CreateProgramareDto
+        {
+          DataProgramare = dataProgramare,
+     OraInceput = oraInceput,
+            OraSfarsit = oraSfarsit,
+     Status = "Programata",
+     CreatDe = userId
+      };
+
+    // Auto-fill start/end time if available
+    if (PrefilledStartTime.HasValue)
     {
-            DataProgramare = DateTime.Today,
-    OraInceput = new TimeSpan(9, 0, 0),
-          OraSfarsit = new TimeSpan(9, 30, 0),
-            Status = "Programata",
-    CreatDe = userId
-    };
+        Model.OraInceput = PrefilledStartTime.Value.TimeOfDay;
+    }
+
+    if (PrefilledEndTime.HasValue)
+    {
+        Model.OraSfarsit = PrefilledEndTime.Value.TimeOfDay;
+    }
     }
 
     // ✅ Syncfusion Event Handlers
@@ -363,15 +408,16 @@ Observatii = programare.Observatii
         return tipProgramare switch
         {
     "ConsultatieInitiala" => 45,
-      "ControlPeriodic" => 30,
-            "Consultatie" => 30,
-            "Investigatie" => 20,
-       "Procedura" => 60,
- "Urgenta" => 15,
-            "Telemedicina" => 20,
-            "LaDomiciliu" => 60,
-   _ => 30
-     };
+       "ControlPeriodic" => 30,
+  "Consultatie" => 30,
+   "Investigatie" => 20,
+            "Procedura" => 60,
+   "Urgenta" => 15,
+       "Telemedicina" => 20,
+"LaDomiciliu" => 60,
+            "SlotBlocat" => 60,    // ✅ ADDED: 60 min pentru slot blocat
+            _ => 30
+        };
     }
 
     private async Task CheckConflictDebounced()

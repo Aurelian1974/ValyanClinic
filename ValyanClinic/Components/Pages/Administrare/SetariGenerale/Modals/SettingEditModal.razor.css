@@ -50,8 +50,8 @@ SettingEditModal - Specific Styles
     align-items: center;
     gap: 0.625rem;
     margin: 0 0 1rem 0;
-    font-size: 1.025rem;
-    font-weight: 600;
+    font-size: var(--modal-card-title);
+    font-weight: var(--font-weight-semibold);
     color: #334155;
     padding-bottom: 0.625rem;
     border-bottom: 2px solid #e2e8f0;
@@ -59,7 +59,7 @@ SettingEditModal - Specific Styles
 
 .card-title i {
     color: #60a5fa;
-font-size: 1.125rem;
+font-size: var(--modal-card-title-icon);
 }
 
 /* Info Grid */
@@ -81,8 +81,8 @@ font-size: 1.125rem;
 }
 
 .form-group label {
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -91,7 +91,7 @@ font-size: 1.125rem;
 
 .required {
     color: #ef4444;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     text-transform: none;
 }
 
@@ -100,7 +100,7 @@ font-size: 1.125rem;
 .form-group ::deep input.form-control,
 .form-group ::deep select.form-control,
 .form-group ::deep textarea.form-control {
-    font-size: 0.9375rem;
+    font-size: var(--modal-value);
     color: #334155;
     padding: 0.625rem;
     background: #f8fafc;
@@ -313,8 +313,8 @@ font-size: 1.125rem;
     display: inline-block;
     padding: 0.25rem 0.625rem;
     border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
 }
 
 .badge-info {
@@ -329,7 +329,7 @@ font-size: 1.125rem;
     display: flex;
     align-items: center;
     gap: 0.625rem;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     border: 1px solid;
     margin-bottom: 1rem;
 }
@@ -342,7 +342,7 @@ font-size: 1.125rem;
 
 .alert-danger i {
     color: #dc2626;
-    font-size: 1.125rem;
+    font-size: var(--modal-card-title-icon);
 }
 
 /* Loading Container */

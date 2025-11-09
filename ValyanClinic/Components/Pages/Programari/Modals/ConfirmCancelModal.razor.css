@@ -71,8 +71,8 @@ border-radius: 12px;
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
 }
 
 .confirm-cancel-modal .modal-body {
@@ -80,7 +80,7 @@ border-radius: 12px;
 }
 
 .confirm-message {
-    font-size: 16px;
+    font-size: var(--modal-value);
     color: #334155;
     margin-bottom: 20px;
 line-height: 1.5;
@@ -112,7 +112,7 @@ line-height: 1.5;
 
 .confirm-cancel-modal .btn {
     padding: 10px 20px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   border-radius: 8px;
     display: flex;
     align-items: center;

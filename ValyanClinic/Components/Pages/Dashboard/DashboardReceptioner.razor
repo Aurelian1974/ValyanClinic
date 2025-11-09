@@ -1,0 +1,374 @@
+﻿@page "/dashboard/receptioner"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Receptioner")]
+@rendermode InteractiveServer
+@using ValyanClinic.Components.Pages.Pacienti.Modals
+@using ValyanClinic.Components.Pages.Programari.Modals
+
+<PageTitle>Dashboard Receptioner - ValyanClinic</PageTitle>
+
+<div class="dashboard-receptioner-container">
+    @* Header Section *@
+    <div class="dashboard-header">
+  <div class="header-welcome">
+    <h1>Bună, @UserName!</h1>
+            <p class="subtitle">Iată o privire de ansamblu asupra activității de astăzi</p>
+     </div>
+  <div class="header-date">
+     <i class="fas fa-calendar-day"></i>
+    <span>@GetCurrentDate()</span>
+        </div>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Se încarcă...</span>
+ </div>
+        <p>Se încarcă dashboard...</p>
+     </div>
+    }
+    else if (HasError)
+    {
+        <div class="alert alert-danger" role="alert">
+ <i class="fas fa-exclamation-triangle"></i>
+        @ErrorMessage
+        </div>
+    }
+    else
+    {
+        @* Quick Actions - 4 butoane mari *@
+        <div class="quick-actions">
+            <button class="quick-action-btn action-blue" @onclick="HandleNewAppointment">
+        <div class="action-icon">
+    <i class="fas fa-calendar-plus"></i>
+       </div>
+      <span class="action-text">Programare Nouă</span>
+ </button>
+
+    <button class="quick-action-btn action-green" @onclick="HandleNewPatient">
+        <div class="action-icon">
+<i class="fas fa-user-plus"></i>
+ </div>
+  <span class="action-text">Pacient Nou</span>
+            </button>
+
+            <button class="quick-action-btn action-purple" @onclick="HandleCheckIn">
+     <div class="action-icon">
+  <i class="fas fa-user-check"></i>
+         </div>
+                <span class="action-text">Check-in</span>
+            </button>
+
+            <button class="quick-action-btn action-orange" @onclick="HandlePayment">
+      <div class="action-icon">
+   <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <span class="action-text">Înregistrare Plată</span>
+       </button>
+</div>
+
+        @* Statistics Cards - CORECT: Icon + Text + Valoare pe ACELAȘI rând *@
+        <div class="stats-grid">
+   @* Programări Astăzi *@
+        <div class="stat-card stat-blue">
+            <div class="stat-header">
+       <div class="stat-icon">
+      <i class="fas fa-calendar-day"></i>
+            </div>
+               <div class="stat-title">Programări Astăzi</div>
+             <div class="stat-value">@ProgramariAstazi</div>
+  </div>
+      <div class="stat-footer">
+          @* ✅ AFIȘARE GROWTH corectă - chiar dacă ieri = 0 *@
+       @if (ProgramariGrowth == 0)
+       {
+          <span class="stat-change">
+         <i class="fas fa-minus"></i>
+          Fără modificări
+</span>
+    }
+         else if (ProgramariGrowth > 0)
+       {
+        <span class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+       +@ProgramariGrowth% față de ieri
+       </span>
+   }
+        else
+         {
+      <span class="stat-change negative">
+         <i class="fas fa-arrow-down"></i>
+             @ProgramariGrowth% față de ieri
+          </span>
+    }
+   </div>
+   </div>
+
+   @* În Așteptare *@
+         <div class="stat-card stat-orange">
+      <div class="stat-header">
+     <div class="stat-icon">
+         <i class="fas fa-clock"></i>
+             </div>
+        <div class="stat-title">În Așteptare</div>
+         <div class="stat-value">@PacientiInAsteptare</div>
+        </div>
+          <div class="stat-footer">
+       @* ✅ AFIȘARE TIMP MEDIU corectă - N/A când = -1 *@
+     <span class="stat-info">
+     <i class="fas fa-hourglass-half"></i>
+    Timp mediu: @(TimpMediuAsteptare == -1 ? "N/A" : $"{TimpMediuAsteptare} min")
+      </span>
+            </div>
+            </div>
+
+  @* Finalizate *@
+ <div class="stat-card stat-green">
+     <div class="stat-header">
+     <div class="stat-icon">
+ <i class="fas fa-check-circle"></i>
+     </div>
+        <div class="stat-title">Finalizate</div>
+      <div class="stat-value">@ProgramariFinalizate</div>
+    </div>
+      <div class="stat-footer">
+             <span class="stat-info">
+                 <i class="fas fa-list"></i>
+           Rămase: @ProgramariRamase
+       </span>
+      </div>
+       </div>
+
+    @* Pacienți Noi *@
+            <div class="stat-card stat-purple">
+<div class="stat-header">
+      <div class="stat-icon">
+   <i class="fas fa-user-plus"></i>
+     </div>
+       <div class="stat-title">Pacienți Noi</div>
+        <div class="stat-value">@PacientiNoi</div>
+      </div>
+       <div class="stat-footer">
+          <span class="stat-info">
+         <i class="fas fa-calendar-week"></i>
+           Săptămâna aceasta
+      </span>
+  </div>
+            </div>
+     </div>
+
+        @* Main Content - Programări Următoare *@
+        <div class="main-content">
+         <div class="programari-section">
+     <div class="section-header">
+         <h2>
+     <i class="fas fa-list"></i>
+      Programări Următoare
+      </h2>
+      <a href="/programari" class="see-all-link">
+         Vezi toate
+                <i class="fas fa-arrow-right"></i>
+         </a>
+           </div>
+
+   @if (ProgramariUrmatoare == null || !ProgramariUrmatoare.Any())
+     {
+           <div class="no-data">
+          <i class="fas fa-calendar-times"></i>
+    <p>Nu există programări pentru astăzi</p>
+  </div>
+         }
+                else
+          {
+       <div class="programari-list">
+            @foreach (var programare in ProgramariUrmatoare)
+         {
+        <div class="programare-item @GetProgramareStatusClass(programare.Status)">
+         <div class="programare-time">
+          <div class="time-value">@FormatTimeSpan(programare.OraInceput)</div>
+      <div class="time-duration">@programare.Durata min</div>
+ </div>
+
+         <div class="programare-details">
+       <div class="programare-patient">
+       <i class="fas fa-user"></i>
+     <strong>@programare.PacientNumeComplet</strong>
+ </div>
+       <div class="programare-doctor">
+ <i class="fas fa-user-md"></i>
+  @programare.DoctorNumeComplet - @programare.DoctorSpecializare
+       </div>
+ @if (!string.IsNullOrEmpty(programare.TipProgramare))
+     {
+            <div class="programare-type">
+         <span class="badge badge-info">@programare.TipProgramare</span>
+       </div>
+         }
+   </div>
+
+          <div class="programare-status">
+            <span class="status-badge status-@programare.Status.ToLower()">
+   @GetStatusDisplayText(programare.Status)
+           </span>
+      </div>
+
+    <div class="programare-actions">
+          @if (programare.Status == "Confirmata")
+            {
+   <button class="btn-action btn-check-in" 
+          @onclick="() => HandleProgramareCheckIn(programare.ProgramareID)"
+           title="Check-in pacient">
+          <i class="fas fa-user-check"></i>
+        Check-in
+ </button>
+          }
+             else if (programare.Status == "InAsteptare")
+   {
+   <button class="btn-action btn-start" 
+          @onclick="() => HandleStartConsultatie(programare.ProgramareID)"
+           title="Start consultație">
+   <i class="fas fa-play-circle"></i>
+          Start Consultație
+    </button>
+      }
+        <button class="btn-action btn-more" 
+             @onclick="() => HandleProgramareDetails(programare.ProgramareID)"
+      title="Mai multe opțiuni">
+      <i class="fas fa-ellipsis-v"></i>
+              </button>
+     </div>
+      </div>
+       }
+       </div>
+   }
+            </div>
+
+          @* Sidebar Dreapta *@
+            <div class="sidebar-right">
+      @* Medici Astăzi *@
+                <div class="sidebar-card">
+        <h3>
+       <i class="fas fa-user-md"></i>
+    Medici Astăzi
+   </h3>
+      <div class="medici-list">
+     @if (MediciAstazi == null || !MediciAstazi.Any())
+             {
+        <p class="no-data-small">Nu există medici programați</p>
+       }
+            else
+     {
+            @foreach (var medic in MediciAstazi)
+{
+     <div class="medic-item">
+            <div class="medic-avatar" style="background-color: @GetRandomAvatarColor();">
+             @GetInitials(medic.NumeComplet)
+            </div>
+     <div class="medic-info">
+        <div class="medic-name">@medic.NumeComplet</div>
+            <div class="medic-specialty">@medic.Specializare</div>
+      </div>
+     <div class="medic-status">
+  <span class="status-dot @(medic.EsteActiv ? "active" : "inactive")"></span>
+            </div>
+             </div>
+ }
+         }
+        </div>
+            </div>
+
+    @* Notificări *@
+           <div class="sidebar-card">
+             <h3>
+      <i class="fas fa-bell"></i>
+  Notificări
+ @if (Notificari != null && Notificari.Any())
+   {
+      <span class="notification-badge">@Notificari.Count</span>
+          }
+  </h3>
+         <div class="notificari-list">
+     @if (Notificari == null || !Notificari.Any())
+                {
+           <p class="no-data-small">Nu există notificări</p>
+            }
+     else
+           {
+         @foreach (var notificare in Notificari)
+      {
+   <div class="notificare-item @GetNotificareTypeClass(notificare.Tip)">
+            <div class="notificare-icon">
+             <i class="fas fa-@GetNotificareIcon(notificare.Tip)"></i>
+       </div>
+                <div class="notificare-content">
+         <div class="notificare-title">@notificare.Titlu</div>
+ <div class="notificare-message">@notificare.Mesaj</div>
+  <div class="notificare-time">@GetRelativeTime(notificare.Data)</div>
+      </div>
+              </div>
+  }
+     }
+     </div>
+       </div>
+
+     @* Căutare Rapidă *@
+   <div class="sidebar-card">
+        <h3>
+            <i class="fas fa-search"></i>
+           Căutare Rapidă
+  </h3>
+  <div class="search-box">
+    <input type="text" 
+     class="search-input" 
+       placeholder="Caută pacient..."
+    @bind="SearchText"
+    @bind:event="oninput"
+              @onkeydown="HandleSearchKeyDown" />
+              <button class="search-btn" @onclick="HandleSearch">
+        <i class="fas fa-search"></i>
+         </button>
+        </div>
+          @if (SearchResults != null && SearchResults.Any())
+          {
+  <div class="search-results">
+          @foreach (var result in SearchResults)
+     {
+            <div class="search-result-item" @onclick="() => HandleSelectPatient(result.Id)">
+<div class="result-icon">
+     <i class="fas fa-user"></i>
+       </div>
+      <div class="result-info">
+        <div class="result-name">@result.NumeComplet</div>
+       <div class="result-details">
+  @result.CNP | @result.Telefon
+  </div>
+          </div>
+      </div>
+      }
+     </div>
+         }
+</div>
+         </div>
+        </div>
+    }
+</div>
+
+@* ✅ ADDED: Modal adaugare pacient *@
+<PacientAddEditModal 
+    IsVisible="@ShowAddPacientModal"
+    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowAddPacientModal = value))"
+    OnSaved="OnPacientSaved" />
+
+@* ✅ ADDED: Modal scheduler pentru programari *@
+<ProgramareSchedulerModal 
+    IsVisible="@ShowSchedulerModal"
+  IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowSchedulerModal = value))"
+    OnProgramareCreated="OnProgramareCreated" />
+
+@code {
+    private string FormatTimeSpan(TimeSpan time)
+    {
+     return $"{time.Hours:D2}:{time.Minutes:D2}";
+    }
+}

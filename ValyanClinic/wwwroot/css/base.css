@@ -13,25 +13,64 @@ html, body {
 }
 
 body {
-    color: var(--text-color);
+  color: var(--text-color);
     background-color: var(--background-color);
     font-size: var(--font-size-base);
+font-weight: var(--font-weight-normal);
     line-height: var(--line-height-base);
+    
+    /* Font Rendering Optimization */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 a {
     color: var(--primary-color);
     text-decoration: none;
+    transition: color var(--transition-fast);
 }
 
 a:hover {
+    color: var(--primary-dark);
     text-decoration: underline;
 }
 
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     margin-bottom: var(--spacing-md);
-    font-weight: 500;
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    color: var(--text-color);
+}
+
+/* Specific heading sizes */
+h1 {
+    font-size: var(--page-header-title);
+    font-weight: var(--font-weight-bold);
+}
+
+h2 {
+    font-size: var(--modal-header-title);
+}
+
+h3 {
+    font-size: var(--modal-card-title);
+}
+
+h4 {
+    font-size: var(--font-size-lg);
+}
+
+h5 {
+    font-size: var(--font-size-base);
+}
+
+h6 {
+    font-size: var(--modal-label);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wider);
 }
 
 /* ========================================

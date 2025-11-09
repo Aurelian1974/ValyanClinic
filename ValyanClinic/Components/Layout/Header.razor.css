@@ -42,8 +42,8 @@
     gap: 6px;
     padding: 4px 10px;
     border-radius: 5px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-medium);
     color: #64748b;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -61,7 +61,7 @@
 
 .breadcrumb-item.active {
     color: #3b82f6;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     background: #dbeafe;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .breadcrumb-item i {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 .breadcrumb-separator {
@@ -82,7 +82,7 @@
 .btn-toggle-sidebar {
     background: none;
     border: none;
-    font-size: 18px;
+    font-size: var(--font-size-xl);
     color: #64748b;
     cursor: pointer;
     padding: 6px 10px;
@@ -106,7 +106,7 @@
     position: relative;
     background: none;
     border: none;
-    font-size: 18px;
+    font-size: var(--font-size-xl);
     color: #64748b;
     cursor: pointer;
     padding: 8px;
@@ -120,7 +120,7 @@
 }
 
 .btn-icon i {
-    font-size: 18px;
+    font-size: var(--font-size-xl);
 }
 
 .btn-icon .badge {
@@ -130,7 +130,7 @@
     background: linear-gradient(135deg, #fca5a5 0%, #f87171 100%);
     color: white;
     font-size: 9px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     padding: 2px 5px;
     border-radius: 8px;
     min-width: 16px;
@@ -173,8 +173,8 @@
     color: white;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 14px;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--modal-tab-text);
     border: 2px solid white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -190,21 +190,21 @@
 }
 
 .user-name {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     color: #334155;
     line-height: 1.2;
 }
 
 .user-role {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     color: #94a3b8;
     line-height: 1.2;
 }
 
 .user-profile i {
     color: #94a3b8;
-    font-size: 11px;
+    font-size: var(--font-size-xs);
 }
 
 /* User Dropdown Menu */
@@ -245,13 +245,13 @@
 }
 
 .dropdown-user-info strong {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-semibold);
     color: #0f172a;
 }
 
 .dropdown-user-info small {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #64748b;
 }
 
@@ -268,7 +268,7 @@
     padding: 12px 15px;
     color: #334155;
     text-decoration: none;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     transition: all 0.2s ease;
     cursor: pointer;
 }
@@ -279,7 +279,7 @@
 
 .dropdown-item i {
     width: 20px;
-    font-size: 16px;
+    font-size: var(--modal-value);
     color: #64748b;
 }
 
@@ -321,11 +321,11 @@
     }
 
     .breadcrumb-item i {
-        font-size: 14px;
+        font-size: var(--modal-tab-text);
     }
     
     .btn-icon {
         padding: 6px;
-        font-size: 16px;
+        font-size: var(--modal-value);
     }
 }

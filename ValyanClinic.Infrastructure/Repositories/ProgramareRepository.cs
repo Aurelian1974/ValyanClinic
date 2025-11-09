@@ -431,69 +431,125 @@ if (success)
 
     /// <inheritdoc />
     public async Task<Dictionary<string, object>> GetStatisticsAsync(
-    DateTime? dataStart = null,
-        DateTime? dataEnd = null,
+        DateTime? dataStart = null,
+    DateTime? dataEnd = null,
         CancellationToken cancellationToken = default)
-    {
-_logger.LogInformation(
-         "Obținere statistici globale: DataStart={DataStart}, DataEnd={DataEnd}",
-    dataStart?.ToString("yyyy-MM-dd"), dataEnd?.ToString("yyyy-MM-dd"));
+{
+        _logger.LogInformation(
+            "Obținere statistici globale: DataStart={DataStart}, DataEnd={DataEnd}",
+  dataStart?.ToString("yyyy-MM-dd"), dataEnd?.ToString("yyyy-MM-dd"));
 
-        var parameters = new
+    var parameters = new
         {
-DataStart = dataStart,
-            DataEnd = dataEnd
+            DataStart = dataStart,
+     DataEnd = dataEnd
+      };
+
+        // ✅ UPDATED: Folosește sp_Programari_GetStatistics_v2 (returnează un singur row cu toate statisticile)
+        using var connection = _connectionFactory.CreateConnection();
+var result = await connection.QueryFirstOrDefaultAsync<StatisticsResult>(
+        "sp_Programari_GetStatistics_v2",
+            parameters,
+            commandType: System.Data.CommandType.StoredProcedure);
+
+        if (result == null)
+        {
+     _logger.LogWarning("Statisticile nu au putut fi obținute - result null");
+            return new Dictionary<string, object>();
+        }
+
+        // ✅ Mapare result la Dictionary<string, object> pentru handler
+        var statistics = new Dictionary<string, object>
+  {
+            ["TotalProgramari"] = result.TotalProgramari,
+     ["Programate"] = result.Programate,
+   ["Confirmate"] = result.Confirmate,
+     ["CheckedIn"] = result.CheckedIn,
+         ["InConsultatie"] = result.InConsultatie,
+     ["Finalizate"] = result.Finalizate,
+            ["Anulate"] = result.Anulate,
+   ["NoShow"] = result.NoShow,
+  ["ConsultatiiInitiale"] = result.ConsultatiiInitiale,
+["ControalePeriodice"] = result.ControalePeriodice,
+         ["Consultatii"] = result.Consultatii,
+            ["Investigatii"] = result.Investigatii,
+      ["Proceduri"] = result.Proceduri,
+      ["Urgente"] = result.Urgente,
+            ["Telemedicina"] = result.Telemedicina,
+        ["LaDomiciliu"] = result.LaDomiciliu,
+ ["MediciActivi"] = result.MediciActivi,
+    ["PacientiUnici"] = result.PacientiUnici,
+            ["DurataMedieMinute"] = result.DurataMedieMinute ?? 0.0
         };
 
-        using var connection = _connectionFactory.CreateConnection();
-        var results = await connection.QueryAsync<StatisticResult>(
-            "sp_Programari_GetStatistics",
-            parameters,
-     commandType: System.Data.CommandType.StoredProcedure);
-
-        var statistics = results.ToDictionary(
-          r => r.Categorie,
-            r => (object)r.Valoare);
-
-      _logger.LogInformation("Statistici obținute: {Count} categorii", statistics.Count);
- return statistics;
-    }
+        _logger.LogInformation("Statistici obținute: Total={Total}, Finalizate={Finalizate}", 
+            result.TotalProgramari, result.Finalizate);
+        
+   return statistics;
+  }
 
     /// <inheritdoc />
     public async Task<Dictionary<string, object>> GetDoctorStatisticsAsync(
  Guid doctorID,
-  DateTime? dataStart = null,
-        DateTime? dataEnd = null,
-        CancellationToken cancellationToken = default)
+        DateTime? dataStart = null,
+    DateTime? dataEnd = null,
+   CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(
-      "Obținere statistici doctor: {DoctorID}, DataStart={DataStart}, DataEnd={DataEnd}",
-    doctorID, dataStart?.ToString("yyyy-MM-dd"), dataEnd?.ToString("yyyy-MM-dd"));
+            "Obținere statistici doctor: {DoctorID}, DataStart={DataStart}, DataEnd={DataEnd}",
+            doctorID, dataStart?.ToString("yyyy-MM-dd"), dataEnd?.ToString("yyyy-MM-dd"));
 
-        var parameters = new
-    {
-    DoctorID = doctorID,
-            DataStart = dataStart,
-            DataEnd = dataEnd
+      var parameters = new
+        {
+          DoctorID = doctorID,
+  DataStart = dataStart,
+    DataEnd = dataEnd
         };
 
-        using var connection = _connectionFactory.CreateConnection();
-  var results = await connection.QueryAsync<StatisticResult>(
-    "sp_Programari_GetDoctorStatistics",
- parameters,
+        // ✅ UPDATED: Folosește sp_Programari_GetDoctorStatistics_v2
+   using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryFirstOrDefaultAsync<StatisticsResult>(
+      "sp_Programari_GetDoctorStatistics_v2",
+      parameters,
    commandType: System.Data.CommandType.StoredProcedure);
 
-        var statistics = results.ToDictionary(
-      r => r.Categorie,
-    r => (object)r.Valoare);
+        if (result == null)
+        {
+         _logger.LogWarning("Statisticile pentru doctor {DoctorID} nu au putut fi obținute", doctorID);
+            return new Dictionary<string, object>();
+        }
 
-        _logger.LogInformation(
-   "Statistici doctor {DoctorID} obținute: {Count} categorii",
-            doctorID, statistics.Count);
+        // ✅ Mapare result la Dictionary<string, object>
+        var statistics = new Dictionary<string, object>
+        {
+         ["TotalProgramari"] = result.TotalProgramari,
+  ["Programate"] = result.Programate,
+    ["Confirmate"] = result.Confirmate,
+            ["CheckedIn"] = result.CheckedIn,
+       ["InConsultatie"] = result.InConsultatie,
+            ["Finalizate"] = result.Finalizate,
+       ["Anulate"] = result.Anulate,
+          ["NoShow"] = result.NoShow,
+       ["ConsultatiiInitiale"] = result.ConsultatiiInitiale,
+      ["ControalePeriodice"] = result.ControalePeriodice,
+   ["Consultatii"] = result.Consultatii,
+          ["Investigatii"] = result.Investigatii,
+    ["Proceduri"] = result.Proceduri,
+            ["Urgente"] = result.Urgente,
+       ["Telemedicina"] = result.Telemedicina,
+["LaDomiciliu"] = result.LaDomiciliu,
+            ["MediciActivi"] = result.MediciActivi,
+            ["PacientiUnici"] = result.PacientiUnici,
+            ["DurataMedieMinute"] = result.DurataMedieMinute ?? 0.0
+        };
 
-    return statistics;
-    }
+_logger.LogInformation(
+            "Statistici doctor {DoctorID} obținute: Total={Total}, Finalizate={Finalizate}",
+       doctorID, result.TotalProgramari, result.Finalizate);
 
+        return statistics;
+ }
+    
     // ==================== PRIVATE HELPER METHODS ====================
 
     /// <summary>
@@ -571,19 +627,52 @@ DataStart = dataStart,
 
     /// <summary>
 /// DTO pentru rezultatele de tip success/failure din SP-uri.
-    /// </summary>
+/// </summary>
     private class SuccessResult
     {
-        public int Success { get; set; }
-      public string? Message { get; set; }
+    public int Success { get; set; }
+     public string? Message { get; set; }
+    }
+
+  /// <summary>
+    /// DTO pentru rezultatele statistice (v2 format - UN SINGUR ROW cu toate statisticile).
+  /// </summary>
+    private class StatisticsResult
+    {
+  // Status counts
+        public int TotalProgramari { get; set; }
+        public int Programate { get; set; }
+        public int Confirmate { get; set; }
+        public int CheckedIn { get; set; }
+        public int InConsultatie { get; set; }
+        public int Finalizate { get; set; }
+  public int Anulate { get; set; }
+ public int NoShow { get; set; }
+        
+        // Tip programare counts
+        public int ConsultatiiInitiale { get; set; }
+     public int ControalePeriodice { get; set; }
+     public int Consultatii { get; set; }
+   public int Investigatii { get; set; }
+     public int Proceduri { get; set; }
+        public int Urgente { get; set; }
+        public int Telemedicina { get; set; }
+ public int LaDomiciliu { get; set; }
+    
+   // Advanced statistics
+      public int MediciActivi { get; set; }
+    public int PacientiUnici { get; set; }
+     public double? DurataMedieMinute { get; set; }
     }
 
     /// <summary>
-  /// DTO pentru rezultatele statistice.
-    /// </summary>
+  /// DTO DEPRECATED - păstrat pentru backwards compatibility.
+    /// Folosește StatisticsResult în loc.
+  /// </summary>
+    [Obsolete("Use StatisticsResult instead")]
     private class StatisticResult
     {
-      public string Categorie { get; set; } = string.Empty;
+        public string Categorie { get; set; } = string.Empty;
    public int Valoare { get; set; }
-    }
+  }
 }

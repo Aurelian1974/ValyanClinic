@@ -3,7 +3,10 @@
 -- Database: ValyanMed
 -- Descriere: Obtinere lista paginata programari cu filtrare complexa
 -- Creat: 2025-01-15
--- Versiune: 1.0
+-- Versiune: 1.1 (Modified: 2025-01-XX)
+-- Modificari: 
+--   - FilterDataStart default: prima zi a lunii curente (instead of azi)
+--   - Cautare case-insensitive folosind COLLATE Latin1_General_CI_AI
 -- ============================================================================
 
 USE [ValyanMed]
@@ -38,35 +41,35 @@ BEGIN
         SET @SortColumn = 'DataProgramare';
     
     DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
-  
+    
     -- Setare interval implicit daca nu e specificat (urmatoarele 30 zile)
     IF @DataStart IS NULL
-     SET @DataStart = CAST(GETDATE() AS DATE);
+        SET @DataStart = DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1);
     
     IF @DataEnd IS NULL
-        SET @DataEnd = DATEADD(DAY, 30, @DataStart);
+        SET @DataEnd = EOMONTH(@DataStart);
     
     SELECT 
-      p.ProgramareID,
-     p.PacientID,
-      p.DoctorID,
-   p.DataProgramare,
+        p.ProgramareID,
+        p.PacientID,
+        p.DoctorID,
+        p.DataProgramare,
         p.OraInceput,
         p.OraSfarsit,
         p.TipProgramare,
         p.Status,
         p.Observatii,
         p.DataCreare,
-  p.CreatDe,
+        p.CreatDe,
         p.DataUltimeiModificari,
         p.ModificatDe,
         -- Join cu Pacienti pentru nume complet
         pac.Nume + ' ' + pac.Prenume AS PacientNumeComplet,
- pac.Telefon AS PacientTelefon,
-     pac.Email AS PacientEmail,
+        pac.Telefon AS PacientTelefon,
+        pac.Email AS PacientEmail,
         pac.CNP AS PacientCNP,
         -- Join cu PersonalMedical pentru doctor
-     doc.Nume + ' ' + doc.Prenume AS DoctorNumeComplet,
+        doc.Nume + ' ' + doc.Prenume AS DoctorNumeComplet,
         doc.Specializare AS DoctorSpecializare,
         doc.Telefon AS DoctorTelefon,
         -- Creat de (PersonalMedical)
@@ -74,9 +77,9 @@ BEGIN
     FROM Programari p
     INNER JOIN Pacienti pac ON p.PacientID = pac.Id
     INNER JOIN PersonalMedical doc ON p.DoctorID = doc.PersonalID
- LEFT JOIN PersonalMedical cre ON p.CreatDe = cre.PersonalID
-WHERE 1=1
-     -- Filtrare dupa data (obligatorie)
+    LEFT JOIN PersonalMedical cre ON p.CreatDe = cre.PersonalID
+    WHERE 1=1
+        -- Filtrare dupa data (obligatorie)
         AND p.DataProgramare BETWEEN @DataStart AND @DataEnd
         -- Filtrare dupa doctor
         AND (@DoctorID IS NULL OR p.DoctorID = @DoctorID)
@@ -86,16 +89,16 @@ WHERE 1=1
         AND (@Status IS NULL OR p.Status = @Status)
         -- Filtrare dupa tip programare
   AND (@TipProgramare IS NULL OR p.TipProgramare = @TipProgramare)
- -- Search global (pacient, doctor, observatii)
+         -- Search global (pacient, doctor, observatii)
         AND (
             @SearchText IS NULL OR
-        pac.Nume LIKE '%' + @SearchText + '%' OR
-  pac.Prenume LIKE '%' + @SearchText + '%' OR
+        pac.Nume COLLATE Latin1_General_CI_AI LIKE '%' + @SearchText COLLATE Latin1_General_CI_AI + '%' OR
+            pac.Prenume COLLATE Latin1_General_CI_AI LIKE '%' + @SearchText COLLATE Latin1_General_CI_AI + '%' OR
             pac.CNP LIKE '%' + @SearchText + '%' OR
-            doc.Nume LIKE '%' + @SearchText + '%' OR
-     doc.Prenume LIKE '%' + @SearchText + '%' OR
-       p.Observatii LIKE '%' + @SearchText + '%'
-  )
+            doc.Nume COLLATE Latin1_General_CI_AI LIKE '%' + @SearchText COLLATE Latin1_General_CI_AI + '%' OR
+     doc.Prenume COLLATE Latin1_General_CI_AI LIKE '%' + @SearchText COLLATE Latin1_General_CI_AI + '%' OR
+       p.Observatii COLLATE Latin1_General_CI_AI LIKE '%' + @SearchText COLLATE Latin1_General_CI_AI + '%'
+        )
     ORDER BY 
         CASE WHEN @SortColumn = 'DataProgramare' AND @SortDirection = 'ASC' 
  THEN p.DataProgramare END ASC,
@@ -129,5 +132,5 @@ WHERE 1=1
 END
 GO
 
-PRINT '? sp_Programari_GetAll creat cu succes';
+PRINT '? sp_Programari_GetAll creat cu succes (v1.1 - case-insensitive search + prima zi luna curenta)';
 GO

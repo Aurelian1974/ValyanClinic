@@ -50,8 +50,8 @@
     align-items: center;
     gap: 0.625rem;
     margin: 0 0 1rem 0;
-    font-size: 1.025rem;
-    font-weight: 600;
+    font-size: var(--modal-card-title);
+    font-weight: var(--font-weight-semibold);
     color: #334155;
     padding-bottom: 0.625rem;
     border-bottom: 2px solid #e2e8f0;
@@ -59,7 +59,7 @@
 
 .card-title i {
     color: #60a5fa;
-    font-size: 1.125rem;
+    font-size: var(--modal-card-title-icon);
 }
 
 /* Info Grid */
@@ -81,8 +81,8 @@
 }
 
 .form-group label {
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -91,7 +91,7 @@
 
 .required {
     color: #ef4444;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     text-transform: none;
 }
 
@@ -100,7 +100,7 @@
 .form-group ::deep input.form-control,
 .form-group ::deep select.form-control,
 .form-group ::deep textarea.form-control {
-    font-size: 0.9375rem;
+    font-size: var(--modal-value);
     color: #334155;
     padding: 0.625rem;
     background: #f8fafc;
@@ -161,17 +161,17 @@
 /* Validation Messages */
 .validation-message {
     color: #dc2626;
-    font-size: 0.8125rem;
+    font-size: var(--modal-label);
     margin-top: 0.375rem;
     display: flex;
     align-items: center;
     gap: 0.375rem;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .validation-message::before {
     content: "⚠";
-    font-size: 0.9375rem;
+    font-size: var(--modal-value);
     color: #ef4444;
 }
 
@@ -217,7 +217,7 @@ small.form-text.text-muted,
 .form-group ::deep .e-ddl,
 .form-group ::deep .e-dropdownbase,
 .form-group ::deep .e-input-group.e-control-wrapper.e-ddl {
-    font-size: 0.9375rem;
+    font-size: var(--modal-value);
     background: #f8fafc;
     border-radius: 7px;
     border: 1px solid #e2e8f0;
@@ -248,7 +248,7 @@ small.form-text.text-muted,
     background: transparent;
     border: none;
     color: #334155;
-    font-size: 0.9375rem;
+    font-size: var(--modal-value);
     font-family: inherit;
 }
 
@@ -293,7 +293,7 @@ small.form-text.text-muted,
 ::deep .e-ddl .e-list-item,
 ::deep .e-dropdownbase .e-list-item {
     padding: 0.625rem 0.875rem;
-    font-size: 0.9375rem;
+    font-size: var(--modal-value);
     color: #334155;
     transition: all 0.2s ease;
     cursor: pointer;
@@ -309,7 +309,7 @@ small.form-text.text-muted,
 ::deep .e-dropdownbase .e-list-item.e-active {
     background: linear-gradient(135deg, #dbeafe, #bfdbfe);
     color: #1e40af;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Scrollbar - ALBASTRU Theme */

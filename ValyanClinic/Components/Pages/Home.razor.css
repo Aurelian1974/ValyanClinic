@@ -25,13 +25,13 @@
 
 .welcome-header h1 {
     margin: 0;
-    font-size: 32px;
-    font-weight: 700;
+    font-size: var(--page-header-title);
+    font-weight: var(--font-weight-bold);
 }
 
 .welcome-header .subtitle {
     margin: 8px 0 0;
-    font-size: 16px;
+    font-size: var(--modal-value);
     color: rgba(255, 255, 255, 0.95);
 }
 
@@ -42,12 +42,12 @@
     padding: 12px 24px;
     background: rgba(255, 255, 255, 0.25);
     border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-medium);
 }
 
 .date-info i {
-    font-size: 18px;
+    font-size: var(--font-size-xl);
 }
 
 /* Stats Grid */
@@ -97,7 +97,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: var(--page-header-title);
     flex-shrink: 0;
 }
 
@@ -127,16 +127,16 @@
 
 .stat-content h3 {
     margin: 0 0 8px 0;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-semibold);
     color: #94a3b8;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .stat-number {
-    font-size: 32px;
-    font-weight: 700;
+    font-size: var(--page-header-title);
+    font-weight: var(--font-weight-bold);
     color: #334155;
     margin-bottom: 8px;
 }
@@ -145,8 +145,8 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-medium);
     padding: 4px 10px;
     border-radius: 6px;
 }
@@ -241,13 +241,13 @@
 .dashboard-card h3 {
     margin: 0;
     font-size: 20px;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: #334155;
 }
 
 .dashboard-card p {
     color: #64748b;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     line-height: 1.6;
     margin: 0 0 20px 0;
 }
@@ -258,8 +258,8 @@
     gap: 8px;
     color: #60a5fa;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--modal-tab-text);
     transition: all 0.3s ease;
 }
 
@@ -287,14 +287,14 @@
     align-items: center;
     gap: 10px;
     margin: 0 0 20px 0;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
     color: #334155;
 }
 
 .info-card h3 i {
     color: #60a5fa;
-    font-size: 22px;
+    font-size: var(--modal-header-title);
 }
 
 .tech-list {
@@ -309,7 +309,7 @@
     gap: 12px;
     padding: 10px 0;
     color: #64748b;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     border-bottom: 1px solid #f1f5f9;
 }
 
@@ -319,7 +319,7 @@
 
 .tech-list i {
     color: #6ee7b7;
-    font-size: 16px;
+    font-size: var(--modal-value);
 }
 
 .health-links {
@@ -353,8 +353,8 @@
 }
 
 .health-link span {
-    font-weight: 500;
-    font-size: 14px;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--modal-tab-text);
 }
 
 /* Responsive */

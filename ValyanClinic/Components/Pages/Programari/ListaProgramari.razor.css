@@ -30,8 +30,8 @@
 
 .programari-header h1 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
     display: flex;
   align-items: center;
     gap: 8px;
@@ -51,8 +51,8 @@
     padding: 10px 20px;
     border: none;
 border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -128,7 +128,7 @@ display: flex;
     position: absolute;
     left: 12px;
     color: #60a5fa;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     pointer-events: none;
     z-index: 2;
     transition: all 0.2s ease;
@@ -139,8 +139,8 @@ display: flex;
     padding: 10px 40px 10px 36px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 400;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-normal);
     color: #374151;
     transition: all 0.2s ease;
     background: white;
@@ -150,7 +150,7 @@ display: flex;
 .search-box-wrapper .search-input::placeholder {
     color: #9ca3af;
     font-style: italic;
-    font-weight: 400;
+    font-weight: var(--font-weight-normal);
 }
 
 .search-box-wrapper .search-input:hover {
@@ -193,7 +193,7 @@ width: 24px;
 }
 
 .search-box-wrapper .search-clear-btn i {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 .btn-filter {
@@ -205,8 +205,8 @@ width: 24px;
     border: 1px solid #d1d5db;
   border-radius: 8px;
     color: #374151;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
@@ -236,8 +236,8 @@ white-space: nowrap;
     background: #ef4444;
 color: white;
 border-radius: 9px;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
 }
 
 .btn-filter.active .filter-badge {
@@ -246,7 +246,7 @@ border-radius: 9px;
 }
 
 .btn-filter .chevron-icon {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     transition: transform 0.2s ease;
 }
 
@@ -258,7 +258,7 @@ border-radius: 9px;
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     color: #6b7280;
     padding: 10px 16px;
     background: #f9fafb;
@@ -269,17 +269,17 @@ border-radius: 9px;
 
 .total-records i {
     color: #3b82f6;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
 }
 
 .total-records strong {
     color: #111827;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .filtered-info {
     color: #f59e0b;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     font-style: normal;
 }
 
@@ -332,14 +332,14 @@ border-radius: 9px;
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     color: #495057;
 }
 
 .filter-label i {
     color: #60a5fa;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 .form-control,
@@ -347,7 +347,7 @@ border-radius: 9px;
     padding: 10px 14px;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     transition: all 0.3s ease;
     width: 100%;
 }
@@ -379,8 +379,8 @@ border-radius: 9px;
     padding: 8px 16px;
   border: none;
     border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
  cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -423,8 +423,8 @@ box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     color: #495057;
     margin-right: 12px;
 }
@@ -448,8 +448,8 @@ box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
     background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
     color: #1e40af;
   border-radius: 20px;
-    font-size: 12px;
-font-weight: 600;
+    font-size: var(--font-size-xs);
+font-weight: var(--font-weight-semibold);
     animation: slideInChip 0.3s ease;
 }
 
@@ -508,7 +508,7 @@ font-weight: 600;
 .loading-overlay p {
   margin-top: 15px;
     color: #64748b;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .empty-state {
@@ -541,13 +541,13 @@ font-weight: 600;
 }
 
 .datetime-cell .date {
-font-weight: 600;
+font-weight: var(--font-weight-semibold);
     color: #334155;
-    font-size: 13px;
+    font-size: var(--modal-label);
 }
 
 .datetime-cell .time {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #64748b;
 }
 
@@ -559,7 +559,7 @@ font-weight: 600;
 
 .pacient-cell i {
     color: #3b82f6;
-    font-size: 16px;
+    font-size: var(--modal-value);
 }
 
 .doctor-cell {
@@ -569,13 +569,13 @@ font-weight: 600;
 }
 
 .doctor-name {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: #334155;
- font-size: 13px;
+ font-size: var(--modal-label);
 }
 
 .doctor-spec {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
 color: #64748b;
     font-style: italic;
 }
@@ -584,8 +584,8 @@ color: #64748b;
 .badge {
     padding: 6px 12px;
     border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     text-align: center;
     white-space: nowrap;
 }
@@ -742,10 +742,10 @@ border-bottom: 2px solid #60a5fa;
 }
 
 ::deep .e-grid .e-headercell {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: #495057;
     padding: 6px 8px;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 ::deep .e-grid .e-gridcontent {
@@ -777,7 +777,7 @@ border-bottom: 2px solid #60a5fa;
 ::deep .e-grid .e-rowcell {
     padding: 5px 8px !important;
     border-color: #e9ecef;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     line-height: 1.4;
 }
 

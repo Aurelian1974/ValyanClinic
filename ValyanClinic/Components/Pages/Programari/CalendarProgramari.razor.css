@@ -36,14 +36,14 @@
 
 .header-text h1 {
     margin: 0;
-    font-size: 28px;
-    font-weight: 700;
+    font-size: var(--page-header-title);
+    font-weight: var(--font-weight-bold);
     color: white;
 }
 
 .header-subtitle {
  margin: 5px 0 0;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     color: rgba(255, 255, 255, 0.95);
 }
 
@@ -58,7 +58,7 @@ background: white;
     border: none;
     padding: 12px 24px;
   border-radius: 8px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -86,8 +86,8 @@ background: white;
 }
 
 .filter-group label {
-    font-weight: 600;
-    font-size: 13px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--modal-label);
     color: #64748b;
     margin-bottom: 8px;
 }
@@ -134,14 +134,14 @@ background: white;
 }
 
 .day-name {
-    font-weight: 700;
-    font-size: 14px;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--modal-tab-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .day-date {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 margin-top: 4px;
     opacity: 0.8;
 }
@@ -165,9 +165,9 @@ margin-top: 4px;
     align-items: flex-start;
     justify-content: center;
   padding: 10px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: #64748b;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 .time-slot {
@@ -194,7 +194,7 @@ margin-top: 4px;
     border-radius: 6px;
     margin-bottom: 4px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     transition: all 0.2s ease;
     border: 2px solid rgba(255, 255, 255, 0.5);
 }
@@ -206,13 +206,13 @@ margin-top: 4px;
 }
 
 .programare-time {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     font-size: 10px;
     margin-bottom: 2px;
 }
 
 .programare-pacient {
- font-weight: 600;
+ font-weight: var(--font-weight-semibold);
   overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -240,8 +240,8 @@ margin-top: 4px;
 }
 
 .calendar-legend h6 {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-bold);
     color: #475569;
     margin-bottom: 10px;
 }
@@ -256,7 +256,7 @@ margin-top: 4px;
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #64748b;
 }
 

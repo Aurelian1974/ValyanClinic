@@ -23,8 +23,8 @@
 
 .departamente-header h1 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -43,8 +43,8 @@
     padding: 10px 20px;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -89,7 +89,7 @@
 }
 
 .loading-container p {
-    font-size: 16px;
+    font-size: var(--modal-value);
     color: #6c757d;
     margin: 0;
 }
@@ -132,7 +132,7 @@
     position: absolute;
     left: 12px;
     color: #60a5fa;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     pointer-events: none;
     z-index: 2;
 }
@@ -142,8 +142,8 @@
     padding: 10px 40px 10px 36px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 400;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-normal);
     color: #374151;
     transition: all 0.2s ease;
     background: white;
@@ -153,7 +153,7 @@
 .search-box-wrapper .search-input::placeholder {
     color: #9ca3af;
     font-style: italic;
-    font-weight: 400;
+    font-weight: var(--font-weight-normal);
 }
 
 .search-box-wrapper .search-input:hover {
@@ -195,7 +195,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     color: #6b7280;
     padding: 10px 16px;
     background: #f9fafb;
@@ -206,12 +206,12 @@
 
 .total-records i {
     color: #3b82f6;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
 }
 
 .total-records strong {
     color: #111827;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .action-toolbar {
@@ -250,20 +250,20 @@
 }
 
 .selected-item-info i {
-    font-size: 16px;
+    font-size: var(--modal-value);
     color: #60a5fa;
 }
 
 .selected-label {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #6b7280;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .selected-item-info strong {
-    font-size: 13px;
+    font-size: var(--modal-label);
     color: #374151;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .selected-badge {
@@ -272,7 +272,7 @@
     color: white;
     border-radius: 12px;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
@@ -282,12 +282,12 @@
     align-items: center;
     gap: 8px;
     color: #9ca3af;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     font-style: italic;
 }
 
 .no-selection-info i {
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
 }
 
 .toolbar-actions {
@@ -300,8 +300,8 @@
     padding: 6px 12px;
     border: 1px solid;
     border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -368,8 +368,8 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     color: #374151;
     margin: 0;
 }
@@ -385,8 +385,8 @@
     border-radius: 6px;
     background: white;
     color: #374151;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     transition: all 0.2s ease;
     appearance: none;
@@ -442,7 +442,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
+    font-size: var(--modal-label);
     color: #6b7280;
 }
 
@@ -452,7 +452,7 @@
 
 .pager-text strong {
     color: #111827;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .pager-controls {
@@ -472,8 +472,8 @@
     background: white;
     color: #374151;
     border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -495,7 +495,7 @@
     background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
     color: white;
     border-color: #3b82f6;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 ::deep .e-grid {
@@ -514,10 +514,10 @@
 }
 
 ::deep .e-grid .e-headercell {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: #495057;
     padding: 6px 8px;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 ::deep .e-grid .e-gridcontent {
@@ -544,5 +544,5 @@
 ::deep .e-grid .e-rowcell {
     padding: 5px 8px !important;
     border-color: #e9ecef;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }

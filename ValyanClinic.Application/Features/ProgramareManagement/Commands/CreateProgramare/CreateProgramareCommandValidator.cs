@@ -12,17 +12,21 @@ public class CreateProgramareCommandValidator : AbstractValidator<CreatePrograma
     {
     // ==================== VALIDĂRI CÂMPURI OBLIGATORII ====================
 
-      RuleFor(x => x.PacientID)
-            .NotEmpty()
-       .WithMessage("ID-ul pacientului este obligatoriu.")
-    .NotEqual(Guid.Empty)
-          .WithMessage("ID-ul pacientului nu este valid.");
+     // ✅ UPDATED: PacientID opțional pentru SlotBlocat
+      When(x => x.TipProgramare != "SlotBlocat", () =>
+        {
+RuleFor(x => x.PacientID)
+       .NotEmpty()
+     .WithMessage("ID-ul pacientului este obligatoriu.")
+          .NotEqual(Guid.Empty)
+      .WithMessage("ID-ul pacientului nu este valid.");
+        });
 
-    RuleFor(x => x.DoctorID)
-         .NotEmpty()
-.WithMessage("ID-ul medicului este obligatoriu.")
-        .NotEqual(Guid.Empty)
-            .WithMessage("ID-ul medicului nu este valid.");
+        RuleFor(x => x.DoctorID)
+            .NotEmpty()
+    .WithMessage("ID-ul medicului este obligatoriu.")
+      .NotEqual(Guid.Empty)
+   .WithMessage("ID-ul medicului nu este valid.");
 
         RuleFor(x => x.DataProgramare)
             .NotEmpty()
@@ -68,11 +72,14 @@ public class CreateProgramareCommandValidator : AbstractValidator<CreatePrograma
             .WithMessage("Durata programării nu poate depăși 4 ore.")
             .WithName("Durata");
 
-// Validare: Pacient diferit de Doctor (nu poate fi același GUID)
-        RuleFor(x => x)
-            .Must(x => x.PacientID != x.DoctorID)
-            .WithMessage("Pacientul și medicul nu pot fi aceeași persoană.")
-   .WithName("PacientID");
+// Validare: Pacient diferit de Doctor (nu poate fi același GUID) - excepție pentru SlotBlocat
+        When(x => x.TipProgramare != "SlotBlocat", () =>
+      {
+       RuleFor(x => x)
+        .Must(x => x.PacientID != x.DoctorID)
+       .WithMessage("Pacientul și medicul nu pot fi aceeași persoană.")
+ .WithName("PacientID");
+        });
 
         // Validare: Data programării nu poate fi cu mai mult de 1 an în viitor
         RuleFor(x => x.DataProgramare)
@@ -90,14 +97,14 @@ public class CreateProgramareCommandValidator : AbstractValidator<CreatePrograma
             .WithMessage("Statusul trebuie să fie unul dintre: Programata, Confirmata, CheckedIn, InConsultatie, Finalizata, Anulata, NoShow.");
 
   // Validare TipProgramare (dacă e furnizat)
-        When(x => !string.IsNullOrEmpty(x.TipProgramare), () =>
+     When(x => !string.IsNullOrEmpty(x.TipProgramare), () =>
         {
-            RuleFor(x => x.TipProgramare)
-           .Must(tip => new[] { "ConsultatieInitiala", "ControlPeriodic", "Consultatie", "Investigatie", 
-     "Procedura", "Urgenta", "Telemedicina", "LaDomiciliu" }
-        .Contains(tip, StringComparer.OrdinalIgnoreCase))
- .WithMessage("Tipul programării trebuie să fie unul dintre: ConsultatieInitiala, ControlPeriodic, Consultatie, Investigatie, Procedura, Urgenta, Telemedicina, LaDomiciliu.");
-        });
+    RuleFor(x => x.TipProgramare)
+   .Must(tip => new[] { "ConsultatieInitiala", "ControlPeriodic", "Consultatie", "Investigatie", 
+    "Procedura", "Urgenta", "Telemedicina", "LaDomiciliu", "SlotBlocat" }
+       .Contains(tip, StringComparer.OrdinalIgnoreCase))
+             .WithMessage("Tipul programării trebuie să fie unul dintre: ConsultatieInitiala, ControlPeriodic, Consultatie, Investigatie, Procedura, Urgenta, Telemedicina, LaDomiciliu, SlotBlocat.");
+  });
 
         // Validare Observatii (max 1000 caractere)
    When(x => !string.IsNullOrEmpty(x.Observatii), () =>

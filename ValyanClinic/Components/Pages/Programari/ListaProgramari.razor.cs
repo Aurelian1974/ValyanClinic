@@ -74,27 +74,28 @@ public partial class ListaProgramari : ComponentBase
         {
             Logger.LogInformation("Inițializare ListaProgramari");
 
-    // Set default filters
-      FilterDataStart = DateTime.Today;
-        FilterDataEnd = DateTime.Today.AddDays(30);
+         // ✅ Set default filters - PRIMA ZI și ULTIMA ZI a lunii curente
+       var today = DateTime.Today;
+          FilterDataStart = new DateTime(today.Year, today.Month, 1); // Prima zi a lunii
+            FilterDataEnd = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month)); // Ultima zi a lunii
 
       // Load dropdown data
-            await Task.WhenAll(
-           LoadDoctorsListAsync(),
-    LoadPacientiListAsync()
+ await Task.WhenAll(
+         LoadDoctorsListAsync(),
+  LoadPacientiListAsync()
             );
 
-       // Load initial data
+      // Load initial data
           await LoadDataAsync();
+     }
+  catch (Exception ex)
+      {
+            Logger.LogError(ex, "Eroare la inițializarea paginii ListaProgramari");
+        HasError = true;
+     ErrorMessage = "Eroare la încărcarea datelor. Vă rugăm să reîncărcați pagina.";
         }
-        catch (Exception ex)
-        {
-    Logger.LogError(ex, "Eroare la inițializarea paginii ListaProgramari");
-     HasError = true;
-      ErrorMessage = "Eroare la încărcarea datelor. Vă rugăm să reîncărcați pagina.";
- }
         finally
-   {
+      {
         IsLoading = false;
         }
     }
@@ -236,14 +237,18 @@ PageNumber = 1,
     private async Task ClearAllFilters()
     {
         SearchText = null;
-        FilterDoctorID = null;
-      FilterPacientID = null;
-        FilterDataStart = DateTime.Today;
-    FilterDataEnd = DateTime.Today.AddDays(30);
-     FilterStatus = null;
+      FilterDoctorID = null;
+        FilterPacientID = null;
+        
+        // ✅ Reset to PRIMA ZI și ULTIMA ZI a lunii curente
+        var today = DateTime.Today;
+   FilterDataStart = new DateTime(today.Year, today.Month, 1); // Prima zi a lunii
+        FilterDataEnd = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month)); // Ultima zi a lunii
+        
+        FilterStatus = null;
         FilterTipProgramare = null;
 
-      await ApplyFilters();
+        await ApplyFilters();
     }
 
     private void OpenAddModal()

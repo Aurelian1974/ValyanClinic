@@ -18,8 +18,8 @@
 .page-title {
     color: white;
     margin: 0;
-    font-size: 1.375rem;
-    font-weight: 600;
+    font-size: var(--modal-header-title);
+    font-weight: var(--font-weight-semibold);
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -48,9 +48,9 @@
 .filter-item label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: #334155;
-    font-size: 0.875rem;
+    font-size: var(--modal-tab-text);
 }
 
 .audit-grid {
@@ -63,8 +63,8 @@
 .badge-action {
     padding: 0.25rem 0.75rem;
     border-radius: 6px;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     background: #bfdbfe;
     color: #1e40af;
 }
@@ -72,8 +72,8 @@
 .badge-success {
     padding: 0.25rem 0.75rem;
     border-radius: 6px;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
   background: #a7f3d0;
     color: #065f46;
 }
@@ -81,8 +81,8 @@
 .badge-danger {
     padding: 0.25rem 0.75rem;
     border-radius: 6px;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
  background: #fca5a5;
     color: #991b1b;
 }

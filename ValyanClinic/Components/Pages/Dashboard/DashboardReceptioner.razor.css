@@ -1,0 +1,899 @@
+﻿/* =========================================
+   Dashboard Receptioner - Scoped CSS
+   Culori conform imaginii - COMPACTAT FINAL
+   ========================================= */
+
+/* Container Principal */
+.dashboard-receptioner-container {
+    padding: 20px;
+    background: #f8f9fa;
+    min-height: calc(100vh - 60px);
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+/* ========== HEADER SECTION ========== */
+.dashboard-header {
+    display: flex;
+  justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 14px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.header-welcome h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.header-welcome .subtitle {
+ margin: 2px 0 0 0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.header-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #64748b;
+background: #f8fafc;
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+.header-date i {
+    color: #3b82f6;
+}
+
+/* ========== QUICK ACTIONS - COMPACTAT (UN SINGUR RÂND) ========== */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.quick-action-btn {
+    display: flex;
+    flex-direction: row;
+ align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    min-height: 70px;
+}
+
+.action-icon {
+ width: 40px;
+    height: 40px;
+border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.action-text {
+    font-size: 15px;
+    font-weight: 600;
+  color: white;
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* Quick Action Colors */
+.action-blue {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.action-blue:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.action-green {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.action-green:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.action-purple {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+}
+
+.action-purple:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.action-orange {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.action-orange:hover {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* ========== STATISTICS GRID - CORECT: Icon + Text + Valoare PE ACELAȘI RÂND ========== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+ background: white;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* ✅ PRIMUL RÂND: Icon + Text + Valoare TOATE PE ACEEAȘI LINIE */
+.stat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+}
+
+.stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.stat-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-left: auto;
+    line-height: 1;
+}
+
+/* ✅ AL DOILEA RÂND: Detalii (growth, timp mediu, etc.) */
+.stat-footer {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding-left: 46px;
+}
+
+.stat-change {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-change.positive {
+    color: #10b981;
+}
+
+/* ✅ NOU: Stil pentru growth negativ */
+.stat-change.negative {
+    color: #ef4444;
+}
+
+.stat-change i {
+    font-size: 11px;
+}
+
+.stat-info {
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Stat Card Colors */
+.stat-blue .stat-icon {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #3b82f6;
+}
+
+.stat-orange .stat-icon {
+    background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+    color: #f59e0b;
+}
+
+.stat-green .stat-icon {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #10b981;
+}
+
+.stat-purple .stat-icon {
+  background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
+    color: #8b5cf6;
+}
+
+/* ========== MAIN CONTENT LAYOUT ========== */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* ========== PROGRAMĂRI SECTION - COMPACTATĂ ========== */
+.programari-section {
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.section-header {
+    display: flex;
+ justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header h2 i {
+    color: #3b82f6;
+}
+
+.see-all-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #3b82f6;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.see-all-link:hover {
+    color: #2563eb;
+    gap: 8px;
+}
+
+/* Programări List - COMPACTATĂ */
+.programari-list {
+  display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.programare-item {
+    display: flex;
+    align-items: center;
+ gap: 12px;
+    padding: 12px;
+  background: #f8fafc;
+    border-radius: 10px;
+    border-left: 4px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.programare-item:hover {
+    background: #f1f5f9;
+    border-left-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.programare-item.status-confirmed {
+    border-left-color: #3b82f6;
+}
+
+.programare-item.status-waiting {
+    border-left-color: #f59e0b;
+}
+
+.programare-item.status-completed {
+    border-left-color: #10b981;
+}
+
+.programare-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 65px;
+}
+
+.time-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.time-duration {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.programare-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.programare-patient {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+ color: #1e293b;
+}
+
+.programare-patient i {
+    color: #3b82f6;
+    font-size: 13px;
+}
+
+.programare-doctor {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.programare-doctor i {
+    font-size: 11px;
+}
+
+.programare-type {
+    margin-top: 2px;
+}
+
+.programare-status {
+ display: flex;
+    align-items: center;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.status-confirmata {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-badge.status-inasteptare {
+    background: #fed7aa;
+    color: #92400e;
+}
+
+.status-badge.status-finalizata {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.status-anulata {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.programare-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-action {
+  display: flex;
+    align-items: center;
+    gap: 5px;
+  padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-check-in {
+    background: #10b981;
+    color: white;
+}
+
+.btn-check-in:hover {
+    background: #059669;
+}
+
+.btn-start {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-start:hover {
+    background: #2563eb;
+}
+
+.btn-more {
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 6px 10px;
+}
+
+.btn-more:hover {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+/* ========== SIDEBAR DREAPTA ========== */
+.sidebar-right {
+    display: flex;
+ flex-direction: column;
+gap: 14px;
+}
+
+.sidebar-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-card h3 {
+    margin: 0 0 12px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.sidebar-card h3 i {
+    color: #3b82f6;
+}
+
+.notification-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: #ef4444;
+    color: white;
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: auto;
+}
+
+/* Medici List */
+.medici-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.medic-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.medic-item:hover {
+    background: #f1f5f9;
+}
+
+.medic-avatar {
+    width: 40px;
+    height: 40px;
+ border-radius: 50%;
+    display: flex;
+    align-items: center;
+  justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+}
+
+.medic-info {
+    flex: 1;
+}
+
+.medic-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.medic-specialty {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.medic-status {
+    display: flex;
+    align-items: center;
+}
+
+.status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.status-dot.active {
+    background: #10b981;
+}
+
+.status-dot.inactive {
+    background: #94a3b8;
+}
+
+@keyframes pulse {
+    0%, 100% {
+     opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Notificări List */
+.notificari-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notificare-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 3px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.notificare-item:hover {
+    background: #f1f5f9;
+}
+
+.notif-confirmare {
+    border-left-color: #3b82f6;
+}
+
+.notif-intarziere {
+    border-left-color: #f59e0b;
+}
+
+.notif-plata {
+    border-left-color: #10b981;
+}
+
+.notif-urgent {
+    border-left-color: #ef4444;
+}
+
+.notificare-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  font-size: 13px;
+    flex-shrink: 0;
+}
+
+.notif-confirmare .notificare-icon {
+  background: #dbeafe;
+    color: #3b82f6;
+}
+
+.notif-intarziere .notificare-icon {
+    background: #fed7aa;
+    color: #f59e0b;
+}
+
+.notif-plata .notificare-icon {
+    background: #d1fae5;
+    color: #10b981;
+}
+
+.notif-urgent .notificare-icon {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.notificare-content {
+    flex: 1;
+}
+
+.notificare-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.notificare-message {
+    font-size: 11px;
+    color: #64748b;
+    margin-bottom: 3px;
+}
+
+.notificare-time {
+    font-size: 10px;
+ color: #94a3b8;
+}
+
+/* Căutare Rapidă */
+.search-box {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-btn {
+    padding: 8px 14px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+    background: #2563eb;
+}
+
+.search-results {
+    display: flex;
+ flex-direction: column;
+    gap: 8px;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+  cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-result-item:hover {
+    background: #f1f5f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.result-icon {
+width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+}
+
+.result-info {
+    flex: 1;
+}
+
+.result-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.result-details {
+    font-size: 11px;
+    color: #64748b;
+}
+
+/* ========== COMMON ========== */
+.no-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+    color: #94a3b8;
+}
+
+.no-data i {
+    font-size: 42px;
+    margin-bottom: 14px;
+    color: #cbd5e1;
+}
+
+.no-data p {
+    margin: 0;
+    font-size: 13px;
+}
+
+.no-data-small {
+    text-align: center;
+    padding: 16px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+}
+
+.loading-container p {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.badge {
+  padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1400px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-right {
+        grid-template-columns: repeat(3, 1fr);
+     flex-direction: row;
+    }
+}
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .quick-actions {
+grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sidebar-right {
+        grid-template-columns: 1fr;
+flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-receptioner-container {
+        padding: 12px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    gap: 12px;
+    }
+
+    .stats-grid,
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .programare-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .programare-actions {
+  width: 100%;
+flex-direction: column;
+    }
+
+    .btn-action {
+        width: 100%;
+        justify-content: center;
+    }
+}

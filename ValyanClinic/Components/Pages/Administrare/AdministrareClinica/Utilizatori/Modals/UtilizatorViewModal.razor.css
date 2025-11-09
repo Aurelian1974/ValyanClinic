@@ -42,21 +42,21 @@
     border-bottom: 2px solid #e2e8f0;
     flex-wrap: wrap;
     background: white;
-    padding: 0.375rem 0.875rem;
+    padding: var(--badge-padding);
     border-radius: 8px 8px 0 0;
 }
 
 .tab-button {
 background: transparent;
     border: none;
-    padding: 0.625rem 1rem;
+    padding: var(--tab-padding);
     color: #64748b;
     cursor: pointer;
   display: flex;
     align-items: center;
     gap: 0.375rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-medium);
     border-bottom: 3px solid transparent;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -73,11 +73,11 @@ background: transparent;
     color: #60a5fa;
     border-bottom-color: #60a5fa;
     background: #eff6ff;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .tab-button i {
-    font-size: 0.875rem;
+    font-size: var(--modal-tab-text);
 }
 
 /* Tab Content */
@@ -123,8 +123,8 @@ display: block;
     align-items: center;
     gap: 0.625rem;
     margin: 0 0 1rem 0;
-    font-size: 1.025rem;
-    font-weight: 600;
+    font-size: var(--modal-card-title);
+    font-weight: var(--font-weight-semibold);
     color: #334155;
     padding-bottom: 0.625rem;
     border-bottom: 2px solid #e2e8f0;
@@ -132,7 +132,7 @@ display: block;
 
 .card-title i {
     color: #60a5fa;
-    font-size: 1.125rem;
+    font-size: var(--modal-card-title-icon);
 }
 
 /* Info Grid */
@@ -154,8 +154,8 @@ display: block;
 }
 
 .info-item label {
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -164,7 +164,7 @@ display: block;
 
 /* Info Value - Base */
 .info-value {
-    font-size: 0.9375rem;
+    font-size: var(--modal-value);
 color: #334155;
     padding: 0.625rem;
   background: #f8fafc;
@@ -184,8 +184,8 @@ color: #334155;
 
 /* Info Value - Primary (Emphasized) */
 .info-value.primary-text {
-    font-size: 1.125rem;
-    font-weight: 600;
+    font-size: var(--modal-card-title-icon);
+    font-weight: var(--font-weight-semibold);
     color: #1e40af;
     background: linear-gradient(135deg, #eff6ff, #dbeafe);
     border-color: #bfdbfe;
@@ -195,7 +195,7 @@ color: #334155;
 /* Info Value - Technical (IDs, etc) */
 .info-value.technical-text {
     font-family: 'Courier New', monospace;
- font-size: 0.8125rem;
+ font-size: var(--modal-label);
     color: #64748b;
     background: #f1f5f9;
 }
@@ -223,7 +223,7 @@ color: #334155;
     align-items: center;
     gap: 0.375rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .contact-link:hover {
@@ -233,17 +233,17 @@ color: #334155;
 }
 
 .contact-link i {
-    font-size: 0.8125rem;
+    font-size: var(--modal-label);
 }
 
 /* Status Badges */
 .status-badge {
  display: inline-flex;
     align-items: center;
-    padding: 0.375rem 0.875rem;
+    padding: var(--badge-padding);
     border-radius: 18px;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     gap: 0.375rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
@@ -266,10 +266,10 @@ color: #334155;
 /* Role Badges */
 .role-badge {
     display: inline-block;
-    padding: 0.375rem 0.875rem;
+    padding: var(--badge-padding);
     border-radius: 12px;
-    font-size: 0.8125rem;
-    font-weight: 700;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-bold);
  text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
@@ -310,8 +310,8 @@ background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 .badge-primary {
     background: linear-gradient(135deg, #dbeafe, #bfdbfe);
     color: #1e40af;
-    font-weight: 600;
-    padding: 0.375rem 0.875rem;
+    font-weight: var(--font-weight-semibold);
+    padding: var(--badge-padding);
     border-radius: 12px;
   border: 1px solid #93c5fd;
     display: inline-block;
@@ -320,8 +320,8 @@ background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 .badge-success {
     background: linear-gradient(135deg, #d1fae5, #a7f3d0);
     color: #065f46;
-    font-weight: 600;
-    padding: 0.375rem 0.875rem;
+    font-weight: var(--font-weight-semibold);
+    padding: var(--badge-padding);
     border-radius: 12px;
     border: 1px solid #6ee7b7;
     display: inline-block;
@@ -330,8 +330,8 @@ background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 .badge-danger {
     background: linear-gradient(135deg, #fee2e2, #fecaca);
     color: #991b1b;
-    font-weight: 600;
-    padding: 0.375rem 0.875rem;
+    font-weight: var(--font-weight-semibold);
+    padding: var(--badge-padding);
     border-radius: 12px;
     border: 1px solid #fca5a5;
     display: inline-block;
@@ -357,7 +357,7 @@ background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     display: flex;
  align-items: center;
     gap: 0.625rem;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     border: 1px solid;
 }
 
@@ -369,7 +369,7 @@ background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 
 .alert-danger i {
     color: #dc2626;
-    font-size: 1.125rem;
+    font-size: var(--modal-card-title-icon);
 }
 
 /* Loading Container */
@@ -421,7 +421,7 @@ background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 
     .tab-button {
         white-space: nowrap;
-     font-size: 0.8125rem;
+     font-size: var(--modal-label);
         padding: 0.5rem 0.875rem;
     }
 

@@ -57,7 +57,7 @@
 }
 
 .confirm-message p {
-    font-size: 1.125rem;
+    font-size: var(--modal-card-title-icon);
     color: #334155;
     margin: 0;
     line-height: 1.6;
@@ -92,10 +92,10 @@
     }
 
     .confirm-icon i {
-        font-size: 2rem;
+        font-size: var(--page-header-title);
     }
 
     .confirm-message p {
-        font-size: 1rem;
+        font-size: var(--modal-value);
     }
 }

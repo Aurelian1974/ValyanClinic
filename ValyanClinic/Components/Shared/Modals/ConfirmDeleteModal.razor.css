@@ -32,7 +32,7 @@
 
 .loading-container p {
     color: #991b1b;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Error Actions */
@@ -69,24 +69,24 @@
 
 .warning-content h3 {
     margin: 0;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: var(--modal-header-title);
+    font-weight: var(--font-weight-bold);
     color: #991b1b;
 }
 
 .warning-text {
-    font-size: 1.0625rem;
+    font-size: var(--font-size-lg);
     color: #334155;
     margin: 0;
 }
 
 .warning-text strong {
     color: #dc2626;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 .warning-subtext {
-    font-size: 0.9375rem;
+    font-size: var(--modal-value);
     color: #64748b;
     margin: 0;
     font-style: italic;
@@ -102,14 +102,14 @@
 }
 
 .confirmation-input label {
-    font-size: 0.9375rem;
-    font-weight: 600;
+    font-size: var(--modal-value);
+    font-weight: var(--font-weight-semibold);
     color: #334155;
 }
 
 .confirmation-input label strong {
     color: #dc2626;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 .form-input {
@@ -117,8 +117,8 @@
     padding: 0.875rem;
     border: 2px solid #fca5a5;
     border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: var(--modal-value);
+    font-weight: var(--font-weight-semibold);
     text-align: center;
     text-transform: uppercase;
     transition: all 0.3s ease;
@@ -147,17 +147,17 @@
     border: 1px solid #fbbf24;
     border-radius: 8px;
     color: #92400e;
-    font-size: 0.9375rem;
-    font-weight: 600;
+    font-size: var(--modal-value);
+    font-weight: var(--font-weight-semibold);
 }
 
 .countdown-info i {
-    font-size: 1rem;
+    font-size: var(--modal-value);
 }
 
 .countdown-info strong {
     color: #f59e0b;
-    font-size: 1.125rem;
+    font-size: var(--modal-card-title-icon);
 }
 
 /* Validation Error */
@@ -171,16 +171,16 @@
     border: 1px solid #fca5a5;
     border-radius: 8px;
     color: #991b1b;
-    font-size: 0.875rem;
-    font-weight: 600;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-semibold);
 }
 
 .validation-error i {
-    font-size: 1rem;
+    font-size: var(--modal-value);
 }
 
 .validation-error strong {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 /* Modal Footer - Red Theme */
@@ -218,10 +218,10 @@
     }
 
     .warning-icon i {
-        font-size: 2rem;
+        font-size: var(--page-header-title);
     }
 
     .warning-content h3 {
-        font-size: 1.25rem;
+        font-size: var(--modal-card-title-icon);
     }
 }

@@ -66,34 +66,41 @@
           <div class="form-group">
         <label class="form-label">
  <i class="fas fa-user-injured"></i>
-     Pacient <span class="text-danger">*</span>
+     Pacient @if (Model?.TipProgramare != "SlotBlocat") { <span class="text-danger">*</span> }
        </label>
-            @if (PacientiList.Any())
-    {
-      <SfDropDownList TValue="Guid" 
-      TItem="PacientDropdownDto"
-        DataSource="@PacientiList"
-   Value="@Model.PacientID"
-Placeholder="Selectează pacient..."
- CssClass="@GetValidationClass(nameof(Model.PacientID))"
-Enabled="@(!IsEditMode)"
-     ShowClearButton="true"
-        AllowFiltering="true"
-              FilterType="SyncfusionFilterType.Contains"
-            PopupHeight="300px">
-                <DropDownListFieldSettings Value="Id" Text="NumeComplet" />
-   <DropDownListEvents TValue="Guid" TItem="PacientDropdownDto" ValueChange="@OnPacientChanged" />
-               </SfDropDownList>
-       }
-    else
-     {
-             <div class="alert alert-warning">
-        <i class="fas fa-exclamation-triangle"></i>
-       Nu sunt pacienți disponibili.
-       </div>
+            @if (Model?.TipProgramare == "SlotBlocat")
+       {
+          <div class="alert alert-info" style="font-size: 0.875rem; padding: 0.5rem; margin-bottom: 0.5rem;">
+ <i class="fas fa-info-circle"></i>
+          Slot blocat - nu necesită selecție pacient
+  </div>
       }
-  <ValidationMessage For="@(() => Model.PacientID)" />
-             </div>
+          @if (PacientiList.Any())
+         {
+      <SfDropDownList TValue="Guid" 
+             TItem="PacientDropdownDto"
+         DataSource="@PacientiList"
+                Value="@Model.PacientID"
+       Placeholder="@(Model?.TipProgramare == "SlotBlocat" ? "Opțional pentru slot blocat" : "Selectează pacient...")"
+       CssClass="@GetValidationClass(nameof(Model.PacientID))"
+   Enabled="@(!IsEditMode)"
+           ShowClearButton="true"
+    AllowFiltering="true"
+      FilterType="SyncfusionFilterType.Contains"
+      PopupHeight="300px">
+<DropDownListFieldSettings Value="Id" Text="NumeComplet" />
+          <DropDownListEvents TValue="Guid" TItem="PacientDropdownDto" ValueChange="@OnPacientChanged" />
+    </SfDropDownList>
+        }
+   else
+        {
+<div class="alert alert-warning">
+   <i class="fas fa-exclamation-triangle"></i>
+  Nu sunt pacienți disponibili.
+          </div>
+             }
+            <ValidationMessage For="@(() => Model.PacientID)" />
+   </div>
 
       <!-- Doctor -->
         <div class="form-group">

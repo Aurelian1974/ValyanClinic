@@ -5,181 +5,455 @@
 <div class="modal statistics-modal @(IsVisible ? "show" : "")" style="display: @(IsVisible ? "block" : "none")" tabindex="-1">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
-<h5 class="modal-title">
-        <i class="fas fa-chart-pie"></i>
-        Statistici Programări
-   </h5>
-    <button type="button" class="btn-close" @onclick="CloseModal" aria-label="Close"></button>
-       </div>
-
-      <div class="modal-body">
-       @if (IsLoading)
-            {
-                <div class="text-center py-5">
-        <div class="spinner-border text-primary"></div>
-    <p>Se încarcă statisticile...</p>
+     <!-- ✅ Modern Header with Gradient -->
+  <div class="modal-header">
+    <div class="modal-title-wrapper">
+          <div class="modal-icon">
+  <i class="fas fa-chart-line"></i>
+              </div>
+       <div>
+  <h5 class="modal-title">Statistici Programări</h5>
+   @if (Statistics != null)
+     {
+        <p class="modal-subtitle">@Statistics.PerioadaFormatata</p>
+         }
  </div>
-              }
-            else if (Statistics != null)
-    {
-    <!-- Filters Section -->
-            <div class="stats-filters mb-4">
-               <div class="row g-3">
-    <div class="col-md-4">
-     <label class="form-label">De la data:</label>
-               <input type="date" class="form-control" @bind="FilterDataStart" @bind:after="LoadStatistics" />
-    </div>
-     <div class="col-md-4">
-        <label class="form-label">Până la data:</label>
- <input type="date" class="form-control" @bind="FilterDataEnd" @bind:after="LoadStatistics" />
-        </div>
-     <div class="col-md-4">
-       <label class="form-label">Doctor:</label>
-         <select class="form-select" @bind="FilterDoctorID" @bind:after="LoadStatistics">
-           <option value="">Toți medicii</option>
-    @foreach (var doctor in DoctorsList)
-   {
-            <option value="@doctor.PersonalID">Dr. @doctor.Nume @doctor.Prenume</option>
-              }
-         </select>
-   </div>
-    </div>
          </div>
+     <button type="button" class="btn-close" @onclick="CloseModal" aria-label="Close"></button>
+            </div>
 
-       <!-- Summary Cards -->
-  <div class="stats-cards mb-4">
-            <div class="row g-3">
-        <div class="col-md-3">
- <div class="stat-card stat-card-primary">
-       <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-    <div class="stat-content">
-       <div class="stat-value">@Statistics.TotalProgramari</div>
-        <div class="stat-label">Total Programări</div>
-          </div>
-</div>
-    </div>
-                <div class="col-md-3">
-   <div class="stat-card stat-card-success">
-              <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-           <div class="stat-content">
-     <div class="stat-value">@Statistics.RataPrezentare%</div>
-               <div class="stat-label">Rată Prezentare</div>
+            <div class="modal-body">
+        @if (IsLoading)
+                {
+              <div class="loading-state">
+         <div class="spinner-container">
+          <div class="spinner-border text-primary" role="status"></div>
+       <p>Se încarcă statisticile...</p>
+     <small class="text-muted">Vă rugăm așteptați</small>
+  </div>
        </div>
-   </div>
-         </div>
-          <div class="col-md-3">
-             <div class="stat-card stat-card-warning">
-        <div class="stat-icon"><i class="fas fa-user-md"></i></div>
-             <div class="stat-content">
-      <div class="stat-value">@Statistics.MediciActivi</div>
-              <div class="stat-label">Medici Activi</div>
-          </div>
+          }
+         else if (Statistics != null)
+    {
+            <!-- ✅ Filters Section - Compact Single Row Design -->
+ <div class="stats-filters">
+                <div class="filter-header">
+         <h6><i class="fas fa-sliders-h"></i> Filtre Perioadă</h6>
+   <button class="btn-reset-filters" @onclick="ResetFilters">
+   <i class="fas fa-redo"></i> Reset
+      </button>
+                </div>
+      <div class="filters-row">
+          <div class="filter-item">
+   <label class="form-label">
+       <i class="fas fa-calendar-day"></i>
+          De la
+       </label>
+         <input type="date" class="form-control" @bind="FilterDataStart" @bind:after="LoadStatistics" />
+    </div>
+         <div class="filter-item">
+   <label class="form-label">
+          <i class="fas fa-calendar-day"></i>
+        Până la
+      </label>
+      <input type="date" class="form-control" @bind="FilterDataEnd" @bind:after="LoadStatistics" />
+  </div>
+             <div class="filter-item filter-item-grow">
+   <label class="form-label">
+<i class="fas fa-user-md"></i>
+              Doctor
+     </label>
+        <select class="form-select" @bind="FilterDoctorID" @bind:after="LoadStatistics" title="@GetSelectedDoctorName()">
+          <option value="">Toți medicii</option>
+       @foreach (var doctor in DoctorsList)
+            {
+    var doctorName = $"Dr. {doctor.Nume} {doctor.Prenume}";
+    var truncatedName = doctorName.Length > 35 ? doctorName.Substring(0, 32) + "..." : doctorName;
+             <option value="@doctor.PersonalID" title="@doctorName">@truncatedName</option>
+        }
+      </select>
              </div>
     </div>
-    <div class="col-md-3">
-          <div class="stat-card stat-card-info">
-        <div class="stat-icon"><i class="fas fa-users"></i></div>
-      <div class="stat-content">
-   <div class="stat-value">@Statistics.PacientiUnici</div>
-  <div class="stat-label">Pacienți Unici</div>
-        </div>
-       </div>
-         </div>
-          </div>
-        </div>
+            </div>
 
-      <!-- Charts Section -->
-        <div class="charts-section">
-            <div class="row g-3">
-      <!-- Pie Chart: Status -->
-             <div class="col-md-6">
-    <div class="chart-container">
-    <h6 class="chart-title">Distribuție pe Status</h6>
-          <SfAccumulationChart>
-           <AccumulationChartSeriesCollection>
-     <AccumulationChartSeries DataSource="@GetStatusData()"
-         XName="Status"
-       YName="Count"
-              InnerRadius="40%"
-           Palettes="@(new string[] { "#94a3b8", "#3b82f6", "#1e40af", "#f59e0b", "#10b981", "#ef4444", "#1f2937" })">
-          <AccumulationDataLabelSettings Visible="true" Name="Status" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
-     </AccumulationChartSeries>
-   </AccumulationChartSeriesCollection>
-       <AccumulationChartLegendSettings Visible="true" Position="LegendPosition.Bottom"></AccumulationChartLegendSettings>
-        </SfAccumulationChart>
+        <!-- ✅ Summary Cards - Single Row Layout (4 columns) -->
+              <div class="stats-summary">
+ <div class="stats-cards-row">
+      <!-- Card 1: Total -->
+        <div class="stat-card stat-card-primary">
+   <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+     <i class="fas fa-calendar-check"></i>
+                </div>
+     </div>
+    <div class="stat-content">
+        <div class="stat-value">@Statistics.TotalProgramari</div>
+           <div class="stat-label">Programări</div>
+ </div>
          </div>
-           </div>
 
-                    <!-- Bar Chart: Tip Programare -->
-    <div class="col-md-6">
-            <div class="chart-container">
-     <h6 class="chart-title">Distribuție pe Tip</h6>
-              <SfChart>
-             <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
-                   <ChartSeriesCollection>
-   <ChartSeries DataSource="@GetTipData()"
-  XName="Tip"
-           YName="Count"
- Type="ChartSeriesType.Column"
-        Fill="#3b82f6">
-     <ChartMarker>
-        <ChartDataLabel Visible="true" Position="Syncfusion.Blazor.Charts.LabelPosition.Top"></ChartDataLabel>
-         </ChartMarker>
-     </ChartSeries>
-     </ChartSeriesCollection>
-                </SfChart>
+          <!-- Card 2: Rata Prezentare -->
+         <div class="stat-card stat-card-success">
+   <div class="stat-icon-wrapper">
+     <div class="stat-icon">
+       <i class="fas fa-check-circle"></i>
+                 </div>
       </div>
-    </div>
-     </div>
+    <div class="stat-content">
+ <div class="stat-value">@Statistics.RataPrezentare<span class="stat-unit">%</span></div>
+      <div class="stat-label">Rată Prezentare</div>
+   <div class="stat-progress">
+   <div class="stat-progress-bar" style="width: @Statistics.RataPrezentare%"></div>
+             </div>
+ </div>
+   </div>
 
-     <!-- Additional Stats Table -->
-   <div class="stats-table mt-4">
-   <h6 class="mb-3"><i class="fas fa-table"></i> Detalii Statistici</h6>
-          <table class="table table-sm table-hover">
-               <tbody>
-           <tr>
-    <td><strong>Programate:</strong></td>
-                <td>@Statistics.Programate</td>
-       <td><strong>Confirmate:</strong></td>
-       <td>@Statistics.Confirmate</td>
-                 </tr>
-        <tr>
-<td><strong>Finalizate:</strong></td>
-       <td>@Statistics.Finalizate</td>
-                <td><strong>Anulate:</strong></td>
-     <td>@Statistics.Anulate</td>
-          </tr>
-        <tr>
-           <td><strong>Nu s-au prezentat:</strong></td>
-    <td>@Statistics.NoShow</td>
-  <td><strong>Durată medie:</strong></td>
-        <td>@Statistics.DurataMedieMinute min</td>
-       </tr>
-            </tbody>
-       </table>
-         </div>
-         </div>
-         }
-        else
-       {
-           <div class="text-center py-5">
-      <p class="text-muted">Nu sunt date disponibile pentru perioada selectată.</p>
-     </div>
-     }
-            </div>
+  <!-- Card 3: Medici Activi -->
+        <div class="stat-card stat-card-info">
+     <div class="stat-icon-wrapper">
+        <div class="stat-icon">
+   <i class="fas fa-user-md"></i>
+ </div>
+      </div>
+            <div class="stat-content">
+     <div class="stat-value">@Statistics.MediciActivi</div>
+                  <div class="stat-label">Medici Activi</div>
+       </div>
+                    </div>
 
-            <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @onclick="CloseModal">
- <i class="fas fa-times"></i>
-  Închide
-              </button>
-            </div>
+  <!-- Card 4: Pacienți Unici -->
+        <div class="stat-card stat-card-warning">
+  <div class="stat-icon-wrapper">
+ <div class="stat-icon">
+    <i class="fas fa-users"></i>
         </div>
+    </div>
+ <div class="stat-content">
+       <div class="stat-value">@Statistics.PacientiUnici</div>
+    <div class="stat-label">Pacienți Unici</div>
+       </div>
+     </div>
+                </div>
+       </div>
+
+            <!-- ✅ KPI Cards Row - Single Row Layout (3 columns) -->
+            <div class="kpi-cards-section">
+        <div class="kpi-cards-row">
+ <div class="kpi-card kpi-success">
+    <div class="kpi-icon"><i class="fas fa-check-double"></i></div>
+     <div class="kpi-content">
+         <div class="kpi-label">Finalizate</div>
+   <div class="kpi-value">@Statistics.Finalizate <span class="kpi-percent">(@Statistics.RataFinalizare%)</span></div>
+        </div>
+ </div>
+        <div class="kpi-card kpi-danger">
+  <div class="kpi-icon"><i class="fas fa-ban"></i></div>
+      <div class="kpi-content">
+  <div class="kpi-label">Anulate</div>
+     <div class="kpi-value">@Statistics.Anulate <span class="kpi-percent">(@Statistics.RataAnulare%)</span></div>
+ </div>
+        </div>
+   <div class="kpi-card kpi-warning">
+     <div class="kpi-icon"><i class="fas fa-user-times"></i></div>
+     <div class="kpi-content">
+         <div class="kpi-label">No-Show</div>
+   <div class="kpi-value">@Statistics.NoShow <span class="kpi-percent">(@Statistics.RataNoShow%)</span></div>
+    </div>
+       </div>
+           </div>
+        </div>
+
+        <!-- ✅ Charts Section - Compact Single Row -->
+    <div class="charts-section">
+      <div class="row">
+   <!-- Donut Chart: Status -->
+   <div class="chart-col">
+ <div class="chart-card">
+         <div class="chart-header">
+   <h6 class="chart-title">
+             <i class="fas fa-chart-pie"></i>
+   Distribuție pe Status
+       </h6>
+     <span class="chart-count">@Statistics.TotalProgramari total</span>
+          </div>
+<div class="chart-body">
+ <SfAccumulationChart EnableAnimation="true">
+        <AccumulationChartSeriesCollection>
+    <AccumulationChartSeries DataSource="@GetStatusData()"
+   XName="Label"
+         YName="Value"
+        InnerRadius="50%"
+      Radius="80%"
+PointColorMapping="Color">
+        <AccumulationDataLabelSettings Visible="true" 
+        Name="Label" 
+ Position="AccumulationLabelPosition.Outside">
+ <AccumulationChartConnector Length="20px"></AccumulationChartConnector>
+       </AccumulationDataLabelSettings>
+    </AccumulationChartSeries>
+       </AccumulationChartSeriesCollection>
+<AccumulationChartLegendSettings Visible="true" 
+   Position="LegendPosition.Bottom"
+  Alignment="Syncfusion.Blazor.Charts.Alignment.Center">
+      </AccumulationChartLegendSettings>
+          <AccumulationChartTooltipSettings Enable="true" Format="${point.x}: <b>${point.y}</b> programări"></AccumulationChartTooltipSettings>
+      </SfAccumulationChart>
+ </div>
+      </div>
+   </div>
+
+    <!-- Column Chart: Tip Programare -->
+<div class="chart-col">
+       <div class="chart-card">
+   <div class="chart-header">
+   <h6 class="chart-title">
+      <i class="fas fa-chart-bar"></i>
+ Distribuție pe Tip
+ </h6>
+ <span class="chart-count">@GetTipData().Sum(x => x.Value) total</span>
+        </div>
+        <div class="chart-body">
+    <SfChart>
+               <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
+   <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+        </ChartPrimaryXAxis>
+    <ChartPrimaryYAxis>
+   <ChartAxisMajorGridLines Width="1" Color="#e5e7eb"></ChartAxisMajorGridLines>
+       </ChartPrimaryYAxis>
+     <ChartSeriesCollection>
+        <ChartSeries DataSource="@GetTipData()"
+      XName="Label"
+       YName="Value"
+        Type="ChartSeriesType.Column"
+         PointColorMapping="Color"
+   ColumnSpacing="0.2">
+    <ChartMarker>
+ <ChartDataLabel Visible="true" 
+Position="Syncfusion.Blazor.Charts.LabelPosition.Top">
+  </ChartDataLabel>
+            </ChartMarker>
+     </ChartSeries>
+   </ChartSeriesCollection>
+    <ChartTooltipSettings Enable="true" Format="${point.x}: <b>${point.y}</b> programări"></ChartTooltipSettings>
+    </SfChart>
+     </div>
+        </div>
+        </div>
+        </div>
+              </div>
+
+       <!-- ✅ Detailed Stats - Compact Card Layout (Max 2 Rows) -->
+   <div class="details-section">
+    <div class="details-header">
+        <h6><i class="fas fa-list-ul"></i> Detalii Complete</h6>
+        </div>
+        
+        <!-- Row 1: Status Programări (7 items in a row) -->
+        <div class="details-row">
+            <div class="detail-card detail-card-primary">
+    <div class="detail-icon"><i class="fas fa-calendar"></i></div>
+ <div class="detail-content">
+                <div class="detail-label">Programate</div>
+       <div class="detail-value">@Statistics.Programate</div>
+       </div>
+    </div>
+            <div class="detail-card detail-card-info">
+        <div class="detail-icon"><i class="fas fa-check"></i></div>
+             <div class="detail-content">
+          <div class="detail-label">Confirmate</div>
+                    <div class="detail-value">@Statistics.Confirmate</div>
+     </div>
+            </div>
+          <div class="detail-card detail-card-warning">
+    <div class="detail-icon"><i class="fas fa-user-check"></i></div>
+           <div class="detail-content">
+   <div class="detail-label">Check-in</div>
+        <div class="detail-value">@Statistics.CheckedIn</div>
+       </div>
+            </div>
+            <div class="detail-card detail-card-orange">
+      <div class="detail-icon"><i class="fas fa-stethoscope"></i></div>
+    <div class="detail-content">
+   <div class="detail-label">În consultație</div>
+         <div class="detail-value">@Statistics.InConsultatie</div>
+             </div>
+        </div>
+     <div class="detail-card detail-card-success">
+       <div class="detail-icon"><i class="fas fa-check-double"></i></div>
+    <div class="detail-content">
+  <div class="detail-label">Finalizate</div>
+         <div class="detail-value">@Statistics.Finalizate</div>
+       </div>
+            </div>
+            <div class="detail-card detail-card-danger">
+      <div class="detail-icon"><i class="fas fa-ban"></i></div>
+   <div class="detail-content">
+           <div class="detail-label">Anulate</div>
+     <div class="detail-value">@Statistics.Anulate</div>
+ </div>
+    </div>
+          <div class="detail-card detail-card-secondary">
+  <div class="detail-icon"><i class="fas fa-user-times"></i></div>
+     <div class="detail-content">
+              <div class="detail-label">No-Show</div>
+ <div class="detail-value">@Statistics.NoShow</div>
+     </div>
+  </div>
+        </div>
+
+        <!-- Row 2: Tipuri Programări + Metrici (only non-zero values, max 7 items) -->
+        <div class="details-row">
+        @if (Statistics.ConsultatiiInitiale > 0)
+            {
+   <div class="detail-card detail-card-blue">
+               <div class="detail-icon"><i class="fas fa-file-medical"></i></div>
+          <div class="detail-content">
+ <div class="detail-label">Consultații Inițiale</div>
+          <div class="detail-value">@Statistics.ConsultatiiInitiale</div>
+        </div>
+     </div>
+       }
+            @if (Statistics.ControalePeriodice > 0)
+    {
+      <div class="detail-card detail-card-cyan">
+    <div class="detail-icon"><i class="fas fa-redo"></i></div>
+      <div class="detail-content">
+   <div class="detail-label">Controale</div>
+   <div class="detail-value">@Statistics.ControalePeriodice</div>
+   </div>
+        </div>
+   }
+        @if (Statistics.Consultatii > 0)
+   {
+                <div class="detail-card detail-card-indigo">
+               <div class="detail-icon"><i class="fas fa-stethoscope"></i></div>
+ <div class="detail-content">
+             <div class="detail-label">Consultații</div>
+              <div class="detail-value">@Statistics.Consultatii</div>
+           </div>
+   </div>
+            }
+  @if (Statistics.Investigatii > 0)
+            {
+    <div class="detail-card detail-card-warning">
+        <div class="detail-icon"><i class="fas fa-microscope"></i></div>
+    <div class="detail-content">
+         <div class="detail-label">Investigații</div>
+      <div class="detail-value">@Statistics.Investigatii</div>
+        </div>
+                </div>
+    }
+       @if (Statistics.Proceduri > 0)
+         {
+       <div class="detail-card detail-card-success">
+            <div class="detail-icon"><i class="fas fa-syringe"></i></div>
+        <div class="detail-content">
+       <div class="detail-label">Proceduri</div>
+ <div class="detail-value">@Statistics.Proceduri</div>
+      </div>
+   </div>
+      }
+   @if (Statistics.Urgente > 0)
+     {
+   <div class="detail-card detail-card-danger">
+         <div class="detail-icon"><i class="fas fa-ambulance"></i></div>
+   <div class="detail-content">
+              <div class="detail-label">Urgențe</div>
+           <div class="detail-value">@Statistics.Urgente</div>
+         </div>
+    </div>
+       }
+     @if (Statistics.Telemedicina > 0)
+   {
+            <div class="detail-card detail-card-purple">
+        <div class="detail-icon"><i class="fas fa-video"></i></div>
+      <div class="detail-content">
+       <div class="detail-label">Telemedicină</div>
+        <div class="detail-value">@Statistics.Telemedicina</div>
 </div>
+ </div>
+            }
+    @if (Statistics.LaDomiciliu > 0)
+            {
+ <div class="detail-card detail-card-pink">
+<div class="detail-icon"><i class="fas fa-home"></i></div>
+              <div class="detail-content">
+         <div class="detail-label">La Domiciliu</div>
+       <div class="detail-value">@Statistics.LaDomiciliu</div>
+    </div>
+          </div>
+     }
+            
+   <!-- Always show these 3 metrics at the end -->
+            <div class="detail-card detail-card-info">
+       <div class="detail-icon"><i class="fas fa-clock"></i></div>
+       <div class="detail-content">
+          <div class="detail-label">Durată Medie</div>
+                    <div class="detail-value">@Statistics.DurataMedieMinute min</div>
+      </div>
+     </div>
+    <div class="detail-card detail-card-success">
+   <div class="detail-icon"><i class="fas fa-percentage"></i></div>
+       <div class="detail-content">
+              <div class="detail-label">Rată Finalizare</div>
+                    <div class="detail-value">@Statistics.RataFinalizare%</div>
+     </div>
+        </div>
+            <div class="detail-card detail-card-danger">
+        <div class="detail-icon"><i class="fas fa-chart-line"></i></div>
+         <div class="detail-content">
+   <div class="detail-label">Rată Anulare</div>
+          <div class="detail-value">@Statistics.RataAnulare%</div>
+                </div>
+            </div>
+ </div>
+    </div>
+      }
+           else
+          {
+      <div class="empty-state">
+               <div class="empty-icon">
+        <i class="fas fa-chart-bar"></i>
+      </div>
+    <h4>Nu sunt date disponibile</h4>
+    <p>Nu există programări pentru perioada selectată.</p>
+           <button class="btn btn-primary" @onclick="LoadStatistics">
+     <i class="fas fa-sync"></i>
+        Reîncarcă
+   </button>
+    </div>
+       }
+    </div>
+
+   <div class="modal-footer">
+         <button type="button" class="btn btn-secondary" @onclick="CloseModal">
+       <i class="fas fa-times"></i>
+          Închide
+     </button>
+          @if (Statistics != null)
+     {
+   <button type="button" class="btn btn-primary">
+      <i class="fas fa-download"></i>
+          Export PDF
+        </button>
+          }
+       </div>
+        </div>
+    </div>
 </div>
 
 @if (IsVisible)
 {
     <div class="modal-backdrop show" @onclick="CloseModal"></div>
+}
+
+@code {
+    private void ResetFilters()
+    {
+      var today = DateTime.Today;
+        FilterDataStart = new DateTime(today.Year, today.Month, 1);
+  FilterDataEnd = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+        FilterDoctorID = null;
+        _ = LoadStatistics();
+    }
 }

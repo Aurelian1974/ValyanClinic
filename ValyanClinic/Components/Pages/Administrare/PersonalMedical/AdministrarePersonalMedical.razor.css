@@ -30,8 +30,8 @@
 
 .personal-medical-header h1 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -51,8 +51,8 @@
     padding: 10px 20px;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -98,7 +98,7 @@
 }
 
 .loading-container p {
-    font-size: 16px;
+    font-size: var(--modal-value);
     color: #6c757d;
     margin: 0;
 }
@@ -145,7 +145,7 @@
     position: absolute;
     left: 12px;
     color: #60a5fa;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     pointer-events: none;
     z-index: 2;
     transition: all 0.2s ease;
@@ -156,8 +156,8 @@
     padding: 10px 40px 10px 36px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 400;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-normal);
     color: #374151;
     transition: all 0.2s ease;
     background: white;
@@ -167,7 +167,7 @@
 .search-box-wrapper .search-input::placeholder {
     color: #9ca3af;
     font-style: italic;
-    font-weight: 400;
+    font-weight: var(--font-weight-normal);
 }
 
 .search-box-wrapper .search-input:hover {
@@ -210,7 +210,7 @@
 }
 
 .search-box-wrapper .search-clear-btn i {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 .btn-filter {
@@ -222,8 +222,8 @@
     border: 1px solid #d1d5db;
     border-radius: 8px;
     color: #374151;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
@@ -253,8 +253,8 @@
     background: #ef4444;
     color: white;
     border-radius: 9px;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
 }
 
 .btn-filter.active .filter-badge {
@@ -263,7 +263,7 @@
 }
 
 .btn-filter .chevron-icon {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     transition: transform 0.2s ease;
 }
 
@@ -275,7 +275,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     color: #6b7280;
     padding: 10px 16px;
     background: #f9fafb;
@@ -286,17 +286,17 @@
 
 .total-records i {
     color: #3b82f6;
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
 }
 
 .total-records strong {
     color: #111827;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .filtered-info {
     color: #f59e0b;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     font-style: normal;
 }
 
@@ -342,14 +342,14 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     color: #495057;
 }
 
 .filter-label i {
     color: #60a5fa;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 .filter-actions {
@@ -367,8 +367,8 @@
     padding: 8px 16px;
     border: none;
     border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -411,8 +411,8 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     color: #495057;
     margin-right: 12px;
 }
@@ -436,8 +436,8 @@
     background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
     color: #1e40af;
     border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     animation: slideInChip 0.3s ease;
 }
 
@@ -505,20 +505,20 @@
 }
 
 .selected-item-info i {
-    font-size: 16px;
+    font-size: var(--modal-value);
     color: #60a5fa;
 }
 
 .selected-label {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #6b7280;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .selected-item-info strong {
-    font-size: 13px;
+    font-size: var(--modal-label);
     color: #374151;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .selected-badge {
@@ -527,7 +527,7 @@
     color: white;
     border-radius: 12px;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
@@ -537,12 +537,12 @@
     align-items: center;
     gap: 8px;
     color: #9ca3af;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     font-style: italic;
 }
 
 .no-selection-info i {
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
 }
 
 .toolbar-actions {
@@ -555,8 +555,8 @@
     padding: 6px 12px;
     border: 1px solid;
     border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -613,7 +613,7 @@
 }
 
 .toolbar-btn i {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 /* ========================================
@@ -636,15 +636,15 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     color: #374151;
     margin: 0;
 }
 
 .page-size-selector label i {
     color: #60a5fa;
-    font-size: 13px;
+    font-size: var(--modal-label);
 }
 
 .page-size-select {
@@ -654,8 +654,8 @@
     border-radius: 6px;
     background: white;
     color: #374151;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     transition: all 0.2s ease;
     appearance: none;
@@ -720,18 +720,18 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
+    font-size: var(--modal-label);
     color: #6b7280;
 }
 
 .pager-text i {
     color: #60a5fa;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 .pager-text strong {
     color: #111827;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .pager-controls {
@@ -751,8 +751,8 @@
     background: white;
     color: #374151;
     border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -776,12 +776,12 @@
     background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
     color: white;
     border-color: #3b82f6;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     box-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
 }
 
 .pager-btn i {
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
 }
 
 /* ========================================
@@ -804,10 +804,10 @@
 }
 
 ::deep .e-grid .e-headercell {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: #495057;
     padding: 6px 8px;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 ::deep .e-grid .e-gridcontent {
@@ -839,7 +839,7 @@
 ::deep .e-grid .e-rowcell {
     padding: 5px 8px !important;
     border-color: #e9ecef;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     line-height: 1.4;
 }
 
@@ -851,8 +851,8 @@
     display: inline-block;
     padding: 4px 12px;
     border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
@@ -889,7 +889,7 @@
 
 .phone-link i,
 .email-link i {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
 }
 
 /* Animation */

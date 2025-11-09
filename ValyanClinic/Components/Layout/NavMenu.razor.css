@@ -47,7 +47,7 @@
 }
 
 .logo-icon {
-    font-size: 28px;
+    font-size: var(--page-header-title);
     color: white;
     min-width: 28px;
     flex-shrink: 0;
@@ -55,8 +55,8 @@
 
 .sidebar-header h2 {
     margin: 0;
-    font-size: 22px;
-    font-weight: 700;
+    font-size: var(--modal-header-title);
+    font-weight: var(--font-weight-bold);
     color: white;
     white-space: nowrap;
     opacity: 1;
@@ -72,9 +72,9 @@
 
 .sidebar-header .subtitle {
     margin: 5px 0 0;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: rgba(255, 255, 255, 0.95);
-    font-weight: 400;
+    font-weight: var(--font-weight-normal);
     white-space: normal;
     word-wrap: break-word;
     opacity: 1;
@@ -95,7 +95,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    font-size: 16px;
+    font-size: var(--modal-value);
     flex-shrink: 0;
     z-index: 1001;
     pointer-events: auto !important;
@@ -114,7 +114,7 @@
 
 .btn-collapse i {
     transition: transform 0.3s ease;
-    font-size: 16px;
+    font-size: var(--modal-value);
     pointer-events: none;
 }
 
@@ -162,20 +162,20 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--modal-label);
+    font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     color: #475569;
     letter-spacing: 0.5px;
 }
 
 .nav-section-title i {
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     min-width: 20px;
 }
 
 .nav-chevron {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #64748b;
     transition: transform 0.3s ease;
 }
@@ -206,13 +206,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     color: #64748b;
 }
 
 .nav-subsection-title i {
-    font-size: 13px;
+    font-size: var(--modal-label);
     min-width: 18px;
 }
 
@@ -256,15 +256,15 @@
     text-decoration: none;
     border-radius: 8px;
     transition: all 0.3s ease;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--modal-tab-text);
+    font-weight: var(--font-weight-medium);
     white-space: nowrap;
     position: relative;
 }
 
 .nav-link-child {
     padding: 10px 12px;
-    font-size: 13px;
+    font-size: var(--modal-label);
     color: #64748b;
     background: rgba(255, 255, 255, 0.5);
 }
@@ -281,14 +281,14 @@
 }
 
 .nav-link i {
-    font-size: 16px;
+    font-size: var(--modal-value);
     min-width: 20px;
     text-align: center;
     flex-shrink: 0;
 }
 
 .nav-link-child i {
-    font-size: 14px;
+    font-size: var(--modal-tab-text);
     min-width: 18px;
 }
 
@@ -328,7 +328,7 @@
     color: white;
     padding: 8px 12px;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     white-space: nowrap;
     opacity: 0;
     pointer-events: none;

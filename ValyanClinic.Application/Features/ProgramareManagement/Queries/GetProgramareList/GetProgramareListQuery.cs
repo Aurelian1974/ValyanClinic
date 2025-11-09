@@ -15,7 +15,7 @@ public class GetProgramareListQuery : IRequest<PagedResult<ProgramareListDto>>
     /// </summary>
     public int PageNumber { get; set; } = 1;
 
-  /// <summary>
+    /// <summary>
     /// Numărul de elemente per pagină.
     /// </summary>
     public int PageSize { get; set; } = 50;
@@ -25,29 +25,29 @@ public class GetProgramareListQuery : IRequest<PagedResult<ProgramareListDto>>
     /// </summary>
     public string? GlobalSearchText { get; set; }
 
-  /// <summary>
+    /// <summary>
     /// Filtru după ID-ul medicului.
     /// </summary>
     public Guid? FilterDoctorID { get; set; }
 
-    /// <summary>
+  /// <summary>
     /// Filtru după ID-ul pacientului.
     /// </summary>
     public Guid? FilterPacientID { get; set; }
 
     /// <summary>
-    /// Data de început pentru interval (implicit: azi).
+  /// Data de început pentru interval (implicit: prima zi a lunii curente).
     /// </summary>
     public DateTime? FilterDataStart { get; set; }
 
     /// <summary>
-    /// Data de sfârșit pentru interval (implicit: azi + 30 zile).
+    /// Data de sfârșit pentru interval (implicit: ultima zi a lunii curente).
     /// </summary>
     public DateTime? FilterDataEnd { get; set; }
 
     /// <summary>
     /// Filtru după status programare.
-    /// </summary>
+  /// </summary>
     public string? FilterStatus { get; set; }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class GetProgramareListQuery : IRequest<PagedResult<ProgramareListDto>>
 
     /// <summary>
     /// Coloana pentru sortare.
-  /// Valori permise: DataProgramare, OraInceput, Status, PacientNume, DoctorNume, DataCreare.
+    /// Valori permise: DataProgramare, OraInceput, Status, PacientNume, DoctorNume, DataCreare.
     /// </summary>
     public string SortColumn { get; set; } = "DataProgramare";
 
