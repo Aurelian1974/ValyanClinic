@@ -2,26 +2,27 @@
 @rendermode InteractiveServer
 @using ValyanClinic.Application.Features.ProgramareManagement.DTOs
 @using ValyanClinic.Components.Pages.Programari.Modals
+@using System.Globalization
 
 <PageTitle>Calendar Programări</PageTitle>
 
 <div class="calendar-programari-container">
-    <!-- Header Section -->
+<!-- Header Section -->
     <div class="page-header">
-        <div class="header-content">
+   <div class="header-content">
       <div class="header-left">
-          <div class="header-icon">
+      <div class="header-icon">
        <i class="fas fa-calendar-alt"></i>
-        </div>
+      </div>
     <div class="header-text">
-     <h1>Calendar Programări</h1>
+  <h1>Calendar Programări</h1>
  <p class="header-subtitle">Vizualizare programări în format calendar</p>
-     </div>
+  </div>
    </div>
  <div class="header-actions">
      <button class="btn btn-primary btn-add" @onclick="OpenAddModal">
         <i class="fas fa-calendar-plus"></i>
-     Adaugă Programare Nouă
+   Adaugă Programare Nouă
    </button>
       <button class="btn btn-outline-primary" @onclick="NavigateToList">
        <i class="fas fa-list"></i>
@@ -40,12 +41,12 @@
    <option value="">Toți medicii</option>
         @foreach (var doctor in DoctorsList)
     {
-       <option value="@doctor.PersonalID">Dr. @doctor.Nume @doctor.Prenume</option>
-       }
+ <option value="@doctor.PersonalID">Dr. @doctor.Nume @doctor.Prenume</option>
+  }
    </select>
-         </div>
-        <div class="filter-group">
-      <label>Data</label>
+ </div>
+     <div class="filter-group">
+ <label>Data</label>
   <input type="date" class="form-control" @bind="SelectedDate" @bind:after="LoadCalendarData" />
       </div>
   <div class="filter-group">
@@ -71,12 +72,19 @@
        <div class="weekly-calendar">
             <!-- Header: Days of Week -->
 <div class="calendar-header">
-      @for (int i = 0; i < 5; i++)
+  @* ✅ FIX: Cultura română pentru zilele săptămânii *@
+  @{
+      var romanianCulture = new CultureInfo("ro-RO");
+  }
+  @* ✅ FIX: Celulă goală pentru coloana time labels *@
+  <div class="time-label-spacer"></div>
+  @for (int i = 0; i < 5; i++)
         {
    var date = GetWeekStart().AddDays(i);
       <div class="day-header @(date.Date == DateTime.Today ? "today" : "")">
-       <div class="day-name">@date.ToString("dddd")</div>
-          <div class="day-date">@date.ToString("dd MMM")</div>
+    @* ✅ Forțăm cultura română *@
+       <div class="day-name">@date.ToString("dddd", romanianCulture)</div>
+      <div class="day-date">@date.ToString("dd MMM", romanianCulture)</div>
        </div>
  }
        </div>
@@ -86,24 +94,24 @@
        @for (int hour = 7; hour <= 20; hour++)
        {
     <div class="time-row">
-         <div class="time-label">@($"{hour:D2}:00")</div>
-          @for (int day = 0; day < 5; day++)
-         {
+    <div class="time-label">@($"{hour:D2}:00")</div>
+  @for (int day = 0; day < 5; day++)
+      {
          var date = GetWeekStart().AddDays(day);
         var slot = GetSlotProgramari(date, hour);
-       
+     
      <div class="time-slot @(slot.Any() ? "has-programari" : "")">
        @foreach (var programare in slot)
     {
-       <div class="programare-item badge-@programare.StatusColor" 
+     <div class="programare-item badge-@programare.StatusColor" 
  @onclick="() => OpenViewModal(programare.ProgramareID)">
      <div class="programare-time">@programare.OraInceput.ToString(@"hh\:mm")</div>
   <div class="programare-pacient">@GetShortName(programare.PacientNumeComplet)</div>
       <div class="programare-doctor-mini">@GetDoctorInitials(programare.DoctorNumeComplet)</div>
-       </div>
+   </div>
     }
      </div>
-       }
+    }
      </div>
    }
     </div>
@@ -132,6 +140,6 @@
   OnSaved="@HandleModalSaved" />
 
 <ProgramareViewModal IsVisible="@ShowViewModal"
-     IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
+IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
     ProgramareId="@(SelectedProgramareId ?? Guid.Empty)"
-     OnEditRequested="@HandleEditRequested" />
+  OnEditRequested="@HandleEditRequested" />

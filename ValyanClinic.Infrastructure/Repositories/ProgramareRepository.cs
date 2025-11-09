@@ -180,16 +180,15 @@ DataStart = dataStart,
       "Obținere programări pentru data: {Date}, Doctor={DoctorID}",
             date.ToString("yyyy-MM-dd"), doctorID);
 
+   // ✅ FIX: SP așteaptă @DataProgramare, nu @Data!
         var parameters = new
         {
-  Data = date,
+        DataProgramare = date,
        DoctorID = doctorID
         };
 
         var results = await QueryAsync<ProgramareDto>(
-  "sp_Programari_GetByDate",
-  parameters,
-          cancellationToken);
+        "sp_Programari_GetByDate", parameters, cancellationToken);
 
         return results.Select(MapToEntity);
     }
@@ -197,25 +196,22 @@ DataStart = dataStart,
  /// <inheritdoc />
     public async Task<IEnumerable<Programare>> GetUpcomingAsync(
         int days = 7,
-Guid? doctorID = null,
-   CancellationToken cancellationToken = default)
+        Guid? doctorID = null,
+        CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(
-   "Obținere programări viitoare: Zile={Days}, Doctor={DoctorID}",
+        "Obținere programări viitoare: Zile={Days}, Doctor={DoctorID}",
         days, doctorID);
 
-    var parameters = new
+        var parameters = new
         {
-     Zile = days,
+            Zile = days,
             DoctorID = doctorID
-      };
+        };
 
         var results = await QueryAsync<ProgramareDto>(
-      "sp_Programari_GetUpcoming",
-            parameters,
-            cancellationToken);
-
- return results.Select(MapToEntity);
+                            "sp_Programari_GetUpcoming", parameters, cancellationToken);
+            return results.Select(MapToEntity);
     }
 
     /// <inheritdoc />
