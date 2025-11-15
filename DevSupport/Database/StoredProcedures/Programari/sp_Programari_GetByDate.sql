@@ -36,8 +36,9 @@ BEGIN
         pac.Telefon AS PacientTelefon,
         -- Detalii Doctor
     doc.Nume + ' ' + doc.Prenume AS DoctorNumeComplet,
-        doc.Specializare AS DoctorSpecializare,
-  doc.Telefon AS DoctorTelefon
+     doc.Specializare AS DoctorSpecializare,
+  doc.Telefon AS DoctorTelefon,
+ doc.Email AS DoctorEmail  -- ? NEW - pentru trimitere email-uri
     FROM Programari p
     INNER JOIN Pacienti pac ON p.PacientID = pac.Id
     INNER JOIN PersonalMedical doc ON p.DoctorID = doc.PersonalID

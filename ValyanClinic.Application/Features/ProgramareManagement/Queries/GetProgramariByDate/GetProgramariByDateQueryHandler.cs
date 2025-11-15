@@ -52,7 +52,8 @@ PacientEmail = p.PacientEmail,
                 DoctorNumeComplet = p.DoctorNumeComplet,
      DoctorSpecializare = p.DoctorSpecializare,
    DoctorTelefon = p.DoctorTelefon,
-                DataCreare = p.DataCreare,
+          DoctorEmail = p.DoctorEmail,  // ✅ NEW - pentru trimitere email-uri
+  DataCreare = p.DataCreare,
    CreatDeNumeComplet = p.CreatDeNumeComplet,
     DataUltimeiModificari = p.DataUltimeiModificari
      }).ToList();

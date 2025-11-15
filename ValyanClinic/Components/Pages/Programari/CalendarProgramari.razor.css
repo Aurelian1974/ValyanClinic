@@ -56,6 +56,22 @@
     color: #3b82f6;
 }
 
+.btn-info {
+    background: rgba(255,255,255,0.9);
+    color: #0ea5e9;
+    border: 2px solid rgba(14, 165, 233, 0.3);
+}
+
+.btn-info:hover:not(:disabled) {
+  background: white;
+    border-color: #0ea5e9;
+}
+
+.btn-info:disabled {
+    opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .btn-secondary {
     background: rgba(255,255,255,0.2);
  color: white;

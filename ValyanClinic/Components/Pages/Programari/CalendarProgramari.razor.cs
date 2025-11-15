@@ -16,6 +16,7 @@ public partial class CalendarProgramari : ComponentBase
     [Inject] private INotificationService NotificationService { get; set; } = default!;
     [Inject] private ILogger<CalendarProgramari> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private ValyanClinic.Services.Email.IEmailService EmailService { get; set; } = default!;
 
     // Scheduler
     private SfSchedule<ProgramareEventDto>? SchedulerRef;
@@ -30,8 +31,10 @@ public partial class CalendarProgramari : ComponentBase
 
     // UI State
   private bool IsLoading = true;
+    private bool IsSendingEmails = false; // ✅ NEW - pentru spinner button
    private bool ShowAddEditModal = false;
     private bool ShowViewModal = false;
+    private bool ShowSendEmailModal = false; // ✅ NEW - pentru email modal
     private Guid? SelectedProgramareId;
   private DateTime? SelectedCellStartTime;
   private DateTime? SelectedCellEndTime;
@@ -283,8 +286,41 @@ await NotificationService.ShowSuccessAsync("Programarea a fost salvată!");
       "Anulata" => "Anulată",
     _ => status ?? "Necunoscut"
     };
-}
 
+    /// <summary>
+ /// ✅ NEW - Deschide modal composer pentru email programări
+/// </summary>
+    private void OpenSendEmailModal()
+    {
+        Logger.LogInformation("📧 Opening send daily email modal");
+        ShowSendEmailModal = true;
+ }
+
+    /// <summary>
+    /// ✅ NEW - Callback după trimiterea email-urilor din modal
+    /// </summary>
+    private async Task HandleEmailsSent(int emailsSent)
+  {
+  ShowSendEmailModal = false;
+
+     if (emailsSent > 0)
+   {
+  await NotificationService.ShowSuccessAsync(
+ $"✅ Trimise {emailsSent} email-uri cu succes!",
+    "Email-uri trimise");
+  
+    Logger.LogInformation("✅ Trimise {Count} email-uri cu succes", emailsSent);
+        }
+  else
+   {
+       await NotificationService.ShowWarningAsync(
+    "⚠️ Nu s-au putut trimite email-urile.",
+  "Atenție");
+      
+    Logger.LogWarning("⚠️ Nu s-au trimis email-uri");
+        }
+    }
+}
 public class ProgramareEventDto
 {
     public Guid Id { get; set; }

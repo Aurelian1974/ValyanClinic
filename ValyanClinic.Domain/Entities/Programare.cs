@@ -121,6 +121,13 @@ public class Programare
     public string? DoctorTelefon { get; set; }
 
     /// <summary>
+    /// ✅ NEW - Adresa de email a medicului.
+    /// Populat din JOIN cu tabelul PersonalMedical.
+    /// Utilizat pentru trimiterea notificărilor automate.
+    /// </summary>
+    public string? DoctorEmail { get; set; }
+
+    /// <summary>
  /// Numele complet al utilizatorului care a creat programarea.
     /// Populat din JOIN cu tabelul PersonalMedical.
     /// </summary>

@@ -609,13 +609,14 @@ _logger.LogInformation(
             // Navigation properties (din JOIN-uri)
             PacientNumeComplet = dto.PacientNumeComplet,
  PacientTelefon = dto.PacientTelefon,
-            PacientEmail = dto.PacientEmail,
+ PacientEmail = dto.PacientEmail,
    PacientCNP = dto.PacientCNP,
  DoctorNumeComplet = dto.DoctorNumeComplet,
  DoctorSpecializare = dto.DoctorSpecializare,
             DoctorTelefon = dto.DoctorTelefon,
+            DoctorEmail = dto.DoctorEmail,  // ✅ NEW - pentru trimitere email-uri
    CreatDeNumeComplet = dto.CreatDeNumeComplet
-        };
+    };
     }
 
     // ==================== INTERNAL DTOs (pentru mapare rezultate SP) ====================
@@ -648,6 +649,7 @@ _logger.LogInformation(
         public string? DoctorNumeComplet { get; set; }
         public string? DoctorSpecializare { get; set; }
         public string? DoctorTelefon { get; set; }
+        public string? DoctorEmail { get; set; }  // ✅ NEW - pentru trimitere email-uri
         public string? CreatDeNumeComplet { get; set; }
     }
 

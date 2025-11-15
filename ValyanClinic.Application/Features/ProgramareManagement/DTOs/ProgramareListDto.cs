@@ -102,6 +102,11 @@ public class ProgramareListDto
     /// </summary>
     public string? DoctorTelefon { get; set; }
 
+    /// <summary>
+    /// ✅ NEW - Email-ul medicului (pentru trimitere notificări).
+    /// </summary>
+    public string? DoctorEmail { get; set; }
+
     // ==================== AUDIT INFO ====================
 
     /// <summary>

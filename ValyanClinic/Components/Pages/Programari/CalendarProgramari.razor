@@ -16,17 +16,21 @@
     <div class="page-header">
         <h1>
     <i class="fas fa-calendar-alt"></i>
-       Calendar Programări
+     Calendar Programări
         </h1>
         <div class="header-actions">
     <button class="btn btn-primary" @onclick="OpenAddModal">
-        <i class="fas fa-plus"></i>
-         Programare Nouă
-            </button>
+    <i class="fas fa-plus"></i>
+       Programare Nouă
+  </button>
+<button class="btn btn-info" @onclick="OpenSendEmailModal">
+    <i class="fas fa-envelope"></i>
+        <span>Email Programări Mâine</span>
+    </button>
   <button class="btn btn-secondary" @onclick="NavigateToList">
           <i class="fas fa-list"></i>
   Listă
-            </button>
+     </button>
    </div>
     </div>
 
@@ -186,6 +190,12 @@ OnEventClick="@OnEventClicked"
 
 <ProgramareViewModal 
     IsVisible="@ShowViewModal"
-    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, v => ShowViewModal = v))"
+  IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, v => ShowViewModal = v))"
     ProgramareId="@(SelectedProgramareId ?? Guid.Empty)"
     OnEditRequested="HandleEditRequested" />
+
+<SendDailyEmailModal 
+    IsVisible="@ShowSendEmailModal"
+    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, v => ShowSendEmailModal = v))"
+    TargetDate="@DateTime.Today.AddDays(1)"
+    OnEmailsSent="HandleEmailsSent" />

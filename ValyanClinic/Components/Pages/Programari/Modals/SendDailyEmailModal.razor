@@ -1,0 +1,318 @@
+﻿@using ValyanClinic.Services.Email
+
+<!-- Modal Overlay -->
+<div class="modal-overlay @(IsVisible ? "visible" : "")" 
+     style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+  background: rgba(0,0,0,0.5); z-index: 10000; 
+  display: @(IsVisible ? "flex" : "none"); 
+            align-items: center; justify-content: center;"
+     @onclick="HandleOverlayClick">
+
+ <!-- Modal Container -->
+    <div class="email-composer-modal @(IsVisible ? "show" : "")"
+         style="background: white; border-radius: 16px; 
+         width: 90%; max-width: 900px; max-height: 90vh;
+       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+     display: flex; flex-direction: column;
+          overflow: hidden;"
+   @onclick:stopPropagation="true">
+
+      <!-- Header - Email-like -->
+   <div class="email-header" style="background: #f9fafb; 
+      border-bottom: 1px solid #e5e7eb;
+        padding: 16px 20px;
+    display: flex;
+      justify-content: space-between;
+    align-items: center;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+         <i class="fas fa-envelope" style="color: #3b82f6; font-size: 20px;"></i>
+  <h3 style="margin: 0; font-size: 18px; color: #1f2937;">Email nou</h3>
+          </div>
+            <button type="button" 
+      class="btn-close-composer" 
+             @onclick="Close"
+style="background: transparent; border: none; 
+   color: #6b7280; cursor: pointer; padding: 8px;
+             border-radius: 4px; transition: all 0.2s;">
+    <i class="fas fa-times" style="font-size: 18px;"></i>
+        </button>
+    </div>
+
+        <!-- Email Fields (TO, FROM, SUBJECT) -->
+        <div class="email-fields" style="background: white; padding: 16px 20px; 
+           border-bottom: 1px solid #e5e7eb;">
+    
+        <!-- TO Field -->
+            <div class="email-field" style="display: flex; align-items: center; 
+             padding: 10px 0; border-bottom: 1px solid #f3f4f6;">
+     <label style="min-width: 80px; color: #6b7280; font-size: 14px; font-weight: 500;">
+        Către:
+                </label>
+            <div style="flex: 1; color: #1f2937; font-size: 14px;">
+            <i class="fas fa-users" style="color: #3b82f6; margin-right: 8px;"></i>
+             @if (IsLoading)
+    {
+             <span style="color: #6b7280;">Se încarcă destinatari...</span>
+           }
+    else if (DoctorRecipients?.Any() == true)
+        {
+        <span>
+        <strong>@DoctorRecipients.Count doctori</strong>
+  <span style="color: #6b7280; margin-left: 8px;">
+   (@string.Join(", ", DoctorRecipients.Take(2).Select(d => d.NumeComplet))@(DoctorRecipients.Count > 2 ? $", +{DoctorRecipients.Count - 2}" : ""))
+  </span>
+              </span>
+ }
+     else
+        {
+  <span style="color: #ef4444;">Nu s-au găsit destinatari pentru data selectată</span>
+     }
+      </div>
+            </div>
+
+            <!-- FROM Field -->
+      <div class="email-field" style="display: flex; align-items: center; 
+  padding: 10px 0; border-bottom: 1px solid #f3f4f6;">
+   <label style="min-width: 80px; color: #6b7280; font-size: 14px; font-weight: 500;">
+      De la:
+      </label>
+        <div style="flex: 1; color: #1f2937; font-size: 14px;">
+            <i class="fas fa-hospital" style="color: #10b981; margin-right: 8px;"></i>
+         <strong>ValyanClinic</strong>
+         <span style="color: #6b7280; margin-left: 4px;">&lt;clinica.valyan@gmail.com&gt;</span>
+     </div>
+     </div>
+
+          <!-- SUBJECT Field -->
+    <div class="email-field" style="display: flex; align-items: center; padding: 10px 0;">
+  <label style="min-width: 80px; color: #6b7280; font-size: 14px; font-weight: 500;">
+     Subiect:
+        </label>
+      <div style="flex: 1; color: #1f2937; font-size: 14px; font-weight: 500;">
+     <i class="fas fa-calendar-alt" style="color: #f59e0b; margin-right: 8px;"></i>
+📅 Programările tale pentru @TargetDate.ToString("dd.MM.yyyy") - ValyanClinic
+    </div>
+   </div>
+        </div>
+
+    <!-- Body Preview -->
+        <div class="email-body-preview" style="flex: 1; overflow-y: auto; padding: 20px; background: #fafafa;">
+            @if (IsLoading)
+            {
+   <div style="display: flex; flex-direction: column; align-items: center; 
+     justify-content: center; height: 100%; gap: 16px;">
+     <div class="spinner-border text-primary" role="status" style="width: 40px; height: 40px;">
+     <span class="visually-hidden">Se încarcă...</span>
+        </div>
+              <p style="color: #6b7280; font-size: 14px;">Se încarcă previzualizare...</p>
+         </div>
+       }
+  else if (DoctorRecipients?.Any() != true)
+ {
+       <div style="text-align: center; padding: 40px;">
+          <i class="fas fa-inbox" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+            <p style="color: #6b7280; font-size: 16px; margin: 0;">
+             Nu există programări pentru data @TargetDate.ToString("dd.MM.yyyy")
+           </p>
+          <p style="color: #9ca3af; font-size: 14px; margin-top: 8px;">
+     Selectează o altă dată sau adaugă programări noi.
+     </p>
+       </div>
+ }
+         else
+            {
+      <!-- Preview Box -->
+     <div style="background: white; border-radius: 12px; padding: 24px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+   
+     @* ✅ REAL DATA - Show preview for FIRST doctor with REAL appointments *@
+  @{
+   var firstDoctor = DoctorRecipients.FirstOrDefault();
+      var doctorName = firstDoctor?.NumeComplet ?? "Nume Doctor";
+         var doctorSpecializare = firstDoctor?.Specializare;
+      var programariPreview = firstDoctor?.Programari ?? new List<Application.Features.ProgramareManagement.DTOs.ProgramareListDto>();
+      }
+
+     <div style="background: linear-gradient(135deg, #60a5fa, #3b82f6); 
+          color: white; padding: 20px; border-radius: 8px 8px 0 0; margin: -24px -24px 20px -24px;">
+     <h2 style="margin: 0; font-size: 20px;">📅 Programările tale pentru @TargetDate.ToString("dd.MM.yyyy")</h2>
+       <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 14px;">
+      Dr. @doctorName
+      @if (!string.IsNullOrEmpty(doctorSpecializare))
+            {
+    <br/><span style="font-size: 13px; opacity: 0.85;">@doctorSpecializare</span>
+    }
+      </p>
+  </div>
+
+       <div style="margin-bottom: 20px;">
+     <p style="color: #374151; font-size: 15px; line-height: 1.6;">
+    <strong>Bună ziua, Dr. @doctorName!</strong><br/>
+   Aici sunt programările tale pentru <strong>@TargetDate.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("ro-RO"))</strong>:
+   </p>
+    </div>
+
+<!-- ✅ REAL Appointments Table -->
+ <table style="width: 100%; background: white; border-radius: 8px; overflow: hidden; 
+     border: 1px solid #e5e7eb;">
+      <thead style="background: #3b82f6; color: white;">
+  <tr>
+  <th style="padding: 12px; text-align: left;">Oră</th>
+        <th style="padding: 12px; text-align: left;">Pacient</th>
+         <th style="padding: 12px; text-align: left;">Tip</th>
+    <th style="padding: 12px; text-align: left;">Status</th>
+ </tr>
+      </thead>
+  <tbody>
+         @if (programariPreview.Any())
+  {
+         @foreach (var prog in programariPreview)
+    {
+ <tr style="border-bottom: 1px solid #e5e7eb;">
+  <td style="padding: 12px;">@prog.OraInceput.ToString(@"hh\:mm") - @prog.OraSfarsit.ToString(@"hh\:mm")</td>
+  <td style="padding: 12px;"><strong>@prog.PacientNumeComplet</strong></td>
+        <td style="padding: 12px;">@(prog.TipProgramare ?? "Consultație")</td>
+      <td style="padding: 12px;">
+         <span style="background: @GetStatusColorPreview(prog.Status); color: white; padding: 4px 8px; 
+           border-radius: 4px; font-size: 11px; font-weight: 600;">
+         @GetStatusDisplayPreview(prog.Status)
+  </span>
+          </td>
+   </tr>
+ }
+          }
+      else
+            {
+   <tr>
+          <td colspan="4" style="padding: 20px; text-align: center; color: #6b7280;">
+   Nu există programări pentru această dată
+     </td>
+    </tr>
+    }
+        </tbody>
+       </table>
+
+    <div style="margin-top: 20px; padding: 16px; background: #dbeafe; 
+      border-left: 4px solid #3b82f6; border-radius: 8px;">
+    <p style="margin: 0; color: #1e40af; font-weight: 600;">
+         📊 Total programări: @(firstDoctor?.NumarProgramari ?? 0)
+       </p>
+ </div>
+
+  <p style="margin-top: 20px; color: #64748b; font-size: 13px; line-height: 1.6;">
+         Acest email a fost generat automat de sistemul ValyanClinic.<br/>
+       Pentru întrebări, contactează recepția clinicii.
+        </p>
+
+      <div style="margin-top: 20px; padding: 12px; background: #fef3c7; border-left: 3px solid #f59e0b; border-radius: 6px;">
+<p style="margin: 0; color: #92400e; font-size: 13px;">
+      <strong>📌 Preview:</strong> Acest email este un exemplu de cum va arăta email-ul trimis către <strong>@doctorName</strong>.
+  @if (DoctorRecipients.Count > 1)
+     {
+       <text>
+    <br/>Fiecare dintre cei <strong>@DoctorRecipients.Count doctori</strong> va primi propriile programări personalizate.
+   </text>
+  }
+   </p>
+   </div>
+      </div>
+
+    <!-- Stats -->
+        <div style="margin-top: 20px; display: flex; gap: 12px; justify-content: center;">
+     <div style="background: white; padding: 16px 20px; border-radius: 8px; 
+       text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+        <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">
+@(DoctorRecipients?.Count ?? 0)
+ </div>
+        <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+          Doctori
+             </div>
+  </div>
+      <div style="background: white; padding: 16px 20px; border-radius: 8px; 
+        text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+      <div style="font-size: 24px; font-weight: 700; color: #10b981;">
+@TotalAppointments
+             </div>
+    <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+  Programări
+</div>
+         </div>
+   </div>
+            }
+  </div>
+
+        <!-- Footer Actions -->
+        <div class="email-footer" style="background: #f9fafb; border-top: 1px solid #e5e7eb; 
+     padding: 16px 20px; display: flex; 
+                 justify-content: space-between; align-items: center;">
+            <div style="color: #6b7280; font-size: 13px;">
+     @if (DoctorRecipients?.Any() == true)
+   {
+       <span>Se vor trimite <strong>@(DoctorRecipients.Count)</strong> email-uri</span>
+       }
+        </div>
+
+   <div style="display: flex; gap: 12px;">
+      <button type="button" 
+      class="btn btn-secondary" 
+          @onclick="Close"
+               disabled="@IsSending"
+      style="padding: 10px 24px; border: none; border-radius: 8px; 
+      cursor: pointer; font-size: 14px; font-weight: 500;">
+<i class="fas fa-times"></i>
+ Anulează
+                </button>
+
+   <button type="button" 
+            class="btn btn-primary" 
+   @onclick="HandleSend"
+      disabled="@(IsSending || DoctorRecipients?.Any() != true)"
+             style="padding: 10px 24px; border: none; border-radius: 8px; 
+               background: linear-gradient(135deg, #3b82f6, #2563eb); 
+            color: white; cursor: pointer; font-size: 14px; font-weight: 500;
+   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);">
+ @if (IsSending)
+         {
+ <span class="spinner-border spinner-border-sm" role="status"></span>
+        <span style="margin-left: 8px;">Se trimit...</span>
+           }
+   else
+        {
+<i class="fas fa-paper-plane"></i>
+     <span style="margin-left: 8px;">Trimite Email-uri</span>
+     }
+                </button>
+    </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-close-composer:hover {
+ background: #f3f4f6 !important;
+    }
+
+    .email-composer-modal.show {
+        animation: slideUp 0.3s ease-out;
+    }
+
+    @@keyframes slideUp {
+     from {
+     opacity: 0;
+         transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+   transform: translateY(0);
+        }
+    }
+
+    .modal-overlay.visible {
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>

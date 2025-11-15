@@ -292,6 +292,10 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     builder.Services.AddScoped<ValyanClinic.Services.INotificationService, ValyanClinic.Services.NotificationService>();
 
     // ========================================
+    // EMAIL SERVICES
+    // ========================================
+    builder.Services.AddScoped<ValyanClinic.Services.Email.IEmailService, ValyanClinic.Services.Email.EmailService>();
+    // ========================================
     // EXPORT SERVICES
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Services.Export.IExcelExportService, ValyanClinic.Services.Export.ExcelExportService>();

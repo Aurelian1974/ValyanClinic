@@ -1,0 +1,152 @@
+﻿@page "/test-email"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@rendermode InteractiveServer
+@using ValyanClinic.Services.Email
+
+<PageTitle>Test Email - ValyanClinic</PageTitle>
+
+<div class="container" style="padding: 2rem;">
+    <div class="card" style="max-width: 600px; margin: 0 auto;">
+      <div class="card-header" style="background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white;">
+    <h3><i class="fas fa-envelope"></i> Test Trimitere Email</h3>
+        </div>
+        
+        <div class="card-body">
+   @if (IsLoading)
+  {
+   <div class="text-center">
+ <div class="spinner-border text-primary" role="status">
+  <span class="visually-hidden">Se trimite...</span>
+   </div>
+          <p class="mt-2">Se trimite email-ul...</p>
+       </div>
+            }
+        else if (!string.IsNullOrEmpty(ResultMessage))
+          {
+       <div class="alert @(IsSuccess ? "alert-success" : "alert-danger")">
+     <i class="fas @(IsSuccess ? "fa-check-circle" : "fa-exclamation-triangle")"></i>
+         @ResultMessage
+       </div>
+         }
+  
+   <div class="mb-3">
+     <label for="testEmail" class="form-label">
+         <i class="fas fa-at"></i> Email destinatar:
+                </label>
+     <input type="email" 
+           class="form-control" 
+         id="testEmail" 
+    @bind="TestEmailAddress"
+  placeholder="exemplu@gmail.com" />
+      <small class="form-text text-muted">
+        Introdu email-ul tău pentru a primi testul
+       </small>
+            </div>
+   
+    <button class="btn btn-primary w-100" 
+      @onclick="SendTestEmail"
+      disabled="@(IsLoading || string.IsNullOrEmpty(TestEmailAddress))">
+     <i class="fas fa-paper-plane"></i> Trimite Email Test
+     </button>
+</div>
+    </div>
+    
+    <div class="mt-4 text-center">
+  <a href="/" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Înapoi la Dashboard
+   </a>
+    </div>
+</div>
+
+@code {
+    [Inject] private IEmailService EmailService { get; set; } = default!;
+    [Inject] private ILogger<TestEmail> Logger { get; set; } = default!;
+    
+    private string TestEmailAddress { get; set; } = string.Empty;
+    private bool IsLoading { get; set; }
+    private bool IsSuccess { get; set; }
+    private string ResultMessage { get; set; } = string.Empty;
+    
+    private async Task SendTestEmail()
+    {
+        if (string.IsNullOrEmpty(TestEmailAddress))
+{
+            ResultMessage = "Te rog introdu o adresă de email validă!";
+        IsSuccess = false;
+  return;
+        }
+        
+        IsLoading = true;
+        ResultMessage = string.Empty;
+        StateHasChanged();
+     
+        try
+        {
+            var message = new EmailMessageDto
+        {
+            To = TestEmailAddress,
+    Subject = "🎉 Test Email - ValyanClinic",
+    Body = $@"
+<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+       <div style='background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; padding: 20px; border-radius: 8px 8px 0 0;'>
+               <h2 style='margin: 0;'>✅ Email Test Funcțional!</h2>
+           </div>
+             <div style='background: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px;'>
+        <h3 style='color: #1e293b;'>Felicitări!</h3>
+                <p style='color: #475569; font-size: 16px; line-height: 1.6;'>
+        Email-ul tău este configurat corect și funcționează perfect!
+        </p>
+          <div style='background: white; padding: 15px; border-left: 4px solid #3b82f6; margin: 20px 0;'>
+      <p style='margin: 0; color: #64748b;'><strong>Data trimiterii:</strong> {DateTime.Now:dd.MM.yyyy HH:mm:ss}</p>
+             <p style='margin: 5px 0 0 0; color: #64748b;'><strong>Aplicație:</strong> ValyanClinic</p>
+       </div>
+         <p style='color: #94a3b8; font-size: 14px; margin-top: 30px;'>
+          Acum poți implementa:
+           </p>
+          <ul style='color: #64748b; line-height: 1.8;'>
+<li>📧 Confirmare programări</li>
+     <li>⏰ Reminder-e automate</li>
+            <li>🔐 Reset parolă</li>
+         <li>📋 Notificări importante</li>
+        </ul>
+          </div>
+   <div style='text-align: center; padding: 20px; color: #94a3b8; font-size: 12px;'>
+         <p>© {DateTime.Now.Year} ValyanClinic - Sistem Integrat de Management Clinică</p>
+        </div>
+         </div>
+       ",
+        IsHtml = true,
+       ReplyToEmail = "clinica.valyan@gmail.com",
+       ReplyToName = "ValyanClinic Support"
+      };
+  
+            Logger.LogInformation("📧 Sending test email to: {Email}", TestEmailAddress);
+    
+            var success = await EmailService.SendEmailAsync(message);
+            
+            if (success)
+            {
+     IsSuccess = true;
+           ResultMessage = $"✅ Email trimis cu succes la {TestEmailAddress}! Verifică inbox-ul (și spam folder).";
+ Logger.LogInformation("✅ Test email sent successfully!");
+   }
+  else
+      {
+  IsSuccess = false;
+      ResultMessage = "❌ Eroare la trimiterea email-ului. Verifică configurarea SMTP în User Secrets.";
+           Logger.LogError("❌ Failed to send test email");
+      }
+        }
+        catch (Exception ex)
+        {
+IsSuccess = false;
+ResultMessage = $"❌ Excepție: {ex.Message}";
+      Logger.LogError(ex, "❌ Exception while sending test email");
+        }
+        finally
+        {
+            IsLoading = false;
+         StateHasChanged();
+        }
+    }
+}
