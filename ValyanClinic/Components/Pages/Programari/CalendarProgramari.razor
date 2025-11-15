@@ -1,145 +1,191 @@
 ﻿@page "/programari"
+@page "/programari/calendar"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @rendermode InteractiveServer
+@using Syncfusion.Blazor.Schedule
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Popups
 @using ValyanClinic.Application.Features.ProgramareManagement.DTOs
+@using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalList
 @using ValyanClinic.Components.Pages.Programari.Modals
-@using System.Globalization
 
-<PageTitle>Calendar Programări</PageTitle>
+<PageTitle>Calendar Programări - ValyanClinic</PageTitle>
 
-<div class="calendar-programari-container">
-<!-- Header Section -->
+<div class="calendar-container">
+    <!-- Header -->
     <div class="page-header">
-   <div class="header-content">
-      <div class="header-left">
-      <div class="header-icon">
-       <i class="fas fa-calendar-alt"></i>
-      </div>
-    <div class="header-text">
-  <h1>Calendar Programări</h1>
- <p class="header-subtitle">Vizualizare programări în format calendar</p>
-  </div>
+        <h1>
+    <i class="fas fa-calendar-alt"></i>
+       Calendar Programări
+        </h1>
+        <div class="header-actions">
+    <button class="btn btn-primary" @onclick="OpenAddModal">
+        <i class="fas fa-plus"></i>
+         Programare Nouă
+            </button>
+  <button class="btn btn-secondary" @onclick="NavigateToList">
+          <i class="fas fa-list"></i>
+  Listă
+            </button>
    </div>
- <div class="header-actions">
-     <button class="btn btn-primary btn-add" @onclick="OpenAddModal">
-        <i class="fas fa-calendar-plus"></i>
-   Adaugă Programare Nouă
-   </button>
-      <button class="btn btn-outline-primary" @onclick="NavigateToList">
-       <i class="fas fa-list"></i>
-   Vedere Listă
-        </button>
-</div>
+    </div>
+
+    <!-- Filters -->
+<div class="filters-bar">
+<div class="filter-group">
+  <i class="fas fa-user-md"></i>
+      <SfDropDownList TValue="Guid?" 
+      TItem="PersonalMedicalListDto"
+        Placeholder="Toți medicii"
+           DataSource="@DoctorsList"
+    @bind-Value="@FilterDoctorID"
+     AllowFiltering="true"
+    ShowClearButton="true">
+  <DropDownListFieldSettings Value="PersonalID" Text="NumeComplet" />
+         <DropDownListEvents TValue="Guid?" TItem="PersonalMedicalListDto" ValueChange="@OnDoctorFilterChanged" />
+       </SfDropDownList>
+ </div>
+
+   <div class="date-nav">
+    <button class="btn-nav" @onclick="PreviousWeek">
+     <i class="fas fa-chevron-left"></i>
+  </button>
+            <button class="btn-today" @onclick="GoToToday">Astăzi</button>
+            <button class="btn-nav" @onclick="NextWeek">
+     <i class="fas fa-chevron-right"></i>
+  </button>
         </div>
+
+     <div class="total-badge">
+    <i class="fas fa-calendar-check"></i>
+            Total: <strong>@TotalProgramari</strong>
+     </div>
     </div>
 
- <!-- Filters Section -->
-    <div class="filters-section">
-        <div class="filters-compact">
-  <div class="filter-group">
-       <label>Doctor</label>
-      <select class="form-select" @bind="FilterDoctorID" @bind:after="LoadCalendarData">
-   <option value="">Toți medicii</option>
-        @foreach (var doctor in DoctorsList)
-    {
- <option value="@doctor.PersonalID">Dr. @doctor.Nume @doctor.Prenume</option>
-  }
-   </select>
- </div>
-     <div class="filter-group">
- <label>Data</label>
-  <input type="date" class="form-control" @bind="SelectedDate" @bind:after="LoadCalendarData" />
-      </div>
-  <div class="filter-group">
-      <button class="btn btn-outline-secondary" @onclick="GoToToday">
-     <i class="fas fa-calendar-day"></i>
-      Azi
-   </button>
-     </div>
- </div>
- </div>
-
- <!-- Calendar View - Simple Weekly Grid -->
- <div class="calendar-view">
- @if (IsLoading)
- {
-   <div class="loading-overlay">
-    <div class="spinner-border text-primary"></div>
-    <p>Se încarcă programările...</p>
-   </div>
- }
-    else
-     {
-       <div class="weekly-calendar">
-            <!-- Header: Days of Week -->
-<div class="calendar-header">
-  @* ✅ FIX: Cultura română pentru zilele săptămânii *@
-  @{
-      var romanianCulture = new CultureInfo("ro-RO");
-  }
-  @* ✅ FIX: Celulă goală pentru coloana time labels *@
-  <div class="time-label-spacer"></div>
-  @for (int i = 0; i < 5; i++)
+    <!-- Scheduler -->
+    <div class="scheduler-card" id="calendar-scheduler-container">
+  @if (IsLoading)
         {
-   var date = GetWeekStart().AddDays(i);
-      <div class="day-header @(date.Date == DateTime.Today ? "today" : "")">
-    @* ✅ Forțăm cultura română *@
-       <div class="day-name">@date.ToString("dddd", romanianCulture)</div>
-      <div class="day-date">@date.ToString("dd MMM", romanianCulture)</div>
-       </div>
- }
-       </div>
-
-    <!-- Time Slots Grid -->
-     <div class="calendar-grid">
-       @for (int hour = 7; hour <= 20; hour++)
-       {
-    <div class="time-row">
-    <div class="time-label">@($"{hour:D2}:00")</div>
-  @for (int day = 0; day < 5; day++)
-      {
-         var date = GetWeekStart().AddDays(day);
-        var slot = GetSlotProgramari(date, hour);
-     
-     <div class="time-slot @(slot.Any() ? "has-programari" : "")">
-       @foreach (var programare in slot)
-    {
-     <div class="programare-item badge-@programare.StatusColor" 
- @onclick="() => OpenViewModal(programare.ProgramareID)">
-     <div class="programare-time">@programare.OraInceput.ToString(@"hh\:mm")</div>
-  <div class="programare-pacient">@GetShortName(programare.PacientNumeComplet)</div>
-      <div class="programare-doctor-mini">@GetDoctorInitials(programare.DoctorNumeComplet)</div>
-   </div>
-    }
-     </div>
-    }
-     </div>
-   }
-    </div>
+   <div class="loading-overlay">
+         <div class="spinner"></div>
+       <p>Se încarcă...</p>
   </div>
+        }
+        else
+   {
+  <SfSchedule @ref="SchedulerRef"
+    TValue="ProgramareEventDto"
+   Height="100%"
+       @bind-SelectedDate="@SelectedDate"
+  @bind-CurrentView="@CurrentView"
+ StartHour="08:00"
+      EndHour="20:00"
+   ShowQuickInfo="true">
 
-      <!-- Legend -->
- <div class="calendar-legend">
-     <h6>Legendă Statusuri:</h6>
-      <div class="legend-items">
- <span class="legend-item"><span class="badge badge-secondary"></span> Programată</span>
-     <span class="legend-item"><span class="badge badge-info"></span> Confirmată</span>
-   <span class="legend-item"><span class="badge badge-primary"></span> Check-in</span>
-     <span class="legend-item"><span class="badge badge-warning"></span> În consultație</span>
-      <span class="legend-item"><span class="badge badge-success"></span> Finalizată</span>
-  <span class="legend-item"><span class="badge badge-danger"></span> Anulată</span>
-     </div>
+     <ScheduleViews>
+<ScheduleView Option="View.Day"></ScheduleView>
+         <ScheduleView Option="View.Week"></ScheduleView>
+    <ScheduleView Option="View.Month"></ScheduleView>
+   </ScheduleViews>
+
+<ScheduleEventSettings DataSource="@EventsList" />
+
+     <ScheduleQuickInfoTemplates>
+   <ContentTemplate>
+ @{
+          var appointment = (context as ProgramareEventDto)!;
+      }
+  <div class="quickinfo-content">
+<div class="quickinfo-row">
+      <i class="fas fa-user"></i>
+   <strong>Pacient:</strong>
+          <span>@appointment.Subject</span>
+       </div>
+      <div class="quickinfo-row">
+<i class="fas fa-calendar"></i>
+     <strong>Data:</strong>
+     <span>@appointment.StartTime.ToString("dd.MM.yyyy")</span>
       </div>
+      <div class="quickinfo-row">
+  <i class="far fa-clock"></i>
+ <strong>Interval:</strong>
+  <span>@appointment.StartTime.ToString("HH:mm") - @appointment.EndTime.ToString("HH:mm")</span>
+    </div>
+      @if (!string.IsNullOrEmpty(appointment.TipProgramare))
+   {
+        <div class="quickinfo-row">
+   <i class="fas fa-stethoscope"></i>
+    <strong>Tip:</strong>
+   <span>@appointment.TipProgramare</span>
+      </div>
+         }
+   @if (!string.IsNullOrEmpty(appointment.DoctorName))
+        {
+ <div class="quickinfo-row">
+       <i class="fas fa-user-md"></i>
+        <strong>Doctor:</strong>
+       <span>@appointment.DoctorName</span>
+ </div>
+       }
+   <div class="quickinfo-row">
+    <i class="fas fa-info-circle"></i>
+   <strong>Status:</strong>
+    <span class="status-badge status-@appointment.Status.ToLower()">@GetStatusDisplayName(appointment.Status)</span>
+ </div>
+   </div>
+</ContentTemplate>
+  </ScheduleQuickInfoTemplates>
+
+ <ScheduleEvents TValue="ProgramareEventDto"
+   OnCellClick="@OnCellClicked"
+OnEventClick="@OnEventClicked"
+    OnPopupOpen="@OnPopupOpen"
+       EventRendered="@OnEventRendered" />
+      </SfSchedule>
+
+   <!-- Legend -->
+       <div class="legend">
+      <span class="legend-title">Statusuri:</span>
+           <div class="legend-item">
+  <span class="dot dot-blue"></span>
+        <span>Programată</span>
+      </div>
+  <div class="legend-item">
+         <span class="dot dot-green"></span>
+    <span>Confirmată</span>
+ </div>
+    <div class="legend-item">
+  <span class="dot dot-orange"></span>
+    <span>Check-in</span>
+     </div>
+         <div class="legend-item">
+   <span class="dot dot-purple"></span>
+   <span>În consultație</span>
+  </div>
+    <div class="legend-item">
+     <span class="dot dot-gray"></span>
+    <span>Finalizată</span>
+  </div>
+          <div class="legend-item">
+    <span class="dot dot-red"></span>
+     <span>Anulată</span>
+  </div>
+  </div>
    }
     </div>
 </div>
 
-<!-- Modals -->
-<ProgramareAddEditModal IsVisible="@ShowAddEditModal"
-    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowAddEditModal = value))"
-     ProgramareId="@SelectedProgramareId"
-  OnSaved="@HandleModalSaved" />
+@* Modals *@
+<ProgramareAddEditModal 
+    IsVisible="@ShowAddEditModal"
+    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, v => ShowAddEditModal = v))"
+    ProgramareId="@SelectedProgramareId"
+    PrefilledStartTime="@SelectedCellStartTime"
+    PrefilledEndTime="@SelectedCellEndTime"
+    OnSaved="HandleModalSaved" />
 
-<ProgramareViewModal IsVisible="@ShowViewModal"
-IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
+<ProgramareViewModal 
+    IsVisible="@ShowViewModal"
+    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, v => ShowViewModal = v))"
     ProgramareId="@(SelectedProgramareId ?? Guid.Empty)"
-  OnEditRequested="@HandleEditRequested" />
+    OnEditRequested="HandleEditRequested" />

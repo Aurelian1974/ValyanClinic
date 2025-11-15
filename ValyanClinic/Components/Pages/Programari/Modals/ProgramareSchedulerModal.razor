@@ -6,185 +6,186 @@
 
 <div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
     <div class="modal-container modal-extra-large @(IsVisible ? "show" : "")" @onclick:stopPropagation>
-      <div class="modal-header">
-    <div class="modal-title">
-       <i class="fas fa-calendar-alt"></i>
-      <h2>Programare Noua - Calendar</h2>
-</div>
-  <button class="btn-close" @onclick="Close" title="Inchide">
-          <i class="fas fa-times"></i>
-      </button>
-        </div>
-
-        <div class="modal-body scheduler-modal-body">
-   @if (IsLoading)
-         {
- <div class="loading-container">
-          <div class="spinner-border text-primary" role="status">
-       <span class="visually-hidden">Se incarca...</span>
+        <div class="modal-header">
+            <div class="modal-title">
+        <i class="fas fa-calendar-alt"></i>
+    <h2>Calendar Programări - Syncfusion Scheduler</h2>
             </div>
-        <p>Se incarca calendarul...</p>
-</div>
-         }
-     else if (HasError)
-          {
-                <div class="alert alert-danger" role="alert">
-   <i class="fas fa-exclamation-triangle"></i>
-        @ErrorMessage
-     </div>
-     }
-      else
-      {
-       <!-- Toolbar -->
-        <div class="scheduler-toolbar">
-            <div class="toolbar-section">
-    <div class="toolbar-item">
- <label><i class="fas fa-user-md"></i> Filtreaza dupa Doctor:</label>
-     <SfDropDownList TValue="Guid?" 
-      TItem="DoctorDropdownDto"
-    DataSource="@DoctorsList"
-                    @bind-Value="@SelectedDoctorId"
-      Placeholder="Toti doctorii..."
-       AllowFiltering="true"
-   FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-        ShowClearButton="true"
-  CssClass="doctor-filter-dropdown">
-        <DropDownListFieldSettings Value="PersonalID" Text="NumeComplet" />
-         <DropDownListEvents TValue="Guid?" TItem="DoctorDropdownDto" ValueChange="@OnDoctorFilterChanged" />
-                    </SfDropDownList>
-       </div>
-           <div class="toolbar-item">
-   <SfButton Content="Azi" CssClass="e-btn-today" OnClick="@OnTodayClicked"></SfButton>
-        </div>
-          <div class="toolbar-item">
-          <label><i class="fas fa-eye"></i> Vizualizare:</label>
-         <SfDropDownList TValue="string" 
-            TItem="ViewOption"
-         DataSource="@ViewOptions"
-           @bind-Value="@CurrentView"
-         ShowClearButton="false"
-       CssClass="view-selector">
-        <DropDownListFieldSettings Value="Value" Text="Text" />
-    <DropDownListEvents TValue="string" TItem="ViewOption" ValueChange="@OnViewChanged" />
-                </SfDropDownList>
-     </div>
+    <button class="btn-close" @onclick="Close" title="Închide">
+    <i class="fas fa-times"></i>
+      </button>
     </div>
-    <div class="toolbar-info">
-        <span class="info-badge">
-             <i class="fas fa-calendar-check"></i>
-       <strong>@TotalProgramariAfisate</strong> programari afisate
-      </span>
-             </div>
-          </div>
 
-        <!-- Syncfusion Scheduler -->
-     <SfSchedule @ref="SchedulerRef"
-     TValue="ProgramareEventDto"
-        Height="600px"
-      SelectedDate="@SelectedDate"
-    CurrentView="@GetCurrentView()"
-         CssClass="scheduler-container"
-                 ShowQuickInfo="false">
- 
-   <!-- Views -->
-   <ScheduleViews>
-    <ScheduleView Option="View.Day" StartHour="08:00" EndHour="20:00"></ScheduleView>
-             <ScheduleView Option="View.Week" StartHour="08:00" EndHour="20:00"></ScheduleView>
-     <ScheduleView Option="View.WorkWeek" StartHour="08:00" EndHour="20:00"></ScheduleView>
-            <ScheduleView Option="View.Month"></ScheduleView>
-     <ScheduleView Option="View.Agenda"></ScheduleView>
-      </ScheduleViews>
-
-            <!-- Event Settings -->
-        <ScheduleEventSettings DataSource="@EventsList" 
-   Query="@EventsQuery"
-    AllowAdding="false"
-      AllowEditing="false"
-      AllowDeleting="false">
-       </ScheduleEventSettings>
-
-       <!-- Resources (Doctori) -->
-            <ScheduleResources>
-       <ScheduleResource TValue="int" 
-  TItem="DoctorResourceDto"
-        DataSource="@DoctorResources"
-   Field="DoctorId"
-           Title="Doctor"
-  Name="Doctors"
-          TextField="Text"
- IdField="Id"
-          ColorField="Color"
- AllowMultiple="false">
-    </ScheduleResource>
-            </ScheduleResources>
-
-            <!-- ✅ EVENTS: OnCellClick și OnEventClick (sintaxa corectă Syncfusion) -->
-      <ScheduleEvents TValue="ProgramareEventDto" 
-          OnCellClick="@OnCellClicked"
-      OnEventClick="@OnEventClicked">
-     </ScheduleEvents>
-  </SfSchedule>
-
-                <!-- Legend -->
-    <div class="scheduler-legend">
-       <div class="legend-title">
-             <i class="fas fa-info-circle"></i>
-   Legenda Status:
-           </div>
-<div class="legend-items">
-              <div class="legend-item">
-    <span class="legend-color" style="background: #3b82f6;"></span>
-                <span>Programata</span>
-        </div>
-                   <div class="legend-item">
-    <span class="legend-color" style="background: #10b981;"></span>
-     <span>Confirmata</span>
-     </div>
-    <div class="legend-item">
-           <span class="legend-color" style="background: #f59e0b;"></span>
-         <span>Check-in</span>
-      </div>
-        <div class="legend-item">
-         <span class="legend-color" style="background: #8b5cf6;"></span>
-        <span>In consultatie</span>
-        </div>
-  <div class="legend-item">
-  <span class="legend-color" style="background: #6b7280;"></span>
-               <span>Finalizata</span>
-    </div>
- <div class="legend-item">
-      <span class="legend-color" style="background: #ef4444;"></span>
-    <span>Anulata</span>
-        </div>
-     </div>
+      <div class="modal-body scheduler-modal-body">
+@if (IsLoading)
+            {
+      <div class="loading-container">
+   <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Se încarcă...</span>
+   </div>
+     <p>Se încarcă calendarul...</p>
     </div>
             }
-        </div>
+   else if (HasError)
+       {
+    <div class="alert alert-danger" role="alert">
+          <i class="fas fa-exclamation-triangle"></i>
+                @ErrorMessage
+         </div>
+            }
+  else
+      {
+  <!-- Toolbar -->
+              <div class="scheduler-toolbar">
+        <div class="toolbar-section">
+            <div class="toolbar-item">
+                 <label><i class="fas fa-user-md"></i> Filtrează după Doctor:</label>
+          <SfDropDownList TValue="Guid?" 
+   TItem="DoctorDropdownDto"
+       DataSource="@DoctorsList"
+        @bind-Value="@SelectedDoctorId"
+  Placeholder="Toți doctorii..."
+    AllowFiltering="true"
+   FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+   ShowClearButton="true"
+       CssClass="doctor-filter-dropdown">
+ <DropDownListFieldSettings Value="PersonalID" Text="NumeComplet" />
+         <DropDownListEvents TValue="Guid?" TItem="DoctorDropdownDto" ValueChange="@OnDoctorFilterChanged" />
+                </SfDropDownList>
+    </div>
+ <div class="toolbar-item">
+            <SfButton Content="Astăzi" CssClass="e-btn-today" OnClick="@OnTodayClicked"></SfButton>
+  </div>
+      <div class="toolbar-item">
+     <label><i class="fas fa-eye"></i> Vizualizare:</label>
+                 <SfDropDownList TValue="string" 
+  TItem="ViewOption"
+     DataSource="@ViewOptions"
+            @bind-Value="@CurrentView"
+              ShowClearButton="false"
+       CssClass="view-selector">
+    <DropDownListFieldSettings Value="Value" Text="Text" />
+      <DropDownListEvents TValue="string" TItem="ViewOption" ValueChange="@OnViewChanged" />
+               </SfDropDownList>
+         </div>
+     </div>
+         <div class="toolbar-info">
+      <span class="info-badge">
+  <i class="fas fa-calendar-check"></i>
+        <strong>@TotalProgramariAfisate</strong> programări afișate
+          </span>
+      </div>
+       </div>
+
+             <!-- ✅ Syncfusion Scheduler - SIMPLIFIED -->
+     <SfSchedule @ref="SchedulerRef"
+   TValue="ProgramareEventDto"
+Height="600px"
+     @bind-SelectedDate="@SelectedDate"
+   @bind-CurrentView="@CurrentViewEnum"
+    CssClass="scheduler-container"
+         ShowQuickInfo="false"
+    StartHour="08:00"
+   EndHour="20:00">
+       
+  <!-- ✅ Views Configuration -->
+<ScheduleViews>
+      <ScheduleView Option="View.Day"></ScheduleView>
+ <ScheduleView Option="View.Week"></ScheduleView>
+     <ScheduleView Option="View.WorkWeek"></ScheduleView>
+<ScheduleView Option="View.Month"></ScheduleView>
+        <ScheduleView Option="View.Agenda"></ScheduleView>
+      </ScheduleViews>
+
+          <!-- ✅ Event Settings - CORRECT DataSource binding -->
+     <ScheduleEventSettings DataSource="@EventsList"
+ AllowAdding="true"
+   AllowEditing="false"
+ AllowDeleting="false">
+   </ScheduleEventSettings>
+
+   <!-- ✅ Resources (Doctori) -->
+        <ScheduleResources>
+    <ScheduleResource TValue="int" 
+    TItem="DoctorResourceDto"
+DataSource="@DoctorResources"
+Field="DoctorId"
+   Title="Doctor"
+   Name="Doctors"
+        TextField="Text"
+       IdField="Id"
+         ColorField="Color"
+       AllowMultiple="false">
+          </ScheduleResource>
+     </ScheduleResources>
+
+ <!-- ✅ EVENTS - CORRECT Syncfusion event names -->
+        <ScheduleEvents TValue="ProgramareEventDto" 
+          OnCellClick="@OnCellClicked"
+   OnEventClick="@OnEventClicked">
+   </ScheduleEvents>
+         </SfSchedule>
+
+             <!-- Legend -->
+     <div class="scheduler-legend">
+    <div class="legend-title">
+              <i class="fas fa-info-circle"></i>
+       Legendă Status:
+          </div>
+<div class="legend-items">
+ <div class="legend-item">
+         <span class="legend-color" style="background: #3b82f6;"></span>
+       <span>Programată</span>
+           </div>
+                <div class="legend-item">
+         <span class="legend-color" style="background: #10b981;"></span>
+                <span>Confirmată</span>
+         </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: #f59e0b;"></span>
+       <span>Check-in</span>
+       </div>
+      <div class="legend-item">
+           <span class="legend-color" style="background: #8b5cf6;"></span>
+   <span>În consultație</span>
+     </div>
+            <div class="legend-item">
+   <span class="legend-color" style="background: #6b7280;"></span>
+        <span>Finalizată</span>
+      </div>
+          <div class="legend-item">
+      <span class="legend-color" style="background: #ef4444;"></span>
+   <span>Anulată</span>
+     </div>
+       </div>
+           </div>
+            }
+     </div>
 
         <div class="modal-footer">
-   <button type="button" class="btn btn-secondary" @onclick="Close">
-     <i class="fas fa-times"></i>
-             Inchide
-        </button>
- <button type="button" class="btn btn-primary" @onclick="CreateNewProgramare">
-    <i class="fas fa-plus"></i>
-    Creaza Programare Noua
+      <button type="button" class="btn btn-secondary" @onclick="Close">
+    <i class="fas fa-times"></i>
+           Închide
+   </button>
+         <button type="button" class="btn btn-primary" @onclick="CreateNewProgramare">
+  <i class="fas fa-plus"></i>
+             Creează Programare Nouă
             </button>
-        </div>
+   </div>
     </div>
 </div>
 
-<!-- Modal pentru crearea/editarea programarii -->
+<!-- Modal pentru crearea/editarea programării -->
 @if (ShowProgramareModal)
 {
     <ProgramareAddEditModal 
         IsVisible="@ShowProgramareModal"
-    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowProgramareModal = value))"
+        IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowProgramareModal = value))"
         ProgramareId="@SelectedProgramareId"
-   PrefilledStartTime="@SelectedCellStartTime"
-    PrefilledEndTime="@SelectedCellEndTime"
+        PrefilledStartTime="@SelectedCellStartTime"
+      PrefilledEndTime="@SelectedCellEndTime"
         OnSaved="OnProgramareSaved" />
 }
 
-<!-- Toast pentru notificari -->
+<!-- Toast pentru notificări -->
 <Syncfusion.Blazor.Notifications.SfToast @ref="ToastRef" />

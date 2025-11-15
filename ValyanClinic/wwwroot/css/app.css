@@ -17,4 +17,80 @@ html:has(#main-sidebar.collapsed) {
     --sidebar-width: 80px;
 }
 
+/* ========================================
+   SYNCFUSION SCHEDULE CUSTOMIZATION
+   Active + Hover states with consistent dark styling
+   ======================================== */
+
+/* Schedule view buttons - default (inactive) state */
+.e-schedule .e-schedule-toolbar .e-toolbar-items .e-views .e-btn {
+    background: white !important;
+    color: #475569 !important;
+    border: 1px solid #e5e7eb !important;
+    font-size: 11px !important;
+    padding: 5px 12px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Schedule view buttons - hover state (inactive) */
+.e-schedule .e-schedule-toolbar .e-toolbar-items .e-views .e-btn:hover {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #1e293b !important;
+}
+
+/* ========================================
+   ACTIVE VIEW BUTTON - Default state
+   ======================================== */
+.e-schedule .e-schedule-toolbar .e-toolbar-items .e-active-view .e-btn {
+    background: #60a5fa !important;
+    color: #111827 !important;
+    border: 1px solid #3b82f6 !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Target text inside active button */
+.e-schedule .e-schedule-toolbar .e-active-view .e-tbar-btn-text,
+.e-schedule .e-schedule-toolbar .e-active-view .e-btn .e-tbar-btn-text {
+    color: #111827 !important;
+}
+
+/* ========================================
+   ACTIVE VIEW BUTTON - Hover state
+   Background: mai închis (#3b82f6)
+   Text: negru (#111827)
+   ======================================== */
+.e-schedule .e-schedule-toolbar .e-toolbar-items .e-active-view .e-btn:hover {
+    background: #3b82f6 !important;
+    border-color: #2563eb !important;
+  color: #111827 !important;
+    box-shadow: 0 3px 6px rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Target text inside active button on hover */
+.e-schedule .e-schedule-toolbar .e-active-view .e-btn:hover .e-tbar-btn-text {
+    color: #111827 !important;
+}
+
+/* ========================================
+   ACTIVE VIEW BUTTON - Focus state
+   ======================================== */
+.e-schedule .e-schedule-toolbar .e-toolbar-items .e-views .e-btn:focus {
+    outline: none !important;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2) !important;
+}
+
+.e-schedule .e-schedule-toolbar .e-toolbar-items .e-active-view .e-btn:focus {
+    outline: none !important;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3) !important;
+}
+
+.e-schedule .e-schedule-toolbar .e-active-view .e-btn:focus .e-tbar-btn-text {
+    color: #111827 !important;
+}
+
 /* Add more imports as needed */

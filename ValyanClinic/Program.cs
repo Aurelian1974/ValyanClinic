@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Localization;
 using Serilog;
 using Syncfusion.Blazor;
 using ValyanClinic.Infrastructure.Data;
@@ -160,9 +161,21 @@ try
     var syncfusionLicenseKey = builder.Configuration["Syncfusion:LicenseKey"];
     if (!string.IsNullOrEmpty(syncfusionLicenseKey))
     {
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicenseKey);
+   Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicenseKey);
     }
+    
+    // Add Syncfusion Blazor service
     builder.Services.AddSyncfusionBlazor();
+  
+  // Configure localization for Romanian
+    builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+    builder.Services.Configure<RequestLocalizationOptions>(options =>
+    {
+  var supportedCultures = new[] { "ro-RO", "ro" };
+        options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("ro-RO");
+options.SupportedCultures = supportedCultures.Select(c => new System.Globalization.CultureInfo(c)).ToList();
+        options.SupportedUICultures = supportedCultures.Select(c => new System.Globalization.CultureInfo(c)).ToList();
+    });
 
     // ========================================
     // DATABASE - Connection Pooling Configuration OPTIMIZED
@@ -333,6 +346,9 @@ try
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();
+    
+    // Localization
+    app.UseRequestLocalization();
     
     // Authentication & Authorization Middleware (REQUIRED)
     app.UseAuthentication();
