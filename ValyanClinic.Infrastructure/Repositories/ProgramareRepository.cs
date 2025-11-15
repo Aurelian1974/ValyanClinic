@@ -178,22 +178,56 @@ DataStart = dataStart,
     {
         _logger.LogInformation(
       "Obținere programări pentru data: {Date}, Doctor={DoctorID}",
-            date.ToString("yyyy-MM-dd"), doctorID);
+        date.ToString("yyyy-MM-dd"), doctorID);
 
    // ✅ FIX: SP așteaptă @DataProgramare, nu @Data!
-        var parameters = new
+   var parameters = new
         {
-        DataProgramare = date,
+  DataProgramare = date,
        DoctorID = doctorID
         };
 
-        var results = await QueryAsync<ProgramareDto>(
+    var results = await QueryAsync<ProgramareDto>(
         "sp_Programari_GetByDate", parameters, cancellationToken);
 
         return results.Select(MapToEntity);
-    }
+  }
 
- /// <inheritdoc />
+    /// <inheritdoc />
+    public async Task<IEnumerable<Programare>> GetByDateRangeAsync(
+     DateTime startDate,
+   DateTime endDate,
+ Guid? doctorID = null,
+     CancellationToken cancellationToken = default)
+    {
+     _logger.LogInformation(
+       "⚡ GetByDateRange - OPTIMIZED: {StartDate} - {EndDate}, Doctor={DoctorID}",
+     startDate.ToString("yyyy-MM-dd"),
+       endDate.ToString("yyyy-MM-dd"),
+      doctorID);
+
+      var parameters = new
+  {
+       DataStart = startDate,
+        DataEnd = endDate,
+       DoctorID = doctorID
+  };
+
+  var results = await QueryAsync<ProgramareDto>(
+       "sp_Programari_GetByDateRange",
+       parameters,
+       cancellationToken);
+
+        var programari = results.Select(MapToEntity).ToList();
+  
+        _logger.LogInformation(
+        "✅ Loaded {Count} programări for date range in SINGLE query",
+            programari.Count);
+
+     return programari;
+ }
+
+    /// <inheritdoc />
     public async Task<IEnumerable<Programare>> GetUpcomingAsync(
         int days = 7,
         Guid? doctorID = null,

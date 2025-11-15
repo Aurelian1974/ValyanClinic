@@ -107,7 +107,22 @@ public interface IProgramareRepository
     /// <param name="cancellationToken">Token pentru anularea operațiunii.</param>
     /// <returns>Lista programărilor din ziua respectivă.</returns>
     Task<IEnumerable<Programare>> GetByDateAsync(
-        DateTime date,
+    DateTime date,
+    Guid? doctorID = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// ✅ NEW - Obține toate programările pentru un interval de date (ex: o săptămână) cu UN SINGUR QUERY.
+    /// PERFORMANCE: Înlocuiește multiple apeluri GetByDateAsync (7 queries → 1 query).
+    /// </summary>
+    /// <param name="startDate">Data de început a intervalului.</param>
+    /// <param name="endDate">Data de sfârșit a intervalului.</param>
+    /// <param name="doctorID">ID-ul medicului (opțional, null = toți medicii).</param>
+    /// <param name="cancellationToken">Token pentru anularea operațiunii.</param>
+    /// <returns>Lista programărilor din intervalul specificat.</returns>
+    Task<IEnumerable<Programare>> GetByDateRangeAsync(
+  DateTime startDate,
+DateTime endDate,
         Guid? doctorID = null,
         CancellationToken cancellationToken = default);
 
