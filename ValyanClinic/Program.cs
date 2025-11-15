@@ -35,6 +35,15 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     // ========================================
+    // WINDOWS SERVICE SUPPORT (Production)
+    // ========================================
+    // ✅ Permite aplicației să ruleze ca Windows Service
+    // Pentru instalare service:
+    // sc create ValyanClinicService binPath="D:\Lucru\CMS\ValyanClinic\publish\ValyanClinic.exe"
+    // sc start ValyanClinicService
+    builder.Host.UseWindowsService();
+
+    // ========================================
     // SERILOG
     // ========================================
     builder.Host.UseSerilog();
@@ -295,6 +304,36 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // EMAIL SERVICES
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Services.Email.IEmailService, ValyanClinic.Services.Email.EmailService>();
+    
+    // ========================================
+    // SMS SERVICES (MOCK MODE - Production Ready Infrastructure)
+    // ========================================
+    // ✅ CURRENT: MockSmsService pentru testare UI fără cost
+ // ⏳ FUTURE: Când ai buget, switch la TwilioSmsService sau alt provider
+    // 
+    // Setup Production (2 min):
+    // 1. dotnet add package Twilio (sau Vonage/SMS-Gateway.ro SDK)
+    // 2. dotnet user-secrets set "TwilioSettings:AccountSid" "ACxxxx"
+    // 3. dotnet user-secrets set "TwilioSettings:AuthToken" "xxxx"
+    // 4. dotnet user-secrets set "TwilioSettings:PhoneNumber" "+1xxxx"
+    // 5. dotnet user-secrets set "TwilioSettings:Enabled" "true"
+    // 6. Uncomment TwilioSmsService registration și comment MockSmsService
+  //
+    // Estimare cost Twilio: $15 FREE credit = 450 SMS-uri
+    // După trial: $0.025/SMS în România
+    builder.Services.AddScoped<ValyanClinic.Services.Sms.ISmsService, ValyanClinic.Services.Sms.MockSmsService>();
+    
+    // ⏳ TODO când ai buget: Uncomment această linie și comment linia de mai sus
+    // var smsEnabled = builder.Configuration["TwilioSettings:Enabled"] == "true";
+    // if (smsEnabled)
+    // {
+    //     builder.Services.AddScoped<ValyanClinic.Services.Sms.ISmsService, ValyanClinic.Services.Sms.TwilioSmsService>();
+    // }
+    // else
+    // {
+    //     builder.Services.AddScoped<ValyanClinic.Services.Sms.ISmsService, ValyanClinic.Services.Sms.MockSmsService>();
+    // }
+
     // ========================================
     // EXPORT SERVICES
     // ========================================
