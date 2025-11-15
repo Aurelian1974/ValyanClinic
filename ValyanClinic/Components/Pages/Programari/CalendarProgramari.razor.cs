@@ -56,13 +56,18 @@ public partial class CalendarProgramari : ComponentBase
 
     private async Task LoadDoctorsListAsync()
     {
-        var query = new GetPersonalMedicalListQuery { PageNumber = 1, PageSize = 1000, FilterEsteActiv = true };
+    var query = new GetPersonalMedicalListQuery { PageNumber = 1, PageSize = 1000, FilterEsteActiv = true };
         var result = await Mediator.Send(query);
         
  if (result.IsSuccess && result.Value != null)
         {
-      DoctorsList = result.Value.ToList();
- Logger.LogInformation("Loaded {Count} doctors", DoctorsList.Count);
+            // ✅ Filter ONLY doctors (Pozitie starts with "Medic")
+     DoctorsList = result.Value
+             .Where(p => !string.IsNullOrEmpty(p.Pozitie) && p.Pozitie.StartsWith("Medic", StringComparison.OrdinalIgnoreCase))
+          .ToList();
+        
+          Logger.LogInformation("Loaded {Count} doctors (filtered from {Total} total personal)", 
+        DoctorsList.Count, result.Value.Count());
     }
     }
 
