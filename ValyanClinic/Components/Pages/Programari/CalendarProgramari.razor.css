@@ -8,6 +8,15 @@
     gap: 10px;
 }
 
+/* HIDE Syncfusion Today button */
+::deep .e-schedule .e-schedule-toolbar .e-today {
+    display: none !important;
+}
+
+::deep .e-schedule .e-toolbar-item.e-today {
+    display: none !important;
+}
+
 .page-header {
     display: flex;
   justify-content: space-between;
@@ -188,11 +197,26 @@ align-items: center;
     border: 2px solid #e5e7eb !important;
 }
 
+/* 🔴 ZONA ROȘIE - Header DOAR albastru cu text alb, fără alte culori */
 ::deep .e-schedule .e-quick-popup-wrapper .e-popup-header {
-    background: linear-gradient(135deg, #93c5fd, #60a5fa) !important;
+    background: #3b82f6 !important; /* DOAR albastru solid */
     color: white !important;
     padding: 12px 16px !important;
     border-radius: 10px 10px 0 0 !important;
+    border-left: 4px solid #2563eb !important; /* Bara albastră pe stânga */
+}
+
+/* Asigură că TOATE elementele din header sunt albe pe albastru */
+::deep .e-schedule .e-quick-popup-wrapper .e-popup-header * {
+    color: white !important;
+    background: transparent !important;
+}
+
+/* Title în header - alb pe albastru */
+::deep .e-schedule .e-quick-popup-wrapper .e-subject {
+    color: white !important;
+    background: transparent !important;
+    font-weight: 600 !important;
 }
 
 ::deep .e-schedule .e-quick-popup-wrapper .e-popup-content {
@@ -205,7 +229,7 @@ align-items: center;
 
 .quickinfo-row {
     display: flex;
-    align-items: center;
+align-items: center;
     gap: 8px;
   padding: 7px 0;
     font-size: 13px;
@@ -247,7 +271,7 @@ align-items: center;
 
 .status-badge.status-programata {
     background: #dbeafe;
-    color: #1e40af;
+  color: #1e40af;
 }
 
 .status-badge.status-confirmata {
@@ -273,4 +297,81 @@ align-items: center;
 .status-badge.status-anulata {
     background: #fee2e2;
     color: #991b1b;
+}
+
+/* 🟢 ZONA VERDE - Butoane QuickInfo Footer cu tema app-ului (FĂRĂ border!) */
+::deep .e-schedule .e-quick-popup-wrapper .e-popup-footer {
+    padding: 12px 16px !important;
+    background: #f9fafb !important;
+border-top: 1px solid #e5e7eb !important;
+}
+
+/* Buton Edit - stil identic cu btn-primary din app (FĂRĂ border!) */
+::deep .e-schedule .e-quick-popup-wrapper .e-event-edit {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    font-size: 13px !important;
+  font-weight: 500 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+::deep .e-schedule .e-quick-popup-wrapper .e-event-edit:hover {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Buton Delete - stil similar cu btn-secondary din app (FĂRĂ border!) */
+::deep .e-schedule .e-quick-popup-wrapper .e-event-delete {
+  background: white !important;
+    color: #ef4444 !important;
+    border: none !important;
+    border-radius: 8px !important;
+padding: 10px 20px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+::deep .e-schedule .e-quick-popup-wrapper .e-event-delete:hover {
+    background: #fee2e2 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* Buton Details - stil similar cu btn-secondary din app (FĂRĂ border!) */
+::deep .e-schedule .e-quick-popup-wrapper .e-event-details {
+    background: white !important;
+    color: #3b82f6 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+::deep .e-schedule .e-quick-popup-wrapper .e-event-details:hover {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #2563eb !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Close button în header */
+::deep .e-schedule .e-quick-popup-wrapper .e-close {
+  color: white !important;
+    opacity: 0.9 !important;
+}
+
+::deep .e-schedule .e-quick-popup-wrapper .e-close:hover {
+  opacity: 1 !important;
+    background: rgba(255,255,255,0.2) !important;
+    border-radius: 4px !important;
 }

@@ -50,7 +50,6 @@
     <button class="btn-nav" @onclick="PreviousWeek">
      <i class="fas fa-chevron-left"></i>
   </button>
-            <button class="btn-today" @onclick="GoToToday">Astăzi</button>
             <button class="btn-nav" @onclick="NextWeek">
      <i class="fas fa-chevron-right"></i>
   </button>
@@ -83,9 +82,9 @@
    ShowQuickInfo="true">
 
      <ScheduleViews>
-<ScheduleView Option="View.Day"></ScheduleView>
-         <ScheduleView Option="View.Week"></ScheduleView>
-    <ScheduleView Option="View.Month"></ScheduleView>
+<ScheduleView Option="View.Day" DisplayName="Zi"></ScheduleView>
+         <ScheduleView Option="View.Week" DisplayName="Săptămână"></ScheduleView>
+    <ScheduleView Option="View.Month" DisplayName="Lună"></ScheduleView>
    </ScheduleViews>
 
 <ScheduleEventSettings DataSource="@EventsList" />
@@ -94,19 +93,19 @@
    <ContentTemplate>
  @{
           var appointment = (context as ProgramareEventDto)!;
-      }
+    }
   <div class="quickinfo-content">
 <div class="quickinfo-row">
-      <i class="fas fa-user"></i>
+  <i class="fas fa-user"></i>
    <strong>Pacient:</strong>
-          <span>@appointment.Subject</span>
+       <span>@appointment.Subject</span>
        </div>
       <div class="quickinfo-row">
 <i class="fas fa-calendar"></i>
      <strong>Data:</strong>
      <span>@appointment.StartTime.ToString("dd.MM.yyyy")</span>
       </div>
-      <div class="quickinfo-row">
+   <div class="quickinfo-row">
   <i class="far fa-clock"></i>
  <strong>Interval:</strong>
   <span>@appointment.StartTime.ToString("HH:mm") - @appointment.EndTime.ToString("HH:mm")</span>
@@ -118,7 +117,7 @@
     <strong>Tip:</strong>
    <span>@appointment.TipProgramare</span>
       </div>
-         }
+   }
    @if (!string.IsNullOrEmpty(appointment.DoctorName))
         {
  <div class="quickinfo-row">
@@ -126,7 +125,7 @@
         <strong>Doctor:</strong>
        <span>@appointment.DoctorName</span>
  </div>
-       }
+    }
    <div class="quickinfo-row">
     <i class="fas fa-info-circle"></i>
    <strong>Status:</strong>
