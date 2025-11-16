@@ -127,7 +127,7 @@
 }
 
 .subtitle {
-    color: var(--text-secondary);
+    color: #6b7280; /* Gri închis pentru subtitle */
     font-size: var(--modal-value);
     margin: 0;
 }
@@ -146,7 +146,7 @@
 
 .alert-danger {
     background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-    color: #dc2626;
+    color: #dc2626; /* Roșu pentru erori */
 }
 
 .alert i {
@@ -176,9 +176,9 @@
 }
 
 .form-group label {
-  font-size: var(--form-label);
+    font-size: var(--form-label);
     font-weight: var(--font-weight-semibold);
-    color: var(--text-color);
+    color: #111827; /* Negru închis pentru vizibilitate */
     display: flex;
     align-items: center;
     gap: 8px;
@@ -198,7 +198,7 @@
     border: 2px solid var(--border-color);
     border-radius: 12px;
     font-size: var(--form-input);
-    color: var(--text-color);
+    color: #111827; /* Negru închis pentru text input */
     background: white;
     transition: all 0.3s ease;
 }
@@ -210,12 +210,13 @@
 }
 
 .form-control::placeholder {
-    color: var(--text-muted);
+    color: #9ca3af; /* Gri mediu pentru placeholder */
 }
 
 .form-control:disabled {
     background: var(--background-secondary);
     cursor: not-allowed;
+    color: #6b7280; /* Gri pentru disabled state */
 }
 
 /* Password Toggle Button */
@@ -295,7 +296,7 @@
 
 .checkbox-text {
 font-size: var(--font-size-base);
-    color: var(--text-secondary);
+    color: #111827; /* Negru închis pentru vizibilitate */
   display: flex;
     align-items: center;
     gap: 8px;

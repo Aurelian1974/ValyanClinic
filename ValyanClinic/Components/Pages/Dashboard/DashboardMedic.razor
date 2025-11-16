@@ -1,0 +1,229 @@
+﻿@page "/dashboard/medic"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Doctor,Medic")]
+@rendermode InteractiveServer
+
+<PageTitle>Dashboard Medic - ValyanClinic</PageTitle>
+
+<div class="dashboard-medic-container">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="doctor-info">
+            <div class="doctor-avatar">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div class="doctor-details">
+                <h1>@DoctorName</h1>
+                <p class="specializare">@Specializare</p>
+                <p class="data-info">
+                    <i class="fas fa-calendar-day"></i>
+                    @CurrentDate
+                </p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-refresh" @onclick="RefreshData">
+                <i class="fas fa-sync-alt @(IsLoading ? "fa-spin" : "")"></i>
+                Actualizeaza
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="dashboard-content">
+        <!-- Left Panel - Programari -->
+        <div class="programari-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-calendar-check"></i>
+                    <h2>Programari Astazi (@TotalProgramariAstazi)</h2>
+                </div>
+                <div class="section-filters">
+                    <input type="text" 
+                           class="search-input" 
+                           placeholder="Cauta pacient, diagnostic sau motiv..."
+                           @bind="SearchText"
+                           @bind:event="oninput" />
+                    <select class="filter-select" @bind="StatusFilter">
+                        <option value="">Toate statusurile</option>
+                        <option value="Confirmata">Confirmata</option>
+                        <option value="In asteptare">In asteptare</option>
+                        <option value="Consulta">Consulta</option>
+                    </select>
+                </div>
+            </div>
+
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary"></div>
+                    <p>Se incarca programarile...</p>
+                </div>
+            }
+            else if (FilteredProgramari.Any())
+            {
+                <div class="programari-list">
+                    @foreach (var programare in FilteredProgramari)
+                    {
+                        <div class="programare-card @GetStatusClass(programare.Status)">
+                            <div class="programare-time">
+                                <i class="fas fa-clock"></i>
+                                <span class="ora">@programare.OraInceput.ToString(@"hh\:mm")</span>
+                                <span class="status-badge">@programare.Status</span>
+                            </div>
+                            <div class="programare-info">
+                                <div class="pacient-header">
+                                    <i class="fas fa-user"></i>
+                                    <span class="pacient-nume">@programare.PacientNumeComplet</span>
+                                    <span class="pacient-varsta">@programare.PacientVarsta ani</span>
+                                </div>
+                                <div class="programare-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Motiv:</span>
+                                        <span class="detail-value">@programare.Motiv</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Diagnostic:</span>
+                                        <span class="detail-value">@programare.Diagnostic</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Telefon:</span>
+                                        <a href="tel:@programare.PacientTelefon" class="detail-value link">
+                                            <i class="fas fa-phone"></i>
+                                            @programare.PacientTelefon
+                                        </a>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(programare.TratamentActual))
+                                    {
+                                        <div class="detail-row">
+                                            <span class="detail-label">Tratament:</span>
+                                            <span class="detail-value">@programare.TratamentActual</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="programare-actions">
+                                <button class="btn-action btn-dosar" 
+                                        @onclick="() => OpenDosarPacient(programare.PacientID)"
+                                        title="Deschide dosar pacient">
+                                    <i class="fas fa-folder-open"></i>
+                                    <span>Dosar</span>
+                                </button>
+                                <button class="btn-action btn-consulta" 
+                                        @onclick="() => StartConsultatie(programare.ProgramareID)"
+                                        title="Incepe consultatie">
+                                    <i class="fas fa-stethoscope"></i>
+                                    <span>Consulta</span>
+                                </button>
+                                <button class="btn-action btn-apel" 
+                                        @onclick="() => CallPacient(programare.PacientTelefon)"
+                                        title="Apeleaza pacient">
+                                    <i class="fas fa-phone"></i>
+                                    <span>Apel</span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>Nu exista programari astazi</h3>
+                    <p>Lista de programari este goala pentru ziua curenta.</p>
+                </div>
+            }
+        </div>
+
+        <!-- Right Panel - Activitati & Grafic -->
+        <div class="side-panel">
+            <!-- Activitati Recente -->
+            <div class="activitati-section">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-history"></i>
+                        Activitati Recente
+                    </h3>
+                </div>
+                <div class="activitati-timeline">
+                    @foreach (var activitate in ActivitatiRecente)
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-icon @GetActivityIconClass(activitate.Tip)">
+                                <i class="@GetActivityIcon(activitate.Tip)"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <p class="activitate-text">@activitate.Descriere</p>
+                                <span class="activitate-time">@activitate.Data.ToString("HH:mm")</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Grafic Activitate Saptamanala -->
+            <div class="grafic-section">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-chart-bar"></i>
+                        Activitate Saptamanala
+                    </h3>
+                </div>
+                <div class="chart-container">
+                    <SfChart>
+                        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
+                        </ChartPrimaryXAxis>
+                        <ChartSeriesCollection>
+                            <ChartSeries DataSource="@ChartData" 
+                                        XName="Zi" 
+                                        YName="NumarConsultatii" 
+                                        Type="ChartSeriesType.Column"
+                                        Fill="#60a5fa">
+                            </ChartSeries>
+                        </ChartSeriesCollection>
+                    </SfChart>
+                </div>
+            </div>
+
+            <!-- Acces Rapid -->
+            <div class="acces-rapid-section">
+                <div class="section-header">
+                    <h3>
+                        <i class="fas fa-bolt"></i>
+                        Acces Rapid
+                    </h3>
+                </div>
+                <div class="quick-links">
+                    <a href="/protocoale-medicale" class="quick-link">
+                        <div class="link-icon blue">
+                            <i class="fas fa-file-medical"></i>
+                        </div>
+                        <span>Protocoale Medicale</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="/pacienti/baza-date" class="quick-link">
+                        <div class="link-icon green">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <span>Baza de Pacienti</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="/investigatii-analize" class="quick-link">
+                        <div class="link-icon orange">
+                            <i class="fas fa-vial"></i>
+                        </div>
+                        <span>Investigatii/Analize</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="/retete-electronice" class="quick-link">
+                        <div class="link-icon purple">
+                            <i class="fas fa-prescription"></i>
+                        </div>
+                        <span>Retete Electronice</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

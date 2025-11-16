@@ -1,6 +1,7 @@
 ﻿@page "/test-email"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Email Testing Suite - ValyanClinic</PageTitle>
 
@@ -43,6 +44,12 @@
                         Selectează Template
                         <span class="badge">@Templates.Count</span>
                     </label>
+                    <div class="template-actions">
+                        <button class="btn-new-template" @onclick="OpenTemplateManager">
+                            <i class="fas fa-cog"></i>
+                            <span>Gestionează Template-uri</span>
+                        </button>
+                    </div>
                     <div class="template-grid">
                         @foreach (var template in Templates)
                         {
@@ -58,6 +65,17 @@
                                 @if (SelectedTemplate == template.Key)
                                 {
                                     <i class="fas fa-check-circle template-check"></i>
+                                }
+                                @if (!template.Value.IsDefault)
+                                {
+                                    <div class="template-actions-mini">
+                                        <button class="btn-edit-mini" @onclick:stopPropagation="true" @onclick="() => StartEditTemplate(template.Key)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-delete-mini" @onclick:stopPropagation="true" @onclick="() => StartDeleteTemplate(template.Key)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 }
                             </div>
                         }
@@ -106,6 +124,80 @@
                            maxlength="100"
                            placeholder="Subiectul email-ului" />
                 </div>
+
+                <!-- CUSTOM MESSAGE EDITOR -->
+                @if (SelectedTemplate == "custom" || (Templates.ContainsKey(SelectedTemplate) && !Templates[SelectedTemplate].IsDefault))
+                {
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-edit"></i>
+                            Mesaj personalizat
+                            <div class="editor-mode-toggle">
+                                <button class="mode-btn @(IsHtmlMode ? "active" : "")" 
+                                        @onclick="() => ToggleEditorMode(true)"
+                                        title="HTML mode">
+                                    <i class="fas fa-code"></i>
+                                </button>
+                                <button class="mode-btn @(!IsHtmlMode ? "active" : "")" 
+                                        @onclick="() => ToggleEditorMode(false)"
+                                        title="Visual mode">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </label>
+
+                        @if (IsHtmlMode)
+                        {
+                            <textarea class="code-editor" 
+                                      @bind="CustomMessageHtml"
+                                      placeholder="<h1>Scrie HTML aici...</h1>"
+                                      rows="10"></textarea>
+                        }
+                        else
+                        {
+                            <div class="editor-toolbar">
+                                <button class="toolbar-btn" @onclick='() => InsertFormatting("bold")' title="Bold">
+                                    <i class="fas fa-bold"></i>
+                                </button>
+                                <button class="toolbar-btn" @onclick='() => InsertFormatting("italic")' title="Italic">
+                                    <i class="fas fa-italic"></i>
+                                </button>
+                                <button class="toolbar-btn" @onclick='() => InsertFormatting("underline")' title="Underline">
+                                    <i class="fas fa-underline"></i>
+                                </button>
+                                <div class="toolbar-divider"></div>
+                                <button class="toolbar-btn" @onclick='() => InsertFormatting("h1")' title="Heading 1">
+                                    <i class="fas fa-heading"></i>
+                                </button>
+                                <button class="toolbar-btn" @onclick='() => InsertFormatting("ul")' title="List">
+                                    <i class="fas fa-list-ul"></i>
+                                </button>
+                                <button class="toolbar-btn" @onclick='() => InsertFormatting("link")' title="Link">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                                <div class="toolbar-divider"></div>
+                                <button class="toolbar-btn emoji-btn" @onclick="ToggleEmojiPicker" title="Emoji">
+                                    <i class="fas fa-smile"></i>
+                                </button>
+                            </div>
+
+                            @if (ShowEmojiPicker)
+                            {
+                                <div class="emoji-picker">
+                                    @foreach (var emoji in Emojis)
+                                    {
+                                        <button class="emoji-item" @onclick="() => InsertEmoji(emoji)">@emoji</button>
+                                    }
+                                </div>
+                            }
+
+                            <textarea class="rich-editor" 
+                                      @bind="CustomMessageText"
+                                      placeholder="Scrie mesajul tău aici..."
+                                      rows="10"></textarea>
+                        }
+                    </div>
+                }
 
                 <!-- Alert Message -->
                 @if (!string.IsNullOrEmpty(ResultMessage))
@@ -217,3 +309,134 @@
         </a>
     </div>
 </div>
+
+<!-- 🆕 TEMPLATE MANAGER MODAL -->
+@if (ShowTemplateManager)
+{
+    <div class="modal-overlay @(ShowTemplateManager ? "visible" : "")" @onclick="CloseTemplateManager">
+        <div class="modal-container @(ShowTemplateManager ? "show" : "")" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-layer-group"></i>
+                    <h2>Gestionare Template-uri</h2>
+                </div>
+                <button class="btn-close" @onclick="CloseTemplateManager">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                @if (IsCreatingTemplate || EditingTemplateKey != null)
+                {
+                    <!-- CREATE/EDIT TEMPLATE FORM -->
+                    <div class="template-form">
+                        <h3>@(IsCreatingTemplate ? "Creează Template Nou" : "Editează Template")</h3>
+                        
+                        <div class="form-group">
+                            <label>Nume Template</label>
+                            <input type="text" class="form-input" @bind="NewTemplateName" placeholder="ex: Newsletter" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descriere</label>
+                            <input type="text" class="form-input" @bind="NewTemplateDescription" placeholder="ex: Template pentru newsletter lunar" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Icon (Font Awesome class)</label>
+                            <input type="text" class="form-input" @bind="NewTemplateIcon" placeholder="ex: fas fa-envelope" />
+                            <small class="hint">Vizualizare: <i class="@NewTemplateIcon"></i></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Conținut HTML</label>
+                            <textarea class="code-editor" @bind="NewTemplateHtml" rows="15" placeholder="<h1>Titlu</h1><p>Content...</p>"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary" @onclick="SaveTemplate">
+                                <i class="fas fa-save"></i>
+                                Salvează
+                            </button>
+                            <button class="btn btn-secondary" @onclick="CancelTemplateEdit">
+                                <i class="fas fa-times"></i>
+                                Anulează
+                            </button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- TEMPLATE LIST -->
+                    <button class="btn-new-template-full" @onclick="StartCreateTemplate">
+                        <i class="fas fa-plus"></i>
+                        <span>Creează Template Nou</span>
+                    </button>
+
+                    <div class="template-manager-list">
+                        @foreach (var template in Templates)
+                        {
+                            <div class="template-manager-item @(template.Value.IsDefault ? "default" : "")">
+                                <div class="template-manager-icon">
+                                    <i class="@template.Value.Icon"></i>
+                                </div>
+                                <div class="template-manager-info">
+                                    <div class="template-manager-name">
+                                        @template.Value.Name
+                                        @if (template.Value.IsDefault)
+                                        {
+                                            <span class="default-badge">Default</span>
+                                        }
+                                    </div>
+                                    <div class="template-manager-desc">@template.Value.Description</div>
+                                </div>
+                                @if (!template.Value.IsDefault)
+                                {
+                                    <div class="template-manager-actions">
+                                        <button class="btn-icon-small" @onclick="() => StartEditTemplate(template.Key)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-icon-small btn-danger" @onclick="() => StartDeleteTemplate(template.Key)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<!-- 🆕 DELETE CONFIRMATION MODAL -->
+@if (ShowDeleteConfirmation)
+{
+    <div class="modal-overlay @(ShowDeleteConfirmation ? "visible" : "")" @onclick="CancelDelete">
+        <div class="modal-container modal-small @(ShowDeleteConfirmation ? "show" : "")" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h2>Confirmare Ștergere</h2>
+                </div>
+                <button class="btn-close" @onclick="CancelDelete">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Ești sigur că vrei să ștergi template-ul <strong>"@(DeletingTemplateKey != null && Templates.ContainsKey(DeletingTemplateKey) ? Templates[DeletingTemplateKey].Name : "")"</strong>?</p>
+                <p class="text-warning">Această acțiune nu poate fi anulată!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" @onclick="ConfirmDelete">
+                    <i class="fas fa-trash"></i>
+                    Șterge
+                </button>
+                <button class="btn btn-secondary" @onclick="CancelDelete">
+                    <i class="fas fa-times"></i>
+                    Anulează
+                </button>
+            </div>
+        </div>
+    </div>
+}

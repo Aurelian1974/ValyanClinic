@@ -85,6 +85,26 @@ public class ProgramareListDto
     /// </summary>
     public string? PacientCNP { get; set; }
 
+    /// <summary>
+    /// ✅ NEW - Vârsta pacientului calculată.
+    /// </summary>
+    public int PacientVarsta { get; set; }
+
+    /// <summary>
+    /// ✅ NEW - Motiv programare (ex: Control periodic, Dureri abdominale).
+    /// </summary>
+    public string? Motiv { get; set; }
+
+    /// <summary>
+    /// ✅ NEW - Diagnostic (dacă există din consultații anterioare).
+    /// </summary>
+    public string? Diagnostic { get; set; }
+
+    /// <summary>
+    /// ✅ NEW - Tratament actual pacient (pentru context medical).
+    /// </summary>
+    public string? TratamentActual { get; set; }
+
     // ==================== INFORMAȚII DOCTOR ====================
 
     /// <summary>
