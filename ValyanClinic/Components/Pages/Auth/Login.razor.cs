@@ -121,19 +121,25 @@ public partial class Login : ComponentBase
    await Task.Delay(100);
 
   // ✅ REDIRECT BAZAT PE ROL (cu forceLoad: true pentru a reîncărca complet)
-  string redirectUrl = result.Data.Rol.Equals("Receptioner", StringComparison.OrdinalIgnoreCase)
-       ? "/dashboard/receptioner"
-     : "/dashboard";
+  string redirectUrl = result.Data.Rol switch
+{
+    "Doctor" or "Medic" => "/dashboard/medic",
+    "Receptioner" => "/dashboard/receptioner",
+    "Administrator" or "Admin" => "/dashboard",
+    "Asistent" or "Asistent Medical" => "/dashboard",  // TODO: Create dashboard asistent
+    "Manager" => "/dashboard",  // TODO: Create dashboard manager
+    _ => "/dashboard"  // Default dashboard pentru roluri necunoscute
+};
 
-      Logger.LogInformation("🔄 Redirecting user {Username} with role {Rol} to {Url}", 
-         LoginModel.Username, result.Data.Rol, redirectUrl);
+    Logger.LogInformation("🔄 Redirecting user {Username} with role {Rol} to {Url}", 
+    LoginModel.Username, result.Data.Rol, redirectUrl);
 
-    // CRITICAL: forceLoad: true pentru a forța reîncărcarea completă a paginii
-   // Acest lucru asigură că:
-     // 1. Toate componentele se reinițializează
-  // 2. Header-ul încarcă datele utilizatorului
-            // 3. Dashboard-ul încarcă datele fresh
-          NavigationManager.NavigateTo(redirectUrl, forceLoad: true);
+// CRITICAL: forceLoad: true pentru a forța reîncărcarea completă a paginii
+// Acest lucru asigură că:
+// 1. Toate componentele se reinițializează
+// 2. Header-ul încarcă datele utilizatorului
+// 3. Dashboard-ul încarcă datele fresh
+   NavigationManager.NavigateTo(redirectUrl, forceLoad: true);
          }
      else
             {
@@ -228,7 +234,7 @@ public partial class Login : ComponentBase
     public string Username { get; set; } = string.Empty;
 
       [Required(ErrorMessage = "Parola este obligatorie")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Parola trebuie sa aiba intre 6 si 100 de caractere")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Parola trebuie sa aibe intre 6 si 100 de caractere")]
         public string Password { get; set; } = string.Empty;
 
         public bool RememberMe { get; set; } = false;

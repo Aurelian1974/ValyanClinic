@@ -195,13 +195,13 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // CRITICAL: Configurare optimizată connection pooling pentru Blazor Server
     var connectionStringBuilder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString)
     {
-        // Connection Pooling
+        // Connection Pooling - OPTIMIZED pentru startup rapid
         Pooling = true,
-        MinPoolSize = 5,
-        MaxPoolSize = 100,
+        MinPoolSize = 0,  // ✅ CHANGED: 0 pentru startup rapid (conexiuni create on-demand)
+        MaxPoolSize = 50, // ✅ CHANGED: 50 suficient pentru clinică mică-medie (era 100)
         
-        // Timeouts
-        ConnectTimeout = 30,
+        // Timeouts - OPTIMIZED
+        ConnectTimeout = 15, // ✅ CHANGED: 15 secunde (era 30)
         CommandTimeout = 30,
         
         // Connection Resilience
@@ -261,18 +261,23 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     builder.Services.AddScoped<IQueryCacheService, QueryCacheService>();
 
     // ========================================
-    // MEDIATR (CQRS)
+    // MEDIATR (CQRS) - OPTIMIZED
     // ========================================
     builder.Services.AddMediatR(cfg => 
     {
-        cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        // ✅ OPTIMIZED: Scanează doar assembly-urile necesare
         cfg.RegisterServicesFromAssemblyContaining<ValyanClinic.Application.Common.Results.Result>();
+        // Nu mai scanăm toate assembly-urile - doar Application layer unde sunt handlers
     });
 
     // ========================================
-    // AUTOMAPPER
+    // AUTOMAPPER - OPTIMIZED
     // ========================================
-    builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+    // ✅ OPTIMIZED: Scanează doar assembly-urile cu profiluri AutoMapper
+    builder.Services.AddAutoMapper(
+        typeof(ValyanClinic.Application.Common.Results.Result).Assembly // Application layer
+        // Adaugă aici alte assembly-uri cu profiluri AutoMapper dacă sunt necesare
+    );
 
     // ========================================
     // LAYOUT SERVICES
@@ -358,7 +363,7 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
       optimizedConnectionString, // FOLOSEȘTE connection string optimizat
      name: "database", 
   tags: new[] { "db", "sql", "sqlserver" },
-     timeout: TimeSpan.FromSeconds(3));
+     timeout: TimeSpan.FromSeconds(1)); // ✅ CHANGED: 1 secund (era 3) pentru startup mai rapid
 
   builder.Services.AddHealthChecksUI(opt =>
     {

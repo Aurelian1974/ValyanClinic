@@ -52,19 +52,27 @@ public partial class Home : ComponentBase
 
             if (user.Identity?.IsAuthenticated == true)
             {
- var role = user.FindFirst(ClaimTypes.Role)?.Value ?? "";
-       
-       Logger.LogInformation("🔍 Dashboard General - User role: {Role}", role);
+                var role = user.FindFirst(ClaimTypes.Role)?.Value ?? "";
+                
+                Logger.LogInformation("🔍 Dashboard General - User role: {Role}", role);
 
-       // ✅ Dacă utilizatorul este Receptioner, redirect către dashboard-ul lui
-                if (role.Equals("Receptioner", StringComparison.OrdinalIgnoreCase))
-     {
-  Logger.LogInformation("🔄 Receptioner detected on General Dashboard - Redirecting to /dashboard/receptioner");
-     NavigationManager.NavigateTo("/dashboard/receptioner", forceLoad: false);
-    return; // STOP aici, nu mai încărcăm restul
- }
+                // ✅ Redirect către dashboard specific rolului
+                string? redirectUrl = role switch
+                {
+                    "Receptioner" => "/dashboard/receptioner",
+                    "Doctor" or "Medic" => "/dashboard/medic",
+                    _ => null  // Permite accesul la dashboard general
+                };
 
-           Logger.LogInformation("✅ User role {Role} is allowed on General Dashboard", role);
+                if (!string.IsNullOrEmpty(redirectUrl))
+                {
+                    Logger.LogInformation("🔄 User role {Role} detected on General Dashboard - Redirecting to {Url}", 
+                        role, redirectUrl);
+                    NavigationManager.NavigateTo(redirectUrl, forceLoad: false);
+                    return; // STOP aici, nu mai încărcăm restul
+                }
+
+                Logger.LogInformation("✅ User role {Role} is allowed on General Dashboard", role);
             }
      }
         catch (Exception ex)
