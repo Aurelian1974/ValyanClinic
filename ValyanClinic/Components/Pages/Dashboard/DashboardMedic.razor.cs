@@ -6,6 +6,7 @@ using System.Security.Claims;
 using ValyanClinic.Application.Features.ProgramareManagement.Queries.GetProgramareList;
 using ValyanClinic.Application.Features.ProgramareManagement.DTOs;
 using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalById;
+using ValyanClinic.Components.Pages.Dashboard.Modals;
 
 namespace ValyanClinic.Components.Pages.Dashboard;
 
@@ -15,6 +16,9 @@ public partial class DashboardMedic : ComponentBase
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<DashboardMedic> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    // Modal reference
+    private ConsultatieModal? ConsultatieModalRef { get; set; }
 
     // State
     private string DoctorName { get; set; } = "Doctor";
@@ -228,10 +232,33 @@ public partial class DashboardMedic : ComponentBase
         NavigationManager.NavigateTo($"/pacienti/dosar/{pacientId}");
     }
 
-    private void StartConsultatie(Guid programareId)
+    private async Task StartConsultatie(Guid programareId)
     {
         Logger.LogInformation("[DashboardMedic] Starting consultatie: {ProgramareId}", programareId);
-        NavigationManager.NavigateTo($"/consultatie/{programareId}");
+        
+        // Gaseste programarea pentru a obtine PacientID
+        var programare = ToateProgramarile.FirstOrDefault(p => p.ProgramareID == programareId);
+        
+        if (programare != null && PersonalMedicalID.HasValue && ConsultatieModalRef != null)
+        {
+            // Seteaza parametrii modalului
+            ConsultatieModalRef.ProgramareID = programareId;
+            ConsultatieModalRef.PacientID = programare.PacientID;
+            ConsultatieModalRef.MedicID = PersonalMedicalID.Value;
+            
+            // Deschide modalul
+            await ConsultatieModalRef.Open();
+        }
+        else
+        {
+            Logger.LogWarning("[DashboardMedic] Cannot open consultatie modal - missing data");
+        }
+    }
+
+    private async Task OnConsultatieCompleted()
+    {
+        Logger.LogInformation("[DashboardMedic] Consultatie completed, refreshing data...");
+        await RefreshData();
     }
 
     private void CallPacient(string telefon)

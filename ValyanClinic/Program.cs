@@ -245,8 +245,10 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     builder.Services.AddScoped<IPozitieRepository, PozitieRepository>();
     builder.Services.AddScoped<ISpecializareRepository, SpecializareRepository>();
     builder.Services.AddScoped<IPacientRepository, PacientRepository>();
-  builder.Services.AddScoped<IUtilizatorRepository, UtilizatorRepository>();
-    builder.Services.AddScoped<IProgramareRepository, ProgramareRepository>(); // ✅ NOU - Programari
+    builder.Services.AddScoped<IUtilizatorRepository, UtilizatorRepository>();
+    builder.Services.AddScoped<IProgramareRepository, ProgramareRepository>();
+    builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository, 
+                                ValyanClinic.Infrastructure.Repositories.ConsultatieRepository>(); // ✅ NOU - Consultatii
     
     // Phase1 Settings Repositories
     builder.Services.AddScoped<ISystemSettingsRepository, ValyanClinic.Infrastructure.Repositories.Settings.SystemSettingsRepository>();
