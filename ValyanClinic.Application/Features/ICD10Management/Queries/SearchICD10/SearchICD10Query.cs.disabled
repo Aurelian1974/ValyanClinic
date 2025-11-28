@@ -1,0 +1,36 @@
+﻿using MediatR;
+using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Application.Features.ICD10Management.DTOs;
+
+namespace ValyanClinic.Application.Features.ICD10Management.Queries.SearchICD10;
+
+/// <summary>
+/// Query pentru căutarea codurilor ICD-10 cu autocomplete
+/// </summary>
+public class SearchICD10Query : IRequest<Result<List<ICD10SearchResultDto>>>
+{
+    /// <summary>
+    /// Termenul de căutare (cod sau descriere)
+    /// </summary>
+    public string SearchTerm { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Filtru opțional pe categorie (ex: "Cardiovascular")
+    /// </summary>
+    public string? Category { get; set; }
+
+    /// <summary>
+    /// Doar coduri comune (IsCommon = true)
+    /// </summary>
+    public bool OnlyCommon { get; set; } = false;
+
+    /// <summary>
+    /// Număr maxim de rezultate
+    /// </summary>
+    public int MaxResults { get; set; } = 20;
+
+    /// <summary>
+    /// Doar coduri finale (IsLeafNode = true, pot fi folosite în diagnostic)
+    /// </summary>
+    public bool OnlyLeafNodes { get; set; } = true;
+}

@@ -1,5 +1,6 @@
 ﻿@rendermode InteractiveServer
 @using Syncfusion.Blazor.Navigations
+@using Microsoft.AspNetCore.Components.Authorization
 
 <div class="sidebar @(isCollapsed ? "collapsed" : "")" id="main-sidebar">
     <div class="sidebar-header">
@@ -19,15 +20,15 @@
     </div>
 
     <div class="nav-menu">
-        @* Home - Level 0 *@
+        @* Home - Level 0 - ✅ FIX: Click handler cu styling complet pentru link *@
         <div class="nav-item">
-            <a href="/" class="nav-link" title="Acasa">
+            <div class="nav-link" @onclick="NavigateToHome" @onclick:stopPropagation="true" style="cursor: pointer;" title="Acasa">
                 <i class="fas fa-home"></i>
                 @if (!isCollapsed)
                 {
                     <span>Acasa</span>
                 }
-            </a>
+            </div>
         </div>
 
         @* Pacienti - Level 1 (Parent) *@

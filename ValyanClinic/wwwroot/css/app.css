@@ -1,6 +1,7 @@
 ﻿@import url('variables.css');
 @import url('base.css');
 @import url('modal-base.css');
+@import url('icd10-autocomplete.css'); /* ICD-10 Autocomplete Component */
 
 /* Sidebar width management - CRITICAL for layout */
 :root {
@@ -79,7 +80,7 @@ html:has(#main-sidebar.collapsed) {
 /* ========================================
    ACTIVE VIEW BUTTON - Focus state
    ======================================== */
-.e-schedule .e-schedule-toolbar .e-toolbar-items .e-views .e-btn:focus {
+.e-schedule .e-schedule-toolbar .e-toolbar-items .e-btn:focus {
     outline: none !important;
     box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2) !important;
 }

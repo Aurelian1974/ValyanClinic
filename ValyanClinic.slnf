@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "path": "ValyanClinic.sln",
+    "projects": [
+      "ValyanClinic\\ValyanClinic.csproj",
+      "ValyanClinic.Domain\\ValyanClinic.Domain.csproj",
+      "ValyanClinic.Application\\ValyanClinic.Application.csproj",
+      "ValyanClinic.Infrastructure\\ValyanClinic.Infrastructure.csproj"
+    ]
+  }
+}

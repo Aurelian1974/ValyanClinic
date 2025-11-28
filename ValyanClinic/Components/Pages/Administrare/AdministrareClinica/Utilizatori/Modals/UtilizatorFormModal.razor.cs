@@ -297,32 +297,33 @@ await InvokeAsync(StateHasChanged);
 
 if (Model.IsEditMode)
             {
-    var command = new UpdateUtilizatorCommand
-            {
-  UtilizatorID = Model.UtilizatorID!.Value,
-               Username = Model.Username,
-             Email = Model.Email,
-         Rol = Model.Rol,
-        EsteActiv = Model.EsteActiv,
-      ModificatDe = "CurrentUser" // TODO: Get from auth context
-       };
+                var command = new UpdateUtilizatorCommand
+                {
+                    UtilizatorID = Model.UtilizatorID!.Value,
+                    Username = Model.Username,
+                    Email = Model.Email,
+                    Rol = Model.Rol,
+                    EsteActiv = Model.EsteActiv,
+                    Password = string.IsNullOrWhiteSpace(Model.Password) ? null : Model.Password, // ✅ ADDED: Send password if provided
+                    ModificatDe = "CurrentUser" // TODO: Get from auth context
+                };
 
-           var result = await Mediator.Send(command);
+                var result = await Mediator.Send(command);
 
                 if (_disposed) return;
 
-    if (result.IsSuccess)
-    {
-Logger.LogInformation("Utilizator updated successfully: {UtilizatorID}", Model.UtilizatorID);
-     await OnUtilizatorSaved.InvokeAsync();
-             await Close();
-             }
+                if (result.IsSuccess)
+                {
+                    Logger.LogInformation("Utilizator updated successfully: {UtilizatorID}", Model.UtilizatorID);
+                    await OnUtilizatorSaved.InvokeAsync();
+                    await Close();
+                }
                 else
-  {
-        HasError = true;
-         ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare la actualizare" });
-       Logger.LogWarning("Failed to update: {Error}", ErrorMessage);
-     }
+                {
+                    HasError = true;
+                    ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare la actualizare" });
+                    Logger.LogWarning("Failed to update: {Error}", ErrorMessage);
+                }
             }
  else
             {

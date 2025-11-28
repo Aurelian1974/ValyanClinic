@@ -118,28 +118,25 @@ public partial class Login : ComponentBase
             }
 
     // ✅ WAIT pentru ca authentication state să se propage
-   await Task.Delay(100);
+   await Task.Delay(50); // Redus de la 100ms la 50ms
 
-  // ✅ REDIRECT BAZAT PE ROL (cu forceLoad: true pentru a reîncărca complet)
+  // ✅ REDIRECT BAZAT PE ROL (fara forceLoad pentru experienta mai smooth)
   string redirectUrl = result.Data.Rol switch
 {
     "Doctor" or "Medic" => "/dashboard/medic",
     "Receptioner" => "/dashboard/receptioner",
     "Administrator" or "Admin" => "/dashboard",
-    "Asistent" or "Asistent Medical" => "/dashboard",  // TODO: Create dashboard asistent
-    "Manager" => "/dashboard",  // TODO: Create dashboard manager
-    _ => "/dashboard"  // Default dashboard pentru roluri necunoscute
+    "Asistent" or "Asistent Medical" => "/dashboard",
+    "Manager" => "/dashboard",
+    _ => "/dashboard"
 };
 
     Logger.LogInformation("🔄 Redirecting user {Username} with role {Rol} to {Url}", 
     LoginModel.Username, result.Data.Rol, redirectUrl);
 
-// CRITICAL: forceLoad: true pentru a forța reîncărcarea completă a paginii
-// Acest lucru asigură că:
-// 1. Toate componentele se reinițializează
-// 2. Header-ul încarcă datele utilizatorului
-// 3. Dashboard-ul încarcă datele fresh
-   NavigationManager.NavigateTo(redirectUrl, forceLoad: true);
+// ✅ OPTIMIZED: forceLoad: false pentru navigare smooth
+// Blazor va gestiona starea corect fără reîncărcare completă
+   NavigationManager.NavigateTo(redirectUrl, forceLoad: false);
          }
      else
             {

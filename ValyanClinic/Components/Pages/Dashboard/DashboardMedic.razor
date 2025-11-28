@@ -78,26 +78,25 @@
                                     <span class="pacient-varsta">@programare.PacientVarsta ani</span>
                                 </div>
                                 <div class="programare-details">
-                                    <div class="detail-row">
-                                        <span class="detail-label">Motiv:</span>
-                                        <span class="detail-value">@programare.Motiv</span>
-                                    </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Diagnostic:</span>
-                                        <span class="detail-value">@programare.Diagnostic</span>
-                                    </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Telefon:</span>
-                                        <a href="tel:@programare.PacientTelefon" class="detail-value link">
-                                            <i class="fas fa-phone"></i>
-                                            @programare.PacientTelefon
-                                        </a>
-                                    </div>
+                                    @if (!string.IsNullOrEmpty(programare.TipProgramare))
+                                    {
+                                        <div class="detail-row">
+                                            <span class="detail-label">Tip:</span>
+                                            <span class="detail-value">@programare.TipProgramare</span>
+                                        </div>
+                                    }
                                     @if (!string.IsNullOrEmpty(programare.TratamentActual))
                                     {
                                         <div class="detail-row">
-                                            <span class="detail-label">Tratament:</span>
+                                            <span class="detail-label">Tratament actual:</span>
                                             <span class="detail-value">@programare.TratamentActual</span>
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(programare.Observatii))
+                                    {
+                                        <div class="detail-row">
+                                            <span class="detail-label">Observatii:</span>
+                                            <span class="detail-value">@programare.Observatii</span>
                                         </div>
                                     }
                                 </div>
@@ -114,12 +113,6 @@
                                         title="Incepe consultatie">
                                     <i class="fas fa-stethoscope"></i>
                                     <span>Consulta</span>
-                                </button>
-                                <button class="btn-action btn-apel" 
-                                        @onclick="() => CallPacient(programare.PacientTelefon)"
-                                        title="Apeleaza pacient">
-                                    <i class="fas fa-phone"></i>
-                                    <span>Apel</span>
                                 </button>
                             </div>
                         </div>

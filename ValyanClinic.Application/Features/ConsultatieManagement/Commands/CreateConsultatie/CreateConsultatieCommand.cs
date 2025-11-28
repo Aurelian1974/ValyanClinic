@@ -84,7 +84,8 @@ public class CreateConsultatieCommand : IRequest<Result<Guid>>
     public string? DiagnosticPozitiv { get; set; }
     public string? DiagnosticDiferential { get; set; }
     public string? DiagnosticEtiologic { get; set; }
-    public string? CoduriICD10 { get; set; }
+    public string? CoduriICD10 { get; set; } // Cod principal
+    public string? CoduriICD10Secundare { get; set; } // Coduri secundare (comma-separated)
 
     // ==================== TRATAMENT ====================
     public string? TratamentMedicamentos { get; set; }

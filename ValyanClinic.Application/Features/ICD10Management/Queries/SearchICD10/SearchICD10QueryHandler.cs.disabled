@@ -1,0 +1,65 @@
+﻿using MediatR;
+using Microsoft.Extensions.Logging;
+using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Application.Features.ICD10Management.DTOs;
+using ValyanClinic.Infrastructure.Repositories.Interfaces;
+
+namespace ValyanClinic.Application.Features.ICD10Management.Queries.SearchICD10;
+
+/// <summary>
+/// Handler pentru SearchICD10Query
+/// </summary>
+public class SearchICD10QueryHandler : IRequestHandler<SearchICD10Query, Result<List<ICD10SearchResultDto>>>
+{
+    private readonly IICD10Repository _icd10Repository;
+    private readonly ILogger<SearchICD10QueryHandler> _logger;
+
+    public SearchICD10QueryHandler(
+        IICD10Repository icd10Repository,
+        ILogger<SearchICD10QueryHandler> logger)
+    {
+        _icd10Repository = icd10Repository;
+        _logger = logger;
+    }
+
+    public async Task<Result<List<ICD10SearchResultDto>>> Handle(
+        SearchICD10Query request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "Searching ICD-10 codes: SearchTerm={SearchTerm}, Category={Category}, OnlyCommon={OnlyCommon}",
+                request.SearchTerm, request.Category, request.OnlyCommon);
+
+            // Validare
+            if (string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                return Result<List<ICD10SearchResultDto>>.Failure("Termenul de căutare nu poate fi gol.");
+            }
+
+            if (request.SearchTerm.Length < 2)
+            {
+                return Result<List<ICD10SearchResultDto>>.Failure("Termenul de căutare trebuie să aibă minim 2 caractere.");
+            }
+
+            // Căutare în repository
+            var results = await _icd10Repository.SearchAsync(
+                request.SearchTerm,
+                request.Category,
+                request.OnlyCommon,
+                request.OnlyLeafNodes,
+                request.MaxResults,
+                cancellationToken);
+
+            _logger.LogInformation("Found {Count} ICD-10 codes", results.Count);
+
+            return Result<List<ICD10SearchResultDto>>.Success(results);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error searching ICD-10 codes");
+            return Result<List<ICD10SearchResultDto>>.Failure($"Eroare la căutarea codurilor ICD-10: {ex.Message}");
+        }
+    }
+}

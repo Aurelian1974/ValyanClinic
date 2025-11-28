@@ -8,7 +8,12 @@ public record UpdateUtilizatorCommand : IRequest<Result<bool>>
     public Guid UtilizatorID { get; init; }
     public string Username { get; init; } = string.Empty;
     public string Email { get; init; } = string.Empty;
-  public string Rol { get; init; } = string.Empty;
- public bool EsteActiv { get; init; }
+    public string Rol { get; init; } = string.Empty;
+    public bool EsteActiv { get; init; }
     public string ModificatDe { get; init; } = "System";
+    
+    /// <summary>
+    /// ✅ ADDED: Password (optional) - dacă e null/empty, parola NU se schimbă
+    /// </summary>
+    public string? Password { get; init; }
 }

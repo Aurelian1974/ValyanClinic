@@ -1,0 +1,14 @@
+﻿/* ========================================
+   ICD10 Autocomplete Component - Scoped CSS
+   
+   NOTE: Acest component folosește CSS global din:
+   wwwroot/css/icd10-autocomplete.css
+   
+   Acest fișier există pentru consistență cu pattern-ul
+   de design al proiectului (toate componentele au .razor.css)
+   
+   Orice stil specific acestei instanțe poate fi adăugat aici.
+   ======================================== */
+
+/* Placeholder pentru stiluri specifice component-ului
+   Stilurile globale sunt în wwwroot/css/icd10-autocomplete.css */

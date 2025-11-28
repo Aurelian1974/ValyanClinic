@@ -1,11 +1,17 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
+using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace ValyanClinic.Components.Layout;
 
 public partial class NavMenu : ComponentBase
 {
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private ILogger<NavMenu> Logger { get; set; } = default!;
     
     private bool isCollapsed = false;
     private int clickCount = 0;
@@ -20,11 +26,103 @@ public partial class NavMenu : ComponentBase
     private bool isRapoarteExpanded = false;
     private bool isMonitorizareExpanded = false;
 
+    // ✅ Cached user role - STATIC pentru a persista între instanțe
+    private static string? _sharedUserRole = null;
+    private static DateTime _lastRoleCheckTime = DateTime.MinValue;
+    private static readonly TimeSpan RoleCacheExpiration = TimeSpan.FromMinutes(5);
+    
+    private bool _instanceRoleChecked = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // ✅ Încarcă rolul utilizatorului
+        await LoadUserRole();
+    }
+
+    private async Task LoadUserRole()
+    {
+        Logger.LogInformation("[NavMenu] LoadUserRole() START - _sharedUserRole: {UserRole}, Age: {Age}", 
+            _sharedUserRole ?? "null", DateTime.Now - _lastRoleCheckTime);
+        
+        // ✅ Dacă avem deja rolul în cache și nu a expirat, folosește-l
+        if (!string.IsNullOrEmpty(_sharedUserRole) && 
+            (DateTime.Now - _lastRoleCheckTime) < RoleCacheExpiration)
+        {
+            Logger.LogInformation("[NavMenu] LoadUserRole() - Using cached role: {Role}", _sharedUserRole);
+            _instanceRoleChecked = true;
+            return;
+        }
+        
+        try
+        {
+            Logger.LogInformation("[NavMenu] LoadUserRole() - Getting authentication state...");
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            
+            Logger.LogInformation("[NavMenu] LoadUserRole() - IsAuthenticated: {IsAuth}", user.Identity?.IsAuthenticated);
+            
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                var roleClaim = user.FindFirst(ClaimTypes.Role);
+                _sharedUserRole = roleClaim?.Value;
+                _lastRoleCheckTime = DateTime.Now;
+                
+                Logger.LogInformation("[NavMenu] LoadUserRole() - Role claim found: {HasClaim}, Value: {Role}", 
+                    roleClaim != null, _sharedUserRole ?? "null");
+            }
+            else
+            {
+                Logger.LogWarning("[NavMenu] LoadUserRole() - User not authenticated, keeping existing cached role");
+                // ❌ NU resetăm _sharedUserRole la null când autentificarea temporar nu e disponibilă
+            }
+            
+            _instanceRoleChecked = true;
+            Logger.LogInformation("[NavMenu] LoadUserRole() END - _sharedUserRole: {Role}", _sharedUserRole ?? "null");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[NavMenu] LoadUserRole() - Error loading user role");
+            _instanceRoleChecked = true;
+            // ❌ NU resetăm _sharedUserRole la null în caz de eroare
+        }
+    }
+
+    // ✅ FIX: Navighează la dashboard când user-ul apasă "Acasă"
+    private async Task NavigateToHome()
+    {
+        Logger.LogInformation("[NavMenu] Home button clicked");
+        
+        // ✅ Re-verifică rolul (dar nu resetează cache-ul static)
+        await LoadUserRole();
+        
+        var dashboardUrl = "/dashboard"; // Default
+        
+        if (!string.IsNullOrEmpty(_sharedUserRole))
+        {
+            dashboardUrl = _sharedUserRole switch
+            {
+                "Doctor" or "Medic" => "/dashboard/medic",
+                "Receptioner" => "/dashboard/receptioner",
+                "Administrator" or "Admin" => "/dashboard",
+                "Asistent" or "Asistent Medical" => "/dashboard",
+                "Manager" => "/dashboard",
+                _ => "/dashboard"
+            };
+        }
+        else
+        {
+            Logger.LogWarning("[NavMenu] Role is still null after LoadUserRole, using default dashboard");
+        }
+        
+        Logger.LogInformation("[NavMenu] Navigating to {DashboardUrl} (role: {Role})", dashboardUrl, _sharedUserRole ?? "null");
+        NavigationManager.NavigateTo(dashboardUrl, forceLoad: false);
+    }
+
     private async void HandleToggle()
     {
         clickCount++;
         isCollapsed = !isCollapsed;
-        Console.WriteLine($"NavMenu: Button clicked! Click: {clickCount}, Collapsed: {isCollapsed}");
+        Logger.LogDebug("[NavMenu] Sidebar toggle - Click: {ClickCount}, Collapsed: {IsCollapsed}", clickCount, isCollapsed);
         
         // When collapsing sidebar, collapse all expanded sections
         if (isCollapsed)
@@ -125,11 +223,10 @@ public partial class NavMenu : ComponentBase
         {
             // Use global JavaScript function
             await JSRuntime.InvokeVoidAsync("updateSidebarWidth", isCollapsed);
-            Console.WriteLine($"NavMenu: Updated sidebar width via JS function. Collapsed: {isCollapsed}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error updating sidebar width: {ex.Message}");
+            Logger.LogError(ex, "[NavMenu] Error updating sidebar width");
         }
     }
 
@@ -138,21 +235,19 @@ public partial class NavMenu : ComponentBase
         try
         {
             var savedState = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "sidebar-collapsed");
-            Console.WriteLine($"NavMenu: Raw localStorage value: '{savedState}'");
             
-            // Compare case-insensitive and handle both "true"/"True" and boolean
             if (string.IsNullOrEmpty(savedState))
             {
                 return false;
             }
             
             var result = savedState.Equals("true", StringComparison.OrdinalIgnoreCase);
-            Console.WriteLine($"NavMenu: Parsed collapsed state: {result}");
+            Logger.LogDebug("[NavMenu] Loaded collapsed state: {IsCollapsed}", result);
             return result;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading collapsed state: {ex.Message}");
+            Logger.LogError(ex, "[NavMenu] Error loading collapsed state");
             return false;
         }
     }
@@ -163,7 +258,6 @@ public partial class NavMenu : ComponentBase
         {
             // Load saved state from localStorage
             isCollapsed = await LoadCollapsedState();
-            Console.WriteLine($"NavMenu: OnAfterRenderAsync - Setting collapsed to: {isCollapsed}");
             
             // Force update sidebar width to match loaded state
             await UpdateSidebarWidth();

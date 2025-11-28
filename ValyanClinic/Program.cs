@@ -72,83 +72,93 @@ try
     builder.Services.AddScoped(sp =>
     {
         var navigationManager = sp.GetRequiredService<NavigationManager>();
-     return new HttpClient
-   {
+        return new HttpClient
+        {
             BaseAddress = new Uri(navigationManager.BaseUri)
         };
     });
 
     // ========================================
-    // AUTHENTICATION & AUTHORIZATION
+    // AUTHENTICATION & AUTHORIZATION - Session Cookie STRICT
     // ========================================
     
     // ASP.NET Core Authentication Services (REQUIRED for AuthorizeRouteView)
     builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-   .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-   {
-   options.Cookie.Name = "ValyanClinic.Auth";
+        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+        {
+            options.Cookie.Name = "ValyanClinic.Auth";
             options.LoginPath = "/login";
-  options.LogoutPath = "/logout";
-        options.AccessDeniedPath = "/access-denied";
-  
-   // ✅ PRODUCTION MODE: Session timeout
-            // Cookie-ul expire după 30 minute de inactivitate
-      options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        options.SlidingExpiration = true; // Resetează timeout-ul la fiecare request
-      
-     // ✅ Cookie settings - Browser session cookie
-       options.Cookie.IsEssential = true;
+            options.LogoutPath = "/logout";
+            options.AccessDeniedPath = "/access-denied";
+            
+            // ✅ SESSION COOKIE CONFIGURATION
+            // Cookie-ul se șterge AUTOMAT când închizi browser-ul (TOATE ferestrele)
+            options.ExpireTimeSpan = TimeSpan.FromHours(8); // Maximum session duration
+            options.SlidingExpiration = false; // ✅ FIX: NU reseta timeout - session strict
+            
+            // ✅ Cookie settings - TRUE session cookie
+            options.Cookie.IsEssential = true;
             options.Cookie.HttpOnly = true; // Nu poate fi accesat din JavaScript
-         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             options.Cookie.SameSite = SameSiteMode.Lax;
-     
-            // ✅ CRITICAL: MaxAge = null pentru session cookie
-// Cookie-ul nu are Max-Age header → browser-ul decide când să-l șteargă
+            
+            // ✅ CRITICAL: MaxAge = null pentru TRUE session cookie
+            // Cookie-ul nu are Max-Age header → browser-ul îl șterge la închiderea completă
             options.Cookie.MaxAge = null;
-        
-      // ✅ Events pentru validare și logging
+            
+            // ✅ Events pentru validare și logging
             options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
-         {
+            {
                 OnSigningIn = context =>
                 {
-        var logger = context.HttpContext.RequestServices
-       .GetRequiredService<ILogger<Program>>();
-     
- logger.LogInformation("========== User Login ==========");
-       
-          if (context.Properties != null)
-      {
-           // ✅ Force session-only cookie
- context.Properties.IsPersistent = false;
-           context.Properties.ExpiresUtc = null;
-             context.Properties.AllowRefresh = true; // Allow sliding expiration
-         
-           logger.LogInformation("Session Properties:");
-    logger.LogInformation("  IsPersistent: {IsPersistent}", context.Properties.IsPersistent);
-        logger.LogInformation("  ExpiresUtc: {ExpiresUtc}", context.Properties.ExpiresUtc?.ToString() ?? "NULL");
-        logger.LogInformation("  AllowRefresh: {AllowRefresh}", context.Properties.AllowRefresh);
-                 }
-     
-   logger.LogInformation("================================");
+                    var logger = context.HttpContext.RequestServices
+                        .GetRequiredService<ILogger<Program>>();
+                    
+                    logger.LogInformation("========== SESSION COOKIE CREATED ==========");
+                    
+                    if (context.Properties != null)
+                    {
+                        // ✅ Force session-only cookie - STRICT mode
+                        context.Properties.IsPersistent = false;
+                        context.Properties.ExpiresUtc = null; // NU seta expirare - se șterge când browser se închide
+                        context.Properties.AllowRefresh = false; // NU permite refresh automat
+                        
+                        logger.LogInformation("Session Properties:");
+                        logger.LogInformation("  IsPersistent: FALSE (session-only)");
+                        logger.LogInformation("  ExpiresUtc: NULL (no expiration - will expire when browser closes)");
+                        logger.LogInformation("  AllowRefresh: FALSE (strict timeout)");
+                        logger.LogInformation("  IssuedUtc: {IssuedUtc} (Romania timezone)", context.Properties.IssuedUtc);
+                        logger.LogInformation("Cookie will be deleted when ALL browser windows are closed");
+                    }
+                    
+                    logger.LogInformation("============================================");
                     return Task.CompletedTask;
- },
-    OnValidatePrincipal = async context =>
-      {
-       var logger = context.HttpContext.RequestServices
-      .GetRequiredService<ILogger<Program>>();
-     
-      // Verificare expirare session (30 minute cu sliding expiration)
-      if (context.Properties?.ExpiresUtc.HasValue == true)
-  {
-             if (context.Properties.ExpiresUtc.Value < DateTimeOffset.UtcNow)
- {
-    logger.LogWarning("Session EXPIRED! Forcing logout...");
-   context.RejectPrincipal();
-         await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-          }
- }
-     }
-    };
+                },
+                OnValidatePrincipal = async context =>
+                {
+                    var logger = context.HttpContext.RequestServices
+                        .GetRequiredService<ILogger<Program>>();
+                    
+                    // Verificare expirare session (8 ore STRICT - fără sliding)
+                    // ✅ CORECTARE: Folosim ora locală România, nu UTC
+                    if (context.Properties?.IssuedUtc.HasValue == true)
+                    {
+                        // Convertim IssuedUtc la ora României pentru comparație corectă
+                        var romaniaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time");
+                        var issuedLocalTime = TimeZoneInfo.ConvertTimeFromUtc(context.Properties.IssuedUtc.Value.UtcDateTime, romaniaTimeZone);
+                        var currentLocalTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, romaniaTimeZone);
+                        
+                        var elapsed = currentLocalTime - issuedLocalTime;
+                        if (elapsed > TimeSpan.FromHours(8))
+                        {
+                            logger.LogWarning("Session EXPIRED after 8 hours! Issued: {IssuedTime} (Romania), Current: {CurrentTime} (Romania)", 
+                                issuedLocalTime, currentLocalTime);
+                            context.RejectPrincipal();
+                            await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                        }
+                    }
+                }
+            };
         });
     
     // Authorization Services
@@ -249,6 +259,7 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     builder.Services.AddScoped<IProgramareRepository, ProgramareRepository>();
     builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository, 
                                 ValyanClinic.Infrastructure.Repositories.ConsultatieRepository>(); // ✅ NOU - Consultatii
+    builder.Services.AddScoped<IICD10Repository, ICD10Repository>(); // ✅ NOU - ICD10 Autocomplete
     
     // Phase1 Settings Repositories
     builder.Services.AddScoped<ISystemSettingsRepository, ValyanClinic.Infrastructure.Repositories.Settings.SystemSettingsRepository>();

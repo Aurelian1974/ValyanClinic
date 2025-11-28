@@ -1,0 +1,104 @@
+﻿@rendermode InteractiveServer
+@using ValyanClinic.Application.Features.ICD10Management.DTOs
+
+<div class="icd10-autocomplete-wrapper">
+    <div class="icd10-input-group @(IsOpen ? "open" : "")">
+        <label class="icd10-label">
+            @Label
+            @if (IsRequired)
+            {
+                <span class="required-mark">*</span>
+            }
+        </label>
+
+        <div class="icd10-search-box">
+            <input type="text"
+                   class="icd10-input"
+                   placeholder="@Placeholder"
+                   value="@SearchText"
+                   @oninput="HandleSearchInput"
+                   @onfocus="HandleFocus"
+                   @onblur="HandleBlur"
+                   autocomplete="off" />
+
+            @if (IsSearching)
+            {
+                <div class="icd10-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(SearchText))
+            {
+                <button type="button" class="icd10-clear" @onclick="ClearSearch">
+                    <i class="fas fa-times"></i>
+                </button>
+            }
+        </div>
+
+        @if (IsOpen && Results.Any())
+        {
+            <div class="icd10-dropdown">
+                <div class="icd10-results">
+                    @foreach (var result in Results.Take(MaxResults))
+                    {
+                        <div class="icd10-result-item @(result == SelectedResult ? "selected" : "")"
+                             @onclick="() => SelectResult(result)"
+                             @onmouseenter="() => SelectedResult = result">
+
+                            <div class="icd10-result-header">
+                                <span class="icd10-code">@result.Code</span>
+                                @if (result.IsCommon)
+                                {
+                                    <span class="icd10-badge common">
+                                        <i class="fas fa-star"></i> Frecvent
+                                    </span>
+                                }
+                                @if (!string.IsNullOrEmpty(result.Severity))
+                                {
+                                    <span class="icd10-badge severity severity-@result.Severity?.ToLower()">
+                                        @GetSeverityText(result.Severity)
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="icd10-result-description">
+                                @HighlightSearchTerm(result.ShortDescription, SearchText)
+                            </div>
+
+                            <div class="icd10-result-footer">
+                                <span class="icd10-category">
+                                    @result.CategoryIcon @result.Category
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (Results.Count > MaxResults)
+                {
+                    <div class="icd10-footer">
+                        <small>Afișate @MaxResults din @Results.Count rezultate. Refinează căutarea pentru mai multă precizie.</small>
+                    </div>
+                }
+            </div>
+        }
+        else if (IsOpen && !IsSearching && !string.IsNullOrEmpty(SearchText) && !Results.Any())
+        {
+            <div class="icd10-dropdown">
+                <div class="icd10-no-results">
+                    <i class="fas fa-search"></i>
+                    <p>Nu s-au găsit rezultate pentru "<strong>@SearchText</strong>"</p>
+                    <small>Încearcă un alt termen de căutare sau cod ICD-10</small>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(HelpText))
+        {
+            <small class="icd10-help-text">
+                <i class="fas fa-info-circle"></i>
+                @HelpText
+            </small>
+        }
+    </div>
+</div>

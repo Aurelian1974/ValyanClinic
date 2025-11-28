@@ -1,0 +1,371 @@
+﻿@using MediatR
+@using ValyanClinic.Application.Features.ICD10Management.Queries.SearchICD10
+@using ValyanClinic.Application.Features.ICD10Management.DTOs
+@inject IMediator Mediator
+@inject ILogger<ICD10AutocompleteComponent> Logger
+
+<div class="icd10-autocomplete">
+    <div class="autocomplete-wrapper">
+        <label class="form-label">
+            <i class="fas fa-file-medical"></i>
+            @Label
+            @if (IsRequired)
+            {
+                <span class="text-danger">*</span>
+            }
+        </label>
+        
+        <div class="input-group">
+            <input type="text"
+                   class="form-control @(HasError ? "is-invalid" : "")"
+                   placeholder="@Placeholder"
+                   @bind="SearchText"
+                   @bind:event="oninput"
+                   @onkeyup="HandleKeyUp"
+                   @onfocus="HandleFocus"
+                   @onblur="HandleBlur"
+                   disabled="@IsDisabled" />
+            
+            @if (!string.IsNullOrEmpty(SelectedCode))
+            {
+                <button class="btn btn-outline-secondary" type="button" @onclick="ClearSelection">
+                    <i class="fas fa-times"></i>
+                </button>
+            }
+            
+            @if (IsSearching)
+            {
+                <span class="input-group-text">
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                </span>
+            }
+        </div>
+        
+        @if (HasError && !string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="invalid-feedback d-block">
+                @ErrorMessage
+            </div>
+        }
+        
+        <!-- Dropdown Results -->
+        @if (ShowResults && Results.Any())
+        {
+            <div class="autocomplete-dropdown">
+                <div class="autocomplete-results">
+                    @foreach (var result in Results)
+                    {
+                        <div class="autocomplete-item @(result.Code == HighlightedCode ? "highlighted" : "")"
+                             @onclick="() => SelectResult(result)"
+                             @onmouseenter="() => HighlightedCode = result.Code">
+                            
+                            <div class="item-header">
+                                <span class="item-code">@result.Code</span>
+                                @if (result.IsCommon)
+                                {
+                                    <span class="badge badge-primary">Frecvent</span>
+                                }
+                                <span class="item-category">@result.CategoryIcon @result.Category</span>
+                            </div>
+                            
+                            <div class="item-description">
+                                @HighlightSearchTerm(result.ShortDescription, SearchText)
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(result.Severity))
+                            {
+                                <div class="item-severity">
+                                    <span class="severity-badge severity-@result.Severity?.ToLower()">
+                                        @GetSeverityDisplay(result.Severity)
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                
+                <div class="autocomplete-footer">
+                    <small class="text-muted">
+                        @Results.Count rezultate găsite
+                        @if (OnlyCommon)
+                        {
+                            <span>• Doar coduri frecvente</span>
+                        }
+                    </small>
+                </div>
+            </div>
+        }
+        
+        <!-- Selected Code Display -->
+        @if (!string.IsNullOrEmpty(SelectedCode) && SelectedResult != null)
+        {
+            <div class="selected-code-display">
+                <div class="selected-header">
+                    <strong>@SelectedResult.Code</strong>
+                    <span class="selected-category">@SelectedResult.CategoryIcon @SelectedResult.Category</span>
+                </div>
+                <div class="selected-description">
+                    @SelectedResult.ShortDescription
+                </div>
+                @if (!string.IsNullOrEmpty(SelectedResult.LongDescription))
+                {
+                    <div class="selected-long-desc">
+                        <small class="text-muted">@SelectedResult.LongDescription</small>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    // Parameters
+    [Parameter] public string Label { get; set; } = "Cod ICD-10";
+    [Parameter] public string Placeholder { get; set; } = "Caută cod sau diagnostic (ex: I20, diabet, pneumonie)";
+    [Parameter] public string? SelectedCode { get; set; }
+    [Parameter] public EventCallback<string?> SelectedCodeChanged { get; set; }
+    [Parameter] public EventCallback<ICD10SearchResultDto?> OnCodeSelected { get; set; }
+    [Parameter] public string? Category { get; set; }
+    [Parameter] public bool OnlyCommon { get; set; } = false;
+    [Parameter] public bool IsRequired { get; set; } = false;
+    [Parameter] public bool IsDisabled { get; set; } = false;
+    [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public int MaxResults { get; set; } = 20;
+    [Parameter] public int MinSearchLength { get; set; } = 2;
+    [Parameter] public int DebounceMs { get; set; } = 300;
+
+    // State
+    private string SearchText { get; set; } = string.Empty;
+    private List<ICD10SearchResultDto> Results { get; set; } = new();
+    private ICD10SearchResultDto? SelectedResult { get; set; }
+    private string? HighlightedCode { get; set; }
+    private bool ShowResults { get; set; } = false;
+    private bool IsSearching { get; set; } = false;
+    private bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+    
+    private Timer? _debounceTimer;
+    private bool _isFocused = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Load selected code details if provided
+        if (!string.IsNullOrEmpty(SelectedCode) && SelectedResult == null)
+        {
+            await LoadSelectedCode(SelectedCode);
+        }
+    }
+
+    private async Task HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "ArrowDown" || e.Key == "ArrowUp")
+        {
+            HandleArrowKeys(e.Key);
+            return;
+        }
+
+        if (e.Key == "Enter" && !string.IsNullOrEmpty(HighlightedCode))
+        {
+            var highlighted = Results.FirstOrDefault(r => r.Code == HighlightedCode);
+            if (highlighted != null)
+            {
+                await SelectResult(highlighted);
+            }
+            return;
+        }
+
+        if (e.Key == "Escape")
+        {
+            ShowResults = false;
+            return;
+        }
+
+        // Debounce search
+        _debounceTimer?.Dispose();
+        _debounceTimer = new Timer(async _ =>
+        {
+            await InvokeAsync(async () =>
+            {
+                await PerformSearch();
+            });
+        }, null, DebounceMs, Timeout.Infinite);
+    }
+
+    private void HandleArrowKeys(string key)
+    {
+        if (!Results.Any()) return;
+
+        var currentIndex = Results.FindIndex(r => r.Code == HighlightedCode);
+
+        if (key == "ArrowDown")
+        {
+            currentIndex = currentIndex < Results.Count - 1 ? currentIndex + 1 : 0;
+        }
+        else if (key == "ArrowUp")
+        {
+            currentIndex = currentIndex > 0 ? currentIndex - 1 : Results.Count - 1;
+        }
+
+        HighlightedCode = Results[currentIndex].Code;
+        StateHasChanged();
+    }
+
+    private void HandleFocus()
+    {
+        _isFocused = true;
+        if (!string.IsNullOrEmpty(SearchText) && Results.Any())
+        {
+            ShowResults = true;
+        }
+    }
+
+    private async Task HandleBlur()
+    {
+        // Delay pentru a permite click pe rezultate
+        await Task.Delay(200);
+        _isFocused = false;
+        if (!_isFocused)
+        {
+            ShowResults = false;
+        }
+    }
+
+    private async Task PerformSearch()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            Results.Clear();
+            ShowResults = false;
+            return;
+        }
+
+        if (SearchText.Length < MinSearchLength)
+        {
+            return;
+        }
+
+        IsSearching = true;
+        StateHasChanged();
+
+        try
+        {
+            var query = new SearchICD10Query
+            {
+                SearchTerm = SearchText,
+                Category = Category,
+                OnlyCommon = OnlyCommon,
+                MaxResults = MaxResults
+            };
+
+            var result = await Mediator.Send(query);
+
+            if (result.IsSuccess && result.Value != null)
+            {
+                Results = result.Value;
+                ShowResults = Results.Any();
+                HighlightedCode = Results.FirstOrDefault()?.Code;
+            }
+            else
+            {
+                Results.Clear();
+                ShowResults = false;
+                Logger.LogWarning("ICD10 search failed: {Errors}", string.Join(", ", result.Errors));
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error searching ICD10 codes");
+            Results.Clear();
+            ShowResults = false;
+        }
+        finally
+        {
+            IsSearching = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SelectResult(ICD10SearchResultDto result)
+    {
+        SelectedResult = result;
+        SelectedCode = result.Code;
+        SearchText = result.DisplayText;
+        ShowResults = false;
+        
+        await SelectedCodeChanged.InvokeAsync(SelectedCode);
+        await OnCodeSelected.InvokeAsync(result);
+        
+        StateHasChanged();
+    }
+
+    private async Task ClearSelection()
+    {
+        SelectedResult = null;
+        SelectedCode = null;
+        SearchText = string.Empty;
+        Results.Clear();
+        ShowResults = false;
+        
+        await SelectedCodeChanged.InvokeAsync(null);
+        await OnCodeSelected.InvokeAsync(null);
+        
+        StateHasChanged();
+    }
+
+    private async Task LoadSelectedCode(string code)
+    {
+        try
+        {
+            var query = new SearchICD10Query
+            {
+                SearchTerm = code,
+                MaxResults = 1
+            };
+
+            var result = await Mediator.Send(query);
+
+            if (result.IsSuccess && result.Value?.Any() == true)
+            {
+                SelectedResult = result.Value.First();
+                SearchText = SelectedResult.DisplayText;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading selected ICD10 code: {Code}", code);
+        }
+    }
+
+    private MarkupString HighlightSearchTerm(string text, string searchTerm)
+    {
+        if (string.IsNullOrEmpty(searchTerm) || string.IsNullOrEmpty(text))
+        {
+            return (MarkupString)text;
+        }
+
+        var index = text.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase);
+        if (index < 0)
+        {
+            return (MarkupString)text;
+        }
+
+        var before = text.Substring(0, index);
+        var match = text.Substring(index, searchTerm.Length);
+        var after = text.Substring(index + searchTerm.Length);
+
+        return (MarkupString)$"{before}<mark>{match}</mark>{after}";
+    }
+
+    private string GetSeverityDisplay(string? severity) => severity switch
+    {
+        "Mild" => "Ușoară",
+        "Moderate" => "Moderată",
+        "Severe" => "Severă",
+        "Critical" => "Critică",
+        _ => "Nespecificată"
+    };
+
+    public void Dispose()
+    {
+        _debounceTimer?.Dispose();
+    }
+}

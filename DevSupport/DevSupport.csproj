@@ -13,42 +13,4 @@
     <UseCommonOutputDirectory>false</UseCommonOutputDirectory>
   </PropertyGroup>
 
-  <!-- Include toate fisierele ca Content pentru a fi vizibile in Solution Explorer -->
-  <ItemGroup>
-  <Content Include="Documentation\**\*.*" />
-    <Content Include="Scripts\**\*.*" />
-    <Content Include="Improvement\**\*.*" />
-  <Content Include="SQLScripts\**\*.*" />
-  </ItemGroup>
-
-  <!-- Exclude folder-urile obj si bin -->
-  <ItemGroup>
-    <Compile Remove="obj\**" />
-    <Content Remove="obj\**" />
-    <EmbeddedResource Remove="obj\**" />
-    <None Remove="obj\**" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="AdminPasswordHashFix.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Bogus" Version="35.6.4" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
-    <PackageReference Include="xunit" Version="2.9.3" />
- <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    
-    <!-- ✨ ADĂUGATE pentru AdminPasswordHashFix utility -->
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Documentation\Settings\Phase2\SQLScripts\" />
-  </ItemGroup>
-
 </Project>

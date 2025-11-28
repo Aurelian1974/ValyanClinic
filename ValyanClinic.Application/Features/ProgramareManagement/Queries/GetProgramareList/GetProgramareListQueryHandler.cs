@@ -80,50 +80,94 @@ request.PageSize,
 
             var programariDto = programari.Select(p => new ProgramareListDto
             {
-              ProgramareID = p.ProgramareID,
-       PacientID = p.PacientID,
-     DoctorID = p.DoctorID,
-         DataProgramare = p.DataProgramare,
-           OraInceput = p.OraInceput,
-    OraSfarsit = p.OraSfarsit,
- TipProgramare = p.TipProgramare,
-     Status = p.Status,
-     Observatii = p.Observatii,
-  // Navigation properties
-       PacientNumeComplet = p.PacientNumeComplet,
-     PacientTelefon = p.PacientTelefon,
-      PacientEmail = p.PacientEmail,
-PacientCNP = p.PacientCNP,
-   DoctorNumeComplet = p.DoctorNumeComplet,
-           DoctorSpecializare = p.DoctorSpecializare,
-    DoctorTelefon = p.DoctorTelefon,
-          // Audit
-DataCreare = p.DataCreare,
-        CreatDeNumeComplet = p.CreatDeNumeComplet,
-   DataUltimeiModificari = p.DataUltimeiModificari
-       }).ToList();
+                ProgramareID = p.ProgramareID,
+                PacientID = p.PacientID,
+                DoctorID = p.DoctorID,
+                DataProgramare = p.DataProgramare,
+                OraInceput = p.OraInceput,
+                OraSfarsit = p.OraSfarsit,
+                TipProgramare = p.TipProgramare,
+                Status = p.Status,
+                Observatii = p.Observatii,
+                // Navigation properties
+                PacientNumeComplet = p.PacientNumeComplet,
+                PacientTelefon = p.PacientTelefon,
+                PacientEmail = p.PacientEmail,
+                PacientCNP = p.PacientCNP,
+                PacientVarsta = CalculateAgeFromCNP(p.PacientCNP),  // ✅ FIX: Calcul vârstă din CNP
+                DoctorNumeComplet = p.DoctorNumeComplet,
+                DoctorSpecializare = p.DoctorSpecializare,
+                DoctorTelefon = p.DoctorTelefon,
+                // Audit
+                DataCreare = p.DataCreare,
+                CreatDeNumeComplet = p.CreatDeNumeComplet,
+                DataUltimeiModificari = p.DataUltimeiModificari
+            }).ToList();
 
-_logger.LogInformation(
-          "Listă programări obținută: {Count} din {Total} înregistrări",
-           programariDto.Count, totalCount);
+            _logger.LogInformation(
+                "Listă programări obținută: {Count} din {Total} înregistrări",
+                programariDto.Count, totalCount);
 
             // ==================== RETURNARE REZULTAT ====================
 
-   var message = totalCount == 1
-           ? "A fost găsită 1 programare."
-           : $"Au fost găsite {totalCount} programări.";
+            var message = totalCount == 1
+                ? "A fost găsită 1 programare."
+                : $"Au fost găsite {totalCount} programări.";
 
             return PagedResult<ProgramareListDto>.Success(
-          programariDto,
-    request.PageNumber,
-          request.PageSize,
-      totalCount,
+                programariDto,
+                request.PageNumber,
+                request.PageSize,
+                totalCount,
                 message);
         }
         catch (Exception ex)
-  {
+        {
             _logger.LogError(ex, "Eroare la obținerea listei de programări");
- return PagedResult<ProgramareListDto>.Failure($"Eroare la obținerea listei de programări: {ex.Message}");
+            return PagedResult<ProgramareListDto>.Failure($"Eroare la obținerea listei de programări: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Calculează vârsta pe baza CNP-ului românesc.
+    /// </summary>
+    private static int CalculateAgeFromCNP(string? cnp)
+    {
+        if (string.IsNullOrEmpty(cnp) || cnp.Length != 13)
+            return 0;
+
+        try
+        {
+            // Extragem cifra de sex (primul caracter) pentru a determina secolul
+            int sexDigit = int.Parse(cnp.Substring(0, 1));
+            int year = int.Parse(cnp.Substring(1, 2));
+            int month = int.Parse(cnp.Substring(3, 2));
+            int day = int.Parse(cnp.Substring(5, 2));
+
+            // Determinăm secolul pe baza cifrei de sex
+            int century = sexDigit switch
+            {
+                1 or 2 => 1900,
+                3 or 4 => 1800,
+                5 or 6 => 2000,
+                7 or 8 => 2000, // Persoane cu rezidență în România
+                9 => 1900, // Cetățeni străini cu rezidență în România
+                _ => 2000
+            };
+
+            int birthYear = century + year;
+            var birthDate = new DateTime(birthYear, month, day);
+
+            // Calculăm vârsta
+            int age = DateTime.Now.Year - birthDate.Year;
+            if (DateTime.Now < birthDate.AddYears(age))
+                age--;
+
+            return age;
+        }
+        catch
+        {
+            return 0; // Dacă CNP-ul este invalid, returnăm 0
         }
     }
 }
