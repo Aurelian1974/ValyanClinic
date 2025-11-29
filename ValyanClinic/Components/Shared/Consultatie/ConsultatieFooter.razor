@@ -1,0 +1,63 @@
+﻿@*
+    Footer pentru ConsultatieModal
+    Afișează butoanele de acțiune (Salvare draft, Preview, Salvare finală, Anulare)
+*@
+
+<div class="consultatie-footer">
+    <div class="footer-left">
+        @if (ShowDraftButton)
+        {
+            <button type="button" 
+                    class="btn btn-secondary btn-draft"
+                    @onclick="OnSaveDraftClicked"
+                    disabled="@IsSavingDraft">
+                @if (IsSavingDraft)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span>Salvare draft...</span>
+                }
+                else
+                {
+                    <i class="fas fa-save me-2"></i>
+                    <span>Salvează Draft</span>
+                }
+            </button>
+        }
+        
+        @if (ShowPreviewButton)
+        {
+            <button type="button" 
+                    class="btn btn-outline-primary btn-preview"
+                    @onclick="OnPreviewClicked"
+                    disabled="@(IsSaving || IsSavingDraft)">
+                <i class="fas fa-file-pdf me-2"></i>
+                <span>Preview PDF</span>
+            </button>
+        }
+    </div>
+    
+    <div class="footer-right">
+        <button type="button" 
+                class="btn btn-light btn-cancel"
+                @onclick="OnCancelClicked"
+                disabled="@IsSaving">
+            <i class="fas fa-times me-2"></i>
+            <span>Anulează</span>
+        </button>
+        
+        <button type="submit" 
+                class="btn btn-primary btn-save"
+                disabled="@(IsSaving || IsSavingDraft)">
+            @if (IsSaving)
+            {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                <span>Salvare...</span>
+            }
+            else
+            {
+                <i class="fas fa-check me-2"></i>
+                <span>@SaveButtonText</span>
+            }
+        </button>
+    </div>
+</div>

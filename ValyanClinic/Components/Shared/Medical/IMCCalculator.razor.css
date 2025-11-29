@@ -1,0 +1,224 @@
+﻿/* IMC Calculator Component Styles */
+
+.imc-calculator-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+}
+
+.imc-inputs-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.imc-calculator-card .form-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.imc-calculator-card .form-control {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 1.1rem;
+    padding: 0.6rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.imc-calculator-card .form-control:focus {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.imc-calculator-card .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Result Display */
+.imc-result-display {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.imc-value-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 1rem;
+    min-width: 100px;
+}
+
+.imc-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.imc-label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-top: 0.25rem;
+}
+
+.imc-interpretation {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.imc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    width: fit-content;
+}
+
+/* IMC Category Colors */
+.imc-badge-subponderal {
+    background: #fbbf24;
+    color: #78350f;
+}
+
+.imc-badge-normal {
+    background: #34d399;
+    color: #064e3b;
+}
+
+.imc-badge-supraponderal {
+    background: #fb923c;
+    color: #7c2d12;
+}
+
+.imc-badge-obezitate1 {
+    background: #f87171;
+    color: #7f1d1d;
+}
+
+.imc-badge-obezitate2 {
+    background: #dc2626;
+    color: white;
+}
+
+.imc-badge-obezitate-morbida {
+    background: #991b1b;
+    color: white;
+}
+
+/* Details */
+.imc-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+}
+
+.imc-risk {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.risk-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.risk-low {
+    background: rgba(52, 211, 153, 0.3);
+    color: #34d399;
+}
+
+.risk-medium {
+    background: rgba(251, 191, 36, 0.3);
+    color: #fbbf24;
+}
+
+.risk-high {
+    background: rgba(248, 113, 113, 0.3);
+    color: #f87171;
+}
+
+.risk-veryhigh {
+    background: rgba(220, 38, 38, 0.3);
+    color: #dc2626;
+}
+
+.risk-critical {
+    background: rgba(153, 27, 27, 0.3);
+    color: #fca5a5;
+}
+
+.imc-recommendation {
+    display: flex;
+    gap: 0.5rem;
+    line-height: 1.4;
+    opacity: 0.9;
+}
+
+.imc-recommendation i {
+    margin-top: 0.1rem;
+}
+
+/* Placeholder */
+.imc-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    opacity: 0.7;
+}
+
+.imc-placeholder i {
+    font-size: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .imc-inputs-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .imc-result-display {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .imc-value-badge {
+        width: 100%;
+        padding: 0.75rem;
+    }
+    
+    .imc-value {
+        font-size: 2rem;
+    }
+}

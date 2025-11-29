@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValyanClinic.Infrastructure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevSupport", "DevSupport\DevSupport.csproj", "{059712F2-6EE0-4E2B-BE75-ABB62F35E761}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValyanClinic.Tests", "ValyanClinic.Tests\ValyanClinic.Tests.csproj", "{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,18 @@ Global
 		{059712F2-6EE0-4E2B-BE75-ABB62F35E761}.Release|x64.Build.0 = Release|Any CPU
 		{059712F2-6EE0-4E2B-BE75-ABB62F35E761}.Release|x86.ActiveCfg = Release|Any CPU
 		{059712F2-6EE0-4E2B-BE75-ABB62F35E761}.Release|x86.Build.0 = Release|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Debug|x64.Build.0 = Debug|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Debug|x86.Build.0 = Debug|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Release|x64.ActiveCfg = Release|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Release|x64.Build.0 = Release|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Release|x86.ActiveCfg = Release|Any CPU
+		{AF17CF12-E8C5-4105-AAFB-3659761CEEEA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

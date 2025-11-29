@@ -362,6 +362,18 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Application.Services.IPersonalBusinessService, 
                                 ValyanClinic.Application.Services.PersonalBusinessService>();
+    
+    // ========================================
+    // IMC CALCULATOR SERVICE - Medical Services
+    // ========================================
+    builder.Services.AddScoped<ValyanClinic.Application.Services.IMC.IIMCCalculatorService,
+                                ValyanClinic.Application.Services.IMC.IMCCalculatorService>();
+    
+    // ========================================
+    // DRAFT STORAGE SERVICE - LocalStorage Management
+    // ========================================
+    builder.Services.AddScoped(typeof(ValyanClinic.Infrastructure.Services.DraftStorage.IDraftStorageService<>),
+                                typeof(ValyanClinic.Infrastructure.Services.DraftStorage.LocalStorageDraftService<>));
 
     // ========================================
     // BACKGROUND SERVICES

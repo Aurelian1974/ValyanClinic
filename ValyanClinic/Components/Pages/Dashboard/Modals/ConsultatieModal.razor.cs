@@ -5,6 +5,8 @@ using Microsoft.JSInterop;
 using ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById;
 using ValyanClinic.Application.Features.ProgramareManagement.DTOs;
+using ValyanClinic.Application.Services.IMC;
+using ValyanClinic.Infrastructure.Services.DraftStorage;
 using System.Text.Json;
 
 namespace ValyanClinic.Components.Pages.Dashboard.Modals;
@@ -14,6 +16,8 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<ConsultatieModal> Logger { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+    [Inject] private IIMCCalculatorService IMCCalculator { get; set; } = default!;
+    [Inject] private IDraftStorageService<CreateConsultatieCommand> DraftService { get; set; } = default!;
 
     // Parameters
     [Parameter] public Guid ProgramareID { get; set; }
@@ -55,16 +59,15 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     // ✅ CACHED LastSaveTime pentru a evita blocking calls
     private DateTime _cachedLastSaveTime = DateTime.MinValue;
 
-    // Computed Properties
+    // Computed Properties - folosind serviciul IMCCalculator
     private string CalculatedIMC
     {
         get
         {
-            if (Model.Greutate.HasValue && Model.Inaltime.HasValue && Model.Inaltime > 0)
+            if (Model.Greutate.HasValue && Model.Inaltime.HasValue)
             {
-                var inaltimeMetri = Model.Inaltime.Value / 100;
-                var imc = Model.Greutate.Value / (inaltimeMetri * inaltimeMetri);
-                return Math.Round(imc, 2).ToString("F2");
+                var result = IMCCalculator.Calculate(Model.Greutate.Value, Model.Inaltime.Value);
+                return result.Value.ToString("F2");
             }
             return "-";
         }
@@ -74,20 +77,10 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     {
         get
         {
-            if (Model.Greutate.HasValue && Model.Inaltime.HasValue && Model.Inaltime > 0)
+            if (Model.Greutate.HasValue && Model.Inaltime.HasValue)
             {
-                var inaltimeMetri = Model.Inaltime.Value / 100;
-                var imc = Model.Greutate.Value / (inaltimeMetri * inaltimeMetri);
-
-                return imc switch
-                {
-                    < 18.5m => "Subponderal",
-                    >= 18.5m and < 25m => "Normal",
-                    >= 25m and < 30m => "Supraponderal",
-                    >= 30m and < 35m => "Obezitate I",
-                    >= 35m and < 40m => "Obezitate II",
-                    >= 40m => "Obezitate morbida"
-                };
+                var result = IMCCalculator.Calculate(Model.Greutate.Value, Model.Inaltime.Value);
+                return result.Interpretation;
             }
             return "";
         }
@@ -284,19 +277,9 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     {
         try
         {
-            var storageKey = $"consultatie_draft_{ProgramareID}";
-            var jsonDraft = await JSRuntime.InvokeAsync<string>("localStorage.getItem", storageKey);
-            
-            if (!string.IsNullOrEmpty(jsonDraft))
-            {
-                var draft = JsonSerializer.Deserialize<ConsultatieDraft>(jsonDraft);
-                _cachedLastSaveTime = draft?.SavedAt ?? DateTime.MinValue;
-                Logger.LogDebug("[ConsultatieModal] Loaded LastSaveTime from storage: {Time}", _cachedLastSaveTime);
-            }
-            else
-            {
-                _cachedLastSaveTime = DateTime.MinValue;
-            }
+            var lastSaveTime = await DraftService.GetLastSaveTimeAsync(ProgramareID);
+            _cachedLastSaveTime = lastSaveTime ?? DateTime.MinValue;
+            Logger.LogDebug("[ConsultatieModal] Loaded LastSaveTime from storage: {Time}", _cachedLastSaveTime);
         }
         catch (Exception ex)
         {
@@ -317,32 +300,16 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
             IsSavingDraft = true;
             Logger.LogInformation("[ConsultatieModal] Saving draft for Programare: {ProgramareID}", ProgramareID);
 
-            // Construiește obiect draft
-            var draft = new ConsultatieDraft
-            {
-                ProgramareID = ProgramareID,
-                PacientID = PacientID,
-                MedicID = MedicID,
-                SavedAt = DateTime.Now, // ✅ Timestamp salvat ÎN draft
-                ActiveTab = ActiveTab,
-                CompletedSections = CompletedSections.ToList(),
-                FormData = Model
-            };
+            // Salvează folosind serviciul
+            await DraftService.SaveDraftAsync(ProgramareID, Model, MedicID.ToString());
 
-            // Serializează în JSON
-            var jsonDraft = JsonSerializer.Serialize(draft);
-
-            // Salvează în LocalStorage
-            var storageKey = $"consultatie_draft_{ProgramareID}";
-            await JSRuntime.InvokeVoidAsync("localStorage.setItem", storageKey, jsonDraft);
-
-            // ✅ Update cached LastSaveTime
-            _cachedLastSaveTime = draft.SavedAt;
+            // Update cached LastSaveTime
+            _cachedLastSaveTime = DateTime.Now;
             _hasUnsavedChanges = false;
 
-            Logger.LogInformation("[ConsultatieModal] Draft saved successfully at {Time}", draft.SavedAt);
+            Logger.LogInformation("[ConsultatieModal] Draft saved successfully at {Time}", _cachedLastSaveTime);
 
-            // ✅ Trigger UI update pentru a afișa checkmark
+            // Trigger UI update pentru a afișa checkmark
             await InvokeAsync(StateHasChanged);
 
             // TODO: Show toast notification "Draft salvat!"
@@ -366,27 +333,27 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     {
         try
         {
-            var storageKey = $"consultatie_draft_{ProgramareID}";
-            var jsonDraft = await JSRuntime.InvokeAsync<string>("localStorage.getItem", storageKey);
+            var draftResult = await DraftService.LoadDraftAsync(ProgramareID);
 
-            if (!string.IsNullOrEmpty(jsonDraft))
+            if (draftResult.IsSuccess && draftResult.Data != null)
             {
-                var draft = JsonSerializer.Deserialize<ConsultatieDraft>(jsonDraft);
+                Logger.LogInformation("[ConsultatieModal] Loaded draft from {SavedAt}", draftResult.SavedAt);
+
+                // Restore form data
+                Model = draftResult.Data;
                 
-                if (draft != null)
-                {
-                    Logger.LogInformation("[ConsultatieModal] Loaded draft from {SavedAt}", draft.SavedAt);
+                // Note: ActiveTab și CompletedSections nu sunt în Command, deci le păstrăm pe cele default
+                // Dacă vrei să le salvezi, trebuie să extindi Draft<T> să includă metadata
+                
+                // Update cached LastSaveTime
+                _cachedLastSaveTime = draftResult.SavedAt ?? DateTime.MinValue;
 
-                    // Restore form data
-                    Model = draft.FormData;
-                    ActiveTab = draft.ActiveTab;
-                    CompletedSections = draft.CompletedSections.ToHashSet();
-                    
-                    // ✅ Update cached LastSaveTime
-                    _cachedLastSaveTime = draft.SavedAt;
-
-                    // TODO: Show notification "Draft încărcat din {SavedAt}"
-                }
+                // TODO: Show notification "Draft încărcat din {SavedAt}"
+            }
+            else if (draftResult.ErrorType == DraftErrorType.Expired)
+            {
+                Logger.LogWarning("[ConsultatieModal] Draft expired for programare {ProgramareID}", ProgramareID);
+                // TODO: Show warning "Draft expirat - începe un formular nou"
             }
         }
         catch (Exception ex)
@@ -402,10 +369,9 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     {
         try
         {
-            var storageKey = $"consultatie_draft_{ProgramareID}";
-            await JSRuntime.InvokeVoidAsync("localStorage.removeItem", storageKey);
+            await DraftService.ClearDraftAsync(ProgramareID);
             
-            // ✅ Reset cached LastSaveTime
+            // Reset cached LastSaveTime
             _cachedLastSaveTime = DateTime.MinValue;
             
             Logger.LogInformation("[ConsultatieModal] Draft cleared from storage");
@@ -693,21 +659,11 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     /// </summary>
     private string GetIMCBadgeClass()
     {
-        if (!Model.Greutate.HasValue || !Model.Inaltime.HasValue || Model.Inaltime <= 0)
+        if (!Model.Greutate.HasValue || !Model.Inaltime.HasValue)
             return "";
 
-        var inaltimeMetri = Model.Inaltime.Value / 100;
-        var imc = Model.Greutate.Value / (inaltimeMetri * inaltimeMetri);
-
-        return imc switch
-        {
-            < 18.5m => "imc-badge-subponderal",
-            < 25m => "imc-badge-normal",
-            < 30m => "imc-badge-supraponderal",
-            < 35m => "imc-badge-obezitate1",
-            < 40m => "imc-badge-obezitate2",
-            _ => "imc-badge-obezitate-morbida" // >= 40
-        };
+        var result = IMCCalculator.Calculate(Model.Greutate.Value, Model.Inaltime.Value);
+        return result.ColorClass;
     }
 
     /// <summary>
@@ -715,20 +671,20 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     /// </summary>
     private string GetIMCIcon()
     {
-        if (!Model.Greutate.HasValue || !Model.Inaltime.HasValue || Model.Inaltime <= 0)
+        if (!Model.Greutate.HasValue || !Model.Inaltime.HasValue)
             return "fas fa-calculator";
 
-        var inaltimeMetri = Model.Inaltime.Value / 100;
-        var imc = Model.Greutate.Value / (inaltimeMetri * inaltimeMetri);
-
-        return imc switch
+        var result = IMCCalculator.Calculate(Model.Greutate.Value, Model.Inaltime.Value);
+        
+        return result.Category switch
         {
-            < 18.5m => "fas fa-arrow-down", // Subponderal
-            < 25m => "fas fa-check-circle", // Normal
-            < 30m => "fas fa-exclamation-triangle", // Supraponderal
-            < 35m => "fas fa-exclamation-circle", // Obezitate I
-            < 40m => "fas fa-times-circle", // Obezitate II
-            _ => "fas fa-skull-crossbones" // Obezitate morbida >= 40
+            IMCCategory.Subponderal => "fas fa-arrow-down",
+            IMCCategory.Normal => "fas fa-check-circle",
+            IMCCategory.Supraponderal => "fas fa-exclamation-triangle",
+            IMCCategory.Obezitate1 => "fas fa-exclamation-circle",
+            IMCCategory.Obezitate2 => "fas fa-times-circle",
+            IMCCategory.ObezitateMorbida => "fas fa-skull-crossbones",
+            _ => "fas fa-calculator"
         };
     }
 
@@ -781,22 +737,27 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     {
         return CompletedSections.Contains(section);
     }
+    
+    private async Task HandleTabChanged(string newTab)
+    {
+        Logger.LogInformation("[ConsultatieModal] Changing tab from {OldTab} to {NewTab}", ActiveTab, newTab);
+        
+        // Save current tab state if needed
+        if (_hasUnsavedChanges)
+        {
+            await SaveDraft();
+        }
+        
+        // Change active tab
+        ActiveTab = newTab;
+        CurrentSection = newTab;
+        
+        StateHasChanged();
+    }
 
     // ✅ IDisposable implementation
     public void Dispose()
     {
         StopAutoSaveTimer();
-    }
-
-    // ✅ DTO pentru draft storage
-    private class ConsultatieDraft
-    {
-        public Guid ProgramareID { get; set; }
-        public Guid PacientID { get; set; }
-        public Guid MedicID { get; set; }
-        public DateTime SavedAt { get; set; }
-        public string ActiveTab { get; set; } = "motive";
-        public List<string> CompletedSections { get; set; } = new();
-        public CreateConsultatieCommand FormData { get; set; } = new();
     }
 }

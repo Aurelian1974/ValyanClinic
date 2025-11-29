@@ -1,0 +1,54 @@
+﻿@*
+    Tab pentru Motive Prezentare și Istoric
+    Primul tab din formularul de consultație
+*@
+
+<div class="tab-content-section">
+    <div class="section-title">
+        <i class="fas fa-file-medical"></i>
+        <h4>Motive Prezentare</h4>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label required">
+            Motivul prezentării
+        </label>
+        <textarea class="form-control" 
+                  rows="4"
+                  placeholder="Descrieți motivul pentru care pacientul s-a prezentat la consultație..."
+                  @bind="Model.MotivPrezentare"
+                  @oninput="OnFieldChanged">
+        </textarea>
+        @if (ShowValidation && string.IsNullOrWhiteSpace(Model.MotivPrezentare))
+        {
+            <div class="invalid-feedback d-block">
+                <i class="fas fa-exclamation-circle"></i>
+                Motivul prezentării este obligatoriu
+            </div>
+        }
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">
+            Istoric boală actuală
+        </label>
+        <textarea class="form-control" 
+                  rows="6"
+                  placeholder="Descrieți evoluția simptomelor, când au apărut, ce factori le agravează/ameliorează..."
+                  @bind="Model.IstoricBoalaActuala"
+                  @oninput="OnFieldChanged">
+        </textarea>
+        <small class="form-text text-muted">
+            <i class="fas fa-info-circle"></i>
+            Include: debut, evoluție, tratamente anterioare, factori declanșatori
+        </small>
+    </div>
+    
+    @if (OnSectionCompleted.HasDelegate && IsComplete)
+    {
+        <div class="section-complete-indicator">
+            <i class="fas fa-check-circle"></i>
+            <span>Secțiune completată</span>
+        </div>
+    }
+</div>

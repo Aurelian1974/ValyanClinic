@@ -1,0 +1,78 @@
+﻿@* 
+    Componenta reutilizabilă pentru calculul și afișarea IMC
+    Poate fi folosită în orice formular medical
+*@
+
+<div class="imc-calculator-card">
+    <div class="imc-inputs-row">
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-weight"></i>
+                Greutate (kg)
+            </label>
+            <input type="number" 
+                   class="form-control" 
+                   step="0.1" 
+                   min="1" 
+                   max="500"
+                   value="@Greutate"
+                   @oninput="OnWeightChanged"
+                   placeholder="Ex: 75" />
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-ruler-vertical"></i>
+                Înălțime (cm)
+            </label>
+            <input type="number" 
+                   class="form-control" 
+                   step="0.1" 
+                   min="30" 
+                   max="300"
+                   value="@Inaltime"
+                   @oninput="OnHeightChanged"
+                   placeholder="Ex: 175" />
+        </div>
+    </div>
+    
+    @if (IMCResult != null && IMCResult.Category != ValyanClinic.Application.Services.IMC.IMCCategory.Invalid)
+    {
+        <div class="imc-result-display">
+            <div class="imc-value-badge">
+                <div class="imc-value">@IMCResult.Value.ToString("F2")</div>
+                <div class="imc-label">kg/m²</div>
+            </div>
+            
+            <div class="imc-interpretation">
+                <div class="imc-badge @IMCResult.ColorClass">
+                    <i class="@GetCategoryIcon()"></i>
+                    <span>@IMCResult.Interpretation</span>
+                </div>
+                
+                @if (ShowDetails)
+                {
+                    <div class="imc-details">
+                        <div class="imc-risk">
+                            <strong>Risc sănătate:</strong> 
+                            <span class="risk-badge risk-@IMCResult.HealthRisk.ToLower()">
+                                @IMCResult.HealthRisk
+                            </span>
+                        </div>
+                        <div class="imc-recommendation">
+                            <i class="fas fa-info-circle"></i>
+                            @IMCResult.HealthRecommendation
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else if (Greutate.HasValue || Inaltime.HasValue)
+    {
+        <div class="imc-placeholder">
+            <i class="fas fa-calculator"></i>
+            <span>Completează ambele valori pentru calcul IMC</span>
+        </div>
+    }
+</div>

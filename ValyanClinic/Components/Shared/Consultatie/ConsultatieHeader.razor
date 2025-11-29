@@ -1,0 +1,84 @@
+﻿@* 
+    Header pentru ConsultatieModal
+    Afișează informații despre pacient și buton de închidere
+*@
+
+<div class="consultatie-header">
+    <div class="header-content">
+        <div class="pacient-info">
+            @if (IsLoading)
+            {
+                <div class="loading-skeleton">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-text">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                </div>
+            }
+            else if (PacientInfo != null)
+            {
+                <div class="pacient-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="pacient-details">
+                    <h3 class="pacient-nume">
+                        @PacientInfo.NumeComplet
+                        @if (!string.IsNullOrEmpty(PacientInfo.CNP))
+                        {
+                            <span class="cnp-badge">CNP: @PacientInfo.CNP</span>
+                        }
+                    </h3>
+                    <div class="pacient-meta">
+                        @if (PacientInfo.Data_Nasterii != DateTime.MinValue)
+                        {
+                            <span class="meta-item">
+                                <i class="fas fa-birthday-cake"></i>
+                                @PacientInfo.Data_Nasterii.ToString("dd.MM.yyyy")
+                                (@GetAge(PacientInfo.Data_Nasterii) ani)
+                            </span>
+                        }
+                        @if (!string.IsNullOrEmpty(PacientInfo.Telefon))
+                        {
+                            <span class="meta-item">
+                                <i class="fas fa-phone"></i>
+                                @PacientInfo.Telefon
+                            </span>
+                        }
+                        @if (!string.IsNullOrEmpty(PacientInfo.Email))
+                        {
+                            <span class="meta-item">
+                                <i class="fas fa-envelope"></i>
+                                @PacientInfo.Email
+                            </span>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="pacient-placeholder">
+                    <i class="fas fa-user-times"></i>
+                    <span>Informații pacient indisponibile</span>
+                </div>
+            }
+        </div>
+        
+        <div class="header-actions">
+            @if (ShowDraftInfo && LastSaveTime.HasValue && LastSaveTime.Value != DateTime.MinValue)
+            {
+                <div class="draft-info">
+                    <i class="fas fa-save"></i>
+                    <span>Salvat @GetTimeSince(LastSaveTime.Value)</span>
+                </div>
+            }
+            
+            <button type="button" 
+                    class="btn-close-modal" 
+                    @onclick="OnCloseClicked"
+                    title="Închide (Esc)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</div>

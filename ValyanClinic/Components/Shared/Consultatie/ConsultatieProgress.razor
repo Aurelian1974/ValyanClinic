@@ -1,0 +1,42 @@
+﻿@*
+    Progress bar pentru consultație
+    Afișează progresul completării secțiunilor
+*@
+
+<div class="consultatie-progress-container">
+    <div class="progress-header">
+        <span class="progress-label">
+            <i class="fas fa-tasks"></i>
+            Progres completare
+        </span>
+        <span class="progress-percentage">@ProgressPercentage%</span>
+    </div>
+    
+    <div class="progress-bar-wrapper">
+        <div class="progress-bar" style="width: @(ProgressPercentage)%">
+            <div class="progress-shine"></div>
+        </div>
+    </div>
+    
+    <div class="sections-status">
+        @foreach (var section in Sections)
+        {
+            <div class="section-indicator @(IsSectionCompleted(section) ? "completed" : "")"
+                 title="@GetSectionLabel(section)">
+                @if (IsSectionCompleted(section))
+                {
+                    <i class="fas fa-check-circle"></i>
+                }
+                else if (section == ActiveSection)
+                {
+                    <i class="fas fa-circle active-pulse"></i>
+                }
+                else
+                {
+                    <i class="far fa-circle"></i>
+                }
+                <span class="section-name">@GetSectionLabel(section)</span>
+            </div>
+        }
+    </div>
+</div>

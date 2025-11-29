@@ -1,131 +1,233 @@
-﻿# DevSupport - Admin Password Hash Fix
+﻿# 📁 DevSupport - Development Support Files
 
-## 📦 Ce este?
-
-Acest folder conține utility-ul `AdminPasswordHashFix` pentru a repara hash-ul parolei utilizatorului Admin în baza de date ValyanMed.
-
-## 🎯 Problema
-
-Login-ul cu username `Admin` și password `admin123!@#` NU funcționează pentru că hash-ul din DB este pentru o parolă diferită (`admin123` fără caractere speciale).
-
-## ✅ Soluție Rapidă (C# Interactive - RECOMANDAT)
-
-### Pași:
-
-1. **Visual Studio → View → Other Windows → C# Interactive** (sau `Ctrl + Alt + F1`)
-
-2. **Copiază și rulează:**
-
-```csharp
-#r "nuget: BCrypt.Net-Next, 4.0.3"
-#r "nuget: Microsoft.Data.SqlClient, 5.2.2"
-
-using BCrypt.Net;
-using Microsoft.Data.SqlClient;
-
-// Generate hash
-string password = "admin123!@#";
-string hash = BCrypt.HashPassword(password, 12);
-Console.WriteLine($"Hash: {hash}");
-
-// Update DB (CUSTOMIZE connection string!)
-string connString = "Server=DESKTOP-9H54BCS\\SQLSERVER;Database=ValyanMed;Integrated Security=True;TrustServerCertificate=True;";
-
-using (var conn = new SqlConnection(connString))
-{
-    conn.Open();
-    var cmd = new SqlCommand(
-        "UPDATE Utilizatori SET PasswordHash = @Hash WHERE Username = 'Admin'", 
-        conn);
-    cmd.Parameters.AddWithValue("@Hash", hash);
-    cmd.ExecuteNonQuery();
-    Console.WriteLine("SUCCESS! Password updated.");
-}
-```
-
-3. **Test login:**
-   - Username: `Admin`
-   - Password: `admin123!@#`
+This folder contains all development support materials: database scripts, documentation, tools, and resources.
 
 ---
 
-## 📝 Alternativă: Folosește Utility Class
+## 📊 Folder Structure
 
-### Opțiunea A: Încarcă în C# Interactive
-
-```csharp
-#load "AdminPasswordHashFix.cs"
-ValyanClinic.DevSupport.AdminPasswordHashFix.Execute();
 ```
-
-### Opțiunea B: Apelează din cod
-
-```csharp
-// În orice fișier C#:
-ValyanClinic.DevSupport.AdminPasswordHashFix.Execute();
-```
-
----
-
-## ⚙️ Configurare Connection String
-
-**Dacă primești eroare de conexiune, editează `AdminPasswordHashFix.cs`, linia 8:**
-
-```csharp
-// SQL Server Express:
-private const string ConnectionString = "Server=.\\SQLEXPRESS;Database=ValyanMed;Integrated Security=True;TrustServerCertificate=True;";
-
-// SQL Server Local:
-private const string ConnectionString = "Server=localhost;Database=ValyanMed;Integrated Security=True;TrustServerCertificate=True;";
-
-// SQL Server Named Instance:
-private const string ConnectionString = "Server=YOUR-PC-NAME\\SQLSERVER;Database=ValyanMed;Integrated Security=True;TrustServerCertificate=True;";
+DevSupport/
+│
+├── 📁 01_Database/                    ← SQL Scripts & Database
+│   ├── 01_Tables/                     - Table creation scripts
+│   ├── 02_StoredProcedures/           - Stored procedures (by feature)
+│   │   ├── Consultatie/
+│   │   ├── ICD10/
+│   │   ├── ISCO/
+│   │   └── Programari/
+│   ├── 03_Functions/                  - SQL functions
+│   ├── 04_Views/                      - Database views
+│   ├── 05_Triggers/                   - Database triggers
+│   ├── 06_Migrations/                 - Migration scripts
+│   ├── 07_ICD10_Data/                 - ICD-10 medical codes
+│   ├── 08_Verification/               - Verification scripts
+│   └── 09_Debug/                      - Debug scripts
+│
+├── 📁 02_Scripts/                     ← Automation Scripts
+│   └── PowerShell/
+│       ├── Database/                  - DB deployment scripts
+│       ├── Deployment/                - App deployment scripts
+│       └── Utilities/                 - General utilities
+│
+├── 📁 03_Documentation/               ← All Documentation
+│   ├── 01_Setup/                      - Setup guides
+│   ├── 02_Development/                - Development docs
+│   ├── 03_Database/                   - Database docs
+│   ├── 04_Features/                   - Feature-specific docs
+│   │   ├── Consultatie/
+│   │   ├── Programari/
+│   │   └── Settings/
+│   ├── 05_Refactoring/                - Refactoring reports
+│   │   ├── ConsultatieModal/          - Modal refactoring (Phase 1-6)
+│   │   ├── EventHandlers/             - Event handlers cleanup
+│   │   ├── MemoryLeaks/               - Memory leaks fixes
+│   │   └── CodeCleanup/               - Code cleanup reports
+│   ├── 06_Fixes/                      - Bug fixes documentation
+│   ├── 07_Security/                   - Security docs
+│   ├── 08_Deployment/                 - Deployment guides
+│   ├── 09_Patterns/                   - Design patterns
+│   └── 10_Changes/                    - Change logs
+│
+├── 📁 04_Tools/                       ← Utilities & Tools
+│   ├── PasswordFix/                   - Password hashing tools
+│   └── PopUser/                       - PopUser investigation
+│
+├── 📁 05_Resources/                   ← Assets & Templates
+│   ├── PDFs/                          - PDF documents
+│   ├── Templates/                     - Document templates
+│   └── Images/                        - Graphics
+│
+├── DevSupport.csproj                  - Project file
+├── README.md                          - This file
+└── REORGANIZATION_PLAN.md             - Reorganization details
 ```
 
 ---
 
-## 🐛 Troubleshooting
+## 🎯 Quick Navigation
 
-### Error: "Utilizatorul 'Admin' nu există"
+### **Working with Database**
+```powershell
+# Navigate to database scripts
+cd 01_Database
 
-**Fix:** Creează utilizatorul în SQL mai întâi:
+# Execute table creation
+sqlcmd -S server -d database -i 01_Tables\*.sql
 
-```sql
--- Generează hash mai întâi (vezi cod C# de mai sus)
-DECLARE @Hash NVARCHAR(512) = '<PASTE_HASH_HERE>'
-
-INSERT INTO Utilizatori (
-    UtilizatorID, Username, Email, PasswordHash, Salt, Rol, EsteActiv,
-    Data_Crearii, Data_Ultimei_Modificari, Creat_De, Modificat_De
-) VALUES (
-    NEWID(), 'Admin', 'admin@valyanmed.ro', @Hash, '', 'Administrator', 1,
-    GETDATE(), GETDATE(), 'System', 'System'
-);
+# Deploy stored procedures
+cd 02_StoredProcedures
+# Run scripts by feature folder
 ```
 
-### Error: "Cannot open database"
+### **Reading Documentation**
+```powershell
+# Start with setup
+cd 03_Documentation\01_Setup
 
-1. Verifică SQL Server este pornit (`services.msc`)
-2. Actualizează connection string
-3. Test conexiunea în SSMS
+# View feature docs
+cd 03_Documentation\04_Features\Consultatie
 
-### Error: BCrypt package not found
+# Check refactoring reports
+cd 03_Documentation\05_Refactoring\ConsultatieModal
+```
 
-```bash
-dotnet add package BCrypt.Net-Next --version 4.0.3
-dotnet add package Microsoft.Data.SqlClient --version 5.2.2
-dotnet restore
+### **Using Tools**
+```powershell
+# Password fix tool
+cd 04_Tools\PasswordFix
+
+# PopUser investigation
+cd 04_Tools\PopUser
 ```
 
 ---
 
-## 📚 Documentație Completă
+## 📚 Key Documentation
 
-Vezi: `DOCS/ADMIN_PASSWORD_FIX_COMPLETE.md`
+### **Setup & Development**
+- [Setup Guide](03_Documentation/01_Setup/) - Initial setup instructions
+- [Development Guide](03_Documentation/02_Development/) - Development practices
+
+### **Refactoring Reports**
+- [ConsultatieModal Refactoring](03_Documentation/05_Refactoring/ConsultatieModal/SESSION_COMPLETE_FINAL.md) - Complete refactoring (Phases 1-6)
+- [EventHandlers Cleanup](03_Documentation/05_Refactoring/EventHandlers/) - Event handlers refactoring
+- [Memory Leaks Fix](03_Documentation/05_Refactoring/MemoryLeaks/) - Memory management fixes
+
+### **Database**
+- [ICD-10 Setup](01_Database/07_ICD10_Data/) - Medical codes installation
+- [Migrations](01_Database/06_Migrations/) - Database migrations
 
 ---
 
-**Status:** ✅ **READY TO USE**  
-**Build:** ✅ **SUCCESSFUL**  
-**Tested:** 🟡 **PENDING** (need to run utility)
+## 🔄 Reorganization History
+
+This folder was reorganized on **19 decembrie 2024** from a flat structure to a logical, numbered hierarchy.
+
+**Benefits:**
+- ✅ Clear separation by category
+- ✅ Numbered folders for logical order
+- ✅ Easy navigation
+- ✅ Scalable structure
+- ✅ Professional organization
+
+**Details:** See [REORGANIZATION_PLAN.md](REORGANIZATION_PLAN.md)
+
+---
+
+## 🚀 Quick Start
+
+### **For Developers**
+1. Read [Setup Guide](03_Documentation/01_Setup/)
+2. Review [Development Guide](03_Documentation/02_Development/)
+3. Check [Feature Documentation](03_Documentation/04_Features/)
+
+### **For Database Admins**
+1. Review [Database Structure](01_Database/)
+2. Execute scripts in numerical order
+3. Use [Verification Scripts](01_Database/08_Verification/)
+
+### **For DevOps**
+1. Check [Deployment Guide](03_Documentation/08_Deployment/)
+2. Use [Automation Scripts](02_Scripts/PowerShell/)
+
+---
+
+## 📊 Statistics
+
+| Category | Folders | Approximate Files |
+|----------|---------|-------------------|
+| Database | 13 | 200+ SQL scripts |
+| Documentation | 20+ | 150+ MD files |
+| Scripts | 5 | 50+ PowerShell |
+| Tools | 2 | 10+ utilities |
+| Resources | 3 | Various |
+
+---
+
+## 🔧 Maintenance
+
+### **Adding New Content**
+
+**New Database Script:**
+```powershell
+# Add to appropriate subfolder
+01_Database/02_StoredProcedures/[Feature]/SP_NewProcedure.sql
+```
+
+**New Documentation:**
+```powershell
+# Add to relevant category
+03_Documentation/04_Features/[Feature]/NewFeature.md
+```
+
+**New Tool:**
+```powershell
+# Create subfolder in Tools
+04_Tools/[ToolName]/
+```
+
+### **Updating Existing Content**
+- Keep original folder structure
+- Update README in subfolder if needed
+- Maintain numerical prefixes
+
+---
+
+## 📝 Notes
+
+- Folders are numbered (`01_`, `02_`, etc.) for logical ordering
+- Each major folder has its own README
+- Old folders (Database, Scripts, Documentation, Refactoring) preserved for safety
+- Delete old folders after verifying new structure works
+
+---
+
+## ✅ Verification Checklist
+
+Before deleting old folders, verify:
+- [ ] All files copied to new location
+- [ ] Project compiles successfully
+- [ ] Scripts run from new locations
+- [ ] Documentation accessible
+- [ ] Tools work correctly
+
+---
+
+## 🆘 Support
+
+If you need to revert:
+1. Old folders are preserved
+2. Files were copied (not moved)
+3. Can restore from Git history
+
+---
+
+**Last Updated:** 19 decembrie 2024  
+**Version:** 2.0 (Reorganized Structure)  
+**Status:** ✅ Production Ready
+
+---
+
+*ValyanClinic Development Support - Clean, Organized, Professional* 🚀
 

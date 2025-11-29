@@ -1,0 +1,205 @@
+﻿@*
+    Tab pentru Examen Obiectiv
+    Include IMC Calculator și toate examinările sistemelor
+*@
+@using ValyanClinic.Components.Shared.Medical
+
+<div class="tab-content-section">
+    <div class="section-title">
+        <i class="fas fa-stethoscope"></i>
+        <h4>Examen Obiectiv</h4>
+    </div>
+    
+    @* Stare Generală *@
+    <div class="subsection">
+        <h5 class="subsection-title">Stare Generală</h5>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Stare generală</label>
+                <input type="text" 
+                       class="form-control" 
+                       placeholder="Ex: Bună, satisfăcătoare, alterată..."
+                       @bind="Model.StareGenerala"
+                       @oninput="OnFieldChanged" />
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Constituție</label>
+                <input type="text" 
+                       class="form-control" 
+                       placeholder="Ex: Normostenică, astenică, hipostenică..."
+                       @bind="Model.Constitutie"
+                       @oninput="OnFieldChanged" />
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Atitudine</label>
+                <input type="text" 
+                       class="form-control" 
+                       placeholder="Ex: Activă, pasivă, forțată..."
+                       @bind="Model.Atitudine"
+                       @oninput="OnFieldChanged" />
+            </div>
+        </div>
+    </div>
+    
+    @* Parametri Vitali & IMC *@
+    <div class="subsection">
+        <h5 class="subsection-title">Parametri Vitali</h5>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Tensiune arterială (mmHg)</label>
+                <input type="text" 
+                       class="form-control" 
+                       placeholder="Ex: 120/80"
+                       @bind="Model.TensiuneArteriala"
+                       @oninput="OnFieldChanged" />
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Puls (bpm)</label>
+                <input type="number" 
+                       class="form-control" 
+                       min="30" 
+                       max="250"
+                       placeholder="Ex: 75"
+                       @bind="Model.Puls"
+                       @oninput="OnFieldChanged" />
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Temperatură (°C)</label>
+                <input type="number" 
+                       class="form-control" 
+                       step="0.1" 
+                       min="35" 
+                       max="43"
+                       placeholder="Ex: 36.6"
+                       @bind="Model.Temperatura"
+                       @oninput="OnFieldChanged" />
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Frecvență respiratorie (resp/min)</label>
+                <input type="number" 
+                       class="form-control" 
+                       min="5" 
+                       max="60"
+                       placeholder="Ex: 16"
+                       @bind="Model.FreccventaRespiratorie"
+                       @oninput="OnFieldChanged" />
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Saturație O2 (%)</label>
+                <input type="number" 
+                       class="form-control" 
+                       min="0" 
+                       max="100"
+                       placeholder="Ex: 98"
+                       @bind="Model.SaturatieO2"
+                       @oninput="OnFieldChanged" />
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Glicemie (mg/dL)</label>
+                <input type="number" 
+                       class="form-control" 
+                       step="1" 
+                       min="0" 
+                       max="600"
+                       placeholder="Ex: 95"
+                       @bind="Model.Glicemie"
+                       @oninput="OnFieldChanged" />
+            </div>
+        </div>
+        
+        @* IMC Calculator Component *@
+        <div class="imc-calculator-section">
+            <IMCCalculator @bind-Greutate="Model.Greutate"
+                          @bind-Inaltime="Model.Inaltime"
+                          ShowDetails="true" />
+        </div>
+    </div>
+    
+    @* Examen Aparate și Sisteme *@
+    <div class="subsection">
+        <h5 class="subsection-title">Examen Aparate și Sisteme</h5>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-heartbeat"></i>
+                Cardiovascular
+            </label>
+            <textarea class="form-control" 
+                      rows="3"
+                      placeholder="Ex: Zgomote cardiace ritmice, fără sufluri..."
+                      @bind="Model.ExamenCardiovascular"
+                      @oninput="OnFieldChanged">
+            </textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-lungs"></i>
+                Respiratoriu
+            </label>
+            <textarea class="form-control" 
+                      rows="3"
+                      placeholder="Ex: Murmur vezicular prezent bilateral, fără raluri..."
+                      @bind="Model.ExamenRespiratoriu"
+                      @oninput="OnFieldChanged">
+            </textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-stomach"></i>
+                Digestiv
+            </label>
+            <textarea class="form-control" 
+                      rows="3"
+                      placeholder="Ex: Abdomen suplu, nedureros la palpare..."
+                      @bind="Model.ExamenDigestiv"
+                      @oninput="OnFieldChanged">
+            </textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-kidneys"></i>
+                Urinar
+            </label>
+            <textarea class="form-control" 
+                      rows="2"
+                      placeholder="Ex: Loji renale libere..."
+                      @bind="Model.ExamenUrinar"
+                      @oninput="OnFieldChanged">
+            </textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-brain"></i>
+                Nervos
+            </label>
+            <textarea class="form-control" 
+                      rows="2"
+                      placeholder="Ex: Conștient, orientat temporo-spatial..."
+                      @bind="Model.ExamenNervos"
+                      @oninput="OnFieldChanged">
+            </textarea>
+        </div>
+    </div>
+    
+    @if (OnSectionCompleted.HasDelegate && IsComplete)
+    {
+        <div class="section-complete-indicator">
+            <i class="fas fa-check-circle"></i>
+            <span>Secțiune completată</span>
+        </div>
+    }
+</div>

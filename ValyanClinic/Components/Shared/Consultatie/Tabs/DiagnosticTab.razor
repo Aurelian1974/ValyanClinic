@@ -1,0 +1,76 @@
+﻿@*
+    Tab pentru Diagnostic
+    Include diagnostic pozitiv, diferențial, etiologic și coduri ICD-10
+*@
+@using ValyanClinic.Components.Shared
+
+<div class="tab-content-section">
+    <div class="section-title">
+        <i class="fas fa-diagnoses"></i>
+        <h4>Diagnostic</h4>
+    </div>
+    
+    @* Diagnostic Pozitiv *@
+    <div class="form-group">
+        <label class="form-label required">
+            Diagnostic pozitiv
+        </label>
+        <textarea class="form-control" 
+                  rows="3"
+                  placeholder="Descrieți diagnosticul principal stabilit..."
+                  @bind="Model.DiagnosticPozitiv"
+                  @oninput="OnFieldChanged">
+        </textarea>
+        @if (ShowValidation && string.IsNullOrWhiteSpace(Model.DiagnosticPozitiv))
+        {
+            <div class="invalid-feedback d-block">
+                <i class="fas fa-exclamation-circle"></i>
+                Diagnosticul este obligatoriu
+            </div>
+        }
+    </div>
+    
+    @* Diagnostic Diferențial *@
+    <div class="form-group">
+        <label class="form-label">
+            Diagnostic diferențial
+        </label>
+        <textarea class="form-control" 
+                  rows="3"
+                  placeholder="Liste diagnostice alternative care trebuie excluse..."
+                  @bind="Model.DiagnosticDiferential"
+                  @oninput="OnFieldChanged">
+        </textarea>
+        <small class="form-text text-muted">
+            <i class="fas fa-info-circle"></i>
+            Diagnostice cu simptomatologie similară care trebuie luate în considerare
+        </small>
+    </div>
+    
+    @* Diagnostic Etiologic *@
+    <div class="form-group">
+        <label class="form-label">
+            Diagnostic etiologic
+        </label>
+        <textarea class="form-control" 
+                  rows="2"
+                  placeholder="Cauza bolii (ex: infecțioasă, traumatică, genetică...)..."
+                  @bind="Model.DiagnosticEtiologic"
+                  @oninput="OnFieldChanged">
+        </textarea>
+    </div>
+    
+    @* Componenta ICD-10 Drag & Drop *@
+    <div class="icd10-component-wrapper">
+        <ICD10DragDropCard @bind-CoduriICD10Principal="Model.CoduriICD10"
+                          @bind-CoduriICD10Secundare="Model.CoduriICD10Secundare" />
+    </div>
+    
+    @if (OnSectionCompleted.HasDelegate && IsComplete)
+    {
+        <div class="section-complete-indicator">
+            <i class="fas fa-check-circle"></i>
+            <span>Secțiune completată</span>
+        </div>
+    }
+</div>

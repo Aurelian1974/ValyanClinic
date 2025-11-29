@@ -1,0 +1,57 @@
+﻿/* Examen Tab Styles */
+
+.subsection {
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.subsection-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-group label i {
+    margin-right: 0.5rem;
+    color: #667eea;
+}
+
+.imc-calculator-section {
+    margin-top: 1.5rem;
+}
+
+/* System Examinations */
+.form-group textarea {
+    min-height: 80px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .subsection {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .subsection-title {
+        font-size: 1rem;
+    }
+}

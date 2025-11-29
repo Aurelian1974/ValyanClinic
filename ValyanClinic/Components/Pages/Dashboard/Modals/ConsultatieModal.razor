@@ -3,158 +3,52 @@
 @using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
 @using ValyanClinic.Application.Features.ProgramareManagement.DTOs
 @using ValyanClinic.Components.Shared
+@using ValyanClinic.Components.Shared.Medical
+@using ValyanClinic.Components.Shared.Consultatie
+@using ValyanClinic.Components.Shared.Consultatie.Tabs
 
 <div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
     <div class="modal-container consultatie-modal @(IsVisible ? "show" : "")" @onclick:stopPropagation>
             
-            <!-- MODAL HEADER -->
-            <div class="modal-header">
-                <div class="header-info">
-                    <h4 class="modal-title">
-                        <i class="fas fa-stethoscope"></i>
-                        Consultatie Medicala
-                    </h4>
-                    <div class="patient-info-header">
-                        <span class="patient-name">@PacientInfo?.NumeComplet</span>
-                        <span class="patient-details">
-                            @PacientInfo?.Varsta ani | CNP: @PacientInfo?.CNP
-                        </span>
-                    </div>
-                </div>
-                <div class="header-actions">
-                    <span class="consultatie-date">
-                        <i class="fas fa-calendar"></i>
-                        @DateTime.Now.ToString("dd.MM.yyyy HH:mm")
-                    </span>
-                    <button type="button" class="btn-close" @onclick="CloseModal" aria-label="Close">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
+            @* Componenta Header *@
+            <ConsultatieHeader PacientInfo="@PacientInfo"
+                              IsLoading="@IsLoadingPacient"
+                              LastSaveTime="@LastSaveTime"
+                              ShowDraftInfo="true"
+                              OnClose="CloseModal" />
 
             <!-- MODAL BODY -->
             <div class="modal-body">
                 <EditForm Model="@Model" OnValidSubmit="HandleSubmit">
                     <DataAnnotationsValidator />
 
-                    <!-- PROGRESS INDICATOR -->
-                    <div class="section-progress">
-                        <div class="progress-steps">
-                            @foreach (var section in Sections)
-                            {
-                                <div class="progress-step @(CurrentSection == section ? "active" : "") @(CompletedSections.Contains(section) ? "completed" : "")">
-                                    <div class="step-icon">
-                                        @if (CompletedSections.Contains(section))
-                                        {
-                                            <i class="fas fa-check"></i>
-                                        }
-                                        else
-                                        {
-                                            <span>@(Sections.IndexOf(section) + 1)</span>
-                                        }
-                                    </div>
-                                    <span class="step-label">@GetSectionLabel(section)</span>
-                                </div>
-                            }
-                        </div>
-                    </div>
+                    @* Componenta Progress *@
+                    <ConsultatieProgress Sections="@Sections"
+                                        CompletedSections="@CompletedSections"
+                                        ActiveSection="@CurrentSection" />
 
-                    <!-- TABS NAVIGATION -->
-                    <ul class="nav nav-tabs consultatie-tabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link @(ActiveTab == "motive" ? "active" : "")" 
-                                    type="button" 
-                                    @onclick='() => ActiveTab = "motive"'>
-                                <i class="fas fa-clipboard-list"></i>
-                                Motive Prezentare
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link @(ActiveTab == "antecedente" ? "active" : "")" 
-                                    type="button" 
-                                    @onclick='() => ActiveTab = "antecedente"'>
-                                <i class="fas fa-history"></i>
-                                Antecedente
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link @(ActiveTab == "examen" ? "active" : "")" 
-                                    type="button" 
-                                    @onclick='() => ActiveTab = "examen"'>
-                                <i class="fas fa-heartbeat"></i>
-                                Examen Obiectiv
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link @(ActiveTab == "investigatii" ? "active" : "")" 
-                                    type="button" 
-                                    @onclick='() => ActiveTab = "investigatii"'>
-                                <i class="fas fa-vial"></i>
-                                Investigatii
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link @(ActiveTab == "diagnostic" ? "active" : "")" 
-                                    type="button" 
-                                    @onclick='() => ActiveTab = "diagnostic"'>
-                                <i class="fas fa-diagnoses"></i>
-                                Diagnostic
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link @(ActiveTab == "tratament" ? "active" : "")" 
-                                    type="button" 
-                                    @onclick='() => ActiveTab = "tratament"'>
-                                <i class="fas fa-pills"></i>
-                                Tratament
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link @(ActiveTab == "concluzie" ? "active" : "")" 
-                                    type="button" 
-                                    @onclick='() => ActiveTab = "concluzie"'>
-                                <i class="fas fa-check-circle"></i>
-                                Concluzie
-                            </button>
-                        </li>
-                    </ul>
+                    @* Componenta Tabs *@
+                    <ConsultatieTabs Tabs="@Sections"
+                                    ActiveTab="@ActiveTab"
+                                    CompletedTabs="@CompletedSections"
+                                    OnTabChanged="HandleTabChanged"
+                                    IsDisabled="@IsSaving" />
 
                     <!-- TAB CONTENT -->
                     <div class="tab-content consultatie-content">
 
-                        <!-- TAB 1: MOTIVE PREZENTARE -->
-                        <div class="tab-pane @(ActiveTab == "motive" ? "active show" : "")">
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-clipboard-list"></i>
-                                    I. Motive Prezentare si Istoric
-                                </h5>
-                                
-                                <div class="form-group">
-                                    <label for="motivPrezentare">Motivul Prezentarii *</label>
-                                    <textarea id="motivPrezentare" 
-                                              class="form-control" 
-                                              rows="3"
-                                              placeholder="Descrie motivul pentru care pacientul se prezinta la consultatie..."
-                                              @bind="Model.MotivPrezentare"></textarea>
-                                    <small class="form-text">Simptomele principale pentru care se prezinta pacientul</small>
-                                </div>
+                        @* Tab 1: Motive Prezentare - Folosim componenta *@
+                        @if (ActiveTab == "motive")
+                        {
+                            <MotivePrezentareTab Model="@Model"
+                                                OnChanged="MarkAsChanged"
+                                                OnSectionCompleted="() => MarkSectionCompleted(ActiveTab)"
+                                                ShowValidation="false" />
+                        }
 
-                                <div class="form-group">
-                                    <label for="istoricBoala">Istoricul Bolii Actuale</label>
-                                    <textarea id="istoricBoala" 
-                                              class="form-control" 
-                                              rows="5"
-                                              placeholder="Descrie evolutia simptomelor, debutul, factori declansatori, evolutie..."
-                                              @bind="Model.IstoricBoalaActuala"></textarea>
-                                    <small class="form-text">Cand au debutat simptomele, cum au evoluat, ce tratamente au fost incercate</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB 2: ANTECEDENTE -->
-                        <div class="tab-pane @(ActiveTab == "antecedente" ? "active show" : "")">
-                            
+                        @* Tab 2: Antecedente - Păstrăm codul vechi (încă nu am componentă) *@
+                        @if (ActiveTab == "antecedente")
+                        {
                             <!-- A. ANTECEDENTE HEREDO-COLATERALE -->
                             <div class="section-card">
                                 <h5 class="section-title">
@@ -374,297 +268,20 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        }
 
-                        <!-- TAB 3: EXAMEN OBIECTIV -->
-                        <div class="tab-pane @(ActiveTab == "examen" ? "active show" : "")">
-                            
-                            <!-- EXAMEN GENERAL -->
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-user-check"></i>
-                                    A. Examen General
-                                </h5>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Stare Generala</label>
-                                            <select class="form-control" @bind="Model.StareGenerala">
-                                                <option value="">Selecteaza...</option>
-                                                <option value="Buna">Buna</option>
-                                                <option value="Medie">Medie</option>
-                                                <option value="Alterata">Alterata</option>
-                                                <option value="Grava">Grava</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Constitutie</label>
-                                            <select class="form-control" @bind="Model.Constitutie">
-                                                <option value="">Selecteaza...</option>
-                                                <option value="Normolinica">Normolinica</option>
-                                                <option value="Hipostenica">Hipostenica</option>
-                                                <option value="Hiperstenica">Hiperstenica</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Atitudine</label>
-                                            <select class="form-control" @bind="Model.Atitudine">
-                                                <option value="">Selecteaza...</option>
-                                                <option value="Activa">Activa</option>
-                                                <option value="Pasiva">Pasiva</option>
-                                                <option value="Fortata">Fortata</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Facies</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="Aspect fata: normal, suferind..."
-                                                   @bind="Model.Facies" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Tegumente</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="Aspect piele: normale, palide, ictere..."
-                                                   @bind="Model.Tegumente" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Mucoase</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="Aspect mucoase: normale, palide..."
-                                                   @bind="Model.Mucoase" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Ganglioni Limfatici</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="Nepalpabili, marite..."
-                                                   @bind="Model.GangliniLimfatici" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        @* Tab 3: Examen - Folosim componenta *@
+                        @if (ActiveTab == "examen")
+                        {
+                            <ExamenTab Model="@Model"
+                                      OnChanged="MarkAsChanged"
+                                      OnSectionCompleted="() => MarkSectionCompleted(ActiveTab)"
+                                      ShowValidation="false" />
+                        }
 
-                            <!-- SEMNE VITALE -->
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-heartbeat"></i>
-                                    B. Semne Vitale si Masuratori
-                                </h5>
-                                
-                                <!-- IMC DISPLAY CARD - FEATURED -->
-                                <div class="imc-display-card">
-                                    <div class="imc-display-row">
-                                        <!-- Greutate Input -->
-                                        <div class="imc-input-group">
-                                            <label class="imc-input-label">
-                                                <i class="fas fa-weight"></i>
-                                                Greutate (kg)
-                                            </label>
-                                            <input type="number" 
-                                                   step="0.1" 
-                                                   class="form-control" 
-                                                   placeholder="kg"
-                                                   @bind="Model.Greutate" 
-                                                   @oninput="CalculateIMC" />
-                                        </div>
-
-                                        <!-- Inaltime Input -->
-                                        <div class="imc-input-group">
-                                            <label class="imc-input-label">
-                                                <i class="fas fa-ruler-vertical"></i>
-                                                Înălțime (cm)
-                                            </label>
-                                            <input type="number" 
-                                                   step="0.1" 
-                                                   class="form-control" 
-                                                   placeholder="cm"
-                                                   @bind="Model.Inaltime" 
-                                                   @oninput="CalculateIMC" />
-                                        </div>
-
-                                        <!-- IMC Value Display -->
-                                        <div class="imc-value-display">
-                                            <div class="imc-value-number">@CalculatedIMC</div>
-                                            <div class="imc-value-label">IMC (kg/m²)</div>
-                                        </div>
-                                    </div>
-
-                                    <!-- IMC Interpretation Badge -->
-                                    @if (!string.IsNullOrEmpty(IMCInterpretation))
-                                    {
-                                        <div class="imc-interpretation">
-                                            <span class="imc-interpretation-label">Interpretare:</span>
-                                            <span class="imc-badge @GetIMCBadgeClass()">
-                                                <i class="@GetIMCIcon()"></i>
-                                                @IMCInterpretation
-                                            </span>
-                                        </div>
-                                    }
-
-                                    <!-- Info Text -->
-                                    <div class="imc-info-text">
-                                        <i class="fas fa-info-circle"></i>
-                                        IMC se calculează automat: Greutate (kg) / Înălțime² (m)
-                                    </div>
-                                </div>
-
-                                <!-- Celelalte Semne Vitale -->
-                                <div class="row" style="margin-top: 1.5rem;">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Temperatura (°C)</label>
-                                            <input type="number" step="0.1" class="form-control" 
-                                                   placeholder="°C"
-                                                   @bind="Model.Temperatura" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Tensiune Arteriala</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="120/80 mmHg"
-                                                   @bind="Model.TensiuneArteriala" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Puls (bpm)</label>
-                                            <input type="number" class="form-control" 
-                                                   placeholder="bpm"
-                                                   @bind="Model.Puls" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Frecv. Respiratorie (/min)</label>
-                                            <input type="number" class="form-control" 
-                                                   placeholder="/min"
-                                                   @bind="Model.FreccventaRespiratorie" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Saturatie O2 (%)</label>
-                                            <input type="number" class="form-control" 
-                                                   placeholder="%"
-                                                   @bind="Model.SaturatieO2" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Glicemie (mg/dL)</label>
-                                            <input type="number" step="0.1" class="form-control" 
-                                                   placeholder="mg/dL"
-                                                   @bind="Model.Glicemie" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- EXAMEN PE APARATE -->
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-stethoscope"></i>
-                                    C. Examen pe Aparate si Sisteme
-                                </h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Aparat Cardiovascular</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="ZGC normale, fara sufluri..."
-                                                      @bind="Model.ExamenCardiovascular"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Aparat Respiratoriu</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="MV prezent bilateral, fara raluri..."
-                                                      @bind="Model.ExamenRespiratoriu"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Aparat Digestiv</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Abdomen plan, ficat nepalpabil..."
-                                                      @bind="Model.ExamenDigestiv"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Aparat Urinar</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="FLA libere, loja renala nedureroasa..."
-                                                      @bind="Model.ExamenUrinar"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Sistem Nervos</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Constienta prezenta, ROT vii..."
-                                                      @bind="Model.ExamenNervos"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Aparat Locomotor</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Mobilitate articulara normala..."
-                                                      @bind="Model.ExamenLocomotor"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Sistem Endocrin</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Tiroida nepalpabila..."
-                                                      @bind="Model.ExamenEndocrin"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>ORL</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Faringe normal..."
-                                                      @bind="Model.ExamenORL"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Oftalmologic</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Conjunctive rosate..."
-                                                      @bind="Model.ExamenOftalmologic"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Dermatologic</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Piele integra..."
-                                                      @bind="Model.ExamenDermatologic"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB 4: INVESTIGATII -->
-                        <div class="tab-pane @(ActiveTab == "investigatii" ? "active show" : "")">
+                        @* Tab 4: Investigatii - Păstrăm codul vechi (încă nu am componentă) *@
+                        @if (ActiveTab == "investigatii")
+                        {
                             <div class="section-card">
                                 <h5 class="section-title">
                                     <i class="fas fa-vial"></i>
@@ -705,53 +322,20 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        }
 
-                        <!-- TAB 5: DIAGNOSTIC -->
-                        <div class="tab-pane @(ActiveTab == "diagnostic" ? "active show" : "")">
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-diagnoses"></i>
-                                    V. Diagnostic
-                                </h5>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Diagnostic Pozitiv *</label>
-                                            <textarea class="form-control" rows="3" 
-                                                      placeholder="Diagnosticul principal stabilit..."
-                                                      @bind="Model.DiagnosticPozitiv"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Diagnostic Diferential</label>
-                                            <textarea class="form-control" rows="3" 
-                                                      placeholder="Alternative diagnostice considerate..."
-                                                      @bind="Model.DiagnosticDiferential"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Diagnostic Etiologic</label>
-                                            <textarea class="form-control" rows="3" 
-                                                      placeholder="Cauza bolii..."
-                                                      @bind="Model.DiagnosticEtiologic"></textarea>
-                                        </div>
-                                    </div>
-                                    
-                                    @* ✅ NOUA COMPONENTĂ ICD-10 cu DRAG & DROP *@
-                                    <div class="col-12" style="margin-top: 1.5rem;">
-                                        <ICD10DragDropCard 
-                                            @bind-CoduriICD10Principal="Model.CoduriICD10"
-                                            @bind-CoduriICD10Secundare="Model.CoduriICD10Secundare" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @* Tab 5: Diagnostic - Folosim componenta *@
+                        @if (ActiveTab == "diagnostic")
+                        {
+                            <DiagnosticTab Model="@Model"
+                                          OnChanged="MarkAsChanged"
+                                          OnSectionCompleted="() => MarkSectionCompleted(ActiveTab)"
+                                          ShowValidation="false" />
+                        }
 
-                        <!-- TAB 6: TRATAMENT -->
-                        <div class="tab-pane @(ActiveTab == "tratament" ? "active show" : "")">
+                        @* Tab 6: Tratament - Păstrăm codul vechi (încă nu am componentă) *@
+                        @if (ActiveTab == "tratament")
+                        {
                             <div class="section-card">
                                 <h5 class="section-title">
                                     <i class="fas fa-pills"></i>
@@ -824,10 +408,11 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        }
 
-                        <!-- TAB 7: CONCLUZIE -->
-                        <div class="tab-pane @(ActiveTab == "concluzie" ? "active show" : "")">
+                        @* Tab 7: Concluzie - Păstrăm codul vechi (încă nu am componentă) *@
+                        @if (ActiveTab == "concluzie")
+                        {
                             <div class="section-card">
                                 <h5 class="section-title">
                                     <i class="fas fa-check-circle"></i>
@@ -871,57 +456,19 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
 
                     <!-- MODAL FOOTER -->
-                    <div class="modal-footer">
-                        <div class="footer-left">
-                            <button type="button" 
-                                    class="btn btn-secondary" 
-                                    @onclick="SaveDraft"
-                                    disabled="@IsSavingDraft">
-                                @if (IsSavingDraft)
-                                {
-                                    <span class="spinner-border spinner-border-sm me-2"></span>
-                                    <span>Se salvează...</span>
-                                }
-                                else
-                                {
-                                    <i class="fas fa-save"></i>
-                                    <span>Salvează Draft</span>
-                                }
-                            </button>
-                            
-                            @* Afișează ultima dată când draft-ul a fost salvat *@
-                            @* ✅ Folosește property LastSaveTime care citește din LocalStorage per-programare *@
-                            @if (LastSaveTime != DateTime.MinValue)
-                            {
-                                <small class="text-muted ms-2" style="font-size: 0.75rem;">
-                                    <i class="fas fa-check-circle text-success"></i>
-                                    Salvat @GetTimeSinceSave()
-                                </small>
-                            }
-                            
-                            <button type="button" class="btn btn-info" @onclick="PreviewScrisoare">
-                                <i class="fas fa-eye"></i>
-                                Preview Scrisoare
-                            </button>
-                        </div>
-                        <div class="footer-right">
-                            <button type="button" class="btn btn-outline-secondary" @onclick="CloseModal">
-                                Anuleaza
-                            </button>
-                            <button type="submit" class="btn btn-primary" disabled="@IsSaving">
-                                @if (IsSaving)
-                                {
-                                    <span class="spinner-border spinner-border-sm me-2"></span>
-                                }
-                                <i class="fas fa-check"></i>
-                                Finalizeaza Consultatie
-                            </button>
-                        </div>
-                    </div>
+                    @* Componenta Footer *@
+                    <ConsultatieFooter IsSaving="@IsSaving"
+                                      IsSavingDraft="@IsSavingDraft"
+                                      ShowDraftButton="true"
+                                      ShowPreviewButton="true"
+                                      SaveButtonText="Finalizează Consultație"
+                                      OnSaveDraft="SaveDraft"
+                                      OnPreview="PreviewScrisoare"
+                                      OnCancel="CloseModal" />
                 </EditForm>
             </div>
     </div>

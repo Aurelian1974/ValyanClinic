@@ -1,0 +1,37 @@
+﻿@*
+    Tab navigation pentru consultație
+    Permite navigarea între secțiunile formularului
+*@
+
+<div class="consultatie-tabs">
+    <div class="tabs-container">
+        @foreach (var tab in Tabs)
+        {
+            <button type="button"
+                    class="tab-button @(ActiveTab == tab ? "active" : "") @(IsTabCompleted(tab) ? "completed" : "")"
+                    @onclick="() => OnTabClick(tab)"
+                    disabled="@IsDisabled">
+                
+                @if (IsTabCompleted(tab))
+                {
+                    <i class="fas fa-check-circle tab-icon"></i>
+                }
+                else if (ActiveTab == tab)
+                {
+                    <i class="fas fa-edit tab-icon"></i>
+                }
+                else
+                {
+                    <i class="@GetTabIcon(tab) tab-icon"></i>
+                }
+                
+                <span class="tab-label">@GetTabLabel(tab)</span>
+                
+                @if (GetTabBadge(tab) > 0)
+                {
+                    <span class="tab-badge">@GetTabBadge(tab)</span>
+                }
+            </button>
+        }
+    </div>
+</div>
