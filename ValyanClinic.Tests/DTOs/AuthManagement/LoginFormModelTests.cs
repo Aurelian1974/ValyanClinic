@@ -64,9 +64,10 @@ public class LoginFormModelTests
     }
 
     [Theory]
-    [InlineData("a")] // Too short (1 char)
-    [InlineData("ab")] // Too short (2 chars)
-    public void Username_WhenTooShort_ShouldFailValidation(string username)
+    [InlineData("a")] // Valid (no MinimumLength on Username)
+    [InlineData("ab")] // Valid (no MinimumLength on Username)
+    [InlineData("abc")] // Valid
+    public void Username_WithAnyLength_ShouldPassValidation_WhenNotExceedingMax(string username)
     {
         // Arrange
         var model = new LoginFormModel
@@ -79,18 +80,16 @@ public class LoginFormModelTests
         var results = ValidateModel(model);
 
         // Assert
-        results.Should().ContainSingle(r => r.MemberNames.Contains("Username"));
-        results.First(r => r.MemberNames.Contains("Username"))
-            .ErrorMessage.Should().Contain("100 de caractere");
+        results.Should().NotContain(r => r.MemberNames.Contains("Username"));
     }
 
     [Fact]
-    public void Username_WhenTooLong_ShouldFailValidation()
+    public void Username_WhenExceedsMaxLength_ShouldFailValidation()
     {
         // Arrange
         var model = new LoginFormModel
         {
-            Username = new string('a', 101), // 101 characters
+            Username = new string('a', 101), // 101 characters (exceeds max 100)
             Password = "ValidPassword123"
         };
 

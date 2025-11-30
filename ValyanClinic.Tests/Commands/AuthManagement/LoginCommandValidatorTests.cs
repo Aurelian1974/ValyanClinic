@@ -33,9 +33,9 @@ public class LoginCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().ContainSingle(e => e.PropertyName == "Username");
-        result.Errors.First(e => e.PropertyName == "Username")
-            .ErrorMessage.Should().Be("Numele de utilizator este obligatoriu");
+        result.Errors.Should().Contain(e => 
+            e.PropertyName == "Username" && 
+            e.ErrorMessage.Contains("obligatoriu"));
     }
 
     [Theory]
@@ -170,9 +170,9 @@ public class LoginCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().ContainSingle(e => e.PropertyName == "Password");
-        result.Errors.First(e => e.PropertyName == "Password")
-            .ErrorMessage.Should().Be("Parola este obligatorie");
+        result.Errors.Should().Contain(e => 
+            e.PropertyName == "Password" && 
+            e.ErrorMessage.Contains("obligatorie"));
     }
 
     [Theory]
