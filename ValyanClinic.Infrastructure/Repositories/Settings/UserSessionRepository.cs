@@ -127,40 +127,25 @@ public class UserSessionRepository : IUserSessionRepository
         {
             using var connection = _connectionFactory.CreateConnection();
             
-            // Build WHERE clause
-            var where = "WHERE us.EsteActiva = 1";
-            if (utilizatorId.HasValue)
-                where += " AND us.UtilizatorID = @UtilizatorID";
-            if (doarExpiraInCurand)
-                where += $" AND DATEDIFF(MINUTE, GETDATE(), us.DataExpirare) < {EXPIRING_SOON_THRESHOLD_MINUTES}";
-            
-            // Validate and sanitize sort parameters
+            // Validate and sanitize sort parameters (defense in depth)
             var safeColumn = VALID_SORT_COLUMNS.Contains(sortColumn) 
                 ? sortColumn 
                 : DEFAULT_SORT_COLUMN;
-            var safeDirect = sortDirection.ToUpper() == "ASC" ? "ASC" : DEFAULT_SORT_DIRECTION;
+            var safeDirection = sortDirection.ToUpper() == "ASC" ? "ASC" : DEFAULT_SORT_DIRECTION;
             
-            var query = $@"
-                SELECT 
-                    us.SessionID,
-                    us.UtilizatorID,
-                    u.Username,
-                    u.Email,
-                    u.Rol,
-                    us.SessionToken,
-                    us.AdresaIP,
-                    us.UserAgent,
-                    us.Dispozitiv,
-                    us.DataCreare,
-                    us.DataUltimaActivitate,
-                    us.DataExpirare,
-                    us.EsteActiva
-                FROM UserSessions us
-                INNER JOIN Utilizatori u ON us.UtilizatorID = u.UtilizatorID
-                {where}
-                ORDER BY us.{safeColumn} {safeDirect}";
+            // Use stored procedure instead of inline SQL
+            var parameters = new
+            {
+                UtilizatorID = utilizatorId,
+                DoarExpiraInCurand = doarExpiraInCurand,
+                SortColumn = safeColumn,
+                SortDirection = safeDirection
+            };
             
-            var results = await connection.QueryAsync<dynamic>(query, new { UtilizatorID = utilizatorId });
+            var results = await connection.QueryAsync<dynamic>(
+                "SP_GetActiveSessionsWithDetails",
+                parameters,
+                commandType: CommandType.StoredProcedure);
             
             return results.Select(r => (
                 (Guid)r.SessionID,
@@ -276,12 +261,11 @@ public class UserSessionRepository : IUserSessionRepository
         {
             using var connection = _connectionFactory.CreateConnection();
             
-            var result = await connection.ExecuteAsync(@"
-                UPDATE UserSessions 
-                SET EsteActiva = 0, 
-                    DataUltimaActivitate = GETDATE()
-                WHERE SessionID = @SessionID",
-                new { SessionID = sessionId });
+            // Use stored procedure instead of inline SQL
+            var result = await connection.ExecuteAsync(
+                "SP_EndSession",
+                new { SessionID = sessionId },
+                commandType: CommandType.StoredProcedure);
             
             if (result > 0)
             {
@@ -338,17 +322,10 @@ public class UserSessionRepository : IUserSessionRepository
         {
             using var connection = _connectionFactory.CreateConnection();
             
-            var query = $@"
-                SELECT 
-                    (SELECT COUNT(*) FROM UserSessions WHERE EsteActiva = 1) AS TotalActive,
-                    (SELECT COUNT(*) FROM UserSessions 
-                     WHERE EsteActiva = 1 
-                     AND DATEDIFF(MINUTE, GETDATE(), DataExpirare) < {EXPIRING_SOON_THRESHOLD_MINUTES}) AS ExpiraInCurand,
-                    (SELECT COUNT(*) FROM UserSessions 
-                     WHERE EsteActiva = 0 
-                     AND CAST(DataUltimaActivitate AS DATE) = CAST(GETDATE() AS DATE)) AS InactiviAzi";
-            
-            var result = await connection.QuerySingleAsync<dynamic>(query);
+            // Use stored procedure instead of inline SQL
+            var result = await connection.QuerySingleAsync<dynamic>(
+                "SP_GetSessionStatistics",
+                commandType: CommandType.StoredProcedure);
             
             return (
                 (int)result.TotalActive,
