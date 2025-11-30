@@ -4,34 +4,107 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using MediatR;
 using ValyanClinic.Application.Features.AuthManagement.Commands.Login;
+using ValyanClinic.Application.Features.AuthManagement.DTOs;
 
 namespace ValyanClinic.Controllers;
 
 /// <summary>
-/// API Controller pentru autentificare - setează cookies ÎNAINTE de Blazor rendering
+/// API Controller for authentication operations.
+/// Handles login, logout, and authentication state management.
+/// Sets HTTP-only cookies BEFORE Blazor rendering for secure session management.
 /// </summary>
+/// <remarks>
+/// This controller is critical for security:
+/// - Sets HTTP-only, secure cookies (not accessible via JavaScript)
+/// - Manages authentication claims and principal
+/// - Coordinates with MediatR for business logic
+/// - Provides session-only cookies (expire on browser close)
+/// 
+/// All endpoints return standardized JSON responses.
+/// </remarks>
 [ApiController]
 [Route("api/[controller]")]
 public class AuthenticationController : ControllerBase
 {
- private readonly IMediator _mediator;
+    #region Constants
+
+    /// <summary>
+    /// Error message for generic authentication failures
+    /// </summary>
+    private const string ERROR_AUTHENTICATION_FAILED = "Autentificare esuata";
+
+    /// <summary>
+    /// Error message for generic authentication exceptions
+    /// </summary>
+    private const string ERROR_AUTHENTICATION_EXCEPTION = "A aparut o eroare la autentificare";
+
+    /// <summary>
+    /// Error message for logout exceptions
+    /// </summary>
+    private const string ERROR_LOGOUT_EXCEPTION = "A aparut o eroare la deconectare";
+
+    /// <summary>
+    /// Custom claim type for PersonalMedicalID
+    /// </summary>
+    private const string CLAIM_PERSONAL_MEDICAL_ID = "PersonalMedicalID";
+
+    #endregion
+
+    #region Dependencies
+
+    private readonly IMediator _mediator;
     private readonly ILogger<AuthenticationController> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuthenticationController"/> class.
+    /// </summary>
+    /// <param name="mediator">MediatR instance for command/query handling</param>
+    /// <param name="logger">Logger instance for structured logging</param>
     public AuthenticationController(
-   IMediator mediator,
+        IMediator mediator,
         ILogger<AuthenticationController> logger)
     {
         _mediator = mediator;
         _logger = logger;
     }
 
+    #endregion
+
+    #region Authentication Endpoints
+
+    /// <summary>
+    /// Authenticates a user and creates a session cookie.
+    /// </summary>
+    /// <param name="request">Login credentials and preferences</param>
+    /// <returns>
+    /// - 200 OK with user data if authentication successful
+    /// - 401 Unauthorized if credentials are invalid
+    /// - 500 Internal Server Error if an exception occurs
+    /// </returns>
+    /// <remarks>
+    /// This endpoint:
+    /// 1. Validates credentials via MediatR (LoginCommand)
+    /// 2. Creates claims principal with user identity
+    /// 3. Sets HTTP-only, secure, session-only cookie
+    /// 4. Returns user data for client-side state management
+    /// 
+    /// Security:
+    /// - Cookie is HTTP-only (not accessible via JavaScript)
+    /// - Cookie is session-only (expires when browser closes)
+    /// - Sliding expiration enabled (resets on activity)
+    /// - All sensitive operations logged for audit trail
+    /// </remarks>
     [HttpPost("login")]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         try
         {
-            _logger.LogInformation("API Login attempt for user: {Username}", request.Username);
+            _logger.LogInformation("Login attempt for user: {Username}", request.Username);
 
+            // Send command to business layer
             var command = new LoginCommand
             {
                 Username = request.Username,
@@ -42,46 +115,28 @@ public class AuthenticationController : ControllerBase
 
             var result = await _mediator.Send(command);
 
+            // Check if authentication succeeded
             if (!result.IsSuccess || result.Value == null)
             {
-                _logger.LogWarning("API Login failed for user: {Username}", request.Username);
-                return Unauthorized(new { message = result.FirstError ?? "Autentificare esuata" });
+                _logger.LogWarning("Login failed for user: {Username}", request.Username);
+                return Unauthorized(new { message = result.FirstError ?? ERROR_AUTHENTICATION_FAILED });
             }
 
-            // Create claims
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, result.Value.UtilizatorID.ToString()),
-                new Claim(ClaimTypes.Name, result.Value.Username),
-                new Claim(ClaimTypes.Email, result.Value.Email),
-                new Claim(ClaimTypes.Role, result.Value.Rol),
-                new Claim("PersonalMedicalID", result.Value.PersonalMedicalID.ToString())
-            };
-
+            // Create claims for authenticated user
+            var claims = CreateUserClaims(result.Value);
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
-            // ✅ Sign in - TRUE SESSION COOKIE (se șterge ÎNTOTDEAUNA când închizi browser-ul)
+            // Sign in user with session-only cookie
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal,
-                new AuthenticationProperties
-                {
-                    // ✅ FORȚAT: FALSE - cookie se șterge când închizi browser-ul (TOATE ferestrele)
-                    IsPersistent = false,
-                    
-                    // ✅ NULL - nu setăm expirare explicită
-                    ExpiresUtc = null,
-                    
-                    // ✅ TRUE - permite sliding (timeout se resetează la activitate)
-                    AllowRefresh = true,
-                    
-                    // ✅ Timestamp pentru tracking
-                    IssuedUtc = DateTimeOffset.Now
-                });
+                CreateAuthenticationProperties());
 
-            _logger.LogInformation("✅ User authenticated: {Username} (Session cookie - expires when browser closes)", request.Username);
+            _logger.LogInformation("User authenticated successfully: {Username} (Role: {Role})", 
+                request.Username, result.Value.Rol);
 
+            // Return user data for client-side state
             return Ok(new LoginResponse
             {
                 Success = true,
@@ -95,61 +150,156 @@ public class AuthenticationController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "API Login exception for user: {Username}", request.Username);
-            return StatusCode(500, new { message = "A aparut o eroare la autentificare" });
+            _logger.LogError(ex, "Authentication exception for user: {Username}", request.Username);
+            return StatusCode(500, new { message = ERROR_AUTHENTICATION_EXCEPTION });
         }
     }
 
+    /// <summary>
+    /// Signs out the current user and clears the authentication cookie.
+    /// </summary>
+    /// <returns>
+    /// - 200 OK with success flag
+    /// - 500 Internal Server Error if an exception occurs
+    /// </returns>
+    /// <remarks>
+    /// This endpoint:
+    /// 1. Signs out the user from cookie authentication
+    /// 2. Clears the authentication cookie
+    /// 3. Logs the logout event for audit trail
+    /// 
+    /// Client should redirect to login page after successful logout.
+    /// </remarks>
     [HttpPost("logout")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Logout()
     {
         try
         {
+            var username = User.Identity?.Name ?? "Unknown";
+            
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-         _logger.LogInformation("API Logout successful");
+            
+            _logger.LogInformation("User logged out successfully: {Username}", username);
+            
             return Ok(new { success = true });
         }
-      catch (Exception ex)
+        catch (Exception ex)
         {
- _logger.LogError(ex, "API Logout exception");
-          return StatusCode(500, new { message = "A aparut o eroare la deconectare" });
+            _logger.LogError(ex, "Logout exception");
+            return StatusCode(500, new { message = ERROR_LOGOUT_EXCEPTION });
         }
     }
 
+    /// <summary>
+    /// Checks the current authentication state.
+    /// </summary>
+    /// <returns>
+    /// - 200 OK with authentication status and user data if authenticated
+    /// - 200 OK with authenticated: false if not authenticated
+    /// </returns>
+    /// <remarks>
+    /// This endpoint is useful for:
+    /// - Client-side authentication state checks
+    /// - Health checks / monitoring
+    /// - Development/debugging
+    /// 
+    /// Does not modify authentication state.
+    /// </remarks>
     [HttpGet("check")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public IActionResult CheckAuthentication()
     {
         if (User.Identity?.IsAuthenticated == true)
         {
-   return Ok(new
+            return Ok(new
             {
-    authenticated = true,
-     username = User.Identity.Name,
-      role = User.FindFirst(ClaimTypes.Role)?.Value
+                authenticated = true,
+                username = User.Identity.Name,
+                role = User.FindFirst(ClaimTypes.Role)?.Value
             });
+        }
+
+        return Ok(new { authenticated = false });
     }
 
-return Ok(new { authenticated = false });
-  }
+    #endregion
 
- [HttpPost("test-hash")]
+    #region Helper Methods
+
+    /// <summary>
+    /// Creates claims array from authenticated user data.
+    /// </summary>
+    /// <param name="userData">User data from successful authentication</param>
+    /// <returns>Array of claims for claims principal</returns>
+    private Claim[] CreateUserClaims(LoginResultDto userData)
+    {
+        return new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, userData.UtilizatorID.ToString()),
+            new Claim(ClaimTypes.Name, userData.Username),
+            new Claim(ClaimTypes.Email, userData.Email),
+            new Claim(ClaimTypes.Role, userData.Rol),
+            new Claim(CLAIM_PERSONAL_MEDICAL_ID, userData.PersonalMedicalID.ToString())
+        };
+    }
+
+    /// <summary>
+    /// Creates authentication properties for cookie-based authentication.
+    /// </summary>
+    /// <returns>Authentication properties configured for session-only cookies</returns>
+    /// <remarks>
+    /// Configuration:
+    /// - IsPersistent = false: Cookie expires when browser closes (all windows)
+    /// - ExpiresUtc = null: No explicit expiration (rely on browser session)
+    /// - AllowRefresh = true: Sliding expiration (resets timeout on activity)
+    /// - IssuedUtc = now: Timestamp for tracking
+    /// </remarks>
+    private AuthenticationProperties CreateAuthenticationProperties()
+    {
+        return new AuthenticationProperties
+        {
+            IsPersistent = false,      // Session-only cookie
+            ExpiresUtc = null,          // No explicit expiration
+            AllowRefresh = true,        // Sliding expiration enabled
+            IssuedUtc = DateTimeOffset.Now
+        };
+    }
+
+    #endregion
+
+    #region Debug Endpoints (Development Only)
+
+#if DEBUG
+    /// <summary>
+    /// Tests BCrypt password hashing and verification (DEBUG ONLY).
+    /// </summary>
+    /// <param name="request">Password and hash to test</param>
+    /// <returns>Hash verification result and new generated hash</returns>
+    /// <remarks>
+    /// ⚠️ THIS ENDPOINT IS ONLY AVAILABLE IN DEBUG BUILDS.
+    /// Used for testing password hash generation and verification.
+    /// Should NOT be available in production.
+    /// </remarks>
+    [HttpPost("test-hash")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult TestHash([FromBody] TestHashRequest request)
     {
         try
         {
-            _logger.LogInformation("Testing hash for password: {Password}", request.Password);
+            _logger.LogInformation("Testing hash verification (DEBUG)");
             
-            // Use the BCrypt hasher from DI
-            var hasher = new ValyanClinic.Infrastructure.Security.BCryptPasswordHasher(_logger as ILogger<ValyanClinic.Infrastructure.Security.BCryptPasswordHasher>);
+            // Direct instantiation for debug only
+            var hasher = new ValyanClinic.Infrastructure.Security.BCryptPasswordHasher(
+                _logger as ILogger<ValyanClinic.Infrastructure.Security.BCryptPasswordHasher>);
     
-            // Test verification
             bool isValid = hasher.VerifyPassword(request.Password, request.Hash);
-            
-            _logger.LogInformation("Hash verification result: {Result}", isValid);
-  
-            // Generate new hash for comparison
             string newHash = hasher.HashPassword(request.Password);
      
+            _logger.LogInformation("Hash verification result: {Result}", isValid);
+
             return Ok(new
             {
                 inputPassword = request.Password,
@@ -167,36 +317,39 @@ return Ok(new { authenticated = false });
     }
 
     /// <summary>
-    /// ✅ ADDED: Endpoint pentru fix password - DOAR PENTRU DEBUGGING
+    /// Fixes/resets a user password (DEBUG ONLY).
     /// </summary>
+    /// <param name="request">User ID, username, and new password</param>
+    /// <returns>Success status and new credentials</returns>
+    /// <remarks>
+    /// ⚠️ THIS ENDPOINT IS ONLY AVAILABLE IN DEBUG BUILDS.
+    /// Used for development/testing to reset passwords.
+    /// Should NOT be available in production.
+    /// </remarks>
     [HttpPost("fix-password")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> FixPassword([FromBody] FixPasswordRequest request)
     {
         try
         {
-            _logger.LogInformation("========== FIX PASSWORD START ==========");
-            _logger.LogInformation("Fixing password for user: {Username}", request.Username);
+            _logger.LogInformation("Password reset request (DEBUG) for user: {Username}", request.Username);
             
-            // Generate BCrypt hash
+            // Generate and verify new hash
             var hasher = new ValyanClinic.Infrastructure.Security.BCryptPasswordHasher(
                 _logger as ILogger<ValyanClinic.Infrastructure.Security.BCryptPasswordHasher>);
             
             string newHash = hasher.HashPassword(request.NewPassword);
-            
-            _logger.LogInformation("New hash generated (preview): {HashPreview}", newHash.Substring(0, Math.Min(30, newHash.Length)));
-            
-            // Verify hash works
             bool testVerify = hasher.VerifyPassword(request.NewPassword, newHash);
             
             if (!testVerify)
             {
-                _logger.LogError("Generated hash FAILED verification!");
+                _logger.LogError("Generated hash failed verification!");
                 return BadRequest(new { error = "Generated hash failed verification" });
             }
             
-            _logger.LogInformation("Hash verification: ✓ PASSED");
-            
-            // Update password using ChangePasswordCommand
+            // Update password using command
             var changePasswordCommand = new ValyanClinic.Application.Features.UtilizatorManagement.Commands.ChangePassword.ChangePasswordCommand
             {
                 UtilizatorID = request.UtilizatorID,
@@ -208,7 +361,8 @@ return Ok(new { authenticated = false });
             
             if (result.IsSuccess)
             {
-                _logger.LogInformation("========== FIX PASSWORD SUCCESS ==========");
+                _logger.LogInformation("Password reset successful (DEBUG) for user: {Username}", request.Username);
+                
                 return Ok(new
                 {
                     success = true,
@@ -224,7 +378,7 @@ return Ok(new { authenticated = false });
             }
             else
             {
-                _logger.LogError("ChangePasswordCommand failed: {Errors}", string.Join(", ", result.Errors));
+                _logger.LogError("Password reset failed (DEBUG): {Errors}", string.Join(", ", result.Errors));
                 return BadRequest(new
                 {
                     success = false,
@@ -234,43 +388,35 @@ return Ok(new { authenticated = false });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "========== FIX PASSWORD EXCEPTION ==========");
+            _logger.LogError(ex, "Password reset exception (DEBUG)");
             return StatusCode(500, new { error = ex.Message });
         }
     }
-}
 
-public class LoginRequest
-{
-    public string Username { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-    public bool RememberMe { get; set; }
-    public bool ResetPasswordOnFirstLogin { get; set; }
-}
+    #region Debug DTOs
 
-public class LoginResponse
-{
-    public bool Success { get; set; }
-    public string Username { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Rol { get; set; } = string.Empty;
-  public Guid UtilizatorID { get; set; }
-    public Guid PersonalMedicalID { get; set; } // ✅ NOU: Pentru PersonalMedical
-    public bool RequiresPasswordReset { get; set; }
-}
+    /// <summary>
+    /// Request DTO for test-hash endpoint (DEBUG ONLY)
+    /// </summary>
+    public class TestHashRequest
+    {
+        public string Password { get; set; } = string.Empty;
+        public string Hash { get; set; } = string.Empty;
+    }
 
-public class TestHashRequest
-{
-    public string Password { get; set; } = string.Empty;
- public string Hash { get; set; } = string.Empty;
-}
+    /// <summary>
+    /// Request DTO for fix-password endpoint (DEBUG ONLY)
+    /// </summary>
+    public class FixPasswordRequest
+    {
+        public Guid UtilizatorID { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
+    }
 
-/// <summary>
-/// ✅ ADDED: DTO pentru fix password endpoint
-/// </summary>
-public class FixPasswordRequest
-{
-    public Guid UtilizatorID { get; set; }
-    public string Username { get; set; } = string.Empty;
-    public string NewPassword { get; set; } = string.Empty;
+    #endregion
+
+#endif
+
+    #endregion
 }
