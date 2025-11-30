@@ -28,88 +28,76 @@ public class AuthenticationController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-    try
+        try
         {
-    _logger.LogInformation("API Login attempt for user: {Username}", request.Username);
+            _logger.LogInformation("API Login attempt for user: {Username}", request.Username);
 
             var command = new LoginCommand
-      {
-     Username = request.Username,
-     Password = request.Password,
+            {
+                Username = request.Username,
+                Password = request.Password,
                 RememberMe = request.RememberMe,
-     ResetPasswordOnFirstLogin = request.ResetPasswordOnFirstLogin
-  };
+                ResetPasswordOnFirstLogin = request.ResetPasswordOnFirstLogin
+            };
 
             var result = await _mediator.Send(command);
 
-     if (!result.IsSuccess || result.Value == null)
-  {
-   _logger.LogWarning("API Login failed for user: {Username}", request.Username);
-     return Unauthorized(new { message = result.FirstError ?? "Autentificare esuata" });
-      }
+            if (!result.IsSuccess || result.Value == null)
+            {
+                _logger.LogWarning("API Login failed for user: {Username}", request.Username);
+                return Unauthorized(new { message = result.FirstError ?? "Autentificare esuata" });
+            }
 
-         // Create claims
+            // Create claims
             var claims = new[]
-   {
-    new Claim(ClaimTypes.NameIdentifier, result.Value.UtilizatorID.ToString()),
-       new Claim(ClaimTypes.Name, result.Value.Username),
-      new Claim(ClaimTypes.Email, result.Value.Email),
-   new Claim(ClaimTypes.Role, result.Value.Rol),
-        new Claim("PersonalMedicalID", result.Value.PersonalMedicalID.ToString()),
-    new Claim("LoginTime", DateTime.Now.ToString("O")) // ✅ CORECTARE: Ora locală România
-    };
+            {
+                new Claim(ClaimTypes.NameIdentifier, result.Value.UtilizatorID.ToString()),
+                new Claim(ClaimTypes.Name, result.Value.Username),
+                new Claim(ClaimTypes.Email, result.Value.Email),
+                new Claim(ClaimTypes.Role, result.Value.Rol),
+                new Claim("PersonalMedicalID", result.Value.PersonalMedicalID.ToString())
+            };
 
-       var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
-            // ✅ Sign in cu sliding expiration (30 minute timeout)
-    // Cookie-ul expira după 30 minute de inactivitate
- await HttpContext.SignInAsync(
+            // ✅ Sign in - TRUE SESSION COOKIE (se șterge ÎNTOTDEAUNA când închizi browser-ul)
+            await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
-  principal,
+                principal,
                 new AuthenticationProperties
-   {
- // ✅ Session cookie (nu persistă între restart-uri browser)
-     IsPersistent = false,
-          
-   // ✅ NU setăm ExpiresUtc explicit
-    // ExpireTimeSpan din Program.cs (30 minute) se va aplica automat
-         ExpiresUtc = null,
-      
-      // ✅ Allow sliding expiration
-             AllowRefresh = true,
-       
-     // ✅ IssuedUtc pentru tracking (convertit automat din ora locală)
-        IssuedUtc = DateTimeOffset.Now // ✅ CORECTARE: Ora locală cu offset corect
-         });
+                {
+                    // ✅ FORȚAT: FALSE - cookie se șterge când închizi browser-ul (TOATE ferestrele)
+                    IsPersistent = false,
+                    
+                    // ✅ NULL - nu setăm expirare explicită
+                    ExpiresUtc = null,
+                    
+                    // ✅ TRUE - permite sliding (timeout se resetează la activitate)
+                    AllowRefresh = true,
+                    
+                    // ✅ Timestamp pentru tracking
+                    IssuedUtc = DateTimeOffset.Now
+                });
 
- // CRITICAL: Update HttpContext.User manually for current request
-            // SignInAsync only sets the cookie for NEXT request, not current one
-     HttpContext.User = principal;
+            _logger.LogInformation("✅ User authenticated: {Username} (Session cookie - expires when browser closes)", request.Username);
 
-    _logger.LogInformation("✅ COOKIE CREATED:");
-            _logger.LogInformation("  - Type: Session cookie (browser session)");
-         _logger.LogInformation("  - Timeout: 30 minutes (sliding expiration)");
-            _logger.LogInformation("  - IssuedUtc: {IssuedUtc} (Romania timezone)", DateTimeOffset.Now);
-            _logger.LogInformation("User authenticated: {IsAuthenticated}", HttpContext.User.Identity?.IsAuthenticated);
-     _logger.LogInformation("API Login successful for user: {Username}", request.Username);
-
-    return Ok(new LoginResponse
-     {
+            return Ok(new LoginResponse
+            {
                 Success = true,
-    Username = result.Value.Username,
-       Email = result.Value.Email,
+                Username = result.Value.Username,
+                Email = result.Value.Email,
                 Rol = result.Value.Rol,
-            UtilizatorID = result.Value.UtilizatorID,
-        PersonalMedicalID = result.Value.PersonalMedicalID, // ✅ NOU
-  RequiresPasswordReset = result.Value.RequiresPasswordReset
-   });
+                UtilizatorID = result.Value.UtilizatorID,
+                PersonalMedicalID = result.Value.PersonalMedicalID,
+                RequiresPasswordReset = result.Value.RequiresPasswordReset
+            });
         }
-catch (Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "API Login exception for user: {Username}", request.Username);
- return StatusCode(500, new { message = "A aparut o eroare la autentificare" });
-     }
+            return StatusCode(500, new { message = "A aparut o eroare la autentificare" });
+        }
     }
 
     [HttpPost("logout")]

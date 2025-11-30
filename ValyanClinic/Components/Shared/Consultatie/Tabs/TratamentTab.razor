@@ -1,0 +1,109 @@
+﻿@*
+    Tab Tratament - Consultație
+    Include: Tratament medicamentos, nemedicamentos, recomandări
+*@
+
+<div class="tab-pane @(IsActive ? "active" : "")" id="tab-tratament">
+    <div class="section-card">
+        <h5 class="section-title">
+            <i class="fas fa-pills"></i>
+            VI. Tratament și Recomandări
+        </h5>
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="required">Tratament Medicamentos</label>
+                    <textarea class="form-control @(ShowValidation && string.IsNullOrWhiteSpace(Model.TratamentMedicamentos) ? "is-invalid" : "")" 
+                              rows="4" 
+                              placeholder="Listă medicamentelor prescrise cu dozaj și durată..."
+                              @bind="Model.TratamentMedicamentos"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Ex: Ibuprofen 400mg x 3/zi, 7 zile</small>
+                    @if (ShowValidation && string.IsNullOrWhiteSpace(Model.TratamentMedicamentos))
+                    {
+                        <div class="invalid-feedback">Tratamentul medicamentos este obligatoriu</div>
+                    }
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Tratament Nemedicamentos</label>
+                    <textarea class="form-control" rows="3" 
+                              placeholder="Fizioterapie, recuperare, etc..."
+                              @bind="Model.TratamentNemedicamentos"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Kinetoterapie, psihoterapie, etc.</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Recomandări Dietetice</label>
+                    <textarea class="form-control" rows="3" 
+                              placeholder="Dietă recomandată..."
+                              @bind="Model.RecomandariDietetice"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Restricții alimentare, suplimente</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Recomandări Regim de Viață</label>
+                    <textarea class="form-control" rows="3" 
+                              placeholder="Activitate fizică, repaus..."
+                              @bind="Model.RecomandariRegimViata"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Activitate, somn, evitare factori</small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Investigații Recomandate</label>
+                    <textarea class="form-control" rows="3" 
+                              placeholder="Investigații suplimentare necesare..."
+                              @bind="Model.InvestigatiiRecomandate"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Analize, imagistică pentru urmărire</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Consulturi de Specialitate</label>
+                    <textarea class="form-control" rows="3" 
+                              placeholder="Trimiteri la alte specialități..."
+                              @bind="Model.ConsulturiSpecialitate"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Bilete trimitere specialiști</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Data Următoarei Programări</label>
+                    <input type="text" class="form-control" 
+                           placeholder="Ex: 1 lună, 3 luni..."
+                           @bind="Model.DataUrmatoareiProgramari"
+                           @oninput="OnFieldChanged" />
+                    <small class="form-text">Interval control</small>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Recomandări Supraveghere</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Ce trebuie supravegheat în evoluție..."
+                              @bind="Model.RecomandariSupraveghere"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Simptome de monitorizat, semne de alarmă</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Section Completed Indicator *@
+    @if (IsSectionCompleted)
+    {
+        <div class="section-completed-indicator">
+            <i class="fas fa-check-circle"></i>
+            <span>Secțiune completată</span>
+        </div>
+    }
+</div>

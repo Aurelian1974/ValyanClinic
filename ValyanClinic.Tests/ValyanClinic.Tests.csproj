@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ValyanClinic.Application\ValyanClinic.Application.csproj" />
+    <ProjectReference Include="..\ValyanClinic\ValyanClinic.csproj" />
   </ItemGroup>
 
 </Project>

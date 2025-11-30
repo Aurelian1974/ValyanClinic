@@ -21,6 +21,7 @@
   <ItemGroup>
     <Folder Include="Common\Interfaces\" />
     <Folder Include="Helpers\" />
+    <Folder Include="Services\ICD10\" />
   </ItemGroup>
 
   <PropertyGroup>

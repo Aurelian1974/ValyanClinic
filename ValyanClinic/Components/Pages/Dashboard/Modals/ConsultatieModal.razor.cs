@@ -7,7 +7,7 @@ using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
 using ValyanClinic.Application.Features.ProgramareManagement.DTOs;
 using ValyanClinic.Application.Services.IMC;
 using ValyanClinic.Infrastructure.Services.DraftStorage;
-using System.Text.Json;
+using ValyanClinic.Application.Services.Draft;
 
 namespace ValyanClinic.Components.Pages.Dashboard.Modals;
 
@@ -18,6 +18,7 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private IIMCCalculatorService IMCCalculator { get; set; } = default!;
     [Inject] private IDraftStorageService<CreateConsultatieCommand> DraftService { get; set; } = default!;
+    [Inject] private DraftAutoSaveHelper<CreateConsultatieCommand> DraftAutoSaveHelper { get; set; } = default!;
 
     // Parameters
     [Parameter] public Guid ProgramareID { get; set; }
@@ -51,40 +52,9 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     };
     private HashSet<string> CompletedSections { get; set; } = new();
 
-    // ✅ AUTO-SAVE
-    private System.Threading.Timer? _autoSaveTimer;
+    // ✅ DRAFT AUTO-SAVE (Hybrid Approach)
     private bool _hasUnsavedChanges = false;
-    private const int AutoSaveIntervalSeconds = 60; // Auto-save la fiecare 60 secunde
-    
-    // ✅ CACHED LastSaveTime pentru a evita blocking calls
     private DateTime _cachedLastSaveTime = DateTime.MinValue;
-
-    // Computed Properties - folosind serviciul IMCCalculator
-    private string CalculatedIMC
-    {
-        get
-        {
-            if (Model.Greutate.HasValue && Model.Inaltime.HasValue)
-            {
-                var result = IMCCalculator.Calculate(Model.Greutate.Value, Model.Inaltime.Value);
-                return result.Value.ToString("F2");
-            }
-            return "-";
-        }
-    }
-
-    private string IMCInterpretation
-    {
-        get
-        {
-            if (Model.Greutate.HasValue && Model.Inaltime.HasValue)
-            {
-                var result = IMCCalculator.Calculate(Model.Greutate.Value, Model.Inaltime.Value);
-                return result.Interpretation;
-            }
-            return "";
-        }
-    }
 
     // ✅ Property pentru LastSaveTime - returnează cached value
     private DateTime LastSaveTime => _cachedLastSaveTime;
@@ -95,25 +65,23 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
         try
         {
             Logger.LogInformation("[ConsultatieModal] ===== OPENING MODAL =====");
-            Logger.LogInformation("[ConsultatieModal] ProgramareID: {ProgramareID}", ProgramareID);
-            Logger.LogInformation("[ConsultatieModal] PacientID: {PacientID}", PacientID);
-            Logger.LogInformation("[ConsultatieModal] MedicID: {MedicID}", MedicID);
             
-            // ✅ Set visible FIRST
+            // ✅ Validare parametrii
+            if (ProgramareID == Guid.Empty || PacientID == Guid.Empty || MedicID == Guid.Empty)
+            {
+                throw new InvalidOperationException("Invalid parameters");
+            }
+            
             IsVisible = true;
-            Logger.LogInformation("[ConsultatieModal] IsVisible set to TRUE");
-            
-            // Force immediate UI update
             await InvokeAsync(StateHasChanged);
-            Logger.LogInformation("[ConsultatieModal] StateHasChanged called (1st)");
             
-            // ✅ Load cached LastSaveTime from storage
+            // ✅ Load cached LastSaveTime
             await LoadLastSaveTimeFromStorage();
             
             // Load pacient data
             await LoadPacientData();
             
-            // ✅ Încarcă draft existent (dacă există)
+            // ✅ Încarcă draft existent
             await LoadDraftFromStorage();
             
             // Initialize model if needed
@@ -122,10 +90,12 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
                 InitializeModel();
             }
             
-            // ✅ Start auto-save timer
-            StartAutoSaveTimer();
+            // ✅ Start auto-save using helper (Hybrid Approach)
+            DraftAutoSaveHelper.Start(
+                shouldSaveCallback: async () => await Task.FromResult(_hasUnsavedChanges && IsVisible && !IsSaving && !IsSavingDraft),
+                saveCallback: SaveDraft
+            );
             
-            // Final state update
             await InvokeAsync(StateHasChanged);
             Logger.LogInformation("[ConsultatieModal] ===== MODAL OPENED SUCCESSFULLY =====");
         }
@@ -137,12 +107,43 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
         }
     }
 
+    // ✅ ADAUGĂ lifecycle hooks pentru debugging
+    protected override void OnInitialized()
+    {
+        Logger.LogInformation("[ConsultatieModal] OnInitialized - Component initialized");
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation("[ConsultatieModal] OnInitializedAsync - Component async initialized");
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Logger.LogInformation("[ConsultatieModal] OnAfterRender - First render completed");
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Logger.LogInformation("[ConsultatieModal] OnAfterRenderAsync - First render async completed");
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
     public void Close()
     {
         Logger.LogInformation("[ConsultatieModal] Closing modal");
         
-        // ✅ Stop auto-save timer
-        StopAutoSaveTimer();
+        // ✅ Stop auto-save using helper
+        DraftAutoSaveHelper.Stop();
         
         IsVisible = false;
         ResetModal();
@@ -383,29 +384,6 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     }
 
     /// <summary>
-    /// Auto-save timer - salvează automat la fiecare 60 secunde
-    /// </summary>
-    private void StartAutoSaveTimer()
-    {
-        _autoSaveTimer = new System.Threading.Timer(async _ =>
-        {
-            if (_hasUnsavedChanges && IsVisible && !IsSaving && !IsSavingDraft)
-            {
-                await SaveDraft();
-            }
-        }, null, TimeSpan.FromSeconds(AutoSaveIntervalSeconds), TimeSpan.FromSeconds(AutoSaveIntervalSeconds));
-
-        Logger.LogDebug("[ConsultatieModal] Auto-save timer started (interval: {Seconds}s)", AutoSaveIntervalSeconds);
-    }
-
-    private void StopAutoSaveTimer()
-    {
-        _autoSaveTimer?.Dispose();
-        _autoSaveTimer = null;
-        Logger.LogDebug("[ConsultatieModal] Auto-save timer stopped");
-    }
-
-    /// <summary>
     /// Marchează că au fost făcute modificări nesalvate
     /// </summary>
     private void MarkAsChanged()
@@ -415,211 +393,6 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
 
     // ==================== END DRAFT MANAGEMENT ====================
     
-    // ✅ ==================== ICD-10 MANAGEMENT ====================
-    
-    /// <summary>
-    /// Handler pentru schimbarea codului ICD-10 din autocomplete (two-way binding)
-    /// </summary>
-    private Task HandleICD10CodeChanged(string? code)
-    {
-        Model.CoduriICD10 = code;
-        MarkAsChanged();
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-    
-    /// <summary>
-    /// Handler pentru selecția unui cod ICD-10 din autocomplete
-    /// Permite selecții multiple prin separare cu virgulă
-    /// </summary>
-    private void HandleICD10Selected(ValyanClinic.Application.Features.ICD10Management.DTOs.ICD10SearchResultDto? selectedCode)
-    {
-        if (selectedCode == null) return;
-
-        try
-        {
-            Logger.LogInformation("[ConsultatieModal] ICD-10 code selected: {Code} - {Description}", 
-                selectedCode.Code, selectedCode.ShortDescription);
-
-            // Verifică dacă codul există deja
-            var existingCodes = string.IsNullOrEmpty(Model.CoduriICD10) 
-                ? new List<string>() 
-                : Model.CoduriICD10.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(c => c.Trim())
-                    .ToList();
-
-            if (!existingCodes.Contains(selectedCode.Code))
-            {
-                // Adaugă noul cod
-                if (string.IsNullOrEmpty(Model.CoduriICD10))
-                {
-                    Model.CoduriICD10 = selectedCode.Code;
-                }
-                else
-                {
-                    Model.CoduriICD10 += $", {selectedCode.Code}";
-                }
-
-                MarkAsChanged();
-                StateHasChanged();
-
-                Logger.LogInformation("[ConsultatieModal] ICD-10 code added. Total codes: {Codes}", Model.CoduriICD10);
-            }
-            else
-            {
-                Logger.LogDebug("[ConsultatieModal] ICD-10 code {Code} already exists", selectedCode.Code);
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "[ConsultatieModal] Error handling ICD-10 selection");
-        }
-    }
-
-    /// <summary>
-    /// Șterge un cod ICD-10 din lista de coduri selectate
-    /// </summary>
-    private void RemoveICD10Code(string codeToRemove)
-    {
-        try
-        {
-            Logger.LogInformation("[ConsultatieModal] Removing ICD-10 code: {Code}", codeToRemove);
-
-            if (string.IsNullOrEmpty(Model.CoduriICD10)) return;
-
-            var existingCodes = Model.CoduriICD10
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(c => c.Trim())
-                .Where(c => c != codeToRemove)
-                .ToList();
-
-            Model.CoduriICD10 = existingCodes.Any() 
-                ? string.Join(", ", existingCodes) 
-                : string.Empty;
-
-            MarkAsChanged();
-            StateHasChanged();
-
-            Logger.LogInformation("[ConsultatieModal] ICD-10 code removed. Remaining codes: {Codes}", Model.CoduriICD10);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "[ConsultatieModal] Error removing ICD-10 code");
-        }
-    }
-    
-    // ==================== END ICD-10 MANAGEMENT ====================
-
-    // ✅ ==================== ICD-10 SECUNDARE MANAGEMENT ====================
-    
-    /// <summary>
-    /// Handler pentru schimbarea codurilor ICD-10 secundare (two-way binding)
-    /// </summary>
-    private Task HandleICD10SecundareChanged(string? code)
-    {
-        Model.CoduriICD10Secundare = code;
-        MarkAsChanged();
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-    
-    /// <summary>
-    /// Handler pentru selecția unui cod ICD-10 secundar
-    /// Permite adăugarea MULTIPLĂ de coduri
-    /// </summary>
-    private void HandleICD10SecundarSelected(ValyanClinic.Application.Features.ICD10Management.DTOs.ICD10SearchResultDto? selectedCode)
-    {
-        if (selectedCode == null) return;
-
-        try
-        {
-            Logger.LogInformation("[ConsultatieModal] ICD-10 SECUNDAR selected: {Code} - {Description}", 
-                selectedCode.Code, selectedCode.ShortDescription);
-
-            // Verifică dacă codul există deja în secundare
-            var existingCodes = string.IsNullOrEmpty(Model.CoduriICD10Secundare) 
-                ? new List<string>() 
-                : Model.CoduriICD10Secundare.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(c => c.Trim())
-                    .ToList();
-
-            // Verifică dacă codul este deja în principal
-            var principalCodes = string.IsNullOrEmpty(Model.CoduriICD10)
-                ? new List<string>()
-                : Model.CoduriICD10.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(c => c.Trim())
-                    .ToList();
-
-            if (principalCodes.Contains(selectedCode.Code))
-            {
-                Logger.LogWarning("[ConsultatieModal] ICD-10 code {Code} already exists in PRINCIPAL codes", selectedCode.Code);
-                // TODO: Show warning toast "Codul există deja ca diagnostic principal!"
-                return;
-            }
-
-            if (!existingCodes.Contains(selectedCode.Code))
-            {
-                // Adaugă noul cod secundar
-                if (string.IsNullOrEmpty(Model.CoduriICD10Secundare))
-                {
-                    Model.CoduriICD10Secundare = selectedCode.Code;
-                }
-                else
-                {
-                    Model.CoduriICD10Secundare += $", {selectedCode.Code}";
-                }
-
-                MarkAsChanged();
-                StateHasChanged();
-
-                Logger.LogInformation("[ConsultatieModal] ICD-10 SECUNDAR added. Total: {Codes}", Model.CoduriICD10Secundare);
-            }
-            else
-            {
-                Logger.LogDebug("[ConsultatieModal] ICD-10 SECUNDAR {Code} already exists", selectedCode.Code);
-                // TODO: Show info toast "Codul a fost deja adăugat!"
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "[ConsultatieModal] Error handling ICD-10 SECUNDAR selection");
-        }
-    }
-
-    /// <summary>
-    /// Șterge un cod ICD-10 secundar din listă
-    /// </summary>
-    private void RemoveICD10SecundarCode(string codeToRemove)
-    {
-        try
-        {
-            Logger.LogInformation("[ConsultatieModal] Removing ICD-10 SECUNDAR: {Code}", codeToRemove);
-
-            if (string.IsNullOrEmpty(Model.CoduriICD10Secundare)) return;
-
-            var existingCodes = Model.CoduriICD10Secundare
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(c => c.Trim())
-                .Where(c => c != codeToRemove)
-                .ToList();
-
-            Model.CoduriICD10Secundare = existingCodes.Any() 
-                ? string.Join(", ", existingCodes) 
-                : string.Empty;
-
-            MarkAsChanged();
-            StateHasChanged();
-
-            Logger.LogInformation("[ConsultatieModal] ICD-10 SECUNDAR removed. Remaining: {Codes}", Model.CoduriICD10Secundare);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "[ConsultatieModal] Error removing ICD-10 SECUNDAR");
-        }
-    }
-    
-    // ==================== END ICD-10 SECUNDARE ====================
-
     private async Task PreviewScrisoare()
     {
         Logger.LogInformation("[ConsultatieModal] Generating preview...");
@@ -630,7 +403,7 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     private async Task CloseModal()
     {
         // ✅ Verifică dacă există modificări nesalvate
-        var lastSave = LastSaveTime; // ✅ Citește din property
+        var lastSave = LastSaveTime;
         if (_hasUnsavedChanges && (DateTime.Now - lastSave).TotalMinutes > 1)
         {
             // TODO: Show confirmation dialog "Ai modificări nesalvate. Salvezi draft?"
@@ -648,52 +421,12 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
         await CloseModal();
     }
 
-    private void CalculateIMC()
-    {
-        MarkAsChanged();
-        StateHasChanged();
-    }
-
-    /// <summary>
-    /// Returnează clasa CSS pentru badge-ul IMC bazat pe interpretare
-    /// </summary>
-    private string GetIMCBadgeClass()
-    {
-        if (!Model.Greutate.HasValue || !Model.Inaltime.HasValue)
-            return "";
-
-        var result = IMCCalculator.Calculate(Model.Greutate.Value, Model.Inaltime.Value);
-        return result.ColorClass;
-    }
-
-    /// <summary>
-    /// Returnează iconița FontAwesome pentru badge-ul IMC
-    /// </summary>
-    private string GetIMCIcon()
-    {
-        if (!Model.Greutate.HasValue || !Model.Inaltime.HasValue)
-            return "fas fa-calculator";
-
-        var result = IMCCalculator.Calculate(Model.Greutate.Value, Model.Inaltime.Value);
-        
-        return result.Category switch
-        {
-            IMCCategory.Subponderal => "fas fa-arrow-down",
-            IMCCategory.Normal => "fas fa-check-circle",
-            IMCCategory.Supraponderal => "fas fa-exclamation-triangle",
-            IMCCategory.Obezitate1 => "fas fa-exclamation-circle",
-            IMCCategory.Obezitate2 => "fas fa-times-circle",
-            IMCCategory.ObezitateMorbida => "fas fa-skull-crossbones",
-            _ => "fas fa-calculator"
-        };
-    }
-
     /// <summary>
     /// Returnează string-ul "acum X minute" pentru timpul trecut de la ultima salvare
     /// </summary>
     private string GetTimeSinceSave()
     {
-        var lastSave = LastSaveTime; // ✅ Citește din property (bound la ProgramareID)
+        var lastSave = LastSaveTime;
         if (lastSave == DateTime.MinValue) return "";
 
         var timeSince = DateTime.Now - lastSave;
@@ -758,6 +491,6 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     // ✅ IDisposable implementation
     public void Dispose()
     {
-        StopAutoSaveTimer();
+        DraftAutoSaveHelper?.Dispose();
     }
 }

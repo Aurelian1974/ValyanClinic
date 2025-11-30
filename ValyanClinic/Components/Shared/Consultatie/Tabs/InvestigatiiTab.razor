@@ -1,0 +1,64 @@
+﻿@*
+    Tab Investigații - Consultație
+    Include: Laborator, Imagistice, EKG, Alte investigații
+*@
+
+<div class="tab-pane @(IsActive ? "active" : "")" id="tab-investigatii">
+    <div class="section-card">
+        <h5 class="section-title">
+            <i class="fas fa-vial"></i>
+            IV. Investigații Efectuate
+        </h5>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Investigații Laborator</label>
+                    <textarea class="form-control" rows="4" 
+                              placeholder="Hemoleucogramă, VSH, transaminaze..."
+                              @bind="Model.InvestigatiiLaborator"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Rezultate analize de sânge, urină, etc.</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Investigații Imagistice</label>
+                    <textarea class="form-control" rows="4" 
+                              placeholder="Radiografie, ecografie, CT..."
+                              @bind="Model.InvestigatiiImagistice"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">RX, ECO, CT, RMN, etc.</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>EKG</label>
+                    <textarea class="form-control" rows="4" 
+                              placeholder="Ritm sinusal, fără modificări ST-T..."
+                              @bind="Model.InvestigatiiEKG"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Electrocardiogramă</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Alte Investigații</label>
+                    <textarea class="form-control" rows="4" 
+                              placeholder="Alte investigații efectuate..."
+                              @bind="Model.AlteInvestigatii"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Spirometrie, audiogramă, etc.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Section Completed Indicator *@
+    @if (IsSectionCompleted)
+    {
+        <div class="section-completed-indicator">
+            <i class="fas fa-check-circle"></i>
+            <span>Secțiune completată</span>
+        </div>
+    }
+</div>

@@ -1,5 +1,4 @@
-﻿@rendermode InteractiveServer
-@using ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie
+﻿@using ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie
 @using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
 @using ValyanClinic.Application.Features.ProgramareManagement.DTOs
 @using ValyanClinic.Components.Shared
@@ -37,7 +36,7 @@
                     <!-- TAB CONTENT -->
                     <div class="tab-content consultatie-content">
 
-                        @* Tab 1: Motive Prezentare - Folosim componenta *@
+                        @* Tab 1: Motive Prezentare *@
                         @if (ActiveTab == "motive")
                         {
                             <MotivePrezentareTab Model="@Model"
@@ -46,231 +45,18 @@
                                                 ShowValidation="false" />
                         }
 
-                        @* Tab 2: Antecedente - Păstrăm codul vechi (încă nu am componentă) *@
+                        @* Tab 2: Antecedente - FOLOSEȘTE COMPONENTA NOUĂ *@
                         @if (ActiveTab == "antecedente")
                         {
-                            <!-- A. ANTECEDENTE HEREDO-COLATERALE -->
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-users"></i>
-                                    A. Antecedente Heredo-Colaterale (AHC)
-                                </h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Mama</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Boli cunoscute ale mamei..."
-                                                      @bind="Model.AHC_Mama"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Tata</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Boli cunoscute ale tatalui..."
-                                                      @bind="Model.AHC_Tata"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Frati</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Boli cunoscute la frati..."
-                                                      @bind="Model.AHC_Frati"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Bunici</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Boli cunoscute la bunici..."
-                                                      @bind="Model.AHC_Bunici"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Alte Rude</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Alte boli ereditare in familie..."
-                                                      @bind="Model.AHC_Altele"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- B. ANTECEDENTE FIZIOLOGICE -->
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-baby"></i>
-                                    B. Antecedente Fiziologice (AF)
-                                </h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Nastere</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="La termen, prematur, CS..."
-                                                   @bind="Model.AF_Nastere" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Dezvoltare</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="Normala, intarziata..."
-                                                   @bind="Model.AF_Dezvoltare" />
-                                        </div>
-                                    </div>
-
-                                    @if (PacientInfo?.Sex == "F")
-                                    {
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Menstruatie</label>
-                                                <input type="text" class="form-control" 
-                                                       placeholder="Varsta debut, regularitate..."
-                                                       @bind="Model.AF_Menstruatie" />
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Sarcini</label>
-                                                <input type="text" class="form-control" 
-                                                       placeholder="Numar sarcini, nasteri..."
-                                                       @bind="Model.AF_Sarcini" />
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Alaptare</label>
-                                                <input type="text" class="form-control" 
-                                                       placeholder="Durata alaptarii..."
-                                                       @bind="Model.AF_Alaptare" />
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-
-                            <!-- C. ANTECEDENTE PERSONALE PATOLOGICE -->
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-notes-medical"></i>
-                                    C. Antecedente Personale Patologice (APP)
-                                </h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Boli Copilarie/Adolescenta</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Rujeola, varicela, oreion..."
-                                                      @bind="Model.APP_BoliCopilarieAdolescenta"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Boli Adult</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Diabet, HTA, boli cronice..."
-                                                      @bind="Model.APP_BoliAdult"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Interventii Chirurgicale</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Tip interventie, data..."
-                                                      @bind="Model.APP_Interventii"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Traumatisme</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Fracturi, traumatisme craniene..."
-                                                      @bind="Model.APP_Traumatisme"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Transfuzii</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Data, motiv..."
-                                                      @bind="Model.APP_Transfuzii"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Alergii</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Alergii medicamentoase, alimentare..."
-                                                      @bind="Model.APP_Alergii"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Medicatie Curenta</label>
-                                            <textarea class="form-control" rows="3" 
-                                                      placeholder="Lista medicamentelor luate in prezent..."
-                                                      @bind="Model.APP_Medicatie"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- D. CONDITII SOCIO-ECONOMICE -->
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-home"></i>
-                                    D. Conditii Socio-Economice
-                                </h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Profesie</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="Profesie curenta..."
-                                                   @bind="Model.Profesie" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Conditii Munca</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="Conditii de munca, expuneri..."
-                                                   @bind="Model.ConditiiMunca" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Conditii Locuinta</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="Conditii de locuit..."
-                                                   @bind="Model.ConditiiLocuinta" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Obiceiuri Alimentare</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="Dieta, obiceiuri alimentare..."
-                                                   @bind="Model.ObiceiuriAlimentare" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Toxice (Tutun, Alcool, Droguri)</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Fumat, alcool, alte substante..."
-                                                      @bind="Model.Toxice"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <AntecedenteTab Model="@Model"
+                                           PacientSex="@PacientInfo?.Sex"
+                                           IsActive="true"
+                                           OnChanged="MarkAsChanged"
+                                           OnSectionCompleted="() => MarkSectionCompleted(ActiveTab)"
+                                           ShowValidation="false" />
                         }
 
-                        @* Tab 3: Examen - Folosim componenta *@
+                        @* Tab 3: Examen Obiectiv *@
                         @if (ActiveTab == "examen")
                         {
                             <ExamenTab Model="@Model"
@@ -279,52 +65,17 @@
                                       ShowValidation="false" />
                         }
 
-                        @* Tab 4: Investigatii - Păstrăm codul vechi (încă nu am componentă) *@
+                        @* Tab 4: Investigații - FOLOSEȘTE COMPONENTA NOUĂ *@
                         @if (ActiveTab == "investigatii")
                         {
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-vial"></i>
-                                    IV. Investigatii Efectuate
-                                </h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Investigatii Laborator</label>
-                                            <textarea class="form-control" rows="4" 
-                                                      placeholder="Hemoleucograma, VSH, transaminaze..."
-                                                      @bind="Model.InvestigatiiLaborator"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Investigatii Imagistice</label>
-                                            <textarea class="form-control" rows="4" 
-                                                      placeholder="Radiografie, ecografie, CT..."
-                                                      @bind="Model.InvestigatiiImagistice"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>EKG</label>
-                                            <textarea class="form-control" rows="4" 
-                                                      placeholder="Ritm sinusal, fara modificari ST-T..."
-                                                      @bind="Model.InvestigatiiEKG"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Alte Investigatii</label>
-                                            <textarea class="form-control" rows="4" 
-                                                      placeholder="Alte investigatii efectuate..."
-                                                      @bind="Model.AlteInvestigatii"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <InvestigatiiTab Model="@Model"
+                                            IsActive="true"
+                                            OnChanged="MarkAsChanged"
+                                            OnSectionCompleted="() => MarkSectionCompleted(ActiveTab)"
+                                            ShowValidation="false" />
                         }
 
-                        @* Tab 5: Diagnostic - Folosim componenta *@
+                        @* Tab 5: Diagnostic *@
                         @if (ActiveTab == "diagnostic")
                         {
                             <DiagnosticTab Model="@Model"
@@ -333,129 +84,25 @@
                                           ShowValidation="false" />
                         }
 
-                        @* Tab 6: Tratament - Păstrăm codul vechi (încă nu am componentă) *@
+                        @* Tab 6: Tratament - FOLOSEȘTE COMPONENTA NOUĂ *@
                         @if (ActiveTab == "tratament")
                         {
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-pills"></i>
-                                    VI. Tratament si Recomandari
-                                </h5>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Tratament Medicamentos</label>
-                                            <textarea class="form-control" rows="4" 
-                                                      placeholder="Lista medicamentelor prescrise cu dozaj si durata..."
-                                                      @bind="Model.TratamentMedicamentos"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Tratament Nemedicamentos</label>
-                                            <textarea class="form-control" rows="3" 
-                                                      placeholder="Fizioterapie, recuperare, etc..."
-                                                      @bind="Model.TratamentNemedicamentos"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Recomandari Dietetice</label>
-                                            <textarea class="form-control" rows="3" 
-                                                      placeholder="Dieta recomandata..."
-                                                      @bind="Model.RecomandariDietetice"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Recomandari Regim de Viata</label>
-                                            <textarea class="form-control" rows="3" 
-                                                      placeholder="Activitate fizica, repaus..."
-                                                      @bind="Model.RecomandariRegimViata"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Investigatii Recomandate</label>
-                                            <textarea class="form-control" rows="3" 
-                                                      placeholder="Investigatii suplimentare necesare..."
-                                                      @bind="Model.InvestigatiiRecomandate"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Consulturi de Specialitate</label>
-                                            <textarea class="form-control" rows="3" 
-                                                      placeholder="Trimiteri la alte specialitati..."
-                                                      @bind="Model.ConsulturiSpecialitate"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Data Urmatoarei Programari</label>
-                                            <input type="text" class="form-control" 
-                                                   placeholder="Ex: 1 luna, 3 luni..."
-                                                   @bind="Model.DataUrmatoareiProgramari" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Recomandari Supraveghere</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Ce trebuie supravegheat in evolutie..."
-                                                      @bind="Model.RecomandariSupraveghere"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <TratamentTab Model="@Model"
+                                         IsActive="true"
+                                         OnChanged="MarkAsChanged"
+                                         OnSectionCompleted="() => MarkSectionCompleted(ActiveTab)"
+                                         ShowValidation="false" />
                         }
 
-                        @* Tab 7: Concluzie - Păstrăm codul vechi (încă nu am componentă) *@
+                        @* Tab 7: Concluzie - FOLOSEȘTE COMPONENTA NOUĂ *@
                         @if (ActiveTab == "concluzie")
                         {
-                            <div class="section-card">
-                                <h5 class="section-title">
-                                    <i class="fas fa-check-circle"></i>
-                                    VII. Prognostic si Concluzie
-                                </h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Prognostic</label>
-                                            <select class="form-control" @bind="Model.Prognostic">
-                                                <option value="">Selecteaza...</option>
-                                                <option value="Favorabil">Favorabil</option>
-                                                <option value="Rezervat">Rezervat</option>
-                                                <option value="Sever">Sever</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Concluzie</label>
-                                            <textarea class="form-control" rows="4" 
-                                                      placeholder="Rezumat consultatie si plan terapeutic..."
-                                                      @bind="Model.Concluzie"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Observatii Medic</label>
-                                            <textarea class="form-control" rows="3" 
-                                                      placeholder="Note suplimentare pentru dosar medical..."
-                                                      @bind="Model.ObservatiiMedic"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label>Note Pacient</label>
-                                            <textarea class="form-control" rows="2" 
-                                                      placeholder="Informatii mentionate de pacient..."
-                                                      @bind="Model.NotePacient"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <ConcluzieTab Model="@Model"
+                                         IsActive="true"
+                                         OnChanged="MarkAsChanged"
+                                         OnSectionCompleted="() => MarkSectionCompleted(ActiveTab)"
+                                         OnPreview="PreviewScrisoare"
+                                         ShowValidation="false" />
                         }
                     </div>
 

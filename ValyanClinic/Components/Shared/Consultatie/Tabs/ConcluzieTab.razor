@@ -1,0 +1,88 @@
+﻿@*
+    Tab Concluzie - Consultație
+    Include: Prognostic, Concluzie, Observații
+*@
+
+<div class="tab-pane @(IsActive ? "active" : "")" id="tab-concluzie">
+    <div class="section-card">
+        <h5 class="section-title">
+            <i class="fas fa-check-circle"></i>
+            VII. Prognostic și Concluzie
+        </h5>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="required">Prognostic</label>
+                    <select class="form-control @(ShowValidation && string.IsNullOrWhiteSpace(Model.Prognostic) ? "is-invalid" : "")" 
+                            @bind="Model.Prognostic"
+                            @bind:after="OnFieldChanged">
+                        <option value="">Selectează...</option>
+                        <option value="Favorabil">Favorabil</option>
+                        <option value="Rezervat">Rezervat</option>
+                        <option value="Sever">Sever</option>
+                    </select>
+                    @if (ShowValidation && string.IsNullOrWhiteSpace(Model.Prognostic))
+                    {
+                        <div class="invalid-feedback">Prognosticul este obligatoriu</div>
+                    }
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="required">Concluzie</label>
+                    <textarea class="form-control @(ShowValidation && string.IsNullOrWhiteSpace(Model.Concluzie) ? "is-invalid" : "")" 
+                              rows="4" 
+                              placeholder="Rezumat consultație și plan terapeutic..."
+                              @bind="Model.Concluzie"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Sinteză consultație și recomandări finale</small>
+                    @if (ShowValidation && string.IsNullOrWhiteSpace(Model.Concluzie))
+                    {
+                        <div class="invalid-feedback">Concluzia este obligatorie</div>
+                    }
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Observații Medic</label>
+                    <textarea class="form-control" rows="3" 
+                              placeholder="Note suplimentare pentru dosar medical..."
+                              @bind="Model.ObservatiiMedic"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Informații pentru uz intern (nu apar în scrisoare medicală)</small>
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Note Pacient</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Informații menționate de pacient..."
+                              @bind="Model.NotePacient"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Cereri, preocupări sau întrebări ale pacientului</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Completion Summary *@
+    @if (IsSectionCompleted)
+    {
+        <div class="completion-summary">
+            <div class="completion-header">
+                <i class="fas fa-clipboard-check"></i>
+                <h6>Consultație Completă</h6>
+            </div>
+            <p>Toate câmpurile obligatorii au fost completate. Puteți finaliza consultația.</p>
+            <div class="completion-actions">
+                <button type="button" class="btn btn-outline-primary" @onclick="OnPreview">
+                    <i class="fas fa-file-pdf"></i>
+                    Preview Scrisoare Medicală
+                </button>
+            </div>
+        </div>
+    }
+</div>

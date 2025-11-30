@@ -1,35 +1,33 @@
 ﻿@using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Authorization
 
-<CascadingAuthenticationState>
-    <Router AppAssembly="typeof(Program).Assembly">
-        <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(Layout.MainLayout)">
-   <NotAuthorized>
-           @if (context.User.Identity?.IsAuthenticated != true)
-          {
-   <RedirectToLogin />
-       }
-  else
-    {
-               <p role="alert">Nu aveți permisiunea să accesați această resursă.</p>
-   }
-          </NotAuthorized>
-          <Authorizing>
-     <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);">
-         <div style="text-align: center;">
-              <div style="width: 60px; height: 60px; border: 4px solid #3b82f6; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-       <p style="color: #64748b; font-size: 16px;">Se verifică autentificarea...</p>
-             </div>
-             </div>
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                @if (context.User.Identity?.IsAuthenticated != true)
+                {
+                    <RedirectToLogin />
+                }
+                else
+                {
+                    <p role="alert">Nu aveți permisiunea să accesați această resursă.</p>
+                }
+            </NotAuthorized>
+            <Authorizing>
+                <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);">
+                    <div style="text-align: center;">
+                        <div style="width: 60px; height: 60px; border: 4px solid #3b82f6; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                        <p style="color: #64748b; font-size: 16px;">Se verifică autentificarea...</p>
+                    </div>
+                </div>
                 <style>
-            @@keyframes spin {
-        to { transform: rotate(360deg); }
-   }
-    </style>
-                </Authorizing>
-            </AuthorizeRouteView>
-<FocusOnNavigate RouteData="@routeData" Selector="h1" />
-        </Found>
-    </Router>
-</CascadingAuthenticationState>
+                    @@keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
+                </style>
+            </Authorizing>
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+</Router>

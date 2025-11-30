@@ -79,7 +79,7 @@ try
     });
 
     // ========================================
-    // AUTHENTICATION & AUTHORIZATION - Session Cookie STRICT
+    // AUTHENTICATION & AUTHORIZATION - Cookie Configuration
     // ========================================
     
     // ASP.NET Core Authentication Services (REQUIRED for AuthorizeRouteView)
@@ -91,71 +91,35 @@ try
             options.LogoutPath = "/logout";
             options.AccessDeniedPath = "/access-denied";
             
-            // ✅ SESSION COOKIE CONFIGURATION
-            // Cookie-ul se șterge AUTOMAT când închizi browser-ul (TOATE ferestrele)
-            options.ExpireTimeSpan = TimeSpan.FromHours(8); // Maximum session duration
-            options.SlidingExpiration = false; // ✅ FIX: NU reseta timeout - session strict
+            // ✅ SESSION COOKIE - Simplu și eficient
+            options.ExpireTimeSpan = TimeSpan.FromHours(8);
+            options.SlidingExpiration = true; // ✅ SCHIMBAT: True pentru UX mai bun
             
-            // ✅ Cookie settings - TRUE session cookie
+            // ✅ Cookie settings
             options.Cookie.IsEssential = true;
-            options.Cookie.HttpOnly = true; // Nu poate fi accesat din JavaScript
+            options.Cookie.HttpOnly = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             options.Cookie.SameSite = SameSiteMode.Lax;
+            options.Cookie.MaxAge = null; // Session cookie - se șterge când închizi browser-ul
             
-            // ✅ CRITICAL: MaxAge = null pentru TRUE session cookie
-            // Cookie-ul nu are Max-Age header → browser-ul îl șterge la închiderea completă
-            options.Cookie.MaxAge = null;
-            
-            // ✅ Events pentru validare și logging
-            options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
+            // ✅ Events simplificate - doar validare esențială
+            options.Events = new CookieAuthenticationEvents
             {
-                OnSigningIn = context =>
-                {
-                    var logger = context.HttpContext.RequestServices
-                        .GetRequiredService<ILogger<Program>>();
-                    
-                    logger.LogInformation("========== SESSION COOKIE CREATED ==========");
-                    
-                    if (context.Properties != null)
-                    {
-                        // ✅ Force session-only cookie - STRICT mode
-                        context.Properties.IsPersistent = false;
-                        context.Properties.ExpiresUtc = null; // NU seta expirare - se șterge când browser se închide
-                        context.Properties.AllowRefresh = false; // NU permite refresh automat
-                        
-                        logger.LogInformation("Session Properties:");
-                        logger.LogInformation("  IsPersistent: FALSE (session-only)");
-                        logger.LogInformation("  ExpiresUtc: NULL (no expiration - will expire when browser closes)");
-                        logger.LogInformation("  AllowRefresh: FALSE (strict timeout)");
-                        logger.LogInformation("  IssuedUtc: {IssuedUtc} (Romania timezone)", context.Properties.IssuedUtc);
-                        logger.LogInformation("Cookie will be deleted when ALL browser windows are closed");
-                    }
-                    
-                    logger.LogInformation("============================================");
-                    return Task.CompletedTask;
-                },
                 OnValidatePrincipal = async context =>
                 {
                     var logger = context.HttpContext.RequestServices
                         .GetRequiredService<ILogger<Program>>();
                     
-                    // Verificare expirare session (8 ore STRICT - fără sliding)
-                    // ✅ CORECTARE: Folosim ora locală România, nu UTC
-                    if (context.Properties?.IssuedUtc.HasValue == true)
+                    // Verificare simplă - cookie valid?
+                    if (context.Principal?.Identity?.IsAuthenticated != true)
                     {
-                        // Convertim IssuedUtc la ora României pentru comparație corectă
-                        var romaniaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time");
-                        var issuedLocalTime = TimeZoneInfo.ConvertTimeFromUtc(context.Properties.IssuedUtc.Value.UtcDateTime, romaniaTimeZone);
-                        var currentLocalTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, romaniaTimeZone);
-                        
-                        var elapsed = currentLocalTime - issuedLocalTime;
-                        if (elapsed > TimeSpan.FromHours(8))
-                        {
-                            logger.LogWarning("Session EXPIRED after 8 hours! Issued: {IssuedTime} (Romania), Current: {CurrentTime} (Romania)", 
-                                issuedLocalTime, currentLocalTime);
-                            context.RejectPrincipal();
-                            await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                        }
+                        logger.LogWarning("❌ Principal invalid - reject");
+                        context.RejectPrincipal();
+                        await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    }
+                    else
+                    {
+                        logger.LogDebug("✅ Principal valid: {Name}", context.Principal.Identity.Name);
                     }
                 }
             };
@@ -374,6 +338,11 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // ========================================
     builder.Services.AddScoped(typeof(ValyanClinic.Infrastructure.Services.DraftStorage.IDraftStorageService<>),
                                 typeof(ValyanClinic.Infrastructure.Services.DraftStorage.LocalStorageDraftService<>));
+    
+    // ========================================
+    // DRAFT AUTO-SAVE HELPER - Blazor Timer Management (Hybrid Approach)
+    // ========================================
+    builder.Services.AddScoped(typeof(ValyanClinic.Application.Services.Draft.DraftAutoSaveHelper<>));
 
     // ========================================
     // BACKGROUND SERVICES

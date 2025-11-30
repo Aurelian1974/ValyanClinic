@@ -120,23 +120,24 @@ public partial class Login : ComponentBase
     // ✅ WAIT pentru ca authentication state să se propage
    await Task.Delay(50); // Redus de la 100ms la 50ms
 
-  // ✅ REDIRECT BAZAT PE ROL (fara forceLoad pentru experienta mai smooth)
-  string redirectUrl = result.Data.Rol switch
-{
-    "Doctor" or "Medic" => "/dashboard/medic",
-    "Receptioner" => "/dashboard/receptioner",
-    "Administrator" or "Admin" => "/dashboard",
-    "Asistent" or "Asistent Medical" => "/dashboard",
-    "Manager" => "/dashboard",
-    _ => "/dashboard"
-};
+  // ✅ REDIRECT BAZAT PE ROL cu forceLoad: TRUE
+            // forceLoad: TRUE este NECESAR pentru ca cookie-ul să fie citit corect!
+            string redirectUrl = result.Data.Rol switch
+            {
+                "Doctor" or "Medic" => "/dashboard/medic",
+                "Receptioner" => "/dashboard/receptioner",
+                "Administrator" or "Admin" => "/dashboard",
+                "Asistent" or "Asistent Medical" => "/dashboard",
+                "Manager" => "/dashboard",
+                _ => "/dashboard"
+            };
 
-    Logger.LogInformation("🔄 Redirecting user {Username} with role {Rol} to {Url}", 
-    LoginModel.Username, result.Data.Rol, redirectUrl);
+            Logger.LogInformation("🔄 Redirecting user {Username} with role {Rol} to {Url}", 
+                LoginModel.Username, result.Data.Rol, redirectUrl);
 
-// ✅ OPTIMIZED: forceLoad: false pentru navigare smooth
-// Blazor va gestiona starea corect fără reîncărcare completă
-   NavigationManager.NavigateTo(redirectUrl, forceLoad: false);
+            // ✅ forceLoad: TRUE - reîncarcă pagina complet pentru a citi cookie-ul
+            // Session cookie (IsPersistent = false) se va șterge când închizi TOATE ferestrele browser-ului
+            NavigationManager.NavigateTo(redirectUrl, forceLoad: true);
          }
      else
             {

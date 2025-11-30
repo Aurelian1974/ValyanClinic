@@ -1,0 +1,258 @@
+﻿@*
+    Tab Antecedente - Consultație
+    Include: AHC, AF, APP, Condiții Socio-Economice
+*@
+
+<div class="tab-pane @(IsActive ? "active" : "")" id="tab-antecedente">
+    
+    <!-- A. ANTECEDENTE HEREDO-COLATERALE -->
+    <div class="section-card">
+        <h5 class="section-title">
+            <i class="fas fa-users"></i>
+            A. Antecedente Heredo-Colaterale (AHC)
+        </h5>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Mama</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Boli cunoscute ale mamei..."
+                              @bind="Model.AHC_Mama"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Tata</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Boli cunoscute ale tatalui..."
+                              @bind="Model.AHC_Tata"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Frați</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Boli cunoscute la frați..."
+                              @bind="Model.AHC_Frati"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Bunici</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Boli cunoscute la bunici..."
+                              @bind="Model.AHC_Bunici"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Alte Rude</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Alte boli ereditare în familie..."
+                              @bind="Model.AHC_Altele"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- B. ANTECEDENTE FIZIOLOGICE -->
+    <div class="section-card">
+        <h5 class="section-title">
+            <i class="fas fa-baby"></i>
+            B. Antecedente Fiziologice (AF)
+        </h5>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Naștere</label>
+                    <input type="text" class="form-control" 
+                           placeholder="La termen, prematur, CS..."
+                           @bind="Model.AF_Nastere"
+                           @oninput="OnFieldChanged" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Dezvoltare</label>
+                    <input type="text" class="form-control" 
+                           placeholder="Normală, întârziată..."
+                           @bind="Model.AF_Dezvoltare"
+                           @oninput="OnFieldChanged" />
+                </div>
+            </div>
+
+            @if (PacientSex == "F")
+            {
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Menstruație</label>
+                        <input type="text" class="form-control" 
+                               placeholder="Vârstă debut, regularitate..."
+                               @bind="Model.AF_Menstruatie"
+                               @oninput="OnFieldChanged" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Sarcini</label>
+                        <input type="text" class="form-control" 
+                               placeholder="Număr sarcini, nașteri..."
+                               @bind="Model.AF_Sarcini"
+                               @oninput="OnFieldChanged" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Alăptare</label>
+                        <input type="text" class="form-control" 
+                               placeholder="Durata alăptării..."
+                               @bind="Model.AF_Alaptare"
+                               @oninput="OnFieldChanged" />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- C. ANTECEDENTE PERSONALE PATOLOGICE -->
+    <div class="section-card">
+        <h5 class="section-title">
+            <i class="fas fa-notes-medical"></i>
+            C. Antecedente Personale Patologice (APP)
+        </h5>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Boli Copilărie/Adolescență</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Rujeolă, varicela, oreion..."
+                              @bind="Model.APP_BoliCopilarieAdolescenta"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Boli Adult</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Diabet, HTA, boli cronice..."
+                              @bind="Model.APP_BoliAdult"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Intervenții Chirurgicale</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Tip intervenție, dată..."
+                              @bind="Model.APP_Interventii"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Traumatisme</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Fracturi, traumatisme craniene..."
+                              @bind="Model.APP_Traumatisme"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Transfuzii</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Dată, motiv..."
+                              @bind="Model.APP_Transfuzii"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Alergii</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Alergii medicamentoase, alimentare..."
+                              @bind="Model.APP_Alergii"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Medicație Curentă</label>
+                    <textarea class="form-control" rows="3" 
+                              placeholder="Lista medicamentelor luate în prezent..."
+                              @bind="Model.APP_Medicatie"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- D. CONDITII SOCIO-ECONOMICE -->
+    <div class="section-card">
+        <h5 class="section-title">
+            <i class="fas fa-home"></i>
+            D. Condiții Socio-Economice
+        </h5>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Profesie</label>
+                    <input type="text" class="form-control" 
+                           placeholder="Profesie curentă..."
+                           @bind="Model.Profesie"
+                           @oninput="OnFieldChanged" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Condiții Muncă</label>
+                    <input type="text" class="form-control" 
+                           placeholder="Condiții de muncă, expuneri..."
+                           @bind="Model.ConditiiMunca"
+                           @oninput="OnFieldChanged" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Condiții Locuință</label>
+                    <input type="text" class="form-control" 
+                           placeholder="Condiții de locuit..."
+                           @bind="Model.ConditiiLocuinta"
+                           @oninput="OnFieldChanged" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Obiceiuri Alimentare</label>
+                    <input type="text" class="form-control" 
+                           placeholder="Dietă, obiceiuri alimentare..."
+                           @bind="Model.ObiceiuriAlimentare"
+                           @oninput="OnFieldChanged" />
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Toxice (Tutun, Alcool, Droguri)</label>
+                    <textarea class="form-control" rows="2" 
+                              placeholder="Fumat, alcool, alte substanțe..."
+                              @bind="Model.Toxice"
+                              @oninput="OnFieldChanged"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Section Completed Indicator *@
+    @if (IsSectionCompleted)
+    {
+        <div class="section-completed-indicator">
+            <i class="fas fa-check-circle"></i>
+            <span>Secțiune completată</span>
+        </div>
+    }
+</div>
