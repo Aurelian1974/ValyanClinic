@@ -1,9 +1,13 @@
 ﻿using Bunit;
 using MediatR;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Bunit.TestDoubles;
+using ValyanClinic.Application.Services.IMC;
+using ValyanClinic.Application.Services.Draft;
+using ValyanClinic.Infrastructure.Services.DraftStorage;
 
 namespace ValyanClinic.Tests.Infrastructure;
 
@@ -19,6 +23,11 @@ public abstract class ComponentTestBase : TestContext
     protected Mock<IMediator> MockMediator { get; }
     
     /// <summary>
+    /// Mock IMC Calculator service
+    /// </summary>
+    protected Mock<IIMCCalculatorService> MockIMCCalculator { get; }
+    
+    /// <summary>
     /// Mock authentication state for testing authorized components
     /// </summary>
     protected TestAuthorizationContext AuthContext { get; }
@@ -28,6 +37,36 @@ public abstract class ComponentTestBase : TestContext
         // Setup MediatR mock
         MockMediator = new Mock<IMediator>();
         Services.AddSingleton(MockMediator.Object);
+        
+        // Setup IMC Calculator mock
+        MockIMCCalculator = new Mock<IIMCCalculatorService>();
+        MockIMCCalculator.Setup(x => x.Calculate(It.IsAny<decimal>(), It.IsAny<decimal>()))
+            .Returns(new IMCResult 
+            { 
+                Value = 24.5m, 
+                Category = IMCCategory.Normal, 
+                Interpretation = "Normal" 
+            });
+        MockIMCCalculator.Setup(x => x.AreValuesValid(It.IsAny<decimal>(), It.IsAny<decimal>()))
+            .Returns(true);
+        Services.AddSingleton(MockIMCCalculator.Object);
+        
+        // Setup Draft Storage Service mock (generic for CreateConsultatieCommand)
+        var mockDraftService = new Mock<IDraftStorageService<Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>>();
+        mockDraftService.Setup(x => x.LoadDraftAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(DraftResult<Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>.NotFound);
+        mockDraftService.Setup(x => x.SaveDraftAsync(It.IsAny<Guid>(), It.IsAny<Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>(), It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+        mockDraftService.Setup(x => x.ClearDraftAsync(It.IsAny<Guid>()))
+            .Returns(Task.CompletedTask);
+        mockDraftService.Setup(x => x.GetLastSaveTimeAsync(It.IsAny<Guid>()))
+            .ReturnsAsync((DateTime?)null);
+        Services.AddSingleton(mockDraftService.Object);
+        
+        // Setup DraftAutoSaveHelper mock
+        var mockLogger = MockLogger<DraftAutoSaveHelper<Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>>();
+        var draftHelper = new DraftAutoSaveHelper<Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>(mockLogger.Object);
+        Services.AddSingleton(draftHelper);
         
         // Setup authentication
         AuthContext = this.AddTestAuthorization();

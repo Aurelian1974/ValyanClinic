@@ -1,5 +1,5 @@
-﻿using ValyanClinic.Application.Features.Consultatii.Models;
-using ValyanClinic.Application.Features.Programari.DTOs;
+﻿using ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
+using ValyanClinic.Application.Features.ProgramareManagement.DTOs;
 
 namespace ValyanClinic.Tests.Infrastructure;
 
@@ -10,85 +10,81 @@ namespace ValyanClinic.Tests.Infrastructure;
 public static class TestData
 {
     /// <summary>
-    /// Creates a valid ConsultatieModel with default test data
+    /// Creates a valid CreateConsultatieCommand with default test data
     /// </summary>
-    public static ConsultatieModel CreateValidConsultatieModel()
+    public static CreateConsultatieCommand CreateValidConsultatieCommand()
     {
-        return new ConsultatieModel
+        return new CreateConsultatieCommand
         {
-            ProgramareId = Guid.NewGuid(),
-            PacientId = Guid.NewGuid(),
-            DoctorId = Guid.NewGuid(),
-            DataConsultatie = DateTime.Now,
+            ProgramareID = Guid.NewGuid(),
+            PacientID = Guid.NewGuid(),
+            MedicID = Guid.NewGuid(),
+            TipConsultatie = "Prima consultatie",
             
             // Motive Prezentare
             MotivPrezentare = "Dureri abdominale",
-            SimptomeAsociate = "Greata, varsaturi",
-            Observatii = "Simptome de 3 zile",
+            IstoricBoalaActuala = "Simptome de 3 zile - greata, varsaturi",
             
             // Antecedente
-            AntecedentePersonale = "Hipertensiune arteriala",
-            AntecedenteFamiliare = "Diabet zaharat la tata",
-            Alergii = "Penicilina",
-            TratamenteActuale = "Enalapril 10mg",
+            APP_BoliAdult = "Hipertensiune arteriala",
+            APP_Alergii = "Penicilina",
+            APP_Medicatie = "Enalapril 10mg",
             
             // Examen
             Greutate = 75.5m,
             Inaltime = 175,
-            IndiceMasaCorporala = 24.7m,
-            Tensiune = "130/80",
-            Puls = "72",
-            Temperatura = "36.7",
-            ExamenClinic = "Abdomen sensibil la palpare",
+            TensiuneArteriala = "130/80",
+            Puls = 72,
+            Temperatura = 36.7m,
             
             // Diagnostic
-            DiagnosticPrincipal = "K29.0", // Gastrita acuta
-            DiagnosticuriSecundare = "K30", // Dispepsie
-            
-            // Investigatii
-            InvestigatiiRecomandate = "Ecografie abdominala",
-            RezultateInvestigatii = "",
+            DiagnosticPozitiv = "Gastrita acuta",
+            CoduriICD10 = "K29.0",
+            CoduriICD10Secundare = "K30",
             
             // Tratament
-            Tratament = "Omeprazol 20mg, 1cp/zi",
-            Recomandari = "Dieta usoara, evitarea alimentelor grele",
-            ProgramareControl = DateTime.Now.AddDays(14),
+            TratamentMedicamentos = "Omeprazol 20mg, 1cp/zi",
+            RecomandariDietetice = "Dieta usoara, evitarea alimentelor grele",
             
             // Concluzie
             Concluzie = "Gastrita acuta, tratament medicamentos si dieta",
-            NoteSuplimentare = "Monitorizare simptome urmatoarele 7 zile"
+            ObservatiiMedic = "Monitorizare simptome urmatoarele 7 zile",
+            
+            // Audit
+            CreatDe = "doctor123"
         };
     }
     
     /// <summary>
-    /// Creates an empty ConsultatieModel (for new consultatie)
+    /// Creates an empty CreateConsultatieCommand (for new consultatie)
     /// </summary>
-    public static ConsultatieModel CreateEmptyConsultatieModel()
+    public static CreateConsultatieCommand CreateEmptyConsultatieCommand()
     {
-        return new ConsultatieModel
+        return new CreateConsultatieCommand
         {
-            ProgramareId = Guid.NewGuid(),
-            PacientId = Guid.NewGuid(),
-            DoctorId = Guid.NewGuid(),
-            DataConsultatie = DateTime.Now
+            ProgramareID = Guid.NewGuid(),
+            PacientID = Guid.NewGuid(),
+            MedicID = Guid.NewGuid(),
+            TipConsultatie = "Prima consultatie",
+            CreatDe = "doctor123"
         };
     }
     
     /// <summary>
-    /// Creates a ProgramareDto with test data
+    /// Creates a ProgramareListDto with test data
     /// </summary>
-    public static ProgramareDto CreateProgramareDto()
+    public static ProgramareListDto CreateProgramareDto()
     {
-        return new ProgramareDto
+        return new ProgramareListDto
         {
-            Id = Guid.NewGuid(),
-            PacientId = Guid.NewGuid(),
-            PacientNume = "Popescu",
-            PacientPrenume = "Ion",
-            DoctorId = Guid.NewGuid(),
-            DoctorNume = "Dr. Ionescu Maria",
+            ProgramareID = Guid.NewGuid(),
+            PacientID = Guid.NewGuid(),
+            PacientNumeComplet = "Popescu Ion",
+            DoctorID = Guid.NewGuid(),
+            DoctorNumeComplet = "Dr. Ionescu Maria",
             DataProgramare = DateTime.Today.AddHours(10),
-            DurataMinute = 30,
+            OraInceput = new TimeSpan(10, 0, 0),
+            OraSfarsit = new TimeSpan(10, 30, 0),
             Status = "Confirmata",
             TipProgramare = "Consultatie",
             Observatii = "Prima consultatie"
