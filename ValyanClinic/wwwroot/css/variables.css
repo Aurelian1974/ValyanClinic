@@ -86,12 +86,24 @@
     --primary-light: #93c5fd;
     --primary-lighter: #bfdbfe;
     
+    /* ✅ NEW: RGB Variants for RGBA Usage */
+    --primary-color-rgb: 96, 165, 250;
+    --primary-dark-rgb: 59, 130, 246;
+    --primary-darker-rgb: 37, 99, 235;
+    --primary-light-rgb: 147, 197, 253;
+    --primary-lighter-rgb: 191, 219, 254;
+    
     /* Culori Secundare Pastelate */
- --secondary-color: #94a3b8;
- --success-color: #6ee7b7;
+    --secondary-color: #94a3b8;
+    --success-color: #6ee7b7;
     --danger-color: #fca5a5;
     --warning-color: #fcd34d;
     --info-color: #7dd3fc;
+    
+    /* ✅ NEW: Danger/Error Colors */
+    --danger-text: #dc2626;
+    --danger-light: #fee2e2;
+    --danger-lighter: #fecaca;
     
     /* Text Colors */
     --text-color: #334155;
@@ -101,7 +113,7 @@
     
     /* Background Colors - Mai deschise */
     --background-color: #f8fafc;
-  --background-secondary: #f1f5f9;
+    --background-secondary: #f1f5f9;
     --background-light: #eff6ff;
     --background-white: #ffffff;
     
@@ -114,9 +126,12 @@
     --gradient-blue: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #93c5fd 100%);
     --gradient-dark-blue: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
     
+    /* ✅ NEW: Danger Gradient */
+    --gradient-danger: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    
     /* ==========================================
        SPACING
-    ========================================== */
+       ========================================== */
     --spacing-xs: 0.25rem;    /* 4px */
     --spacing-sm: 0.5rem;     /* 8px */
     --spacing-md: 1rem;       /* 16px */
@@ -163,6 +178,10 @@
     --shadow-blue: 0 4px 12px rgba(96, 165, 250, 0.3);
     --shadow-blue-lg: 0 10px 30px rgba(96, 165, 250, 0.2);
     
+    /* ✅ NEW: Focus and Hover Shadows */
+    --shadow-focus: 0 0 0 3px rgba(96, 165, 250, 0.1);
+    --shadow-blue-hover: 0 6px 20px rgba(59, 130, 246, 0.5);
+    
     /* ==========================================
        TRANSITIONS
        ========================================== */
@@ -179,7 +198,7 @@
     --z-fixed: 1030;
     --z-modal-backdrop: 1040;
     --z-modal: 1050;
-  --z-popover: 1060;
+    --z-popover: 1060;
     --z-tooltip: 1070;
 }
 
@@ -189,9 +208,9 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --text-color: #f1f5f9;
-     --background-color: #0f172a;
+        --background-color: #0f172a;
         --background-secondary: #1e293b;
- --border-color: #334155;
+        --border-color: #334155;
     }
 }
 
