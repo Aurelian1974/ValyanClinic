@@ -8,6 +8,7 @@ using Bunit.TestDoubles;
 using ValyanClinic.Application.Services.IMC;
 using ValyanClinic.Application.Services.Draft;
 using ValyanClinic.Infrastructure.Services.DraftStorage;
+using Syncfusion.Blazor;
 
 namespace ValyanClinic.Tests.Infrastructure;
 
@@ -52,10 +53,10 @@ public abstract class ComponentTestBase : TestContext
         Services.AddSingleton(MockIMCCalculator.Object);
         
         // Setup Draft Storage Service mock (generic for CreateConsultatieCommand)
-        var mockDraftService = new Mock<IDraftStorageService<Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>>();
+        var mockDraftService = new Mock<IDraftStorageService<ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>>();
         mockDraftService.Setup(x => x.LoadDraftAsync(It.IsAny<Guid>()))
-            .ReturnsAsync(DraftResult<Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>.NotFound);
-        mockDraftService.Setup(x => x.SaveDraftAsync(It.IsAny<Guid>(), It.IsAny<Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>(), It.IsAny<string>()))
+            .ReturnsAsync(DraftResult<ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>.NotFound);
+        mockDraftService.Setup(x => x.SaveDraftAsync(It.IsAny<Guid>(), It.IsAny<ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>(), It.IsAny<string>()))
             .Returns(Task.CompletedTask);
         mockDraftService.Setup(x => x.ClearDraftAsync(It.IsAny<Guid>()))
             .Returns(Task.CompletedTask);
@@ -64,8 +65,8 @@ public abstract class ComponentTestBase : TestContext
         Services.AddSingleton(mockDraftService.Object);
         
         // Setup DraftAutoSaveHelper mock
-        var mockLogger = MockLogger<DraftAutoSaveHelper<Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>>();
-        var draftHelper = new DraftAutoSaveHelper<Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>(mockLogger.Object);
+        var mockLogger = MockLogger<DraftAutoSaveHelper<ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>>();
+        var draftHelper = new DraftAutoSaveHelper<ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand>(mockLogger.Object);
         Services.AddSingleton(draftHelper);
         
         // Setup authentication
@@ -109,6 +110,9 @@ public abstract class ComponentTestBase : TestContext
     {
         // Add logging
         Services.AddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
+        
+        // Add Syncfusion Blazor services (required for Syncfusion components like SfGrid, SfToast)
+        Services.AddSyncfusionBlazor();
         
         // Add other common services as needed
         // Services.AddSingleton<IMyService, MyServiceMock>();

@@ -17,6 +17,7 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<VizualizarePacienti> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private ValyanClinic.Application.Services.Pacienti.IPacientDataService DataService { get; set; } = default!;
 
     // Grid reference
 private SfGrid<PacientListDto>? GridRef;
@@ -209,43 +210,31 @@ private int ActiveFiltersCount =>
         
       try
         {
-         Logger.LogInformation("Incarcare filter options de pe server (CACHED)...");
+         Logger.LogInformation("Incarcare filter options de pe server (via DataService)...");
       
-      // Load toate datele DOAR pentru filter options (fara paging)
-    var query = new GetPacientListQuery
-       {
-    PageNumber = 1,
-       PageSize = int.MaxValue,
-    SearchText = null,
-                Judet = null,
-        Asigurat = null,
-    Activ = null,
-                SortColumn = "Nume",
- SortDirection = "ASC"
-         };
-
-     var result = await Mediator.Send(query);
+      // ✅ REFACTORED: Use PacientDataService instead of direct MediatR call
+     var result = await DataService.LoadFilterOptionsAsync();
 
   if (_disposed) return; // Check after async operation
 
-     if (result.IsSuccess && result.Value != null && result.Value.Value != null && result.Value.Value.Any())
+     if (result.IsSuccess)
             {
-          var allData = result.Value.Value.ToList();
-      
-            // Generate Judet options
-                JudetOptions = allData
-       .Where(p => !string.IsNullOrEmpty(p.Judet))
-      .Select(p => p.Judet!)
-      .Distinct()
-           .OrderBy(j => j)
-         .Select(j => new FilterOption { Value = j, Text = j })
-  .ToList();
+            // Map filter options
+                JudetOptions = result.Value.Judete
+                    .Select(j => new FilterOption { Value = j, Text = j })
+                    .ToList();
       
       FilterOptionsLoaded = true;
                 
     Logger.LogInformation(
-           "Filter options CACHED: Judet={JudetCount}, Asigurat={AsiguratCount}, Status={StatusCount}",
+           "Filter options loaded via DataService: Judet={JudetCount}, Asigurat={AsiguratCount}, Status={StatusCount}",
   JudetOptions.Count, AsiguratOptions.Count, StatusOptions.Count);
+            }
+            else
+            {
+                Logger.LogWarning("Failed to load filter options: {Errors}", 
+                    string.Join(", ", result.Errors ?? new List<string>()));
+                JudetOptions = new List<FilterOption>();
             }
         }
         catch (ObjectDisposedException)
@@ -277,31 +266,39 @@ private int ActiveFiltersCount =>
    "========== SERVER-SIDE Load START: Page={Page}, Size={Size}, Search='{Search}', Judet={Judet}, Asigurat={Asigurat}, Status={Status}, Sort={Sort} {Dir} ==========",
       CurrentPage, CurrentPageSize, GlobalSearchText, FilterJudet, FilterAsigurat, FilterStatus, CurrentSortColumn, CurrentSortDirection);
 
-         // Convert string filters to boolean
+         // ✅ REFACTORED: Use PacientDataService instead of direct MediatR call
        bool? asiguratFilter = string.IsNullOrEmpty(FilterAsigurat) ? null : FilterAsigurat == "true";
  bool? statusFilter = string.IsNullOrEmpty(FilterStatus) ? null : FilterStatus == "true";
 
-          var query = new GetPacientListQuery
+            var filters = new ValyanClinic.Application.Services.Pacienti.PacientFilters
             {
-           PageNumber = CurrentPage,
-     PageSize = CurrentPageSize,
-      SearchText = string.IsNullOrWhiteSpace(GlobalSearchText) ? null : GlobalSearchText,
+                SearchText = GlobalSearchText,
                 Judet = FilterJudet,
-       Asigurat = asiguratFilter,
-   Activ = statusFilter,
- SortColumn = CurrentSortColumn,
-       SortDirection = CurrentSortDirection
+                Asigurat = asiguratFilter,
+                Activ = statusFilter
             };
 
-      var result = await Mediator.Send(query);
+            var pagination = new ValyanClinic.Application.Services.Pacienti.PaginationOptions
+            {
+                PageNumber = CurrentPage,
+                PageSize = CurrentPageSize
+            };
+
+            var sorting = new ValyanClinic.Application.Services.Pacienti.SortOptions
+            {
+                Column = CurrentSortColumn,
+                Direction = CurrentSortDirection
+            };
+
+            var result = await DataService.LoadPagedDataAsync(filters, pagination, sorting);
           
             if (_disposed) return; // Check after async operation
             
-       Logger.LogInformation("MediatR result: IsSuccess={IsSuccess}", result.IsSuccess);
+       Logger.LogInformation("DataService result: IsSuccess={IsSuccess}", result.IsSuccess);
 
-         if (result.IsSuccess && result.Value != null)
+         if (result.IsSuccess)
           {
-  CurrentPageData = result.Value.Value?.ToList() ?? new List<PacientListDto>();
+  CurrentPageData = result.Value.Items;
      TotalRecords = result.Value.TotalCount;
                 
    Logger.LogInformation(
@@ -426,14 +423,18 @@ private int ActiveFiltersCount =>
     private async Task ClearSearch()
     {
         if (_disposed) return;
-      
+        
         Logger.LogInformation("Clearing search text");
         
         _searchDebounceTokenSource?.Cancel();
         
         GlobalSearchText = string.Empty;
         CurrentPage = 1;
-  await LoadPagedData();
+        
+        // Force UI update BEFORE reloading data
+        await InvokeAsync(StateHasChanged);
+        
+        await LoadPagedData();
     }
 
   private async Task ApplyFilters()
@@ -450,43 +451,47 @@ private int ActiveFiltersCount =>
 
     private async Task ClearAllFilters()
     {
-   if (_disposed) return;
+        if (_disposed) return;
         
-      Logger.LogInformation("Clearing all filters");
+        Logger.LogInformation("Clearing all filters");
         
         GlobalSearchText = string.Empty;
-   FilterJudet = null;
+        FilterJudet = null;
         FilterAsigurat = null;
         FilterStatus = null;
 
         CurrentPage = 1;
+        
+        // Force UI update BEFORE reloading data
+        await InvokeAsync(StateHasChanged);
+        
         await LoadPagedData();
     }
 
     private async Task ClearFilter(string filterName)
     {
-        if (_disposed) return;
+        if (_disposed) return; // ✅ FIXED: Changed from (_disposed = true) to (_disposed)
         
         Logger.LogInformation("Clearing filter: {FilterName}", filterName);
 
         switch (filterName)
-     {
-      case nameof(GlobalSearchText):
-          GlobalSearchText = string.Empty;
-         break;
-      case nameof(FilterJudet):
-          FilterJudet = null;
-        break;
-   case nameof(FilterAsigurat):
-       FilterAsigurat = null;
-      break;
-            case nameof(FilterStatus):
-        FilterStatus = null;
-     break;
-   }
+        {
+            case FilterNames.GlobalSearchText:
+                GlobalSearchText = string.Empty;
+                break;
+            case FilterNames.FilterJudet:
+                FilterJudet = null;
+                break;
+            case FilterNames.FilterAsigurat:
+                FilterAsigurat = null;
+                break;
+            case FilterNames.FilterStatus:
+                FilterStatus = null;
+                break;
+        }
 
         CurrentPage = 1;
-     await LoadPagedData();
+        await LoadPagedData();
     }
 
     private void OnRowSelected(RowSelectEventArgs<PacientListDto> args)
@@ -714,4 +719,15 @@ private int ActiveFiltersCount =>
       public string Value { get; set; } = string.Empty;
      public string Text { get; set; } = string.Empty;
   }
+
+    /// <summary>
+    /// Static class containing filter name constants to avoid magic strings.
+    /// </summary>
+    private static class FilterNames
+    {
+        public const string GlobalSearchText = nameof(GlobalSearchText);
+        public const string FilterJudet = nameof(FilterJudet);
+        public const string FilterAsigurat = nameof(FilterAsigurat);
+        public const string FilterStatus = nameof(FilterStatus);
+    }
 }

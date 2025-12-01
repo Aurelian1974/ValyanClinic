@@ -224,6 +224,7 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository, 
                                 ValyanClinic.Infrastructure.Repositories.ConsultatieRepository>(); // ✅ NOU - Consultatii
     builder.Services.AddScoped<IICD10Repository, ICD10Repository>(); // ✅ NOU - ICD10 Autocomplete
+    builder.Services.AddScoped<IPacientPersonalMedicalRepository, PacientPersonalMedicalRepository>(); // ✅ NOU - Relații Pacient-Doctor
     
     // Phase1 Settings Repositories
     builder.Services.AddScoped<ISystemSettingsRepository, ValyanClinic.Infrastructure.Repositories.Settings.SystemSettingsRepository>();
@@ -326,6 +327,10 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Application.Services.IPersonalBusinessService, 
                                 ValyanClinic.Application.Services.PersonalBusinessService>();
+    
+    // ✅ NEW: PacientDataService - Business logic for patient list management
+    builder.Services.AddScoped<ValyanClinic.Application.Services.Pacienti.IPacientDataService,
+                                ValyanClinic.Application.Services.Pacienti.PacientDataService>();
     
     // ========================================
     // IMC CALCULATOR SERVICE - Medical Services

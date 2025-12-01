@@ -1,9 +1,4 @@
-﻿/* ========================================
-   Vizualizare Pacienti - Scoped CSS
-   Tema: Albastru Pastelat (consistentă cu AdministrarePersonal)
-   ======================================== */
-
-/* Container principal */
+﻿/* Container principal */
 .pacienti-container {
     padding: 5px;
     max-width: 100%;
@@ -38,12 +33,7 @@
 }
 
 .pacienti-header h1 i {
-    font-size: 20px;
-}
-
-.header-actions {
-    display: flex;
-    gap: 12px;
+    font-size: var(--font-size-xl); /* Fixed: was hardcoded 20px */
 }
 
 /* Butoane - ALBASTRU */
@@ -582,14 +572,14 @@
 }
 
 .toolbar-btn.btn-doctors {
-    background: #8b5cf6;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); /* Fixed: was #8b5cf6 (violet) */
     color: white;
-    border-color: #8b5cf6;
+    border-color: var(--primary-color); /* Fixed: was #8b5cf6 (violet) */
 }
 
 .toolbar-btn.btn-doctors:not(:disabled):hover {
-    background: #7c3aed;
-    border-color: #7c3aed;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker)); /* Fixed: was #7c3aed (violet) */
+    border-color: var(--primary-dark); /* Fixed: was #7c3aed (violet) */
 }
 
 .toolbar-btn i {

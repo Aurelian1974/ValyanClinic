@@ -1,15 +1,16 @@
 ﻿/* ========================================
    PACIENT DOCTORI MODAL - SCOPED STYLES
+   Tema: Albastru Pastelat (consistent cu PacientViewModal)
    ======================================== */
 
-/* Modal Overlay */
+/* Modal Overlay - ALBASTRU Transparent */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(37, 99, 235, 0.3); /* Blue transparent - updated from black */
     backdrop-filter: blur(4px);
     z-index: 9999;
     display: flex;
@@ -20,10 +21,10 @@
 
 @keyframes fadeIn {
     from {
-opacity: 0;
+        opacity: 0;
     }
     to {
-  opacity: 1;
+        opacity: 1;
     }
 }
 
@@ -36,31 +37,32 @@ opacity: 0;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 40px rgba(96, 165, 250, 0.2); /* Blue shadow - updated */
+    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes slideIn {
     from {
-    transform: scale(0.9) translateY(-20px);
+        transform: scale(0.9) translateY(-20px);
         opacity: 0;
     }
     to {
         transform: scale(1) translateY(0);
-      opacity: 1;
+        opacity: 1;
     }
 }
 
-/* Modal Header */
+/* Modal Header - ALBASTRU Gradient (updated from VIOLET) */
 .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 1.25rem 1.75rem;
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
- color: white;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color)); /* BLUE - was #8b5cf6 (violet) */
+    color: white;
     border-radius: 14px 14px 0 0;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.15);
 }
 
 .modal-title {
@@ -80,12 +82,12 @@ opacity: 0;
 }
 
 .btn-close {
-  background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.2);
     border: none;
     width: 34px;
     height: 34px;
     border-radius: 50%;
- color: white;
+    color: white;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -102,7 +104,8 @@ opacity: 0;
 .modal-body {
     flex: 1;
     overflow-y: auto;
-padding: 1.5rem 1.75rem;
+    padding: 1.5rem 1.75rem;
+    background: var(--background-light); /* Light blue background */
 }
 
 /* Loading Container */
@@ -123,7 +126,7 @@ padding: 1.5rem 1.75rem;
 
 /* Section */
 .section {
- margin-bottom: 2rem;
+    margin-bottom: 2rem;
 }
 
 .section-header {
@@ -149,7 +152,7 @@ padding: 1.5rem 1.75rem;
 
 /* Doctor Cards Grid */
 .doctor-cards {
- display: grid;
+    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 1rem;
 }
@@ -165,9 +168,9 @@ padding: 1.5rem 1.75rem;
 }
 
 .doctor-card:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 16px rgba(96, 165, 250, 0.15); /* Blue shadow - updated */
     transform: translateY(-2px);
-    border-color: #8b5cf6;
+    border-color: var(--primary-color); /* Blue border - updated from #8b5cf6 (violet) */
 }
 
 .doctor-card.inactive {
@@ -204,7 +207,7 @@ padding: 1.5rem 1.75rem;
 
 /* Doctor Info */
 .doctor-info {
-margin: 1rem 0;
+    margin: 1rem 0;
 }
 
 .info-row {
@@ -218,7 +221,7 @@ margin: 1rem 0;
 
 .info-row i {
     width: 18px;
-    color: #8b5cf6;
+    color: var(--primary-color); /* Blue icon - updated from #8b5cf6 (violet) */
     font-size: var(--modal-tab-text);
 }
 
@@ -246,13 +249,13 @@ margin: 1rem 0;
 }
 
 .badge-primary {
-    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); /* BLUE - updated */
     color: white;
 }
 
 .badge-info {
     background: linear-gradient(135deg, #7dd3fc, #38bdf8);
- color: #0c4a6e;
+    color: #0c4a6e;
 }
 
 .badge-success {
@@ -288,7 +291,7 @@ margin: 1rem 0;
     color: #374151;
 }
 
-/* Buttons */
+/* Buttons - ALBASTRU Theme */
 .btn {
     padding: 0.625rem 1.25rem;
     border: none;
@@ -309,17 +312,17 @@ margin: 1rem 0;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); /* BLUE - updated from violet */
     color: white;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-darker)); /* BLUE hover - updated */
 }
 
 .btn-secondary {
     background: linear-gradient(135deg, #94a3b8, #64748b);
-color: white;
+    color: white;
 }
 
 .btn-secondary:hover {
@@ -348,7 +351,7 @@ color: white;
     gap: 0.875rem;
     padding: 1.25rem 1.75rem;
     border-top: 2px solid #f3f4f6;
- background: white;
+    background: white;
     border-radius: 0 0 14px 14px;
     flex-shrink: 0;
 }
@@ -375,7 +378,7 @@ color: white;
 
 /* Text Utilities */
 .text-primary {
- color: #8b5cf6;
+    color: var(--primary-color); /* BLUE - updated from violet */
 }
 
 .text-success {
@@ -386,29 +389,29 @@ color: white;
     color: #6b7280;
 }
 
-/* Scrollbar */
+/* Scrollbar - ALBASTRU Theme */
 .modal-body::-webkit-scrollbar {
     width: 8px;
 }
 
 .modal-body::-webkit-scrollbar-track {
-  background: #f1f5f9;
+    background: #f1f5f9;
     border-radius: 4px;
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-    background: #8b5cf6;
+    background: linear-gradient(135deg, var(--primary-lighter), var(--primary-light)); /* BLUE - updated */
     border-radius: 4px;
 }
 
 .modal-body::-webkit-scrollbar-thumb:hover {
-    background: #7c3aed;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color)); /* BLUE hover - updated */
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .modal-container {
- width: 95%;
+        width: 95%;
         max-height: 95vh;
     }
 
@@ -428,14 +431,14 @@ color: white;
 
     .doctor-actions {
         flex-direction: column;
-  }
+    }
 
     .doctor-actions button {
-  width: 100%;
+        width: 100%;
     }
 
     .modal-footer {
-  flex-direction: column;
+        flex-direction: column;
     }
 
     .modal-footer button {

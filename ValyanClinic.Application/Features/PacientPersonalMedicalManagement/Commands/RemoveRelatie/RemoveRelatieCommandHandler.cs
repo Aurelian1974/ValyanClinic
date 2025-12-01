@@ -1,78 +1,96 @@
 ﻿using MediatR;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Data;
 using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Commands.RemoveRelatie;
 
+/// <summary>
+/// Handler pentru RemoveRelatieCommand.
+/// Dezactivează (soft delete) o relație între pacient și personal medical.
+/// </summary>
 public class RemoveRelatieCommandHandler : IRequestHandler<RemoveRelatieCommand, Result>
 {
-    private readonly IConfiguration _configuration;
+    private readonly IPacientPersonalMedicalRepository _repository;
     private readonly ILogger<RemoveRelatieCommandHandler> _logger;
 
+    /// <summary>
+    /// Constructor pentru RemoveRelatieCommandHandler.
+    /// </summary>
+    /// <param name="repository">
+    /// Repository pentru accesarea relațiilor pacient-personal medical.
+    /// </param>
+    /// <param name="logger">
+    /// Logger pentru înregistrarea operațiilor și erorilor.
+    /// </param>
     public RemoveRelatieCommandHandler(
-        IConfiguration configuration,
+        IPacientPersonalMedicalRepository repository,
         ILogger<RemoveRelatieCommandHandler> logger)
     {
-        _configuration = configuration;
-        _logger = logger;
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-  public async Task<Result> Handle(RemoveRelatieCommand request, CancellationToken cancellationToken)
+    /// <summary>
+    /// Procesează command-ul pentru dezactivarea unei relații.
+    /// </summary>
+    /// <param name="request">Command-ul cu ID-ul relației de dezactivat.</param>
+    /// <param name="cancellationToken">Token pentru anularea operației.</param>
+    /// <returns>
+    /// Result care indică succesul sau eșecul operației.
+    /// </returns>
+    public async Task<Result> Handle(
+        RemoveRelatieCommand request,
+        CancellationToken cancellationToken)
     {
+        // Validation: RelatieID must be specified
+        if (!request.RelatieID.HasValue || request.RelatieID.Value == Guid.Empty)
+        {
+            _logger.LogWarning(
+                "[RemoveRelatieCommandHandler] RelatieID was not specified or is empty");
+
+            return Result.Failure("RelatieID este obligatoriu pentru dezactivarea relației.");
+        }
+
         try
         {
-   // ✅ VALIDATION: RelatieID trebuie specificat
-   if (!request.RelatieID.HasValue)
-  {
-        _logger.LogWarning("RelatieID nu a fost specificat");
-return Result.Failure("RelatieID este obligatoriu pentru dezactivarea relației.");
-       }
+            _logger.LogInformation(
+                "[RemoveRelatieCommandHandler] Processing command to remove RelatieID={RelatieID}",
+                request.RelatieID.Value);
 
-        _logger.LogInformation(
-        "Dezactivare relație: RelatieID={RelatieID}",
- request.RelatieID.Value);
+            await _repository.RemoveRelatieAsync(
+                request.RelatieID.Value,
+                cancellationToken);
 
-        var connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-   using (var connection = new SqlConnection(connectionString))
-        {
-                await connection.OpenAsync(cancellationToken);
-
-      // ✅ FIXED: Nume corect SP + doar 1 parametru
-       using (var command = new SqlCommand("sp_PacientiPersonalMedical_RemoveRelatie", connection))
-    {
-      command.CommandType = CommandType.StoredProcedure;
-      
-// ✅ FIXED: Doar @RelatieID - așa cum cere stored procedure-ul
-      command.Parameters.AddWithValue("@RelatieID", request.RelatieID.Value);
-
-  await command.ExecuteNonQueryAsync(cancellationToken);
-          
-       _logger.LogInformation(
-       "Relație dezactivată cu succes: RelatieID={RelatieID}",
-     request.RelatieID.Value);
-              }
-      }
+            _logger.LogInformation(
+                "[RemoveRelatieCommandHandler] Relație dezactivată cu succes: RelatieID={RelatieID}",
+                request.RelatieID.Value);
 
             return Result.Success();
         }
-catch (SqlException ex) when (ex.Message.Contains("nu exist"))
+        catch (InvalidOperationException ex)
         {
-  _logger.LogWarning(ex, "Relația nu a fost găsită: RelatieID={RelatieID}", request.RelatieID);
-return Result.Failure("Relația specificată nu a fost găsită sau este deja inactivă.");
+            _logger.LogWarning(ex,
+                "[RemoveRelatieCommandHandler] Relația nu a fost găsită sau este deja inactivă: RelatieID={RelatieID}",
+                request.RelatieID);
+
+            return Result.Failure(ex.Message);
         }
-        catch (SqlException ex)
+        catch (ArgumentException ex)
         {
-       _logger.LogError(ex, "Eroare SQL la dezactivarea relației: RelatieID={RelatieID}", request.RelatieID);
-  return Result.Failure($"Eroare SQL: {ex.Message}");
+            _logger.LogWarning(ex,
+                "[RemoveRelatieCommandHandler] Invalid arguments: RelatieID={RelatieID}",
+                request.RelatieID);
+
+            return Result.Failure($"Parametri invalizi: {ex.Message}");
         }
         catch (Exception ex)
-     {
- _logger.LogError(ex, "Eroare neașteptată la dezactivarea relației: RelatieID={RelatieID}", request.RelatieID);
-    return Result.Failure($"Eroare la dezactivarea relației: {ex.Message}");
- }
+        {
+            _logger.LogError(ex,
+                "[RemoveRelatieCommandHandler] Unexpected error removing RelatieID={RelatieID}",
+                request.RelatieID);
+
+            return Result.Failure($"Eroare la dezactivarea relației: {ex.Message}");
+        }
     }
 }

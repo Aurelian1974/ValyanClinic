@@ -419,6 +419,7 @@ public class PersonalRepository : IPersonalRepository
 ### Unit Testing Guidelines
 - ✅ **Test business logic** (MediatR handlers, services)
 - ✅ **Use xUnit** as testing framework
+- ✅ **Use bUnit** as testing framework
 - ✅ **Use FluentAssertions** for readable assertions
 - ✅ **Use Moq** for mocking dependencies
 - ✅ **Follow AAA pattern:** Arrange, Act, Assert
@@ -747,6 +748,791 @@ chore: Update NuGet packages
 
 **🎨 Remember: Blue Pastel Theme, Scoped CSS, No Logic in UI!**
 
-**Status:** ✅ **COMPREHENSIVE GUIDELINES - v2.0**  
-**Last Updated:** November 2025  
+**Status:** ✅ **COMPREHENSIVE GUIDELINES - v2.1**  
+**Last Updated:** December 2025  
 **Project:** ValyanClinic - Medical Clinic Management System
+
+---
+
+## 🔧 Business Logic Services Pattern
+
+### **WHY Extract Business Logic to Services?**
+
+**Problem:** Complex Blazor components with heavy business logic are **difficult to unit test** because:
+- Third-party UI components (Syncfusion, DevExpress) require extensive DI setup in tests
+- Component lifecycle (OnInitializedAsync, StateHasChanged) complicates testing
+- UI state management mixes with business rules
+
+**Solution:** **Extract business logic into separate Application Services** that can be easily unit tested.
+
+---
+
+### **Pattern: Service Extraction for Complex Components**
+
+#### **❌ BEFORE (Logic in Component - Hard to Test):**
+
+```csharp
+// VizualizarePacienti.razor.cs - ❌ HARD TO TEST
+public partial class VizualizarePacienti : ComponentBase
+{
+    [Inject] private IMediator Mediator { get; set; } = default!;
+    
+    private List<PacientListDto> CurrentPageData { get; set; } = new();
+    private int CurrentPage { get; set; } = 1;
+    private int CurrentPageSize { get; set; } = 20;
+    
+    // ❌ COMPLEX BUSINESS LOGIC IN COMPONENT
+    private async Task LoadPagedData()
+    {
+        // Complex filtering logic
+        var filters = new PacientFilters
+        {
+            SearchText = GlobalSearchText,
+            Judet = FilterJudet,
+            Asigurat = ParseAsiguratFilter(FilterAsigurat),
+            Activ = ParseStatusFilter(FilterStatus)
+        };
+        
+        // Complex sorting logic
+        var sortOptions = new SortOptions
+        {
+            Column = CurrentSortColumn,
+            Direction = CurrentSortDirection
+        };
+        
+        // Complex query building
+        var query = new GetPacientListQuery
+        {
+            PageNumber = CurrentPage,
+            PageSize = CurrentPageSize,
+            SearchText = filters.SearchText,
+            Judet = filters.Judet,
+            Asigurat = filters.Asigurat,
+            Activ = filters.Activ,
+            SortColumn = sortOptions.Column,
+            SortDirection = sortOptions.Direction
+        };
+        
+        var result = await Mediator.Send(query);
+        CurrentPageData = result.Value?.Value?.ToList() ?? new();
+    }
+    
+    private bool? ParseAsiguratFilter(string? value)
+    {
+        // Complex parsing logic
+        if (string.IsNullOrEmpty(value)) return null;
+        return value == "true";
+    }
+}
+```
+
+**Problem:** Testing requires mocking Syncfusion Grid, NavigationManager, JSInterop, etc. → **NIGHTMARE!**
+
+---
+
+#### **✅ AFTER (Logic in Service - Easy to Test):**
+
+**Step 1: Create Application Service**
+
+```csharp
+// ValyanClinic.Application/Services/Pacienti/IPacientDataService.cs
+namespace ValyanClinic.Application.Services.Pacienti;
+
+/// <summary>
+/// Service for managing patient data operations (filtering, sorting, pagination).
+/// Encapsulates business logic for patient list management.
+/// </summary>
+public interface IPacientDataService
+{
+    /// <summary>
+    /// Loads paged patient data with filters and sorting.
+    /// </summary>
+    Task<Result<PagedPacientData>> LoadPagedDataAsync(
+        PacientFilters filters,
+        PaginationOptions pagination,
+        SortOptions sorting,
+        CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Loads filter options (unique judete, etc.) from server.
+    /// </summary>
+    Task<Result<PacientFilterOptions>> LoadFilterOptionsAsync(
+        CancellationToken cancellationToken = default);
+}
+
+// Implementation
+public class PacientDataService : IPacientDataService
+{
+    private readonly IMediator _mediator;
+    private readonly ILogger<PacientDataService> _logger;
+    
+    public PacientDataService(IMediator mediator, ILogger<PacientDataService> logger)
+    {
+        _mediator = mediator;
+        _logger = logger;
+    }
+    
+    public async Task<Result<PagedPacientData>> LoadPagedDataAsync(
+        PacientFilters filters,
+        PaginationOptions pagination,
+        SortOptions sorting,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "Loading paged data: Page={Page}, Size={Size}, Search={Search}",
+                pagination.PageNumber, pagination.PageSize, filters.SearchText);
+            
+            var query = new GetPacientListQuery
+            {
+                PageNumber = pagination.PageNumber,
+                PageSize = pagination.PageSize,
+                SearchText = filters.SearchText,
+                Judet = filters.Judet,
+                Asigurat = filters.Asigurat,
+                Activ = filters.Activ,
+                SortColumn = sorting.Column,
+                SortDirection = sorting.Direction
+            };
+            
+            var result = await _mediator.Send(query, cancellationToken);
+            
+            if (!result.IsSuccess)
+                return Result<PagedPacientData>.Failure(result.Errors);
+            
+            var pagedData = new PagedPacientData
+            {
+                Items = result.Value?.Value?.ToList() ?? new(),
+                TotalCount = result.Value?.TotalCount ?? 0,
+                CurrentPage = result.Value?.CurrentPage ?? 1,
+                PageSize = result.Value?.PageSize ?? 20
+            };
+            
+            return Result<PagedPacientData>.Success(pagedData);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading paged data");
+            return Result<PagedPacientData>.Failure($"Eroare: {ex.Message}");
+        }
+    }
+    
+    public async Task<Result<PacientFilterOptions>> LoadFilterOptionsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Load all data for filter options
+            var query = new GetPacientListQuery
+            {
+                PageNumber = 1,
+                PageSize = int.MaxValue
+            };
+            
+            var result = await _mediator.Send(query, cancellationToken);
+            
+            if (!result.IsSuccess)
+                return Result<PacientFilterOptions>.Failure(result.Errors);
+            
+            var data = result.Value?.Value?.ToList() ?? new();
+            
+            var options = new PacientFilterOptions
+            {
+                Judete = data
+                    .Where(p => !string.IsNullOrEmpty(p.Judet))
+                    .Select(p => p.Judet!)
+                    .Distinct()
+                    .OrderBy(j => j)
+                    .ToList()
+            };
+            
+            return Result<PacientFilterOptions>.Success(options);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading filter options");
+            return Result<PacientFilterOptions>.Failure($"Eroare: {ex.Message}");
+        }
+    }
+}
+```
+
+**Step 2: Simplify Component (UI Only)**
+
+```csharp
+// VizualizarePacienti.razor.cs - ✅ EASY TO TEST (UI ONLY)
+public partial class VizualizarePacienti : ComponentBase
+{
+    [Inject] private IPacientDataService DataService { get; set; } = default!;
+    [Inject] private ILogger<VizualizarePacienti> Logger { get; set; } = default!;
+    
+    private List<PacientListDto> CurrentPageData { get; set; } = new();
+    private int CurrentPage { get; set; } = 1;
+    private int TotalRecords { get; set; }
+    
+    // ✅ SIMPLE - JUST CALLS SERVICE
+    private async Task LoadPagedData()
+    {
+        IsLoading = true;
+        
+        var filters = new PacientFilters
+        {
+            SearchText = GlobalSearchText,
+            Judet = FilterJudet,
+            Asigurat = ParseAsiguratFilter(FilterAsigurat),
+            Activ = ParseStatusFilter(FilterStatus)
+        };
+        
+        var pagination = new PaginationOptions
+        {
+            PageNumber = CurrentPage,
+            PageSize = CurrentPageSize
+        };
+        
+        var sorting = new SortOptions
+        {
+            Column = CurrentSortColumn,
+            Direction = CurrentSortDirection
+        };
+        
+        var result = await DataService.LoadPagedDataAsync(filters, pagination, sorting);
+        
+        if (result.IsSuccess)
+        {
+            CurrentPageData = result.Value.Items;
+            TotalRecords = result.Value.TotalCount;
+        }
+        else
+        {
+            HasError = true;
+            ErrorMessage = result.FirstError;
+        }
+        
+        IsLoading = false;
+    }
+}
+```
+
+**Step 3: Easy Unit Tests for Service**
+
+```csharp
+// PacientDataServiceTests.cs - ✅ EASY TO TEST!
+public class PacientDataServiceTests
+{
+    private readonly Mock<IMediator> _mockMediator;
+    private readonly Mock<ILogger<PacientDataService>> _mockLogger;
+    private readonly PacientDataService _service;
+    
+    public PacientDataServiceTests()
+    {
+        _mockMediator = new Mock<IMediator>();
+        _mockLogger = new Mock<ILogger<PacientDataService>>();
+        _service = new PacientDataService(_mockMediator.Object, _mockLogger.Object);
+    }
+    
+    [Fact]
+    public async Task LoadPagedDataAsync_WithFilters_ReturnsFilteredData()
+    {
+        // Arrange
+        var filters = new PacientFilters { SearchText = "Popescu", Judet = "Bucuresti" };
+        var pagination = new PaginationOptions { PageNumber = 1, PageSize = 20 };
+        var sorting = new SortOptions { Column = "Nume", Direction = "ASC" };
+        
+        var expectedData = CreateMockPagedResult();
+        _mockMediator
+            .Setup(m => m.Send(It.IsAny<GetPacientListQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<PagedResult<PacientListDto>>.Success(expectedData));
+        
+        // Act
+        var result = await _service.LoadPagedDataAsync(filters, pagination, sorting);
+        
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().HaveCount(10);
+        result.Value.TotalCount.Should().Be(50);
+        
+        _mockMediator.Verify(m => m.Send(
+            It.Is<GetPacientListQuery>(q => 
+                q.SearchText == "Popescu" && 
+                q.Judet == "Bucuresti"),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+    
+    // NO NEED TO MOCK: Syncfusion Grid, NavigationManager, JSInterop! 🎉
+}
+```
+
+---
+
+### **When to Extract Business Logic to Services?**
+
+✅ **Extract when:**
+- Component has complex filtering/sorting/pagination logic
+- Business rules need to be reused across multiple components
+- Component logic exceeds **~200 lines** in code-behind
+- Unit testing component requires mocking **>5 UI dependencies**
+
+❌ **Keep in component when:**
+- Simple UI state management (show/hide modal, toggle flags)
+- Direct EventCallback invocations
+- Simple parameter binding
+
+---
+
+### **Benefits of Service Extraction:**
+
+1. ✅ **Testability:** Service can be unit tested with **ZERO UI dependencies**
+2. ✅ **Reusability:** Same service can be used by multiple components
+3. ✅ **Maintainability:** Business logic changes in ONE place
+4. ✅ **Separation of Concerns:** UI components focus on **rendering**, services focus on **logic**
+5. ✅ **Performance:** Service methods can be **cached/memoized** independently
+
+---
+
+## 🎭 Integration Testing with Playwright
+
+### **WHY Playwright over Selenium?**
+
+| Feature | Playwright | Selenium |
+|---------|-----------|----------|
+| **Speed** | ⚡ **3-5x faster** | Slower |
+| **Auto-wait** | ✅ Built-in smart waits | ❌ Manual waits required |
+| **Browser Support** | ✅ Chromium, Firefox, WebKit | ✅ Chrome, Firefox, Safari |
+| **API Design** | ✅ Modern async/await | ❌ Older sync API |
+| **Network Interception** | ✅ Native support | ⚠️ Limited |
+| **Screenshots/Videos** | ✅ Built-in | ⚠️ External tools |
+| **Maintenance** | ✅ Microsoft actively maintained | ⚠️ Community-driven |
+| **Blazor Support** | ✅ Excellent (.NET 9+) | ⚠️ Requires workarounds |
+
+**Recommendation:** **Playwright** is the **best choice** for ValyanClinic due to:
+- Native **.NET 9 support** with `Microsoft.Playwright` NuGet package
+- **Auto-waiting** eliminates 90% of flaky tests (no more `Thread.Sleep`!)
+- **Fast execution** (parallel test runs)
+- **Rich debugging** with Playwright Inspector
+
+---
+
+### **Setting Up Playwright for ValyanClinic**
+
+#### **Step 1: Install NuGet Packages**
+
+```xml
+<!-- ValyanClinic.Tests.csproj -->
+<ItemGroup>
+  <PackageReference Include="Microsoft.Playwright" Version="1.47.0" />
+  <PackageReference Include="Microsoft.Playwright.NUnit" Version="1.47.0" />
+  <!-- OR use xUnit adapter -->
+  <PackageReference Include="xunit" Version="2.9.3" />
+</ItemGroup>
+```
+
+#### **Step 2: Install Playwright Browsers**
+
+```bash
+# Run once after installing package
+pwsh bin\Debug\net10.0\playwright.ps1 install
+```
+
+#### **Step 3: Create Base Test Class**
+
+```csharp
+// ValyanClinic.Tests/Integration/PlaywrightTestBase.cs
+using Microsoft.Playwright;
+using Xunit;
+
+namespace ValyanClinic.Tests.Integration;
+
+/// <summary>
+/// Base class for Playwright integration tests.
+/// Handles browser lifecycle and provides common utilities.
+/// </summary>
+public abstract class PlaywrightTestBase : IAsyncLifetime
+{
+    protected IPlaywright Playwright { get; private set; } = default!;
+    protected IBrowser Browser { get; private set; } = default!;
+    protected IBrowserContext Context { get; private set; } = default!;
+    protected IPage Page { get; private set; } = default!;
+    
+    // ValyanClinic base URL (update for your environment)
+    protected string BaseUrl { get; } = "https://localhost:5001";
+    
+    public async Task InitializeAsync()
+    {
+        // Create Playwright instance
+        Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
+        
+        // Launch browser (use Chromium by default, can switch to Firefox/WebKit)
+        Browser = await Playwright.Chromium.LaunchAsync(new()
+        {
+            Headless = true, // Set to false for debugging
+            SlowMo = 50 // Slow down actions for debugging
+        });
+        
+        // Create browser context (isolated session)
+        Context = await Browser.NewContextAsync(new()
+        {
+            ViewportSize = new ViewportSize { Width = 1920, Height = 1080 },
+            RecordVideoDir = "videos/" // Record test videos
+        });
+        
+        // Create page
+        Page = await Context.NewPageAsync();
+    }
+    
+    public async Task DisposeAsync()
+    {
+        await Page?.CloseAsync()!;
+        await Context?.CloseAsync()!;
+        await Browser?.CloseAsync()!;
+        Playwright?.Dispose();
+    }
+    
+    /// <summary>
+    /// Navigate to a specific page and wait for load.
+    /// </summary>
+    protected async Task NavigateToAsync(string relativeUrl)
+    {
+        await Page.GotoAsync($"{BaseUrl}{relativeUrl}", new()
+        {
+            WaitUntil = WaitUntilState.NetworkIdle
+        });
+    }
+    
+    /// <summary>
+    /// Wait for Blazor to finish rendering (SignalR ready).
+    /// </summary>
+    protected async Task WaitForBlazorAsync()
+    {
+        await Page.WaitForFunctionAsync("() => window.Blazor !== undefined");
+    }
+}
+```
+
+#### **Step 4: Write Integration Tests**
+
+```csharp
+// ValyanClinic.Tests/Integration/VizualizarePacientiIntegrationTests.cs
+using FluentAssertions;
+using Microsoft.Playwright;
+using Xunit;
+
+namespace ValyanClinic.Tests.Integration;
+
+/// <summary>
+/// End-to-end integration tests pentru VizualizarePacienti page.
+/// Tests full user workflows including UI interactions and data persistence.
+/// </summary>
+public class VizualizarePacientiIntegrationTests : PlaywrightTestBase
+{
+    [Fact]
+    public async Task VizualizarePacienti_PageLoads_DisplaysPacientList()
+    {
+        // Arrange & Act
+        await NavigateToAsync("/pacienti/vizualizare");
+        await WaitForBlazorAsync();
+        
+        // Assert - Page header is visible
+        var header = Page.Locator("h1:has-text('Vizualizare Pacienti')");
+        await Expect(header).ToBeVisibleAsync();
+        
+        // Assert - Grid is rendered
+        var grid = Page.Locator(".grid-container");
+        await Expect(grid).ToBeVisibleAsync();
+        
+        // Assert - Total records counter exists
+        var totalRecords = Page.Locator(".total-records");
+        await Expect(totalRecords).ToContainTextAsync("Total:");
+    }
+    
+    [Fact]
+    public async Task VizualizarePacienti_GlobalSearch_FiltersResults()
+    {
+        // Arrange
+        await NavigateToAsync("/pacienti/vizualizare");
+        await WaitForBlazorAsync();
+        
+        // Act - Type in search box
+        var searchInput = Page.Locator("input.search-input");
+        await searchInput.FillAsync("Popescu");
+        await searchInput.PressAsync("Enter");
+        
+        // Wait for results to update (Playwright auto-waits!)
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        
+        // Assert - Results contain search term
+        var firstRow = Page.Locator("table tbody tr").First;
+        await Expect(firstRow).ToContainTextAsync("Popescu");
+    }
+    
+    [Fact]
+    public async Task VizualizarePacienti_SelectPacient_OpensViewModal()
+    {
+        // Arrange
+        await NavigateToAsync("/pacienti/vizualizare");
+        await WaitForBlazorAsync();
+        
+        // Act - Click first row to select
+        var firstRow = Page.Locator("table tbody tr").First;
+        await firstRow.ClickAsync();
+        
+        // Act - Click "Vizualizeaza Detalii" button
+        var viewButton = Page.Locator("button.btn-view");
+        await viewButton.ClickAsync();
+        
+        // Assert - Modal is visible
+        var modal = Page.Locator(".modal-overlay.visible");
+        await Expect(modal).ToBeVisibleAsync();
+        
+        // Assert - Modal contains patient data
+        var modalTitle = Page.Locator(".modal-header h2");
+        await Expect(modalTitle).ToContainTextAsync("Detalii Pacient");
+    }
+    
+    [Fact]
+    public async Task VizualizarePacienti_ApplyFilters_UpdatesResults()
+    {
+        // Arrange
+        await NavigateToAsync("/pacienti/vizualizare");
+        await WaitForBlazorAsync();
+        
+        // Act - Open advanced filters
+        var filterButton = Page.Locator("button.btn-filter");
+        await filterButton.ClickAsync();
+        
+        // Wait for filter panel to expand
+        var filterPanel = Page.Locator(".advanced-filter-panel.expanded");
+        await Expect(filterPanel).ToBeVisibleAsync();
+        
+        // Act - Select Judet filter
+        var judetDropdown = Page.Locator(".filter-dropdown").First;
+        await judetDropdown.ClickAsync();
+        await Page.Locator("li:has-text('Bucuresti')").ClickAsync();
+        
+        // Act - Click Apply Filters
+        var applyButton = Page.Locator("button.btn-apply");
+        await applyButton.ClickAsync();
+        
+        // Wait for results
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        
+        // Assert - Filter chip is visible
+        var filterChip = Page.Locator(".filter-chip:has-text('Judet: Bucuresti')");
+        await Expect(filterChip).ToBeVisibleAsync();
+        
+        // Assert - Results are filtered
+        var rows = Page.Locator("table tbody tr");
+        var count = await rows.CountAsync();
+        count.Should().BeGreaterThan(0);
+    }
+    
+    [Fact]
+    public async Task VizualizarePacienti_Paging_NavigatesToNextPage()
+    {
+        // Arrange
+        await NavigateToAsync("/pacienti/vizualizare");
+        await WaitForBlazorAsync();
+        
+        // Act - Click next page button (Syncfusion Grid pagination)
+        var nextPageButton = Page.Locator(".e-nextpage");
+        await nextPageButton.ClickAsync();
+        
+        // Wait for page change
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        
+        // Assert - Page number updated
+        var currentPage = Page.Locator(".e-currentitem");
+        var pageText = await currentPage.TextContentAsync();
+        pageText.Should().Contain("2"); // Page 2
+    }
+    
+    [Fact]
+    public async Task VizualizarePacienti_RefreshButton_ReloadsData()
+    {
+        // Arrange
+        await NavigateToAsync("/pacienti/vizualizare");
+        await WaitForBlazorAsync();
+        
+        // Act - Click refresh button
+        var refreshButton = Page.Locator("button:has-text('Reincarca')");
+        await refreshButton.ClickAsync();
+        
+        // Assert - Loading spinner appears (briefly)
+        var spinner = Page.Locator(".spinner-border");
+        // Spinner might disappear quickly, so check for toast instead
+        
+        // Assert - Success toast appears
+        await Page.WaitForSelectorAsync(".e-toast-success", new()
+        {
+            Timeout = 5000
+        });
+        
+        var toast = Page.Locator(".e-toast-success");
+        await Expect(toast).ToContainTextAsync("reincarcate cu succes");
+    }
+}
+```
+
+---
+
+### **Playwright Best Practices for ValyanClinic**
+
+#### **1. Use Locator Strategies (in order of preference)**
+
+```csharp
+// ✅ BEST - Semantic locators (accessible to screen readers)
+await Page.GetByRole(AriaRole.Button, new() { Name = "Reincarca" }).ClickAsync();
+await Page.GetByLabel("Cautare rapida").FillAsync("Popescu");
+
+// ✅ GOOD - Data-testid attributes (add to markup)
+await Page.Locator("[data-testid='patient-grid']").WaitForAsync();
+
+// ⚠️ OK - CSS classes (but can break with style changes)
+await Page.Locator(".btn-primary").ClickAsync();
+
+// ❌ AVOID - XPath (fragile, hard to read)
+await Page.Locator("//div[@class='modal']//button[1]").ClickAsync();
+```
+
+#### **2. Add data-testid Attributes to Key Elements**
+
+```razor
+<!-- VizualizarePacienti.razor -->
+<div class="pacienti-container" data-testid="pacienti-page">
+    <input type="text" 
+           class="search-input" 
+           data-testid="search-input"
+           placeholder="Cautare rapida..." />
+    
+    <button class="btn-filter" 
+            data-testid="filter-button"
+            @onclick="ToggleAdvancedFilter">
+        Filtre
+    </button>
+    
+    <div class="grid-container" data-testid="patient-grid">
+        <SfGrid @ref="GridRef" DataSource="@CurrentPageData">
+            <!-- Grid columns -->
+        </SfGrid>
+    </div>
+</div>
+```
+
+#### **3. Parallel Test Execution**
+
+```csharp
+// Mark tests as parallel-safe
+[Collection("Sequential")] // Use for tests that modify shared state
+public class VizualizarePacientiIntegrationTests : PlaywrightTestBase
+{
+    // Tests run in parallel by default with xUnit + Playwright
+}
+```
+
+#### **4. Visual Regression Testing**
+
+```csharp
+[Fact]
+public async Task VizualizarePacienti_Screenshot_MatchesBaseline()
+{
+    // Arrange
+    await NavigateToAsync("/pacienti/vizualizare");
+    await WaitForBlazorAsync();
+    
+    // Act - Take screenshot
+    await Page.ScreenshotAsync(new()
+    {
+        Path = "screenshots/vizualizare-pacienti.png",
+        FullPage = true
+    });
+    
+    // Assert - Compare with baseline (use external tool like Percy or Applitools)
+    // Or manually review screenshots in CI/CD pipeline
+}
+```
+
+#### **5. Network Interception for Testing**
+
+```csharp
+[Fact]
+public async Task VizualizarePacienti_ApiFailure_DisplaysErrorMessage()
+{
+    // Arrange - Intercept API calls
+    await Page.RouteAsync("**/api/pacienti/**", async route =>
+    {
+        await route.FulfillAsync(new()
+        {
+            Status = 500,
+            Body = "{\"error\": \"Database connection failed\"}"
+        });
+    });
+    
+    // Act
+    await NavigateToAsync("/pacienti/vizualizare");
+    await WaitForBlazorAsync();
+    
+    // Assert - Error message displayed
+    var errorAlert = Page.Locator(".alert-danger");
+    await Expect(errorAlert).ToBeVisibleAsync();
+    await Expect(errorAlert).ToContainTextAsync("Eroare");
+}
+```
+
+---
+
+### **CI/CD Integration**
+
+```yaml
+# .github/workflows/playwright-tests.yml
+name: Playwright Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      
+      - name: Install dependencies
+        run: dotnet restore
+      
+      - name: Build
+        run: dotnet build --configuration Release
+      
+      - name: Install Playwright browsers
+        run: pwsh ValyanClinic.Tests/bin/Release/net10.0/playwright.ps1 install
+      
+      - name: Run Playwright tests
+        run: dotnet test --filter "Category=Integration" --configuration Release
+      
+      - name: Upload test videos
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos
+          path: ValyanClinic.Tests/videos/
+```
+
+---
+
+## 📊 Testing Strategy Summary
+
+| Test Type | Tool | When to Use | Coverage Goal |
+|-----------|------|-------------|---------------|
+| **Unit Tests** | xUnit + FluentAssertions + Moq | Business logic, MediatR handlers, services | **80-90%** |
+| **Component Tests** | bUnit | Simple Blazor components (modals, forms) | **60-70%** |
+| **Integration Tests** | Playwright | Complex UI workflows, E2E scenarios | **Critical paths 100%** |
+
+**Recommended Approach for ValyanClinic:**
+1. ✅ **Unit test all business logic** (Application layer services)
+2. ✅ **bUnit test simple components** (modals without third-party dependencies)
+3. ✅ **Playwright test critical user journeys** (login, patient registration, consultation flow)
+
+---
