@@ -204,12 +204,15 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
             ErrorMessage = null;
 
             Logger.LogInformation(
-                "SERVER-SIDE Load: Page={Page}, Size={Size}, Search='{Search}', Judet={Judet}, Asigurat={Asigurat}, Activ={Activ}",
+                "🔍 [AdministrarePacienti] SERVER-SIDE Load: Page={Page}, Size={Size}, Search='{Search}', Judet={Judet}, Asigurat={Asigurat}, Activ={Activ}",
                 CurrentPage, PageSize, SearchText, FilterJudet, FilterAsigurat, FilterActiv);
 
             // Prepare filters
             bool? asiguratFilter = string.IsNullOrEmpty(FilterAsigurat) ? null : FilterAsigurat == "true";
             bool? activFilter = string.IsNullOrEmpty(FilterActiv) ? null : FilterActiv == "true";
+
+            Logger.LogWarning("🔍 [AdministrarePacienti] Filters parsed: Asigurat={Asigurat}, Activ={Activ}",
+                asiguratFilter, activFilter);
 
             var filters = new ValyanClinic.Application.Services.Pacienti.PacientFilters
             {
@@ -231,9 +234,14 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
                 Direction = "ASC"
             };
 
+            Logger.LogWarning("🔍 [AdministrarePacienti] Calling DataService.LoadPagedDataAsync...");
+
             var result = await DataService.LoadPagedDataAsync(filters, pagination, sorting);
 
             if (_disposed) return;
+
+            Logger.LogWarning("🔍 [AdministrarePacienti] DataService returned: IsSuccess={IsSuccess}, ErrorCount={ErrorCount}",
+                result.IsSuccess, result.Errors?.Count ?? 0);
 
             if (result.IsSuccess)
             {
@@ -241,15 +249,25 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
                 TotalRecords = result.Value.TotalCount;
                 TotalPages = result.Value.TotalPages;
 
-                Logger.LogInformation(
-                    "SERVER-SIDE Data loaded: Page {Page}/{TotalPages}, Records {Count}, Total {Total}",
+                Logger.LogWarning(
+                    "🎉 [AdministrarePacienti] SERVER-SIDE Data loaded: Page {Page}/{TotalPages}, Records {Count}, Total {Total}",
                     CurrentPage, TotalPages, CurrentPageData.Count, TotalRecords);
+                    
+                if (CurrentPageData.Count == 0)
+                {
+                    Logger.LogError("❌ [AdministrarePacienti] ZERO RECORDS RETURNED! This is the problem!");
+                }
+                else
+                {
+                    Logger.LogInformation("✅ [AdministrarePacienti] First patient: {Name}, Activ={Activ}",
+                        CurrentPageData[0].NumeComplet, CurrentPageData[0].Activ);
+                }
             }
             else
             {
                 HasError = true;
                 ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare necunoscuta" });
-                Logger.LogError("Eroare la incarcarea datelor: {Message}", ErrorMessage);
+                Logger.LogError("❌ [AdministrarePacienti] Eroare la incarcarea datelor: {Message}", ErrorMessage);
                 CurrentPageData = new List<PacientListDto>();
                 TotalRecords = 0;
                 TotalPages = 0;
@@ -265,7 +283,7 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
             {
                 HasError = true;
                 ErrorMessage = $"Eroare neașteptată: {ex.Message}";
-                Logger.LogError(ex, "EXCEPTION la incarcarea datelor");
+                Logger.LogError(ex, "❌ [AdministrarePacienti] EXCEPTION la incarcarea datelor");
                 CurrentPageData = new List<PacientListDto>();
                 TotalRecords = 0;
                 TotalPages = 0;
