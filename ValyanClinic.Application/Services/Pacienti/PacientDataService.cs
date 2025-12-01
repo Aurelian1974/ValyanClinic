@@ -47,8 +47,8 @@ public class PacientDataService : IPacientDataService
         {
             _logger.LogInformation(
                 "[PacientDataService] Loading paged data: Page={Page}, Size={Size}, Search='{Search}', Judet={Judet}, Asigurat={Asigurat}, Activ={Activ}, Sort={Sort} {Direction}",
-                pagination.PageNumber, pagination.PageSize, filters.SearchText, 
-                filters.Judet, filters.Asigurat, filters.Activ, 
+                pagination.PageNumber, pagination.PageSize, filters.SearchText,
+                filters.Judet, filters.Asigurat, filters.Activ,
                 sorting.Column, sorting.Direction);
 
             // Create MediatR query

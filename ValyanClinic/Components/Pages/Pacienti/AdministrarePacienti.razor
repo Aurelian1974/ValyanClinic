@@ -1,4 +1,5 @@
 ﻿@page "/pacienti/administrare"
+@attribute [Authorize]
 @rendermode InteractiveServer
 @using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientList
 @using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
@@ -128,14 +129,14 @@
         {
             <SfGrid @ref="GridRef"
                     DataSource="@FilteredPacienti"
-                    AllowPaging="true"
+                    AllowPaging="false"
                     AllowSorting="true"
                     AllowFiltering="false"
                     AllowResizing="true"
                     GridLines="GridLine.Both"
                     Height="100%">
                 
-                <GridPageSettings PageSize="25" PageSizes="@(new int[] { 10, 25, 50, 100 })"></GridPageSettings>
+                <!-- ✅ REMOVED GridPageSettings - we handle pagination manually -->
                 
                 <GridColumns>
                     <GridColumn Field="@nameof(PacientListDto.Cod_Pacient)" 
@@ -144,7 +145,7 @@
                         <Template>
                             @{
                                 var pacient = (context as PacientListDto);
-                                <span class="badge badge-code">@pacient?.Cod_Pacient</span>
+                                <span class="badge badge-code" @key="pacient!.Id">@pacient?.Cod_Pacient</span>
                             }
                         </Template>
                     </GridColumn>
@@ -155,7 +156,7 @@
                         <Template>
                             @{
                                 var pacient = (context as PacientListDto);
-                                <div class="patient-info">
+                                <div class="patient-info" @key="pacient!.Id">
                                     <i class="fas fa-@(pacient?.Sex == "M" ? "mars" : "venus") sex-icon sex-@(pacient?.Sex.ToLower())"></i>
                                     <span class="patient-name">@pacient?.NumeComplet</span>
                                 </div>
@@ -175,7 +176,7 @@
                         <Template>
                             @{
                                 var pacient = (context as PacientListDto);
-                                <span>@pacient?.Varsta ani</span>
+                                <span @key="pacient!.Id">@pacient?.Varsta ani</span>
                             }
                         </Template>
                     </GridColumn>
@@ -186,17 +187,19 @@
                         <Template>
                             @{
                                 var pacient = (context as PacientListDto);
-                                if (!string.IsNullOrEmpty(pacient?.Telefon))
-                                {
-                                    <a href="tel:@pacient.Telefon" class="phone-link">
-                                        <i class="fas fa-phone"></i>
-                                        @pacient.Telefon
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">-</span>
-                                }
+                                <div @key="pacient!.Id">
+                                    @if (!string.IsNullOrEmpty(pacient?.Telefon))
+                                    {
+                                        <a href="tel:@pacient.Telefon" class="phone-link">
+                                            <i class="fas fa-phone"></i>
+                                            @pacient.Telefon
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </div>
                             }
                         </Template>
                     </GridColumn>
@@ -207,17 +210,19 @@
                         <Template>
                             @{
                                 var pacient = (context as PacientListDto);
-                                if (!string.IsNullOrEmpty(pacient?.Email))
-                                {
-                                    <a href="mailto:@pacient.Email" class="email-link">
-                                        <i class="fas fa-envelope"></i>
-                                        @pacient.Email
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">-</span>
-                                }
+                                <div @key="pacient!.Id">
+                                    @if (!string.IsNullOrEmpty(pacient?.Email))
+                                    {
+                                        <a href="mailto:@pacient.Email" class="email-link">
+                                            <i class="fas fa-envelope"></i>
+                                            @pacient.Email
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </div>
                             }
                         </Template>
                     </GridColumn>
@@ -234,21 +239,23 @@
                         <Template>
                             @{
                                 var pacient = (context as PacientListDto);
-                                if (pacient != null)
-                                {
-                                    if (pacient.Asigurat)
+                                <div @key="pacient!.Id">
+                                    @if (pacient != null)
                                     {
-                                        <span class="badge badge-success">
-                                            <i class="fas fa-check-circle"></i> Da
-                                        </span>
+                                        if (pacient.Asigurat)
+                                        {
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-check-circle"></i> Da
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-secondary">
+                                                <i class="fas fa-times-circle"></i> Nu
+                                            </span>
+                                        }
                                     }
-                                    else
-                                    {
-                                        <span class="badge badge-secondary">
-                                            <i class="fas fa-times-circle"></i> Nu
-                                        </span>
-                                    }
-                                }
+                                </div>
                             }
                         </Template>
                     </GridColumn>
@@ -260,7 +267,8 @@
                         <Template>
                             @{
                                 var pacient = (context as PacientListDto);
-                                <span class="badge @(pacient?.Activ == true ? "badge-active" : "badge-inactive")">
+                                <span class="badge @(pacient?.Activ == true ? "badge-active" : "badge-inactive")" 
+                                      @key="pacient!.Id">
                                     @(pacient?.Activ == true ? "Activ" : "Inactiv")
                                 </span>
                             }
@@ -271,7 +279,7 @@
                         <Template>
                             @{
                                 var pacient = (context as PacientListDto);
-                                <div class="action-buttons">
+                                <div class="action-buttons" @key="pacient!.Id">
                                     <button class="btn btn-sm btn-view" 
                                             @onclick="() => OpenViewModal(pacient!.Id)"
                                             title="Vizualizeaza detalii">
@@ -303,30 +311,86 @@
                     </GridColumn>
                 </GridColumns>
             </SfGrid>
+
+            <!-- ✅ ADDED: Custom Pagination Controls -->
+            @if (TotalRecords > 0)
+            {
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        <span>
+                            Afișare <strong>@((CurrentPage - 1) * PageSize + 1)</strong> 
+                            - <strong>@Math.Min(CurrentPage * PageSize, TotalRecords)</strong> 
+                            din <strong>@TotalRecords</strong> înregistrări
+                        </span>
+                    </div>
+                    
+                    <div class="pagination-controls">
+                        <button class="btn btn-sm btn-outline-secondary" 
+                                @onclick="GoToFirstPage" 
+                                disabled="@(CurrentPage == 1)">
+                            <i class="fas fa-angle-double-left"></i> Prima
+                        </button>
+                        
+                        <button class="btn btn-sm btn-outline-secondary" 
+                                @onclick="GoToPreviousPage" 
+                                disabled="@(CurrentPage == 1)">
+                            <i class="fas fa-angle-left"></i> Anterioara
+                        </button>
+                        
+                        <span class="pagination-page-info">
+                            Pagina <strong>@CurrentPage</strong> din <strong>@TotalPages</strong>
+                        </span>
+                        
+                        <button class="btn btn-sm btn-outline-secondary" 
+                                @onclick="GoToNextPage" 
+                                disabled="@(CurrentPage >= TotalPages)">
+                            Următoarea <i class="fas fa-angle-right"></i>
+                        </button>
+                        
+                        <button class="btn btn-sm btn-outline-secondary" 
+                                @onclick="GoToLastPage" 
+                                disabled="@(CurrentPage >= TotalPages)">
+                            Ultima <i class="fas fa-angle-double-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="pagination-page-size">
+                        <label>Înregistrări/pagină:</label>
+                        <select class="form-select form-select-sm" 
+                                @bind="PageSize" 
+                                @bind:after="@(() => ChangePageSize(PageSize))">
+                            @foreach (var size in PageSizeArray)
+                            {
+                                <option value="@size">@size</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
         }
     </div>
+
+    <!-- Modals -->
+    <PacientAddEditModal IsVisible="@ShowAddEditModal"
+                         IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowAddEditModal = value))"
+                         PacientId="@SelectedPacientId"
+                         OnSaved="@HandleModalSaved" />
+
+    <PacientViewModal IsVisible="@ShowViewModal"
+                      IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
+                      PacientId="@SelectedPacientId" />
+
+    <PacientHistoryModal IsVisible="@ShowHistoryModal"
+                         IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowHistoryModal = value))"
+                         PacientId="@SelectedPacientId" />
+
+    <PacientDocumentsModal IsVisible="@ShowDocumentsModal"
+                           IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowDocumentsModal = value))"
+                           PacientId="@SelectedPacientId" />
+
+    <ConfirmDeleteModal IsVisible="@ShowDeleteModal"
+                        IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowDeleteModal = value))"
+                        Title="Confirmare Stergere"
+                        Message="@DeleteConfirmMessage"
+                        OnConfirmed="@HandleDeleteConfirmed" />
 </div>
-
-<!-- Modals -->
-<PacientAddEditModal IsVisible="@ShowAddEditModal"
-                     IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowAddEditModal = value))"
-                     PacientId="@SelectedPacientId"
-                     OnSaved="@HandleModalSaved" />
-
-<PacientViewModal IsVisible="@ShowViewModal"
-                  IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowViewModal = value))"
-                  PacientId="@SelectedPacientId" />
-
-<PacientHistoryModal IsVisible="@ShowHistoryModal"
-                     IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowHistoryModal = value))"
-                     PacientId="@SelectedPacientId" />
-
-<PacientDocumentsModal IsVisible="@ShowDocumentsModal"
-                       IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowDocumentsModal = value))"
-                       PacientId="@SelectedPacientId" />
-
-<ConfirmDeleteModal IsVisible="@ShowDeleteModal"
-                    IsVisibleChanged="@(EventCallback.Factory.Create<bool>(this, value => ShowDeleteModal = value))"
-                    Title="Confirmare Stergere"
-                    Message="@DeleteConfirmMessage"
-                    OnConfirmed="@HandleDeleteConfirmed" />

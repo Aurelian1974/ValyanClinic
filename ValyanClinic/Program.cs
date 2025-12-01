@@ -55,10 +55,10 @@ try
         .AddInteractiveServerComponents(options =>
         {
             options.DetailedErrors = builder.Environment.IsDevelopment();
-          options.DisconnectedCircuitMaxRetained = 100;
- options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
-         options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
-      options.MaxBufferedUnacknowledgedRenderBatches = 20;
+            options.DisconnectedCircuitMaxRetained = 100;
+            options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
+            options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
+            options.MaxBufferedUnacknowledgedRenderBatches = 20;
         });
 
     // ========================================
@@ -81,7 +81,7 @@ try
     // ========================================
     // AUTHENTICATION & AUTHORIZATION - Cookie Configuration
     // ========================================
-    
+
     // ASP.NET Core Authentication Services (REQUIRED for AuthorizeRouteView)
     builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -90,18 +90,18 @@ try
             options.LoginPath = "/login";
             options.LogoutPath = "/logout";
             options.AccessDeniedPath = "/access-denied";
-            
+
             // ✅ SESSION COOKIE - Simplu și eficient
             options.ExpireTimeSpan = TimeSpan.FromHours(8);
             options.SlidingExpiration = true; // ✅ SCHIMBAT: True pentru UX mai bun
-            
+
             // ✅ Cookie settings
             options.Cookie.IsEssential = true;
             options.Cookie.HttpOnly = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.Cookie.MaxAge = null; // Session cookie - se șterge când închizi browser-ul
-            
+
             // ✅ Events simplificate - doar validare esențială
             options.Events = new CookieAuthenticationEvents
             {
@@ -109,7 +109,7 @@ try
                 {
                     var logger = context.HttpContext.RequestServices
                         .GetRequiredService<ILogger<Program>>();
-                    
+
                     // Verificare simplă - cookie valid?
                     if (context.Principal?.Identity?.IsAuthenticated != true)
                     {
@@ -124,15 +124,15 @@ try
                 }
             };
         });
-    
+
     // Authorization Services
     builder.Services.AddAuthorizationCore();
-    
+
     // Blazor Authentication State Provider
     builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-    builder.Services.AddScoped<CustomAuthenticationStateProvider>(sp => 
+    builder.Services.AddScoped<CustomAuthenticationStateProvider>(sp =>
         (CustomAuthenticationStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
-    
+
     // ========================================
     // CIRCUIT HANDLER - Pentru gestionarea reconectărilor
     // ========================================
@@ -144,19 +144,19 @@ try
     var syncfusionLicenseKey = builder.Configuration["Syncfusion:LicenseKey"];
     if (!string.IsNullOrEmpty(syncfusionLicenseKey))
     {
-   Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicenseKey);
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicenseKey);
     }
-    
+
     // Add Syncfusion Blazor service
     builder.Services.AddSyncfusionBlazor();
-  
-  // Configure localization for Romanian
+
+    // Configure localization for Romanian
     builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
     builder.Services.Configure<RequestLocalizationOptions>(options =>
     {
-  var supportedCultures = new[] { "ro-RO", "ro" };
+        var supportedCultures = new[] { "ro-RO", "ro" };
         options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("ro-RO");
-options.SupportedCultures = supportedCultures.Select(c => new System.Globalization.CultureInfo(c)).ToList();
+        options.SupportedCultures = supportedCultures.Select(c => new System.Globalization.CultureInfo(c)).ToList();
         options.SupportedUICultures = supportedCultures.Select(c => new System.Globalization.CultureInfo(c)).ToList();
     });
 
@@ -165,7 +165,7 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // ========================================
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
         ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-    
+
     // CRITICAL: Configurare optimizată connection pooling pentru Blazor Server
     var connectionStringBuilder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString)
     {
@@ -173,34 +173,34 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
         Pooling = true,
         MinPoolSize = 0,  // ✅ CHANGED: 0 pentru startup rapid (conexiuni create on-demand)
         MaxPoolSize = 50, // ✅ CHANGED: 50 suficient pentru clinică mică-medie (era 100)
-        
+
         // Timeouts - OPTIMIZED
         ConnectTimeout = 15, // ✅ CHANGED: 15 secunde (era 30)
         CommandTimeout = 30,
-        
+
         // Connection Resilience
         ConnectRetryCount = 3,
         ConnectRetryInterval = 10,
-        
+
         // CRITICAL: Cleanup stale connections
         LoadBalanceTimeout = 60, // Seconds before connection is returned to pool
-        
+
         // Performance
         MultipleActiveResultSets = false, // MARS disabled pentru Dapper
-        
+
         // Security
         Encrypt = false, // Set true for production with SSL
         TrustServerCertificate = true
     };
-    
+
     var optimizedConnectionString = connectionStringBuilder.ConnectionString;
-    
+
     Log.Information("Connection string optimized: Pooling={Pooling}, Min={Min}, Max={Max}, Timeout={Timeout}",
         connectionStringBuilder.Pooling,
         connectionStringBuilder.MinPoolSize,
         connectionStringBuilder.MaxPoolSize,
         connectionStringBuilder.ConnectTimeout);
-    
+
     builder.Services.AddSingleton<IDbConnectionFactory>(sp =>
     {
         var logger = sp.GetRequiredService<ILogger<SqlConnectionFactory>>();
@@ -221,11 +221,11 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     builder.Services.AddScoped<IPacientRepository, PacientRepository>();
     builder.Services.AddScoped<IUtilizatorRepository, UtilizatorRepository>();
     builder.Services.AddScoped<IProgramareRepository, ProgramareRepository>();
-    builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository, 
+    builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository,
                                 ValyanClinic.Infrastructure.Repositories.ConsultatieRepository>(); // ✅ NOU - Consultatii
     builder.Services.AddScoped<IICD10Repository, ICD10Repository>(); // ✅ NOU - ICD10 Autocomplete
     builder.Services.AddScoped<IPacientPersonalMedicalRepository, PacientPersonalMedicalRepository>(); // ✅ NOU - Relații Pacient-Doctor
-    
+
     // Phase1 Settings Repositories
     builder.Services.AddScoped<ISystemSettingsRepository, ValyanClinic.Infrastructure.Repositories.Settings.SystemSettingsRepository>();
     builder.Services.AddScoped<IAuditLogRepository, ValyanClinic.Infrastructure.Repositories.Settings.AuditLogRepository>();
@@ -241,7 +241,7 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // ========================================
     // MEDIATR (CQRS) - OPTIMIZED
     // ========================================
-    builder.Services.AddMediatR(cfg => 
+    builder.Services.AddMediatR(cfg =>
     {
         // ✅ OPTIMIZED: Scanează doar assembly-urile necesare
         cfg.RegisterServicesFromAssemblyContaining<ValyanClinic.Application.Common.Results.Result>();
@@ -254,7 +254,7 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // ✅ OPTIMIZED: Scanează doar assembly-urile cu profiluri AutoMapper
     builder.Services.AddAutoMapper(
         typeof(ValyanClinic.Application.Common.Results.Result).Assembly // Application layer
-        // Adaugă aici alte assembly-uri cu profiluri AutoMapper dacă sunt necesare
+                                                                        // Adaugă aici alte assembly-uri cu profiluri AutoMapper dacă sunt necesare
     );
 
     // ========================================
@@ -287,12 +287,12 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // EMAIL SERVICES
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Services.Email.IEmailService, ValyanClinic.Services.Email.EmailService>();
-    
+
     // ========================================
     // SMS SERVICES (MOCK MODE - Production Ready Infrastructure)
     // ========================================
     // ✅ CURRENT: MockSmsService pentru testare UI fără cost
- // ⏳ FUTURE: Când ai buget, switch la TwilioSmsService sau alt provider
+    // ⏳ FUTURE: Când ai buget, switch la TwilioSmsService sau alt provider
     // 
     // Setup Production (2 min):
     // 1. dotnet add package Twilio (sau Vonage/SMS-Gateway.ro SDK)
@@ -301,11 +301,11 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // 4. dotnet user-secrets set "TwilioSettings:PhoneNumber" "+1xxxx"
     // 5. dotnet user-secrets set "TwilioSettings:Enabled" "true"
     // 6. Uncomment TwilioSmsService registration și comment MockSmsService
-  //
+    //
     // Estimare cost Twilio: $15 FREE credit = 450 SMS-uri
     // După trial: $0.025/SMS în România
     builder.Services.AddScoped<ValyanClinic.Services.Sms.ISmsService, ValyanClinic.Services.Sms.MockSmsService>();
-    
+
     // ⏳ TODO când ai buget: Uncomment această linie și comment linia de mai sus
     // var smsEnabled = builder.Configuration["TwilioSettings:Enabled"] == "true";
     // if (smsEnabled)
@@ -325,25 +325,25 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // ========================================
     // BUSINESS SERVICES
     // ========================================
-    builder.Services.AddScoped<ValyanClinic.Application.Services.IPersonalBusinessService, 
+    builder.Services.AddScoped<ValyanClinic.Application.Services.IPersonalBusinessService,
                                 ValyanClinic.Application.Services.PersonalBusinessService>();
-    
+
     // ✅ NEW: PacientDataService - Business logic for patient list management
     builder.Services.AddScoped<ValyanClinic.Application.Services.Pacienti.IPacientDataService,
                                 ValyanClinic.Application.Services.Pacienti.PacientDataService>();
-    
+
     // ========================================
     // IMC CALCULATOR SERVICE - Medical Services
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Application.Services.IMC.IIMCCalculatorService,
                                 ValyanClinic.Application.Services.IMC.IMCCalculatorService>();
-    
+
     // ========================================
     // DRAFT STORAGE SERVICE - LocalStorage Management
     // ========================================
     builder.Services.AddScoped(typeof(ValyanClinic.Infrastructure.Services.DraftStorage.IDraftStorageService<>),
                                 typeof(ValyanClinic.Infrastructure.Services.DraftStorage.LocalStorageDraftService<>));
-    
+
     // ========================================
     // DRAFT AUTO-SAVE HELPER - Blazor Timer Management (Hybrid Approach)
     // ========================================
@@ -360,17 +360,17 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     builder.Services.AddHealthChecks()
 .AddSqlServer(
       optimizedConnectionString, // FOLOSEȘTE connection string optimizat
-     name: "database", 
+     name: "database",
   tags: new[] { "db", "sql", "sqlserver" },
      timeout: TimeSpan.FromSeconds(1)); // ✅ CHANGED: 1 secund (era 3) pentru startup mai rapid
 
-  builder.Services.AddHealthChecksUI(opt =>
-    {
-        opt.SetEvaluationTimeInSeconds(60);
-        opt.MaximumHistoryEntriesPerEndpoint(50);
-  opt.AddHealthCheckEndpoint("ValyanClinic API", "/health-json"); // ✅ CORECTAT: endpoint-ul JSON pentru UI
-    })
-    .AddInMemoryStorage();
+    builder.Services.AddHealthChecksUI(opt =>
+      {
+          opt.SetEvaluationTimeInSeconds(60);
+          opt.MaximumHistoryEntriesPerEndpoint(50);
+          opt.AddHealthCheckEndpoint("ValyanClinic API", "/health-json"); // ✅ CORECTAT: endpoint-ul JSON pentru UI
+      })
+      .AddInMemoryStorage();
 
     // ========================================
     // HTTP CONTEXT
@@ -393,14 +393,14 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();
-    
+
     // Localization
     app.UseRequestLocalization();
-    
+
     // Authentication & Authorization Middleware (REQUIRED)
     app.UseAuthentication();
     app.UseAuthorization();
-    
+
     app.UseAntiforgery();
 
     // ========================================
@@ -423,7 +423,7 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     // Health Checks UI Dashboard
     app.MapHealthChecksUI(config =>
     {
-      config.UIPath = "/health-ui";
+        config.UIPath = "/health-ui";
     });
 
     // ========================================
@@ -440,7 +440,7 @@ options.SupportedCultures = supportedCultures.Select(c => new System.Globalizati
     Log.Information("Aplicatie pornita cu succes!");
     Log.Information("Health Check Dashboard: /health-ui");
     Log.Information("Connection string configured with pooling");
-    
+
     app.Run();
 }
 catch (Exception ex)

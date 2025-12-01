@@ -66,7 +66,7 @@ public class VizualizarePacientiE2ETests : PlaywrightTestBase
         // Assert - Loading indicator should appear briefly
         // (May be too fast to catch in some environments)
         var loadingIndicator = Page.Locator(".loading-container, .spinner-border");
-        
+
         // Wait for data to load completely
         await WaitForBlazorAsync();
         await WaitForNetworkIdleAsync();
@@ -100,7 +100,7 @@ public class VizualizarePacientiE2ETests : PlaywrightTestBase
         // Assert - Results should be filtered
         var gridRows = Page.Locator("table tbody tr");
         var rowCount = await gridRows.CountAsync();
-        
+
         if (rowCount > 0)
         {
             // At least one result should contain search term
@@ -130,10 +130,10 @@ public class VizualizarePacientiE2ETests : PlaywrightTestBase
         if (await clearButton.IsVisibleAsync())
         {
             await clearButton.ClickAsync();
-            
+
             // Wait explicitly for the input to become empty
-            await Page.WaitForFunctionAsync("() => document.querySelector('input.search-input').value === ''", new() { Timeout = 2000 });
-            
+            await Page.WaitForFunctionAsync("() => document.querySelector('input.search-input').value === ''", new PageWaitForFunctionOptions { Timeout = 2000 });
+
             await WaitForNetworkIdleAsync();
 
             // Assert - Search input should be empty
@@ -244,10 +244,10 @@ public class VizualizarePacientiE2ETests : PlaywrightTestBase
         if (await clearAllButton.IsEnabledAsync())
         {
             await clearAllButton.ClickAsync();
-            
+
             // Wait explicitly for the input to become empty
-            await Page.WaitForFunctionAsync("() => document.querySelector('input.search-input').value === ''", new() { Timeout = 2000 });
-            
+            await Page.WaitForFunctionAsync("() => document.querySelector('input.search-input').value === ''", new PageWaitForFunctionOptions { Timeout = 2000 });
+
             await WaitForNetworkIdleAsync();
 
             // Assert - Search input should be empty
@@ -278,7 +278,7 @@ public class VizualizarePacientiE2ETests : PlaywrightTestBase
 
         // Check if we have enough data for multiple pages
         var totalRecordsText = await Page.Locator(".total-records").TextContentAsync();
-        
+
         // Act - Click next page button (Syncfusion Grid pagination)
         var nextPageButton = Page.Locator(".e-nextpage");
         if (await nextPageButton.IsVisibleAsync() && await nextPageButton.IsEnabledAsync())
