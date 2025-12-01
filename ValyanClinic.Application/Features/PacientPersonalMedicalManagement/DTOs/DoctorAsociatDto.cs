@@ -11,12 +11,12 @@ public class DoctorAsociatDto
     public string? DoctorSpecializare { get; set; }
     public string? DoctorTelefon { get; set; }
     public string? DoctorEmail { get; set; }
- public string? DoctorDepartament { get; set; }
+    public string? DoctorDepartament { get; set; }
     public string? TipRelatie { get; set; }
     public DateTime DataAsocierii { get; set; }
     public DateTime? DataDezactivarii { get; set; }
     public bool EsteActiv { get; set; }
- public int ZileDeAsociere { get; set; }
+    public int ZileDeAsociere { get; set; }
     public string? Observatii { get; set; }
     public string? Motiv { get; set; }
 }

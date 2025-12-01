@@ -15,20 +15,20 @@ public partial class ConcluzieTab : ComponentBase
     [Parameter] public EventCallback OnSectionCompleted { get; set; }
     [Parameter] public EventCallback OnPreview { get; set; }
     [Parameter] public bool ShowValidation { get; set; } = false;
-    
+
     private bool IsSectionCompleted => IsConcluzieCompleted();
-    
+
     private async Task OnFieldChanged()
     {
         await OnChanged.InvokeAsync();
-        
+
         // Check if section is completed
         if (IsSectionCompleted)
         {
             await OnSectionCompleted.InvokeAsync();
         }
     }
-    
+
     /// <summary>
     /// Verifică dacă secțiunea Concluzie este completă
     /// Considerăm completă dacă prognosticul și concluzia sunt completate (ambele obligatorii)
@@ -38,11 +38,11 @@ public partial class ConcluzieTab : ComponentBase
         // Prognostic obligatoriu
         if (string.IsNullOrWhiteSpace(Model.Prognostic))
             return false;
-        
+
         // Concluzie obligatorie
         if (string.IsNullOrWhiteSpace(Model.Concluzie))
             return false;
-        
+
         return true;
     }
 }

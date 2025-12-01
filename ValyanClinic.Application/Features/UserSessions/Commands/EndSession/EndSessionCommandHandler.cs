@@ -17,7 +17,7 @@ public class EndSessionCommandHandler : IRequestHandler<EndSessionCommand, Resul
         IUserSessionRepository repository,
   ILogger<EndSessionCommandHandler> logger)
     {
-    _repository = repository;
+        _repository = repository;
         _logger = logger;
     }
 
@@ -27,27 +27,27 @@ public class EndSessionCommandHandler : IRequestHandler<EndSessionCommand, Resul
     {
         try
         {
-  _logger.LogInformation(
-       "Ending session: {SessionID} by {ModificatDe}",
-                request.SessionID, request.ModificatDe);
+            _logger.LogInformation(
+                 "Ending session: {SessionID} by {ModificatDe}",
+                          request.SessionID, request.ModificatDe);
 
-    var success = await _repository.EndSessionAsync(
-       request.SessionID,
-          cancellationToken);
+            var success = await _repository.EndSessionAsync(
+               request.SessionID,
+                  cancellationToken);
 
-   if (success)
-      {
-       _logger.LogInformation("Session {SessionID} ended successfully", request.SessionID);
-       return Result<bool>.Success(true, "Sesiunea a fost inchisa cu succes");
-  }
+            if (success)
+            {
+                _logger.LogInformation("Session {SessionID} ended successfully", request.SessionID);
+                return Result<bool>.Success(true, "Sesiunea a fost inchisa cu succes");
+            }
 
-   _logger.LogWarning("Failed to end session: {SessionID}", request.SessionID);
-    return Result<bool>.Failure(new List<string> { "Sesiunea nu a putut fi inchisa" });
-      }
-  catch (Exception ex)
+            _logger.LogWarning("Failed to end session: {SessionID}", request.SessionID);
+            return Result<bool>.Failure(new List<string> { "Sesiunea nu a putut fi inchisa" });
+        }
+        catch (Exception ex)
         {
-        _logger.LogError(ex, "Error ending session: {SessionID}", request.SessionID);
-        return Result<bool>.Failure(new List<string> { $"Eroare: {ex.Message}" });
-      }
+            _logger.LogError(ex, "Error ending session: {SessionID}", request.SessionID);
+            return Result<bool>.Failure(new List<string> { $"Eroare: {ex.Message}" });
+        }
     }
 }

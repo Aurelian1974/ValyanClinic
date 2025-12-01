@@ -23,7 +23,7 @@ public class CreateProgramareCommandHandler : IRequestHandler<CreateProgramareCo
         IPersonalMedicalRepository personalMedicalRepository,
         ILogger<CreateProgramareCommandHandler> logger)
     {
-   _programareRepository = programareRepository;
+        _programareRepository = programareRepository;
         _pacientRepository = pacientRepository;
         _personalMedicalRepository = personalMedicalRepository;
         _logger = logger;
@@ -33,48 +33,48 @@ public class CreateProgramareCommandHandler : IRequestHandler<CreateProgramareCo
         CreateProgramareCommand request,
     CancellationToken cancellationToken)
     {
-      try
-   {
- _logger.LogInformation(
-        "Creare programare: Pacient={PacientID}, Doctor={DoctorID}, Data={Data}, Ora={Ora}",
-                request.PacientID, request.DoctorID,
-       request.DataProgramare.ToString("yyyy-MM-dd"),
-    request.OraInceput.ToString(@"hh\:mm"));
+        try
+        {
+            _logger.LogInformation(
+                   "Creare programare: Pacient={PacientID}, Doctor={DoctorID}, Data={Data}, Ora={Ora}",
+                           request.PacientID, request.DoctorID,
+                  request.DataProgramare.ToString("yyyy-MM-dd"),
+               request.OraInceput.ToString(@"hh\:mm"));
 
-   // ==================== VALIDĂRI BUSINESS ====================
+            // ==================== VALIDĂRI BUSINESS ====================
 
             // 1. Verificare existență pacient (SKIP pentru SlotBlocat)
-     if (request.TipProgramare != "SlotBlocat")
-        {
-   var pacient = await _pacientRepository.GetByIdAsync(request.PacientID, cancellationToken);
-     if (pacient == null)
-  {
-         _logger.LogWarning("Pacientul {PacientID} nu există", request.PacientID);
-     return Result<Guid>.Failure("Pacientul specificat nu există în sistem.");
-       }
-
-        if (!pacient.Activ)
-     {
-     _logger.LogWarning("Pacientul {PacientID} este inactiv", request.PacientID);
-          return Result<Guid>.Failure("Pacientul este inactiv și nu poate fi programat.");
-    }
-     }
-
-       // 2. Verificare existență doctor
-      var doctor = await _personalMedicalRepository.GetByIdAsync(request.DoctorID, cancellationToken);
-   if (doctor == null)
+            if (request.TipProgramare != "SlotBlocat")
             {
-      _logger.LogWarning("Medicul {DoctorID} nu există", request.DoctorID);
-         return Result<Guid>.Failure("Medicul specificat nu există în sistem.");
+                var pacient = await _pacientRepository.GetByIdAsync(request.PacientID, cancellationToken);
+                if (pacient == null)
+                {
+                    _logger.LogWarning("Pacientul {PacientID} nu există", request.PacientID);
+                    return Result<Guid>.Failure("Pacientul specificat nu există în sistem.");
+                }
+
+                if (!pacient.Activ)
+                {
+                    _logger.LogWarning("Pacientul {PacientID} este inactiv", request.PacientID);
+                    return Result<Guid>.Failure("Pacientul este inactiv și nu poate fi programat.");
+                }
+            }
+
+            // 2. Verificare existență doctor
+            var doctor = await _personalMedicalRepository.GetByIdAsync(request.DoctorID, cancellationToken);
+            if (doctor == null)
+            {
+                _logger.LogWarning("Medicul {DoctorID} nu există", request.DoctorID);
+                return Result<Guid>.Failure("Medicul specificat nu există în sistem.");
             }
 
             if (!doctor.EsteActiv.GetValueOrDefault(true))
-     {
-      _logger.LogWarning("Medicul {DoctorID} este inactiv", request.DoctorID);
-       return Result<Guid>.Failure("Medicul este inactiv și nu poate primi programări.");
+            {
+                _logger.LogWarning("Medicul {DoctorID} este inactiv", request.DoctorID);
+                return Result<Guid>.Failure("Medicul este inactiv și nu poate primi programări.");
             }
 
-  // 3. Verificare conflict de programare (suprapunere interval orar)
+            // 3. Verificare conflict de programare (suprapunere interval orar)
             var hasConflict = await _programareRepository.CheckConflictAsync(
     request.DoctorID,
   request.DataProgramare,
@@ -83,72 +83,72 @@ public class CreateProgramareCommandHandler : IRequestHandler<CreateProgramareCo
           excludeProgramareID: null, // null pentru creare (nu excludem nimic)
                 cancellationToken);
 
-    if (hasConflict)
-          {
-    _logger.LogWarning(
-        "Conflict detectat pentru doctor {DoctorID} la data {Data} în intervalul {Interval}",
-       request.DoctorID,
-          request.DataProgramare.ToString("yyyy-MM-dd"),
-          $"{request.OraInceput:hh\\:mm}-{request.OraSfarsit:hh\\:mm}");
-
-   return Result<Guid>.Failure(
-          $"Medicul {doctor.Nume} {doctor.Prenume} are deja o programare în intervalul orar selectat. " +
-            $"Vă rugăm să alegeți un alt interval.");
-       }
-
-         // ==================== CREARE ENTITY ====================
-
-       var programare = new Programare
+            if (hasConflict)
             {
-   PacientID = request.PacientID,
+                _logger.LogWarning(
+                    "Conflict detectat pentru doctor {DoctorID} la data {Data} în intervalul {Interval}",
+                   request.DoctorID,
+                      request.DataProgramare.ToString("yyyy-MM-dd"),
+                      $"{request.OraInceput:hh\\:mm}-{request.OraSfarsit:hh\\:mm}");
+
+                return Result<Guid>.Failure(
+                       $"Medicul {doctor.Nume} {doctor.Prenume} are deja o programare în intervalul orar selectat. " +
+                         $"Vă rugăm să alegeți un alt interval.");
+            }
+
+            // ==================== CREARE ENTITY ====================
+
+            var programare = new Programare
+            {
+                PacientID = request.PacientID,
                 DoctorID = request.DoctorID,
-    DataProgramare = request.DataProgramare.Date, // Asigurăm că e doar dată
-          OraInceput = request.OraInceput,
-           OraSfarsit = request.OraSfarsit,
+                DataProgramare = request.DataProgramare.Date, // Asigurăm că e doar dată
+                OraInceput = request.OraInceput,
+                OraSfarsit = request.OraSfarsit,
                 TipProgramare = request.TipProgramare,
-    Status = request.Status,
-           Observatii = request.Observatii,
-      DataCreare = DateTime.UtcNow,
-       CreatDe = request.CreatDe
-    };
+                Status = request.Status,
+                Observatii = request.Observatii,
+                DataCreare = DateTime.UtcNow,
+                CreatDe = request.CreatDe
+            };
 
             // ==================== SALVARE ÎN DB ====================
 
-var createdProgramare = await _programareRepository.CreateAsync(programare, cancellationToken);
+            var createdProgramare = await _programareRepository.CreateAsync(programare, cancellationToken);
 
-        // ✅ UPDATED: Mesaj de succes specific pentru SlotBlocat
-        string successMessage;
-     if (request.TipProgramare == "SlotBlocat")
-    {
-      _logger.LogInformation(
-   "Slot blocat creat cu succes: {ProgramareID} pentru doctor {DoctorNume}",
- createdProgramare.ProgramareID,
-     $"{doctor.Nume} {doctor.Prenume}");
-        
-        successMessage = $"Slot-ul a fost blocat cu succes pentru Dr. {doctor.Nume} {doctor.Prenume} " +
-             $"pe data de {request.DataProgramare:dd.MM.yyyy} între orele {request.OraInceput:hh\\:mm} - {request.OraSfarsit:hh\\:mm}.";
-        }
-  else
-        {
- var pacient = await _pacientRepository.GetByIdAsync(request.PacientID, cancellationToken);
-  _logger.LogInformation(
-        "Programare creată cu succes: {ProgramareID} pentru pacient {PacientNume} cu doctor {DoctorNume}",
-      createdProgramare.ProgramareID,
-       $"{pacient!.Nume} {pacient.Prenume}",
-  $"{doctor.Nume} {doctor.Prenume}");
-            
- successMessage = $"Programarea a fost creată cu succes pentru {pacient.Nume} {pacient.Prenume} " +
-       $"cu Dr. {doctor.Nume} {doctor.Prenume} pe data de {request.DataProgramare:dd.MM.yyyy} " +
-       $"la ora {request.OraInceput:hh\\:mm}.";
-  }
+            // ✅ UPDATED: Mesaj de succes specific pentru SlotBlocat
+            string successMessage;
+            if (request.TipProgramare == "SlotBlocat")
+            {
+                _logger.LogInformation(
+             "Slot blocat creat cu succes: {ProgramareID} pentru doctor {DoctorNume}",
+           createdProgramare.ProgramareID,
+               $"{doctor.Nume} {doctor.Prenume}");
 
-  return Result<Guid>.Success(createdProgramare.ProgramareID, successMessage);
+                successMessage = $"Slot-ul a fost blocat cu succes pentru Dr. {doctor.Nume} {doctor.Prenume} " +
+                     $"pe data de {request.DataProgramare:dd.MM.yyyy} între orele {request.OraInceput:hh\\:mm} - {request.OraSfarsit:hh\\:mm}.";
+            }
+            else
+            {
+                var pacient = await _pacientRepository.GetByIdAsync(request.PacientID, cancellationToken);
+                _logger.LogInformation(
+                      "Programare creată cu succes: {ProgramareID} pentru pacient {PacientNume} cu doctor {DoctorNume}",
+                    createdProgramare.ProgramareID,
+                     $"{pacient!.Nume} {pacient.Prenume}",
+                $"{doctor.Nume} {doctor.Prenume}");
+
+                successMessage = $"Programarea a fost creată cu succes pentru {pacient.Nume} {pacient.Prenume} " +
+                      $"cu Dr. {doctor.Nume} {doctor.Prenume} pe data de {request.DataProgramare:dd.MM.yyyy} " +
+                      $"la ora {request.OraInceput:hh\\:mm}.";
+            }
+
+            return Result<Guid>.Success(createdProgramare.ProgramareID, successMessage);
 
         }
         catch (Exception ex)
         {
-   _logger.LogError(ex, "Eroare la crearea programării");
-  return Result<Guid>.Failure($"Eroare la crearea programării: {ex.Message}");
+            _logger.LogError(ex, "Eroare la crearea programării");
+            return Result<Guid>.Failure($"Eroare la crearea programării: {ex.Message}");
         }
     }
 }

@@ -16,7 +16,7 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     // CRITICAL: Static lock pentru ABSOLUTE protection
     private static readonly object _initLock = new object();
     private static bool _anyInstanceInitializing = false;
-    
+
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<AdministrareDepartamente> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -28,22 +28,22 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private DepartamentViewModal? departamentViewModal;
 
     private List<DepartamentListDto> CurrentPageData { get; set; } = new();
-    
+
     private int CurrentPage { get; set; } = 1;
     private int CurrentPageSize { get; set; } = 20;
     private int TotalRecords { get; set; } = 0;
-    private int TotalPages => TotalRecords > 0 && CurrentPageSize > 0 
-        ? (int)Math.Ceiling((double)TotalRecords / CurrentPageSize) 
+    private int TotalPages => TotalRecords > 0 && CurrentPageSize > 0
+        ? (int)Math.Ceiling((double)TotalRecords / CurrentPageSize)
         : 1;
-    
+
     private const int MinPageSize = 10;
     private const int MaxPageSize = 1000;
     private const int DefaultPageSizeValue = 20;
     private int[] PageSizeArray = { 10, 20, 50, 100, 250, 500, 1000 };
-    
+
     private string CurrentSortColumn { get; set; } = "DenumireDepartament";
     private string CurrentSortDirection { get; set; } = "ASC";
-    
+
     private DepartamentListDto? SelectedDepartament { get; set; }
 
     private bool IsLoading { get; set; } = true;
@@ -51,7 +51,7 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private string? ErrorMessage { get; set; }
 
     private string GlobalSearchText { get; set; } = string.Empty;
-    
+
     private CancellationTokenSource? _searchDebounceTokenSource;
     private const int SearchDebounceMs = 500;
     private bool _disposed = false;
@@ -77,7 +77,7 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
                 Logger.LogWarning("Another instance is ALREADY initializing - BLOCKING this call");
                 return;
             }
-            
+
             if (_initialized || _isInitializing)
             {
                 Logger.LogWarning("This instance already initialized/initializing - SKIPPING");
@@ -94,10 +94,10 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             // Syncfusion Grid necesită timp suplimentar pentru cleanup DOM - mărit de la 200ms la 800ms
             Logger.LogInformation("Waiting for previous component cleanup...");
             await Task.Delay(800); // MĂRIT de la 200ms la 800ms pentru Syncfusion Grid cleanup
-            
+
             Logger.LogInformation("Initializare pagina Administrare Departamente");
             await LoadPagedData();
-            
+
             _initialized = true;
         }
         catch (ObjectDisposedException ex)
@@ -124,37 +124,37 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        
+
         // Setează flag imediat pentru a bloca noi operații
         _disposed = true;
-        
+
         // CRITICAL: Cleanup SINCRON pentru Syncfusion Grid - IMEDIAT
         try
         {
             Logger.LogDebug("AdministrareDepartamente disposing - SYNCHRONOUS cleanup");
-            
+
             // Dezactivează Grid-ul IMEDIAT
             if (GridRef != null)
             {
                 GridRef = null;
             }
-            
+
             // Cancel orice operații în curs
             _searchDebounceTokenSource?.Cancel();
             _searchDebounceTokenSource?.Dispose();
             _searchDebounceTokenSource = null;
-            
+
             // Clear data IMEDIAT
             CurrentPageData?.Clear();
             CurrentPageData = new();
-            
+
             Logger.LogDebug("AdministrareDepartamente disposed - Grid cleared IMMEDIATELY");
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error in synchronous dispose");
         }
-        
+
         // Cleanup async pentru JavaScript - delay suplimentar
         _ = Task.Run(async () =>
         {
@@ -162,7 +162,7 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             {
                 // CRITICAL: Delay pentru a permite Syncfusion să termine operațiile DOM
                 await Task.Delay(150);
-                
+
                 Logger.LogDebug("AdministrareDepartamente async cleanup complete");
             }
             catch (Exception ex)
@@ -206,16 +206,16 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             {
                 CurrentPageData = result.Value?.ToList() ?? new List<DepartamentListDto>();
                 TotalRecords = result.TotalCount;
-                
+
                 if (TotalPages > 0 && CurrentPage > TotalPages)
                 {
-                    Logger.LogWarning("CurrentPage {Page} > TotalPages {Total}, ajustare", 
+                    Logger.LogWarning("CurrentPage {Page} > TotalPages {Total}, ajustare",
                         CurrentPage, TotalPages);
                     CurrentPage = TotalPages;
                     await LoadPagedData();
                     return;
                 }
-                
+
                 Logger.LogInformation(
                     "Data loaded: Page {Page}/{Total}, Records {Start}-{End} din {TotalRecords}",
                     CurrentPage, TotalPages, DisplayedRecordsStart, DisplayedRecordsEnd, TotalRecords);
@@ -257,15 +257,15 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private void OnSearchInput(ChangeEventArgs e)
     {
         if (_disposed) return; // Guard check
-        
+
         var newValue = e.Value?.ToString() ?? string.Empty;
-        
+
         if (newValue == GlobalSearchText) return;
-        
+
         GlobalSearchText = newValue;
-        
+
         Logger.LogDebug("Search input changed: '{SearchText}'", GlobalSearchText);
-        
+
         _searchDebounceTokenSource?.Cancel();
         _searchDebounceTokenSource?.Dispose();
         _searchDebounceTokenSource = new CancellationTokenSource();
@@ -277,11 +277,11 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             try
             {
                 await Task.Delay(SearchDebounceMs, localToken);
-                
+
                 if (!localToken.IsCancellationRequested && !_disposed)
                 {
                     Logger.LogInformation("Executing search for: '{SearchText}'", GlobalSearchText);
-                    
+
                     await InvokeAsync(async () =>
                     {
                         if (!_disposed)
@@ -313,13 +313,13 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task OnSearchKeyDown(KeyboardEventArgs e)
     {
         if (_disposed) return; // Guard check
-        
+
         if (e.Key == "Enter")
         {
             _searchDebounceTokenSource?.Cancel();
-            
+
             Logger.LogInformation("Enter pressed - immediate search: '{SearchText}'", GlobalSearchText);
-            
+
             CurrentPage = 1;
             await LoadPagedData();
         }
@@ -328,11 +328,11 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task ClearSearch()
     {
         if (_disposed) return; // Guard check
-        
+
         Logger.LogInformation("Clearing search");
-        
+
         _searchDebounceTokenSource?.Cancel();
-        
+
         GlobalSearchText = string.Empty;
         CurrentPage = 1;
         await LoadPagedData();
@@ -341,9 +341,9 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task HandleRefresh()
     {
         if (_disposed) return; // Guard check
-        
+
         Logger.LogInformation("Refresh departamente");
-        
+
         await LoadPagedData();
         await ShowToast("Succes", "Datele au fost reincarcate", "e-toast-success");
     }
@@ -351,9 +351,9 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task HandleAddNew()
     {
         if (_disposed) return; // Guard check
-        
+
         Logger.LogInformation("Opening modal for ADD Departament");
-        
+
         if (departamentFormModal != null)
         {
             await departamentFormModal.OpenForAdd();
@@ -363,15 +363,15 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task HandleViewSelected()
     {
         if (_disposed) return; // Guard check
-        
+
         if (SelectedDepartament == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
             return;
         }
-        
+
         Logger.LogInformation("Opening View modal for: {DeptID}", SelectedDepartament.IdDepartament);
-        
+
         if (departamentViewModal != null)
         {
             await departamentViewModal.Open(SelectedDepartament.IdDepartament);
@@ -381,15 +381,15 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task HandleEditSelected()
     {
         if (_disposed) return; // Guard check
-        
+
         if (SelectedDepartament == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
             return;
         }
-        
+
         Logger.LogInformation("Opening Edit modal for: {DeptID}", SelectedDepartament.IdDepartament);
-        
+
         if (departamentFormModal != null)
         {
             await departamentFormModal.OpenForEdit(SelectedDepartament.IdDepartament);
@@ -399,60 +399,60 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task HandleDepartamentSaved()
     {
         if (_disposed) return;
-      
+
         Logger.LogInformation("🎉 Departament saved - FORCING component re-initialization");
- 
+
         try
         {
             // 1️⃣ Wait for modal to close completely
             Logger.LogInformation("⏳ Waiting 700ms for modal close...");
             await Task.Delay(700);
- 
+
             if (_disposed) return;
-      
+
             // 2️⃣ Show loading state
             IsLoading = true;
             await InvokeAsync(StateHasChanged);
-      
+
             // 3️⃣ Force navigation to SAME page (triggers full re-init)
             Logger.LogInformation("🔄 Force navigation to trigger re-initialization");
-         NavigationManager.NavigateTo("/administrare/departamente", forceLoad: true);
-        
+            NavigationManager.NavigateTo("/administrare/departamente", forceLoad: true);
+
             // Note: forceLoad: true forces a FULL page reload, not just component refresh
-       // This clears ALL Blazor state and starts fresh - exactly like F5!
+            // This clears ALL Blazor state and starts fresh - exactly like F5!
         }
-   catch (Exception ex)
+        catch (Exception ex)
         {
-          Logger.LogError(ex, "Error during forced re-initialization");
-      
-   // Fallback: Reload data normally if navigation fails
-       if (!_disposed)
-        {
-    await LoadPagedData();
-    await ShowToast("Succes", "Departament salvat cu succes", "e-toast-success");
+            Logger.LogError(ex, "Error during forced re-initialization");
+
+            // Fallback: Reload data normally if navigation fails
+            if (!_disposed)
+            {
+                await LoadPagedData();
+                await ShowToast("Succes", "Departament salvat cu succes", "e-toast-success");
             }
         }
         finally
         {
             if (!_disposed)
             {
-        IsLoading = false;
-  }
+                IsLoading = false;
+            }
         }
     }
 
     private async Task HandleEditFromView(Guid departamentId)
     {
         if (_disposed) return; // Guard check
-        
+
         Logger.LogInformation("Edit requested from View modal for: {DeptID}", departamentId);
-        
+
         // Close view modal
         if (departamentViewModal != null)
         {
             await departamentViewModal.Close();
         }
-        
+
         // Open edit modal
         if (departamentFormModal != null)
         {
@@ -463,15 +463,15 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task HandleDeleteFromView(Guid departamentId)
     {
         if (_disposed) return; // Guard check
-        
+
         Logger.LogInformation("Delete requested from View modal for: {DeptID}", departamentId);
-        
+
         // Close view modal
         if (departamentViewModal != null)
         {
             await departamentViewModal.Close();
         }
-        
+
         // Find departament in list for delete confirmation
         var departament = CurrentPageData.FirstOrDefault(d => d.IdDepartament == departamentId);
         if (departament != null && confirmDeleteModal != null)
@@ -483,16 +483,16 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task HandleDeleteSelected()
     {
         if (_disposed) return; // Guard check
-        
+
         if (SelectedDepartament == null)
         {
             await ShowToast("Atentie", "Selecteaza un rand din tabel", "e-toast-warning");
             return;
         }
-        
-        Logger.LogInformation("Opening Delete modal for: {DeptID} - {Denumire}", 
+
+        Logger.LogInformation("Opening Delete modal for: {DeptID} - {Denumire}",
             SelectedDepartament.IdDepartament, SelectedDepartament.DenumireDepartament);
-        
+
         if (confirmDeleteModal != null)
         {
             await confirmDeleteModal.Open(SelectedDepartament.IdDepartament, SelectedDepartament.DenumireDepartament);
@@ -502,16 +502,16 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task HandleDeleteConfirmed(Guid id)
     {
         if (_disposed) return; // Guard check
-        
+
         Logger.LogInformation("Delete confirmed for: {DeptID}", id);
-        
+
         try
         {
             var command = new DeleteDepartamentCommand(id);
             var result = await Mediator.Send(command);
-            
+
             if (_disposed) return; // Check after async
-            
+
             if (result.IsSuccess)
             {
                 Logger.LogInformation("Departament deleted successfully: {DeptID}", id);
@@ -542,9 +542,9 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task GoToPage(int pageNumber)
     {
         if (_disposed) return; // Guard check
-        
+
         if (pageNumber < 1 || pageNumber > TotalPages) return;
-        
+
         Logger.LogInformation("Navigare la pagina {Page}", pageNumber);
         CurrentPage = pageNumber;
         await LoadPagedData();
@@ -583,9 +583,9 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
             Logger.LogWarning("PageSize invalid: {Size}, using default", newPageSize);
             newPageSize = DefaultPageSizeValue;
         }
-        
+
         Logger.LogInformation("PageSize changed: {OldSize} -> {NewSize}", CurrentPageSize, newPageSize);
-        
+
         CurrentPageSize = newPageSize;
         CurrentPage = 1;
         await LoadPagedData();
@@ -621,9 +621,9 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private void OnRowSelected(RowSelectEventArgs<DepartamentListDto> args)
     {
         if (_disposed) return; // Guard check
-        
+
         SelectedDepartament = args.Data;
-        Logger.LogInformation("Departament selectat: {DeptID} - {Denumire}", 
+        Logger.LogInformation("Departament selectat: {DeptID} - {Denumire}",
             SelectedDepartament?.IdDepartament, SelectedDepartament?.DenumireDepartament);
         StateHasChanged();
     }
@@ -631,7 +631,7 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private void OnRowDeselected(RowDeselectEventArgs<DepartamentListDto> args)
     {
         if (_disposed) return; // Guard check
-        
+
         SelectedDepartament = null;
         Logger.LogInformation("Selectie anulata");
         StateHasChanged();
@@ -640,11 +640,11 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task OnGridActionBegin(ActionEventArgs<DepartamentListDto> args)
     {
         if (_disposed) return; // Guard check
-        
+
         if (args.RequestType == Syncfusion.Blazor.Grids.Action.Sorting)
         {
             args.Cancel = true;
-            
+
             if (args is { Data: not null })
             {
                 var sortingColumns = (args.Data as IEnumerable<object>)?.Cast<dynamic>().ToList();
@@ -653,10 +653,10 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
                     var sortCol = sortingColumns[0];
                     CurrentSortColumn = sortCol.Name?.ToString() ?? "DenumireDepartament";
                     CurrentSortDirection = sortCol.Direction?.ToString()?.ToUpper() ?? "ASC";
-                    
-                    Logger.LogInformation("Sort: {Column} {Direction}", 
+
+                    Logger.LogInformation("Sort: {Column} {Direction}",
                         CurrentSortColumn, CurrentSortDirection);
-                    
+
                     await LoadPagedData();
                 }
             }
@@ -666,7 +666,7 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
     private async Task ShowToast(string title, string content, string cssClass)
     {
         if (_disposed) return; // Guard check
-        
+
         if (ToastRef == null)
         {
             Logger.LogWarning("ToastRef is null, cannot show toast");
@@ -685,7 +685,7 @@ public partial class AdministrareDepartamente : ComponentBase, IDisposable
                 Timeout = 3000
             };
 
-            Logger.LogDebug("Showing toast: Title='{Title}', Content='{Content}', CssClass='{CssClass}'", 
+            Logger.LogDebug("Showing toast: Title='{Title}', Content='{Content}', CssClass='{CssClass}'",
                 title, content, cssClass);
 
             await ToastRef.ShowAsync(toastModel);

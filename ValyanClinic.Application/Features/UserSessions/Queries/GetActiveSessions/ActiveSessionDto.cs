@@ -5,7 +5,7 @@
 /// </summary>
 public class ActiveSessionDto
 {
-  public Guid SessionID { get; set; }
+    public Guid SessionID { get; set; }
     public Guid UtilizatorID { get; set; }
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
@@ -18,7 +18,7 @@ public class ActiveSessionDto
     public DateTime DataUltimaActivitate { get; set; }
     public DateTime DataExpirare { get; set; }
     public bool EsteActiva { get; set; }
-    
+
     // Computed properties pentru UI
     public string DurataActivitate => CalculeazaDurata(DataCreare, DateTime.Now);
     public string DurataInactivitate => CalculeazaDurata(DataUltimaActivitate, DateTime.Now);
@@ -28,37 +28,37 @@ public class ActiveSessionDto
     public string StatusText => EsteActiva ? (ExpiraInCurând ? "Expira in curand" : "Activa") : "Inactiva";
     public string DeviceIcon => GetDeviceIcon(Dispozitiv);
     public string BrowserIcon => GetBrowserIcon(UserAgent);
-    
- private static string CalculeazaDurata(DateTime start, DateTime end)
+
+    private static string CalculeazaDurata(DateTime start, DateTime end)
     {
         var diff = end - start;
- if (diff.TotalDays >= 1)
-  return $"{(int)diff.TotalDays}z {diff.Hours}h";
+        if (diff.TotalDays >= 1)
+            return $"{(int)diff.TotalDays}z {diff.Hours}h";
         if (diff.TotalHours >= 1)
             return $"{(int)diff.TotalHours}h {diff.Minutes}m";
         if (diff.TotalMinutes >= 1)
             return $"{(int)diff.TotalMinutes}m {diff.Seconds}s";
         return $"{(int)diff.TotalSeconds}s";
     }
-    
+
     private static string GetDeviceIcon(string? device)
     {
         if (string.IsNullOrEmpty(device)) return "fa-question";
-      
+
         var deviceLower = device.ToLower();
         if (deviceLower.Contains("mobile") || deviceLower.Contains("android") || deviceLower.Contains("iphone"))
             return "fa-mobile-alt";
         if (deviceLower.Contains("tablet") || deviceLower.Contains("ipad"))
-       return "fa-tablet-alt";
+            return "fa-tablet-alt";
         return "fa-desktop";
     }
-    
+
     private static string GetBrowserIcon(string? userAgent)
     {
-   if (string.IsNullOrEmpty(userAgent)) return "fa-browser";
-        
+        if (string.IsNullOrEmpty(userAgent)) return "fa-browser";
+
         var ua = userAgent.ToLower();
-     if (ua.Contains("chrome")) return "fa-chrome";
+        if (ua.Contains("chrome")) return "fa-chrome";
         if (ua.Contains("firefox")) return "fa-firefox";
         if (ua.Contains("edge")) return "fa-edge";
         if (ua.Contains("safari")) return "fa-safari";

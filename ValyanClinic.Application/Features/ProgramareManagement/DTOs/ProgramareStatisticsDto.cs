@@ -16,15 +16,15 @@ public class ProgramareStatisticsDto
     public DateTime? DataEnd { get; set; }
 
     /// <summary>
-  /// Număr total de programări în perioada specificată.
+    /// Număr total de programări în perioada specificată.
     /// </summary>
     public int TotalProgramari { get; set; }
 
     // ==================== STATISTICI PE STATUS ====================
 
- /// <summary>
+    /// <summary>
     /// Număr programări cu status "Programata".
- /// </summary>
+    /// </summary>
     public int Programate { get; set; }
 
     /// <summary>
@@ -123,10 +123,10 @@ public class ProgramareStatisticsDto
     {
         get
         {
-          if (TotalProgramari == 0) return 0;
-    var prezenti = TotalProgramari - NoShow - Anulate;
-   return Math.Round((double)prezenti / TotalProgramari * 100, 2);
-     }
+            if (TotalProgramari == 0) return 0;
+            var prezenti = TotalProgramari - NoShow - Anulate;
+            return Math.Round((double)prezenti / TotalProgramari * 100, 2);
+        }
     }
 
     /// <summary>
@@ -135,33 +135,33 @@ public class ProgramareStatisticsDto
     public double RataAnulare
     {
         get
-   {
-        if (TotalProgramari == 0) return 0;
-        return Math.Round((double)Anulate / TotalProgramari * 100, 2);
-    }
+        {
+            if (TotalProgramari == 0) return 0;
+            return Math.Round((double)Anulate / TotalProgramari * 100, 2);
+        }
     }
 
     /// <summary>
     /// Rata No-Show (% din total programări).
     /// </summary>
- public double RataNoShow
+    public double RataNoShow
     {
         get
-  {
-      if (TotalProgramari == 0) return 0;
-       return Math.Round((double)NoShow / TotalProgramari * 100, 2);
-      }
+        {
+            if (TotalProgramari == 0) return 0;
+            return Math.Round((double)NoShow / TotalProgramari * 100, 2);
+        }
     }
 
     /// <summary>
-  /// Rata de finalizare (% programări finalizate din total).
+    /// Rata de finalizare (% programări finalizate din total).
     /// </summary>
     public double RataFinalizare
     {
         get
         {
-    if (TotalProgramari == 0) return 0;
-  return Math.Round((double)Finalizate / TotalProgramari * 100, 2);
+            if (TotalProgramari == 0) return 0;
+            return Math.Round((double)Finalizate / TotalProgramari * 100, 2);
         }
     }
 
@@ -185,13 +185,13 @@ public class ProgramareStatisticsDto
     public string PerioadaFormatata
     {
         get
-  {
-   if (DataStart.HasValue && DataEnd.HasValue)
-   return $"{DataStart.Value:dd.MM.yyyy} - {DataEnd.Value:dd.MM.yyyy}";
- if (DataStart.HasValue)
-  return $"De la {DataStart.Value:dd.MM.yyyy}";
-        if (DataEnd.HasValue)
-           return $"Până la {DataEnd.Value:dd.MM.yyyy}";
+        {
+            if (DataStart.HasValue && DataEnd.HasValue)
+                return $"{DataStart.Value:dd.MM.yyyy} - {DataEnd.Value:dd.MM.yyyy}";
+            if (DataStart.HasValue)
+                return $"De la {DataStart.Value:dd.MM.yyyy}";
+            if (DataEnd.HasValue)
+                return $"Până la {DataEnd.Value:dd.MM.yyyy}";
             return "Toate perioadele";
         }
     }

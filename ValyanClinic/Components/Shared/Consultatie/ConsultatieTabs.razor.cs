@@ -10,7 +10,7 @@ public partial class ConsultatieTabs : ComponentBase
     [Parameter] public EventCallback<string> OnTabChanged { get; set; }
     [Parameter] public bool IsDisabled { get; set; } = false;
     [Parameter] public Dictionary<string, int>? TabBadges { get; set; }
-    
+
     private async Task OnTabClick(string tab)
     {
         if (!IsDisabled && tab != ActiveTab)
@@ -18,12 +18,12 @@ public partial class ConsultatieTabs : ComponentBase
             await OnTabChanged.InvokeAsync(tab);
         }
     }
-    
+
     private bool IsTabCompleted(string tab)
     {
         return CompletedTabs.Contains(tab);
     }
-    
+
     private string GetTabLabel(string tab)
     {
         return tab switch
@@ -38,7 +38,7 @@ public partial class ConsultatieTabs : ComponentBase
             _ => tab
         };
     }
-    
+
     private string GetTabIcon(string tab)
     {
         return tab switch
@@ -53,7 +53,7 @@ public partial class ConsultatieTabs : ComponentBase
             _ => "fas fa-circle"
         };
     }
-    
+
     private int GetTabBadge(string tab)
     {
         if (TabBadges == null) return 0;

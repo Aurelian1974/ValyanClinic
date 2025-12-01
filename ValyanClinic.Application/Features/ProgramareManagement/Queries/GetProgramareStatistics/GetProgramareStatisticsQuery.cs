@@ -28,11 +28,11 @@ public class GetProgramareStatisticsQuery : IRequest<Result<ProgramareStatistics
     public GetProgramareStatisticsQuery(DateTime? dataStart = null, DateTime? dataEnd = null, Guid? doctorID = null)
     {
         DataStart = dataStart;
-   DataEnd = dataEnd;
+        DataEnd = dataEnd;
         DoctorID = doctorID;
     }
 
     public GetProgramareStatisticsQuery()
     {
- }
+    }
 }

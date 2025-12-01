@@ -12,7 +12,7 @@ public interface ISmsService
     /// <param name="phoneNumber">Număr telefon (format: 07xxxxxxxx sau +407xxxxxxxx)</param>
     /// <param name="message">Conținutul mesajului (max 160 caractere pentru un SMS simplu)</param>
     /// <returns>True dacă SMS-ul a fost trimis cu succes</returns>
-  Task<bool> SendSmsAsync(string phoneNumber, string message);
+    Task<bool> SendSmsAsync(string phoneNumber, string message);
 
     /// <summary>
     /// Trimite SMS de confirmare programare către pacient.
@@ -43,7 +43,7 @@ public interface ISmsService
     /// </summary>
     /// <param name="phoneNumbers">Lista de numere de telefon</param>
     /// <param name="message">Mesajul comun pentru toți destinatarii</param>
-  /// <returns>Numărul de SMS-uri trimise cu succes</returns>
+    /// <returns>Numărul de SMS-uri trimise cu succes</returns>
     Task<int> SendBulkSmsAsync(List<string> phoneNumbers, string message);
 
     /// <summary>

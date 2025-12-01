@@ -102,7 +102,7 @@ public partial class DepartamentViewModal : ComponentBase
     public async Task Close()
     {
         Logger.LogInformation("Inchidere modal vizualizare departament");
-        
+
         IsVisible = false;
         await InvokeAsync(StateHasChanged);
 
@@ -145,7 +145,7 @@ public partial class DepartamentViewModal : ComponentBase
             {
                 HasError = true;
                 ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele departamentului";
-                Logger.LogWarning("Eroare la incarcarea datelor departamentului {DepartamentId}: {Error}", 
+                Logger.LogWarning("Eroare la incarcarea datelor departamentului {DepartamentId}: {Error}",
                     departamentId, ErrorMessage);
             }
         }
@@ -178,7 +178,7 @@ public partial class DepartamentViewModal : ComponentBase
         if (CurrentDepartamentId != Guid.Empty)
         {
             Logger.LogInformation("Solicitare editare pentru departamentul {DepartamentId}", CurrentDepartamentId);
-            
+
             if (OnEditRequested.HasDelegate)
             {
                 await OnEditRequested.InvokeAsync(CurrentDepartamentId);
@@ -202,7 +202,7 @@ public partial class DepartamentViewModal : ComponentBase
         }
 
         Logger.LogInformation("Solicitare stergere pentru departamentul {DepartamentId}", CurrentDepartamentId);
-        
+
         if (OnDeleteRequested.HasDelegate)
         {
             await OnDeleteRequested.InvokeAsync(CurrentDepartamentId);

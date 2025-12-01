@@ -104,7 +104,7 @@ public partial class PacientViewModal : ComponentBase
     {
         IsLoading = true;
         HasError = false;
-        
+
         try
         {
             Logger.LogInformation("Incarca datele pacientului {PacientId} pentru vizualizare", pacientId);
@@ -117,7 +117,7 @@ public partial class PacientViewModal : ComponentBase
                 PacientData = result.Value;
                 HasError = false;
                 Logger.LogInformation("Date pacient incarcate cu succes pentru {PacientId}", pacientId);
-    
+
                 // Încarcă și doctorii asociați
                 await LoadDoctoriAsociati(pacientId);
             }
@@ -125,7 +125,7 @@ public partial class PacientViewModal : ComponentBase
             {
                 HasError = true;
                 ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele pacientului";
-                Logger.LogWarning("Eroare la incarcarea datelor pacientului {PacientId}: {Error}", 
+                Logger.LogWarning("Eroare la incarcarea datelor pacientului {PacientId}: {Error}",
                     pacientId, ErrorMessage);
             }
         }
@@ -148,14 +148,14 @@ public partial class PacientViewModal : ComponentBase
     private async Task LoadDoctoriAsociati(Guid pacientId)
     {
         IsLoadingDoctori = true;
-     
+
         try
         {
             Logger.LogInformation("[PacientViewModal] Loading doctori for PacientID: {PacientId}", pacientId);
-         
+
             var query = new GetDoctoriByPacientQuery(pacientId, ApenumereActivi: false);
             var result = await Mediator.Send(query);
-            
+
             if (result.IsSuccess && result.Value != null)
             {
                 DoctoriAsociati = result.Value;
@@ -166,7 +166,7 @@ public partial class PacientViewModal : ComponentBase
                 DoctoriAsociati = new List<DoctorAsociatDto>();
                 Logger.LogWarning("[PacientViewModal] Failed to load doctori: {Error}", result.FirstError);
             }
-     }
+        }
         catch (Exception ex)
         {
             Logger.LogError(ex, "[PacientViewModal] Exception loading doctori");
@@ -176,7 +176,7 @@ public partial class PacientViewModal : ComponentBase
         {
             IsLoadingDoctori = false;
         }
- }
+    }
 
     /// <summary>
     /// Seteaza tab-ul activ
@@ -219,7 +219,7 @@ public partial class PacientViewModal : ComponentBase
         ErrorMessage = string.Empty;
         ActiveTab = "personal";
     }
-    
+
     /// <summary>
     /// Returnează clasa CSS pentru badge-ul tipului de relație
     /// </summary>
@@ -227,24 +227,24 @@ public partial class PacientViewModal : ComponentBase
     {
         return tipRelatie switch
         {
-          "MedicPrimar" => "badge-primary",
-"Specialist" => "badge-info",
+            "MedicPrimar" => "badge-primary",
+            "Specialist" => "badge-info",
             "MedicConsultant" => "badge-success",
             "MedicDeGarda" => "badge-warning",
-"MedicFamilie" => "badge-secondary",
+            "MedicFamilie" => "badge-secondary",
             _ => "badge-secondary"
         };
     }
-    
+
     /// <summary>
     /// Formatează numărul de zile în text friendly
     /// </summary>
-  private string FormatZile(int zile)
+    private string FormatZile(int zile)
     {
-      if (zile < 30)
-  return $"{zile} zile";
+        if (zile < 30)
+            return $"{zile} zile";
         if (zile < 365)
- return $"{zile / 30} luni";
+            return $"{zile / 30} luni";
         return $"{zile / 365} ani";
     }
     #endregion

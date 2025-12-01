@@ -28,7 +28,7 @@ public class ConsultatieRepository : IConsultatieRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             var parameters = new DynamicParameters();
             parameters.Add("@ConsultatieID", consultatie.ConsultatieID, DbType.Guid, ParameterDirection.InputOutput);
             parameters.Add("@ProgramareID", consultatie.ProgramareID);
@@ -37,25 +37,25 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@DataConsultatie", consultatie.DataConsultatie);
             parameters.Add("@OraConsultatie", consultatie.OraConsultatie);
             parameters.Add("@TipConsultatie", consultatie.TipConsultatie);
-            
+
             // Motive Prezentare
             parameters.Add("@MotivPrezentare", consultatie.MotivPrezentare);
             parameters.Add("@IstoricBoalaActuala", consultatie.IstoricBoalaActuala);
-            
+
             // Antecedente Heredo-Colaterale
             parameters.Add("@AHC_Mama", consultatie.AHC_Mama);
             parameters.Add("@AHC_Tata", consultatie.AHC_Tata);
             parameters.Add("@AHC_Frati", consultatie.AHC_Frati);
             parameters.Add("@AHC_Bunici", consultatie.AHC_Bunici);
             parameters.Add("@AHC_Altele", consultatie.AHC_Altele);
-            
+
             // Antecedente Fiziologice
             parameters.Add("@AF_Nastere", consultatie.AF_Nastere);
             parameters.Add("@AF_Dezvoltare", consultatie.AF_Dezvoltare);
             parameters.Add("@AF_Menstruatie", consultatie.AF_Menstruatie);
             parameters.Add("@AF_Sarcini", consultatie.AF_Sarcini);
             parameters.Add("@AF_Alaptare", consultatie.AF_Alaptare);
-            
+
             // Antecedente Personale Patologice
             parameters.Add("@APP_BoliCopilarieAdolescenta", consultatie.APP_BoliCopilarieAdolescenta);
             parameters.Add("@APP_BoliAdult", consultatie.APP_BoliAdult);
@@ -64,14 +64,14 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@APP_Transfuzii", consultatie.APP_Transfuzii);
             parameters.Add("@APP_Alergii", consultatie.APP_Alergii);
             parameters.Add("@APP_Medicatie", consultatie.APP_Medicatie);
-            
+
             // Conditii Socio-Economice
             parameters.Add("@Profesie", consultatie.Profesie);
             parameters.Add("@ConditiiLocuinta", consultatie.ConditiiLocuinta);
             parameters.Add("@ConditiiMunca", consultatie.ConditiiMunca);
             parameters.Add("@ObiceiuriAlimentare", consultatie.ObiceiuriAlimentare);
             parameters.Add("@Toxice", consultatie.Toxice);
-            
+
             // Examen General
             parameters.Add("@StareGenerala", consultatie.StareGenerala);
             parameters.Add("@Constitutie", consultatie.Constitutie);
@@ -80,7 +80,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@Tegumente", consultatie.Tegumente);
             parameters.Add("@Mucoase", consultatie.Mucoase);
             parameters.Add("@GangliniLimfatici", consultatie.GangliniLimfatici);
-            
+
             // Semne Vitale
             parameters.Add("@Greutate", consultatie.Greutate);
             parameters.Add("@Inaltime", consultatie.Inaltime);
@@ -91,7 +91,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@FreccventaRespiratorie", consultatie.FreccventaRespiratorie);
             parameters.Add("@SaturatieO2", consultatie.SaturatieO2);
             parameters.Add("@Glicemie", consultatie.Glicemie);
-            
+
             // Examen pe Aparate
             parameters.Add("@ExamenCardiovascular", consultatie.ExamenCardiovascular);
             parameters.Add("@ExamenRespiratoriu", consultatie.ExamenRespiratoriu);
@@ -103,43 +103,43 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@ExamenORL", consultatie.ExamenORL);
             parameters.Add("@ExamenOftalmologic", consultatie.ExamenOftalmologic);
             parameters.Add("@ExamenDermatologic", consultatie.ExamenDermatologic);
-            
+
             // Investigatii
             parameters.Add("@InvestigatiiLaborator", consultatie.InvestigatiiLaborator);
             parameters.Add("@InvestigatiiImagistice", consultatie.InvestigatiiImagistice);
             parameters.Add("@InvestigatiiEKG", consultatie.InvestigatiiEKG);
             parameters.Add("@AlteInvestigatii", consultatie.AlteInvestigatii);
-            
+
             // Diagnostic
             parameters.Add("@DiagnosticPozitiv", consultatie.DiagnosticPozitiv);
             parameters.Add("@DiagnosticDiferential", consultatie.DiagnosticDiferential);
             parameters.Add("@DiagnosticEtiologic", consultatie.DiagnosticEtiologic);
             parameters.Add("@CoduriICD10", consultatie.CoduriICD10);
-            
+
             // Tratament
             parameters.Add("@TratamentMedicamentos", consultatie.TratamentMedicamentos);
             parameters.Add("@TratamentNemedicamentos", consultatie.TratamentNemedicamentos);
             parameters.Add("@RecomandariDietetice", consultatie.RecomandariDietetice);
             parameters.Add("@RecomandariRegimViata", consultatie.RecomandariRegimViata);
-            
+
             // Recomandari
             parameters.Add("@InvestigatiiRecomandate", consultatie.InvestigatiiRecomandate);
             parameters.Add("@ConsulturiSpecialitate", consultatie.ConsulturiSpecialitate);
             parameters.Add("@DataUrmatoareiProgramari", consultatie.DataUrmatoareiProgramari);
             parameters.Add("@RecomandariSupraveghere", consultatie.RecomandariSupraveghere);
-            
+
             // Prognostic & Concluzie
             parameters.Add("@Prognostic", consultatie.Prognostic);
             parameters.Add("@Concluzie", consultatie.Concluzie);
-            
+
             // Observatii
             parameters.Add("@ObservatiiMedic", consultatie.ObservatiiMedic);
             parameters.Add("@NotePacient", consultatie.NotePacient);
-            
+
             // Status
             parameters.Add("@Status", consultatie.Status);
             parameters.Add("@DataFinalizare", consultatie.DataFinalizare);
-            
+
             // Audit
             parameters.Add("@CreatDe", consultatie.CreatDe);
 
@@ -150,9 +150,9 @@ public class ConsultatieRepository : IConsultatieRepository
                 commandTimeout: 30);
 
             var consultatieId = parameters.Get<Guid>("@ConsultatieID");
-            
+
             _logger.LogInformation("[ConsultatieRepository] Consultatie created: {ConsultatieID}", consultatieId);
-            
+
             return consultatieId;
         }
         catch (Exception ex)
@@ -167,9 +167,9 @@ public class ConsultatieRepository : IConsultatieRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             var parameters = new { ConsultatieID = consultatieId };
-            
+
             var result = await connection.QueryFirstOrDefaultAsync<Consultatie>(
                 "sp_Consultatie_GetById",
                 parameters,
@@ -189,9 +189,9 @@ public class ConsultatieRepository : IConsultatieRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             var parameters = new { PacientID = pacientId };
-            
+
             var results = await connection.QueryAsync<Consultatie>(
                 "sp_Consultatie_GetByPacient",
                 parameters,
@@ -211,9 +211,9 @@ public class ConsultatieRepository : IConsultatieRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             var parameters = new { MedicID = medicId };
-            
+
             var results = await connection.QueryAsync<Consultatie>(
                 "sp_Consultatie_GetByMedic",
                 parameters,
@@ -233,9 +233,9 @@ public class ConsultatieRepository : IConsultatieRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             var parameters = new { ProgramareID = programareId };
-            
+
             var result = await connection.QueryFirstOrDefaultAsync<Consultatie>(
                 "sp_Consultatie_GetByProgramare",
                 parameters,
@@ -255,19 +255,19 @@ public class ConsultatieRepository : IConsultatieRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             // Similar parameter setup as CreateAsync but with UPDATE SP
             var parameters = new DynamicParameters();
             parameters.Add("@ConsultatieID", consultatie.ConsultatieID);
             // ... all other parameters similar to Create
-            
+
             var result = await connection.ExecuteAsync(
                 "sp_Consultatie_Update",
                 parameters,
                 commandType: CommandType.StoredProcedure);
 
             _logger.LogInformation("[ConsultatieRepository] Consultatie updated: {ConsultatieID}", consultatie.ConsultatieID);
-            
+
             return result > 0;
         }
         catch (Exception ex)
@@ -282,16 +282,16 @@ public class ConsultatieRepository : IConsultatieRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             var parameters = new { ConsultatieID = consultatieId };
-            
+
             var result = await connection.ExecuteAsync(
                 "sp_Consultatie_Delete",
                 parameters,
                 commandType: CommandType.StoredProcedure);
 
             _logger.LogInformation("[ConsultatieRepository] Consultatie deleted: {ConsultatieID}", consultatieId);
-            
+
             return result > 0;
         }
         catch (Exception ex)

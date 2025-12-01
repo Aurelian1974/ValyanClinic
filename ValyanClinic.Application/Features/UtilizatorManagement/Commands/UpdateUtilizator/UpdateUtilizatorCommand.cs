@@ -11,7 +11,7 @@ public record UpdateUtilizatorCommand : IRequest<Result<bool>>
     public string Rol { get; init; } = string.Empty;
     public bool EsteActiv { get; init; }
     public string ModificatDe { get; init; } = "System";
-    
+
     /// <summary>
     /// ✅ ADDED: Password (optional) - dacă e null/empty, parola NU se schimbă
     /// </summary>

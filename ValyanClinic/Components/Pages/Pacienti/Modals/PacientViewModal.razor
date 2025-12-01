@@ -1,4 +1,5 @@
-﻿@rendermode InteractiveServer
+﻿@attribute [Authorize]
+@rendermode InteractiveServer
 @using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
 
 <div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">

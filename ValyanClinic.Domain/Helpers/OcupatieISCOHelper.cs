@@ -34,12 +34,12 @@ public static class OcupatieISCOHelper
     /// Verifica daca este o grupa (nu ocupatie finala)
     /// </summary>
     public static bool EsteGrupa(byte nivel) => nivel < 4;
-    
+
     /// <summary>
     /// Verifica daca este ocupatie finala (nivel 4)
     /// </summary>
     public static bool EsteOcupatieFinal(byte nivel) => nivel == 4;
-    
+
     /// <summary>
     /// Formateaza ID-ul GUID scurt (primele 8 caractere uppercase)
     /// </summary>

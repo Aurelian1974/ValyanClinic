@@ -12,7 +12,7 @@ public class ProgramareDetailDto
     public Guid ProgramareID { get; set; }
 
     /// <summary>
-  /// ID-ul pacientului.
+    /// ID-ul pacientului.
     /// </summary>
     public Guid PacientID { get; set; }
 
@@ -47,8 +47,8 @@ public class ProgramareDetailDto
     public string Status { get; set; } = string.Empty;
 
     /// <summary>
- /// Observații complete.
- /// </summary>
+    /// Observații complete.
+    /// </summary>
     public string? Observatii { get; set; }
 
     // ==================== INFORMAȚII PACIENT (COMPLETE) ====================
@@ -60,13 +60,13 @@ public class ProgramareDetailDto
 
     /// <summary>
     /// Telefonul pacientului.
- /// </summary>
+    /// </summary>
     public string? PacientTelefon { get; set; }
 
     /// <summary>
     /// Email-ul pacientului.
     /// </summary>
- public string? PacientEmail { get; set; }
+    public string? PacientEmail { get; set; }
 
     /// <summary>
     /// CNP-ul pacientului.
@@ -82,11 +82,11 @@ public class ProgramareDetailDto
 
     /// <summary>
     /// Specializarea medicului.
- /// </summary>
+    /// </summary>
     public string? DoctorSpecializare { get; set; }
 
     /// <summary>
-  /// Telefonul medicului.
+    /// Telefonul medicului.
     /// </summary>
     public string? DoctorTelefon { get; set; }
 
@@ -113,11 +113,11 @@ public class ProgramareDetailDto
     public DateTime? DataUltimeiModificari { get; set; }
 
     /// <summary>
- /// ID-ul utilizatorului care a modificat ultima dată programarea.
+    /// ID-ul utilizatorului care a modificat ultima dată programarea.
     /// </summary>
     public Guid? ModificatDe { get; set; }
 
- // ==================== COMPUTED PROPERTIES ====================
+    // ==================== COMPUTED PROPERTIES ====================
 
     /// <summary>
     /// Durata programării în minute.
@@ -125,12 +125,12 @@ public class ProgramareDetailDto
     public int DurataMinute => (int)(OraSfarsit - OraInceput).TotalMinutes;
 
     /// <summary>
- /// Data și ora completă de început.
+    /// Data și ora completă de început.
     /// </summary>
     public DateTime DataOraInceput => DataProgramare.Date + OraInceput;
 
     /// <summary>
-  /// Data și ora completă de sfârșit.
+    /// Data și ora completă de sfârșit.
     /// </summary>
     public DateTime DataOraSfarsit => DataProgramare.Date + OraSfarsit;
 
@@ -148,10 +148,10 @@ public class ProgramareDetailDto
     /// Verifică dacă programarea este în desfășurare.
     /// </summary>
     public bool EsteInDesfasurare
- {
+    {
         get
-      {
-        var now = DateTime.Now;
+        {
+            var now = DateTime.Now;
             return now >= DataOraInceput && now <= DataOraSfarsit;
         }
     }
@@ -169,6 +169,6 @@ public class ProgramareDetailDto
     /// <summary>
     /// String format pentru afișare: "DD.MM.YYYY HH:mm - HH:mm (Durata: XX min)".
     /// </summary>
-    public string DataOraFormatata => 
+    public string DataOraFormatata =>
         $"{DataProgramare:dd.MM.yyyy} {OraInceput:hh\\:mm} - {OraSfarsit:hh\\:mm} (Durata: {DurataMinute} min)";
 }

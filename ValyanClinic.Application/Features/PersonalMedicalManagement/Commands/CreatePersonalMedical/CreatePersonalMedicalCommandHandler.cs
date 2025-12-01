@@ -25,7 +25,7 @@ public class CreatePersonalMedicalCommandHandler : IRequestHandler<CreatePersona
     {
         try
         {
-            _logger.LogInformation("Creating new PersonalMedical: {Nume} {Prenume}", 
+            _logger.LogInformation("Creating new PersonalMedical: {Nume} {Prenume}",
                 request.Nume, request.Prenume);
 
             var personalMedical = new PersonalMedical

@@ -12,45 +12,45 @@ namespace ValyanClinic.Tests.Components.Consultatie;
 public class TratamentTabTests
 {
     #region Test Setup
-    
+
     private static TratamentTab CreateComponent(CreateConsultatieCommand? model = null)
     {
         var component = new TratamentTab();
-        
+
         var modelProperty = typeof(TratamentTab).GetProperty(nameof(TratamentTab.Model));
         modelProperty?.SetValue(component, model ?? new CreateConsultatieCommand());
-        
+
         var isActiveProperty = typeof(TratamentTab).GetProperty(nameof(TratamentTab.IsActive));
         isActiveProperty?.SetValue(component, true);
-        
+
         return component;
     }
-    
+
     private static bool GetIsSectionCompleted(TratamentTab component)
     {
-        var property = typeof(TratamentTab).GetProperty("IsSectionCompleted", 
+        var property = typeof(TratamentTab).GetProperty("IsSectionCompleted",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         return (bool)(property?.GetValue(component) ?? false);
     }
-    
+
     #endregion
 
     #region Validation Tests
-    
+
     [Fact(DisplayName = "IsSectionCompleted - Returnează false când toate câmpurile sunt goale")]
     public void IsSectionCompleted_EmptyFields_ReturnsFalse()
     {
         // Arrange
         var model = new CreateConsultatieCommand();
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("niciun câmp nu este completat");
     }
-    
+
     [Fact(DisplayName = "IsSectionCompleted - Returnează false când lipsește tratamentul medicamentos")]
     public void IsSectionCompleted_NoTratamentMedicamentos_ReturnsFalse()
     {
@@ -62,14 +62,14 @@ public class TratamentTabTests
             RecomandariRegimViata = "Activitate fizică regulată"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("tratamentul medicamentos este OBLIGATORIU");
     }
-    
+
     [Fact(DisplayName = "IsSectionCompleted - Returnează false când TratamentMedicamentos există dar fără recomandări")]
     public void IsSectionCompleted_OnlyTratamentMedicamentos_ReturnsFalse()
     {
@@ -79,14 +79,14 @@ public class TratamentTabTests
             TratamentMedicamentos = "Paracetamol 500mg x3/zi"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("necesită și cel puțin o recomandare");
     }
-    
+
     [Fact(DisplayName = "IsSectionCompleted - Returnează true cu tratament + 1 recomandare")]
     public void IsSectionCompleted_TratamentPlusOneRecommendation_ReturnsTrue()
     {
@@ -97,14 +97,14 @@ public class TratamentTabTests
             RecomandariDietetice = "Dietă bogată în fructe și legume"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("tratament obligatoriu + 1 recomandare sunt suficiente");
     }
-    
+
     [Fact(DisplayName = "IsSectionCompleted - Returnează true cu toate câmpurile completate")]
     public void IsSectionCompleted_AllFields_ReturnsTrue()
     {
@@ -121,18 +121,18 @@ public class TratamentTabTests
             RecomandariSupraveghere = "Monitorizare tensiune arterială"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("toate câmpurile sunt completate");
     }
-    
+
     #endregion
-    
+
     #region Tratament Medicamentos Tests (Obligatoriu)
-    
+
     [Theory(DisplayName = "TratamentMedicamentos - Diverse formate valide")]
     [InlineData("Paracetamol 500mg x3/zi")]
     [InlineData("Ibuprofen 400mg dimineața și seara, 5 zile")]
@@ -147,15 +147,15 @@ public class TratamentTabTests
             RecomandariDietetice = "Test"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue($"format '{tratament}' este valid");
         model.TratamentMedicamentos.Should().Be(tratament);
     }
-    
+
     [Fact(DisplayName = "TratamentMedicamentos - 'Fără tratament medicamentos' nu este suficient")]
     public void TratamentMedicamentos_NoTreatmentNeeded_StillRequiresText()
     {
@@ -166,18 +166,18 @@ public class TratamentTabTests
             RecomandariDietetice = "Hidratare adecvată"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("specificarea 'fără tratament' este validă");
     }
-    
+
     #endregion
-    
+
     #region Recomandări Tests
-    
+
     [Theory(DisplayName = "Orice tip de recomandare face secțiunea validă")]
     [InlineData(nameof(CreateConsultatieCommand.TratamentNemedicamentos), "Fizioterapie")]
     [InlineData(nameof(CreateConsultatieCommand.RecomandariDietetice), "Dietă hipocalorică")]
@@ -193,19 +193,19 @@ public class TratamentTabTests
         {
             TratamentMedicamentos = "Paracetamol 500mg"
         };
-        
+
         var property = typeof(CreateConsultatieCommand).GetProperty(propertyName);
         property?.SetValue(model, value);
-        
+
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue($"recomandarea {propertyName} face secțiunea completă");
     }
-    
+
     [Fact(DisplayName = "Multiple recomandări sunt și mai bine")]
     public void MultipleRecommendations_EvenBetter()
     {
@@ -218,18 +218,18 @@ public class TratamentTabTests
             RecomandariSupraveghere = "Control periodic"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("multiple recomandări sunt foarte bine");
     }
-    
+
     #endregion
-    
+
     #region Edge Cases
-    
+
     [Fact(DisplayName = "Edge Case - Whitespace în TratamentMedicamentos nu este valid")]
     public void EdgeCase_WhitespaceTratament_NotValid()
     {
@@ -240,14 +240,14 @@ public class TratamentTabTests
             RecomandariDietetice = "Test"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("whitespace-only nu este tratament valid");
     }
-    
+
     [Fact(DisplayName = "Edge Case - Text foarte lung este acceptat")]
     public void EdgeCase_VeryLongTreatment_Valid()
     {
@@ -259,14 +259,14 @@ public class TratamentTabTests
             RecomandariDietetice = "Test"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("text lung este acceptat");
     }
-    
+
     [Fact(DisplayName = "Edge Case - Caractere speciale în nume medicament")]
     public void EdgeCase_SpecialCharactersInDrugNames_Valid()
     {
@@ -277,18 +277,18 @@ public class TratamentTabTests
             RecomandariDietetice = "Test"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("caractere speciale în nume medicamente sunt normale");
     }
-    
+
     #endregion
-    
+
     #region Real Scenarios
-    
+
     [Fact(DisplayName = "Scenariu Real - Tratament complet cu toate recomandările")]
     public void RealScenario_CompleteTreatment_Valid()
     {
@@ -308,16 +308,16 @@ public class TratamentTabTests
             RecomandariSupraveghere = "Monitorizare simptome, prezentare la reapariție dureri"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
         model.TratamentMedicamentos.Should().Contain("Ibuprofen");
         model.RecomandariDietetice.Should().Contain("picante");
     }
-    
+
     [Fact(DisplayName = "Scenariu Real - Tratament simplu cu o singură recomandare")]
     public void RealScenario_SimpleTreatment_Valid()
     {
@@ -328,14 +328,14 @@ public class TratamentTabTests
             RecomandariRegimViata = "Repaus la pat, hidratare"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("tratament simplu + 1 recomandare este suficient");
     }
-    
+
     [Fact(DisplayName = "Scenariu Real - Tratament cronic cu multiple medicamente")]
     public void RealScenario_ChronicTreatment_Valid()
     {
@@ -352,15 +352,15 @@ public class TratamentTabTests
             RecomandariSupraveghere = "Control glicemie zilnic, tensiune 2x/săptămână"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
         model.TratamentMedicamentos.Should().Contain("Metformin");
     }
-    
+
     [Fact(DisplayName = "Scenariu Real - Fără medicație dar cu recomandări lifestyle")]
     public void RealScenario_NoMedication_OnlyLifestyle_Valid()
     {
@@ -373,14 +373,14 @@ public class TratamentTabTests
             DataUrmatoareiProgramari = "6 luni"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("chiar fără medicamente, recomandările lifestyle sunt valide");
     }
-    
+
     [Fact(DisplayName = "Scenariu Real - Urgență cu trimitere la spital")]
     public void RealScenario_Emergency_ReferralToHospital_Valid()
     {
@@ -392,18 +392,18 @@ public class TratamentTabTests
             RecomandariSupraveghere = "Prezentare imediată la UPU dacă se agravează"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("trimitere la spital este o recomandare validă");
     }
-    
+
     #endregion
-    
+
     #region Negative Tests
-    
+
     [Fact(DisplayName = "Negative Test - Doar recomandări fără tratament NU este suficient")]
     public void NegativeTest_OnlyRecommendations_NotSufficient()
     {
@@ -416,14 +416,14 @@ public class TratamentTabTests
             InvestigatiiRecomandate = "Analize"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("tratamentul medicamentos este OBLIGATORIU");
     }
-    
+
     [Fact(DisplayName = "Negative Test - Null model aruncă NullReferenceException")]
     public void NegativeTest_NullModel_ThrowsNullReferenceException()
     {
@@ -431,14 +431,14 @@ public class TratamentTabTests
         var component = new TratamentTab();
         var modelProperty = typeof(TratamentTab).GetProperty(nameof(TratamentTab.Model));
         modelProperty?.SetValue(component, null);
-        
+
         // Act
         Action act = () => GetIsSectionCompleted(component);
-        
+
         // Assert
         act.Should().Throw<System.Reflection.TargetInvocationException>()
             .WithInnerException<NullReferenceException>("model-ul nu poate fi null în Blazor components");
     }
-    
+
     #endregion
 }

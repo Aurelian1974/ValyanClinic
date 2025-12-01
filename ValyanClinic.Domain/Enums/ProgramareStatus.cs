@@ -8,7 +8,7 @@ public enum ProgramareStatus
     /// <summary>
     /// Programarea a fost creată dar nu este confirmată (status implicit).
     /// </summary>
- Programata = 0,
+    Programata = 0,
 
     /// <summary>
     /// Pacientul a confirmat prezența (telefonic, email sau SMS).
@@ -52,15 +52,15 @@ public static class ProgramareStatusExtensions
     public static string ToDbString(this ProgramareStatus status)
     {
         return status switch
-   {
-       ProgramareStatus.Programata => "Programata",
- ProgramareStatus.Confirmata => "Confirmata",
-        ProgramareStatus.CheckedIn => "CheckedIn",
-    ProgramareStatus.InConsultatie => "InConsultatie",
-  ProgramareStatus.Finalizata => "Finalizata",
-    ProgramareStatus.Anulata => "Anulata",
- ProgramareStatus.NoShow => "NoShow",
-       _ => "Programata"
+        {
+            ProgramareStatus.Programata => "Programata",
+            ProgramareStatus.Confirmata => "Confirmata",
+            ProgramareStatus.CheckedIn => "CheckedIn",
+            ProgramareStatus.InConsultatie => "InConsultatie",
+            ProgramareStatus.Finalizata => "Finalizata",
+            ProgramareStatus.Anulata => "Anulata",
+            ProgramareStatus.NoShow => "NoShow",
+            _ => "Programata"
         };
     }
 
@@ -72,32 +72,32 @@ public static class ProgramareStatusExtensions
         return status?.ToLower() switch
         {
             "programata" => ProgramareStatus.Programata,
-     "confirmata" => ProgramareStatus.Confirmata,
+            "confirmata" => ProgramareStatus.Confirmata,
             "checkedin" => ProgramareStatus.CheckedIn,
             "inconsultatie" => ProgramareStatus.InConsultatie,
             "finalizata" => ProgramareStatus.Finalizata,
             "anulata" => ProgramareStatus.Anulata,
             "noshow" => ProgramareStatus.NoShow,
-    _ => ProgramareStatus.Programata
+            _ => ProgramareStatus.Programata
         };
     }
 
-  /// <summary>
+    /// <summary>
     /// Returnează culoarea Bootstrap pentru afișare în UI (badge color).
     /// </summary>
     public static string GetBootstrapColor(this ProgramareStatus status)
     {
         return status switch
         {
-     ProgramareStatus.Programata => "secondary",     // Gray
-         ProgramareStatus.Confirmata => "info",          // Blue
- ProgramareStatus.CheckedIn => "primary",        // Dark Blue
-        ProgramareStatus.InConsultatie => "warning",    // Orange
+            ProgramareStatus.Programata => "secondary",     // Gray
+            ProgramareStatus.Confirmata => "info",          // Blue
+            ProgramareStatus.CheckedIn => "primary",        // Dark Blue
+            ProgramareStatus.InConsultatie => "warning",    // Orange
             ProgramareStatus.Finalizata => "success",       // Green
-     ProgramareStatus.Anulata => "danger",           // Red
+            ProgramareStatus.Anulata => "danger",           // Red
             ProgramareStatus.NoShow => "dark",           // Black
-        _ => "secondary"
-    };
+            _ => "secondary"
+        };
     }
 
     /// <summary>
@@ -106,15 +106,15 @@ public static class ProgramareStatusExtensions
     public static string GetDisplayName(this ProgramareStatus status)
     {
         return status switch
-      {
-          ProgramareStatus.Programata => "Programată",
-      ProgramareStatus.Confirmata => "Confirmată",
+        {
+            ProgramareStatus.Programata => "Programată",
+            ProgramareStatus.Confirmata => "Confirmată",
             ProgramareStatus.CheckedIn => "Check-in efectuat",
-        ProgramareStatus.InConsultatie => "În consultație",
-      ProgramareStatus.Finalizata => "Finalizată",
+            ProgramareStatus.InConsultatie => "În consultație",
+            ProgramareStatus.Finalizata => "Finalizată",
             ProgramareStatus.Anulata => "Anulată",
             ProgramareStatus.NoShow => "Nu s-a prezentat",
-     _ => "Programată"
+            _ => "Programată"
         };
     }
 
@@ -123,8 +123,8 @@ public static class ProgramareStatusExtensions
     /// </summary>
     public static bool PesteEditat(this ProgramareStatus status)
     {
-    return status is ProgramareStatus.Programata or 
-    ProgramareStatus.Confirmata;
+        return status is ProgramareStatus.Programata or
+        ProgramareStatus.Confirmata;
     }
 
     /// <summary>
@@ -132,8 +132,8 @@ public static class ProgramareStatusExtensions
     /// </summary>
     public static bool PoateAnulat(this ProgramareStatus status)
     {
-        return status is ProgramareStatus.Programata or 
-       ProgramareStatus.Confirmata or 
+        return status is ProgramareStatus.Programata or
+       ProgramareStatus.Confirmata or
          ProgramareStatus.CheckedIn;
     }
 }

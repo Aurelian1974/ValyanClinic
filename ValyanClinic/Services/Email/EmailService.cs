@@ -24,144 +24,144 @@ IConfiguration configuration,
     ILogger<EmailService> logger,
         IMediator mediator)
     {
-_configuration = configuration;
-  _logger = logger;
-_mediator = mediator;
-  }
+        _configuration = configuration;
+        _logger = logger;
+        _mediator = mediator;
+    }
 
     /// <inheritdoc />
     public async Task<bool> SendEmailAsync(EmailMessageDto message)
     {
-    try
+        try
         {
-      _logger.LogInformation("📧 Pregătire trimitere email către: {To}, Subiect: {Subject}", 
-           message.To, message.Subject);
+            _logger.LogInformation("📧 Pregătire trimitere email către: {To}, Subiect: {Subject}",
+                 message.To, message.Subject);
 
- // Validare
-       if (string.IsNullOrEmpty(message.To) || string.IsNullOrEmpty(message.Subject))
-          {
-       _logger.LogWarning("⚠️ Email invalid - lipsesc câmpuri obligatorii");
-              return false;
-      }
+            // Validare
+            if (string.IsNullOrEmpty(message.To) || string.IsNullOrEmpty(message.Subject))
+            {
+                _logger.LogWarning("⚠️ Email invalid - lipsesc câmpuri obligatorii");
+                return false;
+            }
 
             // Creează mesajul MimeKit
-   var emailMessage = new MimeMessage();
+            var emailMessage = new MimeMessage();
 
             // FROM (expeditor)
-   var fromEmail = _configuration["EmailSettings:FromEmail"] ?? "noreply@valyanclinic.ro";
-         var fromName = _configuration["EmailSettings:FromName"] ?? "ValyanClinic";
-   emailMessage.From.Add(new MailboxAddress(fromName, fromEmail));
+            var fromEmail = _configuration["EmailSettings:FromEmail"] ?? "noreply@valyanclinic.ro";
+            var fromName = _configuration["EmailSettings:FromName"] ?? "ValyanClinic";
+            emailMessage.From.Add(new MailboxAddress(fromName, fromEmail));
 
             // TO (destinatar)
             emailMessage.To.Add(new MailboxAddress(
      message.ToName ?? message.To,
            message.To));
 
-  // ✅ NEW: REPLY-TO (optional - unde vor raspunde pacientii)
+            // ✅ NEW: REPLY-TO (optional - unde vor raspunde pacientii)
             if (!string.IsNullOrEmpty(message.ReplyToEmail))
-   {
+            {
                 emailMessage.ReplyTo.Add(new MailboxAddress(
      message.ReplyToName ?? message.ReplyToEmail,
                message.ReplyToEmail));
-       }
+            }
 
-     // CC (optional)
-      if (message.CcAddresses?.Any() == true)
+            // CC (optional)
+            if (message.CcAddresses?.Any() == true)
             {
                 foreach (var cc in message.CcAddresses)
-        {
-    emailMessage.Cc.Add(MailboxAddress.Parse(cc));
-     }
-   }
-
- // BCC (optional)
-      if (message.BccAddresses?.Any() == true)
-            {
-          foreach (var bcc in message.BccAddresses)
-   {
-      emailMessage.Bcc.Add(MailboxAddress.Parse(bcc));
-  }
+                {
+                    emailMessage.Cc.Add(MailboxAddress.Parse(cc));
+                }
             }
 
-        // SUBJECT
-     emailMessage.Subject = message.Subject;
+            // BCC (optional)
+            if (message.BccAddresses?.Any() == true)
+            {
+                foreach (var bcc in message.BccAddresses)
+                {
+                    emailMessage.Bcc.Add(MailboxAddress.Parse(bcc));
+                }
+            }
 
-        // BODY
-        var bodyBuilder = new BodyBuilder();
+            // SUBJECT
+            emailMessage.Subject = message.Subject;
+
+            // BODY
+            var bodyBuilder = new BodyBuilder();
             if (message.IsHtml)
-         {
+            {
                 bodyBuilder.HtmlBody = message.Body;
             }
-     else
+            else
             {
-    bodyBuilder.TextBody = message.Body;
-   }
-
-            // ATTACHMENTS (optional)
-   if (message.Attachments?.Any() == true)
-     {
-             foreach (var attachment in message.Attachments)
- {
-            bodyBuilder.Attachments.Add(
-         attachment.FileName,
-     attachment.Content,
-    ContentType.Parse(attachment.ContentType));
-      }
+                bodyBuilder.TextBody = message.Body;
             }
 
-   emailMessage.Body = bodyBuilder.ToMessageBody();
+            // ATTACHMENTS (optional)
+            if (message.Attachments?.Any() == true)
+            {
+                foreach (var attachment in message.Attachments)
+                {
+                    bodyBuilder.Attachments.Add(
+                 attachment.FileName,
+             attachment.Content,
+            ContentType.Parse(attachment.ContentType));
+                }
+            }
 
-      // SMTP2GO Configuration
-  var smtpHost = _configuration["EmailSettings:SmtpHost"] ?? "mail.smtp2go.com";
-      var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "2525");
-       var smtpUser = _configuration["EmailSettings:SmtpUser"];
-       var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
-      var enableSsl = bool.Parse(_configuration["EmailSettings:EnableSsl"] ?? "true");
+            emailMessage.Body = bodyBuilder.ToMessageBody();
+
+            // SMTP2GO Configuration
+            var smtpHost = _configuration["EmailSettings:SmtpHost"] ?? "mail.smtp2go.com";
+            var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "2525");
+            var smtpUser = _configuration["EmailSettings:SmtpUser"];
+            var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
+            var enableSsl = bool.Parse(_configuration["EmailSettings:EnableSsl"] ?? "true");
 
             // Validare credențiale
-       if (string.IsNullOrEmpty(smtpUser) || string.IsNullOrEmpty(smtpPassword))
-   {
-       _logger.LogError("❌ SMTP credentials lipsesc din configurare!");
-     return false;
- }
+            if (string.IsNullOrEmpty(smtpUser) || string.IsNullOrEmpty(smtpPassword))
+            {
+                _logger.LogError("❌ SMTP credentials lipsesc din configurare!");
+                return false;
+            }
 
             // Trimite email prin SMTP
-    using var smtp = new SmtpClient();
+            using var smtp = new SmtpClient();
 
             // Log connection
             _logger.LogDebug("🔌 Conectare la SMTP: {Host}:{Port}", smtpHost, smtpPort);
 
             // Connect
-   await smtp.ConnectAsync(
- smtpHost,
-       smtpPort,
-           enableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None);
+            await smtp.ConnectAsync(
+          smtpHost,
+                smtpPort,
+                    enableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None);
 
-          // Authenticate
-       await smtp.AuthenticateAsync(smtpUser, smtpPassword);
+            // Authenticate
+            await smtp.AuthenticateAsync(smtpUser, smtpPassword);
 
-    // Send
-          await smtp.SendAsync(emailMessage);
+            // Send
+            await smtp.SendAsync(emailMessage);
 
             // Disconnect
-  await smtp.DisconnectAsync(true);
+            await smtp.DisconnectAsync(true);
 
-   _logger.LogInformation("✅ Email trimis cu succes către {To}: {Subject}", 
-           message.To, message.Subject);
+            _logger.LogInformation("✅ Email trimis cu succes către {To}: {Subject}",
+                    message.To, message.Subject);
 
             return true;
-   }
+        }
         catch (Exception ex)
         {
-    _logger.LogError(ex, "❌ Eroare la trimiterea email-ului către {To}", message.To);
-         return false;
-  }
+            _logger.LogError(ex, "❌ Eroare la trimiterea email-ului către {To}", message.To);
+            return false;
+        }
     }
 
     /// <inheritdoc />
     public async Task<bool> SendAppointmentConfirmationAsync(Guid programareId)
- {
-     _logger.LogInformation("📅 Trimitere confirmare programare: {ProgramareId}", programareId);
+    {
+        _logger.LogInformation("📅 Trimitere confirmare programare: {ProgramareId}", programareId);
 
         // TODO: Implementare după ce ai templates HTML
         // 1. Load programare din DB
@@ -169,17 +169,17 @@ _mediator = mediator;
         // 3. Trimite email cu SendEmailAsync()
 
         var message = new EmailMessageDto
-      {
-   To = "pacient@example.com", // TODO: Get from DB
-          Subject = "✅ Confirmare Programare - ValyanClinic",
-         Body = $@"
+        {
+            To = "pacient@example.com", // TODO: Get from DB
+            Subject = "✅ Confirmare Programare - ValyanClinic",
+            Body = $@"
     <h2>Programarea dvs. a fost confirmată!</h2>
              <p><strong>ID Programare:</strong> {programareId}</p>
    <p>Vă așteptăm!</p>
        <p><em>Echipa ValyanClinic</em></p>
             ",
             IsHtml = true
-     };
+        };
 
         return await SendEmailAsync(message);
     }
@@ -187,10 +187,10 @@ _mediator = mediator;
     /// <inheritdoc />
     public async Task<bool> SendAppointmentReminderAsync(Guid programareId)
     {
- _logger.LogInformation("⏰ Trimitere reminder programare: {ProgramareId}", programareId);
+        _logger.LogInformation("⏰ Trimitere reminder programare: {ProgramareId}", programareId);
 
         // TODO: Implementare reminder (24h before appointment)
-return await Task.FromResult(false);
+        return await Task.FromResult(false);
     }
 
     /// <inheritdoc />
@@ -198,13 +198,13 @@ return await Task.FromResult(false);
     {
         _logger.LogInformation("🔐 Trimitere reset parolă către: {Email}", email);
 
-      var resetLink = $"https://localhost:5001/reset-password?token={resetToken}";
+        var resetLink = $"https://localhost:5001/reset-password?token={resetToken}";
 
         var message = new EmailMessageDto
         {
             To = email,
-      Subject = "🔐 Resetare Parolă - ValyanClinic",
-      Body = $@"
+            Subject = "🔐 Resetare Parolă - ValyanClinic",
+            Body = $@"
 <h2>Resetare Parolă</h2>
                 <p>Ați solicitat resetarea parolei.</p>
              <p><a href=""{resetLink}"" style=""padding: 10px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 8px;"">
@@ -224,154 +224,154 @@ return await Task.FromResult(false);
     {
         _logger.LogInformation("❌ Trimitere notificare anulare: {ProgramareId}", programareId);
 
-      // TODO: Implementare notificare anulare
+        // TODO: Implementare notificare anulare
         return await Task.FromResult(false);
     }
 
     /// <inheritdoc />
     public async Task<int> SendDailyAppointmentsEmailAsync(DateTime? targetDate = null)
     {
- // Default: mâine
-var sendDate = targetDate ?? DateTime.Today.AddDays(1);
-  
-        _logger.LogInformation("📧 Începere trimitere email-uri programări pentru data: {Date}", 
+        // Default: mâine
+        var sendDate = targetDate ?? DateTime.Today.AddDays(1);
+
+        _logger.LogInformation("📧 Începere trimitere email-uri programări pentru data: {Date}",
     sendDate.ToString("dd.MM.yyyy"));
 
         try
         {
             // ==================== STEP 1: QUERY PROGRAMĂRI DIN DB ====================
-  
-            var query = new GetProgramariByDateQuery
- {
-          Date = sendDate,
-           DoctorID = null  // All doctors
-   };
 
-          var result = await _mediator.Send(query);
+            var query = new GetProgramariByDateQuery
+            {
+                Date = sendDate,
+                DoctorID = null  // All doctors
+            };
+
+            var result = await _mediator.Send(query);
 
             if (!result.IsSuccess || result.Value == null || !result.Value.Any())
- {
-  _logger.LogWarning("⚠️ Nu s-au găsit programări pentru data {Date}", sendDate.ToString("dd.MM.yyyy"));
-       return 0;
-          }
-
-            var allProgramari = result.Value.ToList();
-    _logger.LogInformation("✅ Găsite {Count} programări pentru data {Date}", 
- allProgramari.Count, sendDate.ToString("dd.MM.yyyy"));
-
-   // ==================== STEP 2: GRUPARE PE DOCTOR ====================
-
-  var programariGroupedByDoctor = allProgramari
-      .Where(p => !string.IsNullOrEmpty(p.DoctorEmail)) // Doar doctori cu email
-     .GroupBy(p => p.DoctorID)
-         .ToList();
-
- if (!programariGroupedByDoctor.Any())
             {
-        _logger.LogWarning("⚠️ Nu există doctori cu email configurat pentru programările din {Date}", 
-     sendDate.ToString("dd.MM.yyyy"));
-     return 0;
+                _logger.LogWarning("⚠️ Nu s-au găsit programări pentru data {Date}", sendDate.ToString("dd.MM.yyyy"));
+                return 0;
             }
 
-      _logger.LogInformation("📊 Găsiți {Count} doctori cu programări și email configurat", 
- programariGroupedByDoctor.Count);
+            var allProgramari = result.Value.ToList();
+            _logger.LogInformation("✅ Găsite {Count} programări pentru data {Date}",
+         allProgramari.Count, sendDate.ToString("dd.MM.yyyy"));
 
-          // Log warning pentru doctori fără email
-var doctorsWithoutEmail = allProgramari
-    .Where(p => string.IsNullOrEmpty(p.DoctorEmail))
-       .Select(p => p.DoctorNumeComplet)
-       .Distinct()
-            .ToList();
+            // ==================== STEP 2: GRUPARE PE DOCTOR ====================
 
-   if (doctorsWithoutEmail.Any())
-   {
-  _logger.LogWarning("⚠️ {Count} doctori NU au email configurat: {Doctors}",
-     doctorsWithoutEmail.Count, string.Join(", ", doctorsWithoutEmail));
-      }
+            var programariGroupedByDoctor = allProgramari
+                .Where(p => !string.IsNullOrEmpty(p.DoctorEmail)) // Doar doctori cu email
+               .GroupBy(p => p.DoctorID)
+                   .ToList();
 
-       // ==================== STEP 3: TRIMITERE EMAIL PENTRU FIECARE DOCTOR ====================
+            if (!programariGroupedByDoctor.Any())
+            {
+                _logger.LogWarning("⚠️ Nu există doctori cu email configurat pentru programările din {Date}",
+             sendDate.ToString("dd.MM.yyyy"));
+                return 0;
+            }
 
-     int emailsSent = 0;
- int emailsFailed = 0;
+            _logger.LogInformation("📊 Găsiți {Count} doctori cu programări și email configurat",
+       programariGroupedByDoctor.Count);
 
-     foreach (var doctorGroup in programariGroupedByDoctor)
-   {
-       var doctorProgramari = doctorGroup.OrderBy(p => p.OraInceput).ToList();
-      var firstProgramare = doctorProgramari.First();
-             
-             var doctorName = firstProgramare.DoctorNumeComplet ?? "Doctor";
-   var doctorEmail = firstProgramare.DoctorEmail!;
-var doctorSpecializare = firstProgramare.DoctorSpecializare;
+            // Log warning pentru doctori fără email
+            var doctorsWithoutEmail = allProgramari
+                .Where(p => string.IsNullOrEmpty(p.DoctorEmail))
+                   .Select(p => p.DoctorNumeComplet)
+                   .Distinct()
+                        .ToList();
 
-    _logger.LogInformation("📧 Pregătire email pentru Dr. {Doctor} ({Email}) - {Count} programări",
-           doctorName, doctorEmail, doctorProgramari.Count);
+            if (doctorsWithoutEmail.Any())
+            {
+                _logger.LogWarning("⚠️ {Count} doctori NU au email configurat: {Doctors}",
+                   doctorsWithoutEmail.Count, string.Join(", ", doctorsWithoutEmail));
+            }
 
-   // Generează HTML body
-        var emailBody = GenerateDoctorAppointmentsEmailBody(
-             doctorName,
-      doctorSpecializare,
-         sendDate,
-       doctorProgramari);
+            // ==================== STEP 3: TRIMITERE EMAIL PENTRU FIECARE DOCTOR ====================
 
-       // Creează mesajul email
-  var message = new EmailMessageDto
-         {
-     To = doctorEmail,
-         ToName = $"Dr. {doctorName}",
- Subject = $"📅 Programările tale pentru {sendDate:dd.MM.yyyy} - ValyanClinic",
-  Body = emailBody,
-       IsHtml = true
-    };
+            int emailsSent = 0;
+            int emailsFailed = 0;
 
-      // Trimite email
-       var success = await SendEmailAsync(message);
+            foreach (var doctorGroup in programariGroupedByDoctor)
+            {
+                var doctorProgramari = doctorGroup.OrderBy(p => p.OraInceput).ToList();
+                var firstProgramare = doctorProgramari.First();
+
+                var doctorName = firstProgramare.DoctorNumeComplet ?? "Doctor";
+                var doctorEmail = firstProgramare.DoctorEmail!;
+                var doctorSpecializare = firstProgramare.DoctorSpecializare;
+
+                _logger.LogInformation("📧 Pregătire email pentru Dr. {Doctor} ({Email}) - {Count} programări",
+                       doctorName, doctorEmail, doctorProgramari.Count);
+
+                // Generează HTML body
+                var emailBody = GenerateDoctorAppointmentsEmailBody(
+                     doctorName,
+              doctorSpecializare,
+                 sendDate,
+               doctorProgramari);
+
+                // Creează mesajul email
+                var message = new EmailMessageDto
+                {
+                    To = doctorEmail,
+                    ToName = $"Dr. {doctorName}",
+                    Subject = $"📅 Programările tale pentru {sendDate:dd.MM.yyyy} - ValyanClinic",
+                    Body = emailBody,
+                    IsHtml = true
+                };
+
+                // Trimite email
+                var success = await SendEmailAsync(message);
 
                 if (success)
                 {
-             emailsSent++;
-         _logger.LogInformation("✅ Email trimis cu succes către Dr. {Doctor} ({Email})",
- doctorName, doctorEmail);
-           }
-      else
-   {
-  emailsFailed++;
-         _logger.LogError("❌ Eroare la trimiterea email-ului către Dr. {Doctor} ({Email})",
-      doctorName, doctorEmail);
-        }
+                    emailsSent++;
+                    _logger.LogInformation("✅ Email trimis cu succes către Dr. {Doctor} ({Email})",
+            doctorName, doctorEmail);
+                }
+                else
+                {
+                    emailsFailed++;
+                    _logger.LogError("❌ Eroare la trimiterea email-ului către Dr. {Doctor} ({Email})",
+                 doctorName, doctorEmail);
+                }
 
                 // Small delay to avoid rate limiting
-         await Task.Delay(100);
-     }
+                await Task.Delay(100);
+            }
 
- // ==================== STEP 4: LOGGING FINAL ====================
+            // ==================== STEP 4: LOGGING FINAL ====================
 
-   _logger.LogInformation(
-      "🎉 Finalizare trimitere email-uri pentru {Date}: Success={Success}, Failed={Failed}, Total={Total}",
-   sendDate.ToString("dd.MM.yyyy"), emailsSent, emailsFailed, emailsSent + emailsFailed);
+            _logger.LogInformation(
+               "🎉 Finalizare trimitere email-uri pentru {Date}: Success={Success}, Failed={Failed}, Total={Total}",
+            sendDate.ToString("dd.MM.yyyy"), emailsSent, emailsFailed, emailsSent + emailsFailed);
 
             return emailsSent;
         }
-   catch (Exception ex)
-{
- _logger.LogError(ex, "❌ Eroare critică la trimiterea email-urilor pentru programările din {Date}", 
-       sendDate.ToString("dd.MM.yyyy"));
-  return 0;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Eroare critică la trimiterea email-urilor pentru programările din {Date}",
+                  sendDate.ToString("dd.MM.yyyy"));
+            return 0;
         }
     }
 
     /// <summary>
     /// Generează HTML body pentru email-ul cu programările unui doctor.
     /// </summary>
- private string GenerateDoctorAppointmentsEmailBody(
-        string doctorName,
-        string? doctorSpecializare,
- DateTime date,
-        List<Application.Features.ProgramareManagement.DTOs.ProgramareListDto> programari)
+    private string GenerateDoctorAppointmentsEmailBody(
+           string doctorName,
+           string? doctorSpecializare,
+    DateTime date,
+           List<Application.Features.ProgramareManagement.DTOs.ProgramareListDto> programari)
     {
         // Setează cultura română pentru formatare dată
         var culture = new CultureInfo("ro-RO");
-        
- // Generează HTML rows pentru fiecare programare
+
+        // Generează HTML rows pentru fiecare programare
         var programariHtml = string.Join("\n", programari.Select(p => $@"
        <tr style='border-bottom: 1px solid #e5e7eb;'>
          <td style='padding: 12px; text-align: left;'>{p.OraInceput:hh\:mm} - {p.OraSfarsit:hh\:mm}</td>
@@ -495,18 +495,18 @@ Dr. {doctorName}
     </div>
 </body>
 </html>";
- }
+    }
 
     /// <summary>
     /// Returnează culoarea de background pentru badge-ul de status în email.
     /// </summary>
     private string GetStatusColorForEmail(string? status) => status?.ToLower() switch
     {
- "programata" => "#94a3b8",   // Gray
+        "programata" => "#94a3b8",   // Gray
         "confirmata" => "#3b82f6",   // Blue
         "checkedin" => "#f59e0b",    // Orange
- "inconsultatie" => "#8b5cf6", // Purple
-"finalizata" => "#10b981",    // Green
+        "inconsultatie" => "#8b5cf6", // Purple
+        "finalizata" => "#10b981",    // Green
         "anulata" => "#ef4444",      // Red
         _ => "#6b7280"         // Default Gray
     };
@@ -516,12 +516,12 @@ Dr. {doctorName}
     /// </summary>
     private string GetStatusDisplayNameForEmail(string? status) => status?.ToLower() switch
     {
-"programata" => "Programată",
+        "programata" => "Programată",
         "confirmata" => "Confirmată",
- "checkedin" => "Check-in",
-    "inconsultatie" => "În consultație",
+        "checkedin" => "Check-in",
+        "inconsultatie" => "În consultație",
         "finalizata" => "Finalizată",
-  "anulata" => "Anulată",
-  _ => status ?? "Necunoscut"
+        "anulata" => "Anulată",
+        _ => status ?? "Necunoscut"
     };
 }

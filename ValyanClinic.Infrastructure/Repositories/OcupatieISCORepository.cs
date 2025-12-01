@@ -98,7 +98,7 @@ public class OcupatieISCORepository : BaseRepository, IOcupatieISCORepository
         };
 
         var results = await QueryAsync<SearchResultDto>("sp_Ocupatii_ISCO08_Search", parameters, cancellationToken);
-        
+
         return results.Select(r => (
             ocupatie: new OcupatieISCO
             {
@@ -177,7 +177,7 @@ public class OcupatieISCORepository : BaseRepository, IOcupatieISCORepository
     public async Task<bool> DeleteAsync(Guid id, string modificatDe, CancellationToken cancellationToken = default)
     {
         var parameters = new { Id = id, ModificatDe = modificatDe };
-        
+
         var result = await QueryFirstOrDefaultAsync<DeleteResultDto>("sp_Ocupatii_ISCO08_Delete", parameters, cancellationToken);
         return result != null;
     }
@@ -185,10 +185,10 @@ public class OcupatieISCORepository : BaseRepository, IOcupatieISCORepository
     public async Task<bool> IsUniqueAsync(string codISCO, Guid? excludeId = null, CancellationToken cancellationToken = default)
     {
         var parameters = new { CodISCO = codISCO, ExcludeId = excludeId };
-        
+
         // FOLOSIM STORED PROCEDURE in loc de SQL inline
         var exists = await ExecuteScalarAsync<int>("sp_Ocupatii_ISCO08_CheckUnique", parameters, cancellationToken);
-        
+
         // SP returneaza 1 daca exista (duplicate), 0 daca e unic
         return exists == 0; // true = unique (nu exista duplicate)
     }

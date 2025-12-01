@@ -14,22 +14,22 @@ public partial class SetariAutentificare : ComponentBase, IDisposable
 
     private SfGrid<SystemSettingDto>? GridRef;
     private SettingEditModal? EditModalRef;
-    
+
     private List<SystemSettingDto> Settings = new();
     private bool IsLoading = true;
     private bool _disposed = false;
 
     protected override async Task OnInitializedAsync()
     {
-    try
-    {
+        try
+        {
             Logger.LogInformation("Loading authentication settings...");
-       await LoadSettingsAsync();
-   }
+            await LoadSettingsAsync();
+        }
         catch (Exception ex)
         {
-       Logger.LogError(ex, "Error loading settings");
-    }
+            Logger.LogError(ex, "Error loading settings");
+        }
         finally
         {
             IsLoading = false;
@@ -38,60 +38,60 @@ public partial class SetariAutentificare : ComponentBase, IDisposable
 
     private async Task LoadSettingsAsync()
     {
- try
-   {
-          var autentificareResult = await Mediator.Send(new GetSystemSettingsQuery("Autentificare"));
-         var securitateResult = await Mediator.Send(new GetSystemSettingsQuery("Securitate"));
+        try
+        {
+            var autentificareResult = await Mediator.Send(new GetSystemSettingsQuery("Autentificare"));
+            var securitateResult = await Mediator.Send(new GetSystemSettingsQuery("Securitate"));
 
             if (autentificareResult.IsSuccess && securitateResult.IsSuccess)
- {
-          Settings = autentificareResult.Value!
-           .Concat(securitateResult.Value!)
-   .OrderBy(s => s.Categorie)
-  .ThenBy(s => s.Cheie)
-     .ToList();
+            {
+                Settings = autentificareResult.Value!
+                 .Concat(securitateResult.Value!)
+         .OrderBy(s => s.Categorie)
+        .ThenBy(s => s.Cheie)
+           .ToList();
 
                 Logger.LogInformation("Loaded {Count} settings", Settings.Count);
-      }
-       else
+            }
+            else
             {
-    Logger.LogWarning("Failed to load settings");
-          }
+                Logger.LogWarning("Failed to load settings");
+            }
         }
         catch (Exception ex)
         {
-     Logger.LogError(ex, "Error loading settings from mediator");
-        throw;
+            Logger.LogError(ex, "Error loading settings from mediator");
+            throw;
         }
     }
 
     private void OpenEditDialog(SystemSettingDto setting)
     {
         Logger.LogInformation("Opening edit dialog for setting: {Cheie}", setting.Cheie);
-  
-   if (EditModalRef != null)
-     {
-          EditModalRef.Open(setting);
+
+        if (EditModalRef != null)
+        {
+            EditModalRef.Open(setting);
         }
         else
-  {
-     Logger.LogWarning("EditModalRef is null");
+        {
+            Logger.LogWarning("EditModalRef is null");
         }
     }
 
     private async Task HandleSettingSaved()
     {
-   Logger.LogInformation("Setting saved - reloading data");
-        
-   await LoadSettingsAsync();
+        Logger.LogInformation("Setting saved - reloading data");
+
+        await LoadSettingsAsync();
         StateHasChanged();
     }
 
     public void Dispose()
-{
+    {
         if (_disposed) return;
         _disposed = true;
-        
+
         Settings?.Clear();
         GridRef = null;
         EditModalRef = null;

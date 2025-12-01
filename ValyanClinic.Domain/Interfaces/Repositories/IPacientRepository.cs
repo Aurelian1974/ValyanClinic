@@ -28,19 +28,19 @@ public interface IPacientRepository
         bool? asigurat = null,
         bool? activ = null,
         CancellationToken cancellationToken = default);
-    
+
     // Lookup operations
     Task<IEnumerable<(string Value, string Text, int NumarPacienti)>> GetJudeteAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<(Guid Id, string DisplayText, string? CNP, DateTime DataNasterii)>> GetDropdownOptionsAsync(
         bool activ = true,
         CancellationToken cancellationToken = default);
-    
+
     // Write operations
     Task<Pacient> CreateAsync(Pacient pacient, CancellationToken cancellationToken = default);
     Task<Pacient> UpdateAsync(Pacient pacient, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(Guid id, string modificatDe, CancellationToken cancellationToken = default);
     Task<bool> HardDeleteAsync(Guid id, CancellationToken cancellationToken = default);
-    
+
     // Business operations
     Task<string> GenerateNextCodPacientAsync(CancellationToken cancellationToken = default);
     Task<(bool CnpExists, bool CodPacientExists)> CheckUniqueAsync(
@@ -53,7 +53,7 @@ public interface IPacientRepository
         DateTime dataVizita,
         string modificatDe,
         CancellationToken cancellationToken = default);
-    
+
     // Statistics
     Task<Dictionary<string, (int Total, int Activi)>> GetStatisticsAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Pacient>> GetBirthdaysAsync(

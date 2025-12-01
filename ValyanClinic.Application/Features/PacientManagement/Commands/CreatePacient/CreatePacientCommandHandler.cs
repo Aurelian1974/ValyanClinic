@@ -167,8 +167,8 @@ public class CreatePacientCommandHandler : IRequestHandler<CreatePacientCommand,
                 errors.Add("Pentru pacienții asigurați este necesar CNP-ul asiguratului sau numărul cardului de sănătate.");
         }
 
-        return errors.Any() 
-            ? Result.Failure(errors) 
+        return errors.Any()
+            ? Result.Failure(errors)
             : Result.Success();
     }
 }

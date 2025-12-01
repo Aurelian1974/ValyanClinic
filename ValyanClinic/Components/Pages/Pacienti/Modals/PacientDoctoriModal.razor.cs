@@ -123,7 +123,7 @@ public partial class PacientDoctoriModal : ComponentBase
         try
         {
             Logger.LogInformation("[PacientDoctoriModal] Calling GetDoctoriByPacientQuery for PacientID: {PacientID}", PacientID);
-            
+
             var query = new GetDoctoriByPacientQuery(PacientID!.Value, ApenumereActivi: false);
             var result = await Mediator.Send(query);
 

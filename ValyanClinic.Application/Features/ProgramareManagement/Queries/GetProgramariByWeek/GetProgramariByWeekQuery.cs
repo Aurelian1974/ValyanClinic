@@ -10,7 +10,7 @@ namespace ValyanClinic.Application.Features.ProgramareManagement.Queries.GetProg
 /// </summary>
 public class GetProgramariByWeekQuery : IRequest<Result<IEnumerable<ProgramareListDto>>>
 {
-  /// <summary>
+    /// <summary>
     /// Start date of the week (Monday)
     /// </summary>
     public DateTime WeekStartDate { get; set; }
@@ -27,7 +27,7 @@ public class GetProgramariByWeekQuery : IRequest<Result<IEnumerable<ProgramareLi
 
     public GetProgramariByWeekQuery(DateTime weekStartDate, DateTime weekEndDate, Guid? doctorID = null)
     {
-     WeekStartDate = weekStartDate;
+        WeekStartDate = weekStartDate;
         WeekEndDate = weekEndDate;
         DoctorID = doctorID;
     }

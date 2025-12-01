@@ -29,7 +29,7 @@ public class ConsultatieViewModelTests
         _draftServiceMock = new Mock<IDraftStorageService<CreateConsultatieCommand>>();
         _imcCalculatorMock = new Mock<IIMCCalculatorService>();
         _loggerMock = new Mock<ILogger<ConsultatieViewModel>>();
-        
+
         _viewModel = new ConsultatieViewModel(
             _mediatorMock.Object,
             _draftServiceMock.Object,
@@ -72,7 +72,7 @@ public class ConsultatieViewModelTests
         // Arrange
         var programareId = Guid.NewGuid();
         var savedTime = DateTime.UtcNow.AddMinutes(-10);
-        
+
         var draftCommand = new CreateConsultatieCommand
         {
             ProgramareID = programareId,
@@ -173,7 +173,7 @@ public class ConsultatieViewModelTests
         // Arrange
         var programareId = Guid.NewGuid();
         await _viewModel.InitializeAsync(programareId, Guid.NewGuid(), Guid.NewGuid(), "user123");
-        
+
         var draftSavedCalled = false;
         _viewModel.DraftSaved += (sender, args) => draftSavedCalled = true;
 
@@ -239,7 +239,7 @@ public class ConsultatieViewModelTests
         // Arrange
         var programareId = Guid.NewGuid();
         await _viewModel.InitializeAsync(programareId, Guid.NewGuid(), Guid.NewGuid(), "user123");
-        
+
         // Command fără câmpuri obligatorii
         _viewModel.Command.MotivPrezentare = null;
         _viewModel.Command.DiagnosticPozitiv = null;
@@ -261,9 +261,9 @@ public class ConsultatieViewModelTests
         // Arrange
         var programareId = Guid.NewGuid();
         var consultatieId = Guid.NewGuid();
-        
+
         await _viewModel.InitializeAsync(programareId, Guid.NewGuid(), Guid.NewGuid(), "user123");
-        
+
         _viewModel.Command.MotivPrezentare = "Dureri abdominale";
         _viewModel.Command.DiagnosticPozitiv = "Gastrită";
 
@@ -282,7 +282,7 @@ public class ConsultatieViewModelTests
         result.Value.Should().Be(consultatieId);
         _viewModel.HasUnsavedChanges.Should().BeFalse();
         consultatieSubmittedCalled.Should().BeTrue();
-        
+
         _draftServiceMock.Verify(
             x => x.ClearDraftAsync(programareId),
             Times.Once
@@ -295,7 +295,7 @@ public class ConsultatieViewModelTests
         // Arrange
         var programareId = Guid.NewGuid();
         await _viewModel.InitializeAsync(programareId, Guid.NewGuid(), Guid.NewGuid(), "user123");
-        
+
         _viewModel.Command.MotivPrezentare = "Test";
         _viewModel.Command.DiagnosticPozitiv = "Test";
 
@@ -318,7 +318,7 @@ public class ConsultatieViewModelTests
         result.IsSuccess.Should().BeFalse();
         errorOccurredCalled.Should().BeTrue();
         errorMessage.Should().Contain("Database error");
-        
+
         _draftServiceMock.Verify(
             x => x.ClearDraftAsync(It.IsAny<Guid>()),
             Times.Never

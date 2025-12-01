@@ -8,9 +8,9 @@ namespace ValyanClinic.Application.Features.ProgramareManagement.Commands.Update
 /// </summary>
 public class UpdateProgramareCommandValidator : AbstractValidator<UpdateProgramareCommand>
 {
-  public UpdateProgramareCommandValidator()
+    public UpdateProgramareCommandValidator()
     {
- // ==================== VALIDĂRI CÂMPURI OBLIGATORII ====================
+        // ==================== VALIDĂRI CÂMPURI OBLIGATORII ====================
 
         RuleFor(x => x.ProgramareID)
   .NotEmpty()
@@ -18,11 +18,11 @@ public class UpdateProgramareCommandValidator : AbstractValidator<UpdatePrograma
      .NotEqual(Guid.Empty)
  .WithMessage("ID-ul programării nu este valid.");
 
-   RuleFor(x => x.PacientID)
-      .NotEmpty()
-         .WithMessage("ID-ul pacientului este obligatoriu.")
-    .NotEqual(Guid.Empty)
-       .WithMessage("ID-ul pacientului nu este valid.");
+        RuleFor(x => x.PacientID)
+           .NotEmpty()
+              .WithMessage("ID-ul pacientului este obligatoriu.")
+         .NotEqual(Guid.Empty)
+            .WithMessage("ID-ul pacientului nu este valid.");
 
         RuleFor(x => x.DoctorID)
    .NotEmpty()
@@ -33,7 +33,7 @@ public class UpdateProgramareCommandValidator : AbstractValidator<UpdatePrograma
         RuleFor(x => x.DataProgramare)
       .NotEmpty()
   .WithMessage("Data programării este obligatorie.");
-            // NOTE: La UPDATE, permitem date în trecut (pentru corecții istorice)
+        // NOTE: La UPDATE, permitem date în trecut (pentru corecții istorice)
 
         RuleFor(x => x.OraInceput)
      .NotEmpty()
@@ -66,24 +66,24 @@ public class UpdateProgramareCommandValidator : AbstractValidator<UpdatePrograma
      .WithName("OraSfarsit");
 
         // Validare: Durata minimă 5 minute
-    RuleFor(x => x)
-        .Must(x => (x.OraSfarsit - x.OraInceput).TotalMinutes >= 5)
-       .WithMessage("Durata programării trebuie să fie de cel puțin 5 minute.")
-         .WithName("Durata");
+        RuleFor(x => x)
+            .Must(x => (x.OraSfarsit - x.OraInceput).TotalMinutes >= 5)
+           .WithMessage("Durata programării trebuie să fie de cel puțin 5 minute.")
+             .WithName("Durata");
 
-   // Validare: Durata maximă 4 ore
-      RuleFor(x => x)
-            .Must(x => (x.OraSfarsit - x.OraInceput).TotalHours <= 4)
-      .WithMessage("Durata programării nu poate depăși 4 ore.")
-   .WithName("Durata");
+        // Validare: Durata maximă 4 ore
+        RuleFor(x => x)
+              .Must(x => (x.OraSfarsit - x.OraInceput).TotalHours <= 4)
+        .WithMessage("Durata programării nu poate depăși 4 ore.")
+     .WithName("Durata");
 
-      // Validare: Pacient diferit de Doctor
+        // Validare: Pacient diferit de Doctor
         RuleFor(x => x)
     .Must(x => x.PacientID != x.DoctorID)
           .WithMessage("Pacientul și medicul nu pot fi aceeași persoană.")
        .WithName("PacientID");
 
-     // ==================== VALIDĂRI STATUS ====================
+        // ==================== VALIDĂRI STATUS ====================
 
         // Validare: Status trebuie să fie unul dintre valorile permise
         RuleFor(x => x.Status)
@@ -93,44 +93,44 @@ public class UpdateProgramareCommandValidator : AbstractValidator<UpdatePrograma
 
         // ==================== VALIDĂRI OPȚIONALE ====================
 
-  // Validare TipProgramare (dacă e furnizat)
+        // Validare TipProgramare (dacă e furnizat)
         When(x => !string.IsNullOrEmpty(x.TipProgramare), () =>
         {
             RuleFor(x => x.TipProgramare)
- .Must(tip => new[] { "ConsultatieInitiala", "ControlPeriodic", "Consultatie", "Investigatie", 
+ .Must(tip => new[] { "ConsultatieInitiala", "ControlPeriodic", "Consultatie", "Investigatie",
         "Procedura", "Urgenta", "Telemedicina", "LaDomiciliu" }
       .Contains(tip, StringComparer.OrdinalIgnoreCase))
  .WithMessage("Tipul programării trebuie să fie unul dintre: ConsultatieInitiala, ControlPeriodic, Consultatie, Investigatie, Procedura, Urgenta, Telemedicina, LaDomiciliu.");
- });
-
-      // Validare Observatii (max 1000 caractere)
-        When(x => !string.IsNullOrEmpty(x.Observatii), () =>
- {
-   RuleFor(x => x.Observatii)
-             .MaximumLength(1000)
-      .WithMessage("Observațiile nu pot depăși 1000 de caractere.");
         });
 
-  // ==================== VALIDĂRI PROGRAM ORAR (mai blânde pentru UPDATE) ====================
-
-        // Validare: Ora de început între 07:00 și 20:00 (program clinică)
-  // NOTE: Pentru UPDATE, permitem excepții (de exemplu, pentru corecții)
-        When(x => x.DataProgramare.Date >= DateTime.Today, () =>
-        {
-     RuleFor(x => x.OraInceput)
-    .Must(ora => ora >= TimeSpan.FromHours(7) && ora <= TimeSpan.FromHours(20))
-          .WithMessage("Ora de început trebuie să fie între 07:00 și 20:00 (programul clinicii).")
-       .When(x => x.TipProgramare != "Urgenta");
-
-   RuleFor(x => x.OraSfarsit)
- .Must(ora => ora >= TimeSpan.FromHours(7) && ora <= TimeSpan.FromHours(21))
-       .WithMessage("Ora de sfârșit trebuie să fie între 07:00 și 21:00 (programul clinicii).")
-         .When(x => x.TipProgramare != "Urgenta");
+        // Validare Observatii (max 1000 caractere)
+        When(x => !string.IsNullOrEmpty(x.Observatii), () =>
+ {
+     RuleFor(x => x.Observatii)
+               .MaximumLength(1000)
+        .WithMessage("Observațiile nu pot depăși 1000 de caractere.");
  });
 
-// ==================== VALIDĂRI TRANZIȚII STATUS ====================
+        // ==================== VALIDĂRI PROGRAM ORAR (mai blânde pentru UPDATE) ====================
 
-      // Validare: Anumite tranziții de status nu sunt permise
+        // Validare: Ora de început între 07:00 și 20:00 (program clinică)
+        // NOTE: Pentru UPDATE, permitem excepții (de exemplu, pentru corecții)
+        When(x => x.DataProgramare.Date >= DateTime.Today, () =>
+        {
+            RuleFor(x => x.OraInceput)
+           .Must(ora => ora >= TimeSpan.FromHours(7) && ora <= TimeSpan.FromHours(20))
+                 .WithMessage("Ora de început trebuie să fie între 07:00 și 20:00 (programul clinicii).")
+              .When(x => x.TipProgramare != "Urgenta");
+
+            RuleFor(x => x.OraSfarsit)
+          .Must(ora => ora >= TimeSpan.FromHours(7) && ora <= TimeSpan.FromHours(21))
+                .WithMessage("Ora de sfârșit trebuie să fie între 07:00 și 21:00 (programul clinicii).")
+                  .When(x => x.TipProgramare != "Urgenta");
+        });
+
+        // ==================== VALIDĂRI TRANZIȚII STATUS ====================
+
+        // Validare: Anumite tranziții de status nu sunt permise
         // De exemplu: Finalizata -> Programata (nu se poate reveni)
         // Această validare se poate extinde în funcție de business rules
     }

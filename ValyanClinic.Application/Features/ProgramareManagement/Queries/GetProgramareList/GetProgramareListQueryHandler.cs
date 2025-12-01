@@ -15,11 +15,11 @@ public class GetProgramareListQueryHandler : IRequestHandler<GetProgramareListQu
     private readonly IProgramareRepository _programareRepository;
     private readonly ILogger<GetProgramareListQueryHandler> _logger;
 
-public GetProgramareListQueryHandler(
-      IProgramareRepository programareRepository,
-        ILogger<GetProgramareListQueryHandler> logger)
-  {
-     _programareRepository = programareRepository;
+    public GetProgramareListQueryHandler(
+          IProgramareRepository programareRepository,
+            ILogger<GetProgramareListQueryHandler> logger)
+    {
+        _programareRepository = programareRepository;
         _logger = logger;
     }
 
@@ -51,30 +51,30 @@ public GetProgramareListQueryHandler(
          cancellationToken: cancellationToken);
 
             if (totalCount == 0)
-      {
+            {
                 _logger.LogInformation("Nu au fost găsite programări pentru criteriile specificate");
-         return PagedResult<ProgramareListDto>.Success(
-     Enumerable.Empty<ProgramareListDto>(),
-               request.PageNumber,
-request.PageSize,
-    0,
-          "Nu au fost găsite programări pentru criteriile specificate.");
+                return PagedResult<ProgramareListDto>.Success(
+            Enumerable.Empty<ProgramareListDto>(),
+                      request.PageNumber,
+       request.PageSize,
+           0,
+                 "Nu au fost găsite programări pentru criteriile specificate.");
             }
 
             // 2. Obține programările paginate
-       var programari = await _programareRepository.GetAllAsync(
-                pageNumber: request.PageNumber,
-    pageSize: request.PageSize,
-       searchText: request.GlobalSearchText,
-                doctorID: request.FilterDoctorID,
-         pacientID: request.FilterPacientID,
-                dataStart: request.FilterDataStart,
-    dataEnd: request.FilterDataEnd,
-  status: request.FilterStatus,
-                tipProgramare: request.FilterTipProgramare,
-       sortColumn: request.SortColumn,
-  sortDirection: request.SortDirection,
-           cancellationToken: cancellationToken);
+            var programari = await _programareRepository.GetAllAsync(
+                     pageNumber: request.PageNumber,
+         pageSize: request.PageSize,
+            searchText: request.GlobalSearchText,
+                     doctorID: request.FilterDoctorID,
+              pacientID: request.FilterPacientID,
+                     dataStart: request.FilterDataStart,
+         dataEnd: request.FilterDataEnd,
+       status: request.FilterStatus,
+                     tipProgramare: request.FilterTipProgramare,
+            sortColumn: request.SortColumn,
+       sortDirection: request.SortDirection,
+                cancellationToken: cancellationToken);
 
             // ==================== MAPARE LA DTO ====================
 

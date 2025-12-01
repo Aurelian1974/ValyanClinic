@@ -16,20 +16,20 @@ public class DepartamentRepository : BaseRepository, IDepartamentRepository
     {
         var parameters = new { IdDepartament = id };
         var dto = await QueryFirstOrDefaultAsync<DepartamentDto>("sp_Departamente_GetById", parameters, cancellationToken);
-        
+
         if (dto == null)
             return null;
-        
+
         return new Departament
         {
             IdDepartament = dto.IdDepartament,
             IdTipDepartament = dto.IdTipDepartament,
             DenumireDepartament = dto.DenumireDepartament,
             DescriereDepartament = dto.DescriereDepartament,
-            TipDepartament = dto.DenumireTipDepartament != null ? new TipDepartament 
-            { 
+            TipDepartament = dto.DenumireTipDepartament != null ? new TipDepartament
+            {
                 IdTipDepartament = dto.IdTipDepartament ?? Guid.Empty,
-                DenumireTipDepartament = dto.DenumireTipDepartament 
+                DenumireTipDepartament = dto.DenumireTipDepartament
             } : null
         };
     }
@@ -52,23 +52,23 @@ public class DepartamentRepository : BaseRepository, IDepartamentRepository
             SortColumn = sortColumn,
             SortDirection = sortDirection
         };
-        
+
         using var connection = _connectionFactory.CreateConnection();
         var data = await connection.QueryAsync<DepartamentDto>(
             "sp_Departamente_GetAll",
             parameters,
             commandType: System.Data.CommandType.StoredProcedure);
-        
+
         return data.Select(dto => new Departament
         {
             IdDepartament = dto.IdDepartament,
             IdTipDepartament = dto.IdTipDepartament,
             DenumireDepartament = dto.DenumireDepartament,
             DescriereDepartament = dto.DescriereDepartament,
-            TipDepartament = dto.DenumireTipDepartament != null ? new TipDepartament 
-            { 
+            TipDepartament = dto.DenumireTipDepartament != null ? new TipDepartament
+            {
                 IdTipDepartament = dto.IdTipDepartament ?? Guid.Empty,
-                DenumireTipDepartament = dto.DenumireTipDepartament 
+                DenumireTipDepartament = dto.DenumireTipDepartament
             } : null
         });
     }
@@ -83,13 +83,13 @@ public class DepartamentRepository : BaseRepository, IDepartamentRepository
             SearchText = searchText,
             IdTipDepartament = idTipDepartament
         };
-        
+
         using var connection = _connectionFactory.CreateConnection();
         var result = await connection.ExecuteScalarAsync<int>(
             "sp_Departamente_GetCount",
             parameters,
             commandType: System.Data.CommandType.StoredProcedure);
-        
+
         return result;
     }
 
@@ -137,12 +137,12 @@ public class DepartamentRepository : BaseRepository, IDepartamentRepository
             DenumireDepartament = denumire,
             ExcludeId = excludeId
         };
-        
+
         var result = await QueryFirstOrDefaultAsync<UniquenessCheckResult>(
-            "sp_Departamente_CheckUnique", 
-            parameters, 
+            "sp_Departamente_CheckUnique",
+            parameters,
             cancellationToken);
-        
+
         return result?.Denumire_Exists == 1;
     }
 

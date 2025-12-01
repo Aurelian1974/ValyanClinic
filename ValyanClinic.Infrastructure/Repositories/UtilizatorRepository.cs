@@ -39,29 +39,29 @@ public class UtilizatorRepository : BaseRepository, IUtilizatorRepository
         // ✅ FIX: Call TWO separate stored procedures
         // sp_Utilizatori_GetAll returns only data (no count)
         // sp_Utilizatori_GetCount returns the total count
-        
+
         using var connection = _connectionFactory.CreateConnection();
-    
+
         // Get paginated items
         var items = await connection.QueryAsync<Utilizator>(
             "sp_Utilizatori_GetAll",
          parameters,
           commandType: System.Data.CommandType.StoredProcedure);
 
-   // Get total count (for pagination)
+        // Get total count (for pagination)
         var countParameters = new
         {
-      SearchText = searchText,
+            SearchText = searchText,
             Rol = rol,
             EsteActiv = esteActiv
         };
- 
-     var count = await connection.QueryFirstOrDefaultAsync<int>(
-"sp_Utilizatori_GetCount",
-      countParameters,
-     commandType: System.Data.CommandType.StoredProcedure);
 
-return (items, count);
+        var count = await connection.QueryFirstOrDefaultAsync<int>(
+   "sp_Utilizatori_GetCount",
+         countParameters,
+        commandType: System.Data.CommandType.StoredProcedure);
+
+        return (items, count);
     }
 
     public async Task<int> GetCountAsync(
@@ -83,41 +83,41 @@ return (items, count);
     public async Task<Utilizator?> GetByIdAsync(Guid utilizatorID, CancellationToken cancellationToken = default)
     {
         var parameters = new { UtilizatorID = utilizatorID };
-   
+
         // ✅ FIX: Use Dapper multi-mapping to map both Utilizator and PersonalMedical
         // The SP returns: UtilizatorID, PersonalMedicalID, Username, Email, ..., Nume, Prenume, Specializare, Departament, Pozitie, Telefon, EmailPersonalMedical
         // After SQL fix, SP now returns Pozitie column as well
-     
-     using var connection = _connectionFactory.CreateConnection();
-   
+
+        using var connection = _connectionFactory.CreateConnection();
+
         var result = await connection.QueryAsync<Utilizator, PersonalMedicalData, Utilizator>(
      "sp_Utilizatori_GetById",
        (utilizator, personalMedical) =>
  {
-      // Map PersonalMedical navigation property
-        if (personalMedical != null)
-    {
-            utilizator.PersonalMedical = new ValyanClinic.Domain.Entities.PersonalMedical
-        {
-           PersonalID = personalMedical.PersonalMedicalID,
-           Nume = personalMedical.Nume,
-           Prenume = personalMedical.Prenume,
-           Specializare = personalMedical.Specializare,
-           Departament = personalMedical.Departament,
-           Pozitie = personalMedical.Pozitie,
-           Telefon = personalMedical.Telefon,
-           Email = personalMedical.EmailPersonalMedical // ✅ FIX: Use correct property name
-             };
-          }
-    return utilizator;
-         },
+     // Map PersonalMedical navigation property
+     if (personalMedical != null)
+     {
+         utilizator.PersonalMedical = new ValyanClinic.Domain.Entities.PersonalMedical
+         {
+             PersonalID = personalMedical.PersonalMedicalID,
+             Nume = personalMedical.Nume,
+             Prenume = personalMedical.Prenume,
+             Specializare = personalMedical.Specializare,
+             Departament = personalMedical.Departament,
+             Pozitie = personalMedical.Pozitie,
+             Telefon = personalMedical.Telefon,
+             Email = personalMedical.EmailPersonalMedical // ✅ FIX: Use correct property name
+         };
+     }
+     return utilizator;
+ },
      parameters,
             splitOn: "Nume", // Split the result set at the "Nume" column (first PersonalMedical column)
        commandType: System.Data.CommandType.StoredProcedure);
- 
+
         return result.FirstOrDefault();
     }
-    
+
     // ✅ Helper class for mapping PersonalMedical data from SP
     // NOTE: Property names MUST match the column names returned by the stored procedure EXACTLY
     private class PersonalMedicalData

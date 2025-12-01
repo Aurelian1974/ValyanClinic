@@ -23,7 +23,7 @@ public class Consultatie
     public string? IstoricBoalaActuala { get; set; }
 
     // ==================== II. ANTECEDENTE ====================
-    
+
     // A. Antecedente Heredo-Colaterale (AHC)
     public string? AHC_Mama { get; set; }
     public string? AHC_Tata { get; set; }
@@ -55,7 +55,7 @@ public class Consultatie
     public string? Toxice { get; set; } // Tutun, Alcool, Droguri
 
     // ==================== III. EXAMEN OBIECTIV ====================
-    
+
     // A. Examen General
     public string? StareGenerala { get; set; }
     public string? Constitutie { get; set; }
@@ -138,7 +138,7 @@ public class Consultatie
 
     // ==================== COMPUTED PROPERTIES ====================
     public DateTime DataOraConsultatie => DataConsultatie.Date + OraConsultatie;
-    
+
     public decimal? IMCCalculat
     {
         get

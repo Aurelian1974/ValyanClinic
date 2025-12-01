@@ -26,9 +26,9 @@ public class GetProgramariByDoctorQuery : IRequest<Result<IEnumerable<Programare
 
     public GetProgramariByDoctorQuery(Guid doctorID, DateTime? dataStart = null, DateTime? dataEnd = null)
     {
-     DoctorID = doctorID;
+        DoctorID = doctorID;
         DataStart = dataStart;
-   DataEnd = dataEnd;
+        DataEnd = dataEnd;
     }
 
     public GetProgramariByDoctorQuery()

@@ -10,27 +10,27 @@ public class DraftResult<T> where T : class
     /// Indică dacă operația a avut succes
     /// </summary>
     public bool IsSuccess { get; set; }
-    
+
     /// <summary>
     /// Datele din draft (null dacă draft-ul nu există sau e invalid)
     /// </summary>
     public T? Data { get; set; }
-    
+
     /// <summary>
     /// Când a fost salvat draft-ul
     /// </summary>
     public DateTime? SavedAt { get; set; }
-    
+
     /// <summary>
     /// Mesaj de eroare (dacă există)
     /// </summary>
     public string? ErrorMessage { get; set; }
-    
+
     /// <summary>
     /// Tipul erorii
     /// </summary>
     public DraftErrorType ErrorType { get; set; }
-    
+
     /// <summary>
     /// Draft încărcat cu succes
     /// </summary>
@@ -41,7 +41,7 @@ public class DraftResult<T> where T : class
         SavedAt = savedAt,
         ErrorType = DraftErrorType.None
     };
-    
+
     /// <summary>
     /// Draft nu a fost găsit
     /// </summary>
@@ -51,7 +51,7 @@ public class DraftResult<T> where T : class
         ErrorMessage = "Draft not found",
         ErrorType = DraftErrorType.NotFound
     };
-    
+
     /// <summary>
     /// Draft găsit dar datele sunt invalide (corrupt JSON, etc.)
     /// </summary>
@@ -61,7 +61,7 @@ public class DraftResult<T> where T : class
         ErrorMessage = "Invalid draft data",
         ErrorType = DraftErrorType.InvalidData
     };
-    
+
     /// <summary>
     /// Draft expirat
     /// </summary>
@@ -71,7 +71,7 @@ public class DraftResult<T> where T : class
         ErrorMessage = "Draft has expired",
         ErrorType = DraftErrorType.Expired
     };
-    
+
     /// <summary>
     /// Eroare generică
     /// </summary>

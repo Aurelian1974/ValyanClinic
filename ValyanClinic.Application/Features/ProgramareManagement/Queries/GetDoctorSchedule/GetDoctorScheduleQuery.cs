@@ -10,7 +10,7 @@ namespace ValyanClinic.Application.Features.ProgramareManagement.Queries.GetDoct
 public class GetDoctorScheduleQuery : IRequest<Result<IEnumerable<ProgramareListDto>>>
 {
     /// <summary>
-  /// ID-ul medicului.
+    /// ID-ul medicului.
     /// </summary>
     public Guid DoctorID { get; set; }
 
@@ -20,14 +20,14 @@ public class GetDoctorScheduleQuery : IRequest<Result<IEnumerable<ProgramareList
     public DateTime DataStart { get; set; }
 
     /// <summary>
- /// Data de sfârșit a intervalului.
+    /// Data de sfârșit a intervalului.
     /// </summary>
     public DateTime DataEnd { get; set; }
 
     public GetDoctorScheduleQuery(Guid doctorID, DateTime dataStart, DateTime dataEnd)
     {
         DoctorID = doctorID;
-  DataStart = dataStart;
+        DataStart = dataStart;
         DataEnd = dataEnd;
     }
 

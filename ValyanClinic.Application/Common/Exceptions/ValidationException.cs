@@ -6,13 +6,13 @@
 public class ValidationException : Exception
 {
     public Dictionary<string, List<string>> ValidationErrors { get; }
-    
+
     public ValidationException(Dictionary<string, List<string>> validationErrors)
         : base("Au aparut una sau mai multe erori de validare")
     {
         ValidationErrors = validationErrors;
     }
-    
+
     public ValidationException(string propertyName, string error)
         : base($"Eroare de validare: {error}")
     {

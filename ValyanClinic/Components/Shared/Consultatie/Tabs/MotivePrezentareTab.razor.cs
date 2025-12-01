@@ -9,13 +9,13 @@ public partial class MotivePrezentareTab : ComponentBase
     [Parameter] public EventCallback OnChanged { get; set; }
     [Parameter] public EventCallback OnSectionCompleted { get; set; }
     [Parameter] public bool ShowValidation { get; set; } = false;
-    
+
     private bool IsComplete => !string.IsNullOrWhiteSpace(Model.MotivPrezentare);
-    
+
     private async Task OnFieldChanged()
     {
         await OnChanged.InvokeAsync();
-        
+
         if (IsComplete)
         {
             await OnSectionCompleted.InvokeAsync();

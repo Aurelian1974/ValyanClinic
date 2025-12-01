@@ -276,8 +276,8 @@ public class PacientDoctoriModalTests : ComponentTestBase
         var pacientNume = "Popescu Ion";
 
         _mockMediator
-            .Setup(m => m.Send(It.Is<GetDoctoriByPacientQuery>(q => 
-                q.PacientID == pacientId && q.ApenumereActivi == false), 
+            .Setup(m => m.Send(It.Is<GetDoctoriByPacientQuery>(q =>
+                q.PacientID == pacientId && q.ApenumereActivi == false),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<List<DoctorAsociatDto>>.Success(new List<DoctorAsociatDto>()));
 
@@ -290,7 +290,7 @@ public class PacientDoctoriModalTests : ComponentTestBase
         // Assert
         _mockMediator.Verify(m => m.Send(
             It.Is<GetDoctoriByPacientQuery>(q => q.PacientID == pacientId),
-            It.IsAny<CancellationToken>()), 
+            It.IsAny<CancellationToken>()),
             Times.Once);
 
         cut.Markup.Should().Contain(pacientNume);

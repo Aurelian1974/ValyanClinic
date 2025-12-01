@@ -17,13 +17,13 @@ public class LoginResult
     /// </summary>
     [JsonPropertyName("success")]
     public bool Success { get; set; }
-    
+
     /// <summary>
     /// Authenticated user data (null if login failed)
     /// </summary>
     [JsonPropertyName("data")]
     public LoginResponseData? Data { get; set; }
-    
+
     /// <summary>
     /// Error message if login failed (null if successful)
     /// </summary>

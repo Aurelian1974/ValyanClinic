@@ -11,10 +11,10 @@ public class CheckProgramareConflictQuery : IRequest<Result<bool>>
 {
     /// <summary>
     /// ID-ul medicului pentru care se verifică conflictul.
-  /// </summary>
+    /// </summary>
     public Guid DoctorID { get; set; }
 
- /// <summary>
+    /// <summary>
     /// Data programării.
     /// </summary>
     public DateTime DataProgramare { get; set; }
@@ -41,7 +41,7 @@ public class CheckProgramareConflictQuery : IRequest<Result<bool>>
         TimeSpan oraSfarsit,
         Guid? excludeProgramareID = null)
     {
-     DoctorID = doctorID;
+        DoctorID = doctorID;
         DataProgramare = dataProgramare;
         OraInceput = oraInceput;
         OraSfarsit = oraSfarsit;

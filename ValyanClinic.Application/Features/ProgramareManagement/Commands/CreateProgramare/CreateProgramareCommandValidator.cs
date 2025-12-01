@@ -10,17 +10,17 @@ public class CreateProgramareCommandValidator : AbstractValidator<CreatePrograma
 {
     public CreateProgramareCommandValidator()
     {
-    // ==================== VALIDĂRI CÂMPURI OBLIGATORII ====================
+        // ==================== VALIDĂRI CÂMPURI OBLIGATORII ====================
 
-     // ✅ UPDATED: PacientID opțional pentru SlotBlocat
-      When(x => x.TipProgramare != "SlotBlocat", () =>
-        {
-RuleFor(x => x.PacientID)
-       .NotEmpty()
-     .WithMessage("ID-ul pacientului este obligatoriu.")
-          .NotEqual(Guid.Empty)
-      .WithMessage("ID-ul pacientului nu este valid.");
-        });
+        // ✅ UPDATED: PacientID opțional pentru SlotBlocat
+        When(x => x.TipProgramare != "SlotBlocat", () =>
+          {
+              RuleFor(x => x.PacientID)
+                   .NotEmpty()
+                 .WithMessage("ID-ul pacientului este obligatoriu.")
+                      .NotEqual(Guid.Empty)
+                  .WithMessage("ID-ul pacientului nu este valid.");
+          });
 
         RuleFor(x => x.DoctorID)
             .NotEmpty()
@@ -55,10 +55,10 @@ RuleFor(x => x.PacientID)
         // ==================== VALIDĂRI BUSINESS LOGIC ====================
 
         // Validare: OraSfarsit > OraInceput
-     RuleFor(x => x)
-     .Must(x => x.OraSfarsit > x.OraInceput)
-         .WithMessage("Ora de sfârșit trebuie să fie după ora de început.")
-     .WithName("OraSfarsit");
+        RuleFor(x => x)
+        .Must(x => x.OraSfarsit > x.OraInceput)
+            .WithMessage("Ora de sfârșit trebuie să fie după ora de început.")
+        .WithName("OraSfarsit");
 
         // Validare: Durata minimă 5 minute
         RuleFor(x => x)
@@ -66,20 +66,20 @@ RuleFor(x => x.PacientID)
       .WithMessage("Durata programării trebuie să fie de cel puțin 5 minute.")
        .WithName("Durata");
 
-// Validare: Durata maximă 4 ore
+        // Validare: Durata maximă 4 ore
         RuleFor(x => x)
             .Must(x => (x.OraSfarsit - x.OraInceput).TotalHours <= 4)
             .WithMessage("Durata programării nu poate depăși 4 ore.")
             .WithName("Durata");
 
-// Validare: Pacient diferit de Doctor (nu poate fi același GUID) - excepție pentru SlotBlocat
+        // Validare: Pacient diferit de Doctor (nu poate fi același GUID) - excepție pentru SlotBlocat
         When(x => x.TipProgramare != "SlotBlocat", () =>
       {
-       RuleFor(x => x)
-        .Must(x => x.PacientID != x.DoctorID)
-       .WithMessage("Pacientul și medicul nu pot fi aceeași persoană.")
- .WithName("PacientID");
-        });
+          RuleFor(x => x)
+           .Must(x => x.PacientID != x.DoctorID)
+          .WithMessage("Pacientul și medicul nu pot fi aceeași persoană.")
+    .WithName("PacientID");
+      });
 
         // Validare: Data programării nu poate fi cu mai mult de 1 an în viitor
         RuleFor(x => x.DataProgramare)
@@ -96,27 +96,27 @@ RuleFor(x => x.PacientID)
       .Contains(status, StringComparer.OrdinalIgnoreCase))
             .WithMessage("Statusul trebuie să fie unul dintre: Programata, Confirmata, CheckedIn, InConsultatie, Finalizata, Anulata, NoShow.");
 
-  // Validare TipProgramare (dacă e furnizat)
-     When(x => !string.IsNullOrEmpty(x.TipProgramare), () =>
-        {
-    RuleFor(x => x.TipProgramare)
-   .Must(tip => new[] { "ConsultatieInitiala", "ControlPeriodic", "Consultatie", "Investigatie", 
+        // Validare TipProgramare (dacă e furnizat)
+        When(x => !string.IsNullOrEmpty(x.TipProgramare), () =>
+           {
+               RuleFor(x => x.TipProgramare)
+           .Must(tip => new[] { "ConsultatieInitiala", "ControlPeriodic", "Consultatie", "Investigatie",
     "Procedura", "Urgenta", "Telemedicina", "LaDomiciliu", "SlotBlocat" }
-       .Contains(tip, StringComparer.OrdinalIgnoreCase))
-             .WithMessage("Tipul programării trebuie să fie unul dintre: ConsultatieInitiala, ControlPeriodic, Consultatie, Investigatie, Procedura, Urgenta, Telemedicina, LaDomiciliu, SlotBlocat.");
-  });
+               .Contains(tip, StringComparer.OrdinalIgnoreCase))
+                     .WithMessage("Tipul programării trebuie să fie unul dintre: ConsultatieInitiala, ControlPeriodic, Consultatie, Investigatie, Procedura, Urgenta, Telemedicina, LaDomiciliu, SlotBlocat.");
+           });
 
         // Validare Observatii (max 1000 caractere)
-   When(x => !string.IsNullOrEmpty(x.Observatii), () =>
-        {
-  RuleFor(x => x.Observatii)
-      .MaximumLength(1000)
-.WithMessage("Observațiile nu pot depăși 1000 de caractere.");
-        });
+        When(x => !string.IsNullOrEmpty(x.Observatii), () =>
+             {
+                 RuleFor(x => x.Observatii)
+                .MaximumLength(1000)
+          .WithMessage("Observațiile nu pot depăși 1000 de caractere.");
+             });
 
         // ==================== VALIDĂRI PROGRAM ORAR (BUSINESS HOURS) ====================
 
-    // Validare: Ora de început între 07:00 și 20:00 (program clinică)
+        // Validare: Ora de început între 07:00 și 20:00 (program clinică)
         RuleFor(x => x.OraInceput)
             .Must(ora => ora >= TimeSpan.FromHours(7) && ora <= TimeSpan.FromHours(20))
             .WithMessage("Ora de început trebuie să fie între 07:00 și 20:00 (programul clinicii).")

@@ -85,7 +85,7 @@ public class ICD10Code
     public DateTime? DataModificare { get => UpdatedAt; set => UpdatedAt = value; }
 
     // ==================== COMPUTED PROPERTIES ====================
-    
+
     /// <summary>
     /// Returneaza displayul complet: "I20.0 - Angina instabila"
     /// </summary>

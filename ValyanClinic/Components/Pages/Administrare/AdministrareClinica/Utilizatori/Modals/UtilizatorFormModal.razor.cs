@@ -24,7 +24,7 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
 
     private bool IsVisible { get; set; }
     private bool IsLoading { get; set; }
-  private bool IsSaving { get; set; }
+    private bool IsSaving { get; set; }
     private bool HasError { get; set; }
     private string ErrorMessage { get; set; } = string.Empty;
     private string ActiveTab { get; set; } = "date-utilizator";
@@ -35,15 +35,15 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
     private bool ShowPassword { get; set; }
     private string GeneratedPassword { get; set; } = string.Empty;
 
- // Lookup data
+    // Lookup data
     private bool IsLoadingLookups { get; set; }
     private List<PersonalMedicalOption> PersonalMedicalOptions { get; set; } = new();
     private List<RolOption> RolOptions { get; set; } = new();
 
-  public class PersonalMedicalOption
+    public class PersonalMedicalOption
     {
-  public Guid Id { get; set; }
-     public string DisplayName { get; set; } = string.Empty;
+        public Guid Id { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
     }
 
     public class RolOption
@@ -53,43 +53,43 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
     }
 
     protected override async Task OnInitializedAsync()
- {
+    {
         Model = new UtilizatorFormModel();
-    Logger.LogInformation("UtilizatorFormModal initialized");
+        Logger.LogInformation("UtilizatorFormModal initialized");
 
-   // Initialize role options
+        // Initialize role options
         InitializeRolOptions();
 
-    // Load personal medical options
+        // Load personal medical options
         await LoadPersonalMedicalOptions();
     }
 
     public void Dispose()
     {
-      if (_disposed) return;
-    _disposed = true;
+        if (_disposed) return;
+        _disposed = true;
 
         try
         {
             Logger.LogDebug("UtilizatorFormModal disposing");
 
             PersonalMedicalOptions?.Clear();
-         RolOptions?.Clear();
-  PersonalMedicalOptions = new();
+            RolOptions?.Clear();
+            PersonalMedicalOptions = new();
             RolOptions = new();
-   Model = new UtilizatorFormModel();
-         
+            Model = new UtilizatorFormModel();
+
             Logger.LogDebug("UtilizatorFormModal disposed successfully");
         }
-      catch (Exception ex)
+        catch (Exception ex)
         {
-      Logger.LogError(ex, "Error in UtilizatorFormModal dispose");
+            Logger.LogError(ex, "Error in UtilizatorFormModal dispose");
         }
-  }
+    }
 
     private void InitializeRolOptions()
     {
-  RolOptions = new List<RolOption>
+        RolOptions = new List<RolOption>
         {
             new() { Text = "Administrator", Value = "Administrator" },
         new() { Text = "Doctor", Value = "Doctor" },
@@ -103,11 +103,11 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
     private async Task LoadPersonalMedicalOptions()
     {
         if (_disposed) return;
-        
+
         try
         {
             IsLoadingLookups = true;
-         await InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
 
             var personalMedicalList = await PersonalMedicalRepository.GetAllAsync(
                 pageNumber: 1,
@@ -116,81 +116,81 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
      sortColumn: "Nume",
  sortDirection: "ASC");
 
-     if (_disposed) return;
-      
-   PersonalMedicalOptions = personalMedicalList
-      .Select(pm => new PersonalMedicalOption
-     {
-        Id = pm.PersonalID,
-        DisplayName = $"{pm.Nume} {pm.Prenume}" + 
-      (string.IsNullOrEmpty(pm.Specializare) ? "" : $" - {pm.Specializare}")
- })
-                .OrderBy(pm => pm.DisplayName)
-                .ToList();
+            if (_disposed) return;
 
-         Logger.LogInformation("Loaded {Count} personal medical options", PersonalMedicalOptions.Count);
+            PersonalMedicalOptions = personalMedicalList
+               .Select(pm => new PersonalMedicalOption
+               {
+                   Id = pm.PersonalID,
+                   DisplayName = $"{pm.Nume} {pm.Prenume}" +
+               (string.IsNullOrEmpty(pm.Specializare) ? "" : $" - {pm.Specializare}")
+               })
+                         .OrderBy(pm => pm.DisplayName)
+                         .ToList();
+
+            Logger.LogInformation("Loaded {Count} personal medical options", PersonalMedicalOptions.Count);
         }
         catch (Exception ex)
-     {
-            if (!_disposed)
-         {
-    Logger.LogError(ex, "Error loading personal medical options");
-            }
-        }
-     finally
         {
             if (!_disposed)
             {
-        IsLoadingLookups = false;
+                Logger.LogError(ex, "Error loading personal medical options");
+            }
+        }
+        finally
+        {
+            if (!_disposed)
+            {
+                IsLoadingLookups = false;
                 await InvokeAsync(StateHasChanged);
-   }
-  }
+            }
+        }
     }
 
     private void SetActiveTab(string tabName)
     {
-  if (_disposed) return;
-      ActiveTab = tabName;
+        if (_disposed) return;
+        ActiveTab = tabName;
         Logger.LogDebug("Tab changed to: {TabName}", tabName);
     }
 
     public async Task OpenForAdd()
-  {
+    {
         if (_disposed) return;
-  
-      try
+
+        try
         {
             Logger.LogInformation("Opening modal for ADD Utilizator");
 
-     Model = new UtilizatorFormModel
-          {
-      EsteActiv = true,
-  Rol = "Utilizator" // Default role
+            Model = new UtilizatorFormModel
+            {
+                EsteActiv = true,
+                Rol = "Utilizator" // Default role
             };
 
-  IsVisible = true;
-       IsLoading = false;
-  HasError = false;
-ErrorMessage = string.Empty;
+            IsVisible = true;
+            IsLoading = false;
+            HasError = false;
+            ErrorMessage = string.Empty;
             ActiveTab = "date-utilizator";
             ShowPassword = false;
-     GeneratedPassword = string.Empty;
+            GeneratedPassword = string.Empty;
 
             await InvokeAsync(StateHasChanged);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error opening modal for ADD");
-         HasError = true;
-        ErrorMessage = $"Eroare la deschiderea formularului: {ex.Message}";
+            HasError = true;
+            ErrorMessage = $"Eroare la deschiderea formularului: {ex.Message}";
         }
     }
 
     public async Task OpenForEdit(Guid utilizatorID)
     {
         if (_disposed) return;
-        
-   try
+
+        try
         {
             Logger.LogInformation("Opening modal for EDIT Utilizator: {UtilizatorID}", utilizatorID);
 
@@ -198,53 +198,53 @@ ErrorMessage = string.Empty;
             IsLoading = true;
             HasError = false;
             ErrorMessage = string.Empty;
-    ActiveTab = "date-utilizator";
+            ActiveTab = "date-utilizator";
             ShowPassword = false;
-  GeneratedPassword = string.Empty;
+            GeneratedPassword = string.Empty;
 
-      await InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
 
-       var query = new GetUtilizatorByIdQuery(utilizatorID);
-var result = await Mediator.Send(query);
+            var query = new GetUtilizatorByIdQuery(utilizatorID);
+            var result = await Mediator.Send(query);
 
             if (_disposed) return;
 
-        if (result.IsSuccess && result.Value != null)
-  {
-    var data = result.Value;
+            if (result.IsSuccess && result.Value != null)
+            {
+                var data = result.Value;
 
-    Model = new UtilizatorFormModel
-              {
-            UtilizatorID = data.UtilizatorID,
-     PersonalMedicalID = data.PersonalMedicalID,
-         Username = data.Username,
-        Email = data.Email,
-  Rol = data.Rol,
-         EsteActiv = data.EsteActiv,
-        Password = string.Empty // Don't load password (security)
-          };
+                Model = new UtilizatorFormModel
+                {
+                    UtilizatorID = data.UtilizatorID,
+                    PersonalMedicalID = data.PersonalMedicalID,
+                    Username = data.Username,
+                    Email = data.Email,
+                    Rol = data.Rol,
+                    EsteActiv = data.EsteActiv,
+                    Password = string.Empty // Don't load password (security)
+                };
 
-       Logger.LogInformation("Data loaded for EDIT mode: {Username}", Model.Username);
-}
-      else
-        {
-       HasError = true;
-    ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele";
+                Logger.LogInformation("Data loaded for EDIT mode: {Username}", Model.Username);
+            }
+            else
+            {
+                HasError = true;
+                ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele";
                 Logger.LogWarning("Failed to load data: {Error}", ErrorMessage);
             }
 
             IsLoading = false;
             await InvokeAsync(StateHasChanged);
         }
- catch (Exception ex)
+        catch (Exception ex)
         {
-   if (!_disposed)
-          {
-        Logger.LogError(ex, "Error opening modal for EDIT");
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Error opening modal for EDIT");
                 HasError = true;
                 ErrorMessage = $"Eroare la incarcarea datelor: {ex.Message}";
-            IsLoading = false;
-   await InvokeAsync(StateHasChanged);
+                IsLoading = false;
+                await InvokeAsync(StateHasChanged);
             }
         }
     }
@@ -252,27 +252,27 @@ var result = await Mediator.Send(query);
     public async Task Close()
     {
         if (_disposed) return;
-        
+
         Logger.LogInformation("Closing modal");
         IsVisible = false;
-     await InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
 
-      if (OnClosed.HasDelegate)
+        if (OnClosed.HasDelegate)
         {
-      await OnClosed.InvokeAsync();
+            await OnClosed.InvokeAsync();
         }
 
         await Task.Delay(300);
 
         if (!_disposed)
         {
-       Model = new UtilizatorFormModel();
-  IsLoading = false;
-      HasError = false;
-  ErrorMessage = string.Empty;
-       ActiveTab = "date-utilizator";
-  ShowPassword = false;
-      GeneratedPassword = string.Empty;
+            Model = new UtilizatorFormModel();
+            IsLoading = false;
+            HasError = false;
+            ErrorMessage = string.Empty;
+            ActiveTab = "date-utilizator";
+            ShowPassword = false;
+            GeneratedPassword = string.Empty;
         }
     }
 
@@ -285,17 +285,17 @@ var result = await Mediator.Send(query);
     private async Task HandleSubmit()
     {
         if (_disposed) return;
-        
- try
-     {
-   Logger.LogInformation("Submitting form: IsEditMode={IsEditMode}", Model.IsEditMode);
+
+        try
+        {
+            Logger.LogInformation("Submitting form: IsEditMode={IsEditMode}", Model.IsEditMode);
 
             IsSaving = true;
-          HasError = false;
+            HasError = false;
             ErrorMessage = string.Empty;
-await InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
 
-if (Model.IsEditMode)
+            if (Model.IsEditMode)
             {
                 var command = new UpdateUtilizatorCommand
                 {
@@ -325,69 +325,69 @@ if (Model.IsEditMode)
                     Logger.LogWarning("Failed to update: {Error}", ErrorMessage);
                 }
             }
- else
+            else
             {
-          // ADD MODE - Password required
-      if (string.IsNullOrWhiteSpace(Model.Password))
+                // ADD MODE - Password required
+                if (string.IsNullOrWhiteSpace(Model.Password))
                 {
-    HasError = true;
-   ErrorMessage = "Parola este obligatorie pentru utilizator nou";
-         IsSaving = false;
-         await InvokeAsync(StateHasChanged);
-         return;
+                    HasError = true;
+                    ErrorMessage = "Parola este obligatorie pentru utilizator nou";
+                    IsSaving = false;
+                    await InvokeAsync(StateHasChanged);
+                    return;
                 }
 
-     var command = new CreateUtilizatorCommand
-        {
-   PersonalMedicalID = Model.PersonalMedicalID!.Value,
-   Username = Model.Username,
-       Email = Model.Email,
-            Password = Model.Password, // Will be hashed by handler with BCrypt
-       Rol = Model.Rol,
-EsteActiv = Model.EsteActiv,
-    CreatDe = "CurrentUser" // TODO: Get from auth context
-     };
-
-        var result = await Mediator.Send(command);
-
-       if (_disposed) return;
-
-         if (result.IsSuccess)
+                var command = new CreateUtilizatorCommand
                 {
-     Logger.LogInformation("Utilizator created successfully: {UtilizatorID}", result.Value);
-     await OnUtilizatorSaved.InvokeAsync();
-         await Close();
-  }
-    else
-  {
-             HasError = true;
-        ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare la creare" });
-            Logger.LogWarning("Failed to create: {Error}", ErrorMessage);
-  }
-         }
-   }
+                    PersonalMedicalID = Model.PersonalMedicalID!.Value,
+                    Username = Model.Username,
+                    Email = Model.Email,
+                    Password = Model.Password, // Will be hashed by handler with BCrypt
+                    Rol = Model.Rol,
+                    EsteActiv = Model.EsteActiv,
+                    CreatDe = "CurrentUser" // TODO: Get from auth context
+                };
+
+                var result = await Mediator.Send(command);
+
+                if (_disposed) return;
+
+                if (result.IsSuccess)
+                {
+                    Logger.LogInformation("Utilizator created successfully: {UtilizatorID}", result.Value);
+                    await OnUtilizatorSaved.InvokeAsync();
+                    await Close();
+                }
+                else
+                {
+                    HasError = true;
+                    ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare la creare" });
+                    Logger.LogWarning("Failed to create: {Error}", ErrorMessage);
+                }
+            }
+        }
         catch (Exception ex)
         {
-     if (!_disposed)
+            if (!_disposed)
             {
-Logger.LogError(ex, "Error submitting form");
- HasError = true;
+                Logger.LogError(ex, "Error submitting form");
+                HasError = true;
                 ErrorMessage = $"Eroare: {ex.Message}";
             }
-      }
-      finally
-    {
+        }
+        finally
+        {
             if (!_disposed)
-    {
-IsSaving = false;
-   await InvokeAsync(StateHasChanged);
-      }
+            {
+                IsSaving = false;
+                await InvokeAsync(StateHasChanged);
+            }
         }
     }
 
     private void TogglePasswordVisibility()
     {
-      ShowPassword = !ShowPassword;
+        ShowPassword = !ShowPassword;
     }
 
     private void GenerateRandomPassword()
@@ -397,25 +397,25 @@ IsSaving = false;
             // Generate password with BCrypt PasswordHasher
             GeneratedPassword = PasswordHasher.GenerateRandomPassword(12, includeSpecialChars: true);
             Model.Password = GeneratedPassword;
-     
+
             Logger.LogInformation("Random password generated");
         }
         catch (Exception ex)
-     {
-        Logger.LogError(ex, "Error generating random password");
-  }
+        {
+            Logger.LogError(ex, "Error generating random password");
+        }
     }
 
     private async Task CopyPasswordToClipboard()
     {
         try
-     {
+        {
             await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", GeneratedPassword);
-          Logger.LogInformation("Password copied to clipboard");
+            Logger.LogInformation("Password copied to clipboard");
         }
         catch (Exception ex)
         {
-        Logger.LogError(ex, "Error copying password to clipboard");
+            Logger.LogError(ex, "Error copying password to clipboard");
         }
     }
 
@@ -428,19 +428,19 @@ IsSaving = false;
 
         [Required(ErrorMessage = "Username este obligatoriu")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Username trebuie sa aiba intre 3 si 100 caractere")]
-public string Username { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
 
- [Required(ErrorMessage = "Email este obligatoriu")]
+        [Required(ErrorMessage = "Email este obligatoriu")]
         [EmailAddress(ErrorMessage = "Email invalid")]
-  public string Email { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
 
-  [Required(ErrorMessage = "Rol este obligatoriu")]
+        [Required(ErrorMessage = "Rol este obligatoriu")]
         public string Rol { get; set; } = "Utilizator";
 
         public bool EsteActiv { get; set; } = true;
 
-    // Password - required only for ADD mode
-    [StringLength(100, MinimumLength = 8, ErrorMessage = "Parola trebuie sa aiba minim 8 caractere")]
+        // Password - required only for ADD mode
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Parola trebuie sa aiba minim 8 caractere")]
         public string? Password { get; set; }
 
         public bool IsEditMode => UtilizatorID.HasValue && UtilizatorID.Value != Guid.Empty;

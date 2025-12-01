@@ -23,7 +23,7 @@ public class GetUpcomingProgramariQuery : IRequest<Result<IEnumerable<Programare
     public GetUpcomingProgramariQuery(int days = 7, Guid? doctorID = null)
     {
         Days = days;
-DoctorID = doctorID;
+        DoctorID = doctorID;
     }
 
     public GetUpcomingProgramariQuery()

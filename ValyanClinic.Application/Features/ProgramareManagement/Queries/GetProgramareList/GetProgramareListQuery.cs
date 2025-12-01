@@ -30,13 +30,13 @@ public class GetProgramareListQuery : IRequest<PagedResult<ProgramareListDto>>
     /// </summary>
     public Guid? FilterDoctorID { get; set; }
 
-  /// <summary>
+    /// <summary>
     /// Filtru după ID-ul pacientului.
     /// </summary>
     public Guid? FilterPacientID { get; set; }
 
     /// <summary>
-  /// Data de început pentru interval (implicit: prima zi a lunii curente).
+    /// Data de început pentru interval (implicit: prima zi a lunii curente).
     /// </summary>
     public DateTime? FilterDataStart { get; set; }
 
@@ -47,7 +47,7 @@ public class GetProgramareListQuery : IRequest<PagedResult<ProgramareListDto>>
 
     /// <summary>
     /// Filtru după status programare.
-  /// </summary>
+    /// </summary>
     public string? FilterStatus { get; set; }
 
     /// <summary>

@@ -14,20 +14,20 @@ public partial class InvestigatiiTab : ComponentBase
     [Parameter] public EventCallback OnChanged { get; set; }
     [Parameter] public EventCallback OnSectionCompleted { get; set; }
     [Parameter] public bool ShowValidation { get; set; } = false;
-    
+
     private bool IsSectionCompleted => IsInvestigatiiCompleted();
-    
+
     private async Task OnFieldChanged()
     {
         await OnChanged.InvokeAsync();
-        
+
         // Check if section is completed
         if (IsSectionCompleted)
         {
             await OnSectionCompleted.InvokeAsync();
         }
     }
-    
+
     /// <summary>
     /// Verifică dacă secțiunea Investigații este completă
     /// Considerăm completă dacă cel puțin două tipuri de investigații sunt completate
@@ -35,12 +35,12 @@ public partial class InvestigatiiTab : ComponentBase
     private bool IsInvestigatiiCompleted()
     {
         var completedCount = 0;
-        
+
         if (!string.IsNullOrWhiteSpace(Model.InvestigatiiLaborator)) completedCount++;
         if (!string.IsNullOrWhiteSpace(Model.InvestigatiiImagistice)) completedCount++;
         if (!string.IsNullOrWhiteSpace(Model.InvestigatiiEKG)) completedCount++;
         if (!string.IsNullOrWhiteSpace(Model.AlteInvestigatii)) completedCount++;
-        
+
         // Cel puțin 2 tipuri de investigații completate
         return completedCount >= 2;
     }

@@ -13,7 +13,7 @@ public interface IIMCCalculatorService
     /// <param name="inaltime">Înălțimea în centimetri</param>
     /// <returns>Rezultat complet cu valoare, categorie și interpretare</returns>
     IMCResult Calculate(decimal greutate, decimal inaltime);
-    
+
     /// <summary>
     /// Verifică dacă valorile sunt valide pentru calcul
     /// </summary>
@@ -21,7 +21,7 @@ public interface IIMCCalculatorService
     /// <param name="inaltime">Înălțimea în centimetri</param>
     /// <returns>True dacă valorile sunt în limite rezonabile</returns>
     bool AreValuesValid(decimal greutate, decimal inaltime);
-    
+
     /// <summary>
     /// Calculează greutatea ideală bazată pe înălțime (formula Lorentz)
     /// </summary>

@@ -24,8 +24,8 @@ public partial class ConfirmDeleteModal : ComponentBase, IDisposable
     private CancellationTokenSource? _countdownTokenSource;
     private const int CountdownDuration = 3;
 
-    private bool CanConfirm => 
-        !string.IsNullOrWhiteSpace(ConfirmationText) && 
+    private bool CanConfirm =>
+        !string.IsNullOrWhiteSpace(ConfirmationText) &&
         ConfirmationText.Trim().Equals("STERGE", StringComparison.OrdinalIgnoreCase) &&
         CountdownSeconds == 0 &&
         !IsLoading;
@@ -83,7 +83,7 @@ public partial class ConfirmDeleteModal : ComponentBase, IDisposable
         try
         {
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
-            
+
             while (CountdownSeconds > 0 && await timer.WaitForNextTickAsync(token))
             {
                 CountdownSeconds--;
@@ -119,7 +119,7 @@ public partial class ConfirmDeleteModal : ComponentBase, IDisposable
             {
                 await OnConfirmed.InvokeAsync(ItemId);
             }
-            
+
             await Close();
         }
         catch (Exception ex)
@@ -135,12 +135,12 @@ public partial class ConfirmDeleteModal : ComponentBase, IDisposable
     private async Task RetryDelete()
     {
         Logger.LogInformation("Retry stergere: {ItemName} ({ItemId})", ItemName, ItemId);
-        
+
         HasError = false;
         ErrorMessage = string.Empty;
         ConfirmationText = string.Empty;
         StateHasChanged();
-        
+
         await StartCountdown();
     }
 

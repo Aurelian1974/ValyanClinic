@@ -9,17 +9,17 @@ public partial class ExamenTab : ComponentBase
     [Parameter] public EventCallback OnChanged { get; set; }
     [Parameter] public EventCallback OnSectionCompleted { get; set; }
     [Parameter] public bool ShowValidation { get; set; } = false;
-    
-    private bool IsComplete => 
+
+    private bool IsComplete =>
         !string.IsNullOrWhiteSpace(Model.StareGenerala) ||
         !string.IsNullOrWhiteSpace(Model.TensiuneArteriala) ||
         Model.Greutate.HasValue ||
         Model.Inaltime.HasValue;
-    
+
     private async Task OnFieldChanged()
     {
         await OnChanged.InvokeAsync();
-        
+
         if (IsComplete)
         {
             await OnSectionCompleted.InvokeAsync();

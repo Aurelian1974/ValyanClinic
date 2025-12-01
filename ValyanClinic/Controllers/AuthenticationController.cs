@@ -133,7 +133,7 @@ public class AuthenticationController : ControllerBase
                 principal,
                 CreateAuthenticationProperties());
 
-            _logger.LogInformation("User authenticated successfully: {Username} (Role: {Role})", 
+            _logger.LogInformation("User authenticated successfully: {Username} (Role: {Role})",
                 request.Username, result.Value.Rol);
 
             // Return user data for client-side state
@@ -178,11 +178,11 @@ public class AuthenticationController : ControllerBase
         try
         {
             var username = User.Identity?.Name ?? "Unknown";
-            
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            
+
             _logger.LogInformation("User logged out successfully: {Username}", username);
-            
+
             return Ok(new { success = true });
         }
         catch (Exception ex)
@@ -290,14 +290,14 @@ public class AuthenticationController : ControllerBase
         try
         {
             _logger.LogInformation("Testing hash verification (DEBUG)");
-            
+
             // Direct instantiation for debug only
             var hasher = new ValyanClinic.Infrastructure.Security.BCryptPasswordHasher(
                 _logger as ILogger<ValyanClinic.Infrastructure.Security.BCryptPasswordHasher>);
-    
+
             bool isValid = hasher.VerifyPassword(request.Password, request.Hash);
             string newHash = hasher.HashPassword(request.Password);
-     
+
             _logger.LogInformation("Hash verification result: {Result}", isValid);
 
             return Ok(new
@@ -335,20 +335,20 @@ public class AuthenticationController : ControllerBase
         try
         {
             _logger.LogInformation("Password reset request (DEBUG) for user: {Username}", request.Username);
-            
+
             // Generate and verify new hash
             var hasher = new ValyanClinic.Infrastructure.Security.BCryptPasswordHasher(
                 _logger as ILogger<ValyanClinic.Infrastructure.Security.BCryptPasswordHasher>);
-            
+
             string newHash = hasher.HashPassword(request.NewPassword);
             bool testVerify = hasher.VerifyPassword(request.NewPassword, newHash);
-            
+
             if (!testVerify)
             {
                 _logger.LogError("Generated hash failed verification!");
                 return BadRequest(new { error = "Generated hash failed verification" });
             }
-            
+
             // Update password using command
             var changePasswordCommand = new ValyanClinic.Application.Features.UtilizatorManagement.Commands.ChangePassword.ChangePasswordCommand
             {
@@ -356,13 +356,13 @@ public class AuthenticationController : ControllerBase
                 NewPassword = request.NewPassword,
                 ModificatDe = "DevSupport_PasswordFix"
             };
-            
+
             var result = await _mediator.Send(changePasswordCommand);
-            
+
             if (result.IsSuccess)
             {
                 _logger.LogInformation("Password reset successful (DEBUG) for user: {Username}", request.Username);
-                
+
                 return Ok(new
                 {
                     success = true,

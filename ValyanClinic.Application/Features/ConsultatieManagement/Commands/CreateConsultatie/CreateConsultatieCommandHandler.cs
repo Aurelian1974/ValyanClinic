@@ -43,7 +43,7 @@ public class CreateConsultatieCommandHandler : IRequestHandler<CreateConsultatie
                 ProgramareID = request.ProgramareID,
                 PacientID = request.PacientID,
                 MedicID = request.MedicID,
-                
+
                 DataConsultatie = DateTime.Now.Date,
                 OraConsultatie = DateTime.Now.TimeOfDay,
                 TipConsultatie = request.TipConsultatie,

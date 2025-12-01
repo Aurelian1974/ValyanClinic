@@ -19,13 +19,13 @@ public class DataGridStateService<T> : IDataGridStateService<T> where T : class
     public int CurrentPage => _currentPage;
     public int PageSize => _pageSize;
     public int TotalPages => _filteredData.Count == 0 ? 1 : (int)Math.Ceiling((double)_filteredData.Count / _pageSize);
-    
+
     public int DisplayedRecordsStart => _filteredData.Count == 0 ? 0 : (_currentPage - 1) * _pageSize + 1;
     public int DisplayedRecordsEnd => Math.Min(_currentPage * _pageSize, _filteredData.Count);
-    
+
     public int TotalFilteredRecords => _filteredData.Count;
     public int TotalRecords => _allData.Count;
-    
+
     public bool HasPreviousPage => _currentPage > 1;
     public bool HasNextPage => _currentPage < TotalPages;
 
@@ -131,7 +131,7 @@ public class DataGridStateService<T> : IDataGridStateService<T> where T : class
     public bool GoToPreviousPage()
     {
         if (!HasPreviousPage) return false;
-        
+
         _currentPage--;
         UpdatePagedData();
         OnStateChanged();
@@ -141,7 +141,7 @@ public class DataGridStateService<T> : IDataGridStateService<T> where T : class
     public bool GoToNextPage()
     {
         if (!HasNextPage) return false;
-        
+
         _currentPage++;
         UpdatePagedData();
         OnStateChanged();
@@ -151,7 +151,7 @@ public class DataGridStateService<T> : IDataGridStateService<T> where T : class
     public (int start, int end) GetPagerRange(int visiblePages = 5)
     {
         var totalPages = TotalPages;
-        
+
         if (totalPages <= visiblePages)
             return (1, totalPages);
 

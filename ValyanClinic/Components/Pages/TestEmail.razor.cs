@@ -20,14 +20,14 @@ public partial class TestEmail : ComponentBase
     [Inject] private IEmailService EmailService { get; set; } = default!;
     [Inject] private ILogger<TestEmail> Logger { get; set; } = default!;
     // JSRuntime is injected in .razor file with @inject
-    
+
     // === State Properties ===
     private string TestEmailAddress { get; set; } = string.Empty;
     private string EmailSubject { get; set; } = "🎉 Test Email - ValyanClinic";
     private bool IsLoading { get; set; }
     private bool IsSuccess { get; set; }
     private string ResultMessage { get; set; } = string.Empty;
-    
+
     // === Template System ===
     private string SelectedTemplate { get; set; } = "test";
     private Dictionary<string, TemplateInfo> Templates { get; set; } = new();
@@ -143,11 +143,11 @@ public partial class TestEmail : ComponentBase
     private void OpenTemplateManager()
     {
         Logger.LogInformation("🔷 OpenTemplateManager called - Current state: ShowTemplateManager={ShowTemplateManager}", ShowTemplateManager);
-        
+
         ShowTemplateManager = true;
         IsCreatingTemplate = false;
         EditingTemplateKey = null;
-        
+
         Logger.LogInformation("🔷 After setting: ShowTemplateManager={ShowTemplateManager}", ShowTemplateManager);
         StateHasChanged();
         Logger.LogInformation("🔷 StateHasChanged called");
@@ -156,12 +156,12 @@ public partial class TestEmail : ComponentBase
     private void CloseTemplateManager()
     {
         Logger.LogInformation("🔷 CloseTemplateManager called");
-        
+
         ShowTemplateManager = false;
         IsCreatingTemplate = false;
         EditingTemplateKey = null;
         ClearTemplateForm();
-        
+
         StateHasChanged();
     }
 
@@ -170,7 +170,7 @@ public partial class TestEmail : ComponentBase
         IsCreatingTemplate = true;
         EditingTemplateKey = null;
         ClearTemplateForm();
-        
+
         // Set default HTML template
         NewTemplateHtml = @"<div style='font-family: -apple-system, BlinkMacSystemFont, ""Segoe UI"", Roboto, sans-serif; max-width: 600px; margin: 0 auto;'>
     <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 16px 16px 0 0;'>
@@ -195,13 +195,13 @@ public partial class TestEmail : ComponentBase
 
         EditingTemplateKey = templateKey;
         IsCreatingTemplate = false;
-        
+
         var template = Templates[templateKey];
         NewTemplateName = template.Name;
         NewTemplateDescription = template.Description;
         NewTemplateIcon = template.Icon;
         NewTemplateHtml = template.CustomHtml;
-        
+
         ShowTemplateManager = true;
     }
 
@@ -224,7 +224,7 @@ public partial class TestEmail : ComponentBase
         try
         {
             string templateKey;
-            
+
             if (EditingTemplateKey != null)
             {
                 // Edit existing template
@@ -253,10 +253,10 @@ public partial class TestEmail : ComponentBase
             }
 
             await SaveCustomTemplatesToStorage();
-            
+
             ResultMessage = $"✅ Template '{NewTemplateName}' salvat cu succes!";
             IsSuccess = true;
-            
+
             CloseTemplateManager();
             StateHasChanged();
         }
@@ -306,20 +306,20 @@ public partial class TestEmail : ComponentBase
         {
             var templateName = Templates[DeletingTemplateKey].Name;
             Templates.Remove(DeletingTemplateKey);
-            
+
             await SaveCustomTemplatesToStorage();
-            
+
             Logger.LogInformation("Deleted template: {TemplateKey}", DeletingTemplateKey);
-            
+
             ResultMessage = $"✅ Template '{templateName}' șters cu succes!";
             IsSuccess = true;
-            
+
             // If deleted template was selected, switch to default
             if (SelectedTemplate == DeletingTemplateKey)
             {
                 SelectedTemplate = "test";
             }
-            
+
             CancelDelete();
             StateHasChanged();
         }
@@ -350,14 +350,14 @@ public partial class TestEmail : ComponentBase
             "custom" => "📧 Email Personalizat",
             _ => Templates.ContainsKey(templateKey) ? $"📧 {Templates[templateKey].Name}" : "Email - ValyanClinic"
         };
-        
+
         // Load custom HTML if it's a custom template
         if (Templates.ContainsKey(templateKey) && !Templates[templateKey].IsDefault && !string.IsNullOrEmpty(Templates[templateKey].CustomHtml))
         {
             CustomMessageHtml = Templates[templateKey].CustomHtml;
             CustomMessageText = Regex.Replace(CustomMessageHtml, "<.*?>", string.Empty);
         }
-        
+
         StateHasChanged();
     }
 
@@ -425,7 +425,7 @@ public partial class TestEmail : ComponentBase
     private void ToggleEditorMode(bool htmlMode)
     {
         IsHtmlMode = htmlMode;
-        
+
         if (htmlMode && !string.IsNullOrEmpty(CustomMessageText))
         {
             CustomMessageHtml = $"<p>{CustomMessageText.Replace("\n", "</p><p>")}</p>";
@@ -434,14 +434,14 @@ public partial class TestEmail : ComponentBase
         {
             CustomMessageText = Regex.Replace(CustomMessageHtml, "<.*?>", string.Empty);
         }
-        
+
         StateHasChanged();
     }
 
     private void InsertFormatting(string format)
     {
         var placeholder = "[text]";
-        
+
         CustomMessageText += format switch
         {
             "bold" => $" <strong>{placeholder}</strong>",
@@ -452,7 +452,7 @@ public partial class TestEmail : ComponentBase
             "link" => $" <a href='#'>{placeholder}</a>",
             _ => ""
         };
-        
+
         StateHasChanged();
     }
 
@@ -486,7 +486,7 @@ public partial class TestEmail : ComponentBase
     }
 
     // === Send Email ===
-    
+
     private async Task SendTestEmail()
     {
         if (string.IsNullOrWhiteSpace(TestEmailAddress) || !IsEmailValid)
@@ -495,11 +495,11 @@ public partial class TestEmail : ComponentBase
             IsSuccess = false;
             return;
         }
-        
+
         IsLoading = true;
         ResultMessage = string.Empty;
         StateHasChanged();
-     
+
         try
         {
             var message = new EmailMessageDto
@@ -512,17 +512,17 @@ public partial class TestEmail : ComponentBase
                 ReplyToName = "ValyanClinic Support"
             };
 
-            Logger.LogInformation("📧 Sending test email to: {Email} with template: {Template}", 
+            Logger.LogInformation("📧 Sending test email to: {Email} with template: {Template}",
                 TestEmailAddress, SelectedTemplate);
-    
+
             var success = await EmailService.SendEmailAsync(message);
-            
+
             if (success)
             {
                 IsSuccess = true;
                 ResultMessage = $"✅ Email trimis cu succes la {TestEmailAddress}!";
                 Logger.LogInformation("✅ Test email sent successfully!");
-                
+
                 RecentSends.Insert(0, new EmailSendRecord
                 {
                     To = TestEmailAddress,
@@ -530,7 +530,7 @@ public partial class TestEmail : ComponentBase
                     Success = true,
                     SentAt = DateTime.Now
                 });
-                
+
                 EmailsSentToday++;
                 UpdateSuccessRate();
             }
@@ -539,7 +539,7 @@ public partial class TestEmail : ComponentBase
                 IsSuccess = false;
                 ResultMessage = "❌ Eroare la trimiterea email-ului. Verifică SMTP config.";
                 Logger.LogError("❌ Failed to send test email");
-                
+
                 RecentSends.Insert(0, new EmailSendRecord
                 {
                     To = TestEmailAddress,
@@ -547,7 +547,7 @@ public partial class TestEmail : ComponentBase
                     Success = false,
                     SentAt = DateTime.Now
                 });
-                
+
                 UpdateSuccessRate();
             }
         }
@@ -556,7 +556,7 @@ public partial class TestEmail : ComponentBase
             IsSuccess = false;
             ResultMessage = $"❌ Excepție: {ex.Message}";
             Logger.LogError(ex, "❌ Exception while sending test email");
-            
+
             RecentSends.Insert(0, new EmailSendRecord
             {
                 To = TestEmailAddress,
@@ -564,7 +564,7 @@ public partial class TestEmail : ComponentBase
                 Success = false,
                 SentAt = DateTime.Now
             });
-            
+
             UpdateSuccessRate();
         }
         finally
@@ -666,7 +666,7 @@ public partial class TestEmail : ComponentBase
     private string GenerateCustomEmailHtmlFromEditor()
     {
         var content = IsHtmlMode ? CustomMessageHtml : $"<p>{CustomMessageText.Replace("\n", "</p><p>")}</p>";
-        
+
         return $@"
 <div style='font-family: -apple-system, BlinkMacSystemFont, ""Segoe UI"", Roboto, sans-serif; max-width: 600px; margin: 0 auto;'>
     <div style='background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 2rem; border-radius: 16px 16px 0 0;'>

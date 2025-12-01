@@ -36,7 +36,7 @@ public class MemoryCacheService : ICacheService
     public Task SetAsync<T>(string key, T value, TimeSpan? expiration = null, CancellationToken cancellationToken = default)
     {
         var options = new MemoryCacheEntryOptions();
-        
+
         if (expiration.HasValue)
         {
             options.AbsoluteExpirationRelativeToNow = expiration.Value;
@@ -48,7 +48,7 @@ public class MemoryCacheService : ICacheService
 
         _cache.Set(key, value, options);
         _keys.TryAdd(key, 0);
-        
+
         return Task.CompletedTask;
     }
 
@@ -62,13 +62,13 @@ public class MemoryCacheService : ICacheService
     public Task RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
     {
         var keysToRemove = _keys.Keys.Where(k => k.StartsWith(prefix)).ToList();
-        
+
         foreach (var key in keysToRemove)
         {
             _cache.Remove(key);
             _keys.TryRemove(key, out _);
         }
-        
+
         return Task.CompletedTask;
     }
 }

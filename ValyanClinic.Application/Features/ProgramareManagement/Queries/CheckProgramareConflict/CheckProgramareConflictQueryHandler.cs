@@ -35,7 +35,7 @@ public class CheckProgramareConflictQueryHandler : IRequestHandler<CheckPrograma
          $"{request.OraInceput:hh\\:mm}-{request.OraSfarsit:hh\\:mm}",
    request.ExcludeProgramareID);
 
-  // Apelăm metoda CheckConflictAsync din repository
+            // Apelăm metoda CheckConflictAsync din repository
             var hasConflict = await _programareRepository.CheckConflictAsync(
    request.DoctorID,
         request.DataProgramare,
@@ -44,23 +44,23 @@ public class CheckProgramareConflictQueryHandler : IRequestHandler<CheckPrograma
  request.ExcludeProgramareID,
            cancellationToken);
 
-  if (hasConflict)
+            if (hasConflict)
             {
-  _logger.LogWarning(
-      "Conflict detectat pentru doctor {DoctorID} la data {Data} în intervalul {Interval}",
-          request.DoctorID,
- request.DataProgramare.ToString("yyyy-MM-dd"),
-          $"{request.OraInceput:hh\\:mm}-{request.OraSfarsit:hh\\:mm}");
-}
+                _logger.LogWarning(
+                    "Conflict detectat pentru doctor {DoctorID} la data {Data} în intervalul {Interval}",
+                        request.DoctorID,
+               request.DataProgramare.ToString("yyyy-MM-dd"),
+                        $"{request.OraInceput:hh\\:mm}-{request.OraSfarsit:hh\\:mm}");
+            }
             else
             {
-    _logger.LogInformation("Nu există conflict - intervalul este liber");
+                _logger.LogInformation("Nu există conflict - intervalul este liber");
             }
 
-      return Result<bool>.Success(hasConflict);
+            return Result<bool>.Success(hasConflict);
         }
-      catch (Exception ex)
-    {
+        catch (Exception ex)
+        {
             _logger.LogError(ex, "Eroare la verificarea conflictului de programare");
             return Result<bool>.Failure("Eroare la verificarea disponibilității. Vă rugăm să încercați din nou.");
         }

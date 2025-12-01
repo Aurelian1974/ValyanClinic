@@ -9,7 +9,7 @@ public class NotFoundException : Exception
         : base($"Entitatea '{entityName}' cu ID-ul '{key}' nu a fost gasita.")
     {
     }
-    
+
     public NotFoundException(string message)
         : base(message)
     {

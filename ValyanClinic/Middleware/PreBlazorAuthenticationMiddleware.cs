@@ -17,26 +17,26 @@ public class PreBlazorAuthenticationMiddleware
  RequestDelegate next,
         ILogger<PreBlazorAuthenticationMiddleware> logger)
     {
-   _next = next;
-     _logger = logger;
+        _next = next;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
-  {
-      // Check for authentication request header (set by Blazor component)
+    {
+        // Check for authentication request header (set by Blazor component)
         if (context.Request.Headers.TryGetValue("X-Auth-Credentials", out var credentialsHeader))
-      {
-      try
+        {
+            try
             {
-   var credentials = JsonSerializer.Deserialize<AuthCredentials>(credentialsHeader.ToString());
-              
-           if (credentials != null)
+                var credentials = JsonSerializer.Deserialize<AuthCredentials>(credentialsHeader.ToString());
+
+                if (credentials != null)
                 {
-   // Here you would validate credentials and create claims
-   // For now, we'll assume validation is done elsewhere
-      
-   var claims = new[]
-            {
+                    // Here you would validate credentials and create claims
+                    // For now, we'll assume validation is done elsewhere
+
+                    var claims = new[]
+                             {
    new Claim(ClaimTypes.NameIdentifier, credentials.UtilizatorID.ToString()),
          new Claim(ClaimTypes.Name, credentials.Username),
     new Claim(ClaimTypes.Email, credentials.Email),
@@ -44,36 +44,36 @@ public class PreBlazorAuthenticationMiddleware
     new Claim("LoginTime", DateTime.UtcNow.ToString("O"))
             };
 
-    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-      var principal = new ClaimsPrincipal(identity);
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var principal = new ClaimsPrincipal(identity);
 
-   await context.SignInAsync(
-   CookieAuthenticationDefaults.AuthenticationScheme,
-     principal,
-                new AuthenticationProperties
-        {
-    IsPersistent = credentials.RememberMe,
-             ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
-           });
+                    await context.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                      principal,
+                                 new AuthenticationProperties
+                                 {
+                                     IsPersistent = credentials.RememberMe,
+                                     ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+                                 });
 
-    context.User = principal;
-         
- _logger.LogInformation("User authenticated via middleware: {Username}", credentials.Username);
-      }
-    }
+                    context.User = principal;
+
+                    _logger.LogInformation("User authenticated via middleware: {Username}", credentials.Username);
+                }
+            }
             catch (Exception ex)
             {
-          _logger.LogError(ex, "Error in PreBlazorAuthenticationMiddleware");
-       }
-   }
+                _logger.LogError(ex, "Error in PreBlazorAuthenticationMiddleware");
+            }
+        }
 
-      await _next(context);
+        await _next(context);
     }
 
-  private class AuthCredentials
+    private class AuthCredentials
     {
-   public Guid UtilizatorID { get; set; }
- public string Username { get; set; } = string.Empty;
+        public Guid UtilizatorID { get; set; }
+        public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Rol { get; set; } = string.Empty;
         public bool RememberMe { get; set; }

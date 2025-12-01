@@ -7,7 +7,7 @@ namespace ValyanClinic.Application.Features.ProgramareManagement.Queries.CheckPr
 /// </summary>
 public class CheckProgramareConflictQueryValidator : AbstractValidator<CheckProgramareConflictQuery>
 {
-public CheckProgramareConflictQueryValidator()
+    public CheckProgramareConflictQueryValidator()
     {
         RuleFor(x => x.DoctorID)
      .NotEmpty().WithMessage("ID-ul medicului este obligatoriu.")
@@ -19,8 +19,8 @@ public CheckProgramareConflictQueryValidator()
         RuleFor(x => x.OraInceput)
    .NotEmpty().WithMessage("Ora de început este obligatorie.");
 
-     RuleFor(x => x.OraSfarsit)
-    .NotEmpty().WithMessage("Ora de sfârșit este obligatorie.");
+        RuleFor(x => x.OraSfarsit)
+       .NotEmpty().WithMessage("Ora de sfârșit este obligatorie.");
 
         RuleFor(x => x)
       .Must(x => x.OraSfarsit > x.OraInceput)

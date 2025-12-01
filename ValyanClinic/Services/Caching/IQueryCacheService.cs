@@ -9,8 +9,8 @@ public interface IQueryCacheService
     /// Obține valoare din cache sau execută funcția și cache-uiește rezultatul
     /// </summary>
     Task<T?> GetOrCreateAsync<T>(
-        string cacheKey, 
-        Func<Task<T>> factory, 
+        string cacheKey,
+        Func<Task<T>> factory,
         TimeSpan? expiration = null);
 
     /// <summary>

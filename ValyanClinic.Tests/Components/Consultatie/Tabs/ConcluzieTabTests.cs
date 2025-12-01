@@ -12,45 +12,45 @@ namespace ValyanClinic.Tests.Components.Consultatie;
 public class ConcluzieTabTests
 {
     #region Test Setup
-    
+
     private static ConcluzieTab CreateComponent(CreateConsultatieCommand? model = null)
     {
         var component = new ConcluzieTab();
-        
+
         var modelProperty = typeof(ConcluzieTab).GetProperty(nameof(ConcluzieTab.Model));
         modelProperty?.SetValue(component, model ?? new CreateConsultatieCommand());
-        
+
         var isActiveProperty = typeof(ConcluzieTab).GetProperty(nameof(ConcluzieTab.IsActive));
         isActiveProperty?.SetValue(component, true);
-        
+
         return component;
     }
-    
+
     private static bool GetIsSectionCompleted(ConcluzieTab component)
     {
-        var property = typeof(ConcluzieTab).GetProperty("IsSectionCompleted", 
+        var property = typeof(ConcluzieTab).GetProperty("IsSectionCompleted",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         return (bool)(property?.GetValue(component) ?? false);
     }
-    
+
     #endregion
 
     #region Validation Tests
-    
+
     [Fact(DisplayName = "IsSectionCompleted - Câmpuri goale returnează false")]
     public void IsSectionCompleted_EmptyFields_ReturnsFalse()
     {
         // Arrange
         var model = new CreateConsultatieCommand();
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("niciun câmp obligatoriu nu este completat");
     }
-    
+
     [Fact(DisplayName = "IsSectionCompleted - Doar Prognostic nu e suficient")]
     public void IsSectionCompleted_OnlyPrognostic_ReturnsFalse()
     {
@@ -60,14 +60,14 @@ public class ConcluzieTabTests
             Prognostic = "Favorabil"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("concluzia lipsește");
     }
-    
+
     [Fact(DisplayName = "IsSectionCompleted - Doar Concluzie nu e suficient")]
     public void IsSectionCompleted_OnlyConcluzie_ReturnsFalse()
     {
@@ -77,14 +77,14 @@ public class ConcluzieTabTests
             Concluzie = "Evoluție favorabilă"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("prognosticul lipsește");
     }
-    
+
     [Fact(DisplayName = "IsSectionCompleted - Ambele obligatorii completate returnează true")]
     public void IsSectionCompleted_BothRequired_ReturnsTrue()
     {
@@ -95,14 +95,14 @@ public class ConcluzieTabTests
             Concluzie = "Evoluție favorabilă"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("ambele câmpuri obligatorii sunt completate");
     }
-    
+
     [Fact(DisplayName = "IsSectionCompleted - Toate câmpurile completate")]
     public void IsSectionCompleted_AllFields_ReturnsTrue()
     {
@@ -115,18 +115,18 @@ public class ConcluzieTabTests
             NotePacient = "Mulțumit"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue("toate câmpurile sunt completate");
     }
-    
+
     #endregion
-    
+
     #region Prognostic Tests
-    
+
     [Theory(DisplayName = "Prognostic - Valorile valide sunt acceptate")]
     [InlineData("Favorabil")]
     [InlineData("Rezervat")]
@@ -140,15 +140,15 @@ public class ConcluzieTabTests
             Concluzie = "Test"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue($"prognostic '{prognostic}' e valid");
         model.Prognostic.Should().Be(prognostic);
     }
-    
+
     [Fact(DisplayName = "Prognostic - String gol nu e valid")]
     public void Prognostic_EmptyString_NotValid()
     {
@@ -159,14 +159,14 @@ public class ConcluzieTabTests
             Concluzie = "Test"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("prognostic gol nu e valid");
     }
-    
+
     [Fact(DisplayName = "Prognostic - Whitespace nu e valid")]
     public void Prognostic_Whitespace_NotValid()
     {
@@ -177,18 +177,18 @@ public class ConcluzieTabTests
             Concluzie = "Test"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("whitespace nu e valid");
     }
-    
+
     #endregion
-    
+
     #region Concluzie Tests
-    
+
     [Fact(DisplayName = "Concluzie - Text scurt e valid")]
     public void Concluzie_ShortText_Valid()
     {
@@ -199,14 +199,14 @@ public class ConcluzieTabTests
             Concluzie = "Evoluție favorabilă"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
     }
-    
+
     [Fact(DisplayName = "Concluzie - Text lung e valid")]
     public void Concluzie_LongText_Valid()
     {
@@ -219,14 +219,14 @@ public class ConcluzieTabTests
                           Evoluție favorabilă așteptată în 7-10 zile."
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
     }
-    
+
     [Fact(DisplayName = "Concluzie - String gol nu e valid")]
     public void Concluzie_EmptyString_NotValid()
     {
@@ -237,18 +237,18 @@ public class ConcluzieTabTests
             Concluzie = ""
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeFalse("concluzie goală nu e validă");
     }
-    
+
     #endregion
-    
+
     #region Optional Fields Tests
-    
+
     [Fact(DisplayName = "ObservatiiMedic - Opțional, nu afectează validarea")]
     public void ObservatiiMedic_Optional_Valid()
     {
@@ -260,15 +260,15 @@ public class ConcluzieTabTests
             ObservatiiMedic = "Note interne"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
         model.ObservatiiMedic.Should().NotBeNullOrWhiteSpace();
     }
-    
+
     [Fact(DisplayName = "NotePacient - Opțional, nu afectează validarea")]
     public void NotePacient_Optional_Valid()
     {
@@ -280,19 +280,19 @@ public class ConcluzieTabTests
             NotePacient = "Pacient mulțumit"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
         model.NotePacient.Should().NotBeNullOrWhiteSpace();
     }
-    
+
     #endregion
-    
+
     #region Edge Cases
-    
+
     [Fact(DisplayName = "Edge Case - Text foarte lung")]
     public void EdgeCase_VeryLongText_Valid()
     {
@@ -304,14 +304,14 @@ public class ConcluzieTabTests
             Concluzie = longText
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
     }
-    
+
     [Fact(DisplayName = "Edge Case - Caractere speciale")]
     public void EdgeCase_SpecialCharacters_Valid()
     {
@@ -322,18 +322,18 @@ public class ConcluzieTabTests
             Concluzie = "Evoluție <>&\"' 中文 🎉"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
     }
-    
+
     #endregion
-    
+
     #region Real Scenarios
-    
+
     [Fact(DisplayName = "Scenariu Real - Prognostic favorabil standard")]
     public void RealScenario_StandardFavorable_Valid()
     {
@@ -348,15 +348,15 @@ public class ConcluzieTabTests
             NotePacient = "Alergie peniciline"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
         model.Prognostic.Should().Be("Favorabil");
     }
-    
+
     [Fact(DisplayName = "Scenariu Real - Caz sever cu prognostic rezervat")]
     public void RealScenario_SevereReserved_Valid()
     {
@@ -371,15 +371,15 @@ public class ConcluzieTabTests
             NotePacient = "Familie informată"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
         model.Prognostic.Should().Be("Rezervat");
     }
-    
+
     [Fact(DisplayName = "Scenariu Real - Control periodic")]
     public void RealScenario_RoutineCheckup_Valid()
     {
@@ -391,14 +391,14 @@ public class ConcluzieTabTests
             ObservatiiMedic = "Complianță bună"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
     }
-    
+
     [Fact(DisplayName = "Scenariu Real - Caz complex cu multiple comorbidități")]
     public void RealScenario_ComplexCase_Valid()
     {
@@ -413,14 +413,14 @@ public class ConcluzieTabTests
             NotePacient = "Familie îngrijorată"
         };
         var component = CreateComponent(model);
-        
+
         // Act
         var isCompleted = GetIsSectionCompleted(component);
-        
+
         // Assert
         isCompleted.Should().BeTrue();
         model.Concluzie.Should().Contain("comorbidități");
     }
-    
+
     #endregion
 }

@@ -45,14 +45,14 @@ public class PersonalRepository : BaseRepository, IPersonalRepository
             SortColumn = sortColumn,
             SortDirection = sortDirection
         };
-        
+
         // sp_Personal_GetAll returneaza 2 result sets: datele si count-ul
         using var connection = _connectionFactory.CreateConnection();
         using var multi = await connection.QueryMultipleAsync(
             "sp_Personal_GetAll",
             parameters,
             commandType: System.Data.CommandType.StoredProcedure);
-        
+
         var data = await multi.ReadAsync<Personal>();
         // Skip count result set for now (used in GetCountAsync)
         return data;
@@ -74,15 +74,15 @@ public class PersonalRepository : BaseRepository, IPersonalRepository
             Functie = functie,
             Judet = judet
         };
-        
+
         using var connection = _connectionFactory.CreateConnection();
-        
+
         // sp_Personal_GetCount returneaza un scalar
         var result = await connection.ExecuteScalarAsync<int>(
             "sp_Personal_GetCount",
             parameters,
             commandType: System.Data.CommandType.StoredProcedure);
-        
+
         return result;
     }
 
@@ -101,11 +101,11 @@ public class PersonalRepository : BaseRepository, IPersonalRepository
         using var multi = await connection.QueryMultipleAsync(
             "sp_Personal_GetDropdownOptions",
             commandType: System.Data.CommandType.StoredProcedure);
-        
+
         var departamente = (await multi.ReadAsync<DropdownOption>()).Select(d => d.Value).ToArray();
         var functii = (await multi.ReadAsync<DropdownOption>()).Select(f => f.Value).ToArray();
         var judete = (await multi.ReadAsync<DropdownOption>()).Select(j => j.Value).ToArray();
-        
+
         return (departamente, functii, judete);
     }
 
@@ -198,12 +198,12 @@ public class PersonalRepository : BaseRepository, IPersonalRepository
 
     public async Task<bool> DeleteAsync(Guid id, string modificatDe, CancellationToken cancellationToken = default)
     {
-        var parameters = new 
-        { 
+        var parameters = new
+        {
             Id_Personal = id,
             Modificat_De = modificatDe
         };
-        
+
         // SP face soft delete (seteaza Status_Angajat = 'Inactiv')
         var result = await QueryFirstOrDefaultAsync<SuccessResult>("sp_Personal_Delete", parameters, cancellationToken);
         return result?.Success == 1;
@@ -221,12 +221,12 @@ public class PersonalRepository : BaseRepository, IPersonalRepository
             Cod_Angajat = codAngajat,
             ExcludeId = excludeId
         };
-        
+
         var result = await QueryFirstOrDefaultAsync<UniquenessCheckResult>(
-            "sp_Personal_CheckUnique", 
-            parameters, 
+            "sp_Personal_CheckUnique",
+            parameters,
             cancellationToken);
-        
+
         return (result?.CNP_Exists == 1, result?.CodAngajat_Exists == 1);
     }
 

@@ -34,7 +34,7 @@ public interface IUserSessionRepository
     /// sessions where EsteActiva = 1.
     /// </remarks>
     Task<IEnumerable<UserSession>> GetActiveSessionsAsync(CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets active sessions with user details (joined with Utilizatori table).
     /// </summary>
@@ -91,7 +91,7 @@ public interface IUserSessionRepository
         string sortColumn = "DataUltimaActivitate",
         string sortDirection = "DESC",
         CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets all sessions for a specific user (active and inactive).
     /// </summary>
@@ -107,7 +107,7 @@ public interface IUserSessionRepository
     /// - Security audit: Review user's session activity
     /// </remarks>
     Task<IEnumerable<UserSession>> GetByUserIdAsync(Guid utilizatorId, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Creates a new user session.
     /// </summary>
@@ -141,12 +141,12 @@ public interface IUserSessionRepository
     /// - Device type identified for statistics
     /// </remarks>
     Task<(Guid SessionId, string SessionToken)> CreateAsync(
-        Guid utilizatorId, 
-        string adresaIp, 
-        string userAgent, 
-        string dispozitiv, 
+        Guid utilizatorId,
+        string adresaIp,
+        string userAgent,
+        string dispozitiv,
         CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Updates the last activity timestamp for a session.
     /// </summary>
@@ -171,7 +171,7 @@ public interface IUserSessionRepository
     /// to reduce database load.
     /// </remarks>
     Task<bool> UpdateActivityAsync(string sessionToken, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Closes a session (forced logout).
     /// </summary>
@@ -195,7 +195,7 @@ public interface IUserSessionRepository
     /// - Historical data preserved for audit
     /// </remarks>
     Task<bool> EndSessionAsync(Guid sessionId, CancellationToken cancellationToken = default);
- 
+
     /// <summary>
     /// Cleans up expired sessions (background maintenance task).
     /// </summary>
@@ -220,7 +220,7 @@ public interface IUserSessionRepository
     /// - Alternative: Every 6 hours for strict security
     /// </remarks>
     Task<int> CleanupExpiredAsync(CancellationToken cancellationToken = default);
-  
+
     /// <summary>
     /// Gets session statistics for dashboard and monitoring.
     /// </summary>

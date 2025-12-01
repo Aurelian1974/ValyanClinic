@@ -6,6 +6,6 @@ public class Departament
     public Guid? IdTipDepartament { get; set; }
     public string DenumireDepartament { get; set; } = string.Empty;
     public string? DescriereDepartament { get; set; }
-    
+
     public TipDepartament? TipDepartament { get; set; }
 }

@@ -17,110 +17,110 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     [Inject] private ILogger<ICD10AutocompleteComponent> Logger { get; set; } = default!;
 
     // ==================== PARAMETERS ====================
-    
+
     /// <summary>
     /// Label-ul afișat deasupra input-ului
     /// </summary>
     [Parameter] public string Label { get; set; } = "Cod ICD-10";
-    
+
     /// <summary>
     /// Placeholder text în input
     /// </summary>
     [Parameter] public string Placeholder { get; set; } = "Caută după cod sau descriere...";
-    
+
     /// <summary>
     /// Text de ajutor afișat sub input
     /// </summary>
     [Parameter] public string? HelpText { get; set; }
-    
+
     /// <summary>
     /// Indică dacă câmpul este obligatoriu (afișează *)
     /// </summary>
     [Parameter] public bool IsRequired { get; set; }
-    
+
     /// <summary>
     /// Filtrează după categorie specifică (ex: "Cardiovascular")
     /// </summary>
     [Parameter] public string? Category { get; set; }
-    
+
     /// <summary>
     /// Afișează doar coduri frecvente (IsCommon = true)
     /// </summary>
     [Parameter] public bool OnlyCommon { get; set; }
-    
+
     /// <summary>
     /// Număr maxim de rezultate afișate în dropdown
     /// </summary>
     [Parameter] public int MaxResults { get; set; } = 10;
-    
+
     /// <summary>
     /// Lungime minimă text pentru a declanșa căutarea
     /// </summary>
     [Parameter] public int MinSearchLength { get; set; } = 2;
-    
+
     /// <summary>
     /// Delay în milisecunde pentru debounce căutare
     /// </summary>
     [Parameter] public int SearchDebounceMs { get; set; } = 300;
 
     // ==================== TWO-WAY BINDING ====================
-    
+
     /// <summary>
     /// Codul ICD-10 selectat (two-way binding)
     /// </summary>
     [Parameter] public string? SelectedCode { get; set; }
-    
+
     /// <summary>
     /// Event callback pentru schimbarea codului selectat
     /// </summary>
     [Parameter] public EventCallback<string?> SelectedCodeChanged { get; set; }
-    
+
     /// <summary>
     /// Event callback când un cod este selectat (returnează DTO complet)
     /// </summary>
     [Parameter] public EventCallback<ICD10SearchResultDto?> OnCodeSelected { get; set; }
 
     // ==================== STATE ====================
-    
+
     /// <summary>
     /// Text curent din input de căutare
     /// </summary>
     private string SearchText { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Indică dacă dropdown-ul este deschis
     /// </summary>
     private bool IsOpen { get; set; }
-    
+
     /// <summary>
     /// Indică dacă se efectuează o căutare (loading state)
     /// </summary>
     private bool IsSearching { get; set; }
-    
+
     /// <summary>
     /// Indică dacă input-ul are focus
     /// </summary>
     private bool IsFocused { get; set; }
 
     // ==================== DATA ====================
-    
+
     /// <summary>
     /// Lista de rezultate din căutare
     /// </summary>
     private List<ICD10SearchResultDto> Results { get; set; } = new();
-    
+
     /// <summary>
     /// Rezultatul selectat curent (pentru highlight în dropdown)
     /// </summary>
     private ICD10SearchResultDto? SelectedResult { get; set; }
 
     // ==================== TIMERS ====================
-    
+
     /// <summary>
     /// Timer pentru debounce căutare
     /// </summary>
     private System.Threading.Timer? _debounceTimer;
-    
+
     /// <summary>
     /// Timer pentru delay blur (pentru a permite click pe rezultate)
     /// </summary>

@@ -30,8 +30,8 @@ public partial class ProgramareStatisticsModal : ComponentBase
         var today = DateTime.Today;
         FilterDataStart = new DateTime(today.Year, today.Month, 1); // Prima zi a lunii
         FilterDataEnd = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month)); // Ultima zi a lunii
-     
-        Logger.LogInformation("ProgramareStatisticsModal initialized with dates: {Start} - {End}", 
+
+        Logger.LogInformation("ProgramareStatisticsModal initialized with dates: {Start} - {End}",
   FilterDataStart.ToString("yyyy-MM-dd"), FilterDataEnd.ToString("yyyy-MM-dd"));
     }
 
@@ -49,56 +49,56 @@ public partial class ProgramareStatisticsModal : ComponentBase
     {
         try
         {
-    var query = new GetPersonalMedicalListQuery
-       {
-       PageNumber = 1,
-                PageSize = 1000
-};
-
-   var result = await Mediator.Send(query);
-
-       if (result.IsSuccess && result.Value != null)
+            var query = new GetPersonalMedicalListQuery
             {
-     DoctorsList = result.Value.ToList();
-        }
-        }
-    catch (Exception ex)
-        {
-       Logger.LogError(ex, "Eroare la încărcarea medicilor");
-        }
- }
-
-    private async Task LoadStatistics()
-    {
-     try
-  {
-            IsLoading = true;
-
-          var query = new GetProgramareStatisticsQuery(
-  FilterDataStart,
-  FilterDataEnd,
-    FilterDoctorID);
+                PageNumber = 1,
+                PageSize = 1000
+            };
 
             var result = await Mediator.Send(query);
 
-     if (result.IsSuccess && result.Value != null)
- {
-           Statistics = result.Value;
-    Logger.LogInformation("Statistici încărcate: {Total} programări", Statistics.TotalProgramari);
-         }
-            else
-    {
-        Logger.LogWarning("Nu s-au putut încărca statisticile");
-   }
+            if (result.IsSuccess && result.Value != null)
+            {
+                DoctorsList = result.Value.ToList();
+            }
         }
-      catch (Exception ex)
-  {
-     Logger.LogError(ex, "Eroare la încărcarea statisticilor");
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la încărcarea medicilor");
+        }
+    }
+
+    private async Task LoadStatistics()
+    {
+        try
+        {
+            IsLoading = true;
+
+            var query = new GetProgramareStatisticsQuery(
+    FilterDataStart,
+    FilterDataEnd,
+      FilterDoctorID);
+
+            var result = await Mediator.Send(query);
+
+            if (result.IsSuccess && result.Value != null)
+            {
+                Statistics = result.Value;
+                Logger.LogInformation("Statistici încărcate: {Total} programări", Statistics.TotalProgramari);
+            }
+            else
+            {
+                Logger.LogWarning("Nu s-au putut încărca statisticile");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la încărcarea statisticilor");
         }
         finally
         {
             IsLoading = false;
-   }
+        }
     }
 
     private List<ChartData> GetStatusData()
@@ -146,16 +146,16 @@ public partial class ProgramareStatisticsModal : ComponentBase
     private string GetSelectedDoctorName()
     {
         if (!FilterDoctorID.HasValue)
-     return "Toți medicii";
+            return "Toți medicii";
 
         var doctor = DoctorsList.FirstOrDefault(d => d.PersonalID == FilterDoctorID.Value);
-   return doctor != null ? $"Dr. {doctor.Nume} {doctor.Prenume}" : "Toți medicii";
- }
+        return doctor != null ? $"Dr. {doctor.Nume} {doctor.Prenume}" : "Toți medicii";
+    }
 
     // ✅ Helper class for chart data with colors
     private class ChartData
     {
-     public string Label { get; set; } = string.Empty;
+        public string Label { get; set; } = string.Empty;
         public int Value { get; set; }
         public string Color { get; set; } = "#3b82f6";
         public double Percentage { get; set; }

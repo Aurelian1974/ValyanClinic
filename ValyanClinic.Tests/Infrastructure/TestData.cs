@@ -20,41 +20,41 @@ public static class TestData
             PacientID = Guid.NewGuid(),
             MedicID = Guid.NewGuid(),
             TipConsultatie = "Prima consultatie",
-            
+
             // Motive Prezentare
             MotivPrezentare = "Dureri abdominale",
             IstoricBoalaActuala = "Simptome de 3 zile - greata, varsaturi",
-            
+
             // Antecedente
             APP_BoliAdult = "Hipertensiune arteriala",
             APP_Alergii = "Penicilina",
             APP_Medicatie = "Enalapril 10mg",
-            
+
             // Examen
             Greutate = 75.5m,
             Inaltime = 175,
             TensiuneArteriala = "130/80",
             Puls = 72,
             Temperatura = 36.7m,
-            
+
             // Diagnostic
             DiagnosticPozitiv = "Gastrita acuta",
             CoduriICD10 = "K29.0",
             CoduriICD10Secundare = "K30",
-            
+
             // Tratament
             TratamentMedicamentos = "Omeprazol 20mg, 1cp/zi",
             RecomandariDietetice = "Dieta usoara, evitarea alimentelor grele",
-            
+
             // Concluzie
             Concluzie = "Gastrita acuta, tratament medicamentos si dieta",
             ObservatiiMedic = "Monitorizare simptome urmatoarele 7 zile",
-            
+
             // Audit
             CreatDe = "doctor123"
         };
     }
-    
+
     /// <summary>
     /// Creates an empty CreateConsultatieCommand (for new consultatie)
     /// </summary>
@@ -69,7 +69,7 @@ public static class TestData
             CreatDe = "doctor123"
         };
     }
-    
+
     /// <summary>
     /// Creates a ProgramareListDto with test data
     /// </summary>
@@ -90,7 +90,7 @@ public static class TestData
             Observatii = "Prima consultatie"
         };
     }
-    
+
     /// <summary>
     /// Creates a list of test ICD-10 codes
     /// </summary>
@@ -104,7 +104,7 @@ public static class TestData
             "E11.9"  // Diabet zaharat tip 2
         };
     }
-    
+
     /// <summary>
     /// Creates test Guid identifiers
     /// </summary>

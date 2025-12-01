@@ -59,7 +59,7 @@ public partial class ListaProgramari : ComponentBase
     private bool ShowAddEditModal = false;
     private bool ShowViewModal = false;
     private bool ShowCancelModal = false;
- private bool ShowStatisticsModal = false;
+    private bool ShowStatisticsModal = false;
     private Guid? SelectedProgramareId = null;
     private string CancelConfirmMessage = string.Empty;
     private ProgramareListDto? SelectedProgramareForCancel = null;
@@ -74,158 +74,158 @@ public partial class ListaProgramari : ComponentBase
         {
             Logger.LogInformation("Inițializare ListaProgramari");
 
-         // ✅ Set default filters - PRIMA ZI și ULTIMA ZI a lunii curente
-       var today = DateTime.Today;
-          FilterDataStart = new DateTime(today.Year, today.Month, 1); // Prima zi a lunii
+            // ✅ Set default filters - PRIMA ZI și ULTIMA ZI a lunii curente
+            var today = DateTime.Today;
+            FilterDataStart = new DateTime(today.Year, today.Month, 1); // Prima zi a lunii
             FilterDataEnd = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month)); // Ultima zi a lunii
 
-      // Load dropdown data
- await Task.WhenAll(
-         LoadDoctorsListAsync(),
-  LoadPacientiListAsync()
-            );
+            // Load dropdown data
+            await Task.WhenAll(
+                    LoadDoctorsListAsync(),
+             LoadPacientiListAsync()
+                       );
 
-      // Load initial data
-          await LoadDataAsync();
-     }
-  catch (Exception ex)
-      {
+            // Load initial data
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
             Logger.LogError(ex, "Eroare la inițializarea paginii ListaProgramari");
-        HasError = true;
-     ErrorMessage = "Eroare la încărcarea datelor. Vă rugăm să reîncărcați pagina.";
+            HasError = true;
+            ErrorMessage = "Eroare la încărcarea datelor. Vă rugăm să reîncărcați pagina.";
         }
         finally
-      {
-        IsLoading = false;
+        {
+            IsLoading = false;
         }
     }
 
     private async Task LoadDoctorsListAsync()
     {
         try
-   {
-     var query = new GetPersonalMedicalListQuery
-  {
-   PageNumber = 1,
-        PageSize = 1000 // Load all for dropdown
-       };
+        {
+            var query = new GetPersonalMedicalListQuery
+            {
+                PageNumber = 1,
+                PageSize = 1000 // Load all for dropdown
+            };
 
-  var result = await Mediator.Send(query);
+            var result = await Mediator.Send(query);
 
-     if (result.IsSuccess && result.Value != null)
-  {
-         DoctorsList = result.Value.ToList();
-      Logger.LogInformation("Încărcați {Count} medici pentru dropdown", DoctorsList.Count);
-   }
-      }
+            if (result.IsSuccess && result.Value != null)
+            {
+                DoctorsList = result.Value.ToList();
+                Logger.LogInformation("Încărcați {Count} medici pentru dropdown", DoctorsList.Count);
+            }
+        }
         catch (Exception ex)
-   {
-     Logger.LogError(ex, "Eroare la încărcarea listei de medici");
-  }
+        {
+            Logger.LogError(ex, "Eroare la încărcarea listei de medici");
+        }
     }
 
     private async Task LoadPacientiListAsync()
     {
         try
         {
-     var query = new GetPacientListQuery
+            var query = new GetPacientListQuery
             {
-PageNumber = 1,
-    PageSize = 1000, // Load all for dropdown
-    Activ = true
-      };
+                PageNumber = 1,
+                PageSize = 1000, // Load all for dropdown
+                Activ = true
+            };
 
-      var result = await Mediator.Send(query);
+            var result = await Mediator.Send(query);
 
-    if (result.IsSuccess && result.Value != null && result.Value.Value != null)
-    {
-      PacientiList = result.Value.Value.ToList();
-      Logger.LogInformation("Încărcați {Count} pacienți pentru dropdown", PacientiList.Count);
-}
-  }
+            if (result.IsSuccess && result.Value != null && result.Value.Value != null)
+            {
+                PacientiList = result.Value.Value.ToList();
+                Logger.LogInformation("Încărcați {Count} pacienți pentru dropdown", PacientiList.Count);
+            }
+        }
         catch (Exception ex)
         {
-  Logger.LogError(ex, "Eroare la încărcarea listei de pacienți");
- }
+            Logger.LogError(ex, "Eroare la încărcarea listei de pacienți");
+        }
     }
 
     private async Task LoadDataAsync()
     {
         try
-    {
-        IsLoading = true;
+        {
+            IsLoading = true;
             HasError = false;
 
             Logger.LogInformation(
                 "Încărcare programări: Search={Search}, Doctor={Doctor}, Pacient={Pacient}, DataStart={DataStart}, DataEnd={DataEnd}, Status={Status}, Tip={Tip}",
  SearchText, FilterDoctorID, FilterPacientID, FilterDataStart, FilterDataEnd, FilterStatus, FilterTipProgramare);
 
-   var query = new GetProgramareListQuery
-     {
-         PageNumber = 1,
-           PageSize = 1000, // Load all for client-side filtering in grid
-              GlobalSearchText = SearchText,
- FilterDoctorID = FilterDoctorID,
-    FilterPacientID = FilterPacientID,
- FilterDataStart = FilterDataStart,
-     FilterDataEnd = FilterDataEnd,
-      FilterStatus = FilterStatus,
+            var query = new GetProgramareListQuery
+            {
+                PageNumber = 1,
+                PageSize = 1000, // Load all for client-side filtering in grid
+                GlobalSearchText = SearchText,
+                FilterDoctorID = FilterDoctorID,
+                FilterPacientID = FilterPacientID,
+                FilterDataStart = FilterDataStart,
+                FilterDataEnd = FilterDataEnd,
+                FilterStatus = FilterStatus,
                 FilterTipProgramare = FilterTipProgramare,
-  SortColumn = "DataProgramare",
-      SortDirection = "ASC"
+                SortColumn = "DataProgramare",
+                SortDirection = "ASC"
             };
 
             var result = await Mediator.Send(query);
 
-         if (result.IsSuccess && result.Value != null)
-      {
-       FilteredProgramari = result.Value.ToList();
-   Logger.LogInformation("Încărcate {Count} programări", FilteredProgramari.Count);
-         }
-  else
-      {
-    HasError = true;
-    ErrorMessage = "Eroare la încărcarea programărilor.";
-       Logger.LogWarning("Eroare la încărcarea programărilor");
-      }
+            if (result.IsSuccess && result.Value != null)
+            {
+                FilteredProgramari = result.Value.ToList();
+                Logger.LogInformation("Încărcate {Count} programări", FilteredProgramari.Count);
+            }
+            else
+            {
+                HasError = true;
+                ErrorMessage = "Eroare la încărcarea programărilor.";
+                Logger.LogWarning("Eroare la încărcarea programărilor");
+            }
 
         }
-    catch (Exception ex)
+        catch (Exception ex)
         {
-  Logger.LogError(ex, "Eroare la încărcarea programărilor");
+            Logger.LogError(ex, "Eroare la încărcarea programărilor");
             HasError = true;
             ErrorMessage = "Eroare neașteptată la încărcarea programărilor.";
         }
         finally
         {
-        IsLoading = false;
+            IsLoading = false;
         }
     }
 
     private async Task ApplyFilters()
- {
-   await LoadDataAsync();
+    {
+        await LoadDataAsync();
     }
 
     // ✅ Toggle Advanced Filter Panel
     private void ToggleAdvancedFilter()
- {
+    {
         IsAdvancedFilterExpanded = !IsAdvancedFilterExpanded;
-        Logger.LogInformation("Advanced filter panel toggled: {State}", 
+        Logger.LogInformation("Advanced filter panel toggled: {State}",
             IsAdvancedFilterExpanded ? "Expanded" : "Collapsed");
     }
 
     private void HandleSearchKeyUp()
     {
-      _searchDebounceTimer?.Dispose();
+        _searchDebounceTimer?.Dispose();
         _searchDebounceTimer = new System.Threading.Timer(async _ =>
    {
-      await InvokeAsync(async () =>
-       {
-          await ApplyFilters();
-         StateHasChanged();
-            });
-        }, null, DEBOUNCE_DELAY_MS, Timeout.Infinite);
+       await InvokeAsync(async () =>
+        {
+            await ApplyFilters();
+            StateHasChanged();
+        });
+   }, null, DEBOUNCE_DELAY_MS, Timeout.Infinite);
     }
 
     private async Task ClearSearch()
@@ -237,14 +237,14 @@ PageNumber = 1,
     private async Task ClearAllFilters()
     {
         SearchText = null;
-      FilterDoctorID = null;
+        FilterDoctorID = null;
         FilterPacientID = null;
-        
+
         // ✅ Reset to PRIMA ZI și ULTIMA ZI a lunii curente
         var today = DateTime.Today;
-   FilterDataStart = new DateTime(today.Year, today.Month, 1); // Prima zi a lunii
+        FilterDataStart = new DateTime(today.Year, today.Month, 1); // Prima zi a lunii
         FilterDataEnd = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month)); // Ultima zi a lunii
-        
+
         FilterStatus = null;
         FilterTipProgramare = null;
 
@@ -260,22 +260,22 @@ PageNumber = 1,
     private void OpenEditModal(Guid programareId)
     {
         SelectedProgramareId = programareId;
-     ShowAddEditModal = true;
+        ShowAddEditModal = true;
     }
 
     private void OpenViewModal(Guid programareId)
     {
         SelectedProgramareId = programareId;
         ShowViewModal = true;
- }
+    }
 
     private void OpenCancelModal(ProgramareListDto programare)
     {
         SelectedProgramareId = programare.ProgramareID;
         SelectedProgramareForCancel = programare;
-  CancelConfirmMessage = $"Sigur doriți să anulați programarea pentru {programare.PacientNumeComplet} " +
-              $"cu Dr. {programare.DoctorNumeComplet} din data de {programare.DataProgramare:dd.MM.yyyy} " +
-               $"la ora {programare.OraInceput:hh\\:mm}?";
+        CancelConfirmMessage = $"Sigur doriți să anulați programarea pentru {programare.PacientNumeComplet} " +
+                    $"cu Dr. {programare.DoctorNumeComplet} din data de {programare.DataProgramare:dd.MM.yyyy} " +
+                     $"la ora {programare.OraInceput:hh\\:mm}?";
         ShowCancelModal = true;
     }
 
@@ -286,105 +286,105 @@ PageNumber = 1,
     }
 
     private async Task ExportToExcel()
-  {
+    {
         try
         {
-      Logger.LogInformation("Starting Excel export for {Count} programări", FilteredProgramari.Count);
+            Logger.LogInformation("Starting Excel export for {Count} programări", FilteredProgramari.Count);
 
-      if (!FilteredProgramari.Any())
-    {
-     await NotificationService.ShowWarningAsync("Nu există programări de exportat!");
-         return;
-   }
+            if (!FilteredProgramari.Any())
+            {
+                await NotificationService.ShowWarningAsync("Nu există programări de exportat!");
+                return;
+            }
 
-       // Generate Excel file
-       var excelBytes = await ExcelExportService.ExportProgramariToExcelAsync(FilteredProgramari);
+            // Generate Excel file
+            var excelBytes = await ExcelExportService.ExportProgramariToExcelAsync(FilteredProgramari);
 
-      // Generate filename cu data curentă
-   var fileName = $"Programari_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            // Generate filename cu data curentă
+            var fileName = $"Programari_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
 
-    // Download file prin JavaScript
-  await JSRuntime.InvokeVoidAsync("downloadFileFromBytes", fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelBytes);
+            // Download file prin JavaScript
+            await JSRuntime.InvokeVoidAsync("downloadFileFromBytes", fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelBytes);
 
-    await NotificationService.ShowSuccessAsync($"Export Excel generat: {FilteredProgramari.Count} programări");
-   }
+            await NotificationService.ShowSuccessAsync($"Export Excel generat: {FilteredProgramari.Count} programări");
+        }
         catch (Exception ex)
-{
-    Logger.LogError(ex, "Eroare la exportul Excel");
-         await NotificationService.ShowErrorAsync("Eroare la generarea exportului Excel!");
-    }
+        {
+            Logger.LogError(ex, "Eroare la exportul Excel");
+            await NotificationService.ShowErrorAsync("Eroare la generarea exportului Excel!");
+        }
     }
 
     private void PrintProgramare(Guid programareId)
     {
-     Logger.LogInformation("Print requested for programare {ID}", programareId);
+        Logger.LogInformation("Print requested for programare {ID}", programareId);
         // TODO: Implementare print functionality
         // Pentru moment, redirect către view modal sau print page
-      NavigationManager.NavigateTo($"/programari/print/{programareId}");
+        NavigationManager.NavigateTo($"/programari/print/{programareId}");
     }
 
     private async Task HandleModalSaved()
     {
         ShowAddEditModal = false;
         await LoadDataAsync();
-     await NotificationService.ShowSuccessAsync("Programarea a fost salvată cu succes!");
+        await NotificationService.ShowSuccessAsync("Programarea a fost salvată cu succes!");
     }
 
-private async Task HandleCancelConfirmed()
+    private async Task HandleCancelConfirmed()
     {
         try
         {
             if (!SelectedProgramareId.HasValue)
             {
-  await NotificationService.ShowErrorAsync("ID programare invalid!");
-    return;
+                await NotificationService.ShowErrorAsync("ID programare invalid!");
+                return;
             }
 
-          var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var userIdClaim = authState.User.FindFirst("PersonalID");
-            
+
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
             {
-     await NotificationService.ShowErrorAsync("Nu s-a putut identifica utilizatorul curent!");
-     return;
-         }
+                await NotificationService.ShowErrorAsync("Nu s-a putut identifica utilizatorul curent!");
+                return;
+            }
 
             var command = new DeleteProgramareCommand
             {
-      ProgramareID = SelectedProgramareId.Value,
-              ModificatDe = userId
+                ProgramareID = SelectedProgramareId.Value,
+                ModificatDe = userId
             };
 
             var result = await Mediator.Send(command);
 
-    if (result.IsSuccess)
-  {
-       ShowCancelModal = false;
-      await LoadDataAsync();
-       await NotificationService.ShowSuccessAsync("Programarea a fost anulată cu succes!");
-  }
- else
-    {
-   await NotificationService.ShowErrorAsync(result.Errors?.FirstOrDefault() ?? "Eroare la anularea programării!");
-  }
-    }
+            if (result.IsSuccess)
+            {
+                ShowCancelModal = false;
+                await LoadDataAsync();
+                await NotificationService.ShowSuccessAsync("Programarea a fost anulată cu succes!");
+            }
+            else
+            {
+                await NotificationService.ShowErrorAsync(result.Errors?.FirstOrDefault() ?? "Eroare la anularea programării!");
+            }
+        }
         catch (Exception ex)
         {
-         Logger.LogError(ex, "Eroare la anularea programării {ProgramareID}", SelectedProgramareId);
+            Logger.LogError(ex, "Eroare la anularea programării {ProgramareID}", SelectedProgramareId);
             await NotificationService.ShowErrorAsync("Eroare neașteptată la anularea programării!");
         }
-  }
+    }
 
- private void HandleEditRequested(Guid programareId)
+    private void HandleEditRequested(Guid programareId)
     {
- Logger.LogInformation("Edit requested from ViewModal for programare {ID}", programareId);
-    ShowViewModal = false;
-  SelectedProgramareId = programareId;
-   ShowAddEditModal = true;
+        Logger.LogInformation("Edit requested from ViewModal for programare {ID}", programareId);
+        ShowViewModal = false;
+        SelectedProgramareId = programareId;
+        ShowAddEditModal = true;
     }
 
     private bool CanEditProgramare(string status)
- {
+    {
         return status is "Programata" or "Confirmata";
     }
 
@@ -394,34 +394,34 @@ private async Task HandleCancelConfirmed()
     }
 
     private string GetStatusDisplay(string? status)
-  {
- return status switch
+    {
+        return status switch
         {
-   "Programata" => "Programată",
-          "Confirmata" => "Confirmată",
-"CheckedIn" => "Check-in",
-   "InConsultatie" => "În consultație",
+            "Programata" => "Programată",
+            "Confirmata" => "Confirmată",
+            "CheckedIn" => "Check-in",
+            "InConsultatie" => "În consultație",
             "Finalizata" => "Finalizată",
-     "Anulata" => "Anulată",
- "NoShow" => "Nu s-a prezentat",
+            "Anulata" => "Anulată",
+            "NoShow" => "Nu s-a prezentat",
             _ => status ?? "-"
- };
+        };
     }
 
     private string GetTipProgramareDisplay(string? tipProgramare)
     {
         return tipProgramare switch
-     {
-     "ConsultatieInitiala" => "Consultație Inițială",
+        {
+            "ConsultatieInitiala" => "Consultație Inițială",
             "ControlPeriodic" => "Control Periodic",
             "Consultatie" => "Consultație",
             "Investigatie" => "Investigație",
             "Procedura" => "Procedură",
-    "Urgenta" => "Urgență",
-      "Telemedicina" => "Telemedicină",
- "LaDomiciliu" => "La Domiciliu",
-       _ => tipProgramare ?? "-"
- };
+            "Urgenta" => "Urgență",
+            "Telemedicina" => "Telemedicină",
+            "LaDomiciliu" => "La Domiciliu",
+            _ => tipProgramare ?? "-"
+        };
     }
 
     public void Dispose()

@@ -8,7 +8,7 @@ namespace ValyanClinic.Domain.Interfaces.Repositories;
 public interface IICD10Repository
 {
     /// <summary>
-  /// Cauta coduri ICD-10 pentru autocomplete
+    /// Cauta coduri ICD-10 pentru autocomplete
     /// </summary>
     Task<IEnumerable<ICD10Code>> SearchAsync(
         string searchTerm,
@@ -27,7 +27,7 @@ public interface IICD10Repository
     /// </summary>
     Task<ICD10Code?> GetByCodeAsync(string code, CancellationToken cancellationToken = default);
 
- /// <summary>
+    /// <summary>
     /// Obtine toate codurile dintr-o categorie
     /// </summary>
     Task<IEnumerable<ICD10Code>> GetByCategoryAsync(
@@ -57,7 +57,7 @@ public interface IICD10Repository
 
     /// <summary>
     /// Obtine statistici pentru dashboard
-  /// </summary>
+    /// </summary>
     Task<(int totalCodes, int commonCodes, int categories)> GetStatisticsAsync(
         CancellationToken cancellationToken = default);
 

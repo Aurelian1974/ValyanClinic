@@ -14,10 +14,10 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
 {
     private readonly IJSRuntime _jsRuntime;
     private readonly ILogger<LocalStorageDraftService<T>> _logger;
-    
+
     private const string STORAGE_PREFIX = "draft_";
     private const string METADATA_KEY = "draft_metadata";
-    
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         WriteIndented = false,
@@ -25,7 +25,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter() }
     };
-    
+
     public LocalStorageDraftService(
         IJSRuntime jsRuntime,
         ILogger<LocalStorageDraftService<T>> logger)
@@ -33,7 +33,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
         _jsRuntime = jsRuntime;
         _logger = logger;
     }
-    
+
     /// <summary>
     /// Salvează draft-ul în LocalStorage
     /// </summary>
@@ -49,15 +49,15 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
                 SavedAt = DateTime.UtcNow,
                 Version = 1
             };
-            
+
             var json = JsonSerializer.Serialize(draft, _jsonOptions);
             var key = GetStorageKey(entityId);
-            
+
             await _jsRuntime.InvokeAsync<object>("localStorage.setItem", key, json);
-            
+
             // Update metadata list
             await UpdateMetadataAsync(entityId, userId);
-            
+
             _logger.LogInformation(
                 "Draft saved: EntityId={EntityId}, UserId={UserId}, Size={Size} bytes",
                 entityId,
@@ -67,13 +67,13 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, 
-                "Error saving draft for entity {EntityId}", 
+            _logger.LogError(ex,
+                "Error saving draft for entity {EntityId}",
                 entityId);
             throw;
         }
     }
-    
+
     /// <summary>
     /// Încarcă draft-ul din LocalStorage
     /// </summary>
@@ -83,21 +83,21 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
         {
             var key = GetStorageKey(entityId);
             var json = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", key);
-            
+
             if (string.IsNullOrEmpty(json))
             {
                 _logger.LogDebug("No draft found for entity {EntityId}", entityId);
                 return DraftResult<T>.NotFound;
             }
-            
+
             var draft = JsonSerializer.Deserialize<Draft<T>>(json, _jsonOptions);
-            
+
             if (draft == null || draft.Data == null)
             {
                 _logger.LogWarning("Invalid draft data for entity {EntityId}", entityId);
                 return DraftResult<T>.Invalid;
             }
-            
+
             // Check expiration (7 days)
             var age = DateTime.UtcNow - draft.SavedAt;
             if (age.TotalDays > 7)
@@ -110,14 +110,14 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
                 await ClearDraftAsync(entityId);
                 return DraftResult<T>.Expired;
             }
-            
+
             _logger.LogInformation(
                 "Draft loaded: EntityId={EntityId}, SavedAt={SavedAt}, Age={Age} hours",
                 entityId,
                 draft.SavedAt,
                 age.TotalHours
             );
-            
+
             return DraftResult<T>.Success(draft.Data, draft.SavedAt);
         }
         catch (JsonException ex)
@@ -131,7 +131,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             return DraftResult<T>.Error(ex.Message);
         }
     }
-    
+
     /// <summary>
     /// Șterge draft-ul
     /// </summary>
@@ -141,10 +141,10 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
         {
             var key = GetStorageKey(entityId);
             await _jsRuntime.InvokeAsync<object>("localStorage.removeItem", key);
-            
+
             // Remove from metadata
             await RemoveFromMetadataAsync(entityId);
-            
+
             _logger.LogInformation("Draft cleared for entity {EntityId}", entityId);
         }
         catch (Exception ex)
@@ -152,7 +152,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             _logger.LogError(ex, "Error clearing draft for entity {EntityId}", entityId);
         }
     }
-    
+
     /// <summary>
     /// Verifică existența draft-ului
     /// </summary>
@@ -170,7 +170,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             return false;
         }
     }
-    
+
     /// <summary>
     /// Obține timestamp-ul ultimei salvări
     /// </summary>
@@ -187,7 +187,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             return null;
         }
     }
-    
+
     /// <summary>
     /// Cleanup draft-uri expirate
     /// </summary>
@@ -198,7 +198,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             var metadata = await GetMetadataAsync();
             var deletedCount = 0;
             var expiredKeys = new List<Guid>();
-            
+
             foreach (var entityId in metadata)
             {
                 var result = await LoadDraftAsync(entityId);
@@ -209,7 +209,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
                     deletedCount++;
                 }
             }
-            
+
             if (deletedCount > 0)
             {
                 _logger.LogInformation(
@@ -217,7 +217,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
                     deletedCount
                 );
             }
-            
+
             return deletedCount;
         }
         catch (Exception ex)
@@ -226,7 +226,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             return 0;
         }
     }
-    
+
     /// <summary>
     /// Obține toate draft-urile utilizatorului
     /// </summary>
@@ -236,7 +236,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
         {
             var metadata = await GetMetadataAsync();
             var userDrafts = new List<Guid>();
-            
+
             foreach (var entityId in metadata)
             {
                 var result = await LoadDraftAsync(entityId);
@@ -247,7 +247,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
                     userDrafts.Add(entityId);
                 }
             }
-            
+
             return userDrafts;
         }
         catch (Exception ex)
@@ -256,9 +256,9 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             return new List<Guid>();
         }
     }
-    
+
     #region Private Helpers
-    
+
     /// <summary>
     /// Generează key-ul pentru LocalStorage
     /// </summary>
@@ -267,7 +267,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
         var typeName = typeof(T).Name;
         return $"{STORAGE_PREFIX}{typeName}_{entityId}";
     }
-    
+
     /// <summary>
     /// Update metadata list cu entity IDs
     /// </summary>
@@ -288,7 +288,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             _logger.LogWarning(ex, "Error updating metadata for entity {EntityId}", entityId);
         }
     }
-    
+
     /// <summary>
     /// Remove entity din metadata
     /// </summary>
@@ -308,7 +308,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             _logger.LogWarning(ex, "Error removing from metadata entity {EntityId}", entityId);
         }
     }
-    
+
     /// <summary>
     /// Obține lista de entity IDs din metadata
     /// </summary>
@@ -319,7 +319,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             var json = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", METADATA_KEY);
             if (string.IsNullOrEmpty(json))
                 return new List<Guid>();
-            
+
             return JsonSerializer.Deserialize<List<Guid>>(json) ?? new List<Guid>();
         }
         catch
@@ -327,6 +327,6 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             return new List<Guid>();
         }
     }
-    
+
     #endregion
 }

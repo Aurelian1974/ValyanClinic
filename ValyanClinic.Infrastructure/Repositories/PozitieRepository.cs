@@ -16,10 +16,10 @@ public class PozitieRepository : BaseRepository, IPozitieRepository
     {
         var parameters = new { Id = id };
         var result = await QueryFirstOrDefaultAsync<PozitieDto>("sp_Pozitii_GetById", parameters, cancellationToken);
-        
+
         if (result == null)
             return null;
-            
+
         return MapToEntity(result);
     }
 
@@ -41,13 +41,13 @@ public class PozitieRepository : BaseRepository, IPozitieRepository
             SortColumn = sortColumn,
             SortDirection = sortDirection
         };
-        
+
         using var connection = _connectionFactory.CreateConnection();
         var data = await connection.QueryAsync<PozitieDto>(
             "sp_Pozitii_GetAll",
             parameters,
             commandType: System.Data.CommandType.StoredProcedure);
-        
+
         return data.Select(MapToEntity);
     }
 
@@ -61,13 +61,13 @@ public class PozitieRepository : BaseRepository, IPozitieRepository
             SearchText = searchText,
             EsteActiv = esteActiv
         };
-        
+
         using var connection = _connectionFactory.CreateConnection();
         var result = await connection.ExecuteScalarAsync<int>(
             "sp_Pozitii_GetCount",
             parameters,
             commandType: System.Data.CommandType.StoredProcedure);
-        
+
         return result;
     }
 
@@ -117,12 +117,12 @@ public class PozitieRepository : BaseRepository, IPozitieRepository
             Denumire = denumire,
             ExcludeId = excludeId
         };
-        
+
         var result = await QueryFirstOrDefaultAsync<UniquenessCheckResult>(
-            "sp_Pozitii_CheckUnique", 
-            parameters, 
+            "sp_Pozitii_CheckUnique",
+            parameters,
             cancellationToken);
-        
+
         return result?.Denumire_Exists == 1;
     }
 

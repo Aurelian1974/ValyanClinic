@@ -5,7 +5,7 @@
 /// </summary>
 public enum TipProgramare
 {
-  /// <summary>
+    /// <summary>
     /// Consultație inițială (prima vizită a pacientului).
     /// </summary>
     ConsultatieInitiala = 0,
@@ -13,7 +13,7 @@ public enum TipProgramare
     /// <summary>
     /// Control periodic (pacient existent, consultație de follow-up).
     /// </summary>
-  ControlPeriodic = 1,
+    ControlPeriodic = 1,
 
     /// <summary>
     /// Consultație standard (consultație generală).
@@ -21,7 +21,7 @@ public enum TipProgramare
     Consultatie = 2,
 
     /// <summary>
- /// Investigație medicală (analize, ecografie, radiografie, etc.).
+    /// Investigație medicală (analize, ecografie, radiografie, etc.).
     /// </summary>
     Investigatie = 3,
 
@@ -63,19 +63,19 @@ public static class TipProgramareExtensions
     public static string ToDbString(this TipProgramare tip)
     {
         return tip switch
-    {
-     TipProgramare.ConsultatieInitiala => "ConsultatieInitiala",
-         TipProgramare.ControlPeriodic => "ControlPeriodic",
- TipProgramare.Consultatie => "Consultatie",
-         TipProgramare.Investigatie => "Investigatie",
-        TipProgramare.Procedura => "Procedura",
-      TipProgramare.Urgenta => "Urgenta",
+        {
+            TipProgramare.ConsultatieInitiala => "ConsultatieInitiala",
+            TipProgramare.ControlPeriodic => "ControlPeriodic",
+            TipProgramare.Consultatie => "Consultatie",
+            TipProgramare.Investigatie => "Investigatie",
+            TipProgramare.Procedura => "Procedura",
+            TipProgramare.Urgenta => "Urgenta",
             TipProgramare.Telemedicina => "Telemedicina",
-       TipProgramare.LaDeomiciliu => "LaDomiciliu",
-     TipProgramare.SlotBlocat => "SlotBlocat",
-   _ => "Consultatie"
-    };
-  }
+            TipProgramare.LaDeomiciliu => "LaDomiciliu",
+            TipProgramare.SlotBlocat => "SlotBlocat",
+            _ => "Consultatie"
+        };
+    }
 
     /// <summary>
     /// Convertește string-ul din baza de date în enum.
@@ -83,19 +83,19 @@ public static class TipProgramareExtensions
     public static TipProgramare FromDbString(string? tip)
     {
         return tip?.ToLower() switch
-      {
-        "consultatieinitial" or "consultatieinitială" => TipProgramare.ConsultatieInitiala,
-      "controlperiodic" => TipProgramare.ControlPeriodic,
+        {
+            "consultatieinitial" or "consultatieinitială" => TipProgramare.ConsultatieInitiala,
+            "controlperiodic" => TipProgramare.ControlPeriodic,
             "consultatie" or "consultație" => TipProgramare.Consultatie,
             "investigatie" or "investigație" => TipProgramare.Investigatie,
-        "procedura" or "procedură" => TipProgramare.Procedura,
+            "procedura" or "procedură" => TipProgramare.Procedura,
             "urgenta" or "urgență" => TipProgramare.Urgenta,
-   "telemedicina" or "telemedicină" => TipProgramare.Telemedicina,
+            "telemedicina" or "telemedicină" => TipProgramare.Telemedicina,
             "ladomiciliu" => TipProgramare.LaDeomiciliu,
             "slotblocat" or "blocat" => TipProgramare.SlotBlocat,
             _ => TipProgramare.Consultatie
         };
-  }
+    }
 
     /// <summary>
     /// Returnează culoarea Bootstrap pentru afișare în UI.
@@ -106,14 +106,14 @@ public static class TipProgramareExtensions
         {
             TipProgramare.ConsultatieInitiala => "primary",    // Blue
             TipProgramare.ControlPeriodic => "info",           // Light Blue
-      TipProgramare.Consultatie => "secondary",    // Gray
-       TipProgramare.Investigatie => "warning",           // Orange
-       TipProgramare.Procedura => "success",  // Green
-      TipProgramare.Urgenta => "danger",    // Red
-        TipProgramare.Telemedicina => "dark",       // Dark
+            TipProgramare.Consultatie => "secondary",    // Gray
+            TipProgramare.Investigatie => "warning",           // Orange
+            TipProgramare.Procedura => "success",  // Green
+            TipProgramare.Urgenta => "danger",    // Red
+            TipProgramare.Telemedicina => "dark",       // Dark
             TipProgramare.LaDeomiciliu => "purple",  // Purple (custom)
             TipProgramare.SlotBlocat => "dark",          // Black/Dark Gray
-_ => "secondary"
+            _ => "secondary"
         };
     }
 
@@ -122,18 +122,18 @@ _ => "secondary"
     /// </summary>
     public static string GetDisplayName(this TipProgramare tip)
     {
-     return tip switch
+        return tip switch
         {
-      TipProgramare.ConsultatieInitiala => "Consultație Inițială",
-          TipProgramare.ControlPeriodic => "Control Periodic",
+            TipProgramare.ConsultatieInitiala => "Consultație Inițială",
+            TipProgramare.ControlPeriodic => "Control Periodic",
             TipProgramare.Consultatie => "Consultație",
-        TipProgramare.Investigatie => "Investigație",
+            TipProgramare.Investigatie => "Investigație",
             TipProgramare.Procedura => "Procedură",
-  TipProgramare.Urgenta => "Urgență",
+            TipProgramare.Urgenta => "Urgență",
             TipProgramare.Telemedicina => "Telemedicină",
-      TipProgramare.LaDeomiciliu => "La Domiciliu",
+            TipProgramare.LaDeomiciliu => "La Domiciliu",
             TipProgramare.SlotBlocat => "🚫 Blocat",
-   _ => "Consultație"
+            _ => "Consultație"
         };
     }
 
@@ -144,16 +144,16 @@ _ => "secondary"
     {
         return tip switch
         {
-   TipProgramare.ConsultatieInitiala => 45,  // 45 min
-  TipProgramare.ControlPeriodic => 30,      // 30 min
+            TipProgramare.ConsultatieInitiala => 45,  // 45 min
+            TipProgramare.ControlPeriodic => 30,      // 30 min
             TipProgramare.Consultatie => 30,          // 30 min
-          TipProgramare.Investigatie => 20,         // 20 min
- TipProgramare.Procedura => 60,     // 60 min
-      TipProgramare.Urgenta => 15,  // 15 min
-        TipProgramare.Telemedicina => 20,         // 20 min
-       TipProgramare.LaDeomiciliu => 60,         // 60 min
-       TipProgramare.SlotBlocat => 60,           // 60 min (1 oră default pentru blocare)
-     _ => 30
+            TipProgramare.Investigatie => 20,         // 20 min
+            TipProgramare.Procedura => 60,     // 60 min
+            TipProgramare.Urgenta => 15,  // 15 min
+            TipProgramare.Telemedicina => 20,         // 20 min
+            TipProgramare.LaDeomiciliu => 60,         // 60 min
+            TipProgramare.SlotBlocat => 60,           // 60 min (1 oră default pentru blocare)
+            _ => 30
         };
     }
 
@@ -163,21 +163,21 @@ _ => "secondary"
     public static string GetBootstrapIcon(this TipProgramare tip)
     {
         return tip switch
-  {
-   TipProgramare.ConsultatieInitiala => "bi-person-plus-fill",
-    TipProgramare.ControlPeriodic => "bi-arrow-repeat",
+        {
+            TipProgramare.ConsultatieInitiala => "bi-person-plus-fill",
+            TipProgramare.ControlPeriodic => "bi-arrow-repeat",
             TipProgramare.Consultatie => "bi-clipboard2-pulse",
-      TipProgramare.Investigatie => "bi-eyeglasses",
+            TipProgramare.Investigatie => "bi-eyeglasses",
             TipProgramare.Procedura => "bi-scissors",
             TipProgramare.Urgenta => "bi-exclamation-triangle-fill",
             TipProgramare.Telemedicina => "bi-camera-video",
- TipProgramare.LaDeomiciliu => "bi-house-fill",
+            TipProgramare.LaDeomiciliu => "bi-house-fill",
             TipProgramare.SlotBlocat => "bi-lock-fill",
-   _ => "bi-calendar-check"
+            _ => "bi-calendar-check"
         };
     }
 
-  /// <summary>
+    /// <summary>
     /// Verifică dacă tipul de programare permite confirmare automată.
     /// </summary>
     public static bool PermiteConfirmareAutomata(this TipProgramare tip)
@@ -186,20 +186,20 @@ _ => "secondary"
         return tip is TipProgramare.Urgenta or TipProgramare.Telemedicina;
     }
 
-  /// <summary>
+    /// <summary>
     /// Verifică dacă tipul de programare necesită pregătire specială.
     /// </summary>
     public static bool NecesitaPregatire(this TipProgramare tip)
     {
- // Investigațiile și procedurile necesită pregătire
+        // Investigațiile și procedurile necesită pregătire
         return tip is TipProgramare.Investigatie or TipProgramare.Procedura;
     }
 
     /// <summary>
-  /// Verifică dacă tipul de programare este un slot blocat (nu necesită pacient).
+    /// Verifică dacă tipul de programare este un slot blocat (nu necesită pacient).
     /// </summary>
     public static bool EsteSlotBlocat(this TipProgramare tip)
     {
-    return tip == TipProgramare.SlotBlocat;
+        return tip == TipProgramare.SlotBlocat;
     }
 }

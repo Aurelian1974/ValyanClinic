@@ -20,13 +20,13 @@ public class GetProgramariByDateQuery : IRequest<Result<IEnumerable<ProgramareLi
     /// </summary>
     public Guid? DoctorID { get; set; }
 
- public GetProgramariByDateQuery(DateTime date, Guid? doctorID = null)
+    public GetProgramariByDateQuery(DateTime date, Guid? doctorID = null)
     {
-     Date = date;
+        Date = date;
         DoctorID = doctorID;
     }
 
-  public GetProgramariByDateQuery()
+    public GetProgramariByDateQuery()
     {
- }
+    }
 }

@@ -131,7 +131,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
             // 3. Check if account is locked (BEFORE password verification to prevent brute force)
             if (IsAccountLocked(utilizator.NumarIncercariEsuate, utilizator.DataBlocare))
             {
-                _logger.LogWarning("Login failed: Account locked - {Username}, Attempts: {Attempts}", 
+                _logger.LogWarning("Login failed: Account locked - {Username}, Attempts: {Attempts}",
                     request.Username, utilizator.NumarIncercariEsuate);
                 return Result<LoginResultDto>.Failure(ERROR_ACCOUNT_LOCKED);
             }
@@ -152,7 +152,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
             // 5. Login SUCCESS - Update last authentication timestamp
             await _utilizatorRepository.UpdateUltimaAutentificareAsync(utilizator.UtilizatorID, cancellationToken);
 
-            _logger.LogInformation("Login successful for user: {Username}, Role: {Role}", 
+            _logger.LogInformation("Login successful for user: {Username}, Role: {Role}",
                 request.Username, utilizator.Rol);
 
             // 6. Create result DTO with user data

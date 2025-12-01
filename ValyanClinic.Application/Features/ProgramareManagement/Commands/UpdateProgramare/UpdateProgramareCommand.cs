@@ -14,7 +14,7 @@ public class UpdateProgramareCommand : IRequest<Result<bool>>
     /// </summary>
     public Guid ProgramareID { get; set; }
 
- /// <summary>
+    /// <summary>
     /// ID-ul pacientului.
     /// </summary>
     public Guid PacientID { get; set; }
@@ -50,8 +50,8 @@ public class UpdateProgramareCommand : IRequest<Result<bool>>
     public string Status { get; set; } = string.Empty;
 
     /// <summary>
-  /// Observații.
- /// </summary>
+    /// Observații.
+    /// </summary>
     public string? Observatii { get; set; }
 
     /// <summary>

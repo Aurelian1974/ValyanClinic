@@ -9,7 +9,7 @@ public class BusinessRuleException : Exception
         : base(message)
     {
     }
-    
+
     public BusinessRuleException(string message, Exception innerException)
         : base(message, innerException)
     {

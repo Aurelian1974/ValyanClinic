@@ -28,7 +28,7 @@ public class DraftAutoSaveHelper<T> : IDisposable where T : class
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _intervalSeconds = intervalSeconds > 0 ? intervalSeconds : 60;
-        
+
         _logger.LogDebug("[DraftAutoSave] Helper creat cu interval {Seconds}s", _intervalSeconds);
     }
 

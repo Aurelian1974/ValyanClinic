@@ -148,7 +148,7 @@ public partial class PersonalViewModal : ComponentBase
             {
                 HasError = true;
                 ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele personalului";
-                Logger.LogWarning("Eroare la incarcarea datelor personalului {PersonalId}: {Error}", 
+                Logger.LogWarning("Eroare la incarcarea datelor personalului {PersonalId}: {Error}",
                     personalId, ErrorMessage);
             }
         }
@@ -190,7 +190,7 @@ public partial class PersonalViewModal : ComponentBase
         if (CurrentPersonalId != Guid.Empty)
         {
             Logger.LogInformation("=== Solicitare editare pentru ID: \"{Id}\" ===", CurrentPersonalId);
-            
+
             await OnEditRequested.InvokeAsync(CurrentPersonalId); // Trimite CurrentPersonalId care este corect
             Logger.LogInformation("=== Edit invocat cu succes pentru ID: \"{Id}\" ===", CurrentPersonalId);
         }

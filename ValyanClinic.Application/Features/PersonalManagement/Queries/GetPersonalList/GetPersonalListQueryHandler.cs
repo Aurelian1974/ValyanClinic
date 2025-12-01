@@ -27,7 +27,7 @@ public class GetPersonalListQueryHandler : IRequestHandler<GetPersonalListQuery,
         {
             _logger.LogInformation(
                 "Obtin lista de personal: Page={Page}, Size={Size}, Search={Search}, Status={Status}, Dept={Dept}, Functie={Functie}, Judet={Judet}, Sort={Sort} {Dir}",
-                request.PageNumber, request.PageSize, request.GlobalSearchText, 
+                request.PageNumber, request.PageSize, request.GlobalSearchText,
                 request.FilterStatus, request.FilterDepartament, request.FilterFunctie, request.FilterJudet,
                 request.SortColumn, request.SortDirection);
 
@@ -63,7 +63,7 @@ public class GetPersonalListQueryHandler : IRequestHandler<GetPersonalListQuery,
                 sortColumn: request.SortColumn,
                 sortDirection: request.SortDirection,
                 cancellationToken: cancellationToken);
-            
+
             // Map to DTOs
             var dtoList = personalList.Select(p => new PersonalListDto
             {

@@ -35,10 +35,10 @@ public class UpdateDepartamentCommandHandler : IRequestHandler<UpdateDepartament
 
             // Check uniqueness (exclude current)
             var nameExists = await _repository.CheckUniqueAsync(
-                request.DenumireDepartament, 
-                request.IdDepartament, 
+                request.DenumireDepartament,
+                request.IdDepartament,
                 cancellationToken);
-                
+
             if (nameExists)
             {
                 _logger.LogWarning("Departament name already exists: {Denumire}", request.DenumireDepartament);

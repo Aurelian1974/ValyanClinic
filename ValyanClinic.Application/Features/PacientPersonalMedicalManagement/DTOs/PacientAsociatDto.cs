@@ -6,7 +6,7 @@
 public class PacientAsociatDto
 {
     public Guid RelatieID { get; set; }
-public Guid PacientID { get; set; }
+    public Guid PacientID { get; set; }
     public string PacientCod { get; set; } = string.Empty;
     public string PacientNumeComplet { get; set; } = string.Empty;
     public string? PacientCNP { get; set; }

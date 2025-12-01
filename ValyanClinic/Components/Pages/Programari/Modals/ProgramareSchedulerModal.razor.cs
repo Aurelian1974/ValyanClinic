@@ -21,7 +21,7 @@ public partial class ProgramareSchedulerModal : ComponentBase
     [Parameter] public EventCallback OnProgramareCreated { get; set; }
 
     // ==================== STATE ====================
-private bool IsLoading { get; set; } = true;
+    private bool IsLoading { get; set; } = true;
     private bool HasError { get; set; }
     private string ErrorMessage { get; set; } = string.Empty;
     private bool ShowProgramareModal { get; set; }
@@ -29,12 +29,12 @@ private bool IsLoading { get; set; } = true;
 
     // ==================== SCHEDULER ====================
     private SfSchedule<ProgramareEventDto>? SchedulerRef { get; set; }
-  private DateTime SelectedDate { get; set; } = DateTime.Today;
- 
+    private DateTime SelectedDate { get; set; } = DateTime.Today;
+
     // Use View enum directly
     private View CurrentViewEnum { get; set; } = View.Week;
     private string CurrentView { get; set; } = "Week";
-    
+
     private Guid? SelectedDoctorId { get; set; }
 
     // Pentru cell click - data/ora selectată
@@ -64,19 +64,19 @@ new ViewOption { Value = "Week", Text = "Săptămână" },
     protected override async Task OnInitializedAsync()
     {
         Logger.LogInformation("ProgramareSchedulerModal initialized");
-   
-   if (IsVisible)
+
+        if (IsVisible)
         {
-    await LoadData();
- }
+            await LoadData();
+        }
     }
 
     protected override async Task OnParametersSetAsync()
     {
         if (IsVisible && EventsList.Count == 0)
-    {
-        await LoadData();
-}
+        {
+            await LoadData();
+        }
     }
 
     // ==================== DATA LOADING ====================
@@ -84,156 +84,156 @@ new ViewOption { Value = "Week", Text = "Săptămână" },
     {
         IsLoading = true;
         HasError = false;
-StateHasChanged();
+        StateHasChanged();
 
         try
         {
-   await LoadDoctors();
+            await LoadDoctors();
             await LoadProgramari();
 
-            Logger.LogInformation("Scheduler data loaded: {Count} programări, {DoctorCount} doctori", 
+            Logger.LogInformation("Scheduler data loaded: {Count} programări, {DoctorCount} doctori",
          EventsList.Count, DoctorsList.Count);
-      }
+        }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error loading scheduler data");
-    HasError = true;
-     ErrorMessage = "Eroare la încărcarea datelor.";
+            HasError = true;
+            ErrorMessage = "Eroare la încărcarea datelor.";
         }
         finally
-   {
+        {
             IsLoading = false;
- StateHasChanged();
-   }
+            StateHasChanged();
+        }
     }
 
     private async Task LoadDoctors()
     {
         try
         {
-  var query = new GetPersonalMedicalListQuery
-        {
-      PageNumber = 1,
-    PageSize = 100,
- GlobalSearchText = null,
-              FilterEsteActiv = true
- };
+            var query = new GetPersonalMedicalListQuery
+            {
+                PageNumber = 1,
+                PageSize = 100,
+                GlobalSearchText = null,
+                FilterEsteActiv = true
+            };
 
-       var result = await Mediator.Send(query);
+            var result = await Mediator.Send(query);
 
             if (result.IsSuccess && result.Value != null)
-{
-          // ✅ FIX: result.Value is already IEnumerable<PersonalMedicalListDto>
-    var personalList = result.Value.ToList();
-    
-     DoctorsList = personalList
-  .Where(d => d.Pozitie == "Doctor" || d.Pozitie == "Medic")
- .Select(d => new DoctorDropdownDto
- {
-                 PersonalID = d.PersonalID,
-         NumeComplet = $"Dr. {d.Nume} {d.Prenume}",
-       Specializare = d.Specializare
-        })
-  .ToList();
+            {
+                // ✅ FIX: result.Value is already IEnumerable<PersonalMedicalListDto>
+                var personalList = result.Value.ToList();
 
-         DoctorResources = DoctorsList.Select((d, index) => new DoctorResourceDto
-           {
-               Id = index + 1,
-     Text = d.NumeComplet,
- Color = GetDoctorColor(index),
-             DoctorGuid = d.PersonalID
-    }).ToList();
+                DoctorsList = personalList
+             .Where(d => d.Pozitie == "Doctor" || d.Pozitie == "Medic")
+            .Select(d => new DoctorDropdownDto
+            {
+                PersonalID = d.PersonalID,
+                NumeComplet = $"Dr. {d.Nume} {d.Prenume}",
+                Specializare = d.Specializare
+            })
+             .ToList();
 
-Logger.LogInformation("Loaded {Count} doctors", DoctorsList.Count);
+                DoctorResources = DoctorsList.Select((d, index) => new DoctorResourceDto
+                {
+                    Id = index + 1,
+                    Text = d.NumeComplet,
+                    Color = GetDoctorColor(index),
+                    DoctorGuid = d.PersonalID
+                }).ToList();
+
+                Logger.LogInformation("Loaded {Count} doctors", DoctorsList.Count);
+            }
         }
-        }
- catch (Exception ex)
+        catch (Exception ex)
         {
-  Logger.LogError(ex, "Error loading doctors");
+            Logger.LogError(ex, "Error loading doctors");
             throw;
         }
     }
 
     private async Task LoadProgramari()
     {
-try
-    {
-          var query = new GetProgramariByDateQuery(SelectedDate, SelectedDoctorId);
-          var result = await Mediator.Send(query);
+        try
+        {
+            var query = new GetProgramariByDateQuery(SelectedDate, SelectedDoctorId);
+            var result = await Mediator.Send(query);
 
-          if (result.IsSuccess && result.Value != null)
-  {
-        EventsList = result.Value.Select(p => new ProgramareEventDto
-         {
-        Id = p.ProgramareID,
-            Subject = p.PacientNumeComplet ?? "Pacient Necunoscut",
-      StartTime = p.DataProgramare.Date + p.OraInceput,
-   EndTime = p.DataProgramare.Date + p.OraSfarsit,
-     Description = p.Observatii,
-     IsAllDay = false,
-    Status = p.Status,
-        TipProgramare = p.TipProgramare,
-          PacientId = p.PacientID,
-          PacientName = p.PacientNumeComplet,
-    PacientTelefon = p.PacientTelefon,
-        DoctorId = GetDoctorResourceId(p.DoctorID),
-  DoctorGuid = p.DoctorID,
-    DoctorName = p.DoctorNumeComplet,
-     CategoryColor = GetStatusColor(p.Status)
-            }).ToList();
+            if (result.IsSuccess && result.Value != null)
+            {
+                EventsList = result.Value.Select(p => new ProgramareEventDto
+                {
+                    Id = p.ProgramareID,
+                    Subject = p.PacientNumeComplet ?? "Pacient Necunoscut",
+                    StartTime = p.DataProgramare.Date + p.OraInceput,
+                    EndTime = p.DataProgramare.Date + p.OraSfarsit,
+                    Description = p.Observatii,
+                    IsAllDay = false,
+                    Status = p.Status,
+                    TipProgramare = p.TipProgramare,
+                    PacientId = p.PacientID,
+                    PacientName = p.PacientNumeComplet,
+                    PacientTelefon = p.PacientTelefon,
+                    DoctorId = GetDoctorResourceId(p.DoctorID),
+                    DoctorGuid = p.DoctorID,
+                    DoctorName = p.DoctorNumeComplet,
+                    CategoryColor = GetStatusColor(p.Status)
+                }).ToList();
 
-  Logger.LogInformation("Loaded {Count} programări", EventsList.Count);
-     }
+                Logger.LogInformation("Loaded {Count} programări", EventsList.Count);
+            }
         }
         catch (Exception ex)
         {
-      Logger.LogError(ex, "Error loading programări");
-    throw;
+            Logger.LogError(ex, "Error loading programări");
+            throw;
         }
     }
 
     // ==================== TOOLBAR EVENTS ====================
-    
+
     private async Task OnDoctorFilterChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<Guid?, DoctorDropdownDto> args)
     {
         Logger.LogInformation("Doctor filter changed: {DoctorId}", args.Value);
-  SelectedDoctorId = args.Value;
-    await LoadProgramari();
+        SelectedDoctorId = args.Value;
+        await LoadProgramari();
         StateHasChanged();
     }
 
-  private async Task OnViewChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<string, ViewOption> args)
+    private async Task OnViewChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<string, ViewOption> args)
     {
         Logger.LogInformation("View changed: {View}", args.Value);
         CurrentView = args.Value;
- CurrentViewEnum = GetViewEnum(args.Value);
+        CurrentViewEnum = GetViewEnum(args.Value);
         StateHasChanged();
     }
 
- private async Task OnTodayClicked()
+    private async Task OnTodayClicked()
     {
-   Logger.LogInformation("Today button clicked");
+        Logger.LogInformation("Today button clicked");
         SelectedDate = DateTime.Today;
         await LoadProgramari();
         StateHasChanged();
     }
 
     // ==================== SCHEDULER EVENTS (SIMPLIFIED) ====================
-    
+
     private void OnCellClicked(CellClickEventArgs args)
     {
         try
         {
             Logger.LogInformation("Cell clicked at: {StartTime}", args.StartTime);
-            
-      var clickedDate = args.StartTime;
-         var endTime = clickedDate.AddMinutes(30);
-            
-SelectedProgramareId = null;
-         SelectedCellStartTime = clickedDate;
+
+            var clickedDate = args.StartTime;
+            var endTime = clickedDate.AddMinutes(30);
+
+            SelectedProgramareId = null;
+            SelectedCellStartTime = clickedDate;
             SelectedCellEndTime = endTime;
             ShowProgramareModal = true;
-         StateHasChanged();
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -245,42 +245,42 @@ SelectedProgramareId = null;
     {
         try
         {
-var programare = args.Event;
-      Logger.LogInformation("Event clicked: {ProgramareID}", programare.Id);
-          
+            var programare = args.Event;
+            Logger.LogInformation("Event clicked: {ProgramareID}", programare.Id);
+
             SelectedProgramareId = programare.Id;
-      SelectedCellStartTime = null;
-         SelectedCellEndTime = null;
-     ShowProgramareModal = true;
-       StateHasChanged();
+            SelectedCellStartTime = null;
+            SelectedCellEndTime = null;
+            ShowProgramareModal = true;
+            StateHasChanged();
         }
         catch (Exception ex)
         {
-      Logger.LogError(ex, "Error in OnEventClicked");
-      }
+            Logger.LogError(ex, "Error in OnEventClicked");
+        }
     }
 
     // ✅ REMOVED: ActionBegin/ActionComplete/EventRendered - not working properly
 
     // ==================== PROGRAMARE ACTIONS ====================
-    
+
     private void CreateNewProgramare()
     {
         Logger.LogInformation("Create new programare");
-  SelectedProgramareId = null;
+        SelectedProgramareId = null;
         SelectedCellStartTime = null;
         SelectedCellEndTime = null;
         ShowProgramareModal = true;
-  StateHasChanged();
+        StateHasChanged();
     }
 
     private void OpenEditModal(Guid? programareId)
     {
-   if (programareId == null) return;
-      
-  Logger.LogInformation("Opening edit modal: {Id}", programareId);
+        if (programareId == null) return;
+
+        Logger.LogInformation("Opening edit modal: {Id}", programareId);
         SelectedProgramareId = programareId;
-     SelectedCellStartTime = null;
+        SelectedCellStartTime = null;
         SelectedCellEndTime = null;
         ShowProgramareModal = true;
         StateHasChanged();
@@ -288,36 +288,36 @@ var programare = args.Event;
 
     private void ViewProgramareDetails(Guid? programareId)
     {
-    if (programareId == null) return;
-    Logger.LogInformation("Viewing details: {Id}", programareId);
+        if (programareId == null) return;
+        Logger.LogInformation("Viewing details: {Id}", programareId);
     }
 
     private async Task OnProgramareSaved()
     {
         Logger.LogInformation("Programare saved");
-   ShowProgramareModal = false;
+        ShowProgramareModal = false;
         await LoadProgramari();
         await OnProgramareCreated.InvokeAsync();
         StateHasChanged();
     }
 
     // ==================== HELPERS ====================
-    
+
     private View GetViewEnum(string viewString)
     {
         return viewString switch
         {
-      "Day" => View.Day,
-  "Week" => View.Week,
- "WorkWeek" => View.WorkWeek,
+            "Day" => View.Day,
+            "Week" => View.Week,
+            "WorkWeek" => View.WorkWeek,
             "Month" => View.Month,
-      "Agenda" => View.Agenda,
-  _ => View.Week
-     };
+            "Agenda" => View.Agenda,
+            _ => View.Week
+        };
     }
 
     private int GetDoctorResourceId(Guid doctorGuid)
-  {
+    {
         var resource = DoctorResources.FirstOrDefault(r => r.DoctorGuid == doctorGuid);
         return resource?.Id ?? 1;
     }
@@ -325,7 +325,7 @@ var programare = args.Event;
     private string GetDoctorColor(int index)
     {
         var colors = new[] { "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ef4444", "#06b6d4", "#ec4899", "#84cc16" };
-return colors[index % colors.Length];
+        return colors[index % colors.Length];
     }
 
     private string GetStatusColor(string? status)
@@ -333,26 +333,26 @@ return colors[index % colors.Length];
         return status switch
         {
             "Programata" => "#3b82f6",
-    "Confirmata" => "#10b981",
-    "CheckedIn" => "#f59e0b",
-     "InConsultatie" => "#8b5cf6",
-        "Finalizata" => "#6b7280",
-    "Anulata" => "#ef4444",
-  _ => "#3b82f6"
+            "Confirmata" => "#10b981",
+            "CheckedIn" => "#f59e0b",
+            "InConsultatie" => "#8b5cf6",
+            "Finalizata" => "#6b7280",
+            "Anulata" => "#ef4444",
+            _ => "#3b82f6"
         };
     }
 
     private string GetStatusBorderColor(string? status)
     {
-  return status switch
+        return status switch
         {
-   "Programata" => "#2563eb",
+            "Programata" => "#2563eb",
             "Confirmata" => "#059669",
-        "CheckedIn" => "#d97706",
+            "CheckedIn" => "#d97706",
             "InConsultatie" => "#7c3aed",
-          "Finalizata" => "#4b5563",
+            "Finalizata" => "#4b5563",
             "Anulata" => "#dc2626",
-         _ => "#2563eb"
+            _ => "#2563eb"
         };
     }
 
@@ -360,18 +360,18 @@ return colors[index % colors.Length];
     {
         return status switch
         {
-     "Programata" => "Programată",
-          "Confirmata" => "Confirmată",
-        "CheckedIn" => "Check-in",
+            "Programata" => "Programată",
+            "Confirmata" => "Confirmată",
+            "CheckedIn" => "Check-in",
             "InConsultatie" => "În consultație",
-       "Finalizata" => "Finalizată",
-         "Anulata" => "Anulată",
-     _ => status ?? "Necunoscut"
+            "Finalizata" => "Finalizată",
+            "Anulata" => "Anulată",
+            _ => status ?? "Necunoscut"
         };
     }
 
     // ==================== MODAL CONTROL ====================
-    
+
     private async Task Close()
     {
         Logger.LogInformation("Closing scheduler modal");
@@ -380,30 +380,30 @@ return colors[index % colors.Length];
 
     private async Task HandleOverlayClick()
     {
-    Logger.LogDebug("Overlay clicked");
+        Logger.LogDebug("Overlay clicked");
     }
 
-  // ==================== DTOs ====================
-    
+    // ==================== DTOs ====================
+
     public class ViewOption
     {
         public string Value { get; set; } = string.Empty;
-   public string Text { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
     }
 
     public class DoctorDropdownDto
     {
         public Guid PersonalID { get; set; }
         public string NumeComplet { get; set; } = string.Empty;
-  public string? Specializare { get; set; }
+        public string? Specializare { get; set; }
     }
 
     public class DoctorResourceDto
     {
-    public int Id { get; set; }
+        public int Id { get; set; }
         public string Text { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
-     public Guid DoctorGuid { get; set; }
+        public Guid DoctorGuid { get; set; }
     }
 }
 

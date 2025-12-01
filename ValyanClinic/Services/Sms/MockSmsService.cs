@@ -39,7 +39,7 @@ public class MockSmsService : ISmsService
   ILogger<MockSmsService> logger,
         IMediator mediator)
     {
-  _configuration = configuration;
+        _configuration = configuration;
         _logger = logger;
         _mediator = mediator;
     }
@@ -48,20 +48,20 @@ public class MockSmsService : ISmsService
     public async Task<bool> SendSmsAsync(string phoneNumber, string message)
     {
         // Validate phone number
-    if (!IsValidPhoneNumber(phoneNumber))
+        if (!IsValidPhoneNumber(phoneNumber))
         {
- _logger.LogWarning("⚠️ MOCK SMS - Invalid phone number: {Phone}", phoneNumber);
-     return false;
-  }
+            _logger.LogWarning("⚠️ MOCK SMS - Invalid phone number: {Phone}", phoneNumber);
+            return false;
+        }
 
         // Simulate SMS sending
- _logger.LogInformation(
-            "📱 MOCK SMS SENT\n" +
-      "   To: {Phone}\n" +
-  "   Message: {Message}\n" +
- "   Length: {Length} chars\n" +
-      "   Cost: $0.00 (MOCK MODE)",
-            phoneNumber, message, message.Length);
+        _logger.LogInformation(
+                   "📱 MOCK SMS SENT\n" +
+             "   To: {Phone}\n" +
+         "   Message: {Message}\n" +
+        "   Length: {Length} chars\n" +
+             "   Cost: $0.00 (MOCK MODE)",
+                   phoneNumber, message, message.Length);
 
         // Simulate network delay
         await Task.Delay(100);
@@ -72,39 +72,39 @@ public class MockSmsService : ISmsService
     /// <inheritdoc />
     public async Task<bool> SendAppointmentConfirmationSmsAsync(Guid programareId)
     {
-    try
+        try
         {
-       _logger.LogInformation("📱 Preparing confirmation SMS for appointment {ProgramareID}", programareId);
+            _logger.LogInformation("📱 Preparing confirmation SMS for appointment {ProgramareID}", programareId);
 
-    // Get appointment details
- var query = new GetProgramareByIdQuery { ProgramareID = programareId };
-    var result = await _mediator.Send(query);
+            // Get appointment details
+            var query = new GetProgramareByIdQuery { ProgramareID = programareId };
+            var result = await _mediator.Send(query);
 
-      if (!result.IsSuccess || result.Value == null)
-    {
-             _logger.LogWarning("⚠️ Programarea {ProgramareID} nu a fost găsită", programareId);
-            return false;
- }
-
-    var programare = result.Value;
-
-            // Validate patient has phone
- if (string.IsNullOrEmpty(programare.PacientTelefon))
-   {
-                _logger.LogWarning("⚠️ Pacientul {Pacient} nu are telefon configurat", 
-          programare.PacientNumeComplet);
-      return false;
+            if (!result.IsSuccess || result.Value == null)
+            {
+                _logger.LogWarning("⚠️ Programarea {ProgramareID} nu a fost găsită", programareId);
+                return false;
             }
 
-     // Generate confirmation message
+            var programare = result.Value;
+
+            // Validate patient has phone
+            if (string.IsNullOrEmpty(programare.PacientTelefon))
+            {
+                _logger.LogWarning("⚠️ Pacientul {Pacient} nu are telefon configurat",
+          programare.PacientNumeComplet);
+                return false;
+            }
+
+            // Generate confirmation message
             var message = GenerateConfirmationMessage(programare);
 
-   // Send SMS
-    return await SendSmsAsync(programare.PacientTelefon, message);
-     }
+            // Send SMS
+            return await SendSmsAsync(programare.PacientTelefon, message);
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Eroare la trimiterea SMS-ului de confirmare pentru {ProgramareID}", 
+            _logger.LogError(ex, "❌ Eroare la trimiterea SMS-ului de confirmare pentru {ProgramareID}",
       programareId);
             return false;
         }
@@ -113,120 +113,120 @@ public class MockSmsService : ISmsService
     /// <inheritdoc />
     public async Task<bool> SendAppointmentReminderSmsAsync(Guid programareId, int hoursBeforeAppointment = 24)
     {
-   try
-{
-        _logger.LogInformation("📱 Preparing reminder SMS for appointment {ProgramareID} ({Hours}h before)", 
-          programareId, hoursBeforeAppointment);
+        try
+        {
+            _logger.LogInformation("📱 Preparing reminder SMS for appointment {ProgramareID} ({Hours}h before)",
+              programareId, hoursBeforeAppointment);
 
-   // Get appointment details
- var query = new GetProgramareByIdQuery { ProgramareID = programareId };
-        var result = await _mediator.Send(query);
+            // Get appointment details
+            var query = new GetProgramareByIdQuery { ProgramareID = programareId };
+            var result = await _mediator.Send(query);
 
-      if (!result.IsSuccess || result.Value == null)
+            if (!result.IsSuccess || result.Value == null)
             {
-      _logger.LogWarning("⚠️ Programarea {ProgramareID} nu a fost găsită", programareId);
+                _logger.LogWarning("⚠️ Programarea {ProgramareID} nu a fost găsită", programareId);
                 return false;
             }
 
             var programare = result.Value;
 
-// Validate patient has phone
+            // Validate patient has phone
             if (string.IsNullOrEmpty(programare.PacientTelefon))
-      {
-        _logger.LogWarning("⚠️ Pacientul {Pacient} nu are telefon configurat", 
-         programare.PacientNumeComplet);
+            {
+                _logger.LogWarning("⚠️ Pacientul {Pacient} nu are telefon configurat",
+                 programare.PacientNumeComplet);
                 return false;
-       }
+            }
 
-     // Generate reminder message
+            // Generate reminder message
             var message = GenerateReminderMessage(programare, hoursBeforeAppointment);
 
-          // Send SMS
-return await SendSmsAsync(programare.PacientTelefon, message);
+            // Send SMS
+            return await SendSmsAsync(programare.PacientTelefon, message);
         }
-  catch (Exception ex)
+        catch (Exception ex)
         {
-   _logger.LogError(ex, "❌ Eroare la trimiterea SMS-ului reminder pentru {ProgramareID}", 
-    programareId);
-          return false;
+            _logger.LogError(ex, "❌ Eroare la trimiterea SMS-ului reminder pentru {ProgramareID}",
+             programareId);
+            return false;
         }
     }
 
     /// <inheritdoc />
     public async Task<bool> SendAppointmentCancellationSmsAsync(Guid programareId, string? reason = null)
     {
-      try
+        try
         {
-      _logger.LogInformation("📱 Preparing cancellation SMS for appointment {ProgramareID}", programareId);
+            _logger.LogInformation("📱 Preparing cancellation SMS for appointment {ProgramareID}", programareId);
 
-      // Get appointment details
-  var query = new GetProgramareByIdQuery { ProgramareID = programareId };
+            // Get appointment details
+            var query = new GetProgramareByIdQuery { ProgramareID = programareId };
             var result = await _mediator.Send(query);
 
             if (!result.IsSuccess || result.Value == null)
-    {
-     _logger.LogWarning("⚠️ Programarea {ProgramareID} nu a fost găsită", programareId);
-        return false;
-       }
+            {
+                _logger.LogWarning("⚠️ Programarea {ProgramareID} nu a fost găsită", programareId);
+                return false;
+            }
 
-    var programare = result.Value;
+            var programare = result.Value;
 
-          // Validate patient has phone
-   if (string.IsNullOrEmpty(programare.PacientTelefon))
-    {
-          _logger.LogWarning("⚠️ Pacientul {Pacient} nu are telefon configurat", 
-        programare.PacientNumeComplet);
-       return false;
-    }
+            // Validate patient has phone
+            if (string.IsNullOrEmpty(programare.PacientTelefon))
+            {
+                _logger.LogWarning("⚠️ Pacientul {Pacient} nu are telefon configurat",
+              programare.PacientNumeComplet);
+                return false;
+            }
 
             // Generate cancellation message
-      var message = GenerateCancellationMessage(programare, reason);
+            var message = GenerateCancellationMessage(programare, reason);
 
-     // Send SMS
-         return await SendSmsAsync(programare.PacientTelefon, message);
- }
-  catch (Exception ex)
-     {
-   _logger.LogError(ex, "❌ Eroare la trimiterea SMS-ului de anulare pentru {ProgramareID}", 
-      programareId);
-    return false;
-  }
+            // Send SMS
+            return await SendSmsAsync(programare.PacientTelefon, message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Eroare la trimiterea SMS-ului de anulare pentru {ProgramareID}",
+               programareId);
+            return false;
+        }
     }
 
     /// <inheritdoc />
     public async Task<int> SendBulkSmsAsync(List<string> phoneNumbers, string message)
-  {
+    {
         _logger.LogInformation("📱 Preparing bulk SMS to {Count} recipients", phoneNumbers.Count);
 
-      int successCount = 0;
+        int successCount = 0;
 
         foreach (var phoneNumber in phoneNumbers)
         {
-    var success = await SendSmsAsync(phoneNumber, message);
-      if (success) successCount++;
-            
-       // Small delay to avoid rate limiting (real providers)
+            var success = await SendSmsAsync(phoneNumber, message);
+            if (success) successCount++;
+
+            // Small delay to avoid rate limiting (real providers)
             await Task.Delay(50);
         }
 
-     _logger.LogInformation("✅ Bulk SMS complete: {Success}/{Total} sent successfully", 
-            successCount, phoneNumbers.Count);
+        _logger.LogInformation("✅ Bulk SMS complete: {Success}/{Total} sent successfully",
+               successCount, phoneNumbers.Count);
 
         return successCount;
     }
 
     /// <inheritdoc />
-public bool IsValidPhoneNumber(string phoneNumber)
+    public bool IsValidPhoneNumber(string phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
             return false;
 
-     // Remove spaces, dashes, parentheses
-     var cleaned = Regex.Replace(phoneNumber, @"[\s\-\(\)]", "");
+        // Remove spaces, dashes, parentheses
+        var cleaned = Regex.Replace(phoneNumber, @"[\s\-\(\)]", "");
 
-   // Romanian phone number patterns:
+        // Romanian phone number patterns:
         // 07xxxxxxxx (10 digits)
-      // +407xxxxxxxx (12 digits with country code)
+        // +407xxxxxxxx (12 digits with country code)
         // 004007xxxxxxxx (14 digits with 00 prefix)
 
         var patterns = new[]
@@ -243,17 +243,17 @@ public bool IsValidPhoneNumber(string phoneNumber)
 
     private string GenerateConfirmationMessage(Application.Features.ProgramareManagement.DTOs.ProgramareDetailDto programare)
     {
-   return $"ValyanClinic: Programarea ta cu Dr. {programare.DoctorNumeComplet} " +
-      $"pe data de {programare.DataProgramare:dd.MM.yyyy} la ora {programare.OraInceput:hh\\:mm} " +
-               $"a fost confirmată. Pentru reprogramare, sună la 0123456789.";
+        return $"ValyanClinic: Programarea ta cu Dr. {programare.DoctorNumeComplet} " +
+           $"pe data de {programare.DataProgramare:dd.MM.yyyy} la ora {programare.OraInceput:hh\\:mm} " +
+                    $"a fost confirmată. Pentru reprogramare, sună la 0123456789.";
     }
 
     private string GenerateReminderMessage(
-      Application.Features.ProgramareManagement.DTOs.ProgramareDetailDto programare, 
+      Application.Features.ProgramareManagement.DTOs.ProgramareDetailDto programare,
    int hoursBeforeAppointment)
     {
-        var timeUntil = hoursBeforeAppointment >= 24 
-            ? $"{hoursBeforeAppointment / 24} zi" 
+        var timeUntil = hoursBeforeAppointment >= 24
+            ? $"{hoursBeforeAppointment / 24} zi"
  : $"{hoursBeforeAppointment} ore";
 
         return $"ValyanClinic REMINDER: Ai programare cu Dr. {programare.DoctorNumeComplet} " +
@@ -262,16 +262,16 @@ public bool IsValidPhoneNumber(string phoneNumber)
     }
 
     private string GenerateCancellationMessage(
-        Application.Features.ProgramareManagement.DTOs.ProgramareDetailDto programare, 
+        Application.Features.ProgramareManagement.DTOs.ProgramareDetailDto programare,
  string? reason)
     {
-    var baseMessage = $"ValyanClinic: Programarea ta cu Dr. {programare.DoctorNumeComplet} " +
-           $"din data de {programare.DataProgramare:dd.MM.yyyy} la ora {programare.OraInceput:hh\\:mm} " +
-      $"a fost anulată.";
+        var baseMessage = $"ValyanClinic: Programarea ta cu Dr. {programare.DoctorNumeComplet} " +
+               $"din data de {programare.DataProgramare:dd.MM.yyyy} la ora {programare.OraInceput:hh\\:mm} " +
+          $"a fost anulată.";
 
-     if (!string.IsNullOrEmpty(reason))
+        if (!string.IsNullOrEmpty(reason))
         {
-        baseMessage += $" Motiv: {reason}.";
+            baseMessage += $" Motiv: {reason}.";
         }
 
         baseMessage += " Pentru reprogramare, sună la 0123456789.";

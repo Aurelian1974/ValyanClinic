@@ -49,7 +49,7 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     private bool ShowConfirmRemoveDoctor { get; set; }
     private DoctorAsociatDto? DoctorToRemove { get; set; }
     private bool ShowConfirmAddDoctors { get; set; }
-    
+
     // ✅ ADDED: Confirm modal state pentru reactivare
     private bool ShowConfirmActivateDoctor { get; set; }
     private DoctorAsociatDto? DoctorToActivate { get; set; }
@@ -58,7 +58,7 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     private PacientFormModel FormModel { get; set; } = new();
 
     // Dropdown Options
- private List<string> SexOptions { get; set; } = new() { "M", "F" };
+    private List<string> SexOptions { get; set; } = new() { "M", "F" };
 
     // Judete list
     private List<string> JudeteList { get; set; } = new()
@@ -76,28 +76,28 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     {
         if (_disposed) return;
 
-    try
+        try
         {
             Logger.LogDebug("[PacientAddEditModal] Disposing - Starting cleanup");
 
-  // Setează flag IMEDIAT
-     _disposed = true;
+            // Setează flag IMEDIAT
+            _disposed = true;
 
             // Clear toate listele pentru a elibera memoria
-     DoctoriAsociati?.Clear();
-       DoctoriAsociati = new();
-        JudeteList?.Clear();
-      SexOptions?.Clear();
+            DoctoriAsociati?.Clear();
+            DoctoriAsociati = new();
+            JudeteList?.Clear();
+            SexOptions?.Clear();
 
-     // Reset state flags
-        ShowAddDoctorModal = false;
- ShowConfirmRemoveDoctor = false;
-   ShowConfirmAddDoctors = false;
+            // Reset state flags
+            ShowAddDoctorModal = false;
+            ShowConfirmRemoveDoctor = false;
+            ShowConfirmAddDoctors = false;
             DoctorToRemove = null;
 
             Logger.LogDebug("[PacientAddEditModal] Dispose complete");
-      }
-catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             Logger.LogError(ex, "[PacientAddEditModal] Error during dispose");
         }
@@ -107,94 +107,94 @@ catch (Exception ex)
     {
         if (_disposed) return; // ADDED: Guard check
 
-      if (IsVisible && IsEditMode)
+        if (IsVisible && IsEditMode)
         {
- await LoadPacientData();
-      await LoadDoctoriAsociati();
+            await LoadPacientData();
+            await LoadDoctoriAsociati();
         }
         else if (IsVisible && !IsEditMode)
-   {
- ResetForm();
+        {
+            ResetForm();
         }
     }
 
-  private async Task LoadPacientData()
+    private async Task LoadPacientData()
     {
         if (_disposed) return; // ADDED: Guard check
 
         IsLoading = true;
-      HasError = false;
+        HasError = false;
         ErrorMessage = null;
 
-    try
+        try
         {
-       var query = new GetPacientByIdQuery(PacientId!.Value);
+            var query = new GetPacientByIdQuery(PacientId!.Value);
             var result = await Mediator.Send(query);
 
             if (_disposed) return; // ADDED: Check after async
 
-        if (result.IsSuccess && result.Value != null)
-    {
-     var pacient = result.Value;
-     FormModel = new PacientFormModel
-             {
-    Nume = pacient.Nume,
-           Prenume = pacient.Prenume,
-         CNP = pacient.CNP,
-         Cod_Pacient = pacient.Cod_Pacient,
-   Data_Nasterii = pacient.Data_Nasterii,
-          Sex = pacient.Sex,
-  Telefon = pacient.Telefon,
-       Telefon_Secundar = pacient.Telefon_Secundar,
-          Email = pacient.Email,
-     Judet = pacient.Judet,
-         Localitate = pacient.Localitate,
-          Adresa = pacient.Adresa,
-     Cod_Postal = pacient.Cod_Postal,
-        Asigurat = pacient.Asigurat,
-      CNP_Asigurat = pacient.CNP_Asigurat,
-     Nr_Card_Sanatate = pacient.Nr_Card_Sanatate,
-  Casa_Asigurari = pacient.Casa_Asigurari,
-            Alergii = pacient.Alergii,
+            if (result.IsSuccess && result.Value != null)
+            {
+                var pacient = result.Value;
+                FormModel = new PacientFormModel
+                {
+                    Nume = pacient.Nume,
+                    Prenume = pacient.Prenume,
+                    CNP = pacient.CNP,
+                    Cod_Pacient = pacient.Cod_Pacient,
+                    Data_Nasterii = pacient.Data_Nasterii,
+                    Sex = pacient.Sex,
+                    Telefon = pacient.Telefon,
+                    Telefon_Secundar = pacient.Telefon_Secundar,
+                    Email = pacient.Email,
+                    Judet = pacient.Judet,
+                    Localitate = pacient.Localitate,
+                    Adresa = pacient.Adresa,
+                    Cod_Postal = pacient.Cod_Postal,
+                    Asigurat = pacient.Asigurat,
+                    CNP_Asigurat = pacient.CNP_Asigurat,
+                    Nr_Card_Sanatate = pacient.Nr_Card_Sanatate,
+                    Casa_Asigurari = pacient.Casa_Asigurari,
+                    Alergii = pacient.Alergii,
                     Boli_Cronice = pacient.Boli_Cronice,
- Medic_Familie = pacient.Medic_Familie,
-    Persoana_Contact = pacient.Persoana_Contact,
-         Telefon_Urgenta = pacient.Telefon_Urgenta,
-        Relatie_Contact = pacient.Relatie_Contact,
-         Activ = pacient.Activ,
-                Observatii = pacient.Observatii
-       };
+                    Medic_Familie = pacient.Medic_Familie,
+                    Persoana_Contact = pacient.Persoana_Contact,
+                    Telefon_Urgenta = pacient.Telefon_Urgenta,
+                    Relatie_Contact = pacient.Relatie_Contact,
+                    Activ = pacient.Activ,
+                    Observatii = pacient.Observatii
+                };
             }
-  else
- {
-             HasError = true;
-        ErrorMessage = result.FirstError ?? "Eroare la încărcarea datelor pacientului.";
+            else
+            {
+                HasError = true;
+                ErrorMessage = result.FirstError ?? "Eroare la încărcarea datelor pacientului.";
             }
         }
         catch (ObjectDisposedException)
-    {
+        {
             Logger.LogDebug("[PacientAddEditModal] Component disposed while loading data");
-    }
+        }
         catch (Exception ex)
         {
             if (!_disposed)
             {
-         HasError = true;
-ErrorMessage = $"Eroare: {ex.Message}";
+                HasError = true;
+                ErrorMessage = $"Eroare: {ex.Message}";
             }
         }
         finally
         {
             if (!_disposed)
-    {
-      IsLoading = false;
+            {
+                IsLoading = false;
             }
         }
     }
 
     private async Task LoadDoctoriAsociati()
     {
-if (_disposed || !IsEditMode) return; // ADDED: Guard check
+        if (_disposed || !IsEditMode) return; // ADDED: Guard check
 
         IsLoadingDoctori = true;
 
@@ -205,53 +205,53 @@ if (_disposed || !IsEditMode) return; // ADDED: Guard check
             var query = new GetDoctoriByPacientQuery(PacientId!.Value, ApenumereActivi: false);
             var result = await Mediator.Send(query);
 
-        if (_disposed) return; // ADDED: Check after async
+            if (_disposed) return; // ADDED: Check after async
 
-  if (result.IsSuccess && result.Value != null)
-      {
-            DoctoriAsociati = result.Value;
-       Logger.LogInformation("[PacientAddEditModal] Loaded {Count} doctori", DoctoriAsociati.Count);
-      }
+            if (result.IsSuccess && result.Value != null)
+            {
+                DoctoriAsociati = result.Value;
+                Logger.LogInformation("[PacientAddEditModal] Loaded {Count} doctori", DoctoriAsociati.Count);
+            }
             else
-  {
- DoctoriAsociati = new List<DoctorAsociatDto>();
-     Logger.LogWarning("[PacientAddEditModal] Failed to load doctori: {Error}", result.FirstError);
+            {
+                DoctoriAsociati = new List<DoctorAsociatDto>();
+                Logger.LogWarning("[PacientAddEditModal] Failed to load doctori: {Error}", result.FirstError);
             }
         }
-    catch (ObjectDisposedException)
+        catch (ObjectDisposedException)
         {
             Logger.LogDebug("[PacientAddEditModal] Component disposed while loading doctori");
- }
+        }
         catch (Exception ex)
-   {
+        {
             if (!_disposed)
             {
-   Logger.LogError(ex, "[PacientAddEditModal] Exception loading doctori");
-          DoctoriAsociati = new List<DoctorAsociatDto>();
+                Logger.LogError(ex, "[PacientAddEditModal] Exception loading doctori");
+                DoctoriAsociati = new List<DoctorAsociatDto>();
             }
         }
-     finally
+        finally
         {
-  if (!_disposed)
-        {
-     IsLoadingDoctori = false;
+            if (!_disposed)
+            {
+                IsLoadingDoctori = false;
             }
         }
- }
+    }
 
     private async Task OpenAddDoctorModal()
     {
         if (_disposed) return; // ADDED: Guard check
 
-     if (!IsEditMode)
+        if (!IsEditMode)
         {
-       await NotificationService.ShowWarningAsync(
-    "Vă rugăm să salvați mai întâi pacientul înainte de a adăuga doctori.",
-          "Atenție");
-   return;
+            await NotificationService.ShowWarningAsync(
+         "Vă rugăm să salvați mai întâi pacientul înainte de a adăuga doctori.",
+               "Atenție");
+            return;
         }
 
-     Logger.LogInformation("[PacientAddEditModal] Opening AddDoctorModal");
+        Logger.LogInformation("[PacientAddEditModal] Opening AddDoctorModal");
         ShowAddDoctorModal = true;
     }
 
@@ -260,9 +260,9 @@ if (_disposed || !IsEditMode) return; // ADDED: Guard check
         if (_disposed) return; // ADDED: Guard check
 
         Logger.LogInformation("[PacientAddEditModal] Doctor added - reloading list");
-     ShowAddDoctorModal = false;
+        ShowAddDoctorModal = false;
         await LoadDoctoriAsociati();
- StateHasChanged();
+        StateHasChanged();
     }
 
     private void RemoveDoctor(DoctorAsociatDto doctor)
@@ -278,54 +278,54 @@ if (_disposed || !IsEditMode) return; // ADDED: Guard check
     {
         if (_disposed) return;
 
-    DoctorToActivate = doctor;
+        DoctorToActivate = doctor;
         ShowConfirmActivateDoctor = true;
     }
 
     private async Task HandleRemoveDoctorConfirmed()
     {
-      if (_disposed || DoctorToRemove == null) return; // ADDED: Guard check
+        if (_disposed || DoctorToRemove == null) return; // ADDED: Guard check
 
-      ShowConfirmRemoveDoctor = false;
+        ShowConfirmRemoveDoctor = false;
 
-    try
-      {
-      Logger.LogInformation("[PacientAddEditModal] Removing doctor: {DoctorName}, RelatieID: {RelatieID}",
-        DoctorToRemove.DoctorNumeComplet, DoctorToRemove.RelatieID);
+        try
+        {
+            Logger.LogInformation("[PacientAddEditModal] Removing doctor: {DoctorName}, RelatieID: {RelatieID}",
+              DoctorToRemove.DoctorNumeComplet, DoctorToRemove.RelatieID);
 
-          var command = new RemoveRelatieCommand(RelatieID: DoctorToRemove.RelatieID);
-  var result = await Mediator.Send(command);
+            var command = new RemoveRelatieCommand(RelatieID: DoctorToRemove.RelatieID);
+            var result = await Mediator.Send(command);
 
- if (_disposed) return; // ADDED: Check after async
+            if (_disposed) return; // ADDED: Check after async
 
-     if (result.IsSuccess)
-   {
-     await LoadDoctoriAsociati();
-        await NotificationService.ShowSuccessAsync("Relație dezactivată cu succes!");
-   }
-       else
-       {
-  await NotificationService.ShowErrorAsync(result.FirstError ?? "Eroare la dezactivare");
-}
+            if (result.IsSuccess)
+            {
+                await LoadDoctoriAsociati();
+                await NotificationService.ShowSuccessAsync("Relație dezactivată cu succes!");
+            }
+            else
+            {
+                await NotificationService.ShowErrorAsync(result.FirstError ?? "Eroare la dezactivare");
+            }
         }
         catch (ObjectDisposedException)
         {
-Logger.LogDebug("[PacientAddEditModal] Component disposed during remove operation");
-     }
+            Logger.LogDebug("[PacientAddEditModal] Component disposed during remove operation");
+        }
         catch (Exception ex)
         {
- if (!_disposed)
-  {
-    Logger.LogError(ex, "[PacientAddEditModal] Error removing doctor");
-  await NotificationService.ShowErrorAsync(ex.Message, "Eroare");
- }
-      }
-   finally
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "[PacientAddEditModal] Error removing doctor");
+                await NotificationService.ShowErrorAsync(ex.Message, "Eroare");
+            }
+        }
+        finally
         {
             if (!_disposed)
-   {
-   DoctorToRemove = null;
-    }
+            {
+                DoctorToRemove = null;
+            }
         }
     }
 
@@ -338,8 +338,8 @@ Logger.LogDebug("[PacientAddEditModal] Component disposed during remove operatio
 
         try
         {
-        Logger.LogInformation("[PacientAddEditModal] Activating doctor: {DoctorName}, RelatieID: {RelatieID}",
-DoctorToActivate.DoctorNumeComplet, DoctorToActivate.RelatieID);
+            Logger.LogInformation("[PacientAddEditModal] Activating doctor: {DoctorName}, RelatieID: {RelatieID}",
+    DoctorToActivate.DoctorNumeComplet, DoctorToActivate.RelatieID);
 
             var command = new ActivateRelatieCommand(
      RelatieID: DoctorToActivate.RelatieID,
@@ -352,74 +352,74 @@ DoctorToActivate.DoctorNumeComplet, DoctorToActivate.RelatieID);
             if (_disposed) return;
 
             if (result.IsSuccess)
-     {
+            {
                 await LoadDoctoriAsociati();
-          await NotificationService.ShowSuccessAsync(
-  result.SuccessMessage ?? "Relație reactivată cu succes!");
-        }
+                await NotificationService.ShowSuccessAsync(
+        result.SuccessMessage ?? "Relație reactivată cu succes!");
+            }
             else
-   {
-       await NotificationService.ShowErrorAsync(
-        result.FirstError ?? "Eroare la reactivare");
-      }
+            {
+                await NotificationService.ShowErrorAsync(
+                 result.FirstError ?? "Eroare la reactivare");
+            }
         }
         catch (ObjectDisposedException)
         {
-      Logger.LogDebug("[PacientAddEditModal] Component disposed during activate operation");
+            Logger.LogDebug("[PacientAddEditModal] Component disposed during activate operation");
         }
-    catch (Exception ex)
+        catch (Exception ex)
         {
-     if (!_disposed)
-      {
-        Logger.LogError(ex, "[PacientAddEditModal] Error activating doctor");
-  await NotificationService.ShowErrorAsync(ex.Message, "Eroare");
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "[PacientAddEditModal] Error activating doctor");
+                await NotificationService.ShowErrorAsync(ex.Message, "Eroare");
             }
-      }
+        }
         finally
-    {
-         if (!_disposed)
-      {
-     DoctorToActivate = null;
-    }
+        {
+            if (!_disposed)
+            {
+                DoctorToActivate = null;
+            }
         }
     }
 
     private string GetBadgeClass(string? tipRelatie)
     {
-  return tipRelatie switch
-  {
-     "MedicPrimar" => "badge-primary",
-        "Specialist" => "badge-info",
-          "MedicConsultant" => "badge-success",
-     "MedicDeGarda" => "badge-warning",
-        "MedicFamilie" => "badge-secondary",
-     _ => "badge-secondary"
+        return tipRelatie switch
+        {
+            "MedicPrimar" => "badge-primary",
+            "Specialist" => "badge-info",
+            "MedicConsultant" => "badge-success",
+            "MedicDeGarda" => "badge-warning",
+            "MedicFamilie" => "badge-secondary",
+            _ => "badge-secondary"
         };
     }
 
     private string FormatZile(int zile)
     {
         if (zile < 30)
-   return $"{zile} zile";
+            return $"{zile} zile";
         if (zile < 365)
-  return $"{zile / 30} luni";
-  return $"{zile / 365} ani";
+            return $"{zile / 30} luni";
+        return $"{zile / 365} ani";
     }
 
     private void ResetForm()
     {
- if (_disposed) return; // ADDED: Guard check
+        if (_disposed) return; // ADDED: Guard check
 
         FormModel = new PacientFormModel
         {
-      Data_Nasterii = DateTime.Now.AddYears(-30),
+            Data_Nasterii = DateTime.Now.AddYears(-30),
             Activ = true,
-  Asigurat = false
+            Asigurat = false
         };
         ActiveTab = "personal";
         HasError = false;
         ErrorMessage = null;
-  DoctoriAsociati = new();
+        DoctoriAsociati = new();
         ShowAddDoctorModal = false;
     }
 
@@ -432,162 +432,162 @@ DoctorToActivate.DoctorNumeComplet, DoctorToActivate.RelatieID);
 
     private async Task HandleSubmit()
     {
-      if (_disposed) return; // ADDED: Guard check
+        if (_disposed) return; // ADDED: Guard check
 
         IsSaving = true;
-  HasError = false;
+        HasError = false;
         ErrorMessage = null;
 
         try
         {
-    if (IsEditMode)
-          {
-             await UpdatePacient();
-    }
-     else
-  {
-      await CreatePacient();
-    }
+            if (IsEditMode)
+            {
+                await UpdatePacient();
+            }
+            else
+            {
+                await CreatePacient();
+            }
         }
         finally
-  {
-            if (!_disposed)
         {
-       IsSaving = false;
+            if (!_disposed)
+            {
+                IsSaving = false;
             }
         }
     }
 
-  private async Task CreatePacient()
+    private async Task CreatePacient()
     {
         if (_disposed) return; // ADDED: Guard check
 
-    var command = new CreatePacientCommand
+        var command = new CreatePacientCommand
         {
-        Nume = FormModel.Nume,
- Prenume = FormModel.Prenume,
+            Nume = FormModel.Nume,
+            Prenume = FormModel.Prenume,
             CNP = FormModel.CNP,
-    Cod_Pacient = FormModel.Cod_Pacient,
-  Data_Nasterii = FormModel.Data_Nasterii,
+            Cod_Pacient = FormModel.Cod_Pacient,
+            Data_Nasterii = FormModel.Data_Nasterii,
             Sex = FormModel.Sex,
-     Telefon = FormModel.Telefon,
-   Telefon_Secundar = FormModel.Telefon_Secundar,
-         Email = FormModel.Email,
-   Judet = FormModel.Judet,
-      Localitate = FormModel.Localitate,
-          Adresa = FormModel.Adresa,
-         Cod_Postal = FormModel.Cod_Postal,
+            Telefon = FormModel.Telefon,
+            Telefon_Secundar = FormModel.Telefon_Secundar,
+            Email = FormModel.Email,
+            Judet = FormModel.Judet,
+            Localitate = FormModel.Localitate,
+            Adresa = FormModel.Adresa,
+            Cod_Postal = FormModel.Cod_Postal,
             Asigurat = FormModel.Asigurat,
             CNP_Asigurat = FormModel.CNP_Asigurat,
-          Nr_Card_Sanatate = FormModel.Nr_Card_Sanatate,
-         Casa_Asigurari = FormModel.Casa_Asigurari,
+            Nr_Card_Sanatate = FormModel.Nr_Card_Sanatate,
+            Casa_Asigurari = FormModel.Casa_Asigurari,
             Alergii = FormModel.Alergii,
-     Boli_Cronice = FormModel.Boli_Cronice,
-       Medic_Familie = FormModel.Medic_Familie,
-         Persoana_Contact = FormModel.Persoana_Contact,
-    Telefon_Urgenta = FormModel.Telefon_Urgenta,
-Relatie_Contact = FormModel.Relatie_Contact,
+            Boli_Cronice = FormModel.Boli_Cronice,
+            Medic_Familie = FormModel.Medic_Familie,
+            Persoana_Contact = FormModel.Persoana_Contact,
+            Telefon_Urgenta = FormModel.Telefon_Urgenta,
+            Relatie_Contact = FormModel.Relatie_Contact,
             Activ = FormModel.Activ,
-    Observatii = FormModel.Observatii,
+            Observatii = FormModel.Observatii,
             CreatDe = "System"
-      };
+        };
 
         var result = await Mediator.Send(command);
 
-if (_disposed) return; // ADDED: Check after async
+        if (_disposed) return; // ADDED: Check after async
 
-    if (result.IsSuccess)
-    {
-  Logger.LogInformation("[PacientAddEditModal] Pacient created successfully with ID: {PacientId}", result.Value);
-
-     PacientId = result.Value;
-       ShowConfirmAddDoctors = true;
-        }
-      else
+        if (result.IsSuccess)
         {
-  HasError = true;
-     ErrorMessage = string.Join("\n", result.Errors);
-     await NotificationService.ShowErrorAsync(ErrorMessage, "Eroare la salvare");
-   }
+            Logger.LogInformation("[PacientAddEditModal] Pacient created successfully with ID: {PacientId}", result.Value);
+
+            PacientId = result.Value;
+            ShowConfirmAddDoctors = true;
+        }
+        else
+        {
+            HasError = true;
+            ErrorMessage = string.Join("\n", result.Errors);
+            await NotificationService.ShowErrorAsync(ErrorMessage, "Eroare la salvare");
+        }
     }
 
     private async Task HandleAddDoctorsConfirmed()
     {
-      if (_disposed) return; // ADDED: Guard check
+        if (_disposed) return; // ADDED: Guard check
 
         ShowConfirmAddDoctors = false;
 
         await LoadPacientData();
         await LoadDoctoriAsociati();
 
-      ActiveTab = "doctori";
+        ActiveTab = "doctori";
         StateHasChanged();
 
         await Task.Delay(300);
-   OpenAddDoctorModal();
+        OpenAddDoctorModal();
     }
 
     private async Task HandleAddDoctorsDeclined()
     {
-      if (_disposed) return; // ADDED: Guard check
+        if (_disposed) return; // ADDED: Guard check
 
- ShowConfirmAddDoctors = false;
+        ShowConfirmAddDoctors = false;
 
- await NotificationService.ShowSuccessAsync("Pacient creat cu succes!");
+        await NotificationService.ShowSuccessAsync("Pacient creat cu succes!");
         await Close();
         await OnSaved.InvokeAsync();
     }
 
     private async Task UpdatePacient()
     {
-  if (_disposed) return; // ADDED: Guard check
+        if (_disposed) return; // ADDED: Guard check
 
- var command = new UpdatePacientCommand
+        var command = new UpdatePacientCommand
         {
-          Id = PacientId!.Value,
-   Nume = FormModel.Nume,
- Prenume = FormModel.Prenume,
+            Id = PacientId!.Value,
+            Nume = FormModel.Nume,
+            Prenume = FormModel.Prenume,
             CNP = FormModel.CNP,
             Data_Nasterii = FormModel.Data_Nasterii,
             Sex = FormModel.Sex,
-     Telefon = FormModel.Telefon,
+            Telefon = FormModel.Telefon,
             Telefon_Secundar = FormModel.Telefon_Secundar,
             Email = FormModel.Email,
             Judet = FormModel.Judet,
- Localitate = FormModel.Localitate,
-     Adresa = FormModel.Adresa,
+            Localitate = FormModel.Localitate,
+            Adresa = FormModel.Adresa,
             Cod_Postal = FormModel.Cod_Postal,
- Asigurat = FormModel.Asigurat,
-    CNP_Asigurat = FormModel.CNP_Asigurat,
-         Nr_Card_Sanatate = FormModel.Nr_Card_Sanatate,
-  Casa_Asigurari = FormModel.Casa_Asigurari,
-     Alergii = FormModel.Alergii,
-Boli_Cronice = FormModel.Boli_Cronice,
-       Medic_Familie = FormModel.Medic_Familie,
-     Persoana_Contact = FormModel.Persoana_Contact,
- Telefon_Urgenta = FormModel.Telefon_Urgenta,
-    Relatie_Contact = FormModel.Relatie_Contact,
+            Asigurat = FormModel.Asigurat,
+            CNP_Asigurat = FormModel.CNP_Asigurat,
+            Nr_Card_Sanatate = FormModel.Nr_Card_Sanatate,
+            Casa_Asigurari = FormModel.Casa_Asigurari,
+            Alergii = FormModel.Alergii,
+            Boli_Cronice = FormModel.Boli_Cronice,
+            Medic_Familie = FormModel.Medic_Familie,
+            Persoana_Contact = FormModel.Persoana_Contact,
+            Telefon_Urgenta = FormModel.Telefon_Urgenta,
+            Relatie_Contact = FormModel.Relatie_Contact,
             Activ = FormModel.Activ,
-  Observatii = FormModel.Observatii,
-          ModificatDe = "System"
-   };
+            Observatii = FormModel.Observatii,
+            ModificatDe = "System"
+        };
 
         var result = await Mediator.Send(command);
 
         if (_disposed) return; // ADDED: Check after async
 
-     if (result.IsSuccess)
- {
-      await NotificationService.ShowSuccessAsync(
-    result.SuccessMessage ?? "Pacient actualizat cu succes!");
+        if (result.IsSuccess)
+        {
+            await NotificationService.ShowSuccessAsync(
+          result.SuccessMessage ?? "Pacient actualizat cu succes!");
             await Close();
-await OnSaved.InvokeAsync();
+            await OnSaved.InvokeAsync();
         }
         else
         {
-  HasError = true;
-   ErrorMessage = string.Join("\n", result.Errors);
- await NotificationService.ShowErrorAsync(ErrorMessage, "Eroare la salvare");
+            HasError = true;
+            ErrorMessage = string.Join("\n", result.Errors);
+            await NotificationService.ShowErrorAsync(ErrorMessage, "Eroare la salvare");
         }
     }
 
@@ -599,23 +599,23 @@ await OnSaved.InvokeAsync();
         return;
     }
 
-  private async Task Close()
+    private async Task Close()
     {
         if (_disposed) return; // ADDED: Guard check
 
         IsVisible = false;
- await IsVisibleChanged.InvokeAsync(false);
-   ResetForm();
+        await IsVisibleChanged.InvokeAsync(false);
+        ResetForm();
     }
 
- // Form Model Class
+    // Form Model Class
     public class PacientFormModel
- {
+    {
         [Required(ErrorMessage = "Numele este obligatoriu")]
         [StringLength(100, ErrorMessage = "Numele nu poate depăși 100 de caractere")]
- public string Nume { get; set; } = string.Empty;
+        public string Nume { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Prenumele este obligatoriu")]
+        [Required(ErrorMessage = "Prenumele este obligatoriu")]
         [StringLength(100, ErrorMessage = "Prenumele nu poate depăși 100 de caractere")]
         public string Prenume { get; set; } = string.Empty;
 
@@ -623,26 +623,26 @@ await OnSaved.InvokeAsync();
         [RegularExpression(@"^\d{13}$", ErrorMessage = "CNP-ul trebuie să conțină doar cifre")]
         public string? CNP { get; set; }
 
-   public string? Cod_Pacient { get; set; }
+        public string? Cod_Pacient { get; set; }
 
-   [Required(ErrorMessage = "Data nașterii este obligatorie")]
+        [Required(ErrorMessage = "Data nașterii este obligatorie")]
         public DateTime Data_Nasterii { get; set; }
 
         [Required(ErrorMessage = "Sexul este obligatoriu")]
-    public string Sex { get; set; } = string.Empty;
+        public string Sex { get; set; } = string.Empty;
 
         [Phone(ErrorMessage = "Format telefon invalid")]
         public string? Telefon { get; set; }
 
-[Phone(ErrorMessage = "Format telefon invalid")]
+        [Phone(ErrorMessage = "Format telefon invalid")]
         public string? Telefon_Secundar { get; set; }
 
         [EmailAddress(ErrorMessage = "Format email invalid")]
         public string? Email { get; set; }
 
- public string? Judet { get; set; }
-    public string? Localitate { get; set; }
-    public string? Adresa { get; set; }
+        public string? Judet { get; set; }
+        public string? Localitate { get; set; }
+        public string? Adresa { get; set; }
 
         [StringLength(6, ErrorMessage = "Codul poștal nu poate depăși 6 caractere")]
         public string? Cod_Postal { get; set; }
@@ -650,16 +650,16 @@ await OnSaved.InvokeAsync();
         public bool Asigurat { get; set; }
 
         [StringLength(13, MinimumLength = 13, ErrorMessage = "CNP Asigurat trebuie să conțină exact 13 cifre")]
-public string? CNP_Asigurat { get; set; }
+        public string? CNP_Asigurat { get; set; }
 
         public string? Nr_Card_Sanatate { get; set; }
         public string? Casa_Asigurari { get; set; }
-     public string? Alergii { get; set; }
+        public string? Alergii { get; set; }
         public string? Boli_Cronice { get; set; }
         public string? Medic_Familie { get; set; }
-     public string? Persoana_Contact { get; set; }
+        public string? Persoana_Contact { get; set; }
 
-  [Phone(ErrorMessage = "Format telefon invalid")]
+        [Phone(ErrorMessage = "Format telefon invalid")]
         public string? Telefon_Urgenta { get; set; }
 
         public string? Relatie_Contact { get; set; }

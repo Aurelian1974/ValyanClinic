@@ -42,8 +42,8 @@ public class UpdateProgramareDto
     public string? TipProgramare { get; set; }
 
     /// <summary>
-  /// Statusul programării (obligatoriu).
-/// Poate fi actualizat pentru a reflecta evoluția programării.
+    /// Statusul programării (obligatoriu).
+    /// Poate fi actualizat pentru a reflecta evoluția programării.
     /// </summary>
     public string Status { get; set; } = string.Empty;
 
@@ -74,7 +74,7 @@ public class UpdateProgramareDto
 
     /// <summary>
     /// Durata programării în minute (pentru validare).
-  /// </summary>
+    /// </summary>
     public int DurataMinute => (int)(OraSfarsit - OraInceput).TotalMinutes;
 
     /// <summary>
@@ -83,7 +83,7 @@ public class UpdateProgramareDto
     public DateTime DataOraInceput => DataProgramare.Date + OraInceput;
 
     /// <summary>
-/// Data și ora completă de sfârșit (pentru conflict checking).
+    /// Data și ora completă de sfârșit (pentru conflict checking).
     /// </summary>
     public DateTime DataOraSfarsit => DataProgramare.Date + OraSfarsit;
 }

@@ -11,7 +11,7 @@ public class PacientPersonalMedical
     /// </summary>
     public Guid Id { get; set; }
 
- /// <summary>
+    /// <summary>
     /// ID-ul pacientului (FK catre Pacienti)
     /// </summary>
     public Guid PacientID { get; set; }
@@ -32,7 +32,7 @@ public class PacientPersonalMedical
     public DateTime DataAsocierii { get; set; }
 
     /// <summary>
-  /// Data la care relatia a fost dezactivata (null daca este activa)
+    /// Data la care relatia a fost dezactivata (null daca este activa)
     /// </summary>
     public DateTime? DataDezactivarii { get; set; }
 

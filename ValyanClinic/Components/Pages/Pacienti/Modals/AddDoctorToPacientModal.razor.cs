@@ -12,7 +12,7 @@ public partial class AddDoctorToPacientModal : ComponentBase
 {
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
-  [Inject] private ILogger<AddDoctorToPacientModal> Logger { get; set; } = default!;
+    [Inject] private ILogger<AddDoctorToPacientModal> Logger { get; set; } = default!;
     [Inject] private INotificationService NotificationService { get; set; } = default!; // ✅ ADDED
 
     [Parameter] public bool IsVisible { get; set; }
@@ -31,7 +31,7 @@ public partial class AddDoctorToPacientModal : ComponentBase
     private string? Motiv { get; set; }
     private string? Observatii { get; set; }
 
- private bool IsFormValid => SelectedDoctorId.HasValue && !string.IsNullOrEmpty(TipRelatie);
+    private bool IsFormValid => SelectedDoctorId.HasValue && !string.IsNullOrEmpty(TipRelatie);
 
     private List<TipRelatieOption> TipuriRelatie { get; set; } = new()
     {
@@ -48,57 +48,57 @@ public partial class AddDoctorToPacientModal : ComponentBase
         Logger.LogInformation("[AddDoctorToPacientModal] OnParametersSetAsync - IsVisible: {IsVisible}, PacientID: {PacientID}, PacientNume: {PacientNume}",
          IsVisible, PacientID, PacientNume);
 
-    if (IsVisible && DoctoriDisponibili.Count == 0)
+        if (IsVisible && DoctoriDisponibili.Count == 0)
         {
-   Logger.LogInformation("[AddDoctorToPacientModal] Loading doctori disponibili...");
-        await LoadDoctori();
+            Logger.LogInformation("[AddDoctorToPacientModal] Loading doctori disponibili...");
+            await LoadDoctori();
         }
     }
 
     private async Task LoadDoctori()
     {
-  IsLoading = true;
+        IsLoading = true;
 
-    try
-     {
-        Logger.LogInformation("[AddDoctorToPacientModal] Calling GetPersonalMedicalListQuery...");
+        try
+        {
+            Logger.LogInformation("[AddDoctorToPacientModal] Calling GetPersonalMedicalListQuery...");
 
-    var query = new GetPersonalMedicalListQuery
+            var query = new GetPersonalMedicalListQuery
             {
-       PageNumber = 1,
-       PageSize = 1000,
- GlobalSearchText = null,
-     FilterDepartament = null,
-     FilterPozitie = null,
-         FilterEsteActiv = true,
-SortColumn = "Nume",
-            SortDirection = "ASC"
-  };
+                PageNumber = 1,
+                PageSize = 1000,
+                GlobalSearchText = null,
+                FilterDepartament = null,
+                FilterPozitie = null,
+                FilterEsteActiv = true,
+                SortColumn = "Nume",
+                SortDirection = "ASC"
+            };
 
-     var result = await Mediator.Send(query);
+            var result = await Mediator.Send(query);
 
             if (result != null && result.Value != null)
             {
-    DoctoriDisponibili = result.Value.ToList();
-       Logger.LogInformation("[AddDoctorToPacientModal] Loaded {Count} doctori disponibili", DoctoriDisponibili.Count);
+                DoctoriDisponibili = result.Value.ToList();
+                Logger.LogInformation("[AddDoctorToPacientModal] Loaded {Count} doctori disponibili", DoctoriDisponibili.Count);
             }
             else
-     {
- Logger.LogWarning("[AddDoctorToPacientModal] No doctori returned from query");
-    }
+            {
+                Logger.LogWarning("[AddDoctorToPacientModal] No doctori returned from query");
+            }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "[AddDoctorToPacientModal] Error loading doctori");
-      // ✅ CHANGED: alert() → ShowErrorAsync()
-       await NotificationService.ShowErrorAsync(
-       $"Eroare la încărcarea doctorilor: {ex.Message}",
-             "Eroare");
-}
+            // ✅ CHANGED: alert() → ShowErrorAsync()
+            await NotificationService.ShowErrorAsync(
+            $"Eroare la încărcarea doctorilor: {ex.Message}",
+                  "Eroare");
+        }
         finally
-  {
- IsLoading = false;
-    }
+        {
+            IsLoading = false;
+        }
     }
 
     private async Task SaveDoctor()
@@ -107,8 +107,8 @@ SortColumn = "Nume",
 
         if (!IsFormValid)
         {
-   ValidationError = "Vă rugăm completați toate câmpurile obligatorii.";
-     Logger.LogWarning("[AddDoctorToPacientModal] Form validation failed");
+            ValidationError = "Vă rugăm completați toate câmpurile obligatorii.";
+            Logger.LogWarning("[AddDoctorToPacientModal] Form validation failed");
             return;
         }
 
@@ -119,64 +119,64 @@ SortColumn = "Nume",
             Logger.LogInformation("[AddDoctorToPacientModal] Saving doctor: PacientID={PacientID}, DoctorID={DoctorID}, TipRelatie={TipRelatie}",
      PacientID, SelectedDoctorId, TipRelatie);
 
-       var command = new AddRelatieCommand(
-         PacientID: PacientID!.Value,
-       PersonalMedicalID: SelectedDoctorId!.Value,
-    TipRelatie: TipRelatie,
-          Observatii: Observatii,
-       Motiv: Motiv,
-      CreatDe: null // Will use SYSTEM_USER
-            );
+            var command = new AddRelatieCommand(
+              PacientID: PacientID!.Value,
+            PersonalMedicalID: SelectedDoctorId!.Value,
+         TipRelatie: TipRelatie,
+               Observatii: Observatii,
+            Motiv: Motiv,
+           CreatDe: null // Will use SYSTEM_USER
+                 );
 
-   var result = await Mediator.Send(command);
+            var result = await Mediator.Send(command);
 
             if (result.IsSuccess)
- {
-         Logger.LogInformation("[AddDoctorToPacientModal] Doctor saved successfully");
-      // ✅ CHANGED: alert() → ShowSuccessAsync()
-    await NotificationService.ShowSuccessAsync("Doctor adăugat cu succes!");
+            {
+                Logger.LogInformation("[AddDoctorToPacientModal] Doctor saved successfully");
+                // ✅ CHANGED: alert() → ShowSuccessAsync()
+                await NotificationService.ShowSuccessAsync("Doctor adăugat cu succes!");
                 await OnDoctorAdded.InvokeAsync();
-         ResetForm();
-          await Close();
-          }
-   else
-     {
-         ValidationError = result.FirstError;
-  Logger.LogError("[AddDoctorToPacientModal] Error saving doctor: {Error}", ValidationError);
-     }
+                ResetForm();
+                await Close();
+            }
+            else
+            {
+                ValidationError = result.FirstError;
+                Logger.LogError("[AddDoctorToPacientModal] Error saving doctor: {Error}", ValidationError);
+            }
         }
-      catch (Exception ex)
-    {
-     ValidationError = $"Eroare: {ex.Message}";
-      Logger.LogError(ex, "[AddDoctorToPacientModal] Exception saving doctor");
-    }
-    finally
+        catch (Exception ex)
         {
-     IsSaving = false;
+            ValidationError = $"Eroare: {ex.Message}";
+            Logger.LogError(ex, "[AddDoctorToPacientModal] Exception saving doctor");
         }
-  }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
 
-private void ResetForm()
+    private void ResetForm()
     {
-   Logger.LogInformation("[AddDoctorToPacientModal] Resetting form");
+        Logger.LogInformation("[AddDoctorToPacientModal] Resetting form");
         SelectedDoctorId = null;
- TipRelatie = null;
+        TipRelatie = null;
         Motiv = null;
-  Observatii = null;
+        Observatii = null;
         ValidationError = null;
     }
 
- private async Task Close()
+    private async Task Close()
     {
- Logger.LogInformation("[AddDoctorToPacientModal] Closing modal");
-   ResetForm();
-     IsVisible = false;
+        Logger.LogInformation("[AddDoctorToPacientModal] Closing modal");
+        ResetForm();
+        IsVisible = false;
         await IsVisibleChanged.InvokeAsync(false);
- }
+    }
 
     public class TipRelatieOption
     {
-  public string Value { get; set; } = string.Empty;
+        public string Value { get; set; } = string.Empty;
         public string Text { get; set; } = string.Empty;
     }
 }

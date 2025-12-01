@@ -6,7 +6,7 @@ namespace ValyanClinic.Application.Features.UtilizatorManagement.Commands.Create
 public record CreateUtilizatorCommand : IRequest<Result<Guid>>
 {
     public Guid PersonalMedicalID { get; init; }
- public string Username { get; init; } = string.Empty;
+    public string Username { get; init; } = string.Empty;
     public string Email { get; init; } = string.Empty;
     public string Password { get; init; } = string.Empty; // Plain password - will be hashed
     public string Rol { get; init; } = "Utilizator";

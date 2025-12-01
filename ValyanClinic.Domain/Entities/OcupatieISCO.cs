@@ -146,7 +146,7 @@ public class OcupatieISCO
     public string? ModificatDe { get; set; }
 
     // Navigation properties pentru relația ierarhică
-    
+
     /// <summary>
     /// Referința către ocupația părinte în ierarhie
     /// </summary>

@@ -22,32 +22,32 @@ public class GetProgramareListQueryValidator : AbstractValidator<GetProgramareLi
           .LessThanOrEqualTo(200)
        .WithMessage("Dimensiunea paginii nu poate depăși 200 de elemente.");
 
-    // ==================== VALIDĂRI FILTRE OPȚIONALE ====================
+        // ==================== VALIDĂRI FILTRE OPȚIONALE ====================
 
-     // Validare FilterDoctorID (dacă e furnizat)
-   When(x => x.FilterDoctorID.HasValue, () =>
-  {
-  RuleFor(x => x.FilterDoctorID)
-         .NotEqual(Guid.Empty)
-      .WithMessage("ID-ul medicului nu este valid.");
-        });
+        // Validare FilterDoctorID (dacă e furnizat)
+        When(x => x.FilterDoctorID.HasValue, () =>
+       {
+           RuleFor(x => x.FilterDoctorID)
+             .NotEqual(Guid.Empty)
+          .WithMessage("ID-ul medicului nu este valid.");
+       });
 
-     // Validare FilterPacientID (dacă e furnizat)
+        // Validare FilterPacientID (dacă e furnizat)
         When(x => x.FilterPacientID.HasValue, () =>
  {
-  RuleFor(x => x.FilterPacientID)
-     .NotEqual(Guid.Empty)
-   .WithMessage("ID-ul pacientului nu este valid.");
-  });
+     RuleFor(x => x.FilterPacientID)
+        .NotEqual(Guid.Empty)
+      .WithMessage("ID-ul pacientului nu este valid.");
+ });
 
-  // Validare interval date
-   When(x => x.FilterDataStart.HasValue && x.FilterDataEnd.HasValue, () =>
-     {
- RuleFor(x => x)
-      .Must(x => x.FilterDataStart!.Value <= x.FilterDataEnd!.Value)
-.WithMessage("Data de început trebuie să fie înainte de data de sfârșit.")
-         .WithName("FilterDataStart");
-});
+        // Validare interval date
+        When(x => x.FilterDataStart.HasValue && x.FilterDataEnd.HasValue, () =>
+          {
+              RuleFor(x => x)
+              .Must(x => x.FilterDataStart!.Value <= x.FilterDataEnd!.Value)
+        .WithMessage("Data de început trebuie să fie înainte de data de sfârșit.")
+                 .WithName("FilterDataStart");
+          });
 
         // Validare GlobalSearchText (min 2 caractere dacă e furnizat)
         When(x => !string.IsNullOrEmpty(x.GlobalSearchText), () =>
@@ -55,15 +55,15 @@ public class GetProgramareListQueryValidator : AbstractValidator<GetProgramareLi
        RuleFor(x => x.GlobalSearchText)
        .MinimumLength(2)
      .WithMessage("Textul de căutare trebuie să conțină cel puțin 2 caractere.");
-    });
+   });
 
-   // ==================== VALIDĂRI SORTARE ====================
+        // ==================== VALIDĂRI SORTARE ====================
 
         // Validare SortColumn (whitelist)
-RuleFor(x => x.SortColumn)
-  .Must(col => new[] { "DataProgramare", "OraInceput", "Status", "PacientNume", "DoctorNume", "DataCreare" }
-    .Contains(col, StringComparer.OrdinalIgnoreCase))
-       .WithMessage("Coloana de sortare trebuie să fie una dintre: DataProgramare, OraInceput, Status, PacientNume, DoctorNume, DataCreare.");
+        RuleFor(x => x.SortColumn)
+          .Must(col => new[] { "DataProgramare", "OraInceput", "Status", "PacientNume", "DoctorNume", "DataCreare" }
+            .Contains(col, StringComparer.OrdinalIgnoreCase))
+               .WithMessage("Coloana de sortare trebuie să fie una dintre: DataProgramare, OraInceput, Status, PacientNume, DoctorNume, DataCreare.");
 
         // Validare SortDirection (ASC sau DESC)
         RuleFor(x => x.SortDirection)
@@ -71,25 +71,25 @@ RuleFor(x => x.SortColumn)
     .Contains(dir, StringComparer.OrdinalIgnoreCase))
    .WithMessage("Direcția de sortare trebuie să fie ASC sau DESC.");
 
-// ==================== VALIDĂRI STATUS & TIP (OPȚIONAL) ====================
+        // ==================== VALIDĂRI STATUS & TIP (OPȚIONAL) ====================
 
         // Validare FilterStatus (dacă e furnizat)
-     When(x => !string.IsNullOrEmpty(x.FilterStatus), () =>
-   {
-   RuleFor(x => x.FilterStatus)
-    .Must(status => new[] { "Programata", "Confirmata", "CheckedIn", "InConsultatie", "Finalizata", "Anulata", "NoShow" }
-       .Contains(status, StringComparer.OrdinalIgnoreCase))
-     .WithMessage("Statusul trebuie să fie unul dintre: Programata, Confirmata, CheckedIn, InConsultatie, Finalizata, Anulata, NoShow.");
-});
+        When(x => !string.IsNullOrEmpty(x.FilterStatus), () =>
+      {
+          RuleFor(x => x.FilterStatus)
+        .Must(status => new[] { "Programata", "Confirmata", "CheckedIn", "InConsultatie", "Finalizata", "Anulata", "NoShow" }
+           .Contains(status, StringComparer.OrdinalIgnoreCase))
+         .WithMessage("Statusul trebuie să fie unul dintre: Programata, Confirmata, CheckedIn, InConsultatie, Finalizata, Anulata, NoShow.");
+      });
 
-     // Validare FilterTipProgramare (dacă e furnizat)
- When(x => !string.IsNullOrEmpty(x.FilterTipProgramare), () =>
- {
-      RuleFor(x => x.FilterTipProgramare)
-    .Must(tip => new[] { "ConsultatieInitiala", "ControlPeriodic", "Consultatie", "Investigatie", 
+        // Validare FilterTipProgramare (dacă e furnizat)
+        When(x => !string.IsNullOrEmpty(x.FilterTipProgramare), () =>
+        {
+            RuleFor(x => x.FilterTipProgramare)
+   .Must(tip => new[] { "ConsultatieInitiala", "ControlPeriodic", "Consultatie", "Investigatie",
   "Procedura", "Urgenta", "Telemedicina", "LaDomiciliu" }
-        .Contains(tip, StringComparer.OrdinalIgnoreCase))
-    .WithMessage("Tipul programării trebuie să fie unul dintre: ConsultatieInitiala, ControlPeriodic, Consultatie, Investigatie, Procedura, Urgenta, Telemedicina, LaDomiciliu.");
-     });
- }
+       .Contains(tip, StringComparer.OrdinalIgnoreCase))
+   .WithMessage("Tipul programării trebuie să fie unul dintre: ConsultatieInitiala, ControlPeriodic, Consultatie, Investigatie, Procedura, Urgenta, Telemedicina, LaDomiciliu.");
+        });
+    }
 }

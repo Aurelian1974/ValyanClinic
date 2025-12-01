@@ -20,19 +20,25 @@ public class AuditLogRepository : IAuditLogRepository
     DateTime? dataStart, DateTime? dataEnd, string sortColumn, string sortDirection,
   CancellationToken cancellationToken = default)
     {
-    using var connection = _connectionFactory.CreateConnection();
-  using var multi = await connection.QueryMultipleAsync(
-         "SP_AuditLog_GetAll",
-new
-         {
-        PageNumber = pageNumber, PageSize = pageSize, SearchText = searchText,
-    UtilizatorID = utilizatorId, Actiune = actiune, DataStart = dataStart,
-      DataEnd = dataEnd, SortColumn = sortColumn, SortDirection = sortDirection
-            },
-            commandType: CommandType.StoredProcedure);
+        using var connection = _connectionFactory.CreateConnection();
+        using var multi = await connection.QueryMultipleAsync(
+               "SP_AuditLog_GetAll",
+      new
+      {
+          PageNumber = pageNumber,
+          PageSize = pageSize,
+          SearchText = searchText,
+          UtilizatorID = utilizatorId,
+          Actiune = actiune,
+          DataStart = dataStart,
+          DataEnd = dataEnd,
+          SortColumn = sortColumn,
+          SortDirection = sortDirection
+      },
+                  commandType: CommandType.StoredProcedure);
 
-    var items = await multi.ReadAsync<AuditLog>();
-var count = await multi.ReadFirstOrDefaultAsync<int>();
+        var items = await multi.ReadAsync<AuditLog>();
+        var count = await multi.ReadFirstOrDefaultAsync<int>();
         return (items, count);
     }
 
@@ -41,17 +47,25 @@ var count = await multi.ReadFirstOrDefaultAsync<int>();
   string? dispozitiv, string statusActiune, string? detaliiEroare, Guid? utilizatorId,
         CancellationToken cancellationToken = default)
     {
-using var connection = _connectionFactory.CreateConnection();
+        using var connection = _connectionFactory.CreateConnection();
         var result = await connection.QuerySingleOrDefaultAsync<AuditLog>(
   "SP_AuditLog_Create",
        new
-         {
-        UserName = userName, Actiune = actiune, Entitate = entitate, EntitateID = entitateId,
-   ValoareVeche = valoareVeche, ValoareNoua = valoareNoua, AdresaIP = adresaIp,
-       UserAgent = userAgent, Dispozitiv = dispozitiv, StatusActiune = statusActiune,
- DetaliiEroare = detaliiEroare, UtilizatorID = utilizatorId
-   },
+       {
+           UserName = userName,
+           Actiune = actiune,
+           Entitate = entitate,
+           EntitateID = entitateId,
+           ValoareVeche = valoareVeche,
+           ValoareNoua = valoareNoua,
+           AdresaIP = adresaIp,
+           UserAgent = userAgent,
+           Dispozitiv = dispozitiv,
+           StatusActiune = statusActiune,
+           DetaliiEroare = detaliiEroare,
+           UtilizatorID = utilizatorId
+       },
             commandType: CommandType.StoredProcedure);
-     return result?.AuditID ?? Guid.Empty;
-  }
+        return result?.AuditID ?? Guid.Empty;
+    }
 }

@@ -15,13 +15,13 @@ public class CreateProgramareCommand : IRequest<Result<Guid>>
     public Guid PacientID { get; set; }
 
     /// <summary>
-  /// ID-ul medicului.
+    /// ID-ul medicului.
     /// </summary>
     public Guid DoctorID { get; set; }
 
     /// <summary>
     /// Data programării.
-  /// </summary>
+    /// </summary>
     public DateTime DataProgramare { get; set; }
 
     /// <summary>

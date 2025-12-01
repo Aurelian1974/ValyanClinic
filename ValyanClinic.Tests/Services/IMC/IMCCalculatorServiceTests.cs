@@ -326,7 +326,7 @@ public class IMCCalculatorServiceTests
         stopwatch.Stop();
 
         // Assert
-        stopwatch.ElapsedMilliseconds.Should().BeLessThan(100, 
+        stopwatch.ElapsedMilliseconds.Should().BeLessThan(100,
             "1000 calcule ar trebui să se execute în mai puțin de 100ms");
     }
 

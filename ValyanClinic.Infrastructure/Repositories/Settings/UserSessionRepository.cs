@@ -51,7 +51,7 @@ public class UserSessionRepository : IUserSessionRepository
     /// <summary>
     /// Valid columns for sorting (whitelist to prevent SQL injection)
     /// </summary>
-    private static readonly string[] VALID_SORT_COLUMNS = 
+    private static readonly string[] VALID_SORT_COLUMNS =
     {
         "DataCreare",
         "DataUltimaActivitate",
@@ -90,7 +90,7 @@ public class UserSessionRepository : IUserSessionRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             return await connection.QueryAsync<UserSession>(
                 "SELECT * FROM VW_ActiveSessions ORDER BY DataUltimaActivitate DESC");
         }
@@ -126,13 +126,13 @@ public class UserSessionRepository : IUserSessionRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             // Validate and sanitize sort parameters (defense in depth)
-            var safeColumn = VALID_SORT_COLUMNS.Contains(sortColumn) 
-                ? sortColumn 
+            var safeColumn = VALID_SORT_COLUMNS.Contains(sortColumn)
+                ? sortColumn
                 : DEFAULT_SORT_COLUMN;
             var safeDirection = sortDirection.ToUpper() == "ASC" ? "ASC" : DEFAULT_SORT_DIRECTION;
-            
+
             // Use stored procedure instead of inline SQL
             var parameters = new
             {
@@ -141,12 +141,12 @@ public class UserSessionRepository : IUserSessionRepository
                 SortColumn = safeColumn,
                 SortDirection = safeDirection
             };
-            
+
             var results = await connection.QueryAsync<dynamic>(
                 "SP_GetActiveSessionsWithDetails",
                 parameters,
                 commandType: CommandType.StoredProcedure);
-            
+
             return results.Select(r => (
                 (Guid)r.SessionID,
                 (Guid)r.UtilizatorID,
@@ -176,7 +176,7 @@ public class UserSessionRepository : IUserSessionRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             return await connection.QueryAsync<UserSession>(
                 "SELECT * FROM VW_ActiveSessions WHERE UtilizatorID = @UtilizatorID",
                 new { UtilizatorID = utilizatorId });
@@ -203,7 +203,7 @@ public class UserSessionRepository : IUserSessionRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             // Setup OUTPUT parameters for stored procedure
             var parameters = new DynamicParameters();
             parameters.Add("@UtilizatorID", utilizatorId);
@@ -212,18 +212,18 @@ public class UserSessionRepository : IUserSessionRepository
             parameters.Add("@Dispozitiv", dispozitiv);
             parameters.Add("@SessionToken", dbType: DbType.String, direction: ParameterDirection.Output, size: 500);
             parameters.Add("@SessionID", dbType: DbType.Guid, direction: ParameterDirection.Output);
-            
+
             await connection.ExecuteAsync(
                 "SP_CreateUserSession",
                 parameters,
                 commandType: CommandType.StoredProcedure);
-            
+
             var sessionId = parameters.Get<Guid>("@SessionID");
             var sessionToken = parameters.Get<string>("@SessionToken");
-            
-            _logger.LogInformation("Session created successfully for user: {UtilizatorId}, SessionID: {SessionId}", 
+
+            _logger.LogInformation("Session created successfully for user: {UtilizatorId}, SessionID: {SessionId}",
                 utilizatorId, sessionId);
-            
+
             return (sessionId, sessionToken);
         }
         catch (Exception ex)
@@ -239,12 +239,12 @@ public class UserSessionRepository : IUserSessionRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             var result = await connection.ExecuteAsync(
                 "SP_UpdateSessionActivity",
                 new { SessionToken = sessionToken },
                 commandType: CommandType.StoredProcedure);
-            
+
             return result > 0;
         }
         catch (Exception ex)
@@ -260,13 +260,13 @@ public class UserSessionRepository : IUserSessionRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             // Use stored procedure instead of inline SQL
             var result = await connection.ExecuteAsync(
                 "SP_EndSession",
                 new { SessionID = sessionId },
                 commandType: CommandType.StoredProcedure);
-            
+
             if (result > 0)
             {
                 _logger.LogInformation("Session ended successfully: {SessionId}", sessionId);
@@ -275,7 +275,7 @@ public class UserSessionRepository : IUserSessionRepository
             {
                 _logger.LogWarning("Attempted to end non-existent session: {SessionId}", sessionId);
             }
-            
+
             return result > 0;
         }
         catch (Exception ex)
@@ -291,16 +291,16 @@ public class UserSessionRepository : IUserSessionRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             var count = await connection.ExecuteScalarAsync<int>(
                 "SP_CleanupExpiredSessions",
                 commandType: CommandType.StoredProcedure);
-            
+
             if (count > 0)
             {
                 _logger.LogInformation("Cleaned up {Count} expired sessions", count);
             }
-            
+
             return count;
         }
         catch (Exception ex)
@@ -321,12 +321,12 @@ public class UserSessionRepository : IUserSessionRepository
         try
         {
             using var connection = _connectionFactory.CreateConnection();
-            
+
             // Use stored procedure instead of inline SQL
             var result = await connection.QuerySingleAsync<dynamic>(
                 "SP_GetSessionStatistics",
                 commandType: CommandType.StoredProcedure);
-            
+
             return (
                 (int)result.TotalActive,
                 (int)result.ExpiraInCurand,

@@ -40,9 +40,9 @@ public class FilterOption
 {
     public string Text { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
-    
+
     public FilterOption() { }
-    
+
     public FilterOption(string text, string value)
     {
         Text = text;

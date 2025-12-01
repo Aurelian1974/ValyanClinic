@@ -17,7 +17,7 @@ public class LocalStorageDraftServiceTests
     private readonly Mock<IJSRuntime> _jsRuntimeMock;
     private readonly Mock<ILogger<LocalStorageDraftService<TestData>>> _loggerMock;
     private readonly LocalStorageDraftService<TestData> _service;
-    
+
     // In-memory storage pentru simulare LocalStorage
     private readonly Dictionary<string, string> _localStorage = new();
 
@@ -26,7 +26,7 @@ public class LocalStorageDraftServiceTests
         _jsRuntimeMock = new Mock<IJSRuntime>();
         _loggerMock = new Mock<ILogger<LocalStorageDraftService<TestData>>>();
         _service = new LocalStorageDraftService<TestData>(_jsRuntimeMock.Object, _loggerMock.Object);
-        
+
         SetupJSRuntimeMock();
     }
 
@@ -46,10 +46,10 @@ public class LocalStorageDraftServiceTests
         // Assert
         var key = $"draft_TestData_{entityId}";
         _localStorage.Should().ContainKey(key);
-        
+
         var savedJson = _localStorage[key];
         savedJson.Should().NotBeNullOrEmpty();
-        
+
         var savedDraft = JsonSerializer.Deserialize<Draft<TestData>>(savedJson);
         savedDraft.Should().NotBeNull();
         savedDraft!.EntityId.Should().Be(entityId);
@@ -97,7 +97,7 @@ public class LocalStorageDraftServiceTests
         // Assert
         var result1 = await _service.LoadDraftAsync(entity1);
         var result2 = await _service.LoadDraftAsync(entity2);
-        
+
         result1.Data!.Name.Should().Be("Entity1");
         result2.Data!.Name.Should().Be("Entity2");
     }
@@ -171,7 +171,7 @@ public class LocalStorageDraftServiceTests
             SavedAt = DateTime.UtcNow.AddDays(-8), // 8 zile în urmă
             Version = 1
         };
-        
+
         var key = $"draft_TestData_{entityId}";
         _localStorage[key] = JsonSerializer.Serialize(expiredDraft);
 
@@ -294,10 +294,10 @@ public class LocalStorageDraftServiceTests
         // Arrange
         var recentEntity = Guid.NewGuid();
         var expiredEntity = Guid.NewGuid();
-        
+
         // Recent draft
         await _service.SaveDraftAsync(recentEntity, new TestData { Name = "Recent", Value = 1 }, "user123");
-        
+
         // Expired draft - salvăm direct în localStorage
         var expiredDraft = new Draft<TestData>
         {
@@ -314,7 +314,7 @@ public class LocalStorageDraftServiceTests
         // Verificăm că draft-ul expirat returnează Expired
         var expiredResultBefore = await _service.LoadDraftAsync(expiredEntity);
         expiredResultBefore.ErrorType.Should().Be(DraftErrorType.Expired);
-        
+
         // Draft-ul recent ar trebui să fie valid
         var recentResult = await _service.LoadDraftAsync(recentEntity);
         recentResult.IsSuccess.Should().BeTrue();

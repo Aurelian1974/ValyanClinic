@@ -26,7 +26,7 @@ public class LoginComponentTests : TestContext
         // - FakeNavigationManager
         // - FakeAuthorizationService
         // We only need to add what's missing
-        
+
         // Add IHttpContextAccessor mock (required by CustomAuthenticationStateProvider)
         var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         var mockHttpContext = new Mock<HttpContext>();
@@ -34,26 +34,26 @@ public class LoginComponentTests : TestContext
         mockHttpContext.Setup(c => c.User).Returns(mockUser);
         mockHttpContextAccessor.Setup(a => a.HttpContext).Returns(mockHttpContext.Object);
         Services.AddSingleton(mockHttpContextAccessor.Object);
-        
+
         // Add ILogger<CustomAuthenticationStateProvider> mock
         var mockAuthLogger = new Mock<ILogger<CustomAuthenticationStateProvider>>();
         Services.AddSingleton(mockAuthLogger.Object);
-        
+
         // Add CustomAuthenticationStateProvider (required by Login component)
         Services.AddSingleton<CustomAuthenticationStateProvider>();
-        
+
         // Add IMediator mock (required by Login component)
         var mockMediator = new Mock<IMediator>();
         Services.AddSingleton(mockMediator.Object);
-        
+
         // Add IUserSessionRepository mock (required by Login component)
         var mockUserSessionRepository = new Mock<IUserSessionRepository>();
         Services.AddSingleton(mockUserSessionRepository.Object);
-        
+
         // Add ILogger<Login> mock (required by Login component)
         var mockLoginLogger = new Mock<ILogger<Login>>();
         Services.AddSingleton(mockLoginLogger.Object);
-        
+
         // Add IJSRuntime mock (required by Login component)
         var mockJSRuntime = new Mock<IJSRuntime>();
         Services.AddSingleton(mockJSRuntime.Object);
@@ -193,7 +193,7 @@ public class LoginComponentTests : TestContext
         // Act
         var cut = RenderComponent<Login>();
         var toggleButton = cut.Find(".btn-toggle-password");
-        
+
         // Assert initial state
         var passwordInput = cut.Find("input[name='password']");
         passwordInput.GetAttribute("type").Should().Be("password");
@@ -232,7 +232,7 @@ public class LoginComponentTests : TestContext
         // We verify that the EditForm contains the form structure (ValidationSummary is inside EditForm)
         var form = cut.Find("form.login-form");
         form.Should().NotBeNull();
-        
+
         // ValidationSummary renders as <ul class="validation-errors"> when there are validation errors
         // When there are no errors, it renders as an empty comment or nothing
         // So we just verify the form exists (ValidationSummary is declared in markup)

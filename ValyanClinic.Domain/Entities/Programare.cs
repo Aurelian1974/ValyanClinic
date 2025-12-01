@@ -45,7 +45,7 @@ public class Programare
     /// Statusul programării (ex: Programata, Confirmata, CheckedIn, Finalizata, Anulata, NoShow).
     /// Valoare implicită: "Programata".
     /// </summary>
-  public string Status { get; set; } = "Programata";
+    public string Status { get; set; } = "Programata";
 
     /// <summary>
     /// Observații sau note suplimentare despre programare.
@@ -71,7 +71,7 @@ public class Programare
 
     /// <summary>
     /// ID-ul utilizatorului (PersonalMedical) care a modificat ultima dată programarea.
-/// </summary>
+    /// </summary>
     public Guid? ModificatDe { get; set; }
 
     // ==================== NAVIGATION PROPERTIES ====================
@@ -86,7 +86,7 @@ public class Programare
 
     /// <summary>
     /// Numărul de telefon al pacientului.
-/// Populat din JOIN cu tabelul Pacienti.
+    /// Populat din JOIN cu tabelul Pacienti.
     /// </summary>
     public string? PacientTelefon { get; set; }
 
@@ -108,7 +108,7 @@ public class Programare
     /// </summary>
     public string? DoctorNumeComplet { get; set; }
 
- /// <summary>
+    /// <summary>
     /// Specializarea medicului.
     /// Populat din JOIN cu tabelul PersonalMedical.
     /// </summary>
@@ -116,7 +116,7 @@ public class Programare
 
     /// <summary>
     /// Numărul de telefon al medicului.
- /// Populat din JOIN cu tabelul PersonalMedical.
+    /// Populat din JOIN cu tabelul PersonalMedical.
     /// </summary>
     public string? DoctorTelefon { get; set; }
 
@@ -128,7 +128,7 @@ public class Programare
     public string? DoctorEmail { get; set; }
 
     /// <summary>
- /// Numele complet al utilizatorului care a creat programarea.
+    /// Numele complet al utilizatorului care a creat programarea.
     /// Populat din JOIN cu tabelul PersonalMedical.
     /// </summary>
     public string? CreatDeNumeComplet { get; set; }
@@ -144,7 +144,7 @@ public class Programare
     /// <summary>
     /// Data și ora completă de început a programării.
     /// Combină DataProgramare cu OraInceput.
-/// </summary>
+    /// </summary>
     public DateTime DataOraInceput => DataProgramare.Date + OraInceput;
 
     /// <summary>
@@ -169,9 +169,9 @@ public class Programare
     public bool EsteInDesfasurare
     {
         get
-    {
+        {
             var now = DateTime.Now;
- return now >= DataOraInceput && now <= DataOraSfarsit;
+            return now >= DataOraInceput && now <= DataOraSfarsit;
         }
     }
 }

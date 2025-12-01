@@ -38,7 +38,7 @@ public class UpdatePacientCommandHandler : IRequestHandler<UpdatePacientCommand,
                 throw new NotFoundException($"Pacientul cu ID-ul {request.Id} nu a fost găsit.");
             }
 
-            _logger.LogInformation("Found existing pacient: {Nume} {Prenume}", 
+            _logger.LogInformation("Found existing pacient: {Nume} {Prenume}",
                 existingPacient.Nume, existingPacient.Prenume);
 
             // 2. Validare business rules
@@ -161,8 +161,8 @@ public class UpdatePacientCommandHandler : IRequestHandler<UpdatePacientCommand,
                 errors.Add("Pentru pacienții asigurați este necesar CNP-ul asiguratului sau numărul cardului de sănătate.");
         }
 
-        return errors.Any() 
-            ? Result.Failure(errors) 
+        return errors.Any()
+            ? Result.Failure(errors)
             : Result.Success();
     }
 }

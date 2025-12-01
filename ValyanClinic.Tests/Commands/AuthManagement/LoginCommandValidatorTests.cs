@@ -33,8 +33,8 @@ public class LoginCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => 
-            e.PropertyName == "Username" && 
+        result.Errors.Should().Contain(e =>
+            e.PropertyName == "Username" &&
             e.ErrorMessage.Contains("obligatoriu"));
     }
 
@@ -55,8 +55,8 @@ public class LoginCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => 
-            e.PropertyName == "Username" && 
+        result.Errors.Should().Contain(e =>
+            e.PropertyName == "Username" &&
             e.ErrorMessage.Contains("între 3 și 100 caractere"));
     }
 
@@ -75,8 +75,8 @@ public class LoginCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => 
-            e.PropertyName == "Username" && 
+        result.Errors.Should().Contain(e =>
+            e.PropertyName == "Username" &&
             e.ErrorMessage.Contains("între 3 și 100 caractere"));
     }
 
@@ -119,8 +119,8 @@ public class LoginCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => 
-            e.PropertyName == "Username" && 
+        result.Errors.Should().Contain(e =>
+            e.PropertyName == "Username" &&
             e.ErrorMessage.Contains("caracterele: . _ @ -"));
     }
 
@@ -170,8 +170,8 @@ public class LoginCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => 
-            e.PropertyName == "Password" && 
+        result.Errors.Should().Contain(e =>
+            e.PropertyName == "Password" &&
             e.ErrorMessage.Contains("obligatorie"));
     }
 
@@ -193,8 +193,8 @@ public class LoginCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => 
-            e.PropertyName == "Password" && 
+        result.Errors.Should().Contain(e =>
+            e.PropertyName == "Password" &&
             e.ErrorMessage.Contains("între 6 și 100 caractere"));
     }
 
@@ -213,8 +213,8 @@ public class LoginCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => 
-            e.PropertyName == "Password" && 
+        result.Errors.Should().Contain(e =>
+            e.PropertyName == "Password" &&
             e.ErrorMessage.Contains("între 6 și 100 caractere"));
     }
 

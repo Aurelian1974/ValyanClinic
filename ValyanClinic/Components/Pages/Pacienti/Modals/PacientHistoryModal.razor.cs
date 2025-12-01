@@ -23,8 +23,8 @@ public partial class PacientHistoryModal : ComponentBase
 
     // Data
     private List<MedicalRecord> AllRecords { get; set; } = new();
-    private List<MedicalRecord> FilteredRecords => SelectedFilter == "toate" 
-        ? AllRecords 
+    private List<MedicalRecord> FilteredRecords => SelectedFilter == "toate"
+        ? AllRecords
         : AllRecords.Where(r => r.Type.ToLower() == SelectedFilter.Replace("i", "ie")).ToList();
 
     // Pagination
@@ -101,9 +101,9 @@ public partial class PacientHistoryModal : ComponentBase
 
     private async Task DeleteRecord(MedicalRecord record)
     {
-        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", 
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm",
             $"Sunteți sigur că doriți să ștergeți înregistrarea '{record.Title}'?");
-        
+
         if (confirmed)
         {
             AllRecords.Remove(record);

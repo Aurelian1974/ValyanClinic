@@ -12,16 +12,16 @@ public interface IPasswordHasher
     /// <param name="password">Parola în plain text</param>
     /// <returns>Hash-ul BCrypt (include salt-ul)</returns>
     string HashPassword(string password);
-    
+
     /// <summary>
     /// Verifică dacă o parolă corespunde unui hash BCrypt
     /// </summary>
     /// <param name="password">Parola în plain text</param>
- /// <param name="hash">Hash-ul BCrypt de verificat</param>
+    /// <param name="hash">Hash-ul BCrypt de verificat</param>
     /// <returns>True dacă parola este corectă</returns>
     bool VerifyPassword(string password, string hash);
-    
-  /// <summary>
+
+    /// <summary>
     /// Generează o parolă aleatoare sigură
     /// </summary>
     /// <param name="length">Lungimea parolei (default 12)</param>

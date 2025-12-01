@@ -120,8 +120,8 @@ public partial class Login : ComponentBase
     /// <summary>
     /// Returns the ARIA label for login button with context-aware text
     /// </summary>
-    private string LoginButtonAriaLabel => IsLoading 
-        ? "Se autentifică, vă rugăm așteptați" 
+    private string LoginButtonAriaLabel => IsLoading
+        ? "Se autentifică, vă rugăm așteptați"
         : "Autentificare în sistem";
 
     #endregion
@@ -190,10 +190,10 @@ public partial class Login : ComponentBase
                 LoginModel.ResetPasswordOnFirstLogin);
 
             Logger.LogInformation("Login API Response - Success: {Success}", result?.Success ?? false);
-            
+
             if (result?.Data != null)
             {
-                Logger.LogInformation("Login Data - Username: {Username}, Role: {Role}", 
+                Logger.LogInformation("Login Data - Username: {Username}, Role: {Role}",
                     result.Data.Username, result.Data.Rol);
             }
 
@@ -231,7 +231,7 @@ public partial class Login : ComponentBase
     /// <param name="loginData">Authenticated user data from API</param>
     private async Task HandleSuccessfulLoginAsync(LoginResponseData loginData)
     {
-        Logger.LogInformation("Login successful for user: {Username}, Role: {Role}", 
+        Logger.LogInformation("Login successful for user: {Username}, Role: {Role}",
             loginData.Username, loginData.Rol);
 
         // Create session in database for security audit and tracking
@@ -257,8 +257,8 @@ public partial class Login : ComponentBase
 
         // Redirect to role-specific dashboard
         var redirectUrl = GetRoleBasedRedirectUrl(loginData.Rol);
-        
-        Logger.LogInformation("Redirecting user {Username} with role {Role} to {Url}", 
+
+        Logger.LogInformation("Redirecting user {Username} with role {Role} to {Url}",
             loginData.Username, loginData.Rol, redirectUrl);
 
         // Force reload to ensure cookie is read correctly by Blazor Server
@@ -274,7 +274,7 @@ public partial class Login : ComponentBase
     private async Task HandleFailedLoginAsync(string? errorMessage)
     {
         ErrorMessage = errorMessage ?? "Nume de utilizator sau parolă incorecte. Verificați datele introduse.";
-        
+
         Logger.LogWarning("Login failed for user: {Username}, Error: {Error}",
             LoginModel.Username, ErrorMessage);
 
@@ -292,7 +292,7 @@ public partial class Login : ComponentBase
         try
         {
             var httpContext = HttpContextAccessor.HttpContext;
-            
+
             // Extract client information for session tracking
             var adresaIP = httpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
             var userAgent = httpContext?.Request.Headers["User-Agent"].ToString() ?? "Unknown";
@@ -397,9 +397,9 @@ public partial class Login : ComponentBase
     /// </remarks>
     private async Task HandleForgotPasswordAsync()
     {
-        Logger.LogInformation("Forgot password clicked for user context: {Username}", 
+        Logger.LogInformation("Forgot password clicked for user context: {Username}",
             LoginModel.Username ?? "unknown");
-        
+
         // Placeholder for future implementation
         await Task.CompletedTask;
     }

@@ -16,9 +16,9 @@ public class GetReceptionerStatsQuery : IRequest<Result<ReceptionerStatsDto>>
 
     public GetReceptionerStatsQuery()
     {
-  }
+    }
 
-  public GetReceptionerStatsQuery(DateTime date)
+    public GetReceptionerStatsQuery(DateTime date)
     {
         Date = date;
     }
@@ -31,8 +31,8 @@ public class ReceptionerStatsDto
 {
     /// <summary>
     /// Număr total programări pentru azi.
-/// </summary>
-  public int ProgramariAstazi { get; set; }
+    /// </summary>
+    public int ProgramariAstazi { get; set; }
 
     /// <summary>
     /// Procentaj growth față de ieri.
@@ -41,11 +41,11 @@ public class ReceptionerStatsDto
 
     /// <summary>
     /// Număr pacienți în sala de așteptare (status: CheckedIn).
-  /// </summary>
+    /// </summary>
     public int PacientiInAsteptare { get; set; }
 
     /// <summary>
-/// Timp mediu de așteptare (minute).
+    /// Timp mediu de așteptare (minute).
     /// </summary>
     public int TimpMediuAsteptare { get; set; }
 

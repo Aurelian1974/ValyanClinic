@@ -10,10 +10,10 @@ public class GetUpcomingProgramariQueryValidator : AbstractValidator<GetUpcoming
        .GreaterThan(0).WithMessage("Numărul de zile trebuie să fie mai mare decât 0.")
     .LessThanOrEqualTo(365).WithMessage("Numărul de zile nu poate depăși 365.");
 
-      When(x => x.DoctorID.HasValue, () =>
-        {
-      RuleFor(x => x.DoctorID)
-    .NotEqual(Guid.Empty).WithMessage("ID-ul medicului nu este valid.");
-  });
+        When(x => x.DoctorID.HasValue, () =>
+          {
+              RuleFor(x => x.DoctorID)
+          .NotEqual(Guid.Empty).WithMessage("ID-ul medicului nu este valid.");
+          });
     }
 }

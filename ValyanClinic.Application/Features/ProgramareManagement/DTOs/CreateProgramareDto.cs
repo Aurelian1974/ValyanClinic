@@ -24,7 +24,7 @@ public class CreateProgramareDto
     /// <summary>
     /// Ora de început (obligatoriu).
     /// </summary>
-public TimeSpan OraInceput { get; set; }
+    public TimeSpan OraInceput { get; set; }
 
     /// <summary>
     /// Ora de sfârșit (obligatoriu, trebuie să fie > OraInceput).
@@ -65,13 +65,13 @@ public TimeSpan OraInceput { get; set; }
         OraSfarsit != default &&
         CreatDe != Guid.Empty;
 
-/// <summary>
+    /// <summary>
     /// Durata programării în minute (pentru validare).
     /// </summary>
     public int DurataMinute => (int)(OraSfarsit - OraInceput).TotalMinutes;
 
-  /// <summary>
-/// Data și ora completă de început (pentru conflict checking).
+    /// <summary>
+    /// Data și ora completă de început (pentru conflict checking).
     /// </summary>
     public DateTime DataOraInceput => DataProgramare.Date + OraInceput;
 

@@ -25,7 +25,7 @@ public class LoginCommandHandlerTests
         _mockRepository = new Mock<IUtilizatorRepository>();
         _mockPasswordHasher = new Mock<IPasswordHasher>();
         _mockLogger = new Mock<ILogger<LoginCommandHandler>>();
-        
+
         _handler = new LoginCommandHandler(
             _mockRepository.Object,
             _mockPasswordHasher.Object,

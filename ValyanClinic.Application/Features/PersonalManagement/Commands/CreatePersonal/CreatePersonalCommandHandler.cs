@@ -30,8 +30,8 @@ public class CreatePersonalCommandHandler : IRequestHandler<CreatePersonalComman
 
             // Verificam daca CNP-ul si Cod_Angajat exista deja
             var (cnpExists, codAngajatExists) = await _personalRepository.CheckUniqueAsync(
-                request.CNP, 
-                request.Cod_Angajat, 
+                request.CNP,
+                request.Cod_Angajat,
                 cancellationToken: cancellationToken);
 
             if (cnpExists)

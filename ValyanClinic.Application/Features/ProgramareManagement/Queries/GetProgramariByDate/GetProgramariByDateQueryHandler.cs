@@ -25,49 +25,49 @@ public class GetProgramariByDateQueryHandler : IRequestHandler<GetProgramariByDa
     {
         try
         {
-   _logger.LogInformation(
-  "Obținere programări pentru data: {Date}, Doctor={DoctorID}",
-request.Date.ToString("yyyy-MM-dd"), request.DoctorID);
+            _logger.LogInformation(
+           "Obținere programări pentru data: {Date}, Doctor={DoctorID}",
+         request.Date.ToString("yyyy-MM-dd"), request.DoctorID);
 
-        var programari = await _programareRepository.GetByDateAsync(
-                request.Date,
-    request.DoctorID,
-       cancellationToken);
+            var programari = await _programareRepository.GetByDateAsync(
+                    request.Date,
+        request.DoctorID,
+           cancellationToken);
 
-     var programariDto = programari.Select(p => new ProgramareListDto
-       {
-     ProgramareID = p.ProgramareID,
-     PacientID = p.PacientID,
-         DoctorID = p.DoctorID,
-    DataProgramare = p.DataProgramare,
-      OraInceput = p.OraInceput,
-     OraSfarsit = p.OraSfarsit,
-              TipProgramare = p.TipProgramare,
-           Status = p.Status,
-     Observatii = p.Observatii,
-  PacientNumeComplet = p.PacientNumeComplet,
-    PacientTelefon = p.PacientTelefon,
-PacientEmail = p.PacientEmail,
-     PacientCNP = p.PacientCNP,
+            var programariDto = programari.Select(p => new ProgramareListDto
+            {
+                ProgramareID = p.ProgramareID,
+                PacientID = p.PacientID,
+                DoctorID = p.DoctorID,
+                DataProgramare = p.DataProgramare,
+                OraInceput = p.OraInceput,
+                OraSfarsit = p.OraSfarsit,
+                TipProgramare = p.TipProgramare,
+                Status = p.Status,
+                Observatii = p.Observatii,
+                PacientNumeComplet = p.PacientNumeComplet,
+                PacientTelefon = p.PacientTelefon,
+                PacientEmail = p.PacientEmail,
+                PacientCNP = p.PacientCNP,
                 DoctorNumeComplet = p.DoctorNumeComplet,
-     DoctorSpecializare = p.DoctorSpecializare,
-   DoctorTelefon = p.DoctorTelefon,
-          DoctorEmail = p.DoctorEmail,  // ✅ NEW - pentru trimitere email-uri
-  DataCreare = p.DataCreare,
-   CreatDeNumeComplet = p.CreatDeNumeComplet,
-    DataUltimeiModificari = p.DataUltimeiModificari
-     }).ToList();
+                DoctorSpecializare = p.DoctorSpecializare,
+                DoctorTelefon = p.DoctorTelefon,
+                DoctorEmail = p.DoctorEmail,  // ✅ NEW - pentru trimitere email-uri
+                DataCreare = p.DataCreare,
+                CreatDeNumeComplet = p.CreatDeNumeComplet,
+                DataUltimeiModificari = p.DataUltimeiModificari
+            }).ToList();
 
-         _logger.LogInformation(
-       "Găsite {Count} programări pentru data {Date}",
-       programariDto.Count, request.Date.ToString("yyyy-MM-dd"));
+            _logger.LogInformation(
+          "Găsite {Count} programări pentru data {Date}",
+          programariDto.Count, request.Date.ToString("yyyy-MM-dd"));
 
-          return Result<IEnumerable<ProgramareListDto>>.Success(
-programariDto,
- $"Au fost găsite {programariDto.Count} programări pentru data {request.Date:dd.MM.yyyy}.");
+            return Result<IEnumerable<ProgramareListDto>>.Success(
+  programariDto,
+   $"Au fost găsite {programariDto.Count} programări pentru data {request.Date:dd.MM.yyyy}.");
         }
- catch (Exception ex)
-{
+        catch (Exception ex)
+        {
             _logger.LogError(ex, "Eroare la obținerea programărilor pentru data {Date}", request.Date);
             return Result<IEnumerable<ProgramareListDto>>.Failure($"Eroare: {ex.Message}");
         }

@@ -12,10 +12,10 @@ public partial class NavMenu : ComponentBase
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private ILogger<NavMenu> Logger { get; set; } = default!;
-    
+
     private bool isCollapsed = false;
     private int clickCount = 0;
-    
+
     // Expand/collapse state pentru categorii
     private bool isPacientiExpanded = false;
     private bool isAdministrareExpanded = false;
@@ -30,7 +30,7 @@ public partial class NavMenu : ComponentBase
     private static string? _sharedUserRole = null;
     private static DateTime _lastRoleCheckTime = DateTime.MinValue;
     private static readonly TimeSpan RoleCacheExpiration = TimeSpan.FromMinutes(5);
-    
+
     private bool _instanceRoleChecked = false;
 
     protected override async Task OnInitializedAsync()
@@ -41,33 +41,33 @@ public partial class NavMenu : ComponentBase
 
     private async Task LoadUserRole()
     {
-        Logger.LogInformation("[NavMenu] LoadUserRole() START - _sharedUserRole: {UserRole}, Age: {Age}", 
+        Logger.LogInformation("[NavMenu] LoadUserRole() START - _sharedUserRole: {UserRole}, Age: {Age}",
             _sharedUserRole ?? "null", DateTime.Now - _lastRoleCheckTime);
-        
+
         // ✅ Dacă avem deja rolul în cache și nu a expirat, folosește-l
-        if (!string.IsNullOrEmpty(_sharedUserRole) && 
+        if (!string.IsNullOrEmpty(_sharedUserRole) &&
             (DateTime.Now - _lastRoleCheckTime) < RoleCacheExpiration)
         {
             Logger.LogInformation("[NavMenu] LoadUserRole() - Using cached role: {Role}", _sharedUserRole);
             _instanceRoleChecked = true;
             return;
         }
-        
+
         try
         {
             Logger.LogInformation("[NavMenu] LoadUserRole() - Getting authentication state...");
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
-            
+
             Logger.LogInformation("[NavMenu] LoadUserRole() - IsAuthenticated: {IsAuth}", user.Identity?.IsAuthenticated);
-            
+
             if (user.Identity?.IsAuthenticated == true)
             {
                 var roleClaim = user.FindFirst(ClaimTypes.Role);
                 _sharedUserRole = roleClaim?.Value;
                 _lastRoleCheckTime = DateTime.Now;
-                
-                Logger.LogInformation("[NavMenu] LoadUserRole() - Role claim found: {HasClaim}, Value: {Role}", 
+
+                Logger.LogInformation("[NavMenu] LoadUserRole() - Role claim found: {HasClaim}, Value: {Role}",
                     roleClaim != null, _sharedUserRole ?? "null");
             }
             else
@@ -75,7 +75,7 @@ public partial class NavMenu : ComponentBase
                 Logger.LogWarning("[NavMenu] LoadUserRole() - User not authenticated, keeping existing cached role");
                 // ❌ NU resetăm _sharedUserRole la null când autentificarea temporar nu e disponibilă
             }
-            
+
             _instanceRoleChecked = true;
             Logger.LogInformation("[NavMenu] LoadUserRole() END - _sharedUserRole: {Role}", _sharedUserRole ?? "null");
         }
@@ -91,12 +91,12 @@ public partial class NavMenu : ComponentBase
     private async Task NavigateToHome()
     {
         Logger.LogInformation("[NavMenu] Home button clicked");
-        
+
         // ✅ Re-verifică rolul (dar nu resetează cache-ul static)
         await LoadUserRole();
-        
+
         var dashboardUrl = "/dashboard"; // Default
-        
+
         if (!string.IsNullOrEmpty(_sharedUserRole))
         {
             dashboardUrl = _sharedUserRole switch
@@ -113,7 +113,7 @@ public partial class NavMenu : ComponentBase
         {
             Logger.LogWarning("[NavMenu] Role is still null after LoadUserRole, using default dashboard");
         }
-        
+
         Logger.LogInformation("[NavMenu] Navigating to {DashboardUrl} (role: {Role})", dashboardUrl, _sharedUserRole ?? "null");
         NavigationManager.NavigateTo(dashboardUrl, forceLoad: false);
     }
@@ -123,7 +123,7 @@ public partial class NavMenu : ComponentBase
         clickCount++;
         isCollapsed = !isCollapsed;
         Logger.LogDebug("[NavMenu] Sidebar toggle - Click: {ClickCount}, Collapsed: {IsCollapsed}", clickCount, isCollapsed);
-        
+
         // When collapsing sidebar, collapse all expanded sections
         if (isCollapsed)
         {
@@ -136,10 +136,10 @@ public partial class NavMenu : ComponentBase
             isRapoarteExpanded = false;
             isMonitorizareExpanded = false;
         }
-        
+
         // Update sidebar width using global JS function
         await UpdateSidebarWidth();
-        
+
         StateHasChanged();
     }
 
@@ -235,12 +235,12 @@ public partial class NavMenu : ComponentBase
         try
         {
             var savedState = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "sidebar-collapsed");
-            
+
             if (string.IsNullOrEmpty(savedState))
             {
                 return false;
             }
-            
+
             var result = savedState.Equals("true", StringComparison.OrdinalIgnoreCase);
             Logger.LogDebug("[NavMenu] Loaded collapsed state: {IsCollapsed}", result);
             return result;
@@ -258,7 +258,7 @@ public partial class NavMenu : ComponentBase
         {
             // Load saved state from localStorage
             isCollapsed = await LoadCollapsedState();
-            
+
             // Force update sidebar width to match loaded state
             await UpdateSidebarWidth();
             StateHasChanged();

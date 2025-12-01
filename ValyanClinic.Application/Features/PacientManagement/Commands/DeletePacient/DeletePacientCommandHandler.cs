@@ -25,7 +25,7 @@ public class DeletePacientCommandHandler : IRequestHandler<DeletePacientCommand,
     public async Task<Result> Handle(DeletePacientCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("========== DeletePacientCommandHandler START ==========");
-        _logger.LogInformation("Deleting pacient ID: {Id}, HardDelete: {HardDelete}", 
+        _logger.LogInformation("Deleting pacient ID: {Id}, HardDelete: {HardDelete}",
             request.Id, request.HardDelete);
 
         try
@@ -38,7 +38,7 @@ public class DeletePacientCommandHandler : IRequestHandler<DeletePacientCommand,
                 throw new NotFoundException($"Pacientul cu ID-ul {request.Id} nu a fost găsit.");
             }
 
-            _logger.LogInformation("Found existing pacient: {Nume} {Prenume}", 
+            _logger.LogInformation("Found existing pacient: {Nume} {Prenume}",
                 existingPacient.Nume, existingPacient.Prenume);
 
             bool success;
@@ -49,7 +49,7 @@ public class DeletePacientCommandHandler : IRequestHandler<DeletePacientCommand,
                 // 2a. Stergere fizică (PERICULOS - folosit doar în cazuri speciale)
                 _logger.LogWarning("Performing HARD DELETE for pacient: {Id}", request.Id);
                 success = await _pacientRepository.HardDeleteAsync(request.Id, cancellationToken);
-                message = success 
+                message = success
                     ? $"Pacientul {existingPacient.NumeComplet} a fost șters definitiv din sistem."
                     : "Eroare la ștergerea pacientului.";
             }
@@ -58,7 +58,7 @@ public class DeletePacientCommandHandler : IRequestHandler<DeletePacientCommand,
                 // 2b. Soft delete (recomandat - doar marchează ca inactiv)
                 _logger.LogInformation("Performing SOFT DELETE for pacient: {Id}", request.Id);
                 success = await _pacientRepository.DeleteAsync(request.Id, request.ModificatDe, cancellationToken);
-                message = success 
+                message = success
                     ? $"Pacientul {existingPacient.NumeComplet} a fost dezactivat cu succes."
                     : "Eroare la dezactivarea pacientului.";
             }

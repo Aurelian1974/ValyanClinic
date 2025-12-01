@@ -10,7 +10,7 @@ public interface IPersonalMedicalRepository
     // Queries
     Task<PersonalMedical?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<PersonalMedical?> GetByPersonalIdAsync(Guid personalId, CancellationToken cancellationToken = default);
-    
+
     Task<IEnumerable<PersonalMedical>> GetAllAsync(
         int pageNumber = 1,
         int pageSize = 20,
@@ -21,14 +21,14 @@ public interface IPersonalMedicalRepository
         string sortColumn = "Nume",
         string sortDirection = "ASC",
         CancellationToken cancellationToken = default);
-    
+
     Task<int> GetCountAsync(
         string? searchText = null,
         string? departament = null,
         string? pozitie = null,
         bool? esteActiv = null,
         CancellationToken cancellationToken = default);
-    
+
     // Commands
     Task<Guid> CreateAsync(PersonalMedical personalMedical, CancellationToken cancellationToken = default);
     Task<bool> UpdateAsync(PersonalMedical personalMedical, CancellationToken cancellationToken = default);

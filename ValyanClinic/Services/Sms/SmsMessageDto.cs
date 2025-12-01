@@ -22,7 +22,7 @@ public class SmsMessageDto
     public string Message { get; set; } = string.Empty;
 
     /// <summary>
-  /// Prioritate mesaj (Normal, High, Urgent)
+    /// Prioritate mesaj (Normal, High, Urgent)
     /// </summary>
     public SmsPriority Priority { get; set; } = SmsPriority.Normal;
 

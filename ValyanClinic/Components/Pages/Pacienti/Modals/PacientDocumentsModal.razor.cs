@@ -9,7 +9,7 @@ public partial class PacientDocumentsModal : ComponentBase
 {
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private INotificationService NotificationService { get; set; } = default!; // ✅ ADDED
-  [Inject] private ILogger<PacientDocumentsModal> Logger { get; set; } = default!; // ✅ ADDED
+    [Inject] private ILogger<PacientDocumentsModal> Logger { get; set; } = default!; // ✅ ADDED
 
     #region Parameters
     [Parameter] public bool IsVisible { get; set; }
@@ -17,14 +17,14 @@ public partial class PacientDocumentsModal : ComponentBase
     [Parameter] public Guid? PacientId { get; set; }
     #endregion
 
-  #region State
- private bool IsLoading { get; set; }
+    #region State
+    private bool IsLoading { get; set; }
     private bool HasError { get; set; }
-private string? ErrorMessage { get; set; }
+    private string? ErrorMessage { get; set; }
     private string PacientNume { get; set; } = string.Empty;
     private string SelectedCategory { get; set; } = "toate";
     private string ViewMode { get; set; } = "grid"; // grid or list
-    
+
     // ✅ ADDED: State pentru confirm modal
     private bool ShowConfirmDelete { get; set; }
     private MedicalDocument? DocumentToDelete { get; set; }
@@ -36,47 +36,47 @@ private string? ErrorMessage { get; set; }
         ? AllDocuments
         : AllDocuments.Where(d => d.Category.ToLower() == SelectedCategory).ToList();
 
-  // Storage
+    // Storage
     private long TotalStorageUsed => AllDocuments.Sum(d => d.FileSize);
     private long MaxStorage => 500 * 1024 * 1024; // 500 MB
     private double StoragePercentage => Math.Min((double)TotalStorageUsed / MaxStorage * 100, 100);
 
     protected override async Task OnParametersSetAsync()
     {
-   if (IsVisible && PacientId.HasValue)
+        if (IsVisible && PacientId.HasValue)
         {
-     await LoadDocuments();
- }
+            await LoadDocuments();
+        }
     }
 
     private async Task LoadDocuments()
     {
         IsLoading = true;
-      HasError = false;
-      ErrorMessage = null;
+        HasError = false;
+        ErrorMessage = null;
 
         try
         {
-       // TODO: Replace with actual API call
-   await Task.Delay(500); // Simulate API call
+            // TODO: Replace with actual API call
+            await Task.Delay(500); // Simulate API call
 
-// Mock data
+            // Mock data
             PacientNume = "Popescu Ion";
-   AllDocuments = GenerateMockDocuments();
-   }
+            AllDocuments = GenerateMockDocuments();
+        }
         catch (Exception ex)
         {
-     HasError = true;
- ErrorMessage = $"Eroare: {ex.Message}";
+            HasError = true;
+            ErrorMessage = $"Eroare: {ex.Message}";
         }
         finally
         {
-        IsLoading = false;
-    }
+            IsLoading = false;
+        }
     }
 
     private void SetCategory(string category)
-{
+    {
         SelectedCategory = category;
     }
 
@@ -90,52 +90,52 @@ private string? ErrorMessage { get; set; }
         return category.ToLower() switch
         {
             "rezultate" => "category-results",
- "imagistica" => "category-imaging",
-  "retete" => "category-prescription",
+            "imagistica" => "category-imaging",
+            "retete" => "category-prescription",
             "rapoarte" => "category-reports",
-  "altele" => "category-other",
+            "altele" => "category-other",
             _ => string.Empty
-      };
+        };
     }
 
     private string GetFileTypeIcon(string fileType)
     {
-   return fileType.ToLower() switch
+        return fileType.ToLower() switch
         {
-    "pdf" => "pdf",
+            "pdf" => "pdf",
             "doc" or "docx" => "word",
- "xls" or "xlsx" => "excel",
+            "xls" or "xlsx" => "excel",
             "jpg" or "jpeg" or "png" or "gif" => "image",
-      "zip" or "rar" => "archive",
+            "zip" or "rar" => "archive",
             _ => "file"
- };
+        };
     }
 
     private string FormatFileSize(long bytes)
     {
         string[] sizes = { "B", "KB", "MB", "GB" };
         double len = bytes;
-     int order = 0;
-      
+        int order = 0;
+
         while (len >= 1024 && order < sizes.Length - 1)
         {
-       order++;
-          len = len / 1024;
+            order++;
+            len = len / 1024;
         }
-        
+
         return $"{len:0.##} {sizes[order]}";
     }
 
     private async Task OpenUploadModal()
     {
         // ✅ CHANGED: alert() → ShowInfoAsync()
-  await NotificationService.ShowInfoAsync(
-            "Funcționalitate în dezvoltare: Încărcare document",
-     "În curând");
+        await NotificationService.ShowInfoAsync(
+                  "Funcționalitate în dezvoltare: Încărcare document",
+           "În curând");
     }
 
     private async Task ViewDocument(MedicalDocument doc)
- {
+    {
         // ✅ CHANGED: alert() → ShowInfoAsync()
         await NotificationService.ShowInfoAsync(
           $"Vizualizare document: {doc.FileName}",
@@ -151,17 +151,17 @@ private string? ErrorMessage { get; set; }
     }
 
     private async Task ShareDocument(MedicalDocument doc)
- {
+    {
         // ✅ CHANGED: alert() → ShowInfoAsync()
-  await NotificationService.ShowInfoAsync(
-     $"Partajare document: {doc.FileName}",
- "Funcționalitate în dezvoltare");
+        await NotificationService.ShowInfoAsync(
+           $"Partajare document: {doc.FileName}",
+       "Funcționalitate în dezvoltare");
     }
 
     // ✅ CHANGED: confirm() → ShowConfirmDelete modal
     private void DeleteDocument(MedicalDocument doc)
     {
-    DocumentToDelete = doc;
+        DocumentToDelete = doc;
         ShowConfirmDelete = true;
     }
 
@@ -170,24 +170,24 @@ private string? ErrorMessage { get; set; }
     {
         if (DocumentToDelete == null) return;
 
-    ShowConfirmDelete = false;
+        ShowConfirmDelete = false;
 
         try
-      {
-AllDocuments.Remove(DocumentToDelete);
-     await NotificationService.ShowSuccessAsync(
-              $"Document '{DocumentToDelete.FileName}' șters cu succes!");
-          StateHasChanged();
+        {
+            AllDocuments.Remove(DocumentToDelete);
+            await NotificationService.ShowSuccessAsync(
+                     $"Document '{DocumentToDelete.FileName}' șters cu succes!");
+            StateHasChanged();
         }
         catch (Exception ex)
-   {
-            Logger.LogError(ex, "Error deleting document");
-         await NotificationService.ShowErrorAsync(ex.Message, "Eroare");
-        }
-     finally
         {
-      DocumentToDelete = null;
-  }
+            Logger.LogError(ex, "Error deleting document");
+            await NotificationService.ShowErrorAsync(ex.Message, "Eroare");
+        }
+        finally
+        {
+            DocumentToDelete = null;
+        }
     }
 
     private async Task DownloadAll()
@@ -200,14 +200,14 @@ AllDocuments.Remove(DocumentToDelete);
 
     private async Task HandleOverlayClick()
     {
-  await Close();
+        await Close();
     }
 
     private async Task Close()
     {
         IsVisible = false;
-   await IsVisibleChanged.InvokeAsync(false);
- SelectedCategory = "toate";
+        await IsVisibleChanged.InvokeAsync(false);
+        SelectedCategory = "toate";
         ViewMode = "grid";
     }
 
@@ -322,12 +322,12 @@ new MedicalDocument
     // Data Model
     public class MedicalDocument
     {
-   public Guid Id { get; set; }
+        public Guid Id { get; set; }
         public string FileName { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
-    public string FileType { get; set; } = string.Empty;
+        public string FileType { get; set; } = string.Empty;
         public long FileSize { get; set; }
         public DateTime UploadDate { get; set; }
- public string? Description { get; set; }
-  }
+        public string? Description { get; set; }
+    }
 }

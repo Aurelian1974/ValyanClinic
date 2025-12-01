@@ -12,7 +12,7 @@ public partial class SettingEditModal : ComponentBase
     [Inject] private ILogger<SettingEditModal> Logger { get; set; } = default!;
 
     [Parameter] public EventCallback OnSettingSaved { get; set; }
-    
+
     // State
     public bool IsVisible { get; private set; }
     private bool IsLoading { get; set; }
@@ -24,7 +24,7 @@ public partial class SettingEditModal : ComponentBase
     private SystemSettingDto? CurrentSetting { get; set; }
     private string NewValue { get; set; } = string.Empty;
     private string EditableDescriere { get; set; } = string.Empty;
-  
+
     // Boolean dropdown with labels
     private List<BooleanOptionModel> BooleanOptionsWithLabels { get; set; } = new()
 {
@@ -35,24 +35,24 @@ public partial class SettingEditModal : ComponentBase
     /// <summary>
     /// Opens the modal for editing a setting
     /// </summary>
-public void Open(SystemSettingDto setting)
+    public void Open(SystemSettingDto setting)
     {
-   Logger.LogInformation("Opening modal for setting: {Categorie}.{Cheie}", 
-            setting.Categorie, setting.Cheie);
-   
+        Logger.LogInformation("Opening modal for setting: {Categorie}.{Cheie}",
+                 setting.Categorie, setting.Cheie);
+
         // ✅ LOG pentru debugging
-        Logger.LogInformation("TipDate: '{TipDate}' | IsBool: {IsBool} | IsInt: {IsInt}", 
-  setting.TipDate, 
+        Logger.LogInformation("TipDate: '{TipDate}' | IsBool: {IsBool} | IsInt: {IsInt}",
+  setting.TipDate,
             IsBooleanType(setting.TipDate),
  IsIntegerType(setting.TipDate));
-     
+
         CurrentSetting = setting;
-      NewValue = setting.Valoare;
+        NewValue = setting.Valoare;
         EditableDescriere = setting.Descriere ?? string.Empty;
         IsVisible = true;
         HasError = false;
         ErrorMessage = string.Empty;
-        
+
         StateHasChanged();
     }
 
@@ -60,17 +60,17 @@ public void Open(SystemSettingDto setting)
     /// Closes the modal
     /// </summary>
     public void Close()
- {
-   Logger.LogInformation("Closing modal");
-        
+    {
+        Logger.LogInformation("Closing modal");
+
         IsVisible = false;
-      CurrentSetting = null;
-      NewValue = string.Empty;
+        CurrentSetting = null;
+        NewValue = string.Empty;
         EditableDescriere = string.Empty;
         HasError = false;
         ErrorMessage = string.Empty;
-        
-   StateHasChanged();
+
+        StateHasChanged();
     }
 
     /// <summary>
@@ -78,64 +78,64 @@ public void Open(SystemSettingDto setting)
     /// </summary>
     private void HandleOverlayClick()
     {
- Close();
+        Close();
     }
 
     /// <summary>
     /// Saves the setting value AND description
- /// </summary>
+    /// </summary>
     private async Task SaveSetting()
     {
         if (CurrentSetting == null || string.IsNullOrWhiteSpace(NewValue))
         {
             HasError = true;
-     ErrorMessage = "Valoarea nu poate fi goala";
+            ErrorMessage = "Valoarea nu poate fi goala";
             return;
-      }
+        }
 
         try
-    {
+        {
             IsSaving = true;
             StateHasChanged();
 
-Logger.LogInformation("Updating setting: {Categorie}.{Cheie} to '{Value}' with description '{Desc}'", 
-     CurrentSetting.Categorie, CurrentSetting.Cheie, NewValue, EditableDescriere);
+            Logger.LogInformation("Updating setting: {Categorie}.{Cheie} to '{Value}' with description '{Desc}'",
+                 CurrentSetting.Categorie, CurrentSetting.Cheie, NewValue, EditableDescriere);
 
-      var command = new UpdateSystemSettingCommand(
-     CurrentSetting.Categorie,
-          CurrentSetting.Cheie,
-                NewValue,
-    EditableDescriere, // ✅ TRIMITEM DESCRIEREA
-"admin"); // TODO: Get from auth context
+            var command = new UpdateSystemSettingCommand(
+           CurrentSetting.Categorie,
+                CurrentSetting.Cheie,
+                      NewValue,
+          EditableDescriere, // ✅ TRIMITEM DESCRIEREA
+      "admin"); // TODO: Get from auth context
 
             var result = await Mediator.Send(command);
 
             if (result.IsSuccess)
-  {
-Logger.LogInformation("Setting updated successfully");
-        
-       // Notify parent component
-          await OnSettingSaved.InvokeAsync();
-        
- Close();
-       }
-      else
-        {
-       HasError = true;
-          ErrorMessage = result.ErrorsAsString ?? "Eroare la salvarea setarii";
+            {
+                Logger.LogInformation("Setting updated successfully");
+
+                // Notify parent component
+                await OnSettingSaved.InvokeAsync();
+
+                Close();
+            }
+            else
+            {
+                HasError = true;
+                ErrorMessage = result.ErrorsAsString ?? "Eroare la salvarea setarii";
                 Logger.LogWarning("Failed to update setting: {Errors}", ErrorMessage);
             }
         }
         catch (Exception ex)
         {
-   HasError = true;
+            HasError = true;
             ErrorMessage = $"Eroare: {ex.Message}";
-  Logger.LogError(ex, "Error saving setting");
-  }
+            Logger.LogError(ex, "Error saving setting");
+        }
         finally
         {
-      IsSaving = false;
- StateHasChanged();
+            IsSaving = false;
+            StateHasChanged();
         }
     }
 }

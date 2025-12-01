@@ -7,7 +7,7 @@ public class EmailMessageDto
 {
     /// <summary>
     /// Adresa email destinatar (REQUIRED).
- /// </summary>
+    /// </summary>
     public string To { get; set; } = string.Empty;
 
     /// <summary>
@@ -21,13 +21,13 @@ public class EmailMessageDto
     public string Subject { get; set; } = string.Empty;
 
     /// <summary>
- /// Corpul email-ului (HTML sau text simplu).
+    /// Corpul email-ului (HTML sau text simplu).
     /// </summary>
     public string Body { get; set; } = string.Empty;
 
     /// <summary>
     /// Dacă corpul este HTML (default: true).
-  /// </summary>
+    /// </summary>
     public bool IsHtml { get; set; } = true;
 
     /// <summary>
@@ -38,11 +38,11 @@ public class EmailMessageDto
 
     /// <summary>
     /// ✅ NEW: Reply-To name (optional).
-  /// </summary>
+    /// </summary>
     public string? ReplyToName { get; set; }
 
     /// <summary>
-  /// Liste de adrese CC (optional).
+    /// Liste de adrese CC (optional).
     /// </summary>
     public List<string>? CcAddresses { get; set; }
 

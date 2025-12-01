@@ -261,7 +261,7 @@ public class GetDoctoriByPacientQueryHandlerTests
         var relatieId = Guid.NewGuid();
         var personalMedicalId = Guid.NewGuid();
         var dataAsocierii = DateTime.Now.AddMonths(-2);
-        
+
         var query = new GetDoctoriByPacientQuery(pacientId, ApenumereActivi: true);
 
         var domainDto = new ValyanClinic.Domain.DTOs.DoctorAsociatDto

@@ -32,7 +32,7 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     private bool IsSaving { get; set; }
     private bool IsSavingDraft { get; set; }
     private bool IsLoadingPacient { get; set; }
-    
+
     // Data
     private CreateConsultatieCommand Model { get; set; } = new();
     private PacientDetailDto? PacientInfo { get; set; }
@@ -65,37 +65,37 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
         try
         {
             Logger.LogInformation("[ConsultatieModal] ===== OPENING MODAL =====");
-            
+
             // ✅ Validare parametrii
             if (ProgramareID == Guid.Empty || PacientID == Guid.Empty || MedicID == Guid.Empty)
             {
                 throw new InvalidOperationException("Invalid parameters");
             }
-            
+
             IsVisible = true;
             await InvokeAsync(StateHasChanged);
-            
+
             // ✅ Load cached LastSaveTime
             await LoadLastSaveTimeFromStorage();
-            
+
             // Load pacient data
             await LoadPacientData();
-            
+
             // ✅ Încarcă draft existent
             await LoadDraftFromStorage();
-            
+
             // Initialize model if needed
             if (Model.ProgramareID == Guid.Empty)
             {
                 InitializeModel();
             }
-            
+
             // ✅ Start auto-save using helper (Hybrid Approach)
             DraftAutoSaveHelper.Start(
                 shouldSaveCallback: async () => await Task.FromResult(_hasUnsavedChanges && IsVisible && !IsSaving && !IsSavingDraft),
                 saveCallback: SaveDraft
             );
-            
+
             await InvokeAsync(StateHasChanged);
             Logger.LogInformation("[ConsultatieModal] ===== MODAL OPENED SUCCESSFULLY =====");
         }
@@ -141,10 +141,10 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     public void Close()
     {
         Logger.LogInformation("[ConsultatieModal] Closing modal");
-        
+
         // ✅ Stop auto-save using helper
         DraftAutoSaveHelper.Stop();
-        
+
         IsVisible = false;
         ResetModal();
         StateHasChanged();
@@ -211,7 +211,7 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
         CurrentSection = "motive";
         CompletedSections.Clear();
         _hasUnsavedChanges = false;
-        
+
         // ✅ Reset cached LastSaveTime
         _cachedLastSaveTime = DateTime.MinValue;
     }
@@ -244,10 +244,10 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
             if (result.IsSuccess)
             {
                 Logger.LogInformation("[ConsultatieModal] Consultatie created successfully: {Id}", result.Value);
-                
+
                 // ✅ Șterge draft-ul după salvare finală
                 await ClearDraftFromStorage();
-                
+
                 await OnConsultatieCompleted.InvokeAsync();
                 Close();
             }
@@ -342,10 +342,10 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
 
                 // Restore form data
                 Model = draftResult.Data;
-                
+
                 // Note: ActiveTab și CompletedSections nu sunt în Command, deci le păstrăm pe cele default
                 // Dacă vrei să le salvezi, trebuie să extindi Draft<T> să includă metadata
-                
+
                 // Update cached LastSaveTime
                 _cachedLastSaveTime = draftResult.SavedAt ?? DateTime.MinValue;
 
@@ -371,10 +371,10 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
         try
         {
             await DraftService.ClearDraftAsync(ProgramareID);
-            
+
             // Reset cached LastSaveTime
             _cachedLastSaveTime = DateTime.MinValue;
-            
+
             Logger.LogInformation("[ConsultatieModal] Draft cleared from storage");
         }
         catch (Exception ex)
@@ -392,7 +392,7 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     }
 
     // ==================== END DRAFT MANAGEMENT ====================
-    
+
     private async Task PreviewScrisoare()
     {
         Logger.LogInformation("[ConsultatieModal] Generating preview...");
@@ -470,21 +470,21 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     {
         return CompletedSections.Contains(section);
     }
-    
+
     private async Task HandleTabChanged(string newTab)
     {
         Logger.LogInformation("[ConsultatieModal] Changing tab from {OldTab} to {NewTab}", ActiveTab, newTab);
-        
+
         // Save current tab state if needed
         if (_hasUnsavedChanges)
         {
             await SaveDraft();
         }
-        
+
         // Change active tab
         ActiveTab = newTab;
         CurrentSection = newTab;
-        
+
         StateHasChanged();
     }
 

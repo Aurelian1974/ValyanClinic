@@ -25,11 +25,11 @@ public class SqlConnectionFactory : IDbConnectionFactory
     public IDbConnection CreateConnection()
     {
         var connectionId = Interlocked.Increment(ref _connectionCount);
-        
+
         _logger?.LogDebug("Creating database connection #{ConnectionId}", connectionId);
-        
+
         var connection = new SqlConnection(_connectionString);
-        
+
         // Event handlers pentru monitoring
         connection.StateChange += (sender, args) =>
         {
@@ -39,7 +39,7 @@ public class SqlConnectionFactory : IDbConnectionFactory
                 args.OriginalState,
                 args.CurrentState);
         };
-        
+
         return connection;
     }
 
@@ -49,7 +49,7 @@ public class SqlConnectionFactory : IDbConnectionFactory
         {
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
-            
+
             _logger?.LogInformation("Database connection test successful");
             return true;
         }

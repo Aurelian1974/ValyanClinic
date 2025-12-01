@@ -11,11 +11,11 @@ public class GetUpcomingProgramariQueryHandler : IRequestHandler<GetUpcomingProg
     private readonly IProgramareRepository _programareRepository;
     private readonly ILogger<GetUpcomingProgramariQueryHandler> _logger;
 
-public GetUpcomingProgramariQueryHandler(
-        IProgramareRepository programareRepository,
-        ILogger<GetUpcomingProgramariQueryHandler> logger)
+    public GetUpcomingProgramariQueryHandler(
+            IProgramareRepository programareRepository,
+            ILogger<GetUpcomingProgramariQueryHandler> logger)
     {
-  _programareRepository = programareRepository;
+        _programareRepository = programareRepository;
         _logger = logger;
     }
 
@@ -25,50 +25,50 @@ public GetUpcomingProgramariQueryHandler(
     {
         try
         {
-   _logger.LogInformation(
-   "Obținere programări viitoare: Zile={Days}, Doctor={DoctorID}",
-          request.Days, request.DoctorID);
+            _logger.LogInformation(
+            "Obținere programări viitoare: Zile={Days}, Doctor={DoctorID}",
+                   request.Days, request.DoctorID);
 
-   var programari = await _programareRepository.GetUpcomingAsync(
-    request.Days,
-request.DoctorID,
-       cancellationToken);
+            var programari = await _programareRepository.GetUpcomingAsync(
+             request.Days,
+         request.DoctorID,
+                cancellationToken);
 
-  var programariDto = programari.Select(p => new ProgramareListDto
-    {
-   ProgramareID = p.ProgramareID,
-  PacientID = p.PacientID,
-            DoctorID = p.DoctorID,
-    DataProgramare = p.DataProgramare,
-OraInceput = p.OraInceput,
+            var programariDto = programari.Select(p => new ProgramareListDto
+            {
+                ProgramareID = p.ProgramareID,
+                PacientID = p.PacientID,
+                DoctorID = p.DoctorID,
+                DataProgramare = p.DataProgramare,
+                OraInceput = p.OraInceput,
                 OraSfarsit = p.OraSfarsit,
-     TipProgramare = p.TipProgramare,
-     Status = p.Status,
-        Observatii = p.Observatii,
-      PacientNumeComplet = p.PacientNumeComplet,
-      PacientTelefon = p.PacientTelefon,
-     PacientEmail = p.PacientEmail,
-           PacientCNP = p.PacientCNP,
-      DoctorNumeComplet = p.DoctorNumeComplet,
-   DoctorSpecializare = p.DoctorSpecializare,
-    DoctorTelefon = p.DoctorTelefon,
-   DataCreare = p.DataCreare,
-            CreatDeNumeComplet = p.CreatDeNumeComplet,
-DataUltimeiModificari = p.DataUltimeiModificari
-  }).ToList();
+                TipProgramare = p.TipProgramare,
+                Status = p.Status,
+                Observatii = p.Observatii,
+                PacientNumeComplet = p.PacientNumeComplet,
+                PacientTelefon = p.PacientTelefon,
+                PacientEmail = p.PacientEmail,
+                PacientCNP = p.PacientCNP,
+                DoctorNumeComplet = p.DoctorNumeComplet,
+                DoctorSpecializare = p.DoctorSpecializare,
+                DoctorTelefon = p.DoctorTelefon,
+                DataCreare = p.DataCreare,
+                CreatDeNumeComplet = p.CreatDeNumeComplet,
+                DataUltimeiModificari = p.DataUltimeiModificari
+            }).ToList();
 
-  _logger.LogInformation(
-     "Găsite {Count} programări viitoare în următoarele {Days} zile",
-       programariDto.Count, request.Days);
+            _logger.LogInformation(
+               "Găsite {Count} programări viitoare în următoarele {Days} zile",
+                 programariDto.Count, request.Days);
 
-       return Result<IEnumerable<ProgramareListDto>>.Success(
-    programariDto,
-            $"Au fost găsite {programariDto.Count} programări viitoare.");
+            return Result<IEnumerable<ProgramareListDto>>.Success(
+         programariDto,
+                 $"Au fost găsite {programariDto.Count} programări viitoare.");
         }
         catch (Exception ex)
         {
-   _logger.LogError(ex, "Eroare la obținerea programărilor viitoare");
-      return Result<IEnumerable<ProgramareListDto>>.Failure($"Eroare: {ex.Message}");
+            _logger.LogError(ex, "Eroare la obținerea programărilor viitoare");
+            return Result<IEnumerable<ProgramareListDto>>.Failure($"Eroare: {ex.Message}");
         }
     }
 }

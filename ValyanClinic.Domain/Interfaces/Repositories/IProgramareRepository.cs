@@ -14,7 +14,7 @@ public interface IProgramareRepository
     /// Obține o programare după ID-ul său unic.
     /// Include informații detaliate despre pacient, doctor și utilizatorul care a creat programarea.
     /// </summary>
-  /// <param name="id">ID-ul programării.</param>
+    /// <param name="id">ID-ul programării.</param>
     /// <param name="cancellationToken">Token pentru anularea operațiunii.</param>
     /// <returns>Programarea găsită sau null dacă nu există.</returns>
     Task<Programare?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
@@ -93,7 +93,7 @@ public interface IProgramareRepository
     /// Obține istoricul complet al programărilor unui pacient.
     /// </summary>
     /// <param name="pacientID">ID-ul pacientului.</param>
-  /// <param name="cancellationToken">Token pentru anularea operațiunii.</param>
+    /// <param name="cancellationToken">Token pentru anularea operațiunii.</param>
     /// <returns>Lista tuturor programărilor pacientului (ordonate descrescător după dată).</returns>
     Task<IEnumerable<Programare>> GetByPacientAsync(
   Guid pacientID,
@@ -103,7 +103,7 @@ public interface IProgramareRepository
     /// Obține toate programările pentru o dată specifică (cu filtru opțional după medic).
     /// </summary>
     /// <param name="date">Data pentru care se caută programările.</param>
-  /// <param name="doctorID">ID-ul medicului (opțional, null = toți medicii).</param>
+    /// <param name="doctorID">ID-ul medicului (opțional, null = toți medicii).</param>
     /// <param name="cancellationToken">Token pentru anularea operațiunii.</param>
     /// <returns>Lista programărilor din ziua respectivă.</returns>
     Task<IEnumerable<Programare>> GetByDateAsync(
@@ -131,7 +131,7 @@ DateTime endDate,
     /// Util pentru dashboard-uri și reminder-uri.
     /// </summary>
     /// <param name="days">Numărul de zile în viitor (implicit: 7).</param>
-  /// <param name="doctorID">ID-ul medicului (opțional, null = toți medicii).</param>
+    /// <param name="doctorID">ID-ul medicului (opțional, null = toți medicii).</param>
     /// <param name="cancellationToken">Token pentru anularea operațiunii.</param>
     /// <returns>Lista programărilor viitoare.</returns>
     Task<IEnumerable<Programare>> GetUpcomingAsync(
@@ -172,7 +172,7 @@ DateTime endDate,
     /// </summary>
     /// <param name="programare">Obiectul programare de creat (ProgramareID este generat de DB).</param>
     /// <param name="cancellationToken">Token pentru anularea operațiunii.</param>
-  /// <returns>Programarea creată cu ID-ul generat și toate câmpurile populate.</returns>
+    /// <returns>Programarea creată cu ID-ul generat și toate câmpurile populate.</returns>
     Task<Programare> CreateAsync(Programare programare, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -199,7 +199,7 @@ DateTime endDate,
     /// Folosit pentru validare înainte de creare/editare programare.
     /// </summary>
     /// <param name="doctorID">ID-ul medicului.</param>
-/// <param name="dataProgramare">Data programării.</param>
+    /// <param name="dataProgramare">Data programării.</param>
     /// <param name="oraInceput">Ora de început a programării.</param>
     /// <param name="oraSfarsit">Ora de sfârșit a programării.</param>
     /// <param name="excludeProgramareID">ID-ul programării de exclus din verificare (pentru editare).</param>
@@ -228,15 +228,15 @@ DateTime endDate,
   DateTime? dataEnd = null,
   CancellationToken cancellationToken = default);
 
-  /// <summary>
+    /// <summary>
     /// Obține statistici despre programările unui medic specific pentru un interval de date.
     /// Returnează: total programări, programări per status, rata no-show, etc.
     /// </summary>
     /// <param name="doctorID">ID-ul medicului.</param>
     /// <param name="dataStart">Data de început pentru statistici (implicit: prima zi a lunii curente).</param>
- /// <param name="dataEnd">Data de sfârșit pentru statistici (implicit: ultima zi a lunii curente).</param>
+    /// <param name="dataEnd">Data de sfârșit pentru statistici (implicit: ultima zi a lunii curente).</param>
     /// <param name="cancellationToken">Token pentru anularea operațiunii.</param>
-/// <returns>Dicționar cu statistici specifice medicului.</returns>
+    /// <returns>Dicționar cu statistici specifice medicului.</returns>
     Task<Dictionary<string, object>> GetDoctorStatisticsAsync(
         Guid doctorID,
         DateTime? dataStart = null,

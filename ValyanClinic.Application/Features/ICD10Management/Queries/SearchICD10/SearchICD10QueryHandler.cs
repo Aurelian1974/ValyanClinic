@@ -57,7 +57,7 @@ public class SearchICD10QueryHandler : IRequestHandler<SearchICD10Query, Result<
                     IsCommon = e.IsCommon,
                     Severity = e.Severity,
                     // ✅ Calculate relevance doar dacă avem search term
-                    RelevanceScore = string.IsNullOrEmpty(searchTerm) 
+                    RelevanceScore = string.IsNullOrEmpty(searchTerm)
                         ? 100 // Default relevance pentru toate codurile
                         : e.CalculateRelevance(searchTerm)
                 })

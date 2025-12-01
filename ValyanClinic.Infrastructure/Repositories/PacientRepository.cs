@@ -68,10 +68,10 @@ public class PacientRepository : BaseRepository, IPacientRepository
             commandType: System.Data.CommandType.StoredProcedure);
 
         var items = await multi.ReadAsync<Pacient>();
-        
+
         // Get count
         var count = await GetCountAsync(searchText, judet, asigurat, activ, cancellationToken);
-        
+
         return (items, count);
     }
 
@@ -115,7 +115,7 @@ public class PacientRepository : BaseRepository, IPacientRepository
         CancellationToken cancellationToken = default)
     {
         var parameters = new { Activ = activ };
-        
+
         using var connection = _connectionFactory.CreateConnection();
         var results = await connection.QueryAsync<DropdownOption>(
             "sp_Pacienti_GetDropdownOptions",

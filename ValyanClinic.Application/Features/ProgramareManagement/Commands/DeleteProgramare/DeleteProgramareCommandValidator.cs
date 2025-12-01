@@ -10,7 +10,7 @@ public class DeleteProgramareCommandValidator : AbstractValidator<DeletePrograma
 {
     public DeleteProgramareCommandValidator()
     {
-    // ==================== VALIDĂRI CÂMPURI OBLIGATORII ====================
+        // ==================== VALIDĂRI CÂMPURI OBLIGATORII ====================
 
         RuleFor(x => x.ProgramareID)
     .NotEmpty()
@@ -18,22 +18,22 @@ public class DeleteProgramareCommandValidator : AbstractValidator<DeletePrograma
  .NotEqual(Guid.Empty)
        .WithMessage("ID-ul programării nu este valid.");
 
-RuleFor(x => x.ModificatDe)
-     .NotEmpty()
-       .WithMessage("ID-ul utilizatorului este obligatoriu.")
-   .NotEqual(Guid.Empty)
-            .WithMessage("ID-ul utilizatorului nu este valid.");
+        RuleFor(x => x.ModificatDe)
+             .NotEmpty()
+               .WithMessage("ID-ul utilizatorului este obligatoriu.")
+           .NotEqual(Guid.Empty)
+                    .WithMessage("ID-ul utilizatorului nu este valid.");
 
-      // ==================== VALIDĂRI OPȚIONALE ====================
+        // ==================== VALIDĂRI OPȚIONALE ====================
 
-// Validare MotivAnulare (dacă e furnizat)
-    When(x => !string.IsNullOrEmpty(x.MotivAnulare), () =>
-   {
-            RuleFor(x => x.MotivAnulare)
- .MaximumLength(500)
-   .WithMessage("Motivul anulării nu poate depăși 500 de caractere.")
-     .MinimumLength(10)
-       .WithMessage("Motivul anulării trebuie să conțină cel puțin 10 caractere pentru claritate.");
-        });
+        // Validare MotivAnulare (dacă e furnizat)
+        When(x => !string.IsNullOrEmpty(x.MotivAnulare), () =>
+       {
+           RuleFor(x => x.MotivAnulare)
+.MaximumLength(500)
+.WithMessage("Motivul anulării nu poate depăși 500 de caractere.")
+.MinimumLength(10)
+  .WithMessage("Motivul anulării trebuie să conțină cel puțin 10 caractere pentru claritate.");
+       });
     }
 }

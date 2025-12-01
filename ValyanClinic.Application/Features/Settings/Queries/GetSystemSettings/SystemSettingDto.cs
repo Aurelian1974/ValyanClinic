@@ -7,7 +7,7 @@ public record SystemSettingDto
     public Guid SetareID { get; init; }
     public string Categorie { get; init; } = string.Empty;
     public string Cheie { get; init; } = string.Empty;
- public string Valoare { get; init; } = string.Empty;
+    public string Valoare { get; init; } = string.Empty;
     public string? Descriere { get; init; }
     public string? ValoareDefault { get; init; }
     public string TipDate { get; init; } = "String";

@@ -25,31 +25,31 @@ public partial class SpecializareViewModal : ComponentBase
     {
         try
         {
-  Logger.LogInformation("Opening View modal for Specializare: {Id}", specializareId);
+            Logger.LogInformation("Opening View modal for Specializare: {Id}", specializareId);
 
- CurrentSpecializareId = specializareId;
- IsVisible = true;
-       IsLoading = true;
-  HasError = false;
+            CurrentSpecializareId = specializareId;
+            IsVisible = true;
+            IsLoading = true;
+            HasError = false;
             ErrorMessage = string.Empty;
             SpecializareData = null;
 
             await InvokeAsync(StateHasChanged);
             await LoadSpecializareData(specializareId);
-   }
-    catch (Exception ex)
+        }
+        catch (Exception ex)
         {
-Logger.LogError(ex, "Error opening View modal for {Id}", specializareId);
-  HasError = true;
+            Logger.LogError(ex, "Error opening View modal for {Id}", specializareId);
+            HasError = true;
             ErrorMessage = $"Eroare la deschiderea modalului: {ex.Message}";
-     IsLoading = false;
+            IsLoading = false;
             await InvokeAsync(StateHasChanged);
         }
     }
 
     public async Task Close()
     {
-     Logger.LogInformation("Closing View modal");
+        Logger.LogInformation("Closing View modal");
         IsVisible = false;
         await InvokeAsync(StateHasChanged);
 
@@ -61,44 +61,44 @@ Logger.LogError(ex, "Error opening View modal for {Id}", specializareId);
         await Task.Delay(300);
 
         SpecializareData = null;
-      IsLoading = false;
+        IsLoading = false;
         HasError = false;
         ErrorMessage = string.Empty;
-     CurrentSpecializareId = Guid.Empty;
+        CurrentSpecializareId = Guid.Empty;
     }
 
     private async Task LoadSpecializareData(Guid specializareId)
     {
         try
         {
-    Logger.LogInformation("Loading Specializare data: {Id}", specializareId);
+            Logger.LogInformation("Loading Specializare data: {Id}", specializareId);
 
             var query = new GetSpecializareByIdQuery(specializareId);
-       var result = await Mediator.Send(query);
+            var result = await Mediator.Send(query);
 
-        if (result.IsSuccess && result.Value != null)
+            if (result.IsSuccess && result.Value != null)
             {
-     SpecializareData = result.Value;
-         HasError = false;
-              Logger.LogInformation("Data loaded successfully for {Id}", specializareId);
-      }
-   else
+                SpecializareData = result.Value;
+                HasError = false;
+                Logger.LogInformation("Data loaded successfully for {Id}", specializareId);
+            }
+            else
             {
-    HasError = true;
-        ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele";
-           Logger.LogWarning("Failed to load data for {Id}: {Error}", specializareId, ErrorMessage);
-      }
+                HasError = true;
+                ErrorMessage = result.Errors?.FirstOrDefault() ?? "Nu s-au putut incarca datele";
+                Logger.LogWarning("Failed to load data for {Id}: {Error}", specializareId, ErrorMessage);
+            }
         }
         catch (Exception ex)
         {
-    HasError = true;
-      ErrorMessage = $"Eroare la incarcarea datelor: {ex.Message}";
-Logger.LogError(ex, "Exception loading data for {Id}", specializareId);
+            HasError = true;
+            ErrorMessage = $"Eroare la incarcarea datelor: {ex.Message}";
+            Logger.LogError(ex, "Exception loading data for {Id}", specializareId);
         }
         finally
         {
             IsLoading = false;
-        await InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -113,7 +113,7 @@ Logger.LogError(ex, "Exception loading data for {Id}", specializareId);
 
         if (OnEditRequested.HasDelegate)
         {
-  await OnEditRequested.InvokeAsync(CurrentSpecializareId);
+            await OnEditRequested.InvokeAsync(CurrentSpecializareId);
         }
     }
 
@@ -123,7 +123,7 @@ Logger.LogError(ex, "Exception loading data for {Id}", specializareId);
 
         if (OnDeleteRequested.HasDelegate)
         {
-      await OnDeleteRequested.InvokeAsync(CurrentSpecializareId);
+            await OnDeleteRequested.InvokeAsync(CurrentSpecializareId);
         }
     }
 }

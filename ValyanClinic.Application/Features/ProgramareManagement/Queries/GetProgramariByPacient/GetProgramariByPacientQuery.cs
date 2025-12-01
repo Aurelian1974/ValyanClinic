@@ -14,7 +14,7 @@ public class GetProgramariByPacientQuery : IRequest<Result<IEnumerable<Programar
     /// </summary>
     public Guid PacientID { get; set; }
 
- public GetProgramariByPacientQuery(Guid pacientID)
+    public GetProgramariByPacientQuery(Guid pacientID)
     {
         PacientID = pacientID;
     }

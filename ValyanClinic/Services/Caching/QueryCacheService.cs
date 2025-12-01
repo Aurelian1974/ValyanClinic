@@ -65,7 +65,7 @@ public class QueryCacheService : IQueryCacheService
                 _cacheKeys.Add(cacheKey);
             }
 
-            _logger.LogInformation("Cached result for key: {CacheKey}, Expiration: {Expiration}", 
+            _logger.LogInformation("Cached result for key: {CacheKey}, Expiration: {Expiration}",
                 cacheKey, cacheExpiration);
         }
 
@@ -89,7 +89,7 @@ public class QueryCacheService : IQueryCacheService
                 _logger.LogDebug("Removed cache key: {Key}", key);
             }
 
-            _logger.LogInformation("Invalidated {Count} cache entries for pattern: {Pattern}", 
+            _logger.LogInformation("Invalidated {Count} cache entries for pattern: {Pattern}",
                 keysToRemove.Count, pattern);
         }
     }

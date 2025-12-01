@@ -29,14 +29,14 @@ public class ProgramareRepository : BaseRepository, IProgramareRepository
     {
         _logger.LogInformation("Obținere programare după ID: {ProgramareID}", id);
 
-     // ✅ FIX: Parametru corect - SP așteaptă @ProgramareID, nu @Id!
+        // ✅ FIX: Parametru corect - SP așteaptă @ProgramareID, nu @Id!
         var parameters = new { ProgramareID = id };
         var result = await QueryFirstOrDefaultAsync<ProgramareDto>(
             "sp_Programari_GetById",
      parameters,
         cancellationToken);
 
- if (result == null)
+        if (result == null)
         {
             _logger.LogWarning("Programarea cu ID {ProgramareID} nu a fost găsită", id);
             return null;
@@ -69,17 +69,17 @@ Guid? doctorID = null,
         var parameters = new
         {
             PageNumber = pageNumber,
- PageSize = pageSize,
+            PageSize = pageSize,
             SearchText = searchText,
-  DoctorID = doctorID,
-       PacientID = pacientID,
-DataStart = dataStart,
-          DataEnd = dataEnd,
+            DoctorID = doctorID,
+            PacientID = pacientID,
+            DataStart = dataStart,
+            DataEnd = dataEnd,
             Status = status,
             TipProgramare = tipProgramare,
-         SortColumn = sortColumn,
-          SortDirection = sortDirection
-      };
+            SortColumn = sortColumn,
+            SortDirection = sortDirection
+        };
 
         var results = await QueryAsync<ProgramareDto>(
 "sp_Programari_GetAll",
@@ -106,23 +106,23 @@ DataStart = dataStart,
 
         var parameters = new
         {
-     SearchText = searchText,
+            SearchText = searchText,
             DoctorID = doctorID,
             PacientID = pacientID,
-          DataStart = dataStart,
-       DataEnd = dataEnd,
-     Status = status,
+            DataStart = dataStart,
+            DataEnd = dataEnd,
+            Status = status,
             TipProgramare = tipProgramare
         };
 
         using var connection = _connectionFactory.CreateConnection();
-    var result = await connection.ExecuteScalarAsync<int>(
-   "sp_Programari_GetCount",
-  parameters,
-            commandType: System.Data.CommandType.StoredProcedure);
+        var result = await connection.ExecuteScalarAsync<int>(
+       "sp_Programari_GetCount",
+      parameters,
+                commandType: System.Data.CommandType.StoredProcedure);
 
-      _logger.LogInformation("Număr total programări găsite: {Count}", result);
-      return result;
+        _logger.LogInformation("Număr total programări găsite: {Count}", result);
+        return result;
     }
 
     // ==================== SPECIALIZED QUERIES (BUSINESS LOGIC) ====================
@@ -134,14 +134,14 @@ DataStart = dataStart,
         DateTime? dataEnd = null,
         CancellationToken cancellationToken = default)
     {
-     _logger.LogInformation(
- "Obținere programări pentru doctor: {DoctorID}, DataStart={DataStart}, DataEnd={DataEnd}",
-            doctorID, dataStart, dataEnd);
+        _logger.LogInformation(
+    "Obținere programări pentru doctor: {DoctorID}, DataStart={DataStart}, DataEnd={DataEnd}",
+               doctorID, dataStart, dataEnd);
 
         var parameters = new
         {
-      DoctorID = doctorID,
-    DataStart = dataStart,
+            DoctorID = doctorID,
+            DataStart = dataStart,
             DataEnd = dataEnd
         };
 
@@ -162,10 +162,10 @@ DataStart = dataStart,
 
         var parameters = new { PacientID = pacientID };
 
-      var results = await QueryAsync<ProgramareDto>(
-        "sp_Programari_GetByPacient",
-            parameters,
-      cancellationToken);
+        var results = await QueryAsync<ProgramareDto>(
+          "sp_Programari_GetByPacient",
+              parameters,
+        cancellationToken);
 
         return results.Select(MapToEntity);
     }
@@ -180,18 +180,18 @@ DataStart = dataStart,
       "Obținere programări pentru data: {Date}, Doctor={DoctorID}",
         date.ToString("yyyy-MM-dd"), doctorID);
 
-   // ✅ FIX: SP așteaptă @DataProgramare, nu @Data!
-   var parameters = new
+        // ✅ FIX: SP așteaptă @DataProgramare, nu @Data!
+        var parameters = new
         {
-  DataProgramare = date,
-       DoctorID = doctorID
+            DataProgramare = date,
+            DoctorID = doctorID
         };
 
-    var results = await QueryAsync<ProgramareDto>(
-        "sp_Programari_GetByDate", parameters, cancellationToken);
+        var results = await QueryAsync<ProgramareDto>(
+            "sp_Programari_GetByDate", parameters, cancellationToken);
 
         return results.Select(MapToEntity);
-  }
+    }
 
     /// <inheritdoc />
     public async Task<IEnumerable<Programare>> GetByDateRangeAsync(
@@ -200,32 +200,32 @@ DataStart = dataStart,
  Guid? doctorID = null,
      CancellationToken cancellationToken = default)
     {
-     _logger.LogInformation(
-       "⚡ GetByDateRange - OPTIMIZED: {StartDate} - {EndDate}, Doctor={DoctorID}",
-     startDate.ToString("yyyy-MM-dd"),
-       endDate.ToString("yyyy-MM-dd"),
-      doctorID);
+        _logger.LogInformation(
+          "⚡ GetByDateRange - OPTIMIZED: {StartDate} - {EndDate}, Doctor={DoctorID}",
+        startDate.ToString("yyyy-MM-dd"),
+          endDate.ToString("yyyy-MM-dd"),
+         doctorID);
 
-      var parameters = new
-  {
-       DataStart = startDate,
-        DataEnd = endDate,
-       DoctorID = doctorID
-  };
+        var parameters = new
+        {
+            DataStart = startDate,
+            DataEnd = endDate,
+            DoctorID = doctorID
+        };
 
-  var results = await QueryAsync<ProgramareDto>(
-       "sp_Programari_GetByDateRange",
-       parameters,
-       cancellationToken);
+        var results = await QueryAsync<ProgramareDto>(
+             "sp_Programari_GetByDateRange",
+             parameters,
+             cancellationToken);
 
         var programari = results.Select(MapToEntity).ToList();
-  
+
         _logger.LogInformation(
         "✅ Loaded {Count} programări for date range in SINGLE query",
             programari.Count);
 
-     return programari;
- }
+        return programari;
+    }
 
     /// <inheritdoc />
     public async Task<IEnumerable<Programare>> GetUpcomingAsync(
@@ -245,7 +245,7 @@ DataStart = dataStart,
 
         var results = await QueryAsync<ProgramareDto>(
                             "sp_Programari_GetUpcoming", parameters, cancellationToken);
-            return results.Select(MapToEntity);
+        return results.Select(MapToEntity);
     }
 
     /// <inheritdoc />
@@ -261,9 +261,9 @@ DataStart = dataStart,
 
         var parameters = new
         {
-     DoctorID = doctorID,
+            DoctorID = doctorID,
             DataStart = dataStart,
-DataEnd = dataEnd
+            DataEnd = dataEnd
         };
 
         var results = await QueryAsync<ProgramareDto>(
@@ -285,9 +285,9 @@ Guid pacientID,
    pacientID, ultimeleZile);
 
         var parameters = new
-   {
-   PacientID = pacientID,
-       UltimeleZile = ultimeleZile
+        {
+            PacientID = pacientID,
+            UltimeleZile = ultimeleZile
         };
 
         var results = await QueryAsync<ProgramareDto>(
@@ -312,27 +312,27 @@ Guid pacientID,
         programare.OraInceput.ToString(@"hh\:mm"));
 
         var parameters = new
-   {
-programare.PacientID,
+        {
+            programare.PacientID,
             programare.DoctorID,
-          programare.DataProgramare,
+            programare.DataProgramare,
             programare.OraInceput,
-         programare.OraSfarsit,
-      programare.TipProgramare,
-      programare.Status,
+            programare.OraSfarsit,
+            programare.TipProgramare,
+            programare.Status,
             programare.Observatii,
-       programare.CreatDe
-};
+            programare.CreatDe
+        };
 
-  var result = await QueryFirstOrDefaultAsync<ProgramareDto>(
-            "sp_Programari_Create",
-       parameters,
-       cancellationToken);
+        var result = await QueryFirstOrDefaultAsync<ProgramareDto>(
+                  "sp_Programari_Create",
+             parameters,
+             cancellationToken);
 
         if (result == null)
         {
-    _logger.LogError("Eroare la crearea programării - SP nu a returnat rezultat");
- throw new InvalidOperationException("Crearea programării a eșuat");
+            _logger.LogError("Eroare la crearea programării - SP nu a returnat rezultat");
+            throw new InvalidOperationException("Crearea programării a eșuat");
         }
 
         _logger.LogInformation("Programare creată cu succes: {ProgramareID}", result.ProgramareID);
@@ -343,7 +343,7 @@ programare.PacientID,
     public async Task<Programare> UpdateAsync(
         Programare programare,
  CancellationToken cancellationToken = default)
-  {
+    {
         _logger.LogInformation(
             "Actualizare programare: {ProgramareID}, Data={Data}, Ora={Ora}, Status={Status}",
       programare.ProgramareID,
@@ -352,32 +352,32 @@ programare.PacientID,
     programare.Status);
 
         var parameters = new
-  {
+        {
             programare.ProgramareID,
-       programare.PacientID,
+            programare.PacientID,
             programare.DoctorID,
-        programare.DataProgramare,
-     programare.OraInceput,
+            programare.DataProgramare,
+            programare.OraInceput,
             programare.OraSfarsit,
             programare.TipProgramare,
-         programare.Status,
-  programare.Observatii,
-    programare.ModificatDe
-     };
+            programare.Status,
+            programare.Observatii,
+            programare.ModificatDe
+        };
 
-     var result = await QueryFirstOrDefaultAsync<ProgramareDto>(
-            "sp_Programari_Update",
-            parameters,
-          cancellationToken);
+        var result = await QueryFirstOrDefaultAsync<ProgramareDto>(
+               "sp_Programari_Update",
+               parameters,
+             cancellationToken);
 
- if (result == null)
+        if (result == null)
         {
             _logger.LogError("Eroare la actualizarea programării {ProgramareID} - SP nu a returnat rezultat", programare.ProgramareID);
- throw new InvalidOperationException($"Actualizarea programării {programare.ProgramareID} a eșuat");
+            throw new InvalidOperationException($"Actualizarea programării {programare.ProgramareID} a eșuat");
         }
 
-     _logger.LogInformation("Programare actualizată cu succes: {ProgramareID}", programare.ProgramareID);
-   return MapToEntity(result);
+        _logger.LogInformation("Programare actualizată cu succes: {ProgramareID}", programare.ProgramareID);
+        return MapToEntity(result);
     }
 
     /// <inheritdoc />
@@ -386,28 +386,28 @@ programare.PacientID,
         Guid modificatDe,
         CancellationToken cancellationToken = default)
     {
-     _logger.LogInformation("Ștergere (anulare) programare: {ProgramareID} de către {ModificatDe}", id, modificatDe);
+        _logger.LogInformation("Ștergere (anulare) programare: {ProgramareID} de către {ModificatDe}", id, modificatDe);
 
         var parameters = new
         {
-ProgramareID = id,
+            ProgramareID = id,
             ModificatDe = modificatDe
-};
+        };
 
         var result = await QueryFirstOrDefaultAsync<SuccessResult>(
             "sp_Programari_Delete",
         parameters,
     cancellationToken);
 
-   var success = result?.Success == 1;
+        var success = result?.Success == 1;
 
-if (success)
+        if (success)
         {
             _logger.LogInformation("Programare anulată cu succes: {ProgramareID}", id);
         }
-     else
+        else
         {
-        _logger.LogWarning("Anularea programării {ProgramareID} a eșuat", id);
+            _logger.LogWarning("Anularea programării {ProgramareID} a eșuat", id);
         }
 
         return success;
@@ -431,11 +431,11 @@ if (success)
   excludeProgramareID);
 
         var parameters = new
-  {
-    DoctorID = doctorID,
+        {
+            DoctorID = doctorID,
             DataProgramare = dataProgramare,
- OraInceput = oraInceput,
- OraSfarsit = oraSfarsit,
+            OraInceput = oraInceput,
+            OraSfarsit = oraSfarsit,
             ExcludeProgramareID = excludeProgramareID
         };
 
@@ -446,16 +446,16 @@ if (success)
 
         var hasConflict = result?.ConflictExists == 1;
 
-     if (hasConflict)
+        if (hasConflict)
         {
-    _logger.LogWarning(
-     "Conflict detectat pentru doctor {DoctorID} la data {Data} în intervalul {Interval}",
-      doctorID, dataProgramare.ToString("yyyy-MM-dd"),
-          $"{oraInceput:hh\\:mm}-{oraSfarsit:hh\\:mm}");
- }
+            _logger.LogWarning(
+             "Conflict detectat pentru doctor {DoctorID} la data {Data} în intervalul {Interval}",
+              doctorID, dataProgramare.ToString("yyyy-MM-dd"),
+                  $"{oraInceput:hh\\:mm}-{oraSfarsit:hh\\:mm}");
+        }
         else
         {
-   _logger.LogInformation("Nu există conflict pentru intervalul verificat");
+            _logger.LogInformation("Nu există conflict pentru intervalul verificat");
         }
 
         return hasConflict;
@@ -468,59 +468,59 @@ if (success)
         DateTime? dataStart = null,
     DateTime? dataEnd = null,
         CancellationToken cancellationToken = default)
-{
+    {
         _logger.LogInformation(
             "Obținere statistici globale: DataStart={DataStart}, DataEnd={DataEnd}",
   dataStart?.ToString("yyyy-MM-dd"), dataEnd?.ToString("yyyy-MM-dd"));
 
-    var parameters = new
+        var parameters = new
         {
             DataStart = dataStart,
-     DataEnd = dataEnd
-      };
+            DataEnd = dataEnd
+        };
 
         // ✅ UPDATED: Folosește sp_Programari_GetStatistics_v2 (returnează un singur row cu toate statisticile)
         using var connection = _connectionFactory.CreateConnection();
-var result = await connection.QueryFirstOrDefaultAsync<StatisticsResult>(
-        "sp_Programari_GetStatistics_v2",
-            parameters,
-            commandType: System.Data.CommandType.StoredProcedure);
+        var result = await connection.QueryFirstOrDefaultAsync<StatisticsResult>(
+                "sp_Programari_GetStatistics_v2",
+                    parameters,
+                    commandType: System.Data.CommandType.StoredProcedure);
 
         if (result == null)
         {
-     _logger.LogWarning("Statisticile nu au putut fi obținute - result null");
+            _logger.LogWarning("Statisticile nu au putut fi obținute - result null");
             return new Dictionary<string, object>();
         }
 
         // ✅ Mapare result la Dictionary<string, object> pentru handler
         var statistics = new Dictionary<string, object>
-  {
+        {
             ["TotalProgramari"] = result.TotalProgramari,
-     ["Programate"] = result.Programate,
-   ["Confirmate"] = result.Confirmate,
-     ["CheckedIn"] = result.CheckedIn,
-         ["InConsultatie"] = result.InConsultatie,
-     ["Finalizate"] = result.Finalizate,
+            ["Programate"] = result.Programate,
+            ["Confirmate"] = result.Confirmate,
+            ["CheckedIn"] = result.CheckedIn,
+            ["InConsultatie"] = result.InConsultatie,
+            ["Finalizate"] = result.Finalizate,
             ["Anulate"] = result.Anulate,
-   ["NoShow"] = result.NoShow,
-  ["ConsultatiiInitiale"] = result.ConsultatiiInitiale,
-["ControalePeriodice"] = result.ControalePeriodice,
-         ["Consultatii"] = result.Consultatii,
+            ["NoShow"] = result.NoShow,
+            ["ConsultatiiInitiale"] = result.ConsultatiiInitiale,
+            ["ControalePeriodice"] = result.ControalePeriodice,
+            ["Consultatii"] = result.Consultatii,
             ["Investigatii"] = result.Investigatii,
-      ["Proceduri"] = result.Proceduri,
-      ["Urgente"] = result.Urgente,
+            ["Proceduri"] = result.Proceduri,
+            ["Urgente"] = result.Urgente,
             ["Telemedicina"] = result.Telemedicina,
-        ["LaDomiciliu"] = result.LaDomiciliu,
- ["MediciActivi"] = result.MediciActivi,
-    ["PacientiUnici"] = result.PacientiUnici,
+            ["LaDomiciliu"] = result.LaDomiciliu,
+            ["MediciActivi"] = result.MediciActivi,
+            ["PacientiUnici"] = result.PacientiUnici,
             ["DurataMedieMinute"] = result.DurataMedieMinute ?? 0.0
         };
 
-        _logger.LogInformation("Statistici obținute: Total={Total}, Finalizate={Finalizate}", 
+        _logger.LogInformation("Statistici obținute: Total={Total}, Finalizate={Finalizate}",
             result.TotalProgramari, result.Finalizate);
-        
-   return statistics;
-  }
+
+        return statistics;
+    }
 
     /// <inheritdoc />
     public async Task<Dictionary<string, object>> GetDoctorStatisticsAsync(
@@ -533,15 +533,15 @@ var result = await connection.QueryFirstOrDefaultAsync<StatisticsResult>(
             "Obținere statistici doctor: {DoctorID}, DataStart={DataStart}, DataEnd={DataEnd}",
             doctorID, dataStart?.ToString("yyyy-MM-dd"), dataEnd?.ToString("yyyy-MM-dd"));
 
-      var parameters = new
+        var parameters = new
         {
-          DoctorID = doctorID,
-  DataStart = dataStart,
-    DataEnd = dataEnd
+            DoctorID = doctorID,
+            DataStart = dataStart,
+            DataEnd = dataEnd
         };
 
         // ✅ UPDATED: Folosește sp_Programari_GetDoctorStatistics_v2
-   using var connection = _connectionFactory.CreateConnection();
+        using var connection = _connectionFactory.CreateConnection();
         var result = await connection.QueryFirstOrDefaultAsync<StatisticsResult>(
       "sp_Programari_GetDoctorStatistics_v2",
       parameters,
@@ -549,41 +549,41 @@ var result = await connection.QueryFirstOrDefaultAsync<StatisticsResult>(
 
         if (result == null)
         {
-         _logger.LogWarning("Statisticile pentru doctor {DoctorID} nu au putut fi obținute", doctorID);
+            _logger.LogWarning("Statisticile pentru doctor {DoctorID} nu au putut fi obținute", doctorID);
             return new Dictionary<string, object>();
         }
 
         // ✅ Mapare result la Dictionary<string, object>
         var statistics = new Dictionary<string, object>
         {
-         ["TotalProgramari"] = result.TotalProgramari,
-  ["Programate"] = result.Programate,
-    ["Confirmate"] = result.Confirmate,
+            ["TotalProgramari"] = result.TotalProgramari,
+            ["Programate"] = result.Programate,
+            ["Confirmate"] = result.Confirmate,
             ["CheckedIn"] = result.CheckedIn,
-       ["InConsultatie"] = result.InConsultatie,
+            ["InConsultatie"] = result.InConsultatie,
             ["Finalizate"] = result.Finalizate,
-       ["Anulate"] = result.Anulate,
-          ["NoShow"] = result.NoShow,
-       ["ConsultatiiInitiale"] = result.ConsultatiiInitiale,
-      ["ControalePeriodice"] = result.ControalePeriodice,
-   ["Consultatii"] = result.Consultatii,
-          ["Investigatii"] = result.Investigatii,
-    ["Proceduri"] = result.Proceduri,
+            ["Anulate"] = result.Anulate,
+            ["NoShow"] = result.NoShow,
+            ["ConsultatiiInitiale"] = result.ConsultatiiInitiale,
+            ["ControalePeriodice"] = result.ControalePeriodice,
+            ["Consultatii"] = result.Consultatii,
+            ["Investigatii"] = result.Investigatii,
+            ["Proceduri"] = result.Proceduri,
             ["Urgente"] = result.Urgente,
-       ["Telemedicina"] = result.Telemedicina,
-["LaDomiciliu"] = result.LaDomiciliu,
+            ["Telemedicina"] = result.Telemedicina,
+            ["LaDomiciliu"] = result.LaDomiciliu,
             ["MediciActivi"] = result.MediciActivi,
             ["PacientiUnici"] = result.PacientiUnici,
             ["DurataMedieMinute"] = result.DurataMedieMinute ?? 0.0
         };
 
-_logger.LogInformation(
-            "Statistici doctor {DoctorID} obținute: Total={Total}, Finalizate={Finalizate}",
-       doctorID, result.TotalProgramari, result.Finalizate);
+        _logger.LogInformation(
+                    "Statistici doctor {DoctorID} obținute: Total={Total}, Finalizate={Finalizate}",
+               doctorID, result.TotalProgramari, result.Finalizate);
 
         return statistics;
- }
-    
+    }
+
     // ==================== PRIVATE HELPER METHODS ====================
 
     /// <summary>
@@ -593,30 +593,30 @@ _logger.LogInformation(
     {
         return new Programare
         {
-   ProgramareID = dto.ProgramareID,
- PacientID = dto.PacientID,
+            ProgramareID = dto.ProgramareID,
+            PacientID = dto.PacientID,
             DoctorID = dto.DoctorID,
-          DataProgramare = dto.DataProgramare,
+            DataProgramare = dto.DataProgramare,
             OraInceput = dto.OraInceput,
-       OraSfarsit = dto.OraSfarsit,
-        TipProgramare = dto.TipProgramare,
-   Status = dto.Status,
+            OraSfarsit = dto.OraSfarsit,
+            TipProgramare = dto.TipProgramare,
+            Status = dto.Status,
             Observatii = dto.Observatii,
-        DataCreare = dto.DataCreare,
+            DataCreare = dto.DataCreare,
             CreatDe = dto.CreatDe,
-     DataUltimeiModificari = dto.DataUltimeiModificari,
- ModificatDe = dto.ModificatDe,
+            DataUltimeiModificari = dto.DataUltimeiModificari,
+            ModificatDe = dto.ModificatDe,
             // Navigation properties (din JOIN-uri)
             PacientNumeComplet = dto.PacientNumeComplet,
- PacientTelefon = dto.PacientTelefon,
- PacientEmail = dto.PacientEmail,
-   PacientCNP = dto.PacientCNP,
- DoctorNumeComplet = dto.DoctorNumeComplet,
- DoctorSpecializare = dto.DoctorSpecializare,
+            PacientTelefon = dto.PacientTelefon,
+            PacientEmail = dto.PacientEmail,
+            PacientCNP = dto.PacientCNP,
+            DoctorNumeComplet = dto.DoctorNumeComplet,
+            DoctorSpecializare = dto.DoctorSpecializare,
             DoctorTelefon = dto.DoctorTelefon,
             DoctorEmail = dto.DoctorEmail,  // ✅ NEW - pentru trimitere email-uri
-   CreatDeNumeComplet = dto.CreatDeNumeComplet
-    };
+            CreatDeNumeComplet = dto.CreatDeNumeComplet
+        };
     }
 
     // ==================== INTERNAL DTOs (pentru mapare rezultate SP) ====================
@@ -624,21 +624,21 @@ _logger.LogInformation(
     /// <summary>
     /// DTO pentru maparea rezultatelor din stored procedures.
     /// Structura exactă trebuie să corespundă cu coloanele returnate de SP-uri.
-  /// </summary>
+    /// </summary>
     private class ProgramareDto
-  {
-   public Guid ProgramareID { get; set; }
+    {
+        public Guid ProgramareID { get; set; }
         public Guid PacientID { get; set; }
         public Guid DoctorID { get; set; }
         public DateTime DataProgramare { get; set; }
         public TimeSpan OraInceput { get; set; }
-      public TimeSpan OraSfarsit { get; set; }
+        public TimeSpan OraSfarsit { get; set; }
         public string? TipProgramare { get; set; }
-      public string Status { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
         public string? Observatii { get; set; }
         public DateTime DataCreare { get; set; }
         public Guid CreatDe { get; set; }
-    public DateTime? DataUltimeiModificari { get; set; }
+        public DateTime? DataUltimeiModificari { get; set; }
         public Guid? ModificatDe { get; set; }
 
         // Navigation properties (din JOIN-uri ale SP-urilor)
@@ -653,7 +653,7 @@ _logger.LogInformation(
         public string? CreatDeNumeComplet { get; set; }
     }
 
- /// <summary>
+    /// <summary>
     /// DTO pentru rezultatul verificării de conflict.
     /// </summary>
     private class ConflictCheckResult
@@ -662,53 +662,53 @@ _logger.LogInformation(
     }
 
     /// <summary>
-/// DTO pentru rezultatele de tip success/failure din SP-uri.
-/// </summary>
+    /// DTO pentru rezultatele de tip success/failure din SP-uri.
+    /// </summary>
     private class SuccessResult
     {
-    public int Success { get; set; }
-     public string? Message { get; set; }
+        public int Success { get; set; }
+        public string? Message { get; set; }
     }
 
-  /// <summary>
+    /// <summary>
     /// DTO pentru rezultatele statistice (v2 format - UN SINGUR ROW cu toate statisticile).
-  /// </summary>
+    /// </summary>
     private class StatisticsResult
     {
-  // Status counts
+        // Status counts
         public int TotalProgramari { get; set; }
         public int Programate { get; set; }
         public int Confirmate { get; set; }
         public int CheckedIn { get; set; }
         public int InConsultatie { get; set; }
         public int Finalizate { get; set; }
-  public int Anulate { get; set; }
- public int NoShow { get; set; }
-        
+        public int Anulate { get; set; }
+        public int NoShow { get; set; }
+
         // Tip programare counts
         public int ConsultatiiInitiale { get; set; }
-     public int ControalePeriodice { get; set; }
-     public int Consultatii { get; set; }
-   public int Investigatii { get; set; }
-     public int Proceduri { get; set; }
+        public int ControalePeriodice { get; set; }
+        public int Consultatii { get; set; }
+        public int Investigatii { get; set; }
+        public int Proceduri { get; set; }
         public int Urgente { get; set; }
         public int Telemedicina { get; set; }
- public int LaDomiciliu { get; set; }
-    
-   // Advanced statistics
-      public int MediciActivi { get; set; }
-    public int PacientiUnici { get; set; }
-     public double? DurataMedieMinute { get; set; }
+        public int LaDomiciliu { get; set; }
+
+        // Advanced statistics
+        public int MediciActivi { get; set; }
+        public int PacientiUnici { get; set; }
+        public double? DurataMedieMinute { get; set; }
     }
 
     /// <summary>
-  /// DTO DEPRECATED - păstrat pentru backwards compatibility.
+    /// DTO DEPRECATED - păstrat pentru backwards compatibility.
     /// Folosește StatisticsResult în loc.
-  /// </summary>
+    /// </summary>
     [Obsolete("Use StatisticsResult instead")]
     private class StatisticResult
     {
         public string Categorie { get; set; } = string.Empty;
-   public int Valoare { get; set; }
-  }
+        public int Valoare { get; set; }
+    }
 }

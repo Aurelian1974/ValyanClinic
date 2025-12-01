@@ -14,7 +14,7 @@ public class PacientAsociatDto
     public DateTime PacientDataNasterii { get; set; }
     public int PacientVarsta { get; set; }
     public string PacientSex { get; set; } = string.Empty;
- 
+
     // Informații despre relație
     public string? TipRelatie { get; set; }
     public DateTime DataAsocierii { get; set; }
@@ -22,11 +22,11 @@ public class PacientAsociatDto
     public bool EsteActiv { get; set; }
     public string? Motiv { get; set; }
     public string? Observatii { get; set; }
-    
+
     // Computed properties
-    public int ZileDeAsociere => EsteActiv 
-        ? (DateTime.Now - DataAsocierii).Days 
+    public int ZileDeAsociere => EsteActiv
+        ? (DateTime.Now - DataAsocierii).Days
         : (DataDezactivarii!.Value - DataAsocierii).Days;
-    
+
     public string StatusText => EsteActiv ? "Activ" : "Inactiv";
 }

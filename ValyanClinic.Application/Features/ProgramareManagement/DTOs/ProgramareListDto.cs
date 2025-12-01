@@ -22,7 +22,7 @@ public class ProgramareListDto
     public Guid DoctorID { get; set; }
 
     /// <summary>
-  /// Data programării (format: yyyy-MM-dd).
+    /// Data programării (format: yyyy-MM-dd).
     /// </summary>
     public DateTime DataProgramare { get; set; }
 
@@ -49,18 +49,18 @@ public class ProgramareListDto
     /// <summary>
     /// Statusul programării (Programata, Confirmata, CheckedIn, Finalizata, Anulata, NoShow).
     /// </summary>
-  public string Status { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
 
     /// <summary>
     /// Observații (scurte, max 200 caractere pentru listă).
-/// </summary>
-    public string? ObservatiiScurte => Observatii?.Length > 200 
-        ? Observatii.Substring(0, 197) + "..." 
+    /// </summary>
+    public string? ObservatiiScurte => Observatii?.Length > 200
+        ? Observatii.Substring(0, 197) + "..."
         : Observatii;
 
     /// <summary>
     /// Observații complete.
-  /// </summary>
+    /// </summary>
     public string? Observatii { get; set; }
 
     // ==================== INFORMAȚII PACIENT ====================
@@ -112,9 +112,9 @@ public class ProgramareListDto
     /// </summary>
     public string? DoctorNumeComplet { get; set; }
 
- /// <summary>
+    /// <summary>
     /// Specializarea medicului.
-  /// </summary>
+    /// </summary>
     public string? DoctorSpecializare { get; set; }
 
     /// <summary>
@@ -139,19 +139,19 @@ public class ProgramareListDto
     /// </summary>
     public string? CreatDeNumeComplet { get; set; }
 
-/// <summary>
+    /// <summary>
     /// Data și ora ultimei modificări.
- /// </summary>
+    /// </summary>
     public DateTime? DataUltimeiModificari { get; set; }
 
     // ==================== COMPUTED PROPERTIES (pentru UI) ====================
 
- /// <summary>
+    /// <summary>
     /// Data și ora completă de început (pentru sortare și comparare).
     /// </summary>
     public DateTime DataOraInceput => DataProgramare.Date + OraInceput;
 
-/// <summary>
+    /// <summary>
     /// Data și ora completă de sfârșit.
     /// </summary>
     public DateTime DataOraSfarsit => DataProgramare.Date + OraSfarsit;
@@ -171,29 +171,29 @@ public class ProgramareListDto
     /// </summary>
     public bool EsteInDesfasurare
     {
-    get
+        get
         {
-  var now = DateTime.Now;
-   return now >= DataOraInceput && now <= DataOraSfarsit;
-      }
+            var now = DateTime.Now;
+            return now >= DataOraInceput && now <= DataOraSfarsit;
+        }
     }
 
     /// <summary>
     /// String format pentru afișare în UI: "DD.MM.YYYY HH:mm - HH:mm".
     /// </summary>
-    public string DataOraFormatata => 
+    public string DataOraFormatata =>
         $"{DataProgramare:dd.MM.yyyy} {OraInceput:hh\\:mm} - {OraSfarsit:hh\\:mm}";
 
     /// <summary>
     /// Culoare pentru badge status (Bootstrap colors).
     /// </summary>
     public string StatusColor => Status?.ToLower() switch
-  {
+    {
         "programata" => "secondary",
-      "confirmata" => "info",
-  "checkedin" => "primary",
+        "confirmata" => "info",
+        "checkedin" => "primary",
         "inconsultatie" => "warning",
-     "finalizata" => "success",
+        "finalizata" => "success",
         "anulata" => "danger",
         "noshow" => "dark",
         _ => "secondary"
@@ -205,13 +205,13 @@ public class ProgramareListDto
     public string TipProgramareColor => TipProgramare?.ToLower() switch
     {
         "consultatieinitial" => "primary",
-     "controlperiodic" => "info",
+        "controlperiodic" => "info",
         "consultatie" => "secondary",
-     "investigatie" => "warning",
-      "procedura" => "success",
+        "investigatie" => "warning",
+        "procedura" => "success",
         "urgenta" => "danger",
         "telemedicina" => "dark",
- "ladomiciliu" => "purple",
+        "ladomiciliu" => "purple",
         _ => "secondary"
-  };
+    };
 }

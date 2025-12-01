@@ -93,7 +93,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
             if (IsUserAuthenticated(httpContext))
             {
                 // Log authentication check (DEBUG level for production)
-                _logger.LogDebug("User authenticated: {Username}", 
+                _logger.LogDebug("User authenticated: {Username}",
                     httpContext.User.Identity?.Name ?? "Unknown");
 
                 // Return authenticated state with user's claims
@@ -193,11 +193,11 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
             }
 
             _logger.LogInformation("[DEBUG] Authentication State Details:");
-            _logger.LogInformation("  - User.Identity.Name: {Name}", 
+            _logger.LogInformation("  - User.Identity.Name: {Name}",
                 httpContext.User?.Identity?.Name ?? "NULL");
-            _logger.LogInformation("  - User.Identity.IsAuthenticated: {IsAuth}", 
+            _logger.LogInformation("  - User.Identity.IsAuthenticated: {IsAuth}",
                 httpContext.User?.Identity?.IsAuthenticated);
-            _logger.LogInformation("  - User.Claims.Count: {Count}", 
+            _logger.LogInformation("  - User.Claims.Count: {Count}",
                 httpContext.User?.Claims?.Count() ?? 0);
 
             if (httpContext.User?.Claims != null)

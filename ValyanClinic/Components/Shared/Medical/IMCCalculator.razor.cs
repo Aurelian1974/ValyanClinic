@@ -6,20 +6,20 @@ namespace ValyanClinic.Components.Shared.Medical;
 public partial class IMCCalculator : ComponentBase
 {
     [Inject] private IIMCCalculatorService IMCService { get; set; } = default!;
-    
+
     [Parameter] public decimal? Greutate { get; set; }
     [Parameter] public decimal? Inaltime { get; set; }
     [Parameter] public EventCallback<decimal?> GreutateChanged { get; set; }
     [Parameter] public EventCallback<decimal?> InaltimeChanged { get; set; }
     [Parameter] public bool ShowDetails { get; set; } = true;
-    
+
     private IMCResult? IMCResult { get; set; }
-    
+
     protected override void OnParametersSet()
     {
         CalculateIMC();
     }
-    
+
     private async Task OnWeightChanged(Microsoft.AspNetCore.Components.ChangeEventArgs e)
     {
         if (decimal.TryParse(e.Value?.ToString(), out var weight))
@@ -32,10 +32,10 @@ public partial class IMCCalculator : ComponentBase
             Greutate = null;
             await GreutateChanged.InvokeAsync(null);
         }
-        
+
         CalculateIMC();
     }
-    
+
     private async Task OnHeightChanged(Microsoft.AspNetCore.Components.ChangeEventArgs e)
     {
         if (decimal.TryParse(e.Value?.ToString(), out var height))
@@ -48,10 +48,10 @@ public partial class IMCCalculator : ComponentBase
             Inaltime = null;
             await InaltimeChanged.InvokeAsync(null);
         }
-        
+
         CalculateIMC();
     }
-    
+
     private void CalculateIMC()
     {
         if (Greutate.HasValue && Inaltime.HasValue)
@@ -63,11 +63,11 @@ public partial class IMCCalculator : ComponentBase
             IMCResult = null;
         }
     }
-    
+
     private string GetCategoryIcon()
     {
         if (IMCResult == null) return "fas fa-calculator";
-        
+
         return IMCResult.Category switch
         {
             IMCCategory.Subponderal => "fas fa-arrow-down",

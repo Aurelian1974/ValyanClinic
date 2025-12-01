@@ -49,14 +49,14 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
             SortColumn = sortColumn,
             SortDirection = sortDirection
         };
-        
+
         // SP returneaza 2 result sets: datele si count-ul
         using var connection = _connectionFactory.CreateConnection();
         using var multi = await connection.QueryMultipleAsync(
             "sp_PersonalMedical_GetAll",
             parameters,
             commandType: System.Data.CommandType.StoredProcedure);
-        
+
         var data = await multi.ReadAsync<PersonalMedical>();
         // Skip count result set
         return data;
@@ -80,15 +80,15 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
             SortColumn = "Nume",
             SortDirection = "ASC"
         };
-        
+
         using var connection = _connectionFactory.CreateConnection();
         using var multi = await connection.QueryMultipleAsync(
             "sp_PersonalMedical_GetAll",
             parameters,
             commandType: System.Data.CommandType.StoredProcedure);
-        
+
         await multi.ReadAsync<PersonalMedical>();
-        
+
         var countResult = await multi.ReadFirstOrDefaultAsync<CountResult>();
         return countResult?.TotalCount ?? 0;
     }
@@ -145,7 +145,7 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
 
         // SP returneaza personal medical actualizat
         var result = await QueryFirstOrDefaultAsync<PersonalMedical>("sp_PersonalMedical_Update", parameters, cancellationToken);
-        
+
         // DEBUG: Log result
         Console.WriteLine($"  Update result: {(result != null ? "SUCCESS" : "FAILED")}");
         if (result != null)
@@ -153,14 +153,14 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
             Console.WriteLine($"  Result Pozitie: '{result.Pozitie}'");
             Console.WriteLine($"  Result PozitieID: {result.PozitieID}");   // ✅ FIX: Log si PozitieID
         }
-        
+
         return result != null;
     }
 
     public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var parameters = new { PersonalID = id };
-        
+
         // SP face soft delete (seteaza EsteActiv = 0)
         var result = await QueryFirstOrDefaultAsync<SuccessResult>("sp_PersonalMedical_Delete", parameters, cancellationToken);
         return result?.Success == 1;

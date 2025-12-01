@@ -22,15 +22,15 @@ public class PersonalBusinessService : IPersonalBusinessService
     public string CalculeazaVarsta(DateTime dataNasterii)
     {
         var today = DateTime.Today;
-        
+
         // Calculeaza ani
         int ani = today.Year - dataNasterii.Year;
-        if (today.Month < dataNasterii.Month || 
+        if (today.Month < dataNasterii.Month ||
             (today.Month == dataNasterii.Month && today.Day < dataNasterii.Day))
         {
             ani--;
         }
-        
+
         // Calculeaza luni
         int luni = today.Month - dataNasterii.Month;
         if (luni < 0)
@@ -45,7 +45,7 @@ public class PersonalBusinessService : IPersonalBusinessService
                 luni += 12;
             }
         }
-        
+
         // Calculeaza zile
         int zile = today.Day - dataNasterii.Day;
         if (zile < 0)
@@ -53,38 +53,38 @@ public class PersonalBusinessService : IPersonalBusinessService
             var previousMonth = today.AddMonths(-1);
             zile += DateTime.DaysInMonth(previousMonth.Year, previousMonth.Month);
         }
-        
+
         // Formatare rezultat
         var parts = new List<string>();
-        
+
         if (ani > 0)
         {
             parts.Add($"{ani} {(ani == 1 ? "an" : "ani")}");
         }
-        
+
         if (luni > 0)
         {
             parts.Add($"{luni} {(luni == 1 ? "luna" : "luni")}");
         }
-        
+
         if (zile > 0 || parts.Count == 0)
         {
             parts.Add($"{zile} {(zile == 1 ? "zi" : "zile")}");
         }
-        
+
         return string.Join(", ", parts);
     }
 
     public string CalculeazaVarstaFromCNP(string cnp)
     {
         var dataNasterii = ExtractDataNasteriiFromCNP(cnp);
-        
+
         if (dataNasterii == null)
         {
             _logger.LogDebug("CNP invalid pentru calculul varstei: {CNP}", cnp);
             return "CNP invalid";
         }
-        
+
         return CalculeazaVarsta(dataNasterii.Value);
     }
 
@@ -157,7 +157,7 @@ public class PersonalBusinessService : IPersonalBusinessService
         try
         {
             var dataNasterii = new DateTime(anComplet, luna, zi);
-            
+
             if (dataNasterii > DateTime.Today)
             {
                 return (false, "Data nasterii in viitor");
@@ -229,7 +229,7 @@ public class PersonalBusinessService : IPersonalBusinessService
             var timpTrecut = today - expirare;
             int zileTrecute = (int)timpTrecut.TotalDays;
 
-            _logger.LogDebug("Document expirat: DataExpirare={DataExpirare}, ZileTrecute={ZileTrecute}", 
+            _logger.LogDebug("Document expirat: DataExpirare={DataExpirare}, ZileTrecute={ZileTrecute}",
                 expirare, zileTrecute);
 
             if (zileTrecute <= 7)
@@ -276,7 +276,7 @@ public class PersonalBusinessService : IPersonalBusinessService
         int totalZileRamase = (int)(expirare - today).TotalDays;
         if (totalZileRamase < ZILE_EXPIRARE_CRITICA)
         {
-            _logger.LogWarning("Document expira in curand: DataExpirare={DataExpirare}, ZileRamase={ZileRamase}", 
+            _logger.LogWarning("Document expira in curand: DataExpirare={DataExpirare}, ZileRamase={ZileRamase}",
                 expirare, totalZileRamase);
         }
 

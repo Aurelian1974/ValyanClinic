@@ -11,8 +11,8 @@ public class GetProgramariByDateQueryValidator : AbstractValidator<GetProgramari
 
         When(x => x.DoctorID.HasValue, () =>
         {
-    RuleFor(x => x.DoctorID)
-      .NotEqual(Guid.Empty).WithMessage("ID-ul medicului nu este valid.");
-  });
+            RuleFor(x => x.DoctorID)
+              .NotEqual(Guid.Empty).WithMessage("ID-ul medicului nu este valid.");
+        });
     }
 }

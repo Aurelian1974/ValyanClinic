@@ -12,10 +12,10 @@ public class AuditLog
     public string Actiune { get; set; } = string.Empty;
     public DateTime DataActiune { get; set; }
     public string? Entitate { get; set; }
- public string? EntitateID { get; set; }
+    public string? EntitateID { get; set; }
     public string? ValoareVeche { get; set; }
     public string? ValoareNoua { get; set; }
-  public string? AdresaIP { get; set; }
+    public string? AdresaIP { get; set; }
     public string? UserAgent { get; set; }
     public string? Dispozitiv { get; set; }
     public string StatusActiune { get; set; } = "Success";

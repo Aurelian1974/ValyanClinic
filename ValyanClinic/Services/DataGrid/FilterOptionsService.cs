@@ -61,7 +61,7 @@ public class FilterOptionsService : IFilterOptionsService
                 .FirstOrDefault() as DisplayAttribute;
 
             var displayName = displayAttribute?.Name ?? value.ToString();
-            
+
             options.Add(new FilterOption(displayName, value.ToString()));
         }
 

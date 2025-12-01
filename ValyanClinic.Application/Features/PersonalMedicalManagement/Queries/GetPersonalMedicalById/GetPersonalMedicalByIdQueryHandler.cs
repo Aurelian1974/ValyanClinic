@@ -31,7 +31,7 @@ public class GetPersonalMedicalByIdQueryHandler : IRequestHandler<GetPersonalMed
             // CRITICAL: Query direct cu Dapper pentru a map-a TOATE coloanele din SP
             // inclusiv CategorieName, SpecializareName, SubspecializareName care vin din JOIN-uri
             using var connection = _connectionFactory.CreateConnection();
-            
+
             var dto = await connection.QuerySingleOrDefaultAsync<PersonalMedicalDetailDto>(
                 "sp_PersonalMedical_GetById",
                 new { PersonalID = request.PersonalID },
@@ -44,8 +44,8 @@ public class GetPersonalMedicalByIdQueryHandler : IRequestHandler<GetPersonalMed
             }
 
             _logger.LogInformation(
-                "PersonalMedical found: {PersonalID} - {NumeComplet}, Categorie: {Categorie}, Specializare: {Specializare}", 
-                dto.PersonalID, 
+                "PersonalMedical found: {PersonalID} - {NumeComplet}, Categorie: {Categorie}, Specializare: {Specializare}",
+                dto.PersonalID,
                 dto.NumeComplet,
                 dto.CategorieName ?? "N/A",
                 dto.SpecializareName ?? "N/A");

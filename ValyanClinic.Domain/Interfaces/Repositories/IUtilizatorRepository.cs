@@ -17,7 +17,7 @@ public interface IUtilizatorRepository
         string sortColumn = "Username",
         string sortDirection = "ASC",
         CancellationToken cancellationToken = default);
-    
+
     Task<Utilizator?> GetByIdAsync(Guid utilizatorID, CancellationToken cancellationToken = default);
     Task<Utilizator?> GetByUsernameAsync(string username, CancellationToken cancellationToken = default);
     Task<Utilizator?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
@@ -26,12 +26,12 @@ public interface IUtilizatorRepository
         string? rol = null,
         bool? esteActiv = null,
   CancellationToken cancellationToken = default);
-    
+
     // Command methods
- Task<Guid> CreateAsync(Utilizator utilizator, CancellationToken cancellationToken = default);
-  Task<bool> UpdateAsync(Utilizator utilizator, CancellationToken cancellationToken = default);
+    Task<Guid> CreateAsync(Utilizator utilizator, CancellationToken cancellationToken = default);
+    Task<bool> UpdateAsync(Utilizator utilizator, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(Guid utilizatorID, CancellationToken cancellationToken = default);
-    
+
     // Authentication specific
     Task<bool> ChangePasswordAsync(
    Guid utilizatorID,
@@ -39,19 +39,19 @@ public interface IUtilizatorRepository
  string newSalt,
 string modificatDe,
   CancellationToken cancellationToken = default);
-    
+
     Task<bool> UpdateUltimaAutentificareAsync(Guid utilizatorID, CancellationToken cancellationToken = default);
-    
+
     Task<(bool Success, string Message)> IncrementIncercariEsuateAsync(
         Guid utilizatorID,
  CancellationToken cancellationToken = default);
-    
+
     Task<bool> SetTokenResetareParolaAsync(
      string email,
         string token,
         DateTime dataExpirare,
         CancellationToken cancellationToken = default);
-    
+
     // Statistics
- Task<Dictionary<string, (int Total, int Activi)>> GetStatisticsAsync(CancellationToken cancellationToken = default);
+    Task<Dictionary<string, (int Total, int Activi)>> GetStatisticsAsync(CancellationToken cancellationToken = default);
 }

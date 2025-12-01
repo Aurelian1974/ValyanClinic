@@ -24,26 +24,26 @@ public partial class DashboardMedic : ComponentBase
     private string DoctorName { get; set; } = "Doctor";
     private string Specializare { get; set; } = "";
     private string CurrentDate => DateTime.Now.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("ro-RO"));
-    
+
     private bool IsLoading { get; set; } = false;
     private Guid? PersonalMedicalID { get; set; }
-    
+
     // ✅ Variabile STATICE partajate între toate instanțele (persist între navigări)
     private static List<ProgramareListDto> _sharedProgramari = new();
     private static DateTime _lastLoadTime = DateTime.MinValue;
     private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(5);
-    
+
     // Programari - folosește lista partajată
     private List<ProgramareListDto> ToateProgramarile
     {
         get => _sharedProgramari;
         set => _sharedProgramari = value;
     }
-    
+
     private int TotalProgramariAstazi => ToateProgramarile.Count;
     private string SearchText { get; set; } = "";
     private string StatusFilter { get; set; } = "";
-    
+
     private List<ProgramareListDto> FilteredProgramari
     {
         get
@@ -82,7 +82,7 @@ public partial class DashboardMedic : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         Logger.LogInformation("[DashboardMedic] OnInitializedAsync START");
-        
+
         // ✅ ELIMINAT: flag-ul _hasInitialized pentru a permite re-autentificare
         // Componenta trebuie să se re-inițializeze complet la fiecare navigare
         // pentru a re-încărca informațiile de autentificare
@@ -90,15 +90,15 @@ public partial class DashboardMedic : ComponentBase
         try
         {
             await LoadDoctorInfo();
-            
+
             if (PersonalMedicalID.HasValue)
             {
                 Logger.LogInformation("[DashboardMedic] PersonalMedicalID set: {PersonalMedicalID}", PersonalMedicalID);
-                
+
                 // ✅ Verifică dacă trebuie să reîncarce datele (cache expirat sau listă goală)
                 var cacheAge = DateTime.Now - _lastLoadTime;
                 var needsReload = ToateProgramarile.Count == 0 || cacheAge > CacheExpiration;
-                
+
                 if (needsReload)
                 {
                     Logger.LogInformation("[DashboardMedic] Cache expired or empty, loading data");
@@ -107,9 +107,9 @@ public partial class DashboardMedic : ComponentBase
                 }
                 else
                 {
-                    Logger.LogInformation("[DashboardMedic] Using cached data ({Count} programări, age: {Age})", 
+                    Logger.LogInformation("[DashboardMedic] Using cached data ({Count} programări, age: {Age})",
                         ToateProgramarile.Count, cacheAge);
-                    
+
                     // ✅ Forțează UI update când folosim cache
                     StateHasChanged();
                 }
@@ -118,7 +118,7 @@ public partial class DashboardMedic : ComponentBase
             {
                 Logger.LogWarning("[DashboardMedic] PersonalMedicalID not available after LoadDoctorInfo");
             }
-            
+
             await LoadActivitatiRecente();
             LoadChartData();
         }
@@ -126,7 +126,7 @@ public partial class DashboardMedic : ComponentBase
         {
             Logger.LogError(ex, "[DashboardMedic] Error during initialization");
         }
-        
+
         Logger.LogInformation("[DashboardMedic] OnInitializedAsync END");
     }
 
@@ -136,7 +136,7 @@ public partial class DashboardMedic : ComponentBase
             return;
 
         Logger.LogInformation("[DashboardMedic] OnAfterRenderAsync - First render completed");
-        
+
         // ✅ Verifică dacă modalul a fost inițializat
         if (ConsultatieModalRef != null && !_modalInitialized)
         {
@@ -146,11 +146,11 @@ public partial class DashboardMedic : ComponentBase
         else if (ConsultatieModalRef == null)
         {
             Logger.LogWarning("[DashboardMedic] ConsultatieModal reference is NULL after first render!");
-            
+
             // ✅ Forțează re-render pentru a încerca să obțină referința
             await InvokeAsync(StateHasChanged);
         }
-        
+
         // Forțează re-render pentru a asigura că UI-ul este actualizat
         StateHasChanged();
     }
@@ -165,12 +165,12 @@ public partial class DashboardMedic : ComponentBase
             if (user.Identity?.IsAuthenticated == true)
             {
                 var personalMedicalIdClaim = user.FindFirst("PersonalMedicalID")?.Value;
-                
-                if (!string.IsNullOrEmpty(personalMedicalIdClaim) && 
+
+                if (!string.IsNullOrEmpty(personalMedicalIdClaim) &&
                     Guid.TryParse(personalMedicalIdClaim, out Guid personalMedicalId))
                 {
                     PersonalMedicalID = personalMedicalId;
-                    
+
                     var query = new GetPersonalMedicalByIdQuery(personalMedicalId);
                     var result = await Mediator.Send(query);
 
@@ -178,7 +178,7 @@ public partial class DashboardMedic : ComponentBase
                     {
                         DoctorName = $"Dr. {result.Value.NumeComplet}";
                         Specializare = result.Value.Specializare ?? "Medicina Generala";
-                        
+
                         Logger.LogInformation("[DashboardMedic] Loaded doctor info: {Name}", DoctorName);
                     }
                 }
@@ -225,23 +225,23 @@ public partial class DashboardMedic : ComponentBase
             if (result.IsSuccess && result.Value != null)
             {
                 ToateProgramarile = result.Value.ToList();
-                
+
                 Logger.LogInformation("[DashboardMedic] ===== PROGRAMĂRI ÎNCĂRCATE =====");
                 Logger.LogInformation("[DashboardMedic] Total programări: {Count}", ToateProgramarile.Count);
-                
+
                 foreach (var prog in ToateProgramarile)
                 {
-                    Logger.LogInformation("[DashboardMedic] Programare: {Pacient} - Ora: {Ora} - Status: {Status}", 
-                        prog.PacientNumeComplet, 
-                        prog.OraInceput, 
+                    Logger.LogInformation("[DashboardMedic] Programare: {Pacient} - Ora: {Ora} - Status: {Status}",
+                        prog.PacientNumeComplet,
+                        prog.OraInceput,
                         prog.Status);
                 }
-                
+
                 Logger.LogInformation("[DashboardMedic] ===== END PROGRAMĂRI =====");
             }
             else
             {
-                Logger.LogWarning("[DashboardMedic] Failed to load programari: {Errors}", 
+                Logger.LogWarning("[DashboardMedic] Failed to load programari: {Errors}",
                     string.Join(", ", result.Errors));
             }
         }
@@ -336,39 +336,39 @@ public partial class DashboardMedic : ComponentBase
     private async Task StartConsultatie(Guid programareId)
     {
         Logger.LogInformation("[DashboardMedic] Starting consultatie: {ProgramareId}", programareId);
-        
+
         // Gaseste programarea pentru a obtine PacientID
         var programare = ToateProgramarile.FirstOrDefault(p => p.ProgramareID == programareId);
-        
+
         if (programare == null)
         {
             Logger.LogWarning("[DashboardMedic] Programare not found: {ProgramareId}", programareId);
             return;
         }
-        
+
         if (!PersonalMedicalID.HasValue)
         {
             Logger.LogWarning("[DashboardMedic] PersonalMedicalID is null");
             return;
         }
-        
+
         try
         {
             // ✅ WAIT pentru ca modalul să fie complet render-at
             // Aceasta este o măsură de precauție pentru cazurile când componenta nu este încă gata
             await Task.Delay(50);
-            
+
             // ✅ Verifică dacă modalul este inițializat
             if (ConsultatieModalRef == null)
             {
                 Logger.LogError("[DashboardMedic] ConsultatieModalRef is null! Forcing re-render...");
-                
+
                 // ✅ Forțează re-render și încearcă din nou
                 await InvokeAsync(StateHasChanged);
-                
+
                 // ✅ Așteaptă două cicluri de render
                 await Task.Delay(200);
-                
+
                 if (ConsultatieModalRef == null)
                 {
                     Logger.LogError("[DashboardMedic] ConsultatieModalRef is still null after re-render!");
@@ -376,25 +376,25 @@ public partial class DashboardMedic : ComponentBase
                     return;
                 }
             }
-            
+
             Logger.LogInformation("[DashboardMedic] Opening modal with ProgramareID={ProgramareId}, PacientID={PacientId}, MedicID={MedicId}",
                 programareId, programare.PacientID, PersonalMedicalID.Value);
-            
+
             // ✅ NOUĂ ABORDARE: Setează parametrii ȘI deschide într-un singur apel
             // Acest lucru garantează că parametrii sunt setați înainte ca Open() să fie executat
             ConsultatieModalRef.ProgramareID = programareId;
             ConsultatieModalRef.PacientID = programare.PacientID;
             ConsultatieModalRef.MedicID = PersonalMedicalID.Value;
-            
+
             // ✅ Așteaptă să se seteze parametrii
             await InvokeAsync(StateHasChanged);
-            
+
             // ✅ Deschide modalul
             await ConsultatieModalRef.Open();
-            
+
             // ✅ Force final UI update
             await InvokeAsync(StateHasChanged);
-            
+
             Logger.LogInformation("[DashboardMedic] Modal opened successfully");
         }
         catch (Exception ex)

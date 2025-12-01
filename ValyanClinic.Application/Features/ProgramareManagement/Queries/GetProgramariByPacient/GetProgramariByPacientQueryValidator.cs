@@ -4,10 +4,10 @@ namespace ValyanClinic.Application.Features.ProgramareManagement.Queries.GetProg
 
 public class GetProgramariByPacientQueryValidator : AbstractValidator<GetProgramariByPacientQuery>
 {
-  public GetProgramariByPacientQueryValidator()
+    public GetProgramariByPacientQueryValidator()
     {
-   RuleFor(x => x.PacientID)
-       .NotEmpty().WithMessage("ID-ul pacientului este obligatoriu.")
-     .NotEqual(Guid.Empty).WithMessage("ID-ul pacientului nu este valid.");
+        RuleFor(x => x.PacientID)
+            .NotEmpty().WithMessage("ID-ul pacientului este obligatoriu.")
+          .NotEqual(Guid.Empty).WithMessage("ID-ul pacientului nu este valid.");
     }
 }

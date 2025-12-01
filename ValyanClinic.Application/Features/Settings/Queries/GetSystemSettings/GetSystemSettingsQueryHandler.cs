@@ -22,34 +22,34 @@ public class GetSystemSettingsQueryHandler : IRequestHandler<GetSystemSettingsQu
         GetSystemSettingsQuery request,
         CancellationToken cancellationToken)
     {
-   try
+        try
         {
-        _logger.LogInformation("Fetching system settings for category: {Categorie}", request.Categorie);
+            _logger.LogInformation("Fetching system settings for category: {Categorie}", request.Categorie);
 
-       var settings = await _repository.GetByCategoryAsync(request.Categorie, cancellationToken);
+            var settings = await _repository.GetByCategoryAsync(request.Categorie, cancellationToken);
 
-       var dtos = settings.Select(s => new SystemSettingDto
-       {
-    SetareID = s.SetareID,
-       Categorie = s.Categorie,
-    Cheie = s.Cheie,
-       Valoare = s.Valoare,
-      Descriere = s.Descriere,
-         ValoareDefault = s.ValoareDefault,
+            var dtos = settings.Select(s => new SystemSettingDto
+            {
+                SetareID = s.SetareID,
+                Categorie = s.Categorie,
+                Cheie = s.Cheie,
+                Valoare = s.Valoare,
+                Descriere = s.Descriere,
+                ValoareDefault = s.ValoareDefault,
                 TipDate = s.TipDate,
-       EsteEditabil = s.EsteEditabil,
-            DataCrearii = s.DataCrearii,
-  DataModificarii = s.DataModificarii,
+                EsteEditabil = s.EsteEditabil,
+                DataCrearii = s.DataCrearii,
+                DataModificarii = s.DataModificarii,
                 ModificatDe = s.ModificatDe
             }).ToList();
 
-        _logger.LogInformation("Found {Count} settings for category: {Categorie}", dtos.Count, request.Categorie);
+            _logger.LogInformation("Found {Count} settings for category: {Categorie}", dtos.Count, request.Categorie);
 
             return Result<List<SystemSettingDto>>.Success(dtos);
         }
-catch (Exception ex)
-  {
-   _logger.LogError(ex, "Error fetching system settings for category: {Categorie}", request.Categorie);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching system settings for category: {Categorie}", request.Categorie);
             return Result<List<SystemSettingDto>>.Failure($"Error: {ex.Message}");
         }
     }

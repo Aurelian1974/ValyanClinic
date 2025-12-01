@@ -19,7 +19,7 @@ public class GetProgramareByIdQueryHandler : IRequestHandler<GetProgramareByIdQu
  IProgramareRepository programareRepository,
         ILogger<GetProgramareByIdQueryHandler> logger)
     {
- _programareRepository = programareRepository;
+        _programareRepository = programareRepository;
         _logger = logger;
     }
 
@@ -27,65 +27,65 @@ public class GetProgramareByIdQueryHandler : IRequestHandler<GetProgramareByIdQu
   GetProgramareByIdQuery request,
         CancellationToken cancellationToken)
     {
-     try
-      {
-        _logger.LogInformation("Obținere detalii programare: {ProgramareID}", request.ProgramareID);
+        try
+        {
+            _logger.LogInformation("Obținere detalii programare: {ProgramareID}", request.ProgramareID);
 
-        // ==================== OBȚINERE DATE DIN REPOSITORY ====================
+            // ==================== OBȚINERE DATE DIN REPOSITORY ====================
 
-   var programare = await _programareRepository.GetByIdAsync(request.ProgramareID, cancellationToken);
+            var programare = await _programareRepository.GetByIdAsync(request.ProgramareID, cancellationToken);
 
-    if (programare == null)
-       {
-       _logger.LogWarning("Programarea {ProgramareID} nu a fost găsită", request.ProgramareID);
-      return Result<ProgramareDetailDto>.Failure("Programarea specificată nu a fost găsită.");
-          }
+            if (programare == null)
+            {
+                _logger.LogWarning("Programarea {ProgramareID} nu a fost găsită", request.ProgramareID);
+                return Result<ProgramareDetailDto>.Failure("Programarea specificată nu a fost găsită.");
+            }
 
             // ==================== MAPARE LA DTO ====================
 
-     var programareDto = new ProgramareDetailDto
-  {
-      ProgramareID = programare.ProgramareID,
-    PacientID = programare.PacientID,
-     DoctorID = programare.DoctorID,
-     DataProgramare = programare.DataProgramare,
-   OraInceput = programare.OraInceput,
-OraSfarsit = programare.OraSfarsit,
-  TipProgramare = programare.TipProgramare,
-  Status = programare.Status,
-Observatii = programare.Observatii,
-      // Navigation properties - Pacient
-       PacientNumeComplet = programare.PacientNumeComplet,
-     PacientTelefon = programare.PacientTelefon,
- PacientEmail = programare.PacientEmail,
- PacientCNP = programare.PacientCNP,
-    // Navigation properties - Doctor
-   DoctorNumeComplet = programare.DoctorNumeComplet,
+            var programareDto = new ProgramareDetailDto
+            {
+                ProgramareID = programare.ProgramareID,
+                PacientID = programare.PacientID,
+                DoctorID = programare.DoctorID,
+                DataProgramare = programare.DataProgramare,
+                OraInceput = programare.OraInceput,
+                OraSfarsit = programare.OraSfarsit,
+                TipProgramare = programare.TipProgramare,
+                Status = programare.Status,
+                Observatii = programare.Observatii,
+                // Navigation properties - Pacient
+                PacientNumeComplet = programare.PacientNumeComplet,
+                PacientTelefon = programare.PacientTelefon,
+                PacientEmail = programare.PacientEmail,
+                PacientCNP = programare.PacientCNP,
+                // Navigation properties - Doctor
+                DoctorNumeComplet = programare.DoctorNumeComplet,
                 DoctorSpecializare = programare.DoctorSpecializare,
-     DoctorTelefon = programare.DoctorTelefon,
-       // Audit information
-     DataCreare = programare.DataCreare,
-        CreatDe = programare.CreatDe,
-    CreatDeNumeComplet = programare.CreatDeNumeComplet,
-    DataUltimeiModificari = programare.DataUltimeiModificari,
-         ModificatDe = programare.ModificatDe
-    };
+                DoctorTelefon = programare.DoctorTelefon,
+                // Audit information
+                DataCreare = programare.DataCreare,
+                CreatDe = programare.CreatDe,
+                CreatDeNumeComplet = programare.CreatDeNumeComplet,
+                DataUltimeiModificari = programare.DataUltimeiModificari,
+                ModificatDe = programare.ModificatDe
+            };
 
-   _logger.LogInformation(
-   "Detalii programare obținute: {ProgramareID}, Pacient={Pacient}, Doctor={Doctor}, Data={Data}",
-       programare.ProgramareID,
-   programare.PacientNumeComplet,
-      programare.DoctorNumeComplet,
-            programare.DataProgramare.ToString("yyyy-MM-dd"));
+            _logger.LogInformation(
+            "Detalii programare obținute: {ProgramareID}, Pacient={Pacient}, Doctor={Doctor}, Data={Data}",
+                programare.ProgramareID,
+            programare.PacientNumeComplet,
+               programare.DoctorNumeComplet,
+                     programare.DataProgramare.ToString("yyyy-MM-dd"));
 
-     return Result<ProgramareDetailDto>.Success(
-   programareDto,
-       $"Detaliile programării au fost obținute cu succes.");
-    }
-      catch (Exception ex)
-   {
-     _logger.LogError(ex, "Eroare la obținerea detaliilor programării {ProgramareID}", request.ProgramareID);
-  return Result<ProgramareDetailDto>.Failure($"Eroare la obținerea detaliilor programării: {ex.Message}");
-     }
+            return Result<ProgramareDetailDto>.Success(
+          programareDto,
+              $"Detaliile programării au fost obținute cu succes.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Eroare la obținerea detaliilor programării {ProgramareID}", request.ProgramareID);
+            return Result<ProgramareDetailDto>.Failure($"Eroare la obținerea detaliilor programării: {ex.Message}");
+        }
     }
 }

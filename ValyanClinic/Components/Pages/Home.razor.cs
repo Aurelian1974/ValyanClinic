@@ -15,7 +15,7 @@ public partial class Home : ComponentBase
 
     // User info
     private string UserGreeting = "Bună, Utilizator!";
-    
+
     // Dashboard statistics
     private int PatientsTodayCount { get; set; } = 42;
     private int PatientsTodayGrowth { get; set; } = 12;
@@ -65,7 +65,7 @@ public partial class Home : ComponentBase
 
                 // Get PersonalMedicalID from claims
                 var personalMedicalIdClaim = user.FindFirst("PersonalMedicalID")?.Value;
-         
+
                 if (!string.IsNullOrEmpty(personalMedicalIdClaim) && Guid.TryParse(personalMedicalIdClaim, out Guid personalMedicalId))
                 {
                     // Load PersonalMedical details for full name
@@ -106,7 +106,7 @@ public partial class Home : ComponentBase
             {
                 // ✅ Mesaj COMPACT - doar nume complet, fără titlu (Dr., As.)
                 UserGreeting = $"Bună, {result.Value.NumeComplet}!";
-      
+
                 Logger.LogInformation("Loaded greeting for: {NumeComplet}", result.Value.NumeComplet);
             }
             else
