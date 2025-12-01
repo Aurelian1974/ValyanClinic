@@ -1,11 +1,13 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientList;
 using ValyanClinic.Application.Features.PacientManagement.Commands.DeletePacient;
+using System.Security.Claims;
 
 namespace ValyanClinic.Components.Pages.Pacienti;
 
@@ -55,7 +57,8 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private ILogger<AdministrarePacienti> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
-    [Inject] private ValyanClinic.Application.Services.Pacienti.IPacientDataService DataService { get; set; } = default!; // ✅ ADDED
+    [Inject] private ValyanClinic.Application.Services.Pacienti.IPacientDataService DataService { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!; // ✅ ADDED for auth logging
 
     // Syncfusion Grid Reference
     private SfGrid<PacientListDto>? GridRef { get; set; }
@@ -128,6 +131,51 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
     /// </remarks>
     protected override async Task OnInitializedAsync()
     {
+        // ✅ SIMPLIFIED: Authorization check (essential only)
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            var isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+            
+            if (!isAuthenticated)
+            {
+                Logger.LogError("User NOT authenticated - redirecting to login");
+                return;
+            }
+            
+            var roleClaims = user.Claims.Where(c => 
+                c.Type == ClaimTypes.Role || 
+                c.Type.Contains("role", StringComparison.OrdinalIgnoreCase)).ToList();
+            
+            if (!roleClaims.Any())
+            {
+                Logger.LogError("User {Username} has NO roles assigned", user.Identity?.Name);
+            }
+            else
+            {
+                var userRoles = roleClaims.Select(c => c.Value).ToList();
+                var allowedRoles = new[] { "Admin", "Doctor", "Asistent", "Receptionist" };
+                var isAuthorized = userRoles.Any(r => allowedRoles.Contains(r, StringComparer.OrdinalIgnoreCase));
+                
+                if (isAuthorized)
+                {
+                    Logger.LogInformation("User {Username} authorized with role: {Role}", 
+                        user.Identity?.Name, string.Join(", ", userRoles));
+                }
+                else
+                {
+                    Logger.LogError("User {Username} NOT authorized - Role: {Role}", 
+                        user.Identity?.Name, userRoles.FirstOrDefault() ?? "NONE");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Exception while checking authorization");
+        }
+
         // CRITICAL - GLOBAL lock la nivel de pagină
         lock (_initLock)
         {
@@ -156,7 +204,7 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
             Logger.LogInformation("Initializare pagina Administrare Pacienti");
 
             await LoadJudeteAsync();
-            await LoadPagedDataAsync(); // ✅ CHANGED: Use paged data loading
+            await LoadPagedDataAsync();
 
             _initialized = true;
         }
@@ -170,7 +218,7 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
             HasError = true;
             ErrorMessage = $"Eroare la initializare: {ex.Message}";
             IsLoading = false;
-            _shouldRender = true; // ✅ ADDED: Trigger re-render on error
+            _shouldRender = true;
         }
         finally
         {
@@ -199,25 +247,26 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
         try
         {
             IsLoading = true;
-            _shouldRender = true; // ✅ ADDED: Trigger re-render for loading state
+            _shouldRender = true;
             HasError = false;
             ErrorMessage = null;
 
-            Logger.LogInformation(
-                "🔍 [AdministrarePacienti] SERVER-SIDE Load: Page={Page}, Size={Size}, Search='{Search}', Judet={Judet}, Asigurat={Asigurat}, Activ={Activ}",
-                CurrentPage, PageSize, SearchText, FilterJudet, FilterAsigurat, FilterActiv);
+            Logger.LogInformation("Loading page {Page}/{Size} with filters: Search={Search}, Judet={Judet}, Asigurat={Asigurat}, Activ={Activ}",
+                CurrentPage, PageSize, 
+                string.IsNullOrWhiteSpace(SearchText) ? "none" : SearchText,
+                string.IsNullOrWhiteSpace(FilterJudet) ? "none" : FilterJudet,
+                FilterAsigurat, FilterActiv);
 
-            // Prepare filters
+            // ✅ Convert empty strings to NULL for proper SP handling
             bool? asiguratFilter = string.IsNullOrEmpty(FilterAsigurat) ? null : FilterAsigurat == "true";
             bool? activFilter = string.IsNullOrEmpty(FilterActiv) ? null : FilterActiv == "true";
-
-            Logger.LogWarning("🔍 [AdministrarePacienti] Filters parsed: Asigurat={Asigurat}, Activ={Activ}",
-                asiguratFilter, activFilter);
+            string? judetFilter = string.IsNullOrWhiteSpace(FilterJudet) ? null : FilterJudet;
+            string? searchFilter = string.IsNullOrWhiteSpace(SearchText) ? null : SearchText;
 
             var filters = new ValyanClinic.Application.Services.Pacienti.PacientFilters
             {
-                SearchText = SearchText,
-                Judet = FilterJudet,
+                SearchText = searchFilter,
+                Judet = judetFilter,
                 Asigurat = asiguratFilter,
                 Activ = activFilter
             };
@@ -234,14 +283,9 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
                 Direction = "ASC"
             };
 
-            Logger.LogWarning("🔍 [AdministrarePacienti] Calling DataService.LoadPagedDataAsync...");
-
             var result = await DataService.LoadPagedDataAsync(filters, pagination, sorting);
 
             if (_disposed) return;
-
-            Logger.LogWarning("🔍 [AdministrarePacienti] DataService returned: IsSuccess={IsSuccess}, ErrorCount={ErrorCount}",
-                result.IsSuccess, result.Errors?.Count ?? 0);
 
             if (result.IsSuccess)
             {
@@ -249,25 +293,19 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
                 TotalRecords = result.Value.TotalCount;
                 TotalPages = result.Value.TotalPages;
 
-                Logger.LogWarning(
-                    "🎉 [AdministrarePacienti] SERVER-SIDE Data loaded: Page {Page}/{TotalPages}, Records {Count}, Total {Total}",
+                Logger.LogInformation("Loaded page {Page}/{TotalPages}: {Count} records (Total: {Total})",
                     CurrentPage, TotalPages, CurrentPageData.Count, TotalRecords);
                     
                 if (CurrentPageData.Count == 0)
                 {
-                    Logger.LogError("❌ [AdministrarePacienti] ZERO RECORDS RETURNED! This is the problem!");
-                }
-                else
-                {
-                    Logger.LogInformation("✅ [AdministrarePacienti] First patient: {Name}, Activ={Activ}",
-                        CurrentPageData[0].NumeComplet, CurrentPageData[0].Activ);
+                    Logger.LogWarning("No records returned - check filters or database content");
                 }
             }
             else
             {
                 HasError = true;
                 ErrorMessage = string.Join(", ", result.Errors ?? new List<string> { "Eroare necunoscuta" });
-                Logger.LogError("❌ [AdministrarePacienti] Eroare la incarcarea datelor: {Message}", ErrorMessage);
+                Logger.LogError("Error loading data: {Message}", ErrorMessage);
                 CurrentPageData = new List<PacientListDto>();
                 TotalRecords = 0;
                 TotalPages = 0;
@@ -283,7 +321,7 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
             {
                 HasError = true;
                 ErrorMessage = $"Eroare neașteptată: {ex.Message}";
-                Logger.LogError(ex, "❌ [AdministrarePacienti] EXCEPTION la incarcarea datelor");
+                Logger.LogError(ex, "Exception while loading data");
                 CurrentPageData = new List<PacientListDto>();
                 TotalRecords = 0;
                 TotalPages = 0;
@@ -294,7 +332,7 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
             if (!_disposed)
             {
                 IsLoading = false;
-                _shouldRender = true; // ✅ ADDED: Trigger re-render after data load
+                _shouldRender = true;
                 await InvokeAsync(StateHasChanged);
             }
         }

@@ -55,17 +55,7 @@ public class PacientRepository : BaseRepository, IPacientRepository
         string sortDirection = "ASC",
         CancellationToken cancellationToken = default)
     {
-        // ✅ ADDED: Detailed logging pentru diagnosticare
-        _logger.LogWarning("🔍 [PacientRepository.GetPagedAsync] CALL START");
-        _logger.LogWarning("  📥 Parameters:");
-        _logger.LogWarning("    PageNumber   = {PageNumber}", pageNumber);
-        _logger.LogWarning("    PageSize     = {PageSize}", pageSize);
-        _logger.LogWarning("    SearchText   = {SearchText}", searchText ?? "NULL");
-        _logger.LogWarning("    Judet        = {Judet}", judet ?? "NULL");
-        _logger.LogWarning("    Asigurat     = {Asigurat}", asigurat?.ToString() ?? "NULL");
-        _logger.LogWarning("    Activ        = {Activ}", activ?.ToString() ?? "NULL");
-        _logger.LogWarning("    SortColumn   = {SortColumn}", sortColumn);
-        _logger.LogWarning("    SortDirection= {SortDirection}", sortDirection);
+        _logger.LogInformation("Loading paged patients: Page={Page}, Size={Size}", pageNumber, pageSize);
 
         var parameters = new
         {
@@ -79,52 +69,19 @@ public class PacientRepository : BaseRepository, IPacientRepository
             SortDirection = sortDirection
         };
 
-        _logger.LogWarning("  📦 Dapper parameters object created:");
-        _logger.LogWarning("    {Parameters}", System.Text.Json.JsonSerializer.Serialize(parameters));
-
-        using var connection = _connectionFactory.CreateConnection();
-        
-        _logger.LogWarning("  🔌 Connection created: {ConnectionString}", connection.ConnectionString.Substring(0, Math.Min(50, connection.ConnectionString.Length)) + "...");
-        _logger.LogWarning("  📞 Calling sp_Pacienti_GetAll via Dapper...");
-
-        using var multi = await connection.QueryMultipleAsync(
-            "sp_Pacienti_GetAll",
-            parameters,
-            commandType: System.Data.CommandType.StoredProcedure);
-
-        var items = await multi.ReadAsync<Pacient>();
+        // ✅ Use QueryAsync for single result set
+        var items = await QueryAsync<Pacient>("sp_Pacienti_GetAll", parameters, cancellationToken);
         var itemsList = items.ToList();
 
-        _logger.LogWarning("  📊 SP returned {Count} items", itemsList.Count);
+        if (itemsList.Count == 0)
+        {
+            _logger.LogWarning("No patients returned from SP with current filters");
+        }
 
-        // Get count
-        _logger.LogWarning("  📞 Calling sp_Pacienti_GetCount...");
+        // Get count from separate SP
         var count = await GetCountAsync(searchText, judet, asigurat, activ, cancellationToken);
 
-        _logger.LogWarning("  📊 Total count: {TotalCount}", count);
-        _logger.LogWarning("🔍 [PacientRepository.GetPagedAsync] CALL END");
-
-        // ✅ ADDED: Diagnostic warning daca returneaza 0
-        if (itemsList.Count == 0 && count == 0)
-        {
-            _logger.LogError("❌ [PacientRepository] ZERO RECORDS RETURNED!");
-            _logger.LogError("   This might be caused by NULL parameter handling bug in sp_Pacienti_GetAll");
-            _logger.LogError("   Check if SP has: WHERE (@Activ IS NULL OR Activ = @Activ)");
-            _logger.LogError("   Not: WHERE Activ = @Activ");
-            
-            // Test query to verify data exists
-            var totalInDb = await connection.ExecuteScalarAsync<int>(
-                "SELECT COUNT(*) FROM Pacienti",
-                commandType: System.Data.CommandType.Text);
-            
-            _logger.LogError("   Total pacienti in DB (without filters): {Total}", totalInDb);
-            
-            if (totalInDb > 0)
-            {
-                _logger.LogError("   ⚠️  CONFIRMED: SP bug - DB has {Total} records but SP returned 0", totalInDb);
-                _logger.LogError("   ✅ FIX: Run DevSupport/Fixes/MASTER_FIX_AdministrarePacienti_NULL_Handling.sql");
-            }
-        }
+        _logger.LogInformation("Loaded {Count} patients (Total: {Total})", itemsList.Count, count);
 
         return (itemsList, count);
     }
@@ -136,11 +93,6 @@ public class PacientRepository : BaseRepository, IPacientRepository
         bool? activ = null,
         CancellationToken cancellationToken = default)
     {
-        // ✅ ADDED: Logging pentru GetCountAsync
-        _logger.LogWarning("🔍 [PacientRepository.GetCountAsync] CALL");
-        _logger.LogWarning("  Parameters: SearchText={SearchText}, Judet={Judet}, Asigurat={Asigurat}, Activ={Activ}",
-            searchText ?? "NULL", judet ?? "NULL", asigurat?.ToString() ?? "NULL", activ?.ToString() ?? "NULL");
-
         var parameters = new
         {
             SearchText = searchText,
@@ -154,8 +106,6 @@ public class PacientRepository : BaseRepository, IPacientRepository
             "sp_Pacienti_GetCount",
             parameters,
             commandType: System.Data.CommandType.StoredProcedure);
-
-        _logger.LogWarning("  Result: {Count}", result);
 
         return result;
     }

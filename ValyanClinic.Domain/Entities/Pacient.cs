@@ -58,10 +58,10 @@ public class Pacient
     public string? Creat_De { get; set; }
     public string? Modificat_De { get; set; }
 
-    // Computed properties
-    public string NumeComplet => $"{Nume} {Prenume}";
-    public int Varsta => DateTime.Today.Year - Data_Nasterii.Year -
-        (DateTime.Today.DayOfYear < Data_Nasterii.DayOfYear ? 1 : 0);
-    public string AdresaCompleta => string.IsNullOrWhiteSpace(Adresa) ? "-" :
-        $"{Adresa}, {Localitate}, {Judet}";
+    // ✅ FIX: Computed properties cu setter pentru Dapper mapping
+    // SP returnează aceste coloane, deci trebuie să avem setter
+    // Dapper populează din SP, nu din computed logic
+    public string? NumeComplet { get; set; }
+    public int Varsta { get; set; }
+    public string? AdresaCompleta { get; set; }
 }
