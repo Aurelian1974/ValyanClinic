@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrisoare Medicala - Anexa 43</title>
+    <!--<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=Source+Sans+Pro:wght@400;600;700&subset=latin-ext&display=swap" rel="stylesheet">-->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0A6E7C;
+            --primary-dark: #085460;
+            --text-dark: #1a1a1a;
+            --text-body: #333;
+            --text-muted: #666;
+            --border: #ddd;
+            --bg-light: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', 'Segoe UI', 'Arial', sans-serif;
+            background: #e5e5e5;
+            color: var(--text-body);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--primary);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .toolbar-title {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .toolbar-title i {
+                opacity: 0.8;
+            }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toolbar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .toolbar-btn-secondary {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+
+            .toolbar-btn-secondary:hover {
+                background: rgba(255,255,255,0.25);
+            }
+
+        .toolbar-btn-primary {
+            background: #fff;
+            color: var(--primary);
+        }
+
+            .toolbar-btn-primary:hover {
+                background: #f0f0f0;
+            }
+
+        /* Document Container */
+        .document-container {
+            max-width: 210mm;
+            margin: 70px auto 40px;
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 20mm 18mm;
+        }
+
+        /* Header */
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .clinic-info {
+            flex: 1;
+        }
+
+        .clinic-name {
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .clinic-details {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+            .clinic-details span {
+                display: block;
+            }
+
+        .doc-logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.8rem;
+        }
+
+        .anexa-badge {
+            background: var(--primary);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            margin-left: 15px;
+        }
+
+        /* Document Title */
+        .doc-title {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+            .doc-title h1 {
+                font-family: 'Crimson Pro', Georgia, serif;
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--text-dark);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 5px;
+            }
+
+            .doc-title .doc-subtitle {
+                font-size: 0.85rem;
+                color: var(--text-muted);
+            }
+
+        .doc-number {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        /* Patient Info Box */
+        .patient-box {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px 18px;
+            margin-bottom: 20px;
+        }
+
+        .patient-box-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .patient-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 20px;
+        }
+
+        .patient-field {
+            display: flex;
+            font-size: 0.85rem;
+        }
+
+        .patient-label {
+            color: var(--text-muted);
+            min-width: 110px;
+        }
+
+        .patient-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Intro Text */
+        .intro-text {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid var(--primary);
+            padding: 15px 18px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: var(--text-body);
+            line-height: 1.7;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 18px;
+        }
+
+        .section-title {
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .section-title i {
+                font-size: 0.9rem;
+                opacity: 0.7;
+            }
+
+        .section-content {
+            font-size: 0.9rem;
+            color: var(--text-body);
+            text-align: justify;
+        }
+
+            .section-content p {
+                margin-bottom: 8px;
+            }
+
+                .section-content p:last-child {
+                    margin-bottom: 0;
+                }
+
+        /* Subsections */
+        .subsection {
+            margin-bottom: 12px;
+        }
+
+        .subsection-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .subsection-content {
+            font-size: 0.85rem;
+            color: var(--text-body);
+            padding-left: 12px;
+        }
+
+        /* Data Grid */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .data-item {
+            background: var(--bg-light);
+            padding: 8px 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .data-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .data-value {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .data-unit {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        /* Diagnosis Box */
+        .diagnosis-box {
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .diagnosis-header {
+            background: var(--primary);
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .diagnosis-content {
+            padding: 12px;
+        }
+
+        .diagnosis-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+            .diagnosis-item:last-child {
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+            }
+
+        .diagnosis-type {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-bottom: 4px;
+        }
+
+            .diagnosis-type.principal {
+                background: var(--primary);
+                color: #fff;
+            }
+
+            .diagnosis-type.secundar {
+                background: #e0e7ff;
+                color: #4338ca;
+            }
+
+        .diagnosis-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .diagnosis-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-left: 8px;
+        }
+
+        .diagnosis-details {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            padding-left: 4px;
+            font-style: italic;
+        }
+
+        /* Oncologic Status */
+        .oncologic-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--bg-light);
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+        }
+
+            .oncologic-status .status-label {
+                font-weight: 600;
+                color: var(--text-dark);
+            }
+
+        .oncologic-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .oncologic-option .checkbox {
+                width: 16px;
+                height: 16px;
+                border: 2px solid var(--primary);
+                border-radius: 3px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--primary);
+                font-size: 11px;
+                font-weight: bold;
+            }
+
+                .oncologic-option .checkbox.checked {
+                    background: var(--primary);
+                    color: #fff;
+                }
+
+        /* Lab Results */
+        .lab-results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .lab-section {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .lab-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .lab-section.pathologic {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+            .lab-section.pathologic .lab-section-title {
+                color: #dc2626;
+            }
+
+        .lab-item {
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+            .lab-item:last-child {
+                margin-bottom: 0;
+            }
+
+        /* Treatment Table */
+        .treatment-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+        }
+
+            .treatment-table th {
+                background: var(--bg-light);
+                padding: 8px 10px;
+                text-align: left;
+                font-weight: 700;
+                color: var(--text-dark);
+                border-bottom: 2px solid var(--border);
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+            }
+
+            .treatment-table td {
+                padding: 8px 10px;
+                border-bottom: 1px solid var(--border);
+                vertical-align: top;
+            }
+
+            .treatment-table tr:last-child td {
+                border-bottom: none;
+            }
+
+        .med-name {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .med-note {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-style: italic;
+        }
+
+        /* Recommendations List */
+        .recommendations-list {
+            padding-left: 20px;
+        }
+
+            .recommendations-list li {
+                margin-bottom: 6px;
+                font-size: 0.85rem;
+            }
+
+        /* Checkbox Options */
+        .checkbox-section {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+            .checkbox.checked {
+                background: var(--primary);
+                color: #fff;
+            }
+
+                .checkbox.checked::after {
+                    content: '\2713';
+                }
+
+        .checkbox-label {
+            flex: 1;
+            color: var(--text-body);
+        }
+
+            .checkbox-label .field-value {
+                font-weight: 600;
+                color: var(--primary);
+            }
+
+        /* Notes Section */
+        .notes-box {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .notes-box-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #b45309;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notes-box p {
+            font-size: 0.8rem;
+            color: #92400e;
+            margin-bottom: 8px;
+            text-align: justify;
+        }
+
+            .notes-box p:last-child {
+                margin-bottom: 0;
+            }
+
+        .attention-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+
+        .attention-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 6px;
+        }
+
+        .attention-box p {
+            font-size: 0.8rem;
+            color: #991b1b;
+        }
+
+        /* Footer */
+        .doc-footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .footer-section h4 {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .doctor-signature {
+            text-align: left;
+        }
+
+        .doctor-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .doctor-specialty {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .doctor-stamp {
+            margin-top: 10px;
+            width: 80px;
+            height: 80px;
+            border: 2px dashed var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .transmission-section {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .transmission-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .transmission-options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .transmission-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        /* Footnotes */
+        .footnotes {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+        }
+
+            .footnotes p {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                margin-bottom: 6px;
+                text-align: justify;
+            }
+
+        /* Print Styles */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            html, body {
+                width: 210mm;
+                height: auto;
+            }
+
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .toolbar {
+                display: none !important;
+            }
+
+            .document-container {
+                margin: 0 !important;
+                padding: 15mm !important;
+                max-width: none !important;
+                width: 100% !important;
+                box-shadow: none !important;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-title">
+            <i class="fas fa-file-medical"></i>
+            Scrisoare Medicala - Anexa 43
+        </div>
+        <div class="toolbar-actions">
+            <button class="toolbar-btn toolbar-btn-secondary" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> Inapoi la Consultatie
+            </button>
+            <button class="toolbar-btn toolbar-btn-secondary" onclick="window.print()">
+                <i class="fas fa-print"></i> Printeaza
+            </button>
+            <button class="toolbar-btn toolbar-btn-primary" onclick="window.print()">
+                <i class="fas fa-file-pdf"></i> Salveaza PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Document Container - Single continuous document -->
+    <div class="document-container">
+        <!-- Header -->
+        <header class="doc-header">
+            <div class="clinic-info">
+                <div class="clinic-name">ValyanClinic</div>
+                <div class="clinic-details">
+                    <span>Clinica Medicala de Specialitate</span>
+                    <span>Str. Exemplu nr. 123, Sector 1, Bucuresti</span>
+                    <span>Tel: 021 123 4567 | Email: contact@valyanclinic.ro</span>
+                    <span>CUI: RO12345678 | Reg. Com.: J40/1234/2020</span>
+                </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 15px;">
+                <div class="anexa-badge">
+                    ANEXA nr. 43<br>
+                    <small>Ordin MS nr. 1411/2016</small>
+                </div>
+                <div class="doc-logo">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Document Title -->
+        <div class="doc-title">
+            <h1><i class="fas fa-envelope-open-text"></i> Scrisoare Medicala</h1>
+            <div class="doc-number">Contract/conventie nr. C-2024-1234 | CAS Bucuresti</div>
+        </div>
+
+        <!-- Intro Text -->
+        <div class="intro-text">
+            <strong>Stimate coleg,</strong> va informam ca <strong>Ionescu Maria</strong>, nascuta la data de <strong>15.03.1985</strong>, CNP <strong>2850315123456</strong>, a fost consultata in serviciul nostru la data de <strong>05.12.2025</strong>. Nr. din Registrul de consultatii: <strong>RC-2025-4567</strong>.
+        </div>
+
+        <!-- Patient Info -->
+        <div class="patient-box">
+            <div class="patient-box-title"><i class="fas fa-user"></i> Date Pacient</div>
+            <div class="patient-grid">
+                <div class="patient-field">
+                    <span class="patient-label">Nume:</span>
+                    <span class="patient-value">Ionescu Maria</span>
+                </div>
+                <div class="patient-field">
+                    <span class="patient-label">CNP:</span>
+                    <span class="patient-value">2850315123456</span>
+                </div>
+                <div class="patient-field">
+                    <span class="patient-label">Data nasterii:</span>
+                    <span class="patient-value">15.03.1985</span>
+                </div>
+                <div class="patient-field">
+                    <span class="patient-label">Varsta:</span>
+                    <span class="patient-value">39 ani</span>
+                </div>
+                <div class="patient-field">
+                    <span class="patient-label">Sex:</span>
+                    <span class="patient-value">Feminin</span>
+                </div>
+                <div class="patient-field">
+                    <span class="patient-label">Data consultatiei:</span>
+                    <span class="patient-value">05.12.2025</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Motivul Prezentarii -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-comment-medical"></i> Motivele Prezentarii</h2>
+            <div class="section-content">
+                <p>Control cardiologic periodic in contextul hipertensiunii arteriale cunoscute si tratate. Acuza cefalee occipitala intermitenta in ultimele 2 saptamani, predominant matinal, asociata cu senzatie de ameteala la schimbarea brusca a pozitiei. Valori TA crescute la automonitorizare (160-170/100 mmHg), in ciuda compliantei la tratamentul actual.</p>
+            </div>
+        </div>
+
+        <!-- Oncologic Status -->
+        <div class="oncologic-status">
+            <span class="status-label">Pacient diagnosticat cu afectiune oncologica:</span>
+            <span class="oncologic-option">
+                <span class="checkbox"></span> DA
+            </span>
+            <span class="oncologic-option">
+                <span class="checkbox checked"></span> NU
+            </span>
+        </div>
+
+        <!-- Diagnostic -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-diagnoses"></i> Diagnostic si Cod de Diagnostic</h2>
+            <div class="diagnosis-box">
+                <div class="diagnosis-header">Diagnostice Stabilite</div>
+                <div class="diagnosis-content">
+                    <div class="diagnosis-item">
+                        <span class="diagnosis-type principal">Principal</span>
+                        <span class="diagnosis-code">I10</span>
+                        <span class="diagnosis-name">Hipertensiune arteriala esentiala</span>
+                        <div class="diagnosis-details">HTA esentiala stadiul II, risc cardiovascular inalt. Afectare de organ tinta: HVS concentrica. Control tensional suboptimal sub tratament actual.</div>
+                    </div>
+                    <div class="diagnosis-item">
+                        <span class="diagnosis-type secundar">Secundar</span>
+                        <span class="diagnosis-code">E11.9</span>
+                        <span class="diagnosis-name">Diabet zaharat tip 2 fara complicatii</span>
+                        <div class="diagnosis-details">Control glicemic acceptabil (HbA1c 7.2%). Fara complicatii micro sau macrovasculare decelate.</div>
+                    </div>
+                    <div class="diagnosis-item">
+                        <span class="diagnosis-type secundar">Secundar</span>
+                        <span class="diagnosis-code">E78.0</span>
+                        <span class="diagnosis-name">Hipercolesterolemie pura</span>
+                        <div class="diagnosis-details">LDL-C peste tinta pentru risc CV inalt (&lt;70 mg/dl).</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Anamneza -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-history"></i> Anamneza</h2>
+            <div class="section-content">
+                <div class="subsection">
+                    <div class="subsection-title">Antecedente Heredocolaterale:</div>
+                    <div class="subsection-content">Tata - HTA, DZ tip 2; Mama - cardiopatie ischemica.</div>
+                </div>
+                <div class="subsection">
+                    <div class="subsection-title">Antecedente Patologice Personale:</div>
+                    <div class="subsection-content">HTA esentiala din 2020, DZ tip 2 din 2021, hipercolesterolemie. Fara interventii chirurgicale in antecedente.</div>
+                </div>
+                <div class="subsection">
+                    <div class="subsection-title">Alergii:</div>
+                    <div class="subsection-content">Penicilina (reactie cutanata).</div>
+                </div>
+                <div class="subsection">
+                    <div class="subsection-title">Medicatie Cronica Anterioara:</div>
+                    <div class="subsection-content">Ramipril 5mg/zi, Metformin 850mg x2/zi, Atorvastatina 20mg/zi.</div>
+                </div>
+                <div class="subsection">
+                    <div class="subsection-title">Factori de Risc:</div>
+                    <div class="subsection-content">Supraponderalitate (IMC 26.4 kg/m2), sedentarism, stres ocupational, antecedente familiale cardiovasculare (tata cu HTA si DZ, mama cu cardiopatie ischemica).</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Examen Clinic -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-stethoscope"></i> Examen Clinic</h2>
+            <div class="section-content">
+                <div class="subsection">
+                    <div class="subsection-title">Examen Clinic General:</div>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <div class="data-label">Stare generala</div>
+                            <div class="data-value">Buna</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">TA</div>
+                            <div class="data-value">155/95 <span class="data-unit">mmHg</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Puls</div>
+                            <div class="data-value">78 <span class="data-unit">bpm</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Temp</div>
+                            <div class="data-value">36.4 <span class="data-unit">�C</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Greutate</div>
+                            <div class="data-value">72 <span class="data-unit">kg</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Inaltime</div>
+                            <div class="data-value">165 <span class="data-unit">cm</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">IMC</div>
+                            <div class="data-value">26.4 <span class="data-unit">kg/m2</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">SpO2</div>
+                            <div class="data-value">98 <span class="data-unit">%</span></div>
+                        </div>
+                    </div>
+                    <div class="subsection-content">Stare generala buna, constienta, cooperanta, orientata temporo-spatial. Tegumente normal colorate, fara edeme. Mucoase roz, umede. FR=16/min.</div>
+                </div>
+                <div class="subsection">
+                    <div class="subsection-title">Examen Clinic Local (Cardiovascular):</div>
+                    <div class="subsection-content">Cord - zgomote cardiace ritmice, bine batute, fara sufluri. Socul apexian in spatiul V intercostal pe linia medioclaviculara stanga. Puls periferic prezent si simetric bilateral. Jugulare neturgesente. Fara edeme gambiere.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Examene de Laborator -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-flask"></i> Examene de Laborator</h2>
+            <div class="lab-results">
+                <div class="lab-section">
+                    <div class="lab-section-title"><i class="fas fa-check-circle"></i> Valori Normale</div>
+                    <div class="lab-item">Creatinina: 0.9 mg/dl</div>
+                    <div class="lab-item">Potasiu: 4.2 mEq/L</div>
+                    <div class="lab-item">Hemoglobina: 13.2 g/dl</div>
+                    <div class="lab-item">Leucocite: 6800/mm3</div>
+                </div>
+                <div class="lab-section pathologic">
+                    <div class="lab-section-title"><i class="fas fa-exclamation-triangle"></i> Valori Patologice</div>
+                    <div class="lab-item">Glicemie: 128 mg/dl (VN&lt;100)</div>
+                    <div class="lab-item">HbA1c: 7.2% (VN&lt;5.7%)</div>
+                    <div class="lab-item">Colesterol total: 195 mg/dl</div>
+                    <div class="lab-item">LDL-C: 112 mg/dl (tinta &lt;70)</div>
+                    <div class="lab-item">Trigliceride: 156 mg/dl</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Examene Paraclinice -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-microscope"></i> Examene Paraclinice</h2>
+            <div class="section-content">
+                <div class="subsection">
+                    <div class="subsection-title">EKG (05.12.2025):</div>
+                    <div class="subsection-content">Ritm sinusal, AV 78/min. Ax QRS intermediar. Semne de hipertrofie ventriculara stanga (indice Sokolow-Lyon 38mm). Fara modificari ST-T.</div>
+                </div>
+                <div class="subsection">
+                    <div class="subsection-title">Ecocardiografie (05.12.2025):</div>
+                    <div class="subsection-content">VS cu geometrie concentrica (SIV 12mm, PP 11mm). Functie sistolica VS pastrata (FE 58%). Disfunctie diastolica grad I (relaxare intarziata). Valve morfologic normale. Fara revarsat pericardic.</div>
+                </div>
+                <div class="subsection">
+                    <div class="subsection-title">Rx:</div>
+                    <div class="subsection-content">Nu s-a efectuat.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tratament Efectuat -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-prescription-bottle"></i> Tratament Efectuat (Anterior Consultatiei)</h2>
+            <div class="section-content">
+                <p>Ramipril 5mg 1cp/zi dimineata, Metformin 850mg 1cp x2/zi, Atorvastatina 20mg 1cp/zi seara.</p>
+            </div>
+        </div>
+
+        <!-- Alte Informatii -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-info-circle"></i> Alte Informatii</h2>
+            <div class="section-content">
+                <p>Pacienta prezinta complianta buna la tratament. Automonitorizare TA inconstanta. Dieta partial respectata. Sedentarism. Necesita intensificarea tratamentului antihipertensiv si ajustarea tratamentului hipolipemiant pentru atingerea tintelor terapeutice.</p>
+            </div>
+        </div>
+
+        <!-- Tratament Recomandat -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-pills"></i> Tratament Recomandat</h2>
+            <div class="section-content">
+                <table class="treatment-table">
+                    <thead>
+                        <tr>
+                            <th>Medicament</th>
+                            <th>Doza</th>
+                            <th>Frecventa</th>
+                            <th>Durata</th>
+                            <th>Obs.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="med-name">Ramipril</span></td>
+                            <td>10 mg</td>
+                            <td>1x/zi dimineata</td>
+                            <td>3 luni</td>
+                            <td><span class="med-note">crestere doza</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="med-name">Indapamida</span></td>
+                            <td>1.5 mg</td>
+                            <td>1x/zi dimineata</td>
+                            <td>3 luni</td>
+                            <td><span class="med-note">adaugare diuretic</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="med-name">Atorvastatina</span></td>
+                            <td>40 mg</td>
+                            <td>1x/zi seara</td>
+                            <td>3 luni</td>
+                            <td><span class="med-note">crestere doza</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="med-name">Metformin</span></td>
+                            <td>850 mg</td>
+                            <td>2x/zi (mic dejun, cina)</td>
+                            <td>3 luni</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recomandari -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Recomandari</h2>
+            <div class="section-content">
+                <ol class="recommendations-list">
+                    <li>Automonitorizare TA de 2x/zi (dimineata inainte de medicatie si seara) - notare in jurnal</li>
+                    <li>Regim alimentar hiposodat (max 5g sare/zi), hipolipidic, hipoglucidic</li>
+                    <li>Reducere ponderala - tinta IMC &lt;25 kg/m2</li>
+                    <li>Activitate fizica aerobica moderata - minimum 150 min/saptamana</li>
+                    <li>Evitare fumat si consum excesiv de alcool</li>
+                    <li>Tehnici de management al stresului</li>
+                    <li>Control cardiologic peste 3 luni cu: profil lipidic, HbA1c, ionograma, EKG</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Notes Box -->
+        <div class="notes-box">
+            <div class="notes-box-title"><i class="fas fa-sticky-note"></i> Nota Importanta</div>
+            <p>Se va specifica durata pentru care se poate prescrie de medicul din ambulatoriu, inclusiv medicul de familie, fiecare dintre medicamentele recomandate.</p>
+            <div class="attention-box">
+                <div class="attention-title"><i class="fas fa-exclamation-circle"></i> ATENTIE!</div>
+                <p>Nerespectarea obligatiei medicului de specialitate din ambulatoriu sau din spital de a initia tratamentul prin prescrierea primei retete pentru medicamente cu sau fara contributie personala, astfel cum este prevazut in protocoalele terapeutice, precum si de a elibera prescriptia medicala / bilete de trimitere / concediu medical / recomandari pentru ingrijiri la domiciliu / prescriptii pentru dispozitive medicale in fiecare caz pentru care este necesar, se sanctioneaza potrivit contractului incheiat de furnizor cu casa de asigurari de sanatate!</p>
+            </div>
+            <p>Valabilitatea scrisorii medicale incepe de la data eliberarii acesteia si este in concordanta cu protocolul terapeutic.</p>
+        </div>
+
+        <!-- Indicatie Internare -->
+        <div class="checkbox-section">
+            <div class="checkbox-section-title"><i class="fas fa-hospital"></i> Indicatie de Revenire pentru Internare</div>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <span class="checkbox"></span>
+                    <span class="checkbox-label">Da, revine pentru internare in termen de ____________</span>
+                </div>
+                <div class="checkbox-item">
+                    <span class="checkbox checked"></span>
+                    <span class="checkbox-label">Nu, nu este necesara revenirea pentru internare</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prescriptie Medicala -->
+        <div class="checkbox-section">
+            <div class="checkbox-section-title"><i class="fas fa-prescription"></i> Prescriptie Medicala</div>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <span class="checkbox checked"></span>
+                    <span class="checkbox-label">S-a eliberat prescriptie medicala - <span class="field-value">Seria A nr. 1234567</span></span>
+                </div>
+                <div class="checkbox-item">
+                    <span class="checkbox"></span>
+                    <span class="checkbox-label">Nu s-a eliberat prescriptie medicala deoarece nu a fost necesar</span>
+                </div>
+                <div class="checkbox-item">
+                    <span class="checkbox"></span>
+                    <span class="checkbox-label">Nu s-a eliberat prescriptie medicala</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Concediu Medical -->
+        <div class="checkbox-section">
+            <div class="checkbox-section-title"><i class="fas fa-file-medical-alt"></i> Concediu Medical</div>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <span class="checkbox"></span>
+                    <span class="checkbox-label">S-a eliberat concediu medical - seria si numarul: ____________</span>
+                </div>
+                <div class="checkbox-item">
+                    <span class="checkbox checked"></span>
+                    <span class="checkbox-label">Nu s-a eliberat concediu medical deoarece nu a fost necesar</span>
+                </div>
+                <div class="checkbox-item">
+                    <span class="checkbox"></span>
+                    <span class="checkbox-label">Nu s-a eliberat concediu medical</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ingrijiri la Domiciliu -->
+        <div class="checkbox-section">
+            <div class="checkbox-section-title"><i class="fas fa-home"></i> Ingrijiri Medicale la Domiciliu</div>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <span class="checkbox"></span>
+                    <span class="checkbox-label">S-a eliberat recomandare pentru ingrijiri medicale la domiciliu/paliative la domiciliu</span>
+                </div>
+                <div class="checkbox-item">
+                    <span class="checkbox checked"></span>
+                    <span class="checkbox-label">Nu s-a eliberat recomandare pentru ingrijiri medicale la domiciliu deoarece nu a fost necesar</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dispozitive Medicale -->
+        <div class="checkbox-section">
+            <div class="checkbox-section-title"><i class="fas fa-medkit"></i> Dispozitive Medicale</div>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <span class="checkbox"></span>
+                    <span class="checkbox-label">S-a eliberat prescriptie medicala pentru dispozitive medicale in ambulatoriu</span>
+                </div>
+                <div class="checkbox-item">
+                    <span class="checkbox checked"></span>
+                    <span class="checkbox-label">Nu s-a eliberat prescriptie medicala pentru dispozitive medicale deoarece nu a fost necesar</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="doc-footer">
+            <div class="footer-grid">
+                <div class="footer-section doctor-signature">
+                    <h4>Medic Curant</h4>
+                    <div class="doctor-name">Dr. Adrian Popescu</div>
+                    <div class="doctor-specialty">Medic Primar Cardiologie</div>
+                    <div class="doctor-specialty">Cod Parafa: DR001234</div>
+                    <div class="doctor-stamp">
+                        Parafa<br>& Semnatura
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Data Emiterii</h4>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 15px;">05.12.2025</div>
+                    
+                    <div class="transmission-section">
+                        <div class="transmission-title">Calea de Transmitere</div>
+                        <div class="transmission-options">
+                            <div class="transmission-option">
+                                <span class="checkbox checked" style="width: 14px; height: 14px;"></span>
+                                <span>Prin asigurat</span>
+                            </div>
+                            <div class="transmission-option">
+                                <span class="checkbox" style="width: 14px; height: 14px;"></span>
+                                <span>Prin posta electronica: ____________</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footnotes -->
+            <div class="footnotes">
+                <p><strong>*)</strong> Scrisoarea medicala se intocmeste in doua exemplare, din care un exemplar ramane la medicul care a efectuat consultatia/serviciul in ambulatoriul de specialitate, iar un exemplar este transmis medicului de familie/medicului de specialitate din ambulatoriul de specialitate.</p>
+                <p>Scrisoarea medicala sau biletul de iesire din spital sunt documente tipizate care se intocmesc la data externarii, intr-un singur exemplar care este transmis medicului de familie/medicului de specialitate din ambulatoriul de specialitate, direct, prin intermediul asiguratului ori prin posta electronica.</p>
+                <p>Scrisoarea medicala trimisa prin posta electronica este semnata cu semnatura electronica extinsa/calificata.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                // Let browser handle print
+            }
+        });
+    </script>
+</body>
+</html>
