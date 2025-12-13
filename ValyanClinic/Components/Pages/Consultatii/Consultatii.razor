@@ -1,0 +1,544 @@
+﻿@page "/consultatii"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+
+<PageTitle>Consultație Medicală - ValyanClinic</PageTitle>
+
+<div class="consultatii-container">
+    <!-- Page Header - Template Design -->
+    <header class="page-header">
+        <div class="page-title">
+            <h2>Consultație Nouă</h2>
+            <p>Completează fișa de consultație pentru pacient</p>
+        </div>
+        <div class="header-actions">
+            <div class="consultation-timer @TimerWarningClass">
+                <i class="fas fa-clock"></i>
+                <span class="time">@FormattedTime</span>
+            </div>
+            <button class="btn btn-outline" @onclick="HandleSaveDraft" disabled="@IsSaving">
+                <i class="fas fa-save"></i>
+                Salvează Draft
+            </button>
+            <button class="btn btn-primary" @onclick="HandleGenerateLetter">
+                <i class="fas fa-file-medical"></i>
+                Generează Scrisoare
+            </button>
+        </div>
+    </header>
+
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Se încarcă...</span>
+            </div>
+            <p>Se încarcă datele pacientului...</p>
+        </div>
+    }
+    else if (HasError)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            @ErrorMessage
+        </div>
+    }
+    else
+    {
+        <!-- Patient Card - Template Design (Horizontal Layout) -->
+        <section class="patient-card">
+            <div class="patient-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="patient-details">
+                <h3 class="patient-name">@PacientData?.NumeComplet</h3>
+                <div class="patient-meta">
+                    <span class="patient-meta-item">
+                        <i class="fas fa-id-card"></i>
+                        CNP: @PacientData?.CNP
+                    </span>
+                    <span class="patient-meta-item">
+                        <i class="fas fa-birthday-cake"></i>
+                        @PacientData?.Varsta ani
+                    </span>
+                    <span class="patient-meta-item">
+                        <i class="fas fa-@(PacientData?.Sex == "M" ? "mars" : "venus")"></i>
+                        @(PacientData?.Sex == "M" ? "Masculin" : "Feminin")
+                    </span>
+                    <span class="patient-meta-item">
+                        <i class="fas fa-phone"></i>
+                        @(PacientData?.Telefon ?? "N/A")
+                    </span>
+                </div>
+            </div>
+            @if (HasAllergies || HasConditions)
+            {
+                <div class="patient-tags">
+                    @if (HasAllergies)
+                    {
+                        <span class="tag tag-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Alergie @AllergiesText
+                        </span>
+                    }
+                    @if (HasConditions)
+                    {
+                        <span class="tag tag-info">
+                            <i class="fas fa-heartbeat"></i>
+                            @ConditionsText
+                        </span>
+                    }
+                </div>
+            }
+        </section>
+
+        <!-- Tabs Container - Template Design -->
+        <div class="tabs-container">
+            <!-- Tabs Header with Numbered Badges -->
+            <div class="tabs-header">
+                <button class="tab-btn @(ActiveTab == 1 ? "active" : "") @(IsTabCompleted(1) ? "completed" : "")"
+                        @onclick="() => SwitchTab(1)">
+                    <i class="fas fa-comment-medical"></i>
+                    <span>Motiv & Antecedente</span>
+                    <span class="tab-number">1</span>
+                </button>
+                <button class="tab-btn @(ActiveTab == 2 ? "active" : "") @(IsTabCompleted(2) ? "completed" : "")"
+                        @onclick="() => SwitchTab(2)">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>Examen Clinic & Investigații</span>
+                    <span class="tab-number">2</span>
+                </button>
+                <button class="tab-btn @(ActiveTab == 3 ? "active" : "") @(IsTabCompleted(3) ? "completed" : "")"
+                        @onclick="() => SwitchTab(3)">
+                    <i class="fas fa-diagnoses"></i>
+                    <span>Diagnostic & Tratament</span>
+                    <span class="tab-number">3</span>
+                </button>
+                <button class="tab-btn @(ActiveTab == 4 ? "active" : "") @(IsTabCompleted(4) ? "completed" : "")"
+                        @onclick="() => SwitchTab(4)">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Concluzii</span>
+                    <span class="tab-number">4</span>
+                </button>
+            </div>
+
+            <!-- Tabs Content -->
+            <div class="tabs-content">
+                <!-- Tab 1: Motiv Prezentare & Antecedente -->
+                <div class="tab-panel @(ActiveTab == 1 ? "active" : "")">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-comment-medical"></i>
+                            Motiv Prezentare
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">
+                                Motivul consultației
+                                <span class="required">*</span>
+                            </label>
+                            <textarea class="form-control"
+                                      rows="4"
+                                      placeholder="Descrieți motivul prezentării pacientului..."
+                                      maxlength="1000"
+                                      @bind="MotivPrezentare"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@MotivPrezentare.Length / 1000</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-history"></i>
+                            Antecedente Personale Patologice
+                        </h3>
+                        <div class="form-group">
+                            <textarea class="form-control"
+                                      rows="4"
+                                      placeholder="Afecțiuni anterioare, intervenții chirurgicale..."
+                                      maxlength="2000"
+                                      @bind="AntecedentePatologice"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@AntecedentePatologice.Length / 2000</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-pills"></i>
+                            Tratamente Actuale
+                        </h3>
+                        <div class="form-group">
+                            <textarea class="form-control"
+                                      rows="3"
+                                      placeholder="Medicație actuală..."
+                                      maxlength="1000"
+                                      @bind="TratamenteActuale"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@TratamenteActuale.Length / 1000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Examen Clinic & Investigații - Template Design -->
+                <div class="tab-panel @(ActiveTab == 2 ? "active" : "")">
+                    <!-- Examen Clinic General Grid - 12 Styled Cards -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-user-md"></i>
+                            Examen Clinic General
+                        </h3>
+                        <div class="exam-grid">
+                            <!-- Card 1: Stare Generală -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-user-check"></i></div>
+                                    <div class="exam-label">Stare Generală</div>
+                                </div>
+                                <select class="exam-select" @bind="StareGenerala">
+                                    <option value="">Selectează...</option>
+                                    <option value="Bună">Bună</option>
+                                    <option value="Relativ bună">Relativ bună</option>
+                                    <option value="Medie">Medie</option>
+                                    <option value="Alterată">Alterată</option>
+                                    <option value="Gravă">Gravă</option>
+                                </select>
+                            </div>
+
+                            <!-- Card 2: Tegumente -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-hand-paper"></i></div>
+                                    <div class="exam-label">Tegumente</div>
+                                </div>
+                                <select class="exam-select" @bind="Tegumente">
+                                    <option value="">Selectează...</option>
+                                    <option value="Normale">Normale</option>
+                                    <option value="Palide">Palide</option>
+                                    <option value="Cianotice">Cianotice</option>
+                                    <option value="Icterice">Icterice</option>
+                                </select>
+                            </div>
+
+                            <!-- Card 3: Mucoase -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-eye"></i></div>
+                                    <div class="exam-label">Mucoase</div>
+                                </div>
+                                <select class="exam-select" @bind="Mucoase">
+                                    <option value="">Selectează...</option>
+                                    <option value="Roz">Roz</option>
+                                    <option value="Palide">Palide</option>
+                                    <option value="Cianotice">Cianotice</option>
+                                    <option value="Icterice">Icterice</option>
+                                </select>
+                            </div>
+
+                            <!-- Card 4: Greutate -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-weight"></i></div>
+                                    <div class="exam-label">Greutate</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input type="number" step="0.1" class="exam-input" placeholder="70.5" 
+                                           @bind="Greutate" @bind:event="oninput" />
+                                    <span class="exam-unit">kg</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 5: Înălțime -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-ruler-vertical"></i></div>
+                                    <div class="exam-label">Înălțime</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input type="number" class="exam-input" placeholder="175" 
+                                           @bind="Inaltime" @bind:event="oninput" />
+                                    <span class="exam-unit">cm</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 6: IMC (Calculated + Visual Indicator) -->
+                            <div class="exam-item @(IMC.HasValue ? "has-value" : "")">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-calculator"></i></div>
+                                    <div class="exam-label">IMC</div>
+                                </div>
+                                @if (IMC.HasValue)
+                                {
+                                    <div class="imc-result">
+                                        <div class="imc-value-display @IMCCategory">
+                                            @IMC.Value.ToString("F1")
+                                        </div>
+                                        <span class="imc-badge @IMCCategory">@IMCText</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="exam-placeholder">Completați G + Î</div>
+                                }
+                            </div>
+
+                            <!-- Card 7: Tensiune Arterială -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-heartbeat"></i></div>
+                                    <div class="exam-label">Tensiune Arterială</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input type="number" class="exam-input" placeholder="120" style="width: 45%;" 
+                                           @bind="TensiuneSistolica" />
+                                    <span class="exam-unit">/</span>
+                                    <input type="number" class="exam-input" placeholder="80" style="width: 45%;" 
+                                           @bind="TensiuneDiastolica" />
+                                    <span class="exam-unit">mmHg</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 8: Frecvență Cardiacă -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-heart"></i></div>
+                                    <div class="exam-label">Frecvență Cardiacă</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input type="number" class="exam-input" placeholder="75" @bind="Puls" />
+                                    <span class="exam-unit">bpm</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 9: Frecvență Respiratorie -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-lungs"></i></div>
+                                    <div class="exam-label">Frecvență Respiratorie</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input type="number" class="exam-input" placeholder="16" @bind="FreqventaRespiratorie" />
+                                    <span class="exam-unit">resp/min</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 10: Temperatură -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-thermometer-half"></i></div>
+                                    <div class="exam-label">Temperatură</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input type="number" step="0.1" class="exam-input" placeholder="36.5" @bind="Temperatura" />
+                                    <span class="exam-unit">°C</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 11: SpO₂ (Saturație Oxigen) -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-wind"></i></div>
+                                    <div class="exam-label">SpO₂</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input type="number" class="exam-input" placeholder="98" @bind="SpO2" />
+                                    <span class="exam-unit">%</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 12: Edeme -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-hand-holding-water"></i></div>
+                                    <div class="exam-label">Edeme</div>
+                                </div>
+                                <select class="exam-select" @bind="Edeme">
+                                    <option value="">Selectează...</option>
+                                    <option value="Absente">Absente</option>
+                                    <option value="Ușoare">Ușoare</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="Severe">Severe</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Examen Obiectiv Detaliat -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-stethoscope"></i>
+                            Examen Obiectiv Detaliat
+                        </h3>
+                        <div class="form-group">
+                            <textarea class="form-control"
+                                      rows="5"
+                                      placeholder="Aspect general, examen pe aparate și sisteme..."
+                                      maxlength="2000"
+                                      @bind="ExamenObiectiv"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@ExamenObiectiv.Length / 2000</span>
+                        </div>
+                    </div>
+
+                    <!-- Investigații Paraclinice -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-flask"></i>
+                            Investigații Paraclinice
+                        </h3>
+                        <div class="form-group">
+                            <textarea class="form-control"
+                                      rows="4"
+                                      placeholder="Analize de laborator, imagistică..."
+                                      maxlength="1500"
+                                      @bind="InvestigatiiParaclinice"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@InvestigatiiParaclinice.Length / 1500</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Diagnostic & Tratament -->
+                <div class="tab-panel @(ActiveTab == 3 ? "active" : "")">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-diagnoses"></i>
+                            Diagnostic
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">
+                                Diagnostic principal
+                                <span class="required">*</span>
+                            </label>
+                            <textarea class="form-control"
+                                      rows="3"
+                                      placeholder="Diagnostic stabilit..."
+                                      maxlength="500"
+                                      @bind="DiagnosticPrincipal"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@DiagnosticPrincipal.Length / 500</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Diagnostic secundar</label>
+                            <textarea class="form-control"
+                                      rows="2"
+                                      placeholder="Diagnostice asociate..."
+                                      maxlength="500"
+                                      @bind="DiagnosticSecundar"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@DiagnosticSecundar.Length / 500</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-prescription"></i>
+                            Plan Terapeutic
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">
+                                Tratament prescris
+                                <span class="required">*</span>
+                            </label>
+                            <textarea class="form-control"
+                                      rows="5"
+                                      placeholder="Medicație, dozare, durata tratamentului..."
+                                      maxlength="2000"
+                                      @bind="PlanTerapeutic"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@PlanTerapeutic.Length / 2000</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Recomandări
+                        </h3>
+                        <div class="form-group">
+                            <textarea class="form-control"
+                                      rows="4"
+                                      placeholder="Recomandări non-medicamentoase, regim alimentar, stil de viață..."
+                                      maxlength="1500"
+                                      @bind="Recomandari"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@Recomandari.Length / 1500</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Concluzii -->
+                <div class="tab-panel @(ActiveTab == 4 ? "active" : "")">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-file-medical"></i>
+                            Concluzii
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">Rezumat consultație</label>
+                            <textarea class="form-control"
+                                      rows="6"
+                                      placeholder="Rezumat general al consultației..."
+                                      maxlength="2000"
+                                      @bind="Concluzii"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@Concluzii.Length / 2000</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-calendar-check"></i>
+                            Planificare Următoare
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">Data următoarei vizite</label>
+                            <input type="date" class="form-control" @bind="DataUrmatoareiVizite" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Note pentru vizita următoare</label>
+                            <textarea class="form-control"
+                                      rows="3"
+                                      placeholder="Investigații suplimentare, controale..."
+                                      maxlength="1000"
+                                      @bind="NoteUrmatoareaVizita"
+                                      @bind:event="oninput"></textarea>
+                            <span class="char-counter">@NoteUrmatoareaVizita.Length / 1000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="consultation-footer">
+            <div class="footer-info">
+                @if (IsSaving)
+                {
+                    <span class="save-indicator">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Se salvează...
+                    </span>
+                }
+                else if (LastSaveTime.HasValue)
+                {
+                    <span class="save-indicator">
+                        <i class="fas fa-check-circle"></i>
+                        Salvat automat la @LastSaveTime.Value.ToString("HH:mm")
+                    </span>
+                }
+            </div>
+            <div class="footer-actions">
+                <button class="btn btn-secondary" @onclick="HandleSaveDraft" disabled="@IsSaving">
+                    <i class="fas fa-save"></i>
+                    Salvează Ciornă
+                </button>
+                <button class="btn btn-primary" @onclick="HandleFinalize" disabled="@IsSaving">
+                    <i class="fas fa-check-double"></i>
+                    Finalizează Consultație
+                </button>
+            </div>
+        </div>
+    }
+</div>
