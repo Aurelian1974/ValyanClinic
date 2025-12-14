@@ -1,0 +1,25 @@
+﻿@* LoadingOverlay.razor - Reusable loading overlay with spinner *@
+
+<div class="loading-overlay @(IsVisible ? "visible" : "")">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <p class="loading-message">@Message</p>
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Controls overlay visibility
+    /// </summary>
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    /// <summary>
+    /// Optional message to display below spinner
+    /// </summary>
+    [Parameter]
+    public string? Message { get; set; }
+}

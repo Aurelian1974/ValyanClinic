@@ -9,7 +9,7 @@ public class Consultatie
     public Guid ConsultatieID { get; set; }
 
     // ==================== FOREIGN KEYS ====================
-    public Guid ProgramareID { get; set; }
+    public Guid? ProgramareID { get; set; } // ✅ CHANGED: Nullable - consultație poate fi creată fără programare (walk-in)
     public Guid PacientID { get; set; }
     public Guid MedicID { get; set; }
 

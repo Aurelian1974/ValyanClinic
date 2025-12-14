@@ -2,6 +2,7 @@
 @import url('base.css');
 @import url('modal-base.css');
 @import url('icd10-autocomplete.css'); /* ICD-10 Autocomplete Component */
+@import url('pacienti-grid.css'); /* Pacienti Grid Styles */
 
 /* Sidebar width management - CRITICAL for layout */
 :root {

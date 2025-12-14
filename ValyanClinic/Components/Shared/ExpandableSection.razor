@@ -1,0 +1,61 @@
+﻿@* 
+    ExpandableSection Component
+    Reusable component for collapsible sections with smooth animations
+    Used in: Consultatii page (Tab 1 - Antecedente)
+*@
+
+<div class="expandable-section @(IsOpen ? "open" : "")">
+    <div class="expandable-header" @onclick="ToggleSection">
+        <h4>
+            @if (!string.IsNullOrWhiteSpace(IconClass))
+            {
+                <i class="@IconClass"></i>
+            }
+            @Title
+        </h4>
+        <span class="expandable-toggle">
+            <i class="fas fa-chevron-down"></i>
+        </span>
+    </div>
+    <div class="expandable-content">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Title of the expandable section
+    /// </summary>
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Optional Font Awesome icon class (e.g., "fas fa-dna")
+    /// </summary>
+    [Parameter]
+    public string? IconClass { get; set; }
+
+    /// <summary>
+    /// Initial open state (default: false - collapsed)
+    /// </summary>
+    [Parameter]
+    public bool IsOpen { get; set; } = false;
+
+    /// <summary>
+    /// Content to render inside the expandable section
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Event callback when section is toggled
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> IsOpenChanged { get; set; }
+
+    private async Task ToggleSection()
+    {
+        IsOpen = !IsOpen;
+        await IsOpenChanged.InvokeAsync(IsOpen);
+    }
+}

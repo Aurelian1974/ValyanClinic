@@ -1,0 +1,84 @@
+﻿@using ValyanClinic.Services
+@inject ToastService ToastService
+@implements IDisposable
+
+@*
+    ToastContainer Component
+    Displays toast notifications in the top-right corner
+    Auto-dismisses after duration or on manual close
+*@
+
+<div class="toast-container">
+    @foreach (var toast in ToastService.Messages)
+    {
+        <div class="toast toast-@toast.Type.ToString().ToLower() @(IsToastVisible(toast.Id) ? "visible" : "")" @key="toast.Id">
+            <div class="toast-icon">
+                <i class="fas @GetToastIcon(toast.Type)"></i>
+            </div>
+            <div class="toast-content">
+                <div class="toast-title">@toast.Title</div>
+                <div class="toast-message">@toast.Message</div>
+            </div>
+            <button class="toast-close" @onclick="() => HandleClose(toast.Id)" title="Închide">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private readonly HashSet<Guid> _visibleToasts = new();
+
+    protected override void OnInitialized()
+    {
+        ToastService.OnToastChanged += HandleToastChanged;
+    }
+
+    private void HandleToastChanged()
+    {
+        // Mark new toasts as visible with slight delay for animation
+        Task.Delay(50).ContinueWith(_ =>
+        {
+            foreach (var toast in ToastService.Messages)
+            {
+                if (!_visibleToasts.Contains(toast.Id))
+                {
+                    _visibleToasts.Add(toast.Id);
+                }
+            }
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private bool IsToastVisible(Guid id)
+    {
+        return _visibleToasts.Contains(id);
+    }
+
+    private void HandleClose(Guid id)
+    {
+        // Remove from visible set first (trigger exit animation)
+        _visibleToasts.Remove(id);
+        StateHasChanged();
+
+        // Remove from service after animation completes
+        Task.Delay(300).ContinueWith(_ => ToastService.RemoveToast(id));
+    }
+
+    private string GetToastIcon(ToastType type)
+    {
+        return type switch
+        {
+            ToastType.Success => "fa-check-circle",
+            ToastType.Warning => "fa-exclamation-triangle",
+            ToastType.Error => "fa-times-circle",
+            ToastType.Info => "fa-info-circle",
+            _ => "fa-info-circle"
+        };
+    }
+
+    public void Dispose()
+    {
+        ToastService.OnToastChanged -= HandleToastChanged;
+    }
+}

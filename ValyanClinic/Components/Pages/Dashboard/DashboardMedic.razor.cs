@@ -141,14 +141,28 @@ public partial class DashboardMedic : ComponentBase
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
 
+            Logger.LogInformation("[DashboardMedic] ===== LoadDoctorInfo START =====");
+            Logger.LogInformation("[DashboardMedic] User authenticated: {IsAuthenticated}", user.Identity?.IsAuthenticated);
+            Logger.LogInformation("[DashboardMedic] User name: {Name}", user.Identity?.Name);
+
             if (user.Identity?.IsAuthenticated == true)
             {
                 var personalMedicalIdClaim = user.FindFirst("PersonalMedicalID")?.Value;
+
+                Logger.LogInformation("[DashboardMedic] PersonalMedicalID claim value: '{ClaimValue}'", personalMedicalIdClaim ?? "NULL");
+
+                // ✅ DIAGNOSTIC: Log all claims pentru debugging
+                foreach (var claim in user.Claims)
+                {
+                    Logger.LogInformation("[DashboardMedic] CLAIM: {Type} = {Value}", claim.Type, claim.Value);
+                }
 
                 if (!string.IsNullOrEmpty(personalMedicalIdClaim) &&
                     Guid.TryParse(personalMedicalIdClaim, out Guid personalMedicalId))
                 {
                     PersonalMedicalID = personalMedicalId;
+
+                    Logger.LogInformation("[DashboardMedic] ✅ PersonalMedicalID parsed successfully: {PersonalMedicalID}", PersonalMedicalID);
 
                     var query = new GetPersonalMedicalByIdQuery(personalMedicalId);
                     var result = await Mediator.Send(query);
@@ -158,14 +172,29 @@ public partial class DashboardMedic : ComponentBase
                         DoctorName = $"Dr. {result.Value.NumeComplet}";
                         Specializare = result.Value.Specializare ?? "Medicina Generala";
 
-                        Logger.LogInformation("[DashboardMedic] Loaded doctor info: {Name}", DoctorName);
+                        Logger.LogInformation("[DashboardMedic] ✅ Loaded doctor info: {Name}, Specializare: {Spec}", DoctorName, Specializare);
+                    }
+                    else
+                    {
+                        Logger.LogWarning("[DashboardMedic] ❌ Failed to load PersonalMedical: {Errors}", string.Join(", ", result.Errors ?? new List<string>()));
                     }
                 }
+                else
+                {
+                    Logger.LogWarning("[DashboardMedic] ❌ PersonalMedicalID claim is NULL or invalid!");
+                    Logger.LogWarning("[DashboardMedic] Claim value was: '{ClaimValue}'", personalMedicalIdClaim ?? "NULL");
+                }
             }
+            else
+            {
+                Logger.LogWarning("[DashboardMedic] ❌ User is NOT authenticated!");
+            }
+
+            Logger.LogInformation("[DashboardMedic] ===== LoadDoctorInfo END =====");
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "[DashboardMedic] Error loading doctor info");
+            Logger.LogError(ex, "[DashboardMedic] ❌ Error loading doctor info");
         }
     }
 
@@ -188,10 +217,11 @@ public partial class DashboardMedic : ComponentBase
             Logger.LogInformation("[DashboardMedic] FilterDataEnd: {FilterDataEnd}", DateTime.Today.AddDays(1));
             Logger.LogInformation("[DashboardMedic] Current Time: {CurrentTime}", DateTime.Now);
 
+            // ✅ FIX: PageSize reduced from 1000 to 200 to pass FluentValidation
             var query = new GetProgramareListQuery
             {
                 PageNumber = 1,
-                PageSize = 1000,
+                PageSize = 200, // ✅ Maximum allowed by validator
                 FilterDataStart = DateTime.Today,
                 FilterDataEnd = DateTime.Today.AddDays(1),
                 FilterDoctorID = PersonalMedicalID,
