@@ -1,0 +1,262 @@
+Code,Category,ShortDescription,LongDescription,IsCommon,Severity,SearchTerms
+A00.0,Infectioase,Holera cauzata de Vibrio cholerae,Holera cauzata de Vibrio cholerae 01 biovar cholerae,0,Critical,holera vibrio
+A00.1,Infectioase,Holera cauzata de Vibrio eltor,Holera cauzata de Vibrio cholerae 01 biovar eltor,0,Critical,holera eltor
+A00.9,Infectioase,Holera nespecificata,Holera nespecificata,0,Critical,holera
+A01.0,Infectioase,Febra tifoida,Febra tifoida,0,Severe,tifos tifoida salmonella typhi
+A01.1,Infectioase,Febra paratifoida A,Febra paratifoida A,0,Severe,paratifoida
+A01.2,Infectioase,Febra paratifoida B,Febra paratifoida B,0,Severe,paratifoida
+A01.3,Infectioase,Febra paratifoida C,Febra paratifoida C,0,Severe,paratifoida
+A01.4,Infectioase,Febra paratifoida nespecificata,Febra paratifoida nespecificata,0,Severe,paratifoida
+A02.0,Infectioase,Enterita cu Salmonella,Enterita cu Salmonella,1,Moderate,salmonela enterita
+A02.1,Infectioase,Septicemie cu Salmonella,Septicemie cu Salmonella,0,Severe,salmonela sepsis
+A02.2,Infectioase,Infectii localizate cu Salmonella,Infectii localizate cu Salmonella,0,Moderate,salmonela
+A02.8,Infectioase,Alte infectii cu Salmonella,Alte infectii specificate cu Salmonella,0,Moderate,salmonela
+A02.9,Infectioase,Infectie cu Salmonella nespecificata,Infectie cu Salmonella nespecificata,1,Moderate,salmonela
+A03.0,Infectioase,Shigeloza cu Shigella dysenteriae,Shigeloza cu Shigella dysenteriae,0,Moderate,dizenterie shigella
+A03.9,Infectioase,Shigeloza nespecificata,Shigeloza nespecificata,0,Moderate,dizenterie shigella
+A04.0,Infectioase,Infectie enteropatogena cu E. coli,Infectie enteropatogena cu Escherichia coli,1,Moderate,ecoli diaree
+A04.5,Infectioase,Enterita cu Campylobacter,Enterita cu Campylobacter,1,Moderate,campylobacter diaree
+A04.7,Infectioase,Enterocolita cu Clostridium difficile,Enterocolita cu Clostridium difficile,1,Moderate,clostridium colita
+A04.9,Infectioase,Infectie intestinala bacteriana nespecificata,Infectie intestinala bacteriana nespecificata,1,Moderate,infectie intestinala
+A05.0,Infectioase,Intoxicatie stafilococica alimentara,Intoxicatie alimentara stafilococica,1,Moderate,toxiinfectie stafilococ
+A05.9,Infectioase,Intoxicatie alimentara bacteriana nespecificata,Intoxicatie alimentara bacteriana nespecificata,1,Moderate,toxiinfectie alimentara
+A06.0,Infectioase,Dizenterie amibiana acuta,Dizenterie amibiana acuta,0,Moderate,dizenterie amiba
+A06.9,Infectioase,Amibiaza nespecificata,Amibiaza nespecificata,0,Moderate,amiba
+A07.1,Infectioase,Giardiaza,Giardiaza (lambliaza),1,Mild,giardia lamblia parazit
+A08.0,Infectioase,Enterita cu rotavirus,Enterita cu rotavirus,1,Mild,rotavirus diaree
+A08.1,Infectioase,Gastroenteropatie acuta cu norovirus,Gastroenteropatie acuta cu agentul Norwalk,1,Mild,norovirus varsaturi
+A08.4,Infectioase,Infectie intestinala virala nespecificata,Infectie intestinala virala nespecificata,1,Mild,virus intestinal
+A09.0,Infectioase,Gastroenterita infectioasa,Gastroenterita si colita de origine infectioasa,1,Mild,gastroenterita diaree varsaturi
+A09.9,Infectioase,Gastroenterita nespecificata,Gastroenterita si colita de origine nespecificata,1,Mild,gastroenterita
+A15.0,Infectioase,Tuberculoza pulmonara confirmata,Tuberculoza pulmonara confirmata bacteriologic si histologic,0,Severe,tbc tuberculoza plamani
+A15.3,Infectioase,Tuberculoza pulmonara confirmata prin alte metode,Tuberculoza pulmonara confirmata prin alte metode,0,Severe,tbc tuberculoza
+A16.0,Infectioase,Tuberculoza pulmonara cu examen negativ,Tuberculoza pulmonara cu examen bacteriologic si histologic negativ,0,Severe,tbc tuberculoza
+A16.2,Infectioase,Tuberculoza pulmonara fara confirmare,Tuberculoza pulmonara fara mentiunea confirmarii,0,Severe,tbc tuberculoza
+A37.0,Infectioase,Tuse convulsiva cu Bordetella pertussis,Tuse convulsiva cu Bordetella pertussis,0,Moderate,pertussis tuse convulsiva
+A37.9,Infectioase,Tuse convulsiva nespecificata,Tuse convulsiva nespecificata,0,Moderate,pertussis tuse convulsiva
+A38,Infectioase,Scarlatina,Scarlatina,0,Moderate,scarlatina streptococ
+A39.0,Infectioase,Meningita meningococica,Meningita meningococica,0,Critical,meningita meningococ
+A39.2,Infectioase,Meningococemie acuta,Meningococemie acuta,0,Critical,meningococ sepsis
+A39.9,Infectioase,Infectie meningococica nespecificata,Infectie meningococica nespecificata,0,Severe,meningococ
+A40.0,Infectioase,Septicemie streptococica grupa A,Septicemie cu Streptococ grupa A,0,Critical,sepsis streptococ
+A40.3,Infectioase,Septicemie cu Streptococcus pneumoniae,Septicemie cu Streptococcus pneumoniae,0,Critical,sepsis pneumococ
+A41.0,Infectioase,Septicemie cu Staphylococcus aureus,Septicemie cu Staphylococcus aureus,0,Critical,sepsis stafilococ mrsa
+A41.5,Infectioase,Septicemie cu alti germeni gram-negativi,Septicemie cu alti germeni gram-negativi,0,Critical,sepsis gram negativ
+A41.9,Infectioase,Septicemie nespecificata,Septicemie nespecificata,1,Critical,sepsis septicemie
+A46,Infectioase,Erizipel,Erizipel,1,Moderate,erizipel streptococ piele
+A49.0,Infectioase,Infectie stafilococica nespecificata,Infectie stafilococica de localizare nespecificata,1,Moderate,stafilococ infectie
+A49.1,Infectioase,Infectie streptococica nespecificata,Infectie streptococica de localizare nespecificata,1,Moderate,streptococ infectie
+A49.9,Infectioase,Infectie bacteriana nespecificata,Infectie bacteriana nespecificata,1,Moderate,bacterie infectie
+A60.0,Infectioase,Infectie herpetica a organelor genitale,Infectie herpetica a organelor genitale si tractului urogenital,0,Mild,herpes genital
+A63.0,Infectioase,Veruci anogenitale,Veruci anogenitale (condilom acuminat),1,Mild,condilom hpv veruci
+A69.2,Infectioase,Boala Lyme,Boala Lyme,0,Moderate,lyme borrelia capusa
+B00.0,Infectioase,Eczema herpetica,Eczema herpetica,0,Moderate,herpes eczema
+B00.1,Infectioase,Dermatita veziculoasa herpetica,Dermatita veziculoasa herpetica,1,Mild,herpes piele
+B00.2,Infectioase,Gingivostomatita herpetica,Gingivostomatita si faringoamigdalita herpetica,1,Mild,herpes gura stomatita
+B00.5,Infectioase,Afectiuni oculare herpetica,Afectiuni oculare herpetica,0,Moderate,herpes ochi keratita
+B00.9,Infectioase,Infectie herpetica nespecificata,Infectie herpetica nespecificata,1,Mild,herpes
+B01.0,Infectioase,Meningita varicelica,Meningita varicelica,0,Severe,varicela meningita
+B01.2,Infectioase,Pneumonie varicelica,Pneumonie varicelica,0,Severe,varicela pneumonie
+B01.9,Infectioase,Varicela fara complicatii,Varicela fara complicatii,1,Mild,varicela vant pojarul
+B02.0,Infectioase,Encefalita zosteriana,Encefalita zosteriana,0,Severe,zona zoster encefalita
+B02.2,Infectioase,Zona zoster cu alte complicatii neurologice,Zona zoster cu alte complicatii ale sistemului nervos,0,Moderate,zona zoster neuralgic
+B02.3,Infectioase,Zona zoster oftalmica,Zona zoster oftalmica,0,Moderate,zona zoster ochi
+B02.9,Infectioase,Zona zoster fara complicatii,Zona zoster fara complicatii,1,Mild,zona zoster herpes
+B05.0,Infectioase,Rujeola complicata cu encefalita,Rujeola complicata cu encefalita,0,Critical,rujeola pojar encefalita
+B05.2,Infectioase,Rujeola complicata cu pneumonie,Rujeola complicata cu pneumonie,0,Severe,rujeola pojar pneumonie
+B05.9,Infectioase,Rujeola fara complicatii,Rujeola fara complicatii,0,Moderate,rujeola pojar
+B06.9,Infectioase,Rubeola fara complicatii,Rubeola fara complicatii,0,Mild,rubeola
+B07,Infectioase,Veruci virale,Veruci virale,1,Mild,negi veruci papiloame
+B08.1,Infectioase,Molluscum contagiosum,Molluscum contagiosum,1,Mild,moluscum piele
+B15.0,Infectioase,Hepatita virala acuta A cu coma hepatica,Hepatita virala acuta A cu coma hepatica,0,Critical,hepatita A coma
+B15.9,Infectioase,Hepatita virala acuta A fara coma,Hepatita virala acuta A fara coma hepatica,1,Moderate,hepatita A
+B16.0,Infectioase,Hepatita virala acuta B cu agent delta,Hepatita virala acuta B cu agent delta (coinfectie) cu coma hepatica,0,Critical,hepatita B delta coma
+B16.9,Infectioase,Hepatita virala acuta B fara coma,Hepatita virala acuta B fara agent delta si fara coma hepatica,1,Moderate,hepatita B
+B17.1,Infectioase,Hepatita virala acuta C,Hepatita virala acuta C,1,Moderate,hepatita C
+B18.0,Infectioase,Hepatita virala cronica B cu agent delta,Hepatita virala cronica B cu agent delta,0,Moderate,hepatita B cronica delta
+B18.1,Infectioase,Hepatita virala cronica B fara agent delta,Hepatita virala cronica B fara agent delta,1,Moderate,hepatita B cronica
+B18.2,Infectioase,Hepatita virala cronica C,Hepatita virala cronica C,1,Moderate,hepatita C cronica
+B19.9,Infectioase,Hepatita virala nespecificata,Hepatita virala nespecificata fara coma hepatica,1,Moderate,hepatita virala
+B20,Infectioase,Boala HIV cu infectii,Boala cauzata de virusul imunodeficientei umane rezultand in boli infectioase si parazitare,0,Severe,hiv sida
+B24,Infectioase,Boala HIV nespecificata,Boala cauzata de virusul imunodeficientei umane nespecificata,0,Severe,hiv sida
+B25.9,Infectioase,Infectie cu citomegalovirus nespecificata,Boala cu citomegalovirus nespecificata,0,Moderate,cmv citomegalovirus
+B26.9,Infectioase,Oreion fara complicatii,Oreion fara complicatii,0,Mild,oreion parotidita
+B27.0,Infectioase,Mononucleoza cu virus Epstein-Barr,Mononucleoza cu virusul gammaherpeticGammaherpesviral,1,Mild,mononucleoza ebv
+B27.9,Infectioase,Mononucleoza infectioasa nespecificata,Mononucleoza infectioasa nespecificata,1,Mild,mononucleoza
+B34.0,Infectioase,Infectie cu adenovirus nespecificata,Infectie cu adenovirus de localizare nespecificata,1,Mild,adenovirus
+B34.1,Infectioase,Infectie cu enterovirus nespecificata,Infectie cu enterovirus de localizare nespecificata,1,Mild,enterovirus
+B34.2,Infectioase,Infectie cu coronavirus nespecificata,Infectie cu coronavirus de localizare nespecificata,1,Mild,coronavirus
+B34.9,Infectioase,Infectie virala nespecificata,Infectie virala nespecificata,1,Mild,virus viroza
+B35.0,Infectioase,Tinea barbae si capitis,Tinea barbae si tinea capitis,1,Mild,ciuperca scalp barba
+B35.1,Infectioase,Tinea unguium,Tinea unguium (onicomicoza),1,Mild,ciuperca unghie onicomicoza
+B35.3,Infectioase,Tinea pedis,Tinea pedis (piciorul atletului),1,Mild,ciuperca picior tinea
+B35.4,Infectioase,Tinea corporis,Tinea corporis,1,Mild,ciuperca corp tinea
+B35.6,Infectioase,Tinea cruris,Tinea cruris,1,Mild,ciuperca inghinal tinea
+B36.0,Infectioase,Pitiriazis versicolor,Pitiriazis versicolor,1,Mild,pete piele ciuperca
+B37.0,Infectioase,Stomatita candidozica,Stomatita candidozica (muguet),1,Mild,candidoza gura muguet
+B37.2,Infectioase,Candidoza cutanata si unghiala,Candidoza cutanata si unghiala,1,Mild,candidoza piele unghie
+B37.3,Infectioase,Candidoza vulvei si vaginului,Candidoza vulvei si vaginului,1,Mild,candidoza vaginala
+B37.9,Infectioase,Candidoza nespecificata,Candidoza nespecificata,1,Mild,candidoza
+B86,Infectioase,Scabie,Scabie,1,Mild,scabie raie sarcoptes
+B87.9,Infectioase,Miaza nespecificata,Miaza nespecificata,0,Mild,larve musca miaza
+C00.9,Neoplasme,Cancer de buza nespecificat,Neoplasm malign al buzei nespecificat,0,Critical,cancer buza
+C01,Neoplasme,Cancer de baza a limbii,Neoplasm malign al bazei limbii,0,Critical,cancer limba
+C02.9,Neoplasme,Cancer de limba nespecificat,Neoplasm malign al limbii nespecificat,0,Critical,cancer limba
+C06.9,Neoplasme,Cancer al cavitatii bucale,Neoplasm malign al cavitatii bucale nespecificat,0,Critical,cancer gura
+C10.9,Neoplasme,Cancer orofaringian,Neoplasm malign al orofaringelui nespecificat,0,Critical,cancer orofaringe
+C11.9,Neoplasme,Cancer nazofaringian,Neoplasm malign al nazofaringelui nespecificat,0,Critical,cancer nazofaringe
+C15.9,Neoplasme,Cancer esofagian,Neoplasm malign al esofagului nespecificat,1,Critical,cancer esofag
+C16.0,Neoplasme,Cancer gastric cardial,Neoplasm malign al cardiei gastrice,1,Critical,cancer stomac cardia
+C16.9,Neoplasme,Cancer gastric nespecificat,Neoplasm malign al stomacului nespecificat,1,Critical,cancer stomac gastric
+C17.9,Neoplasme,Cancer intestin subtire,Neoplasm malign al intestinului subtire nespecificat,0,Critical,cancer intestin subtire
+C18.0,Neoplasme,Cancer de cec,Neoplasm malign al cecului,1,Critical,cancer cec colon
+C18.2,Neoplasme,Cancer de colon ascendent,Neoplasm malign al colonului ascendent,1,Critical,cancer colon ascendent
+C18.4,Neoplasme,Cancer de colon transvers,Neoplasm malign al colonului transvers,1,Critical,cancer colon transvers
+C18.7,Neoplasme,Cancer de colon sigmoid,Neoplasm malign al colonului sigmoid,1,Critical,cancer colon sigmoid
+C18.9,Neoplasme,Cancer de colon nespecificat,Neoplasm malign al colonului nespecificat,1,Critical,cancer colon
+C19,Neoplasme,Cancer de jonctiune rectosigmoidiana,Neoplasm malign al jonctiunii rectosigmoidiene,1,Critical,cancer rectosigmoid
+C20,Neoplasme,Cancer rectal,Neoplasm malign al rectului,1,Critical,cancer rect
+C22.0,Neoplasme,Carcinom hepatocelular,Carcinom hepatocelular,1,Critical,cancer ficat hepatocarcinom
+C22.9,Neoplasme,Cancer hepatic nespecificat,Neoplasm malign al ficatului nespecificat,1,Critical,cancer ficat
+C23,Neoplasme,Cancer de vezica biliara,Neoplasm malign al vezicii biliare,0,Critical,cancer vezica biliara
+C24.0,Neoplasme,Cancer de cai biliare extrahepatice,Neoplasm malign al cailor biliare extrahepatice,0,Critical,cancer cai biliare
+C25.0,Neoplasme,Cancer de cap de pancreas,Neoplasm malign al capului pancreasului,1,Critical,cancer pancreas cap
+C25.9,Neoplasme,Cancer pancreatic nespecificat,Neoplasm malign al pancreasului nespecificat,1,Critical,cancer pancreas
+C32.9,Neoplasme,Cancer laringian,Neoplasm malign al laringelui nespecificat,1,Critical,cancer laringe
+C33,Neoplasme,Cancer de trahee,Neoplasm malign al traheei,0,Critical,cancer trahee
+C34.0,Neoplasme,Cancer bronhie principala,Neoplasm malign al bronhiei principale,1,Critical,cancer bronhie
+C34.1,Neoplasme,Cancer lob superior pulmonar,Neoplasm malign al lobului superior bronhie sau plaman,1,Critical,cancer pulmonar lob superior
+C34.3,Neoplasme,Cancer lob inferior pulmonar,Neoplasm malign al lobului inferior bronhie sau plaman,1,Critical,cancer pulmonar lob inferior
+C34.9,Neoplasme,Cancer pulmonar nespecificat,Neoplasm malign al bronhiei sau plamanului nespecificat,1,Critical,cancer pulmonar plamani
+C43.9,Neoplasme,Melanom malign nespecificat,Melanom malign al pielii nespecificat,1,Critical,melanom cancer piele
+C44.9,Neoplasme,Cancer cutanat nespecificat,Neoplasm malign al pielii nespecificat,1,Severe,cancer piele
+C50.1,Neoplasme,Cancer mamar portiune centrala,Neoplasm malign al portiunii centrale a sanului,1,Critical,cancer san mamar
+C50.4,Neoplasme,Cancer mamar cadran supero-extern,Neoplasm malign al cadranului supero-extern al sanului,1,Critical,cancer san mamar
+C50.9,Neoplasme,Cancer mamar nespecificat,Neoplasm malign al sanului nespecificat,1,Critical,cancer san mamar
+C53.9,Neoplasme,Cancer de col uterin,Neoplasm malign al colului uterin nespecificat,1,Critical,cancer col uterin cervical
+C54.1,Neoplasme,Cancer de endometru,Neoplasm malign al endometrului,1,Critical,cancer endometru uter
+C54.9,Neoplasme,Cancer de corp uterin,Neoplasm malign al corpului uterin nespecificat,1,Critical,cancer uter corp
+C56,Neoplasme,Cancer ovarian,Neoplasm malign al ovarului,1,Critical,cancer ovar ovarian
+C61,Neoplasme,Cancer de prostata,Neoplasm malign al prostatei,1,Critical,cancer prostata
+C62.9,Neoplasme,Cancer testicular,Neoplasm malign al testiculului nespecificat,1,Critical,cancer testicul
+C64,Neoplasme,Cancer renal,Neoplasm malign al rinichiului cu exceptia pelvisului renal,1,Critical,cancer rinichi renal
+C67.9,Neoplasme,Cancer de vezica urinara,Neoplasm malign al vezicii urinare nespecificat,1,Critical,cancer vezica urinara
+C71.9,Neoplasme,Cancer cerebral,Neoplasm malign al creierului nespecificat,1,Critical,cancer creier cerebral
+C73,Neoplasme,Cancer tiroidian,Neoplasm malign al glandei tiroide,1,Critical,cancer tiroida
+C78.0,Neoplasme,Metastaze pulmonare,Neoplasm malign secundar al plamanului,1,Critical,metastaze plamani
+C78.7,Neoplasme,Metastaze hepatice,Neoplasm malign secundar al ficatului si cailor biliare intrahepatice,1,Critical,metastaze ficat
+C79.5,Neoplasme,Metastaze osoase,Neoplasm malign secundar al oaselor si maduvei osoase,1,Critical,metastaze oase
+C80.1,Neoplasme,Cancer primar nespecificat,Neoplasm malign primar de localizare nespecificata,1,Critical,cancer nespecificat
+C83.3,Neoplasme,Limfom difuz cu celule B mari,Limfom difuz cu celule B mari,1,Critical,limfom celule b
+C85.9,Neoplasme,Limfom non-Hodgkin nespecificat,Limfom non-Hodgkin nespecificat,1,Critical,limfom non hodgkin
+C90.0,Neoplasme,Mielom multiplu,Mielom multiplu,1,Critical,mielom multiplu plasmocitom
+C91.0,Neoplasme,Leucemie limfoblastica acuta,Leucemie limfoblastica acuta,1,Critical,leucemie limfoblastica lla
+C91.1,Neoplasme,Leucemie limfocitica cronica,Leucemie limfocitica cronica cu celule B,1,Critical,leucemie limfocitica llc
+C92.0,Neoplasme,Leucemie mieloida acuta,Leucemie mieloida acuta,1,Critical,leucemie mieloida lma
+C92.1,Neoplasme,Leucemie mieloida cronica,Leucemie mieloida cronica BCR-ABL pozitiva,1,Critical,leucemie mieloida lmc
+D50.0,Sange,Anemie feripriva secundara pierderii de sange,Anemie feripriva secundara pierderii de sange (cronica),1,Mild,anemie fier sangerare
+D50.1,Sange,Disfagie sideropenica,Disfagie sideropenica,0,Mild,disfagie anemie
+D50.8,Sange,Alte anemii feriprive,Alte anemii feriprive,1,Mild,anemie fier
+D50.9,Sange,Anemie feripriva nespecificata,Anemie feripriva nespecificata,1,Mild,anemie fier
+D51.0,Sange,Anemie prin deficit de B12 din lipsa factor intrinsec,Anemie prin deficit de vitamina B12 datorita deficitului de factor intrinsec,0,Moderate,anemie b12 biermer
+D51.9,Sange,Anemie prin deficit de vitamina B12 nespecificata,Anemie prin deficit de vitamina B12 nespecificata,1,Moderate,anemie b12
+D52.9,Sange,Anemie prin deficit de acid folic nespecificata,Anemie prin deficit de acid folic nespecificata,1,Moderate,anemie folat
+D53.9,Sange,Anemie nutritionala nespecificata,Anemie nutritionala nespecificata,1,Mild,anemie nutritionala
+D56.9,Sange,Talasemie nespecificata,Talasemie nespecificata,0,Moderate,talasemie
+D57.1,Sange,Anemia cu celule falciforme fara crize,Anemia cu celule falciforme fara crize,0,Moderate,siclemie celule falciforme
+D59.9,Sange,Anemie hemolitica dobandita nespecificata,Anemie hemolitica dobandita nespecificata,0,Moderate,anemie hemolitica
+D61.9,Sange,Anemie aplastica nespecificata,Anemie aplastica nespecificata,0,Severe,anemie aplastica
+D63.0,Sange,Anemie in neoplazii,Anemie in neoplazii,0,Moderate,anemie cancer
+D64.9,Sange,Anemie nespecificata,Anemie nespecificata,1,Mild,anemie
+D69.3,Sange,Purpura trombocitopenica idiopatica,Purpura trombocitopenica idiopatica,0,Moderate,itp trombocitopenie
+D69.6,Sange,Trombocitopenie nespecificata,Trombocitopenie nespecificata,1,Moderate,trombocitopenie trombocite scazute
+D70.9,Sange,Neutropenie nespecificata,Neutropenie nespecificata,1,Moderate,neutropenie neutrofile scazute
+D72.8,Sange,Alte tulburari ale leucocitelor,Alte tulburari precizate ale leucocitelor,0,Mild,leucocite anomalii
+D75.9,Sange,Afectiune a sangelui nespecificata,Afectiune a sangelui si organelor hematopoietice nespecificata,1,Mild,sange afectiune
+E00.9,Endocrin,Sindrom de deficit congenital de iod nespecificat,Sindrom de deficit congenital de iod nespecificat,0,Moderate,cretinism iod
+E01.0,Endocrin,Gusa difuza prin deficit de iod,Gusa difuza (endemica) prin deficit de iod,0,Mild,gusa iod tiroid
+E01.2,Endocrin,Gusa prin deficit de iod nespecificata,Gusa (endemica) prin deficit de iod nespecificata,0,Mild,gusa iod
+E02,Endocrin,Hipotiroidism subclinic prin deficit de iod,Hipotiroidism subclinic prin deficit de iod,0,Mild,hipotiroidism subclinic iod
+E03.0,Endocrin,Hipotiroidism congenital cu gusa difuza,Hipotiroidism congenital cu gusa difuza,0,Moderate,hipotiroidism congenital
+E03.1,Endocrin,Hipotiroidism congenital fara gusa,Hipotiroidism congenital fara gusa,0,Moderate,hipotiroidism congenital
+E03.2,Endocrin,Hipotiroidism datorat medicamentelor,Hipotiroidism datorat medicamentelor si altor substante exogene,0,Mild,hipotiroidism medicament
+E03.5,Endocrin,Coma mixedematos,Coma mixedematos,0,Critical,mixedem coma
+E03.8,Endocrin,Alte hipotiroidisme specificate,Alte hipotiroidisme specificate,0,Mild,hipotiroidism
+E03.9,Endocrin,Hipotiroidism nespecificat,Hipotiroidism nespecificat,1,Mild,hipotiroidism
+E04.0,Endocrin,Gusa netoxica difuza,Gusa netoxica difuza,1,Mild,gusa difuza
+E04.1,Endocrin,Nodul tiroidian unic netoxic,Nodul tiroidian unic netoxic,1,Mild,nodul tiroidian
+E04.2,Endocrin,Gusa multinodulara netoxica,Gusa multinodulara netoxica,1,Mild,gusa multinodulara
+E04.9,Endocrin,Gusa netoxica nespecificata,Gusa netoxica nespecificata,1,Mild,gusa
+E05.0,Endocrin,Tirotoxicoza cu gusa difuza,Tirotoxicoza cu gusa difuza (Boala Graves),1,Moderate,hipertiroidism graves basedow
+E05.1,Endocrin,Tirotoxicoza cu nodul toxic unic,Tirotoxicoza cu nodul toxic unic,0,Moderate,hipertiroidism nodul toxic
+E05.2,Endocrin,Tirotoxicoza cu gusa multinodulara toxica,Tirotoxicoza cu gusa multinodulara toxica,0,Moderate,hipertiroidism gusa toxica
+E05.5,Endocrin,Criza tirotoxica,Criza tirotoxica,0,Critical,criza tireotoxica furtuna
+E05.9,Endocrin,Tirotoxicoza nespecificata,Tirotoxicoza nespecificata,1,Moderate,hipertiroidism tirotoxicoza
+E06.0,Endocrin,Tiroidita acuta,Tiroidita acuta,0,Moderate,tiroidita acuta
+E06.1,Endocrin,Tiroidita subacuta,Tiroidita subacuta (de Quervain),0,Moderate,tiroidita subacuta quervain
+E06.3,Endocrin,Tiroidita autoimuna,Tiroidita autoimuna (Hashimoto),1,Mild,tiroidita hashimoto autoimuna
+E06.9,Endocrin,Tiroidita nespecificata,Tiroidita nespecificata,1,Mild,tiroidita
+E07.9,Endocrin,Afectiune tiroidiana nespecificata,Afectiune a tiroidei nespecificata,1,Mild,tiroida afectiune
+E10.0,Endocrin,Diabet zaharat tip 1 cu coma,Diabet zaharat tip 1 cu coma,0,Critical,diabet tip1 coma
+E10.1,Endocrin,Diabet zaharat tip 1 cu cetoacidoza,Diabet zaharat tip 1 cu cetoacidoza,0,Critical,diabet tip1 cetoacidoza
+E10.2,Endocrin,Diabet zaharat tip 1 cu complicatii renale,Diabet zaharat tip 1 cu complicatii renale,0,Severe,diabet tip1 nefropatie
+E10.3,Endocrin,Diabet zaharat tip 1 cu complicatii oftalmologice,Diabet zaharat tip 1 cu complicatii oftalmologice,0,Moderate,diabet tip1 retinopatie ochi
+E10.4,Endocrin,Diabet zaharat tip 1 cu complicatii neurologice,Diabet zaharat tip 1 cu complicatii neurologice,0,Moderate,diabet tip1 neuropatie
+E10.5,Endocrin,Diabet zaharat tip 1 cu complicatii circulatorii periferice,Diabet zaharat tip 1 cu complicatii circulatorii periferice,0,Moderate,diabet tip1 angiopatie
+E10.6,Endocrin,Diabet zaharat tip 1 cu alte complicatii,Diabet zaharat tip 1 cu alte complicatii specificate,0,Moderate,diabet tip1 complicatii
+E10.7,Endocrin,Diabet zaharat tip 1 cu complicatii multiple,Diabet zaharat tip 1 cu complicatii multiple,0,Severe,diabet tip1 complicatii multiple
+E10.9,Endocrin,Diabet zaharat tip 1 fara complicatii,Diabet zaharat tip 1 fara complicatii,1,Moderate,diabet tip1
+E11.0,Endocrin,Diabet zaharat tip 2 cu coma,Diabet zaharat tip 2 cu coma,0,Critical,diabet tip2 coma
+E11.1,Endocrin,Diabet zaharat tip 2 cu cetoacidoza,Diabet zaharat tip 2 cu cetoacidoza,0,Critical,diabet tip2 cetoacidoza
+E11.2,Endocrin,Diabet zaharat tip 2 cu complicatii renale,Diabet zaharat tip 2 cu complicatii renale,1,Severe,diabet tip2 nefropatie
+E11.3,Endocrin,Diabet zaharat tip 2 cu complicatii oftalmologice,Diabet zaharat tip 2 cu complicatii oftalmologice,1,Moderate,diabet tip2 retinopatie ochi
+E11.4,Endocrin,Diabet zaharat tip 2 cu complicatii neurologice,Diabet zaharat tip 2 cu complicatii neurologice,1,Moderate,diabet tip2 neuropatie
+E11.5,Endocrin,Diabet zaharat tip 2 cu complicatii circulatorii periferice,Diabet zaharat tip 2 cu complicatii circulatorii periferice,1,Moderate,diabet tip2 angiopatie picior diabetic
+E11.6,Endocrin,Diabet zaharat tip 2 cu alte complicatii,Diabet zaharat tip 2 cu alte complicatii specificate,0,Moderate,diabet tip2 complicatii
+E11.7,Endocrin,Diabet zaharat tip 2 cu complicatii multiple,Diabet zaharat tip 2 cu complicatii multiple,1,Severe,diabet tip2 complicatii multiple
+E11.9,Endocrin,Diabet zaharat tip 2 fara complicatii,Diabet zaharat tip 2 fara complicatii,1,Moderate,diabet tip2
+E13.9,Endocrin,Alt diabet zaharat specificat fara complicatii,Alt diabet zaharat specificat fara complicatii,0,Moderate,diabet alt
+E14.9,Endocrin,Diabet zaharat nespecificat fara complicatii,Diabet zaharat nespecificat fara complicatii,1,Moderate,diabet nespecificat
+E16.0,Endocrin,Hipoglicemie medicamentoasa fara coma,Hipoglicemie medicamentoasa fara coma,1,Moderate,hipoglicemie medicament
+E16.2,Endocrin,Hipoglicemie nespecificata,Hipoglicemie nespecificata,1,Moderate,hipoglicemie
+E21.0,Endocrin,Hiperparatiroidism primar,Hiperparatiroidism primar,0,Moderate,hiperparatiroidism primar
+E21.3,Endocrin,Hiperparatiroidism nespecificat,Hiperparatiroidism nespecificat,0,Moderate,hiperparatiroidism
+E22.0,Endocrin,Acromegalie si gigantism hipofizar,Acromegalie si gigantism hipofizar,0,Moderate,acromegalie gigantism
+E22.1,Endocrin,Hiperprolactinemie,Hiperprolactinemie,1,Mild,prolactina crescuta hiperprolactinemie
+E23.0,Endocrin,Hipopituitarism,Hipopituitarism,0,Moderate,hipofiza insuficienta
+E24.0,Endocrin,Boala Cushing hipofizar,Boala Cushing de origine hipofizara,0,Moderate,cushing hipofizar
+E24.9,Endocrin,Sindrom Cushing nespecificat,Sindrom Cushing nespecificat,0,Moderate,cushing sindrom
+E27.1,Endocrin,Insuficienta suprarenaliana primara,Insuficienta corticosuprarenaliana primara (Boala Addison),0,Severe,addison insuficienta suprarenala
+E27.4,Endocrin,Alte insuficiente corticosuprarenaliene,Alte insuficiente corticosuprarenaliene si cele nespecificate,0,Moderate,suprarenala insuficienta
+E28.2,Endocrin,Sindromul ovarelor polichistice,Sindromul ovarelor polichistice,1,Mild,sopk ovare polichistice
+E29.1,Endocrin,Hipofunctie testiculara,Hipofunctie testiculara,0,Mild,hipogonadism masculin
+E34.9,Endocrin,Tulburare endocrina nespecificata,Tulburare endocrina nespecificata,0,Mild,endocrin afectiune
+E55.0,Endocrin,Rahitism activ,Rahitism activ,0,Moderate,rahitism vitamina d
+E55.9,Endocrin,Deficit de vitamina D nespecificat,Deficit de vitamina D nespecificat,1,Mild,vitamina d deficit
+E61.1,Endocrin,Deficit de fier,Deficit de fier,1,Mild,fier deficit
+E63.9,Endocrin,Deficienta nutritionala nespecificata,Deficienta nutritionala nespecificata,1,Mild,malnutritie
+E65,Endocrin,Adipozitate localizata,Adipozitate localizata,0,Mild,grasime localizata
+E66.0,Endocrin,Obezitate datorata excesului caloric,Obezitate datorata excesului de calorii,1,Moderate,obezitate exces alimentar
+E66.1,Endocrin,Obezitate medicamentoasa,Obezitate medicamentoasa,0,Moderate,obezitate medicament
+E66.2,Endocrin,Obezitate extrema cu hipoventilatie alveolara,Obezitate extrema cu hipoventilatie alveolara,0,Severe,obezitate pickwick
+E66.8,Endocrin,Alte forme de obezitate,Alte forme de obezitate,0,Moderate,obezitate
+E66.9,Endocrin,Obezitate nespecificata,Obezitate nespecificata,1,Moderate,obezitate
+E78.0,Endocrin,Hipercolesterolemie pura,Hipercolesterolemie pura,1,Mild,colesterol crescut hipercolesterolemie
+E78.1,Endocrin,Hipergliceridemie pura,Hipergliceridemie pura,1,Mild,trigliceride crescute
+E78.2,Endocrin,Hiperlipidemia mixta,Hiperlipidemia mixta,1,Mild,colesterol trigliceride crescute
+E78.4,Endocrin,Alte hiperlipidemii,Alte hiperlipidemii,0,Mild,hiperlipidemie
+E78.5,Endocrin,Hiperlipidemia nespecificata,Hiperlipidemia nespecificata,1,Mild,hiperlipidemie dislipidemie
+E79.0,Endocrin,Hiperuricemie fara semne de guta,Hiperuricemie fara semne de artrita gutoasa si noduli tofacei,1,Mild,acid uric crescut
+E83.1,Endocrin,Boala de suprancarcare cu fier,Boala de supranarcare cu fier (Hemocromatoza),0,Moderate,hemocromatoza fier
+E83.3,Endocrin,Tulburari ale metabolismului fosforului,Tulburari ale metabolismului fosforului si fosfatazei,0,Mild,fosfor
+E83.5,Endocrin,Tulburari ale metabolismului calciului,Tulburari ale metabolismului calciului,1,Mild,calciu
+E86,Endocrin,Deple?ie de volum,Deple?ie de volum (deshidratare),1,Moderate,deshidratare
+E87.0,Endocrin,Hiperosmolaritate si hipernatremie,Hiperosmolaritate si hipernatremie,0,Moderate,sodiu crescut hipernatremie
+E87.1,Endocrin,Hipoosmolaritate si hiponatremie,Hipoosmolaritate si hiponatremie,1,Moderate,sodiu scazut hiponatremie
+E87.2,Endocrin,Acidoza,Acidoza,0,Severe,acidoza
+E87.3,Endocrin,Alcaloza,Alcaloza,0,Moderate,alcaloza
+E87.5,Endocrin,Hiperkaliemie,Hiperkaliemie,1,Severe,potasiu crescut hiperkaliemie
+E87.6,Endocrin,Hipokaliemie,Hipokaliemie,1,Moderate,potasiu scazut hipokaliemie
+E87.8,Endocrin,Alte tulburari ale echilibrului hidro-electrolitic,Alte tulburari ale echilibrului hidro-electrolitic,0,Moderate,electroliti dezechilibru
+E88.9,Endocrin,Tulburare metabolica nespecificata,Tulburare metabolica nespecificata,0,Mild,metabolism tulburare
+E89.0,Endocrin,Hipotiroidism postprocedural,Hipotiroidism postprocedural,0,Mild,hipotiroidism postchirurgical

@@ -1,0 +1,113 @@
+Code,Category,ShortDescription,LongDescription,IsCommon,Severity,SearchTerms
+A00,Infectioase,Holera,Holera,0,Severe,holera
+A01,Infectioase,Febra tifoida si paratifoida,Febra tifoida si paratifoida,0,Severe,tifos
+A02,Infectioase,Alte infectii cu Salmonella,Salmoneloza,1,Moderate,salmonela
+A04,Infectioase,Alte infectii intestinale bacteriene,Infectii intestinale bacteriene,1,Moderate,infectie intestinala
+A09,Infectioase,Gastroenterita infectioasa,Diaree si gastroenterita de origine infectioasa,1,Mild,gastroenterita diaree varsaturi
+B34.9,Infectioase,Infectie virala nespecificata,Infectie virala nespecificata,1,Mild,virus viroza
+C34,Neoplasme,Cancer pulmonar,Neoplasmul malign al bronhiei si plamanului,1,Critical,cancer pulmonar plamani
+C50,Neoplasme,Cancer mamar,Neoplasmul malign al sanului,1,Critical,cancer san mamar
+C61,Neoplasme,Cancer de prostata,Neoplasmul malign al prostatei,1,Critical,cancer prostata
+C18,Neoplasme,Cancer de colon,Neoplasmul malign al colonului,1,Critical,cancer colon
+D50,Sange,Anemie feripriva,Anemie prin deficit de fier,1,Mild,anemie fier feripriva
+D50.9,Sange,Anemie feripriva nespecificata,Anemie feripriva nespecificata,1,Mild,anemie
+D64.9,Sange,Anemie nespecificata,Anemie nespecificata,1,Mild,anemie
+E03,Endocrin,Hipotiroidism,Alte forme de hipotiroidism,1,Mild,hipotiroidism tiroidita
+E03.9,Endocrin,Hipotiroidism nespecificat,Hipotiroidism nespecificat,1,Mild,hipotiroidism
+E05,Endocrin,Hipertiroidism,Tirotoxicoza,1,Moderate,hipertiroidism tireotoxicoza
+E05.9,Endocrin,Hipertiroidism nespecificat,Tirotoxicoza nespecificata,1,Moderate,hipertiroidism
+E10,Endocrin,Diabet zaharat tip 1,Diabet zaharat insulino-dependent,1,Moderate,diabet tip1 insulina
+E10.9,Endocrin,Diabet zaharat tip 1 fara complicatii,Diabet zaharat tip 1 fara complicatii,1,Moderate,diabet tip1
+E11,Endocrin,Diabet zaharat tip 2,Diabet zaharat non-insulino-dependent,1,Moderate,diabet tip2
+E11.9,Endocrin,Diabet zaharat tip 2 fara complicatii,Diabet zaharat tip 2 fara complicatii,1,Moderate,diabet tip2
+E66,Endocrin,Obezitate,Obezitate,1,Moderate,obezitate supraponderabilitate
+E66.9,Endocrin,Obezitate nespecificata,Obezitate nespecificata,1,Moderate,obezitate
+E78,Endocrin,Dislipidemie,Tulburari ale metabolismului lipoproteinelor,1,Mild,dislipidemie colesterol trigliceride
+E78.0,Endocrin,Hipercolesterolemie pura,Hipercolesterolemie pura,1,Mild,colesterol marit
+E78.5,Endocrin,Hiperlipidemie nespecificata,Hiperlipidemie nespecificata,1,Mild,hiperlipidemie
+E79.0,Endocrin,Hiperuricemie,Hiperuricemie fara semne de artrita gutoasa,1,Mild,acid uric guta
+F32,Mental,Episod depresiv,Episod depresiv,1,Moderate,depresie tristete
+F32.9,Mental,Episod depresiv nespecificat,Depresie nespecificata,1,Moderate,depresie
+F41,Mental,Tulburari anxioase,Alte tulburari anxioase,1,Moderate,anxietate neliniste
+F41.1,Mental,Tulburare anxioasa generalizata,Anxietate generalizata,1,Moderate,anxietate tag
+F41.9,Mental,Tulburare anxioasa nespecificata,Anxietate nespecificata,1,Mild,anxietate
+F51.0,Mental,Insomnie,Insomnie neorganica,1,Mild,insomnie somn
+G20,Nervos,Boala Parkinson,Boala Parkinson,1,Severe,parkinson tremor
+G30,Nervos,Boala Alzheimer,Dementa Alzheimer,1,Severe,alzheimer dementa
+G40,Nervos,Epilepsie,Epilepsie,1,Severe,epilepsie convulsii crize
+G43,Nervos,Migrena,Migrena,1,Moderate,migrena durere cap
+G43.9,Nervos,Migrena nespecificata,Migrena nespecificata,1,Moderate,migrena
+G45,Nervos,Atacuri ischemice tranzitorii,AIT,1,Severe,ait tia atac ischemic
+G62.9,Nervos,Polineuropatie nespecificata,Polineuropatie nespecificata,1,Moderate,neuropatie
+H10,Ochi,Conjunctivita,Conjunctivita,1,Mild,conjunctivita ochi rosii
+H25,Ochi,Cataracta senila,Cataracta senila,1,Moderate,cataracta
+H40,Ochi,Glaucom,Glaucom,1,Moderate,glaucom presiune oculara
+H81.1,Ureche,Vertij paroxistic benign,Vertij pozitional paroxistic benign,1,Mild,vertij vppb ameteala
+H91.9,Ureche,Pierdere de auz nespecificata,Surditate nespecificata,1,Moderate,surditate hipoacuzie
+I10,Cardiovascular,Hipertensiune arteriala esentiala,Hipertensiune arteriala primara,1,Moderate,hta hipertensiune tensiune
+I11,Cardiovascular,Cardiopatie hipertensiva,Boala cardiaca hipertensiva,1,Severe,cardiopatie hta
+I20,Cardiovascular,Angina pectorala,Angina pectorala,1,Moderate,angina angor
+I21,Cardiovascular,Infarct miocardic acut,Infarct miocardic acut,1,Critical,infarct ima atac cardiac
+I25,Cardiovascular,Cardiopatie ischemica cronica,Cardiopatie ischemica cronica,1,Moderate,cardiopatie ischemiaca
+I48,Cardiovascular,Fibrilatie atriala,Fibrilatie atriala si flutter atrial,1,Moderate,fibrilatie fa aritmie
+I50,Cardiovascular,Insuficienta cardiaca,Insuficienta cardiaca,1,Severe,ic insuficienta cardiaca
+I63,Cardiovascular,Accident vascular cerebral ischemic,Infarct cerebral,1,Critical,avc stroke
+I64,Cardiovascular,AVC nespecificat,Accident vascular cerebral nespecificat,1,Critical,avc stroke
+I70,Cardiovascular,Ateroscleroza,Ateroscleroza,1,Moderate,ateroscleroza
+I73.9,Cardiovascular,Boala vasculara periferica,Boala vasculara periferica nespecificata,1,Moderate,boala vasculara periferica
+J00,Respirator,Raceala comuna,Rinofaringita acuta,1,Mild,raceala guturai nas
+J02.9,Respirator,Faringita acuta,Faringita acuta nespecificata,1,Mild,faringita durere gat
+J03.9,Respirator,Amigdalita acuta,Amigdalita acuta nespecificata,1,Mild,amigdalita angina
+J06.9,Respirator,Infectie respiratorie superioara,IACRS nespecificata,1,Mild,iacrs infectie respiratorie
+J18.9,Respirator,Pneumonie,Pneumonie nespecificata,1,Moderate,pneumonie
+J20.9,Respirator,Bronsita acuta,Bronsita acuta nespecificata,1,Mild,bronsita
+J40,Respirator,Bronsita nespecificata,Bronsita nespecificata ca acuta sau cronica,1,Mild,bronsita
+J42,Respirator,Bronsita cronica,Bronsita cronica nespecificata,1,Mild,bronsita cronica
+J44,Respirator,BPOC,Boala pulmonara obstructiva cronica,1,Moderate,bpoc bronhopneumopatie
+J44.9,Respirator,BPOC nespecificat,BPOC nespecificat,1,Moderate,bpoc
+J45,Respirator,Astm,Astm bronsic,1,Moderate,astm bronsic
+J45.9,Respirator,Astm nespecificat,Astm nespecificat,1,Moderate,astm
+K21,Digestiv,GERD,Boala de reflux gastroesofagian,1,Mild,gerd reflux pirozis
+K25.9,Digestiv,Ulcer gastric,Ulcer gastric nespecificat,1,Moderate,ulcer stomac gastric
+K26.9,Digestiv,Ulcer duodenal,Ulcer duodenal nespecificat,1,Moderate,ulcer duodenal
+K29,Digestiv,Gastrita,Gastrita si duodenita,1,Mild,gastrita stomac
+K29.7,Digestiv,Gastrita nespecificata,Gastrita nespecificata,1,Mild,gastrita
+K58,Digestiv,Colon iritabil,Sindrom de colon iritabil,1,Mild,ibs colon iritabil
+K59.0,Digestiv,Constipatie,Constipatie,1,Mild,constipatie tranzit lent
+K70.3,Digestiv,Ciroza alcoolica,Ciroza hepatica alcoolica,1,Critical,ciroza alcool
+K74.6,Digestiv,Ciroza hepatica,Ciroza hepatica nespecificata,1,Severe,ciroza ficat
+K76.0,Digestiv,Steatoza hepatica,Ficat gras,1,Mild,ficat gras steatoza nafld
+K80,Digestiv,Litiaza biliara,Colelitiaza,1,Moderate,calculi biliari pietre fiere
+L20,Piele,Dermatita atopica,Dermatita atopica,1,Mild,eczema dermatita
+L23,Piele,Dermatita alergica de contact,Dermatita alergica de contact,1,Mild,dermatita alergie
+L30.9,Piele,Dermatita nespecificata,Dermatita nespecificata,1,Mild,dermatita
+L40,Piele,Psoriazis,Psoriazis,1,Moderate,psoriazis
+L50,Piele,Urticarie,Urticarie,1,Mild,urticarie alergic
+M15,Musculo-scheletic,Poliartroza,Poliartroza,1,Moderate,artroza multipla
+M16.9,Musculo-scheletic,Coxartroza,Coxartroza nespecificata,1,Moderate,artroza sold coxartroza
+M17.9,Musculo-scheletic,Gonartroza,Gonartroza nespecificata,1,Moderate,artroza genunchi
+M19.9,Musculo-scheletic,Artroza nespecificata,Artroza nespecificata,1,Moderate,artroza
+M54.5,Musculo-scheletic,Lombalgie,Durere lombara joasa,1,Mild,lombalgie durere spate
+M54.2,Musculo-scheletic,Cervicalgie,Durere cervicala,1,Mild,cervicalgie durere gat
+M51.1,Musculo-scheletic,Hernie de disc lombara,Hernie de disc lombara cu radiculopatie,1,Moderate,hernie disc sciatica
+M81,Musculo-scheletic,Osteoporoza,Osteoporoza fara fractura patologica,1,Moderate,osteoporoza
+N10,Genito-urinar,Pielonefrita acuta,Nefrita tubulo-interstitiala acuta,1,Severe,pielonefrita infectie rinichi
+N18,Genito-urinar,Boala cronica de rinichi,Insuficienta renala cronica,1,Severe,brc irc boala rinichi
+N20.0,Genito-urinar,Calcul renal,Calcul al rinichiului,1,Moderate,calcul renal piatra rinichi
+N30.0,Genito-urinar,Cistita acuta,Cistita acuta,1,Mild,cistita infectie vezica
+N39.0,Genito-urinar,Infectie urinara,Infectie de tract urinar nespecificata,1,Mild,itu infectie urinara
+N40,Genito-urinar,Hiperplazie de prostata,HBP - adenom de prostata,1,Mild,prostata hbp adenom
+R00.2,Simptome,Palpitatii,Palpitatii,1,Mild,palpitatii batai inima
+R05,Simptome,Tuse,Tuse,1,Mild,tuse
+R06.0,Simptome,Dispnee,Dispnee dificultate respiratorie,1,Moderate,dispnee greu respir
+R10.4,Simptome,Durere abdominala,Durere abdominala nespecificata,1,Mild,durere burta abdomen
+R42,Simptome,Vertij,Ameteala si vertij,1,Mild,vertij ameteala
+R50.9,Simptome,Febra,Febra nespecificata,1,Mild,febra temperatura
+R51,Simptome,Cefalee,Durere de cap,1,Mild,cefalee durere cap
+R53,Simptome,Oboseala,Stare de rau si oboseala,1,Mild,oboseala astenie slabiciune
+R55,Simptome,Sincopa,Lesin pierdere cunostinta,1,Moderate,sincopa lesin
+U07.1,Infectioase,COVID-19,COVID-19 confirmat,1,Moderate,covid coronavirus sarscov2
+Z00,Alte cauze,Examen medical general,Examinare si investigatie generala,1,Mild,control medical examen
+Z01,Alte cauze,Alte examinari speciale,Alte examinari si investigatii speciale,1,Mild,examinare speciala
+Z71.9,Alte cauze,Consiliere,Consiliere nespecificata,1,Mild,consiliere sfat medical
+Z76.0,Alte cauze,Eliberare reteta,Eliberare prescriptie medicala,1,Mild,reteta prescriptie

@@ -1,0 +1,192 @@
+Code,Category,ShortDescription,LongDescription,IsCommon,Severity,SearchTerms
+F00.9,Mental,Dementa in boala Alzheimer nespecificata,Dementa in boala Alzheimer nespecificata,1,Severe,alzheimer dementa
+F01.9,Mental,Dementa vasculara nespecificata,Dementa vasculara nespecificata,1,Severe,dementa vasculara
+F02.8,Mental,Dementa in alte boli clasificate in alta parte,Dementa in alte boli clasificate in alta parte,0,Severe,dementa
+F03,Mental,Dementa nespecificata,Dementa nespecificata,1,Severe,dementa
+F05.9,Mental,Delirium nespecificat,Delirium nespecificat,1,Moderate,delirium confuzie
+F06.7,Mental,Tulburare cognitiva usoara,Tulburare cognitiva usoara,1,Mild,cognitiv deficit
+F10.1,Mental,Tulburari mentale datorate consumului de alcool nociv,Tulburari mentale si de comportament datorate consumului de alcool - utilizare nociva,1,Moderate,alcool abuz
+F10.2,Mental,Sindrom de dependenta de alcool,Tulburari mentale si de comportament datorate consumului de alcool - sindrom de dependenta,1,Moderate,alcoolism dependenta
+F10.3,Mental,Sindrom de sevraj alcoolic,Tulburari mentale si de comportament datorate consumului de alcool - sindrom de sevraj,1,Moderate,sevraj alcool
+F10.5,Mental,Psihoza alcoolica,Tulburari mentale si de comportament datorate consumului de alcool - tulburare psihotica,0,Severe,psihoza alcool
+F11.2,Mental,Dependenta de opioide,Tulburari mentale si de comportament datorate consumului de opioide - sindrom de dependenta,0,Severe,opioide dependenta heroina
+F12.2,Mental,Dependenta de canabis,Tulburari mentale si de comportament datorate consumului de canabinoide - sindrom de dependenta,0,Moderate,canabis marijuana dependenta
+F17.2,Mental,Dependenta de tutun,Tulburari mentale si de comportament datorate consumului de tutun - sindrom de dependenta,1,Mild,fumat tutun dependenta
+F19.2,Mental,Dependenta de droguri multiple,Tulburari mentale si de comportament datorate consumului de droguri multiple - sindrom de dependenta,0,Severe,droguri dependenta multipla
+F20.0,Mental,Schizofrenie paranoida,Schizofrenie paranoida,0,Severe,schizofrenie paranoida
+F20.9,Mental,Schizofrenie nespecificata,Schizofrenie nespecificata,1,Severe,schizofrenie
+F22.0,Mental,Tulburare deliranta,Tulburare deliranta,0,Severe,delir paranoia
+F23.9,Mental,Tulburare psihotica acuta nespecificata,Tulburare psihotica acuta si tranzitorie nespecificata,0,Severe,psihoza acuta
+F25.9,Mental,Tulburare schizoafectiva nespecificata,Tulburare schizoafectiva nespecificata,0,Severe,schizoafectiv
+F30.9,Mental,Episod maniacal nespecificat,Episod maniacal nespecificat,0,Moderate,manie episod
+F31.9,Mental,Tulburare afectiva bipolara nespecificata,Tulburare afectiva bipolara nespecificata,1,Moderate,bipolar maniaco-depresiv
+F32.0,Mental,Episod depresiv usor,Episod depresiv usor,1,Mild,depresie usoara
+F32.1,Mental,Episod depresiv moderat,Episod depresiv moderat,1,Moderate,depresie moderata
+F32.2,Mental,Episod depresiv sever fara simptome psihotice,Episod depresiv sever fara simptome psihotice,1,Severe,depresie severa
+F32.3,Mental,Episod depresiv sever cu simptome psihotice,Episod depresiv sever cu simptome psihotice,0,Severe,depresie psihotica
+F32.9,Mental,Episod depresiv nespecificat,Episod depresiv nespecificat,1,Moderate,depresie
+F33.0,Mental,Tulburare depresiva recurenta episod usor,Tulburare depresiva recurenta episod actual usor,1,Mild,depresie recurenta usoara
+F33.1,Mental,Tulburare depresiva recurenta episod moderat,Tulburare depresiva recurenta episod actual moderat,1,Moderate,depresie recurenta moderata
+F33.2,Mental,Tulburare depresiva recurenta episod sever,Tulburare depresiva recurenta episod actual sever fara simptome psihotice,1,Severe,depresie recurenta severa
+F33.9,Mental,Tulburare depresiva recurenta nespecificata,Tulburare depresiva recurenta nespecificata,1,Moderate,depresie recurenta
+F34.1,Mental,Distimie,Distimie,1,Mild,distimie depresie cronica
+F40.0,Mental,Agorafobie,Agorafobie,0,Moderate,agorafobie fobie spatii
+F40.1,Mental,Fobii sociale,Fobii sociale,1,Mild,fobie sociala anxietate sociala
+F40.2,Mental,Fobii specifice,Fobii specifice (izolate),1,Mild,fobie specifica
+F41.0,Mental,Tulburare de panica,Tulburare de panica (anxietate paroxistica episodica),1,Moderate,panica atac anxietate
+F41.1,Mental,Tulburare anxioasa generalizata,Tulburare anxioasa generalizata,1,Moderate,anxietate generalizata tag
+F41.2,Mental,Tulburare mixta anxios-depresiva,Tulburare mixta anxios-depresiva,1,Moderate,anxietate depresie mixta
+F41.9,Mental,Tulburare anxioasa nespecificata,Tulburare anxioasa nespecificata,1,Mild,anxietate
+F42.9,Mental,Tulburare obsesiv-compulsiva nespecificata,Tulburare obsesiv-compulsiva nespecificata,1,Moderate,toc obsesiv compulsiv
+F43.0,Mental,Reactie acuta la stres,Reactie acuta la stres,1,Moderate,stres acut reactie
+F43.1,Mental,Tulburare de stres post-traumatic,Tulburare de stres post-traumatic (PTSD),1,Moderate,ptsd stres posttraumatic
+F43.2,Mental,Tulburari de adaptare,Tulburari de adaptare,1,Mild,adaptare tulburare
+F44.9,Mental,Tulburare disociativa nespecificata,Tulburare disociativa (de conversie) nespecificata,0,Moderate,disociativa conversie
+F45.0,Mental,Tulburare de somatizare,Tulburare de somatizare,0,Mild,somatizare
+F45.4,Mental,Tulburare algica persistenta,Tulburare algica somatoforma persistenta,0,Mild,durere somatoforma
+F48.0,Mental,Neurastenie,Neurastenie,0,Mild,neurastenie oboseala cronica
+F50.0,Mental,Anorexie nervoasa,Anorexie nervoasa,0,Severe,anorexie alimentar
+F50.2,Mental,Bulimie nervoasa,Bulimie nervoasa,0,Moderate,bulimie alimentar
+F51.0,Mental,Insomnie neorganica,Insomnie neorganica,1,Mild,insomnie somn
+F51.1,Mental,Hipersomnie neorganica,Hipersomnie neorganica,0,Mild,hipersomnie somn
+F51.4,Mental,Terori nocturne,Terori in timpul somnului,0,Mild,terori somn cosmaruri
+F52.0,Mental,Lipsa sau pierderea dorintei sexuale,Lipsa sau pierderea dorintei sexuale,0,Mild,libido scazut
+F52.2,Mental,Esec al raspunsului genital,Esec al raspunsului genital,0,Mild,erectie disfunctie
+F60.3,Mental,Tulburare de personalitate emotional instabila,Tulburare de personalitate emotional instabila,0,Moderate,borderline personalitate
+F60.9,Mental,Tulburare de personalitate nespecificata,Tulburare de personalitate nespecificata,0,Moderate,personalitate tulburare
+F70,Mental,Retard mintal usor,Retard mintal usor (IQ 50-69),0,Mild,retard mintal usor
+F79,Mental,Retard mintal nespecificat,Retard mintal nespecificat,0,Mild,retard mintal
+F84.0,Mental,Autism infantil,Autism infantil,0,Moderate,autism
+F84.5,Mental,Sindromul Asperger,Sindromul Asperger,0,Mild,asperger autism
+F90.0,Mental,Tulburare a activitatii si atentiei,Tulburare a activitatii si atentiei (ADHD),1,Mild,adhd hiperactivitate atentie
+F91.9,Mental,Tulburare de conduita nespecificata,Tulburare de conduita nespecificata,0,Mild,conduita comportament
+F99,Mental,Tulburare mentala nespecificata,Tulburare mentala fara alta specificare,0,Mild,mental tulburare
+G00.9,Nervos,Meningita bacteriana nespecificata,Meningita bacteriana nespecificata,0,Critical,meningita bacteriana
+G03.9,Nervos,Meningita nespecificata,Meningita nespecificata,1,Severe,meningita
+G04.9,Nervos,Encefalita nespecificata,Encefalita mielita si encefalomielita nespecificata,0,Severe,encefalita
+G06.0,Nervos,Abces intracraniar,Abces si granulom intracranian,0,Critical,abces cerebral
+G10,Nervos,Boala Huntington,Boala Huntington (coreea),0,Severe,huntington coree
+G12.2,Nervos,Boala neuronului motor,Boala neuronului motor,0,Severe,sla scleroza laterala amiotrofica
+G20,Nervos,Boala Parkinson,Boala Parkinson,1,Severe,parkinson tremor rigiditate
+G21.0,Nervos,Sindrom neuroleptic malign,Sindrom neuroleptic malign,0,Critical,neuroleptic malign
+G21.9,Nervos,Parkinsonism secundar nespecificat,Parkinsonism secundar nespecificat,0,Moderate,parkinsonism secundar
+G24.9,Nervos,Distonie nespecificata,Distonie nespecificata,0,Moderate,distonie
+G25.0,Nervos,Tremor esential,Tremor esential,1,Mild,tremor esential
+G25.3,Nervos,Mioclonie,Mioclonie,0,Mild,mioclonie
+G25.8,Nervos,Alte tulburari extrapiramidale si ale miscarii,Alte tulburari extrapiramidale si ale miscarii specificate,0,Mild,extrapiramidal
+G30.0,Nervos,Boala Alzheimer cu debut precoce,Boala Alzheimer cu debut precoce,0,Severe,alzheimer precoce
+G30.1,Nervos,Boala Alzheimer cu debut tardiv,Boala Alzheimer cu debut tardiv,1,Severe,alzheimer tardiv
+G30.9,Nervos,Boala Alzheimer nespecificata,Boala Alzheimer nespecificata,1,Severe,alzheimer dementa
+G31.0,Nervos,Atrofie cerebrala circumscrisa,Atrofie cerebrala circumscrisa,0,Moderate,atrofie cerebrala
+G31.8,Nervos,Alte boli degenerative ale sistemului nervos,Alte boli degenerative specificate ale sistemului nervos,0,Moderate,degenerativ nervos
+G35,Nervos,Scleroza multipla,Scleroza multipla,1,Severe,scleroza multipla sm
+G40.0,Nervos,Epilepsie idiopatica legata de localizare,Epilepsie si sindroame epileptice idiopatice legate de localizare (focala partiala) cu crize cu debut focal,0,Moderate,epilepsie focala
+G40.1,Nervos,Epilepsie simptomatica legata de localizare,Epilepsie si sindroame epileptice simptomatice legate de localizare (focala partiala) cu crize partiale simple,0,Moderate,epilepsie simptomatica
+G40.2,Nervos,Epilepsie simptomatica cu crize partiale complexe,Epilepsie si sindroame epileptice simptomatice legate de localizare (focala partiala) cu crize partiale complexe,0,Moderate,epilepsie partiala complexa
+G40.3,Nervos,Epilepsie generalizata idiopatica,Epilepsie si sindroame epileptice idiopatice generalizate,1,Moderate,epilepsie generalizata
+G40.4,Nervos,Alte epilepsii generalizate,Alte epilepsii si sindroame epileptice generalizate,0,Moderate,epilepsie
+G40.5,Nervos,Sindroame epileptice speciale,Sindroame epileptice speciale,0,Moderate,epilepsie sindrom
+G40.6,Nervos,Crize grand mal nespecificate,Crize grand mal nespecificate (cu sau fara petit mal),0,Severe,epilepsie grand mal
+G40.9,Nervos,Epilepsie nespecificata,Epilepsie nespecificata,1,Moderate,epilepsie crize convulsii
+G41.0,Nervos,Status epilepticus grand mal,Status epilepticus grand mal,0,Critical,status epilepticus
+G41.9,Nervos,Status epilepticus nespecificat,Status epilepticus nespecificat,0,Critical,status epilepticus
+G43.0,Nervos,Migrena fara aura,Migrena fara aura (migrena comuna),1,Moderate,migrena comuna fara aura
+G43.1,Nervos,Migrena cu aura,Migrena cu aura (migrena clasica),1,Moderate,migrena aura clasica
+G43.2,Nervos,Status migrenos,Status migrenos,0,Moderate,migrena status
+G43.3,Nervos,Migrena complicata,Migrena complicata,0,Moderate,migrena complicata
+G43.9,Nervos,Migrena nespecificata,Migrena nespecificata,1,Moderate,migrena
+G44.0,Nervos,Sindrom de cefalee in cluster,Sindrom de cefalee in cluster,0,Moderate,cluster cefalee
+G44.1,Nervos,Cefalee vasculara nespecificata,Cefalee vasculara nespecificata in alta parte,0,Mild,cefalee vasculara
+G44.2,Nervos,Cefalee de tip tensional,Cefalee de tip tensional,1,Mild,cefalee tensiune
+G44.4,Nervos,Cefalee medicamentoasa nespecificata,Cefalee medicamentoasa nespecificata in alta parte,0,Mild,cefalee medicament
+G45.0,Nervos,Sindrom vertebro-bazilar,Sindrom al arterei vertebro-bazilare,0,Severe,vertebrobazilar ait
+G45.1,Nervos,Sindrom carotidian hemispheric,Sindrom carotidian (hemispheric),0,Severe,carotidian ait
+G45.9,Nervos,Atac ischemic cerebral tranzitor nespecificat,Atac ischemic cerebral tranzitor nespecificat,1,Severe,ait tia atac ischemic
+G47.0,Nervos,Tulburari de initiere si mentinere a somnului,Tulburari de initiere si mentinere a somnului (insomnii),1,Mild,insomnie somn
+G47.3,Nervos,Apnee de somn,Apnee de somn,1,Moderate,apnee somn saos
+G47.4,Nervos,Narcolepsie si cataplexie,Narcolepsie si cataplexie,0,Moderate,narcolepsie
+G47.9,Nervos,Tulburare de somn nespecificata,Tulburare de somn nespecificata,1,Mild,somn tulburare
+G50.0,Nervos,Nevralgie de trigemen,Nevralgie de trigemen,1,Moderate,trigemen nevralgie durere fata
+G51.0,Nervos,Paralizie Bell,Paralizie Bell (paralizia faciala periferica),1,Moderate,bell paralizie faciala
+G52.9,Nervos,Tulburare a nervilor cranieni nespecificata,Tulburare a nervilor cranieni nespecificata,0,Mild,nerv cranian
+G54.0,Nervos,Afectiuni ale plexului brahial,Afectiuni ale plexului brahial,0,Moderate,plex brahial
+G54.1,Nervos,Afectiuni ale plexului lombosacral,Afectiuni ale plexului lombosacral,0,Moderate,plex lombosacral
+G56.0,Nervos,Sindromul de tunel carpian,Sindromul de tunel carpian,1,Mild,tunel carpian median
+G56.2,Nervos,Leziune a nervului cubital,Leziune a nervului cubital,0,Mild,cubital ulnar nerv
+G57.0,Nervos,Leziune a nervului sciatic,Leziune a nervului sciatic,1,Moderate,sciatic nerv
+G57.1,Nervos,Meralgia parestetica,Meralgia parestetica,0,Mild,meralgie femural lateral
+G57.8,Nervos,Alte mononeuropatii ale membrului inferior,Alte mononeuropatii ale membrului inferior,0,Mild,mononeuropatie
+G58.9,Nervos,Mononeuropatie nespecificata,Mononeuropatie nespecificata,1,Mild,mononeuropatie nerv
+G60.0,Nervos,Neuropatie ereditara motorie si senzitiva,Neuropatie ereditara motorie si senzitiva (Charcot-Marie-Tooth),0,Moderate,charcot marie tooth neuropatie
+G61.0,Nervos,Sindromul Guillain-Barre,Sindromul Guillain-Barre,0,Severe,guillain barre
+G62.0,Nervos,Polineuropatie medicamentoasa,Polineuropatie medicamentoasa,0,Moderate,neuropatie medicament
+G62.1,Nervos,Polineuropatie alcoolica,Polineuropatie alcoolica,1,Moderate,neuropatie alcool
+G62.9,Nervos,Polineuropatie nespecificata,Polineuropatie nespecificata,1,Moderate,polineuropatie
+G63.2,Nervos,Polineuropatie diabetica,Polineuropatie diabetica,1,Moderate,neuropatie diabet
+G70.0,Nervos,Miastenia gravis,Miastenia gravis,0,Severe,miastenie gravis
+G80.9,Nervos,Paralizie cerebrala nespecificata,Paralizie cerebrala nespecificata,0,Severe,paralizie cerebrala
+G81.9,Nervos,Hemiplegie nespecificata,Hemiplegie nespecificata,1,Severe,hemiplegie paralizie
+G82.2,Nervos,Paraplegie nespecificata,Paraplegie nespecificata,0,Severe,paraplegie
+G83.9,Nervos,Sindrom paralitic nespecificat,Sindrom paralitic nespecificat,0,Moderate,paralizie
+G89.2,Nervos,Durere cronica,Alte dureri cronice,1,Moderate,durere cronica
+G91.9,Nervos,Hidrocefalie nespecificata,Hidrocefalie nespecificata,0,Moderate,hidrocefalie
+G93.4,Nervos,Encefalopatie nespecificata,Encefalopatie nespecificata,1,Moderate,encefalopatie
+G95.9,Nervos,Boala maduvei spinarii nespecificata,Boala maduvei spinarii nespecificata,0,Moderate,maduva spinarii
+H00.0,Ochi,Hordeolum si alte inflamatii profunde ale pleoapei,Hordeolum si alte inflamatii profunde ale pleoapei,1,Mild,urcior hordeolum
+H01.0,Ochi,Blefarita,Blefarita,1,Mild,blefarita pleoapa
+H04.0,Ochi,Dacrioadenita,Dacrioadenita,0,Mild,glanda lacrimala inflamatie
+H04.4,Ochi,Epifora nespecificata,Epifora nespecificata,1,Mild,lacrimi exces epifora
+H10.0,Ochi,Conjunctivita mucopurulenta,Conjunctivita mucopurulenta,1,Mild,conjunctivita purulenta
+H10.1,Ochi,Conjunctivita atopica acuta,Conjunctivita atopica acuta,1,Mild,conjunctivita alergica
+H10.3,Ochi,Conjunctivita acuta nespecificata,Conjunctivita acuta nespecificata,1,Mild,conjunctivita ochi rosii
+H10.4,Ochi,Conjunctivita cronica,Conjunctivita cronica,1,Mild,conjunctivita cronica
+H10.9,Ochi,Conjunctivita nespecificata,Conjunctivita nespecificata,1,Mild,conjunctivita
+H11.0,Ochi,Pterigion,Pterigion,0,Mild,pterigion
+H16.0,Ochi,Ulcer cornean,Ulcer cornean,0,Moderate,ulcer cornee
+H16.1,Ochi,Alte keratite superficiale fara conjunctivita,Alte keratite superficiale fara conjunctivita,0,Mild,keratita
+H18.6,Ochi,Keratocon,Keratocon,0,Moderate,keratocon
+H20.0,Ochi,Iridociclita acuta,Iridociclita acuta,0,Moderate,iridociclita uveita
+H20.9,Ochi,Iridociclita nespecificata,Iridociclita nespecificata,0,Moderate,uveita
+H25.0,Ochi,Cataracta senila incipient,Cataracta senila incipienta,1,Mild,cataracta incipienta
+H25.1,Ochi,Cataracta senila nucleara,Cataracta senila nucleara,1,Moderate,cataracta nucleara
+H25.2,Ochi,Cataracta senila tip Morgagnian,Cataracta senila tip Morgagnian,0,Moderate,cataracta morgagni
+H25.9,Ochi,Cataracta senila nespecificata,Cataracta senila nespecificata,1,Moderate,cataracta
+H26.9,Ochi,Cataracta nespecificata,Cataracta nespecificata,1,Moderate,cataracta
+H33.0,Ochi,Dezlipire retiniana cu ruptura retiniana,Dezlipire retiniana cu ruptura retiniana,0,Severe,dezlipire retina
+H34.1,Ochi,Ocluzia arterei centrale a retinei,Ocluzia arterei centrale a retinei,0,Critical,ocluzie artera retina
+H34.2,Ochi,Alte ocluzii ale arterelor retiniene,Alte ocluzii ale arterelor retiniene,0,Severe,ocluzie arteriala retina
+H35.3,Ochi,Degenerescenta maculara senila,Degenerescenta maculara si a polului posterior,1,Moderate,dmla degenerescenta maculara
+H40.0,Ochi,Suspiciune de glaucom,Suspiciune de glaucom,1,Mild,glaucom suspect
+H40.1,Ochi,Glaucom primar cu unghi deschis,Glaucom primar cu unghi deschis,1,Moderate,glaucom unghi deschis
+H40.2,Ochi,Glaucom primar cu unghi inchis,Glaucom primar cu unghi inchis,0,Severe,glaucom unghi inchis
+H40.9,Ochi,Glaucom nespecificat,Glaucom nespecificat,1,Moderate,glaucom
+H43.1,Ochi,Hemoragie vitreana,Hemoragie vitreana,0,Moderate,hemoragie vitreos
+H44.0,Ochi,Endoftalmita purulenta,Endoftalmita purulenta,0,Critical,endoftalmita infectie ochi
+H46,Ochi,Nevrita optica,Nevrita optica,0,Moderate,nevrita optica nerv optic
+H52.1,Ochi,Miopie,Miopie,1,Mild,miopie
+H52.2,Ochi,Astigmatism,Astigmatism,1,Mild,astigmatism
+H52.4,Ochi,Presbiopie,Presbiopie,1,Mild,presbiopie
+H53.4,Ochi,Defecte ale campului vizual,Defecte ale campului vizual,0,Moderate,camp vizual defect
+H53.9,Ochi,Tulburare de vedere nespecificata,Tulburare de vedere nespecificata,1,Mild,vedere tulburare
+H54.0,Ochi,Orbire bilaterala,Orbire bilaterala,0,Severe,orbire bilateral
+H54.4,Ochi,Orbire monoculara,Orbire monoculara,0,Moderate,orbire unilateral
+H57.1,Ochi,Durere oculara,Durere oculara,1,Mild,durere ochi
+H60.9,Ureche,Otita externa nespecificata,Otita externa nespecificata,1,Mild,otita externa ureche
+H65.0,Ureche,Otita medie acuta seroasa,Otita medie acuta seroasa,1,Mild,otita medie seroasa
+H65.9,Ureche,Otita medie nesupurata nespecificata,Otita medie nesupurata nespecificata,1,Mild,otita medie nesupurata
+H66.0,Ureche,Otita medie supurata acuta,Otita medie supurata acuta,1,Moderate,otita medie supurata
+H66.9,Ureche,Otita medie supurata nespecificata,Otita medie supurata nespecificata,1,Moderate,otita medie
+H70.0,Ureche,Mastoidita acuta,Mastoidita acuta,0,Moderate,mastoidita
+H72.9,Ureche,Perforatie a membranei timpanice nespecificata,Perforatie a membranei timpanice nespecificata,1,Mild,perforatie timpan
+H81.0,Ureche,Boala Meniere,Boala Meniere,1,Moderate,meniere vertij
+H81.1,Ureche,Vertij paroxistic benign,Vertij paroxistic pozitional benign,1,Mild,vppb vertij pozitional
+H81.3,Ureche,Alt vertij periferic,Alt vertij periferic,1,Mild,vertij periferic
+H81.9,Ureche,Tulburare a functiei vestibulare nespecificata,Tulburare a functiei vestibulare nespecificata,1,Mild,vestibular vertij
+H83.0,Ureche,Labirintita,Labirintita,0,Moderate,labirintita vertij
+H90.3,Ureche,Pierdere de auz senzorineural bilateral,Pierdere de auz senzorineural bilateral,1,Moderate,surditate senzorineural bilateral
+H90.5,Ureche,Pierdere de auz senzorineural nespecificata,Pierdere de auz senzorineural nespecificata,1,Moderate,surditate senzorineural
+H91.1,Ureche,Prezbiacuzie,Prezbiacuzie,1,Mild,prezbiacuzie
+H91.2,Ureche,Pierdere brusca de auz idiopatica,Pierdere brusca de auz idiopatica,0,Moderate,surditate brusca
+H91.9,Ureche,Pierdere de auz nespecificata,Pierdere de auz nespecificata,1,Moderate,surditate hipoacuzie
+H92.0,Ureche,Otalgie,Otalgie,1,Mild,durere ureche otalgie
+H93.1,Ureche,Tinitus,Tinitus,1,Mild,tinitus zgomot ureche

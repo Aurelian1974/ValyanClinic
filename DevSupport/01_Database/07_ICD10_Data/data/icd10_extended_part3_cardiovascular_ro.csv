@@ -1,0 +1,167 @@
+Code,Category,ShortDescription,LongDescription,IsCommon,Severity,SearchTerms
+I00,Cardiovascular,Febra reumatica fara afectare cardiaca,Febra reumatica fara mentionarea afectarii cardiace,0,Moderate,febra reumatica
+I01.0,Cardiovascular,Pericardita reumatica acuta,Pericardita reumatica acuta,0,Moderate,pericardita reumatica
+I05.0,Cardiovascular,Stenoza mitrala,Stenoza mitrala,0,Moderate,stenoza mitrala valva
+I05.1,Cardiovascular,Insuficienta mitrala reumatica,Insuficienta mitrala reumatica,0,Moderate,insuficienta mitrala reumatica
+I06.0,Cardiovascular,Stenoza aortica reumatica,Stenoza aortica reumatica,0,Moderate,stenoza aortica reumatica
+I06.1,Cardiovascular,Insuficienta aortica reumatica,Insuficienta aortica reumatica,0,Moderate,insuficienta aortica reumatica
+I10,Cardiovascular,Hipertensiune arteriala esentiala (primara),Hipertensiune esentiala (primara),1,Moderate,hta hipertensiune tensiune arteriala
+I11.0,Cardiovascular,Cardiopatie hipertensiva cu insuficienta cardiaca,Cardiopatie hipertensiva cu insuficienta cardiaca (congestiva),1,Severe,hta insuficienta cardiaca
+I11.9,Cardiovascular,Cardiopatie hipertensiva fara insuficienta cardiaca,Cardiopatie hipertensiva fara insuficienta cardiaca (congestiva),1,Moderate,hta cardiopatie
+I12.0,Cardiovascular,Nefropatie hipertensiva cu insuficienta renala,Nefropatie hipertensiva cu insuficienta renala,0,Severe,hta nefropatie renala
+I12.9,Cardiovascular,Nefropatie hipertensiva fara insuficienta renala,Nefropatie hipertensiva fara insuficienta renala,0,Moderate,hta nefropatie
+I13.0,Cardiovascular,Cardiopatie si nefropatie hipertensiva cu IC,Cardiopatie si nefropatie hipertensiva cu insuficienta cardiaca,0,Severe,hta cardio renal
+I13.1,Cardiovascular,Cardiopatie si nefropatie hipertensiva cu IR,Cardiopatie si nefropatie hipertensiva cu insuficienta renala,0,Severe,hta cardio renal
+I15.0,Cardiovascular,Hipertensiune renovasculara,Hipertensiune renovasculara,0,Moderate,hta renovasculara renala
+I15.9,Cardiovascular,Hipertensiune secundara nespecificata,Hipertensiune secundara nespecificata,0,Moderate,hta secundara
+I20.0,Cardiovascular,Angina instabila,Angina instabila,1,Severe,angina instabila
+I20.1,Cardiovascular,Angina pectorala cu spasm documentat,Angina pectorala cu spasm documentat,0,Moderate,angina spasm prinzmetal
+I20.8,Cardiovascular,Alte forme de angina pectorala,Alte forme de angina pectorala,0,Moderate,angina
+I20.9,Cardiovascular,Angina pectorala nespecificata,Angina pectorala nespecificata,1,Moderate,angina
+I21.0,Cardiovascular,Infarct miocardic acut anterior transmural,Infarct miocardic acut transmural al peretelui anterior,1,Critical,stemi anterior infarct
+I21.1,Cardiovascular,Infarct miocardic acut inferior transmural,Infarct miocardic acut transmural al peretelui inferior,1,Critical,stemi inferior infarct
+I21.2,Cardiovascular,Infarct miocardic acut transmural alte localizari,Infarct miocardic acut transmural cu alte localizari,0,Critical,stemi infarct
+I21.3,Cardiovascular,Infarct miocardic acut transmural localizare neprecizata,Infarct miocardic acut transmural cu localizare neprecizata,1,Critical,stemi infarct
+I21.4,Cardiovascular,Infarct miocardic acut subendocardic,Infarct miocardic acut subendocardic (NSTEMI),1,Critical,nstemi infarct
+I21.9,Cardiovascular,Infarct miocardic acut nespecificat,Infarct miocardic acut nespecificat,1,Critical,infarct ima
+I22.0,Cardiovascular,Infarct miocardic recurent anterior,Infarct miocardic recurent al peretelui anterior,0,Critical,reinfarct anterior
+I22.1,Cardiovascular,Infarct miocardic recurent inferior,Infarct miocardic recurent al peretelui inferior,0,Critical,reinfarct inferior
+I22.9,Cardiovascular,Infarct miocardic recurent localizare neprecizata,Infarct miocardic recurent cu localizare neprecizata,0,Critical,reinfarct
+I23.0,Cardiovascular,Hemopericardl postinfarct,Hemopericardl ca si complicatie curenta dupa infarct miocardic acut,0,Critical,hemopericardi infarct complicatie
+I24.0,Cardiovascular,Tromboza coronariana fara infarct,Tromboza coronariana care nu rezulta in infarct miocardic,0,Severe,tromboza coronariana
+I24.1,Cardiovascular,Sindrom Dressler,Sindrom Dressler,0,Moderate,dressler postinfarct
+I24.9,Cardiovascular,Cardiopatie ischemica acuta nespecificata,Cardiopatie ischemica acuta nespecificata,1,Severe,ischemie acuta
+I25.0,Cardiovascular,Boala aterosclerotica cardiovasculara,Boala aterosclerotica cardiovasculara astfel descrisa,1,Moderate,ateroscleroza cardiovascular
+I25.1,Cardiovascular,Cardiopatie aterosclerotica,Cardiopatie aterosclerotica,1,Moderate,cardiopatie ateroscleroza coronariana
+I25.2,Cardiovascular,Infarct miocardic vechi,Infarct miocardic vechi,1,Moderate,infarct vechi sechelar
+I25.3,Cardiovascular,Anevrism cardiac,Anevrism cardiac,0,Moderate,anevrism cardiac
+I25.5,Cardiovascular,Cardiomiopatie ischemica,Cardiomiopatie ischemica,1,Moderate,cardiomiopatie ischemica
+I25.6,Cardiovascular,Ischemie miocardica silentioasa,Ischemie miocardica silentioasa,0,Mild,ischemie silentioasa
+I25.9,Cardiovascular,Cardiopatie ischemica cronica nespecificata,Cardiopatie ischemica cronica nespecificata,1,Moderate,cardiopatie ischemica cronica
+I26.0,Cardiovascular,Embolie pulmonara cu cord pulmonar acut,Embolie pulmonara cu mentiunea cordului pulmonar acut,0,Critical,embolie pulmonara cord
+I26.9,Cardiovascular,Embolie pulmonara fara mentiunea cordului pulmonar acut,Embolie pulmonara fara mentiunea cordului pulmonar acut,1,Critical,embolie pulmonara tep
+I27.0,Cardiovascular,Hipertensiune pulmonara primara,Hipertensiune pulmonara primara,0,Severe,hipertensiune pulmonara
+I27.2,Cardiovascular,Alta hipertensiune pulmonara secundara,Alta hipertensiune pulmonara secundara,0,Severe,hipertensiune pulmonara secundara
+I27.9,Cardiovascular,Cardiopatie pulmonara nespecificata,Cardiopatie pulmonara nespecificata,0,Moderate,cord pulmonar
+I30.0,Cardiovascular,Pericardita idiopatica acuta,Pericardita idiopatica acuta nespecificata,0,Moderate,pericardita acuta
+I30.9,Cardiovascular,Pericardita acuta nespecificata,Pericardita acuta nespecificata,1,Moderate,pericardita
+I31.3,Cardiovascular,Revarsatul pericardic neinflamator,Revarsatul pericardic (neinflamator),1,Moderate,lichid pericardic revarsat
+I33.0,Cardiovascular,Endocardita infectioasa acuta,Endocardita infectioasa acuta si subacuta,0,Critical,endocardita infectioasa
+I33.9,Cardiovascular,Endocardita acuta nespecificata,Endocardita acuta nespecificata,0,Severe,endocardita
+I34.0,Cardiovascular,Insuficienta mitrala (nonreumatica),Insuficienta (regurgitare) mitrala (nonreumatica),1,Moderate,insuficienta mitrala regurgitare
+I34.1,Cardiovascular,Prolapsul valvei mitrale,Prolapsul valvei mitrale,1,Mild,prolaps mitral
+I35.0,Cardiovascular,Stenoza aortica (nonreumatica),Stenoza aortica (nonreumatica),1,Moderate,stenoza aortica
+I35.1,Cardiovascular,Insuficienta aortica (nonreumatica),Insuficienta (regurgitare) aortica (nonreumatica),1,Moderate,insuficienta aortica regurgitare
+I35.2,Cardiovascular,Stenoza aortica cu insuficienta,Stenoza aortica cu insuficienta,0,Moderate,stenoza insuficienta aortica
+I36.0,Cardiovascular,Stenoza tricuspidiana nonreumatica,Stenoza tricuspidiana (nonreumatica),0,Moderate,stenoza tricuspidiana
+I36.1,Cardiovascular,Insuficienta tricuspidiana nonreumatica,Insuficienta (regurgitare) tricuspidiana (nonreumatica),0,Moderate,insuficienta tricuspidiana
+I37.0,Cardiovascular,Stenoza pulmonara,Stenoza valvei pulmonare,0,Moderate,stenoza pulmonara
+I37.1,Cardiovascular,Insuficienta pulmonara,Insuficienta valvei pulmonare,0,Moderate,insuficienta pulmonara
+I38,Cardiovascular,Endocardita valva nespecificata,Endocardita cu valva nespecificata,0,Moderate,endocardita
+I40.9,Cardiovascular,Miocardita acuta nespecificata,Miocardita acuta nespecificata,0,Severe,miocardita
+I42.0,Cardiovascular,Cardiomiopatie dilatativa,Cardiomiopatie dilatativa,1,Severe,cardiomiopatie dilatativa dcm
+I42.1,Cardiovascular,Cardiomiopatie hipertrofica obstructiva,Cardiomiopatie hipertrofica obstructiva,0,Moderate,cardiomiopatie hipertrofica hcm
+I42.2,Cardiovascular,Alta cardiomiopatie hipertrofica,Alta cardiomiopatie hipertrofica,0,Moderate,cardiomiopatie hipertrofica
+I42.5,Cardiovascular,Alta cardiomiopatie restrictiva,Alta cardiomiopatie restrictiva,0,Moderate,cardiomiopatie restrictiva
+I42.9,Cardiovascular,Cardiomiopatie nespecificata,Cardiomiopatie nespecificata,1,Moderate,cardiomiopatie
+I44.0,Cardiovascular,Bloc atrioventricular grad I,Bloc atrioventricular de gradul intai,1,Mild,bloc av grad 1
+I44.1,Cardiovascular,Bloc atrioventricular grad II,Bloc atrioventricular de gradul al doilea,1,Moderate,bloc av grad 2
+I44.2,Cardiovascular,Bloc atrioventricular complet,Bloc atrioventricular complet (grad III),1,Severe,bloc av complet grad 3
+I44.7,Cardiovascular,Bloc de ramura stang nespecificat,Bloc de ramura stang nespecificat,1,Mild,brs bloc ramura stanga
+I45.0,Cardiovascular,Bloc fascicular anterior drept,Bloc fascicular anterior drept,0,Mild,hemibloc anterior
+I45.1,Cardiovascular,Alt bloc fascicular drept si bloc nespecificat,Alt bloc fascicular drept si bloc nespecificat,0,Mild,hemibloc posterior
+I45.2,Cardiovascular,Bloc bifascicular,Bloc bifascicular,0,Moderate,bloc bifascicular
+I45.3,Cardiovascular,Bloc trifascicular,Bloc trifascicular,0,Severe,bloc trifascicular
+I45.4,Cardiovascular,Bloc intraventricular nespecificat,Bloc intraventricular nespecificat,0,Mild,bloc intraventricular
+I45.5,Cardiovascular,Alt bloc cardiac specificat,Alt bloc cardiac specificat,0,Mild,bloc cardiac
+I45.6,Cardiovascular,Sindrom de preexcitare,Sindrom de preexcitare (Wolff-Parkinson-White),0,Moderate,wpw preexcitatie
+I45.9,Cardiovascular,Tulburare de conducere nespecificata,Tulburare de conducere nespecificata,0,Mild,conducere tulburare
+I46.0,Cardiovascular,Stop cardiac cu resuscitare reusita,Stop cardiac cu resuscitare reusita,0,Critical,stop cardiac resuscitare
+I46.1,Cardiovascular,Moarte cardiaca subita astfel descrisa,Moarte cardiaca subita astfel descrisa,0,Critical,moarte subita cardiaca
+I46.9,Cardiovascular,Stop cardiac nespecificat,Stop cardiac nespecificat,0,Critical,stop cardiac asistola
+I47.0,Cardiovascular,Aritmie ventriculara re-entry,Aritmie ventriculara re-entry,0,Moderate,aritmie ventriculara
+I47.1,Cardiovascular,Tahicardie supraventriculara,Tahicardie supraventriculara,1,Moderate,tahicardie supraventriculara svt
+I47.2,Cardiovascular,Tahicardie ventriculara,Tahicardie ventriculara,1,Severe,tahicardie ventriculara tv
+I47.9,Cardiovascular,Tahicardie paroxistica nespecificata,Tahicardie paroxistica nespecificata,1,Moderate,tahicardie paroxistica
+I48.0,Cardiovascular,Fibrilatie atriala paroxistica,Fibrilatie atriala paroxistica,1,Moderate,fa paroxistica fibrilatie
+I48.1,Cardiovascular,Fibrilatie atriala persistenta,Fibrilatie atriala persistenta,1,Moderate,fa persistenta fibrilatie
+I48.2,Cardiovascular,Fibrilatie atriala cronica,Fibrilatie atriala cronica,1,Moderate,fa cronica permanenta fibrilatie
+I48.3,Cardiovascular,Flutter atrial tipic,Flutter atrial tipic,0,Moderate,flutter atrial
+I48.4,Cardiovascular,Flutter atrial atipic,Flutter atrial atipic,0,Moderate,flutter atrial atipic
+I48.9,Cardiovascular,Fibrilatie si flutter atrial nespecificate,Fibrilatie si flutter atrial nespecificate,1,Moderate,fa flutter fibrilatie
+I49.0,Cardiovascular,Fibrilatie si flutter ventricular,Fibrilatie si flutter ventricular,0,Critical,fv fibrilatie ventriculara
+I49.1,Cardiovascular,Depolarizare atriala prematura,Depolarizare atriala prematura (extrasistole atriale),1,Mild,extrasistole atriale esa
+I49.3,Cardiovascular,Depolarizare ventriculara prematura,Depolarizare ventriculara prematura (extrasistole ventriculare),1,Mild,extrasistole ventriculare esv
+I49.4,Cardiovascular,Alte depolarizari premature nespecificate,Alte depolarizari premature si cele nespecificate,1,Mild,extrasistole
+I49.5,Cardiovascular,Sindrom de nod sinusal bolnav,Sindrom de nod sinusal bolnav,0,Moderate,sick sinus sindrom
+I49.8,Cardiovascular,Alte aritmii cardiace specificate,Alte aritmii cardiace specificate,0,Mild,aritmie
+I49.9,Cardiovascular,Aritmie cardiaca nespecificata,Aritmie cardiaca nespecificata,1,Mild,aritmie
+I50.0,Cardiovascular,Insuficienta cardiaca congestiva,Insuficienta cardiaca congestiva,1,Severe,icc insuficienta cardiaca congestiva
+I50.1,Cardiovascular,Insuficienta ventriculara stanga,Insuficienta ventriculara stanga,1,Severe,insuficienta vs edem pulmonar
+I50.9,Cardiovascular,Insuficienta cardiaca nespecificata,Insuficienta cardiaca nespecificata,1,Severe,insuficienta cardiaca ic
+I51.4,Cardiovascular,Miocardita nespecificata,Miocardita nespecificata,0,Moderate,miocardita
+I51.5,Cardiovascular,Degenerare miocardica,Degenerare miocardica,0,Mild,degenerare miocard
+I51.7,Cardiovascular,Cardiomegalie,Cardiomegalie,1,Mild,cardiomegalie cord marit
+I51.9,Cardiovascular,Cardiopatie nespecificata,Cardiopatie nespecificata,1,Mild,cardiopatie
+I60.9,Cardiovascular,Hemoragie subarahnoidiana nespecificata,Hemoragie subarahnoidiana nespecificata,0,Critical,hemoragie subarahnoidiana hsa
+I61.0,Cardiovascular,Hemoragie intracerebrala hemisferica subcorticala,Hemoragie intracerebrala in emisfera subcorticala,0,Critical,hemoragie cerebrala subcorticala
+I61.9,Cardiovascular,Hemoragie intracerebrala nespecificata,Hemoragie intracerebrala nespecificata,1,Critical,hemoragie cerebrala avc hemoragic
+I62.0,Cardiovascular,Hemoragie subdurala,Hemoragie subdurala (acuta) (netraumatica),0,Critical,hematom subdural
+I62.1,Cardiovascular,Hemoragie extradurala netraumatica,Hemoragie extradurala netraumatica,0,Critical,hematom extradural epidural
+I62.9,Cardiovascular,Hemoragie intracraniala netraumatica nespecificata,Hemoragie intracraniala (netraumatica) nespecificata,0,Critical,hemoragie intracraniala
+I63.0,Cardiovascular,Infarct cerebral tromboza artere precerebrale,Infarct cerebral datorat trombozei arterelor precerebrale,0,Critical,avc trombotic precerebrala
+I63.1,Cardiovascular,Infarct cerebral embolie artere precerebrale,Infarct cerebral datorat emboliei arterelor precerebrale,0,Critical,avc embolic precerebrala
+I63.3,Cardiovascular,Infarct cerebral tromboza artere cerebrale,Infarct cerebral datorat trombozei arterelor cerebrale,1,Critical,avc trombotic cerebral
+I63.4,Cardiovascular,Infarct cerebral embolie artere cerebrale,Infarct cerebral datorat emboliei arterelor cerebrale,1,Critical,avc embolic cerebral
+I63.5,Cardiovascular,Infarct cerebral ocluzie sau stenoza nespecificata,Infarct cerebral datorat ocluziei sau stenozei nespecificate a arterelor cerebrale,0,Critical,avc ocluzie stenoza
+I63.9,Cardiovascular,Infarct cerebral nespecificat,Infarct cerebral nespecificat,1,Critical,avc ischemic infarct cerebral
+I64,Cardiovascular,Accident vascular cerebral nespecificat,Accident vascular cerebral nespecificat daca este hemoragic sau ischemic,1,Critical,avc stroke
+I65.0,Cardiovascular,Ocluzie si stenoza arterei vertebrale,Ocluzie si stenoza arterei vertebrale,0,Moderate,stenoza vertebrala
+I65.2,Cardiovascular,Ocluzie si stenoza arterei carotide,Ocluzie si stenoza arterei carotide,1,Moderate,stenoza carotida
+I67.1,Cardiovascular,Anevrism cerebral nerupt,Anevrism cerebral nerupt,0,Moderate,anevrism cerebral
+I67.2,Cardiovascular,Ateroscleroza cerebrala,Ateroscleroza cerebrala,1,Mild,ateroscleroza cerebrala
+I67.4,Cardiovascular,Encefalopatie hipertensiva,Encefalopatie hipertensiva,0,Severe,encefalopatie hta
+I67.8,Cardiovascular,Alte boli cerebrovasculare specificate,Alte boli cerebrovasculare specificate,0,Moderate,cerebrovascular
+I67.9,Cardiovascular,Boala cerebrovasculara nespecificata,Boala cerebrovasculara nespecificata,1,Moderate,boala cerebrovasculara
+I69.3,Cardiovascular,Sechele de infarct cerebral,Sechele de infarct cerebral,1,Moderate,sechele avc post avc
+I69.4,Cardiovascular,Sechele de accident vascular cerebral nespecificat,Sechele de accident vascular cerebral nespecificat daca este hemoragic sau ischemic,1,Moderate,sechele avc
+I70.0,Cardiovascular,Ateroscleroza aortica,Ateroscleroza aortei,1,Moderate,ateroscleroza aorta
+I70.2,Cardiovascular,Ateroscleroza arterelor extremitatilor,Ateroscleroza arterelor extremitatilor,1,Moderate,ateroscleroza periferica boap
+I70.9,Cardiovascular,Ateroscleroza generalizata si nespecificata,Ateroscleroza generalizata si nespecificata,1,Moderate,ateroscleroza
+I71.0,Cardiovascular,Disectie de aorta,Disectie de aorta (orice portiune),0,Critical,disectie aorta
+I71.2,Cardiovascular,Anevrism de aorta toracica fara ruptura,Anevrism de aorta toracica fara mentionarea rupturii,0,Moderate,anevrism aorta toracic
+I71.4,Cardiovascular,Anevrism de aorta abdominala fara ruptura,Anevrism de aorta abdominala fara mentionarea rupturii,1,Moderate,anevrism aorta abdominal aaa
+I71.9,Cardiovascular,Anevrism de aorta localizare nespecificata,Anevrism de aorta cu localizare nespecificata fara mentionarea rupturii,1,Moderate,anevrism aorta
+I73.0,Cardiovascular,Sindromul Raynaud,Sindromul Raynaud,0,Mild,raynaud vasospasm degete
+I73.1,Cardiovascular,Tromboangeita obliteranta (Buerger),Tromboangeita obliteranta (boala Buerger),0,Moderate,buerger tromboangeita
+I73.9,Cardiovascular,Boala vasculara periferica nespecificata,Boala vasculara periferica nespecificata,1,Moderate,boala vasculara periferica arteriopatie
+I74.3,Cardiovascular,Embolie si tromboza arterelor extremitatilor inferioare,Embolie si tromboza arterelor extremitatilor inferioare,0,Severe,embolie arteriala picior
+I74.9,Cardiovascular,Embolie si tromboza arteriala nespecificata,Embolie si tromboza arterelor nespecificate,0,Severe,embolie arteriala tromboza
+I77.1,Cardiovascular,Strictura arteriala,Strictura arteriala,0,Mild,stenoza arteriala
+I77.6,Cardiovascular,Arterita nespecificata,Arterita nespecificata,0,Mild,arterita
+I80.0,Cardiovascular,Flebita si tromboflebita a vaselor superficiale extremitati inferioare,Flebita si tromboflebita a vaselor superficiale ale extremitatilor inferioare,1,Mild,tromboflebita superficiala picior
+I80.1,Cardiovascular,Flebita si tromboflebita a venei femurale,Flebita si tromboflebita a venei femurale,0,Moderate,tromboza femurala tvp
+I80.2,Cardiovascular,Flebita si tromboflebita alte vase profunde extremitati inferioare,Flebita si tromboflebita a altor vase profunde ale extremitatilor inferioare,1,Moderate,tvp tromboza venoasa profunda
+I80.3,Cardiovascular,Flebita si tromboflebita extremitati inferioare nespecificata,Flebita si tromboflebita a extremitatilor inferioare nespecificata,1,Moderate,tromboflebita picior
+I80.9,Cardiovascular,Flebita si tromboflebita localizare nespecificata,Flebita si tromboflebita cu localizare nespecificata,1,Moderate,tromboflebita flebita
+I82.9,Cardiovascular,Embolie si tromboza venoasa nespecificata,Embolie si tromboza venoasa nespecificata,1,Moderate,tromboza venoasa embolie
+I83.0,Cardiovascular,Varice cu ulcer,Vene varicoase ale extremitatilor inferioare cu ulcer,1,Moderate,varice ulcer
+I83.1,Cardiovascular,Varice cu inflamatie,Vene varicoase ale extremitatilor inferioare cu inflamatie,1,Moderate,varice tromboflebita
+I83.2,Cardiovascular,Varice cu ulcer si inflamatie,Vene varicoase ale extremitatilor inferioare cu ulcer si inflamatie,0,Moderate,varice ulcer inflamatie
+I83.9,Cardiovascular,Varice fara ulcer sau inflamatie,Vene varicoase ale extremitatilor inferioare fara ulcer sau inflamatie,1,Mild,varice
+I84.1,Cardiovascular,Hemoroizi interni cu alte complicatii,Hemoroizi interni cu alte complicatii,1,Moderate,hemoroizi interni complicati
+I84.2,Cardiovascular,Hemoroizi interni fara complicatii,Hemoroizi interni fara complicatii,1,Mild,hemoroizi interni
+I84.5,Cardiovascular,Hemoroizi externi cu alte complicatii,Hemoroizi externi cu alte complicatii,1,Moderate,hemoroizi externi complicati
+I84.6,Cardiovascular,Hemoroizi externi fara complicatii,Hemoroizi externi fara complicatii,1,Mild,hemoroizi externi
+I84.9,Cardiovascular,Hemoroizi nespecificati,Hemoroizi nespecificati fara complicatii,1,Mild,hemoroizi
+I85.0,Cardiovascular,Varice esofagiene cu hemoragie,Varice esofagiene cu hemoragie,0,Critical,varice esofag hemoragie
+I85.9,Cardiovascular,Varice esofagiene fara hemoragie,Varice esofagiene fara hemoragie,0,Moderate,varice esofag
+I86.4,Cardiovascular,Varice gastrice,Varice gastrice,0,Moderate,varice stomac
+I87.0,Cardiovascular,Sindromul posttrombotic,Sindromul postflebitic,1,Mild,posttrombotic sindrom
+I87.1,Cardiovascular,Compresie venoasa,Compresie venoasa,0,Mild,compresie vena
+I87.2,Cardiovascular,Insuficienta venoasa (cronica) (periferica),Insuficienta venoasa (cronica) (periferica),1,Mild,insuficienta venoasa cronica
+I89.0,Cardiovascular,Limfedem nespecificat,Limfedem nespecificat in alta parte,1,Mild,limfedem edem limfatic
+I95.0,Cardiovascular,Hipotensiune idiopatica,Hipotensiune idiopatica,0,Mild,hipotensiune
+I95.1,Cardiovascular,Hipotensiune ortostatica,Hipotensiune ortostatica,1,Mild,hipotensiune ortostatica posturala
+I95.9,Cardiovascular,Hipotensiune nespecificata,Hipotensiune nespecificata,1,Mild,hipotensiune tensiune scazuta
+I99,Cardiovascular,Alte tulburari si cele nespecificate ale aparatului circulator,Alte tulburari si cele nespecificate ale aparatului circulator,0,Mild,circulator tulburare
