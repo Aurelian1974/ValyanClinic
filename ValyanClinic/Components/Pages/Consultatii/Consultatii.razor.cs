@@ -11,6 +11,11 @@ using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 using ValyanClinic.Application.Services.IMC;
 using ValyanClinic.Application.Services.Consultatii;
+using ValyanClinic.Application.Features.ICD10Management.Queries.SearchICD10;
+using ValyanClinic.Application.Features.ICD10Management.Queries.GetFavorites;
+using ValyanClinic.Application.Features.ICD10Management.Commands.AddFavorite;
+using ValyanClinic.Application.Features.ICD10Management.Commands.RemoveFavorite;
+using ValyanClinic.Application.Features.ICD10Management.DTOs;
 
 namespace ValyanClinic.Components.Pages.Consultatii;
 
@@ -189,10 +194,33 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
     private string DiagnosticPrincipal { get; set; } = string.Empty;
     private string DiagnosticSecundar { get; set; } = string.Empty;
+    private string CoduriICD10Principal { get; set; } = string.Empty;
+    private string CoduriICD10Secundare { get; set; } = string.Empty;
     private string PlanTerapeutic { get; set; } = string.Empty;
     private string Recomandari { get; set; } = string.Empty;
     private List<DiagnosisCardDto> DiagnosisList { get; set; } = new();
     private List<MedicationRowDto> MedicationList { get; set; } = new();
+    
+    // Secțiuni Diagnostic Secundar (max 10)
+    private List<DiagnosticSecundarSection> DiagnosticeSecundare { get; set; } = new();
+    private int? ActiveSecundarSearchIndex { get; set; } = null;
+
+    // ICD-10 Inline Search State
+    private string SearchTermPrincipal { get; set; } = string.Empty;
+    private string SearchTermSecundar { get; set; } = string.Empty;
+    private bool IsSearchingPrincipal { get; set; } = false;
+    private bool IsSearchingSecundar { get; set; } = false;
+    private List<ICD10SearchResultDto> SearchResultsPrincipal { get; set; } = new();
+    private List<ICD10SearchResultDto> SearchResultsSecundar { get; set; } = new();
+    private System.Timers.Timer? _searchTimerPrincipal;
+    private System.Timers.Timer? _searchTimerSecundar;
+    
+    // ICD-10 Favorites State
+    private bool ShowFavoritesPrincipal { get; set; } = false;
+    private bool ShowFavoritesSecundar { get; set; } = false;
+    private List<ICD10SearchResultDto> FavoritesList { get; set; } = new();
+    private bool IsLoadingFavorites { get; set; } = false;
+    private HashSet<string> FavoriteCodesSet { get; set; } = new();
 
     #endregion
 
@@ -566,6 +594,348 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
     #endregion
 
+    #region ICD-10 Inline Search Methods
+
+    private async Task OnSearchPrincipalAsync()
+    {
+        _searchTimerPrincipal?.Stop();
+        _searchTimerPrincipal?.Dispose();
+
+        if (string.IsNullOrWhiteSpace(SearchTermPrincipal) || SearchTermPrincipal.Length < 2)
+        {
+            SearchResultsPrincipal.Clear();
+            StateHasChanged();
+            return;
+        }
+
+        _searchTimerPrincipal = new System.Timers.Timer(300);
+        _searchTimerPrincipal.Elapsed += async (s, e) =>
+        {
+            _searchTimerPrincipal?.Stop();
+            await ExecuteSearchPrincipalAsync();
+        };
+        _searchTimerPrincipal.AutoReset = false;
+        _searchTimerPrincipal.Start();
+    }
+
+    private async Task ExecuteSearchPrincipalAsync()
+    {
+        await InvokeAsync(async () =>
+        {
+            try
+            {
+                IsSearchingPrincipal = true;
+                StateHasChanged();
+
+                var query = new SearchICD10Query(SearchTermPrincipal, null, false, true, 10);
+                var result = await Mediator.Send(query);
+
+                if (result.IsSuccess)
+                {
+                    SearchResultsPrincipal = result.Value?.ToList() ?? new();
+                }
+                else
+                {
+                    SearchResultsPrincipal.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "[Consultatii] Error searching ICD-10 Principal");
+                SearchResultsPrincipal.Clear();
+            }
+            finally
+            {
+                IsSearchingPrincipal = false;
+                StateHasChanged();
+            }
+        });
+    }
+
+    private async Task OnSearchSecundarAsync()
+    {
+        _searchTimerSecundar?.Stop();
+        _searchTimerSecundar?.Dispose();
+
+        if (string.IsNullOrWhiteSpace(SearchTermSecundar) || SearchTermSecundar.Length < 2)
+        {
+            SearchResultsSecundar.Clear();
+            StateHasChanged();
+            return;
+        }
+
+        _searchTimerSecundar = new System.Timers.Timer(300);
+        _searchTimerSecundar.Elapsed += async (s, e) =>
+        {
+            _searchTimerSecundar?.Stop();
+            await ExecuteSearchSecundarAsync();
+        };
+        _searchTimerSecundar.AutoReset = false;
+        _searchTimerSecundar.Start();
+    }
+
+    private async Task ExecuteSearchSecundarAsync()
+    {
+        await InvokeAsync(async () =>
+        {
+            try
+            {
+                IsSearchingSecundar = true;
+                StateHasChanged();
+
+                var query = new SearchICD10Query(SearchTermSecundar, null, false, true, 10);
+                var result = await Mediator.Send(query);
+
+                if (result.IsSuccess)
+                {
+                    SearchResultsSecundar = result.Value?.ToList() ?? new();
+                }
+                else
+                {
+                    SearchResultsSecundar.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "[Consultatii] Error searching ICD-10 Secundar");
+                SearchResultsSecundar.Clear();
+            }
+            finally
+            {
+                IsSearchingSecundar = false;
+                StateHasChanged();
+            }
+        });
+    }
+
+    private void SelectICD10Principal(ICD10SearchResultDto item)
+    {
+        CoduriICD10Principal = $"{item.Code}|{item.ShortDescription}";
+        SearchTermPrincipal = string.Empty;
+        SearchResultsPrincipal.Clear();
+        MarkFormAsDirty();
+        StateHasChanged();
+        Logger.LogInformation("[Consultatii] Selected ICD-10 Principal: {Code}", item.Code);
+    }
+
+    private void ClearICD10Principal()
+    {
+        CoduriICD10Principal = string.Empty;
+        MarkFormAsDirty();
+        StateHasChanged();
+    }
+
+    private void AddICD10Secundar(ICD10SearchResultDto item)
+    {
+        // Limită maximă de 10 diagnostice secundare
+        var currentCodes = GetSecundareCodes();
+        if (currentCodes.Count >= 10)
+        {
+            ToastService.ShowWarning("Limită atinsă", "Puteți adăuga maxim 10 diagnostice secundare.");
+            return;
+        }
+        
+        var newCode = $"{item.Code}|{item.ShortDescription}";
+        
+        if (string.IsNullOrEmpty(CoduriICD10Secundare))
+        {
+            CoduriICD10Secundare = newCode;
+        }
+        else if (!CoduriICD10Secundare.Contains(item.Code))
+        {
+            CoduriICD10Secundare += ";" + newCode;
+        }
+        
+        SearchTermSecundar = string.Empty;
+        SearchResultsSecundar.Clear();
+        MarkFormAsDirty();
+        StateHasChanged();
+        Logger.LogInformation("[Consultatii] Added ICD-10 Secundar: {Code} ({Count}/10)", item.Code, currentCodes.Count + 1);
+    }
+
+    private void RemoveICD10Secundar(string codeToRemove)
+    {
+        var codes = GetSecundareCodes().Where(c => c != codeToRemove).ToList();
+        CoduriICD10Secundare = string.Join(";", codes);
+        MarkFormAsDirty();
+        StateHasChanged();
+    }
+
+    private List<string> GetSecundareCodes()
+    {
+        if (string.IsNullOrEmpty(CoduriICD10Secundare))
+            return new List<string>();
+        
+        return CoduriICD10Secundare.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList();
+    }
+
+    private string GetICD10Code(string codeWithDescription)
+    {
+        if (string.IsNullOrEmpty(codeWithDescription)) return string.Empty;
+        var parts = codeWithDescription.Split('|');
+        return parts.Length > 0 ? parts[0] : codeWithDescription;
+    }
+
+    private string GetICD10Description(string codeWithDescription)
+    {
+        if (string.IsNullOrEmpty(codeWithDescription)) return string.Empty;
+        var parts = codeWithDescription.Split('|');
+        return parts.Length > 1 ? parts[1] : string.Empty;
+    }
+
+    #endregion
+
+    #region ICD-10 Favorites Methods
+
+    private async Task ToggleFavoritesPrincipalAsync()
+    {
+        ShowFavoritesPrincipal = !ShowFavoritesPrincipal;
+        if (ShowFavoritesPrincipal && !FavoritesList.Any())
+        {
+            await LoadFavoritesAsync();
+        }
+        StateHasChanged();
+    }
+
+    private async Task ToggleFavoritesSecundarAsync()
+    {
+        ShowFavoritesSecundar = !ShowFavoritesSecundar;
+        if (ShowFavoritesSecundar && !FavoritesList.Any())
+        {
+            await LoadFavoritesAsync();
+        }
+        StateHasChanged();
+    }
+
+    private async Task LoadFavoritesAsync()
+    {
+        if (CurrentMedicId == Guid.Empty) return;
+        
+        try
+        {
+            IsLoadingFavorites = true;
+            StateHasChanged();
+
+            var query = new GetICD10FavoritesQuery(CurrentMedicId);
+            var result = await Mediator.Send(query);
+
+            if (result.IsSuccess && result.Value != null)
+            {
+                FavoritesList = result.Value.ToList();
+                FavoriteCodesSet = FavoritesList.Select(f => f.Code).ToHashSet();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[Consultatii] Error loading ICD-10 favorites");
+        }
+        finally
+        {
+            IsLoadingFavorites = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task AddToFavoritesAsync(ICD10SearchResultDto item)
+    {
+        if (CurrentMedicId == Guid.Empty) return;
+        if (FavoriteCodesSet.Contains(item.Code)) return;
+
+        try
+        {
+            var command = new AddICD10FavoriteCommand(CurrentMedicId, item.ICD10_ID);
+            var result = await Mediator.Send(command);
+
+            if (result.IsSuccess)
+            {
+                // Add to local list - create new DTO with IsFavorite = true
+                FavoritesList.Add(new ICD10SearchResultDto
+                {
+                    ICD10_ID = item.ICD10_ID,
+                    Code = item.Code,
+                    ShortDescription = item.ShortDescription,
+                    LongDescription = item.LongDescription,
+                    Category = item.Category,
+                    IsCommon = item.IsCommon,
+                    IsFavorite = true
+                });
+                FavoriteCodesSet.Add(item.Code);
+                ToastService.ShowSuccess("Favorite", $"Cod {item.Code} adăugat la favorite!");
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[Consultatii] Error adding ICD-10 to favorites: {Code}", item.Code);
+            ToastService.ShowError("Eroare", "Eroare la adăugarea în favorite");
+        }
+    }
+
+    private async Task RemoveFromFavoritesAsync(ICD10SearchResultDto favorite)
+    {
+        if (CurrentMedicId == Guid.Empty) return;
+
+        try
+        {
+            var command = new RemoveICD10FavoriteCommand(CurrentMedicId, favorite.ICD10_ID);
+            var result = await Mediator.Send(command);
+
+            if (result.IsSuccess)
+            {
+                FavoritesList.RemoveAll(f => f.ICD10_ID == favorite.ICD10_ID);
+                FavoriteCodesSet.Remove(favorite.Code);
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[Consultatii] Error removing ICD-10 from favorites: {Code}", favorite.Code);
+            ToastService.ShowError("Eroare", "Eroare la ștergerea din favorite");
+        }
+    }
+
+    private void SelectFavoriteAsPrincipal(ICD10SearchResultDto favorite)
+    {
+        CoduriICD10Principal = $"{favorite.Code}|{favorite.ShortDescription}";
+        ShowFavoritesPrincipal = false;
+        MarkFormAsDirty();
+        StateHasChanged();
+        Logger.LogInformation("[Consultatii] Selected favorite as Principal: {Code}", favorite.Code);
+    }
+
+    private void SelectFavoriteAsSecundar(ICD10SearchResultDto favorite)
+    {
+        // Limită maximă de 10 diagnostice secundare
+        var currentCodes = GetSecundareCodes();
+        if (currentCodes.Count >= 10)
+        {
+            ToastService.ShowWarning("Limită atinsă", "Puteți adăuga maxim 10 diagnostice secundare.");
+            return;
+        }
+        
+        var newCode = $"{favorite.Code}|{favorite.ShortDescription}";
+        
+        if (string.IsNullOrEmpty(CoduriICD10Secundare))
+        {
+            CoduriICD10Secundare = newCode;
+        }
+        else if (!CoduriICD10Secundare.Contains(favorite.Code))
+        {
+            CoduriICD10Secundare += ";" + newCode;
+        }
+        
+        MarkFormAsDirty();
+        StateHasChanged();
+        Logger.LogInformation("[Consultatii] Selected favorite as Secundar: {Code} ({Count}/10)", favorite.Code, currentCodes.Count + 1);
+    }
+
+    private bool IsCodeInFavorites(string code)
+    {
+        return FavoriteCodesSet.Contains(code);
+    }
+
+    #endregion
+
     #region Dispose
 
     public async ValueTask DisposeAsync()
@@ -593,4 +963,188 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     }
 
     #endregion
+
+    #region Diagnostic Secundar Sections Methods
+
+    private void AddDiagnosticSecundar()
+    {
+        if (DiagnosticeSecundare.Count >= 10)
+        {
+            ToastService.ShowWarning("Limită atinsă", "Puteți adăuga maxim 10 secțiuni de diagnostic secundar.");
+            return;
+        }
+        
+        DiagnosticeSecundare.Add(new DiagnosticSecundarSection
+        {
+            Index = DiagnosticeSecundare.Count + 1
+        });
+        MarkFormAsDirty();
+        StateHasChanged();
+    }
+
+    private void RemoveDiagnosticSecundar(int index)
+    {
+        var section = DiagnosticeSecundare.FirstOrDefault(s => s.Index == index);
+        if (section != null)
+        {
+            DiagnosticeSecundare.Remove(section);
+            // Renumber remaining sections
+            for (int i = 0; i < DiagnosticeSecundare.Count; i++)
+            {
+                DiagnosticeSecundare[i].Index = i + 1;
+            }
+            MarkFormAsDirty();
+            StateHasChanged();
+        }
+    }
+
+    private void SelectICD10ForSecundar(int sectionIndex, ICD10SearchResultDto item)
+    {
+        var section = DiagnosticeSecundare.FirstOrDefault(s => s.Index == sectionIndex);
+        if (section != null)
+        {
+            section.CodICD10 = item.Code;
+            section.NumeICD10 = item.ShortDescription;
+            section.SearchTerm = string.Empty;
+            section.SearchResults.Clear();
+            ActiveSecundarSearchIndex = null;
+            MarkFormAsDirty();
+            StateHasChanged();
+            Logger.LogInformation("[Consultatii] Selected ICD-10 for Secundar #{Index}: {Code}", sectionIndex, item.Code);
+        }
+    }
+
+    private void ClearICD10ForSecundar(int sectionIndex)
+    {
+        var section = DiagnosticeSecundare.FirstOrDefault(s => s.Index == sectionIndex);
+        if (section != null)
+        {
+            section.CodICD10 = string.Empty;
+            section.NumeICD10 = string.Empty;
+            MarkFormAsDirty();
+            StateHasChanged();
+        }
+    }
+
+    private void SelectFavoriteForSecundar(int sectionIndex, ICD10SearchResultDto favorite)
+    {
+        var section = DiagnosticeSecundare.FirstOrDefault(s => s.Index == sectionIndex);
+        if (section != null)
+        {
+            section.CodICD10 = favorite.Code;
+            section.NumeICD10 = favorite.ShortDescription;
+            section.ShowFavorites = false;
+            MarkFormAsDirty();
+            StateHasChanged();
+            Logger.LogInformation("[Consultatii] Selected favorite for Secundar #{Index}: {Code}", sectionIndex, favorite.Code);
+        }
+    }
+
+    private async Task OnSearchSecundarSectionAsync(int sectionIndex)
+    {
+        var section = DiagnosticeSecundare.FirstOrDefault(s => s.Index == sectionIndex);
+        if (section == null) return;
+
+        section.SearchTimer?.Stop();
+        section.SearchTimer?.Dispose();
+
+        if (string.IsNullOrWhiteSpace(section.SearchTerm) || section.SearchTerm.Length < 2)
+        {
+            section.SearchResults.Clear();
+            StateHasChanged();
+            return;
+        }
+
+        ActiveSecundarSearchIndex = sectionIndex;
+        section.SearchTimer = new System.Timers.Timer(300);
+        section.SearchTimer.Elapsed += async (s, e) =>
+        {
+            section.SearchTimer?.Stop();
+            await ExecuteSearchSecundarSectionAsync(sectionIndex);
+        };
+        section.SearchTimer.AutoReset = false;
+        section.SearchTimer.Start();
+    }
+
+    private async Task ExecuteSearchSecundarSectionAsync(int sectionIndex)
+    {
+        var section = DiagnosticeSecundare.FirstOrDefault(s => s.Index == sectionIndex);
+        if (section == null) return;
+
+        await InvokeAsync(async () =>
+        {
+            try
+            {
+                section.IsSearching = true;
+                StateHasChanged();
+
+                var query = new SearchICD10Query(section.SearchTerm, null, false, true, 10);
+                var result = await Mediator.Send(query);
+
+                if (result.IsSuccess)
+                {
+                    section.SearchResults = result.Value?.ToList() ?? new();
+                }
+                else
+                {
+                    section.SearchResults.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "[Consultatii] Error searching ICD-10 for Secundar #{Index}", sectionIndex);
+                section.SearchResults.Clear();
+            }
+            finally
+            {
+                section.IsSearching = false;
+                StateHasChanged();
+            }
+        });
+    }
+
+    private async Task ToggleFavoritesForSecundarAsync(int sectionIndex)
+    {
+        var section = DiagnosticeSecundare.FirstOrDefault(s => s.Index == sectionIndex);
+        if (section == null) return;
+
+        section.ShowFavorites = !section.ShowFavorites;
+        if (section.ShowFavorites && !FavoritesList.Any())
+        {
+            await LoadFavoritesAsync();
+        }
+        StateHasChanged();
+    }
+
+    private void UpdateSecundarDescriere(int sectionIndex, string value)
+    {
+        var section = DiagnosticeSecundare.FirstOrDefault(s => s.Index == sectionIndex);
+        if (section != null)
+        {
+            section.Descriere = value;
+            MarkFormAsDirty();
+        }
+    }
+
+    #endregion
+}
+
+/// <summary>
+/// Model pentru o secțiune de diagnostic secundar
+/// </summary>
+public class DiagnosticSecundarSection
+{
+    public int Index { get; set; }
+    public string CodICD10 { get; set; } = string.Empty;
+    public string NumeICD10 { get; set; } = string.Empty;
+    public string Descriere { get; set; } = string.Empty;
+    
+    // Search state pentru această secțiune
+    public string SearchTerm { get; set; } = string.Empty;
+    public bool IsSearching { get; set; } = false;
+    public List<ICD10SearchResultDto> SearchResults { get; set; } = new();
+    public System.Timers.Timer? SearchTimer { get; set; }
+    public bool ShowFavorites { get; set; } = false;
+    
+    public bool HasCode => !string.IsNullOrEmpty(CodICD10);
 }

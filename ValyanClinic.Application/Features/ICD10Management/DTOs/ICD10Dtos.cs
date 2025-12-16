@@ -13,6 +13,11 @@ public class ICD10SearchResultDto
     public bool IsCommon { get; set; }
     public string? Severity { get; set; }
     public int RelevanceScore { get; set; }
+    
+    /// <summary>
+    /// Indică dacă acest cod este în lista de favorite a utilizatorului curent
+    /// </summary>
+    public bool IsFavorite { get; set; }
 
     // Display properties
     public string DisplayText => $"{Code} - {ShortDescription}";

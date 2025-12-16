@@ -238,17 +238,17 @@
 }
 
 .tag-warning {
-    background: #FEF3C7;
-    color: #92400E;
+    background: var(--warning-light);
+    color: var(--warning-text);
 }
 
 .tag-warning:hover {
-    background: #FDE68A;
+    background: var(--warning-medium);
     box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
 }
 
 .tag-warning i {
-    color: #F59E0B;
+    color: var(--warning-dark);
 }
 
 .tag-info {
@@ -267,14 +267,14 @@
 
 /* ===== ALLERGY ALERT ===== */
 .allergy-alert {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border: 2px solid #f59e0b;
+    background: linear-gradient(135deg, var(--warning-light), var(--warning-medium));
+    border: 2px solid var(--warning-dark);
     border-radius: var(--border-radius-sm);
     padding: var(--spacing-md) var(--spacing-lg);
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
-    color: #92400e;
+    color: var(--warning-text);
 }
 
 .allergy-alert i {
@@ -813,43 +813,43 @@ textarea.form-control {
 
 /* IMC Categories - Using CSS Variables */
 .imc-underweight .imc-value-display {
-    background: #FEF3C7;
-    color: #92400E;
+    background: var(--warning-light);
+    color: var(--warning-text);
 }
 
 .imc-underweight.imc-badge {
-    background: #FDE68A;
-    color: #78350F;
+    background: var(--warning-medium);
+    color: var(--warning-text-dark);
 }
 
 .imc-normal .imc-value-display {
-    background: #D1FAE5;
-    color: #065F46;
+    background: var(--success-light);
+    color: var(--success-text);
 }
 
 .imc-normal.imc-badge {
     background: var(--success-color);
-    color: #064E3B;
+    color: var(--success-text-dark);
 }
 
 .imc-overweight .imc-value-display {
-    background: #FED7AA;
-    color: #9A3412;
+    background: var(--orange-light);
+    color: var(--orange-text);
 }
 
 .imc-overweight.imc-badge {
-    background: #FDBA74;
-    color: #7C2D12;
+    background: var(--orange-medium);
+    color: var(--orange-text-dark);
 }
 
 .imc-obese .imc-value-display {
     background: var(--danger-light);
-    color: #991B1B;
+    color: var(--red-text);
 }
 
 .imc-obese.imc-badge {
     background: var(--danger-color);
-    color: #7F1D1D;
+    color: var(--red-text-dark);
 }
 
 /* Diagnosis Cards System - Template Design */
@@ -957,9 +957,9 @@ textarea.form-control {
 }
 
 .diagnosis-type.principal {
-    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
-    color: #78350F;
-    border: 1px solid #FCD34D;
+    background: linear-gradient(135deg, var(--warning-light) 0%, var(--warning-medium) 100%);
+    color: var(--warning-text-dark);
+    border: 1px solid var(--warning-color);
 }
 
 .diagnosis-type.secundar {
@@ -1118,8 +1118,8 @@ textarea.form-control {
     display: flex;
     gap: 14px;
     padding: 14px 16px;
-    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
-    border: 2px solid #F59E0B;
+    background: linear-gradient(135deg, var(--warning-light) 0%, var(--warning-medium) 100%);
+    border: 2px solid var(--warning-dark);
     border-radius: 10px;
     margin-bottom: 20px;
     animation: pulseAlert 2s ease-in-out infinite;
@@ -1143,7 +1143,7 @@ textarea.form-control {
 
 .allergy-alert-icon i {
     font-size: 20px;
-    color: #92400E;
+    color: var(--warning-text);
 }
 
 .allergy-alert-content {
@@ -1153,13 +1153,13 @@ textarea.form-control {
 .allergy-alert-title {
     font-size: 15px;
     font-weight: 700;
-    color: #78350F;
+    color: var(--warning-text-dark);
     margin-bottom: 4px;
 }
 
 .allergy-alert-message {
     font-size: 14px;
-    color: #92400E;
+    color: var(--warning-text);
     line-height: 1.5;
 }
 
@@ -1338,11 +1338,11 @@ textarea.form-control {
 }
 
 .save-indicator.unsaved {
-    color: #F59E0B;
+    color: var(--warning-dark);
 }
 
 .save-indicator.unsaved i {
-    color: #F59E0B;
+    color: var(--warning-dark);
 }
 
 .footer-actions {
@@ -1701,4 +1701,640 @@ textarea.form-control {
 .vitals-grid,
 .anthropometric-grid {
     display: none !important;
+}
+
+/* ========================================
+   ICD-10 INLINE SEARCH - MODERN DESIGN
+   ======================================== */
+
+.icd10-inline-search {
+    margin-bottom: 1rem;
+}
+
+.icd10-search-wrapper {
+    position: relative;
+    margin-top: 0.5rem;
+}
+
+.icd10-search-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    padding-right: 2.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, var(--background-white) 0%, var(--background-color) 100%);
+}
+
+.icd10-search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.12);
+}
+
+.icd10-search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-spinner {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+}
+
+/* Search Results Dropdown */
+.icd10-search-results {
+    margin-top: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.icd10-result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.icd10-result-item:last-child {
+    border-bottom: none;
+}
+
+.icd10-result-item:hover {
+    background: linear-gradient(135deg, var(--background-light) 0%, var(--primary-lighter) 100%);
+}
+
+.icd10-result-item:hover .fa-plus-circle {
+    transform: scale(1.2);
+}
+
+.icd10-code {
+    font-weight: 700;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.875rem;
+    color: var(--primary-darker);
+    background: linear-gradient(135deg, var(--primary-lighter) 0%, var(--primary-light) 100%);
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    min-width: 70px;
+    text-align: center;
+    border: 1px solid var(--primary-light);
+}
+
+.icd10-desc {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    line-height: 1.4;
+}
+
+.icd10-result-item .fa-plus-circle {
+    font-size: 1.25rem;
+    transition: transform 0.15s ease;
+}
+
+/* Selected ICD-10 Chip */
+.icd10-selected-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 10px;
+    margin-top: 0.5rem;
+    animation: chipFadeIn 0.25s ease;
+}
+
+@keyframes chipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.icd10-selected-chip.principal {
+    background: linear-gradient(135deg, var(--warning-light) 0%, var(--warning-medium) 100%);
+    border: 2px solid var(--warning-dark);
+}
+
+.icd10-selected-chip.secundar {
+    background: linear-gradient(135deg, var(--primary-lighter) 0%, var(--primary-light) 100%);
+    border: 2px solid var(--primary-dark);
+}
+
+.icd10-selected-chip .chip-code {
+    font-weight: 700;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 1rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.icd10-selected-chip.principal .chip-code {
+    color: var(--warning-text);
+    border: 1px solid var(--warning-dark);
+}
+
+.icd10-selected-chip.secundar .chip-code {
+    color: var(--primary-darker);
+    border: 1px solid var(--primary-dark);
+}
+
+.icd10-selected-chip .chip-desc {
+    flex: 1;
+    font-size: 0.9375rem;
+    font-weight: 500;
+}
+
+.icd10-selected-chip.principal .chip-desc {
+    color: var(--warning-text-dark);
+}
+
+.icd10-selected-chip.secundar .chip-desc {
+    color: var(--primary-darker);
+}
+
+.icd10-selected-chip .btn-remove {
+    background: rgba(239, 68, 68, 0.15);
+    border: none;
+    color: var(--danger-text);
+    cursor: pointer;
+    padding: 0.375rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.icd10-selected-chip .btn-remove:hover {
+    background: var(--red-dark);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Chips List for Secundare */
+.icd10-chips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Utility classes */
+.text-primary {
+    color: var(--primary-dark) !important;
+}
+
+.text-success {
+    color: var(--success-dark) !important;
+}
+
+.text-warning {
+    color: var(--warning-dark) !important;
+}
+
+.mt-3 {
+    margin-top: 1rem !important;
+}
+
+/* Scrollbar pentru rezultate */
+.icd10-search-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+.icd10-search-results::-webkit-scrollbar-track {
+    background: var(--neutral-100);
+    border-radius: 3px;
+}
+
+.icd10-search-results::-webkit-scrollbar-thumb {
+    background: var(--gradient-primary-light);
+    border-radius: 3px;
+}
+
+.icd10-search-results::-webkit-scrollbar-thumb:hover {
+    background: var(--gradient-primary);
+}
+
+/* ========================================
+   ICD-10 FAVORITES SYSTEM
+   ======================================== */
+
+/* Label Row with Toggle */
+.icd10-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.icd10-label-row .form-label {
+    margin-bottom: 0;
+}
+
+/* Favorites Toggle Button */
+.btn-favorites-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem;
+    background: var(--gradient-warning-light);
+    border: 2px solid var(--warning-dark);
+    border-radius: 8px;
+    color: var(--warning-text);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-favorites-toggle:hover {
+    background: var(--gradient-warning);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+}
+
+.btn-favorites-toggle.active {
+    background: linear-gradient(135deg, var(--warning-dark), var(--warning-darker));
+    color: white;
+    border-color: var(--warning-darker);
+}
+
+.btn-favorites-toggle .fa-star {
+    font-size: 0.875rem;
+}
+
+/* Favorites List */
+.icd10-favorites-list {
+    background: linear-gradient(135deg, var(--warning-bg) 0%, var(--warning-lighter) 100%);
+    border: 2px solid var(--warning-color);
+    border-radius: 10px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    max-height: 200px;
+    overflow-y: auto;
+    animation: favListSlideIn 0.2s ease;
+}
+
+@keyframes favListSlideIn {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding: 0 0.75rem;
+    }
+    to {
+        opacity: 1;
+        max-height: 200px;
+        padding: 0.75rem;
+    }
+}
+
+.favorites-loading,
+.favorites-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    color: var(--warning-text);
+    font-size: 0.875rem;
+}
+
+.favorites-empty {
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+/* Favorite Item */
+.icd10-favorite-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid var(--warning-color);
+}
+
+.icd10-favorite-item:last-child {
+    margin-bottom: 0;
+}
+
+.icd10-favorite-item:hover {
+    background: var(--gradient-warning-light);
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.icd10-favorite-item .icd10-code {
+    background: linear-gradient(135deg, var(--warning-dark), var(--warning-darker));
+    color: white;
+    border: none;
+    font-size: 0.8125rem;
+}
+
+.icd10-favorite-item .icd10-desc {
+    font-size: 0.8125rem;
+    color: var(--warning-darker);
+}
+
+/* Remove from Favorites Button */
+.btn-remove-fav {
+    background: rgba(239, 68, 68, 0.1);
+    border: none;
+    color: var(--danger-dark);
+    cursor: pointer;
+    padding: 0.25rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+    margin-left: auto;
+}
+
+.btn-remove-fav:hover {
+    background: var(--danger-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Result Item with Actions */
+.icd10-result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-bottom: 1px solid var(--neutral-100);
+}
+
+.icd10-result-item .result-content {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.icd10-result-item .result-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Add to Favorites Button */
+.btn-add-fav {
+    background: transparent;
+    border: 1px solid var(--warning-color);
+    color: var(--warning-dark);
+    cursor: pointer;
+    padding: 0.25rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.btn-add-fav:hover {
+    background: var(--gradient-warning-light);
+    border-color: var(--warning-dark);
+    transform: scale(1.1);
+}
+
+.btn-add-fav:hover .far.fa-star::before {
+    font-weight: 900;
+}
+
+/* Favorite Badge in Results */
+.fav-badge {
+    color: var(--warning-dark);
+    font-size: 0.875rem;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Select Icon */
+.select-icon {
+    font-size: 1.125rem;
+    transition: transform 0.15s ease;
+}
+
+.icd10-result-item:hover .select-icon {
+    transform: scale(1.2);
+}
+
+/* Favorites List Scrollbar */
+.icd10-favorites-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.icd10-favorites-list::-webkit-scrollbar-track {
+    background: var(--warning-lighter);
+    border-radius: 3px;
+}
+
+.icd10-favorites-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--warning-color), var(--warning-dark));
+    border-radius: 3px;
+}
+
+.icd10-favorites-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--warning-dark), var(--warning-darker));
+}
+
+/* ========================================
+   DIAGNOSTIC SECUNDAR SECTIONS
+   ======================================== */
+
+/* Section Header Row */
+.section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section-header-row .section-title {
+    margin-bottom: 0;
+}
+
+/* Add Section Button */
+.btn-add-section {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-add-section:hover {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* No Secundare Message */
+.no-secundare-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: var(--neutral-50);
+    border: 2px dashed var(--neutral-200);
+    border-radius: 10px;
+    color: var(--neutral-500);
+    font-size: 0.9rem;
+}
+
+/* Diagnostic Secundar Card */
+.diagnostic-secundar-card {
+    background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+    border: 1px solid var(--neutral-200);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.diagnostic-secundar-card:hover {
+    border-color: var(--primary-light);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+/* Card Header Row */
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--neutral-200);
+}
+
+.section-number {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-lighter), var(--primary-light));
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+}
+
+/* Remove Section Button */
+.btn-remove-section {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--danger-dark);
+    cursor: pointer;
+    padding: 0.375rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-section:hover {
+    background: var(--danger-color);
+    color: white;
+    border-color: var(--danger-color);
+}
+
+/* Form Label Small */
+.form-label-sm {
+    font-size: 0.75rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--neutral-500);
+}
+
+/* Form Control Small */
+.form-control-sm {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* ========================================
+   SECUNDAR COUNTER & LIMIT STYLES
+   ======================================== */
+
+/* Counter Badge */
+.secundar-counter {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--neutral-500);
+    background: var(--neutral-100);
+    padding: 0.125rem 0.5rem;
+    border-radius: 10px;
+    margin-left: 0.5rem;
+}
+
+.secundar-counter.limit-reached {
+    color: var(--danger-dark);
+    background: linear-gradient(135deg, var(--danger-lighter), var(--danger-light));
+    border: 1px solid var(--danger-light);
+    animation: pulseWarning 2s ease-in-out infinite;
+}
+
+@keyframes pulseWarning {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Limit Reached Message */
+.limit-reached-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, var(--warning-lighter) 0%, var(--warning-light) 100%);
+    border: 1px solid var(--warning-color);
+    border-radius: 8px;
+    color: var(--warning-text);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.limit-reached-message i {
+    color: var(--warning-dark);
 }

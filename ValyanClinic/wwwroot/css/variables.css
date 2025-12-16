@@ -104,6 +104,44 @@
     --danger-text: #dc2626;
     --danger-light: #fee2e2;
     --danger-lighter: #fecaca;
+    --danger-dark: #dc2626;
+    --danger-darker: #b91c1c;
+    
+    /* ✅ NEW: Warning/Amber Colors (for alerts, IMC, timers) */
+    --warning-bg: #fffbeb;
+    --warning-light: #fef3c7;
+    --warning-lighter: #fffbeb;
+    --warning-medium: #fde68a;
+    --warning-dark: #f59e0b;
+    --warning-darker: #d97706;
+    --warning-text: #92400e;
+    --warning-text-dark: #78350f;
+    
+    /* ✅ NEW: Warning Gradients */
+    --gradient-warning-light: linear-gradient(135deg, #fef3c7, #fde68a);
+    --gradient-warning: linear-gradient(135deg, #fde68a, #fcd34d);
+    
+    /* ✅ NEW: Success/Green Colors */
+    --success-light: #d1fae5;
+    --success-lighter: #dcfce7;
+    --success-medium: #6ee7b7;
+    --success-dark: #10b981;
+    --success-text: #065f46;
+    --success-text-dark: #064e3b;
+    
+    /* ✅ NEW: Orange Colors (for IMC overweight) */
+    --orange-light: #fed7aa;
+    --orange-medium: #fdba74;
+    --orange-dark: #f97316;
+    --orange-text: #9a3412;
+    --orange-text-dark: #7c2d12;
+    
+    /* ✅ NEW: Red/Danger Extended (for critical states) */
+    --red-light: #fee2e2;
+    --red-medium: #fca5a5;
+    --red-dark: #ef4444;
+    --red-text: #991b1b;
+    --red-text-dark: #7f1d1d;
     
     /* Text Colors */
     --text-color: #334155;

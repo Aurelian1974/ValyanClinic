@@ -29,7 +29,7 @@ public class ICD10Repository : BaseRepository, IICD10Repository
             SearchTerm = searchTerm,
             Category = category,
             OnlyCommon = onlyCommon,
-            OnlyLeafNodes = true, // Pentru autocomplete, vrem doar leaf nodes
+            OnlyLeaf = true, // Pentru autocomplete, vrem doar leaf nodes
             MaxResults = maxResults
         };
 

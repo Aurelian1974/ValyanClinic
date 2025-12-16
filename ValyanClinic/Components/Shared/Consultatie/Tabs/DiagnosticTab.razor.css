@@ -106,6 +106,151 @@
     background: rgba(3, 105, 161, 0.2);
 }
 
+/* ==================== ICD-10 INLINE SEARCH ==================== */
+
+.icd10-inline-search {
+    position: relative;
+}
+
+.icd10-search-wrapper {
+    position: relative;
+}
+
+.icd10-search-input {
+    padding-right: 2.5rem;
+}
+
+.search-spinner {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color, #3b82f6);
+}
+
+.icd10-search-results {
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    max-height: 280px;
+    overflow-y: auto;
+    background: white;
+    border: 2px solid var(--primary-light, #93c5fd);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+    margin-top: 4px;
+}
+
+.icd10-result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.icd10-result-item:last-child {
+    border-bottom: none;
+}
+
+.icd10-result-item:hover {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+}
+
+.icd10-code {
+    font-weight: 700;
+    color: var(--primary-dark, #1e40af);
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    min-width: 70px;
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.icd10-desc {
+    flex: 1;
+    font-size: 0.875rem;
+    color: #475569;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.select-icon {
+    font-size: 1.1rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.icd10-result-item:hover .select-icon {
+    opacity: 1;
+}
+
+/* ==================== SELECTED CHIP ==================== */
+
+.icd10-selected-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    animation: chipSlideIn 0.3s ease;
+}
+
+.icd10-selected-chip.principal {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    border: 2px solid #86efac;
+    color: #166534;
+}
+
+.icd10-selected-chip.secundar {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    border: 2px solid #93c5fd;
+    color: #1e40af;
+}
+
+.chip-code {
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+}
+
+.icd10-selected-chip .btn-remove {
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    color: currentColor;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    font-size: 0.75rem;
+}
+
+.icd10-selected-chip .btn-remove:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: rotate(90deg);
+}
+
+@keyframes chipSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateX(0);
+    }
+}
+
 /* Animation for badge appearance */
 .icd10-badge {
     animation: badgeSlideIn 0.3s ease;

@@ -493,37 +493,301 @@
 
                 <!-- Tab 3: Diagnostic & Tratament -->
                 <div class="tab-panel @(ActiveTab == 3 ? "active" : "")">
+                    
                     <div class="form-section">
                         <h3 class="section-title">
                             <i class="fas fa-diagnoses"></i>
-                            Diagnostic
+                            Diagnostic Principal
                         </h3>
-                        <div class="form-group">
+                        
+                        <!-- ICD-10 Cod Principal - inline -->
+                        @if (string.IsNullOrEmpty(CoduriICD10Principal))
+                        {
+                            <div class="icd10-inline-search">
+                                <div class="icd10-label-row">
+                                    <label class="form-label">
+                                        <i class="fas fa-search text-primary"></i>
+                                        Cod ICD-10 Principal
+                                    </label>
+                                    <button type="button" 
+                                            class="btn-favorites-toggle @(ShowFavoritesPrincipal ? "active" : "")"
+                                            @onclick="ToggleFavoritesPrincipalAsync"
+                                            title="@(ShowFavoritesPrincipal ? "Ascunde favorite" : "Arată favorite")">
+                                        <i class="fas fa-star"></i>
+                                        Favorite (@FavoritesList.Count)
+                                    </button>
+                                </div>
+                                
+                                <!-- Favorites List -->
+                                @if (ShowFavoritesPrincipal)
+                                {
+                                    <div class="icd10-favorites-list">
+                                        @if (IsLoadingFavorites)
+                                        {
+                                            <div class="favorites-loading">
+                                                <i class="fas fa-spinner fa-spin"></i> Se încarcă...
+                                            </div>
+                                        }
+                                        else if (!FavoritesList.Any())
+                                        {
+                                            <div class="favorites-empty">
+                                                <i class="fas fa-info-circle"></i>
+                                                Nu aveți coduri favorite. Căutați și adăugați cu <i class="fas fa-star"></i>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var fav in FavoritesList)
+                                            {
+                                                <div class="icd10-favorite-item" @onclick="() => SelectFavoriteAsPrincipal(fav)">
+                                                    <span class="icd10-code">@fav.Code</span>
+                                                    <span class="icd10-desc">@fav.ShortDescription</span>
+                                                    <button type="button" 
+                                                            class="btn-remove-fav" 
+                                                            @onclick="() => RemoveFromFavoritesAsync(fav)" 
+                                                            @onclick:stopPropagation="true"
+                                                            title="Șterge din favorite">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                }
+                                
+                                <div class="icd10-search-wrapper">
+                                    <input type="text" 
+                                           class="form-control icd10-search-input" 
+                                           placeholder="Căutați cod ICD-10 (ex: I10, J18, diabet)..."
+                                           @bind="SearchTermPrincipal"
+                                           @bind:event="oninput"
+                                           @bind:after="OnSearchPrincipalAsync" />
+                                    @if (IsSearchingPrincipal)
+                                    {
+                                        <span class="search-spinner"><i class="fas fa-spinner fa-spin"></i></span>
+                                    }
+                                </div>
+                                
+                                @if (SearchResultsPrincipal.Any())
+                                {
+                                    <div class="icd10-search-results">
+                                        @foreach (var item in SearchResultsPrincipal.Take(8))
+                                        {
+                                            <div class="icd10-result-item">
+                                                <div class="result-content" @onclick="() => SelectICD10Principal(item)">
+                                                    <span class="icd10-code">@item.Code</span>
+                                                    <span class="icd10-desc">@item.ShortDescription</span>
+                                                </div>
+                                                <div class="result-actions">
+                                                    @if (!IsCodeInFavorites(item.Code))
+                                                    {
+                                                        <button type="button" 
+                                                                class="btn-add-fav" 
+                                                                @onclick="() => AddToFavoritesAsync(item)"
+                                                                @onclick:stopPropagation="true"
+                                                                title="Adaugă la favorite">
+                                                            <i class="far fa-star"></i>
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="fav-badge" title="În favorite">
+                                                            <i class="fas fa-star"></i>
+                                                        </span>
+                                                    }
+                                                    <i class="fas fa-plus-circle text-success select-icon"></i>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="icd10-selected-chip principal">
+                                <i class="fas fa-star text-warning"></i>
+                                <span class="chip-code">@GetICD10Code(CoduriICD10Principal)</span>
+                                <span class="chip-desc">@GetICD10Description(CoduriICD10Principal)</span>
+                                <button type="button" class="btn-remove" @onclick="ClearICD10Principal" title="Șterge">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        }
+                        
+                        <div class="form-group mt-3">
                             <label class="form-label">
-                                Diagnostic principal
-                                <span class="required">*</span>
+                                Descriere diagnostic principal
                             </label>
                             <textarea class="form-control"
                                       rows="3"
-                                      placeholder="Diagnostic stabilit..."
+                                      placeholder="Descriere diagnostic principal..."
                                       maxlength="500"
                                       @bind="DiagnosticPrincipal"
                                       @bind:event="oninput"
                                       @bind:after="MarkFormAsDirty"></textarea>
                             <span class="char-counter">@DiagnosticPrincipal.Length / 500</span>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Diagnostic secundar</label>
-                            <textarea class="form-control"
-                                      rows="2"
-                                      placeholder="Diagnostice asociate..."
-                                      maxlength="500"
-                                      @bind="DiagnosticSecundar"
-                                      @bind:event="oninput"
-                                      @bind:after="MarkFormAsDirty"></textarea>
-                            <span class="char-counter">@DiagnosticSecundar.Length / 500</span>
+                    <!-- Secțiuni Diagnostice Secundare (max 10) -->
+                    <div class="form-section diagnostice-secundare-section">
+                        <div class="section-header-row">
+                            <h3 class="section-title">
+                                <i class="fas fa-plus-square"></i>
+                                Diagnostice Secundare
+                                <span class="secundar-counter @(DiagnosticeSecundare.Count >= 10 ? "limit-reached" : "")">
+                                    (@DiagnosticeSecundare.Count/10)
+                                </span>
+                            </h3>
+                            @if (DiagnosticeSecundare.Count < 10)
+                            {
+                                <button type="button" class="btn-add-section" @onclick="AddDiagnosticSecundar">
+                                    <i class="fas fa-plus"></i>
+                                    Adaugă Diagnostic Secundar
+                                </button>
+                            }
                         </div>
+
+                        @if (!DiagnosticeSecundare.Any())
+                        {
+                            <div class="no-secundare-message">
+                                <i class="fas fa-info-circle"></i>
+                                Nu există diagnostice secundare. Apăsați butonul de mai sus pentru a adăuga.
+                            </div>
+                        }
+
+                        @foreach (var secItem in DiagnosticeSecundare)
+                        {
+                            <div class="diagnostic-secundar-card" @key="secItem.Index">
+                                <div class="card-header-row">
+                                    <span class="section-number">#@secItem.Index</span>
+                                    <button type="button" class="btn-remove-section" @onclick="() => RemoveDiagnosticSecundar(secItem.Index)" title="Șterge secțiunea">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Cod ICD-10 pentru această secțiune -->
+                                @if (!secItem.HasCode)
+                                {
+                                    <div class="icd10-inline-search">
+                                        <div class="icd10-label-row">
+                                            <label class="form-label">
+                                                <i class="fas fa-search text-primary"></i>
+                                                Cod ICD-10
+                                            </label>
+                                            <button type="button" 
+                                                    class="btn-favorites-toggle @(secItem.ShowFavorites ? "active" : "")"
+                                                    @onclick="() => ToggleFavoritesForSecundarAsync(secItem.Index)"
+                                                    title="@(secItem.ShowFavorites ? "Ascunde favorite" : "Arată favorite")">
+                                                <i class="fas fa-star"></i>
+                                                Favorite
+                                            </button>
+                                        </div>
+
+                                        <!-- Favorites pentru această secțiune -->
+                                        @if (secItem.ShowFavorites)
+                                        {
+                                            <div class="icd10-favorites-list">
+                                                @if (IsLoadingFavorites)
+                                                {
+                                                    <div class="favorites-loading">
+                                                        <i class="fas fa-spinner fa-spin"></i> Se încarcă...
+                                                    </div>
+                                                }
+                                                else if (!FavoritesList.Any())
+                                                {
+                                                    <div class="favorites-empty">
+                                                        <i class="fas fa-info-circle"></i>
+                                                        Nu aveți coduri favorite.
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    @foreach (var fav in FavoritesList)
+                                                    {
+                                                        <div class="icd10-favorite-item" @onclick="() => SelectFavoriteForSecundar(secItem.Index, fav)">
+                                                            <span class="icd10-code">@fav.Code</span>
+                                                            <span class="icd10-desc">@fav.ShortDescription</span>
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+                                        }
+
+                                        <div class="icd10-search-wrapper">
+                                            <input type="text" 
+                                                   class="form-control icd10-search-input" 
+                                                   placeholder="Căutați cod ICD-10..."
+                                                   @bind="secItem.SearchTerm"
+                                                   @bind:event="oninput"
+                                                   @bind:after="() => OnSearchSecundarSectionAsync(secItem.Index)" />
+                                            @if (secItem.IsSearching)
+                                            {
+                                                <span class="search-spinner"><i class="fas fa-spinner fa-spin"></i></span>
+                                            }
+                                        </div>
+
+                                        @if (secItem.SearchResults.Any())
+                                        {
+                                            <div class="icd10-search-results">
+                                                @foreach (var item in secItem.SearchResults.Take(6))
+                                                {
+                                                    <div class="icd10-result-item">
+                                                        <div class="result-content" @onclick="() => SelectICD10ForSecundar(secItem.Index, item)">
+                                                            <span class="icd10-code">@item.Code</span>
+                                                            <span class="icd10-desc">@item.ShortDescription</span>
+                                                        </div>
+                                                        <div class="result-actions">
+                                                            @if (!IsCodeInFavorites(item.Code))
+                                                            {
+                                                                <button type="button" 
+                                                                        class="btn-add-fav" 
+                                                                        @onclick="() => AddToFavoritesAsync(item)"
+                                                                        @onclick:stopPropagation="true"
+                                                                        title="Adaugă la favorite">
+                                                                    <i class="far fa-star"></i>
+                                                                </button>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="fav-badge" title="În favorite">
+                                                                    <i class="fas fa-star"></i>
+                                                                </span>
+                                                            }
+                                                            <i class="fas fa-plus-circle text-success select-icon"></i>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="icd10-selected-chip secundar">
+                                        <i class="fas fa-plus text-primary"></i>
+                                        <span class="chip-code">@secItem.CodICD10</span>
+                                        <span class="chip-desc">@secItem.NumeICD10</span>
+                                        <button type="button" class="btn-remove" @onclick="() => ClearICD10ForSecundar(secItem.Index)" title="Șterge codul">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                }
+
+                                <!-- Descriere pentru această secțiune -->
+                                <div class="form-group mt-2">
+                                    <label class="form-label form-label-sm">Descriere diagnostic</label>
+                                    <textarea class="form-control form-control-sm"
+                                              rows="2"
+                                              placeholder="Detalii despre acest diagnostic..."
+                                              maxlength="300"
+                                              @bind="secItem.Descriere"
+                                              @bind:event="oninput"
+                                              @bind:after="MarkFormAsDirty"></textarea>
+                                </div>
+                            </div>
+                        }
                     </div>
 
                     <div class="form-section">

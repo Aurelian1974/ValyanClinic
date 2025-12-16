@@ -1,8 +1,9 @@
 ﻿@*
     Tab pentru Diagnostic
     Include diagnostic pozitiv, diferențial, etiologic și coduri ICD-10
+    v2.0: Inline search (fără drag & drop)
 *@
-@using ValyanClinic.Components.Shared
+@using ValyanClinic.Application.Features.ICD10Management.DTOs
 
 <div class="tab-content-section">
     <div class="section-title">
@@ -26,6 +27,56 @@
             <div class="invalid-feedback d-block">
                 <i class="fas fa-exclamation-circle"></i>
                 Diagnosticul este obligatoriu
+            </div>
+        }
+    </div>
+    
+    @* Cod ICD-10 Principal - Inline Search *@
+    <div class="form-group">
+        <label class="form-label">
+            <i class="fas fa-tag text-primary"></i>
+            Cod ICD-10 Principal
+        </label>
+        
+        @if (string.IsNullOrEmpty(Model.CoduriICD10))
+        {
+            <div class="icd10-inline-search">
+                <div class="icd10-search-wrapper">
+                    <input type="text" 
+                           class="form-control icd10-search-input" 
+                           placeholder="Căutați cod ICD-10 (ex: I10, J18, diabet)..."
+                           @bind="SearchTermPrincipal"
+                           @bind:event="oninput"
+                           @bind:after="OnSearchPrincipalAsync" />
+                    @if (IsSearchingPrincipal)
+                    {
+                        <span class="search-spinner"><i class="fas fa-spinner fa-spin"></i></span>
+                    }
+                </div>
+                
+                @if (SearchResultsPrincipal.Any())
+                {
+                    <div class="icd10-search-results">
+                        @foreach (var item in SearchResultsPrincipal.Take(6))
+                        {
+                            <div class="icd10-result-item" @onclick="() => SelectICD10Principal(item)">
+                                <span class="icd10-code">@item.Code</span>
+                                <span class="icd10-desc">@item.ShortDescription</span>
+                                <i class="fas fa-plus-circle text-success select-icon"></i>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="icd10-selected-chip principal">
+                <i class="fas fa-check-circle text-success"></i>
+                <span class="chip-code">@Model.CoduriICD10</span>
+                <button type="button" class="btn-remove" @onclick="ClearICD10Principal" title="Șterge codul">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         }
     </div>
@@ -60,10 +111,54 @@
         </textarea>
     </div>
     
-    @* Componenta ICD-10 Drag & Drop *@
-    <div class="icd10-component-wrapper">
-        <ICD10DragDropCard @bind-CoduriICD10Principal="Model.CoduriICD10"
-                          @bind-CoduriICD10Secundare="Model.CoduriICD10Secundare" />
+    @* Cod ICD-10 Secundar - Inline Search *@
+    <div class="form-group">
+        <label class="form-label">
+            <i class="fas fa-plus text-primary"></i>
+            Cod ICD-10 Secundar
+        </label>
+        
+        @if (string.IsNullOrEmpty(Model.CoduriICD10Secundare))
+        {
+            <div class="icd10-inline-search">
+                <div class="icd10-search-wrapper">
+                    <input type="text" 
+                           class="form-control icd10-search-input" 
+                           placeholder="Căutați cod ICD-10 secundar..."
+                           @bind="SearchTermSecundar"
+                           @bind:event="oninput"
+                           @bind:after="OnSearchSecundarAsync" />
+                    @if (IsSearchingSecundar)
+                    {
+                        <span class="search-spinner"><i class="fas fa-spinner fa-spin"></i></span>
+                    }
+                </div>
+                
+                @if (SearchResultsSecundar.Any())
+                {
+                    <div class="icd10-search-results">
+                        @foreach (var item in SearchResultsSecundar.Take(6))
+                        {
+                            <div class="icd10-result-item" @onclick="() => SelectICD10Secundar(item)">
+                                <span class="icd10-code">@item.Code</span>
+                                <span class="icd10-desc">@item.ShortDescription</span>
+                                <i class="fas fa-plus-circle text-success select-icon"></i>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="icd10-selected-chip secundar">
+                <i class="fas fa-plus text-primary"></i>
+                <span class="chip-code">@Model.CoduriICD10Secundare</span>
+                <button type="button" class="btn-remove" @onclick="ClearICD10Secundar" title="Șterge codul">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        }
     </div>
     
     @if (OnSectionCompleted.HasDelegate && IsComplete)
