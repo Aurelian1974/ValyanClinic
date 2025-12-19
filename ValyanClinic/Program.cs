@@ -299,6 +299,11 @@ try
     builder.Services.AddScoped<ValyanClinic.Services.INavigationGuardService, ValyanClinic.Services.NavigationGuardService>(); // ✅ ADDED: Navigation guard for unsaved changes
 
     // ========================================
+    // PWA & OFFLINE SUPPORT
+    // ========================================
+    builder.Services.AddScoped<ValyanClinic.Services.PWAService>(); // ✅ PWA installation & offline sync
+
+    // ========================================
     // EMAIL SERVICES
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Services.Email.IEmailService, ValyanClinic.Services.Email.EmailService>();

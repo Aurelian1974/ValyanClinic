@@ -1,0 +1,245 @@
+@using ValyanClinic.Services
+@inject PWAService PWA
+@inject ILogger<PWAInstallButton> Logger
+
+@* Exemplu de componentă pentru instalare PWA *@
+
+@if (_canInstall && !_isInstalled)
+{
+    <div class="pwa-install-banner">
+        <div class="pwa-install-content">
+            <div class="pwa-icon">📱</div>
+            <div class="pwa-text">
+                <h4>Instalează aplicația</h4>
+                <p>Accesează Valyan Clinic direct de pe ecranul principal</p>
+            </div>
+            <div class="pwa-actions">
+                <button class="btn btn-primary" @onclick="InstallPWA">
+                    <i class="fa fa-download"></i> Instalează
+                </button>
+                <button class="btn btn-secondary" @onclick="Dismiss">
+                    Mai târziu
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_isInstalled)
+{
+    <div class="pwa-status">
+        <i class="fa fa-check-circle text-success"></i>
+        Aplicația este instalată
+    </div>
+}
+
+@if (!_isOnline)
+{
+    <div class="offline-indicator">
+        <i class="fa fa-wifi-slash"></i>
+        Offline - Datele vor fi sincronizate automat
+        @if (_queueCount > 0)
+        {
+            <span class="badge">@_queueCount în așteptare</span>
+        }
+    </div>
+}
+
+@code {
+    private bool _canInstall;
+    private bool _isInstalled;
+    private bool _isOnline = true;
+    private int _queueCount;
+    private bool _dismissed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Inițializează PWA Service
+        await PWA.InitializeAsync();
+
+        // Obține status
+        var status = await PWA.GetStatusAsync();
+        if (status != null)
+        {
+            _canInstall = status.CanInstall;
+            _isInstalled = status.IsInstalled;
+            _isOnline = status.IsOnline;
+        }
+
+        // Subscribe la evenimente
+        PWA.OnInstallPromptReady += HandleInstallPromptReady;
+        PWA.OnAppInstalled += HandleAppInstalled;
+        PWA.OnSyncComplete += HandleSyncComplete;
+
+        // Check queue status
+        await UpdateQueueStatus();
+    }
+
+    private void HandleInstallPromptReady(object? sender, EventArgs e)
+    {
+        _canInstall = true;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleAppInstalled(object? sender, EventArgs e)
+    {
+        _isInstalled = true;
+        _canInstall = false;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleSyncComplete(object? sender, SyncCompleteEventArgs e)
+    {
+        Logger.LogInformation("Sync complete: {Success} success, {Failed} failed", e.Success, e.Failed);
+        InvokeAsync(async () =>
+        {
+            await UpdateQueueStatus();
+            StateHasChanged();
+        });
+    }
+
+    private async Task InstallPWA()
+    {
+        var installed = await PWA.InstallAsync();
+        if (installed)
+        {
+            Logger.LogInformation("PWA installed successfully");
+        }
+    }
+
+    private void Dismiss()
+    {
+        _dismissed = true;
+    }
+
+    private async Task UpdateQueueStatus()
+    {
+        var queueStatus = await PWA.GetQueueStatusAsync();
+        _queueCount = queueStatus?.Count ?? 0;
+    }
+
+    public void Dispose()
+    {
+        PWA.OnInstallPromptReady -= HandleInstallPromptReady;
+        PWA.OnAppInstalled -= HandleAppInstalled;
+        PWA.OnSyncComplete -= HandleSyncComplete;
+    }
+}
+
+<style>
+    .pwa-install-banner {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        z-index: 9999;
+        max-width: 600px;
+        width: 90%;
+    }
+
+    .pwa-install-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .pwa-icon {
+        font-size: 2.5rem;
+    }
+
+    .pwa-text h4 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .pwa-text p {
+        margin: 0;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .pwa-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: auto;
+    }
+
+    .pwa-actions .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .pwa-actions .btn:hover {
+        transform: scale(1.05);
+    }
+
+    .pwa-actions .btn-primary {
+        background: white;
+        color: #667eea;
+    }
+
+    .pwa-actions .btn-secondary {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+
+    .offline-indicator {
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        background: #ff9800;
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9998;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .offline-indicator .badge {
+        background: rgba(255,255,255,0.3);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.85rem;
+    }
+
+    .pwa-status {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #4caf50;
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9998;
+    }
+
+    @@media (max-width: 768px) {
+        .pwa-install-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .pwa-actions {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .pwa-actions .btn {
+            flex: 1;
+        }
+    }
+</style>
