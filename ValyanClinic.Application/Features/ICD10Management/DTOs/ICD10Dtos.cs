@@ -1,7 +1,7 @@
-﻿namespace ValyanClinic.Application.Features.ICD10Management.DTOs;
+namespace ValyanClinic.Application.Features.ICD10Management.DTOs;
 
 /// <summary>
-/// DTO pentru rezultatele căutării ICD-10
+/// DTO pentru rezultatele cautarii ICD-10
 /// </summary>
 public class ICD10SearchResultDto
 {
@@ -18,12 +18,12 @@ public class ICD10SearchResultDto
     public string DisplayText => $"{Code} - {ShortDescription}";
     public string CategoryIcon => Category switch
     {
-        "Cardiovascular" => "❤️",
-        "Endocrin" => "🩺",
-        "Respirator" => "🫁",
-        "Digestiv" => "🍽️",
-        "Nervos" => "🧠",
-        _ => "📋"
+        "Cardiovascular" => "??",
+        "Endocrin" => "??",
+        "Respirator" => "??",
+        "Digestiv" => "???",
+        "Nervos" => "??",
+        _ => "??"
     };
 }
 

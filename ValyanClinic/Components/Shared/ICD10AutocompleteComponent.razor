@@ -1,4 +1,4 @@
-﻿@rendermode InteractiveServer
+@rendermode InteractiveServer
 @using ValyanClinic.Application.Features.ICD10Management.DTOs
 
 <div class="icd10-autocomplete-wrapper">
@@ -77,7 +77,7 @@
                 @if (Results.Count > MaxResults)
                 {
                     <div class="icd10-footer">
-                        <small>Afișate @MaxResults din @Results.Count rezultate. Refinează căutarea pentru mai multă precizie.</small>
+                        <small>Afi?ate @MaxResults din @Results.Count rezultate. Refineaza cautarea pentru mai multa precizie.</small>
                     </div>
                 }
             </div>
@@ -87,8 +87,8 @@
             <div class="icd10-dropdown">
                 <div class="icd10-no-results">
                     <i class="fas fa-search"></i>
-                    <p>Nu s-au găsit rezultate pentru "<strong>@SearchText</strong>"</p>
-                    <small>Încearcă un alt termen de căutare sau cod ICD-10</small>
+                    <p>Nu s-au gasit rezultate pentru "<strong>@SearchText</strong>"</p>
+                    <small>�ncearca un alt termen de cautare sau cod ICD-10</small>
                 </div>
             </div>
         }

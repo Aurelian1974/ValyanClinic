@@ -35,13 +35,14 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     // ========================================
-    // WINDOWS SERVICE SUPPORT (Production)
+    // WINDOWS SERVICE SUPPORT (Production ONLY)
     // ========================================
-    // ✅ Permite aplicației să ruleze ca Windows Service
-    // Pentru instalare service:
-    // sc create ValyanClinicService binPath="D:\Lucru\CMS\ValyanClinic\publish\ValyanClinic.exe"
-    // sc start ValyanClinicService
-    builder.Host.UseWindowsService();
+    // ✅ Permite aplicației să ruleze ca Windows Service DOAR în Production
+    // În Development (Visual Studio), rulează normal
+    if (!builder.Environment.IsDevelopment())
+    {
+        builder.Host.UseWindowsService();
+    }
 
     // ========================================
     // SERILOG
@@ -223,7 +224,7 @@ try
     builder.Services.AddScoped<IProgramareRepository, ProgramareRepository>();
     builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository,
                                 ValyanClinic.Infrastructure.Repositories.ConsultatieRepository>(); // ✅ NOU - Consultatii
-    builder.Services.AddScoped<IICD10Repository, ICD10Repository>(); // ✅ NOU - ICD10 Autocomplete
+    //builder.Services.AddScoped<IICD10Repository, ICD10Repository>(); // ✅ NOU - ICD10 Autocomplete
     builder.Services.AddScoped<IPacientPersonalMedicalRepository, PacientPersonalMedicalRepository>(); // ✅ NOU - Relații Pacient-Doctor
 
     // Phase1 Settings Repositories
@@ -364,13 +365,14 @@ try
   tags: new[] { "db", "sql", "sqlserver" },
      timeout: TimeSpan.FromSeconds(1)); // ✅ CHANGED: 1 secund (era 3) pentru startup mai rapid
 
-    builder.Services.AddHealthChecksUI(opt =>
-      {
-          opt.SetEvaluationTimeInSeconds(60);
-          opt.MaximumHistoryEntriesPerEndpoint(50);
-          opt.AddHealthCheckEndpoint("ValyanClinic API", "/health-json"); // ✅ CORECTAT: endpoint-ul JSON pentru UI
-      })
-      .AddInMemoryStorage();
+    // ⚠️ DEZACTIVAT TEMPORAR: HealthCheckUI are probleme cu IdentityModel
+    // builder.Services.AddHealthChecksUI(opt =>
+    //   {
+    //       opt.SetEvaluationTimeInSeconds(60);
+    //       opt.MaximumHistoryEntriesPerEndpoint(50);
+    //       opt.AddHealthCheckEndpoint("ValyanClinic API", "/health-json");
+    //   })
+    //   .AddInMemoryStorage();
 
     // ========================================
     // HTTP CONTEXT
@@ -420,11 +422,11 @@ try
         ResponseWriter = HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
     });
 
-    // Health Checks UI Dashboard
-    app.MapHealthChecksUI(config =>
-    {
-        config.UIPath = "/health-ui";
-    });
+    // ⚠️ DEZACTIVAT TEMPORAR: Health Checks UI Dashboard
+    // app.MapHealthChecksUI(config =>
+    // {
+    //     config.UIPath = "/health-ui";
+    // });
 
     // ========================================
     // API CONTROLLERS (TREBUIE SĂ FIE ÎNAINTEA BLAZOR)

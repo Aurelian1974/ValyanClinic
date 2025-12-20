@@ -1,4 +1,4 @@
-﻿/* ========================================
+/* ========================================
    ICD-10 DRAG & DROP CARD
    ======================================== */
 
@@ -31,7 +31,7 @@
 }
 
 /* ========================================
-   LAYOUT GRID - Stânga/Dreapta
+   LAYOUT GRID - St�nga/Dreapta
    ======================================== */
 
 .icd10-layout {
@@ -43,7 +43,7 @@
 }
 
 /* ========================================
-   STÂNGA: DROP ZONES
+   ST�NGA: DROP ZONES
    ======================================== */
 
 .icd10-drop-zones {
@@ -106,7 +106,7 @@
     transform: scale(1.02);
 }
 
-/* Placeholder în drop zone goală */
+/* Placeholder �n drop zone goala */
 .drop-zone-placeholder {
     display: flex;
     flex-direction: column;
@@ -126,7 +126,7 @@
     font-weight: 500;
 }
 
-/* Chips în drop zone (după drop) */
+/* Chips �n drop zone (dupa drop) */
 .icd10-chips-container {
     display: flex;
     flex-wrap: wrap;
@@ -179,7 +179,7 @@
     color: #3b82f6;
 }
 
-/* Remove button în chip */
+/* Remove button �n chip */
 .icd10-chip-remove {
     background: rgba(239, 68, 68, 0.2);
     border: none;
@@ -318,7 +318,7 @@
     background: #dbeafe !important;
 }
 
-/* ✅ GRUPARE COMPACTĂ - Reducem spațiile albe */
+/* ? GRUPARE COMPACTA - Reducem spa?iile albe */
 /* Grid Group Drop Area */
 .icd10-grids .e-grid .e-groupdroparea {
     background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
@@ -329,7 +329,7 @@
     min-height: 40px;
 }
 
-/* ✅ Group Caption Row - Mai compact */
+/* ? Group Caption Row - Mai compact */
 .icd10-grids .e-grid .e-groupcaption {
     background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
     font-weight: 600;
@@ -339,13 +339,13 @@
     border-bottom: 1px solid #cbd5e1;
 }
 
-/* ✅ Group Header - Mai mic */
+/* ? Group Header - Mai mic */
 .icd10-grids .e-grid .e-recordplusexpand,
 .icd10-grids .e-grid .e-recordpluscollapse {
     margin: 0 0.5rem;
 }
 
-/* ✅ Grid Rows - Mai compacte */
+/* ? Grid Rows - Mai compacte */
 .icd10-grids .e-grid .e-row {
     height: 32px !important;
 }
@@ -355,7 +355,7 @@
     vertical-align: middle !important;
 }
 
-/* ✅ Group Footer - Mai compact */
+/* ? Group Footer - Mai compact */
 .icd10-grids .e-grid .e-groupfooterrow td {
     padding: 0.25rem 0.5rem !important;
     font-weight: 600;
@@ -363,7 +363,7 @@
     border-top: 1px solid #e2e8f0;
 }
 
-/* ✅ Elimină spațiile extra între grupuri */
+/* ? Elimina spa?iile extra �ntre grupuri */
 .icd10-grids .e-grid .e-groupcaptionsummarycell {
     padding: 0.5rem 1rem !important;
 }

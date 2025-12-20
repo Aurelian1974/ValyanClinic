@@ -1,0 +1,81 @@
+using MediatR;
+using Microsoft.Extensions.Logging;
+using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Application.Features.ICD10Management.DTOs;
+using ValyanClinic.Domain.Interfaces.Repositories;
+
+namespace ValyanClinic.Application.Features.ICD10Management.Queries.SearchICD10;
+
+/// <summary>
+/// Handler pentru cautarea codurilor ICD-10
+/// Returneaza DTOs pentru UI cu relevance scoring
+/// </summary>
+public class SearchICD10QueryHandler : IRequestHandler<SearchICD10Query, Result<List<ICD10SearchResultDto>>>
+{
+    private readonly IICD10Repository _icd10Repository;
+    private readonly ILogger<SearchICD10QueryHandler> _logger;
+
+    public SearchICD10QueryHandler(
+        IICD10Repository icd10Repository,
+        ILogger<SearchICD10QueryHandler> logger)
+    {
+        _icd10Repository = icd10Repository;
+        _logger = logger;
+    }
+
+    public async Task<Result<List<ICD10SearchResultDto>>> Handle(
+        SearchICD10Query request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "[SearchICD10QueryHandler] Searching for: {SearchTerm}, Category: {Category}, OnlyCommon: {OnlyCommon}",
+                request.SearchTerm ?? "(empty)", request.Category, request.OnlyCommon);
+
+            // ? FIXED: Permitem search term gol pentru a returna toate codurile
+            // Doar filtram dupa OnlyCommon/Category daca sunt specificate
+            var searchTerm = string.IsNullOrWhiteSpace(request.SearchTerm) ? null : request.SearchTerm;
+
+            // Call repository - returns ICD10Code entities
+            var entities = await _icd10Repository.SearchAsync(
+                searchTerm, // ? Poate fi null pentru "toate codurile"
+                request.Category,
+                request.OnlyCommon,
+                request.MaxResults,
+                cancellationToken);
+
+            // Map entities to DTOs with relevance scoring
+            var results = entities
+                .Select(e => new ICD10SearchResultDto
+                {
+                    ICD10_ID = e.ICD10_ID,
+                    Code = e.Code,
+                    Category = e.Category,
+                    ShortDescription = e.ShortDescription,
+                    LongDescription = e.LongDescription,
+                    IsCommon = e.IsCommon,
+                    Severity = e.Severity,
+                    // ? Calculate relevance doar daca avem search term
+                    RelevanceScore = string.IsNullOrEmpty(searchTerm)
+                        ? 100 // Default relevance pentru toate codurile
+                        : e.CalculateRelevance(searchTerm)
+                })
+                .OrderByDescending(r => r.RelevanceScore)
+                .ThenBy(r => r.Code)
+                .Take(request.MaxResults)
+                .ToList();
+
+            _logger.LogInformation(
+                "[SearchICD10QueryHandler] Found {Count} results for search term: {SearchTerm}",
+                results.Count, searchTerm ?? "(all codes)");
+
+            return Result<List<ICD10SearchResultDto>>.Success(results);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[SearchICD10QueryHandler] Error searching ICD-10 codes");
+            return Result<List<ICD10SearchResultDto>>.Failure($"Eroare la cautarea codurilor ICD-10: {ex.Message}");
+        }
+    }
+}

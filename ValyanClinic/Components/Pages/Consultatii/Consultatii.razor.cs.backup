@@ -1,0 +1,144 @@
+﻿using Microsoft.AspNetCore.Components;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
+using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById;
+using ValyanClinic.Application.Services.IMC;
+using ValyanClinic.Infrastructure.Services.DraftStorage;
+using ValyanClinic.Application.Services.Draft;
+
+namespace ValyanClinic.Components.Pages.Consultatii;
+
+public partial class Consultatii : ComponentBase, IDisposable
+{
+    [Parameter] public Guid ProgramareIdParam { get; set; }
+    [Parameter] public Guid PacientIdParam { get; set; }
+
+    [Inject] private IMediator Mediator { get; set; } = default!;
+    [Inject] private ILogger<Consultatii> Logger { get; set; } = default!;
+    [Inject] private IIMCCalculatorService IMCCalculator { get; set; } = default!;
+    [Inject] private IDraftStorageService<CreateConsultatieCommand> DraftService { get; set; } = default!;
+    [Inject] private DraftAutoSaveHelper<CreateConsultatieCommand> DraftAutoSaveHelper { get; set; } = default!;
+
+    private CreateConsultatieCommand Model { get; set; } = new();
+
+    // Patient info placeholders for header card
+    protected string _pacientName { get; private set; } = "Pacient";
+    protected string _pacientCnp { get; private set; } = "-";
+    protected int _pacientAge { get; private set; } = 0;
+    protected string _pacientPhone { get; private set; } = "-";
+    protected string _pacientAllergy { get; private set; } = string.Empty;
+
+    // Tabs state (4 major sections per plan)
+    protected int ActiveTabIndex { get; private set; } = 0;
+    protected int ProgressPercent => (int)(((ActiveTabIndex + 1) / 4.0) * 100);
+
+    // IMC display
+    protected decimal? _greutateKg { get; private set; }
+    protected decimal? _inaltimeCm { get; private set; }
+    protected string _imcBadgeText => _greutateKg.HasValue && _inaltimeCm.HasValue
+        ? $"IMC: {IMCCalculator.Calculate(_greutateKg.Value, _inaltimeCm.Value)}"
+        : "IMC: —";
+
+    // Draft autosave state
+    private bool _hasUnsavedChanges = false;
+    private bool _isSavingDraft = false;
+    private DateTime _cachedLastSaveTime = DateTime.MinValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model.ProgramareID = ProgramareIdParam;
+        Model.PacientID = PacientIdParam;
+
+        await LoadPacientData();
+        await LoadDraftFromStorage();
+
+        // Start autosave (hybrid approach)
+        DraftAutoSaveHelper.Start(
+            shouldSaveCallback: async () => await Task.FromResult(_hasUnsavedChanges && !_isSavingDraft),
+            saveCallback: SaveDraft);
+    }
+
+    private async Task LoadPacientData()
+    {
+        try
+        {
+            var query = new GetPacientByIdQuery(PacientIdParam);
+            var result = await Mediator.Send(query);
+            if (result.IsSuccess && result.Value != null)
+            {
+                _pacientName = result.Value.NumeComplet ?? "Pacient";
+                _pacientCnp = result.Value.CNP ?? "-";
+                _pacientAge = result.Value.Varsta;
+                _pacientPhone = result.Value.Telefon ?? "-";
+                _pacientAllergy = string.IsNullOrWhiteSpace(result.Value.Alergii) ? string.Empty : result.Value.Alergii;
+
+                Model.APP_Alergii = result.Value.Alergii;
+                Model.APP_BoliAdult = result.Value.Boli_Cronice;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[Consultatii] Error loading patient data");
+        }
+    }
+
+    protected void OnTabClick(int index)
+    {
+        if (index < 0 || index > 3) return;
+        ActiveTabIndex = index;
+        StateHasChanged();
+    }
+
+    // Draft management
+    private async Task SaveDraft()
+    {
+        if (_isSavingDraft) return;
+        try
+        {
+            _isSavingDraft = true;
+            await DraftService.SaveDraftAsync(Model.ProgramareID, Model, "Doctor");
+            _cachedLastSaveTime = DateTime.Now;
+            _hasUnsavedChanges = false;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[Consultatii] Error saving draft");
+        }
+        finally
+        {
+            _isSavingDraft = false;
+        }
+    }
+
+    private async Task LoadDraftFromStorage()
+    {
+        try
+        {
+            var draftResult = await DraftService.LoadDraftAsync(ProgramareIdParam);
+            if (draftResult.IsSuccess && draftResult.Data != null)
+            {
+                Model = draftResult.Data;
+                _cachedLastSaveTime = draftResult.SavedAt ?? DateTime.MinValue;
+                _greutateKg = Model.Greutate;
+                _inaltimeCm = Model.Inaltime;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[Consultatii] Error loading draft");
+        }
+    }
+
+    // Mark changes helper
+    protected void MarkChanged()
+    {
+        _hasUnsavedChanges = true;
+    }
+
+    public void Dispose()
+    {
+        DraftAutoSaveHelper?.Dispose();
+    }
+}

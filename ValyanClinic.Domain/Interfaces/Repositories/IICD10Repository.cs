@@ -1,4 +1,4 @@
-﻿using ValyanClinic.Domain.Entities;
+using ValyanClinic.Domain.Entities;
 
 namespace ValyanClinic.Domain.Interfaces.Repositories;
 

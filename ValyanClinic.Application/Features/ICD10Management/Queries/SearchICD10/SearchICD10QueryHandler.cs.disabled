@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ICD10Management.DTOs;
@@ -35,15 +35,15 @@ public class SearchICD10QueryHandler : IRequestHandler<SearchICD10Query, Result<
             // Validare
             if (string.IsNullOrWhiteSpace(request.SearchTerm))
             {
-                return Result<List<ICD10SearchResultDto>>.Failure("Termenul de căutare nu poate fi gol.");
+                return Result<List<ICD10SearchResultDto>>.Failure("Termenul de cautare nu poate fi gol.");
             }
 
             if (request.SearchTerm.Length < 2)
             {
-                return Result<List<ICD10SearchResultDto>>.Failure("Termenul de căutare trebuie să aibă minim 2 caractere.");
+                return Result<List<ICD10SearchResultDto>>.Failure("Termenul de cautare trebuie sa aiba minim 2 caractere.");
             }
 
-            // Căutare în repository
+            // Cautare �n repository
             var results = await _icd10Repository.SearchAsync(
                 request.SearchTerm,
                 request.Category,
@@ -59,7 +59,7 @@ public class SearchICD10QueryHandler : IRequestHandler<SearchICD10Query, Result<
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error searching ICD-10 codes");
-            return Result<List<ICD10SearchResultDto>>.Failure($"Eroare la căutarea codurilor ICD-10: {ex.Message}");
+            return Result<List<ICD10SearchResultDto>>.Failure($"Eroare la cautarea codurilor ICD-10: {ex.Message}");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ValyanClinic.Domain.Entities;
+namespace ValyanClinic.Domain.Entities;
 
 /// <summary>
 /// Entitate pentru coduri ICD-10 (Clasificarea Internationala a Bolilor)
@@ -96,23 +96,23 @@ public class ICD10Code
     /// </summary>
     public string CategoryDisplay => Category switch
     {
-        "Cardiovascular" => "❤️ Cardiovascular",
-        "Endocrin" => "🩺 Endocrin",
-        "Respirator" => "🫁 Respirator",
-        "Digestiv" => "🍽️ Digestiv",
-        "Nervos" => "🧠 Nervos",
-        "Genito-urinar" => "🔬 Genito-urinar",
-        "Musculo-scheletic" => "🦴 Musculo-scheletic",
-        "Piele" => "👤 Piele",
-        "Ochi" => "👁️ Ochi",
-        "Ureche" => "👂 Ureche",
-        "Simptome" => "📋 Simptome",
-        "Infectioase" => "🦠 Infectioase",
-        "Neoplasme" => "🔬 Neoplasme",
-        "Mental" => "🧠 Mental",
-        "Obstetric" => "🤰 Obstetric",
-        "Traumatisme" => "🚑 Traumatisme",
-        _ => $"📌 {Category}"
+        "Cardiovascular" => "?? Cardiovascular",
+        "Endocrin" => "?? Endocrin",
+        "Respirator" => "?? Respirator",
+        "Digestiv" => "??? Digestiv",
+        "Nervos" => "?? Nervos",
+        "Genito-urinar" => "?? Genito-urinar",
+        "Musculo-scheletic" => "?? Musculo-scheletic",
+        "Piele" => "?? Piele",
+        "Ochi" => "??? Ochi",
+        "Ureche" => "?? Ureche",
+        "Simptome" => "?? Simptome",
+        "Infectioase" => "?? Infectioase",
+        "Neoplasme" => "?? Neoplasme",
+        "Mental" => "?? Mental",
+        "Obstetric" => "?? Obstetric",
+        "Traumatisme" => "?? Traumatisme",
+        _ => $"?? {Category}"
     };
 
     /// <summary>
@@ -132,11 +132,11 @@ public class ICD10Code
     /// </summary>
     public string SeverityDisplay => Severity switch
     {
-        "Mild" => "Ușoară",
-        "Moderate" => "Moderată",
-        "Severe" => "Severă",
-        "Critical" => "Critică",
-        _ => "Nespecificată"
+        "Mild" => "U?oara",
+        "Moderate" => "Moderata",
+        "Severe" => "Severa",
+        "Critical" => "Critica",
+        _ => "Nespecificata"
     };
 
     /// <summary>

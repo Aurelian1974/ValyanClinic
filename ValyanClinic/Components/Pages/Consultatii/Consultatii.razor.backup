@@ -1,0 +1,345 @@
+﻿@page "/consultatii/{ProgramareIdParam:guid}/{PacientIdParam:guid}"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Doctor,Medic")]
+@rendermode InteractiveServer
+
+<PageTitle>Consultație - ValyanClinic</PageTitle>
+
+<div class="consultatii-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="page-title">
+            <h2><i class="fas fa-stethoscope"></i> Consultație Nouă</h2>
+            <p class="subtitle">Completează fișa de consultație pentru pacient</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-outline" disabled>
+                <i class="fas fa-save"></i>
+                Salvează Draft
+            </button>
+            <button class="btn btn-primary" disabled>
+                <i class="fas fa-file-medical"></i>
+                Generează Scrisoare
+            </button>
+        </div>
+    </header>
+
+    <!-- Patient Card -->
+    <section class="patient-card">
+        <div class="patient-avatar"><i class="fas fa-user"></i></div>
+        <div class="patient-details">
+            <h3 class="patient-name">@_pacientName</h3>
+            <div class="patient-meta">
+                <span class="patient-meta-item"><i class="fas fa-id-card"></i> CNP: @_pacientCnp</span>
+                <span class="patient-meta-item"><i class="fas fa-birthday-cake"></i> @_pacientAge ani</span>
+                <span class="patient-meta-item"><i class="fas fa-phone"></i> @_pacientPhone</span>
+            </div>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(_pacientAllergy))
+        {
+            <div class="patient-tags">
+                <span class="tag tag-warning"><i class="fas fa-exclamation-triangle"></i> @_pacientAllergy</span>
+            </div>
+        }
+    </section>
+
+    <!-- Tabs Container -->
+    <div class="tabs-container">
+        <div class="tabs-progress">
+            <div class="tabs-progress-bar" style="width: @ProgressPercent%"></div>
+        </div>
+
+        <div class="tabs-header">
+            <button class="tab-btn @(ActiveTabIndex == 0 ? "active" : null)" @onclick="() => OnTabClick(0)">
+                <i class="fas fa-comment-medical"></i>
+                <span>Motiv & Antecedente</span>
+                <span class="tab-number">1</span>
+            </button>
+            <button class="tab-btn @(ActiveTabIndex == 1 ? "active" : null)" @onclick="() => OnTabClick(1)">
+                <i class="fas fa-stethoscope"></i>
+                <span>Examen & Investigații</span>
+                <span class="tab-number">2</span>
+            </button>
+            <button class="tab-btn @(ActiveTabIndex == 2 ? "active" : null)" @onclick="() => OnTabClick(2)">
+                <i class="fas fa-diagnoses"></i>
+                <span>Diagnostic & Tratament</span>
+                <span class="tab-number">3</span>
+            </button>
+            <button class="tab-btn @(ActiveTabIndex == 3 ? "active" : null)" @onclick="() => OnTabClick(3)">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Concluzii</span>
+                <span class="tab-number">4</span>
+            </button>
+        </div>
+
+        <div class="tabs-content">
+            <!-- Tab 1: Motiv & Antecedente -->
+            @if (ActiveTabIndex == 0)
+            {
+                <div class="tab-panel active">
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-comment-medical"></i> Motivul Prezentării</h3>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Motivul principal al consultației</label>
+                                <textarea class="form-textarea" placeholder="Descrieți motivul prezentării pacientului..." disabled></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-history"></i> Antecedente</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">AHC - Mama</label>
+                                <input class="form-input" type="text" placeholder="Boli ereditare, afecțiuni" disabled />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">AHC - Tata</label>
+                                <input class="form-input" type="text" placeholder="Boli ereditare, afecțiuni" disabled />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">APP - Alergii</label>
+                                <input class="form-input" type="text" placeholder="Alergii cunoscute" value="@Model.APP_Alergii" disabled />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">APP - Boli Adult</label>
+                                <input class="form-input" type="text" placeholder="Boli cronice" value="@Model.APP_BoliAdult" disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Tab 2: Examen & Investigații -->
+            @if (ActiveTabIndex == 1)
+            {
+                <div class="tab-panel active">
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-user-md"></i> Semne Vitale</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Greutate (kg)</label>
+                                <input class="form-input" type="number" step="0.1" placeholder="Ex: 72.5" disabled />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Înălțime (cm)</label>
+                                <input class="form-input" type="number" step="0.1" placeholder="Ex: 175" disabled />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Temperatura (°C)</label>
+                                <input class="form-input" type="number" step="0.1" placeholder="Ex: 36.7" disabled />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TA (mmHg)</label>
+                                <input class="form-input" type="text" placeholder="Ex: 120/80" disabled />
+                            </div>
+                        </div>
+                        <div class="imc-result">
+                            <span class="imc-badge normal"><i class="fas fa-heartbeat"></i> @_imcBadgeText</span>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-notes-medical"></i> Examen Clinic General</h3>
+                        <div class="exam-grid">
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-user-check"></i></div>
+                                    <div class="exam-label">Stare generală</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input class="exam-input" placeholder="Ex: Bună" disabled />
+                                </div>
+                            </div>
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-weight"></i></div>
+                                    <div class="exam-label">Constituție</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input class="exam-input" placeholder="Ex: Normostenic" disabled />
+                                </div>
+                            </div>
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-smile"></i></div>
+                                    <div class="exam-label">Facies</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input class="exam-input" placeholder="Ex: Relaxat" disabled />
+                                </div>
+                            </div>
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-allergies"></i></div>
+                                    <div class="exam-label">Tegumente</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input class="exam-input" placeholder="Ex: Integru" disabled />
+                                </div>
+                            </div>
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-tooth"></i></div>
+                                    <div class="exam-label">Mucoase</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input class="exam-input" placeholder="Ex: Umectate" disabled />
+                                </div>
+                            </div>
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-dna"></i></div>
+                                    <div class="exam-label">Ganglioni</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input class="exam-input" placeholder="Ex: Nepalpabili" disabled />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-vials"></i> Investigații</h3>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Laborator</label>
+                                <textarea class="form-textarea" placeholder="Ex: Hemogramă, glicemie, transaminaze" disabled></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Imagistică</label>
+                                <textarea class="form-textarea" placeholder="Ex: Ecografie, radiografie" disabled></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">EKG</label>
+                                <textarea class="form-textarea" placeholder="Ex: Ritm sinusal, modificări ST" disabled></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Alte investigații</label>
+                                <textarea class="form-textarea" placeholder="Ex: Spirometrie, endoscopie" disabled></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Tab 3: Diagnostic & Tratament -->
+            @if (ActiveTabIndex == 2)
+            {
+                <div class="tab-panel active">
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-diagnoses"></i> Diagnostic</h3>
+                        <div class="diagnosis-cards">
+                            <div class="diagnosis-card">
+                                <div class="diagnosis-card-header">
+                                    <span class="diagnosis-type principal">Principal</span>
+                                    <div class="diagnosis-info">
+                                        <input class="diagnosis-code-input" placeholder="Cod" disabled />
+                                        <input class="diagnosis-name-input" placeholder="Diagnostic principal" disabled />
+                                    </div>
+                                    <div class="diagnosis-actions">
+                                        <button class="btn-icon" disabled><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="diagnosis-card-body">
+                                    <div class="diagnosis-details-label">Detalii</div>
+                                    <textarea class="diagnosis-details-textarea" placeholder="Note diagnostic" disabled></textarea>
+                                </div>
+                            </div>
+                            <div class="diagnosis-card">
+                                <div class="diagnosis-card-header">
+                                    <span class="diagnosis-type secundar">Secundar</span>
+                                    <div class="diagnosis-info">
+                                        <input class="diagnosis-code-input" placeholder="Cod" disabled />
+                                        <input class="diagnosis-name-input" placeholder="Diagnostic secundar" disabled />
+                                    </div>
+                                    <div class="diagnosis-actions">
+                                        <button class="btn-icon" disabled><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="diagnosis-card-body">
+                                    <div class="diagnosis-details-label">Detalii</div>
+                                    <textarea class="diagnosis-details-textarea" placeholder="Note diagnostic" disabled></textarea>
+                                </div>
+                            </div>
+                            <button class="add-btn" disabled><i class="fas fa-plus"></i> Adaugă diagnostic</button>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-pills"></i> Tratament</h3>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Tratament medicamentos</label>
+                                <textarea class="form-textarea" placeholder="Medicamente, dozaje, durată" disabled></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Tratament nemedicamentos</label>
+                                <textarea class="form-textarea" placeholder="Fizioterapie, dietă, regim de viață" disabled></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Tab 4: Concluzii -->
+            @if (ActiveTabIndex == 3)
+            {
+                <div class="tab-panel active">
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-clipboard-check"></i> Concluzie</h3>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Concluzie</label>
+                                <textarea class="form-textarea" placeholder="Rezumat consultație și concluzii" disabled></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <div class="form-section">
+                        <h3 class="section-title"><i class="fas fa-calendar-check"></i> Recomandări & Follow-up</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Investigații recomandate</label>
+                                <input class="form-input" type="text" placeholder="Analize, imagistică, EKG, etc." disabled />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Consulturi de specialitate</label>
+                                <input class="form-input" type="text" placeholder="Cardiologie, ORL, etc." disabled />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Următoarea programare</label>
+                                <input class="form-input" type="date" disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Footer -->
+            <div class="form-footer">
+                <div class="footer-left">
+                    <span class="autosave-indicator">
+                        <i class="fas fa-check-circle"></i>
+                        Draft
+                    </span>
+                </div>
+                <div class="footer-right">
+                    <button class="btn btn-outline" disabled><i class="fas fa-arrow-left"></i> Înapoi</button>
+                    <button class="btn btn-outline" disabled><i class="fas fa-save"></i> Salvează Draft</button>
+                    <button class="btn btn-success" disabled><i class="fas fa-check"></i> Continuă</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

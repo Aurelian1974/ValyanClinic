@@ -1,4 +1,4 @@
-﻿@rendermode InteractiveServer
+@rendermode InteractiveServer
 @using ValyanClinic.Application.Features.ICD10Management.DTOs
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Navigations
@@ -14,7 +14,7 @@
 
     <div class="icd10-card-body">
         <div class="icd10-layout">
-            <!-- ==================== STÂNGA: DROP ZONES ==================== -->
+            <!-- ==================== ST�NGA: DROP ZONES ==================== -->
             <div class="icd10-drop-zones">
                 
                 <!-- PRINCIPAL DROP ZONE -->
@@ -99,7 +99,7 @@
                         <!-- TAB 1: FAVORITE -->
                         <TabItem>
                             <ChildContent>
-                                <TabHeader Text="⭐ Favorite"></TabHeader>
+                                <TabHeader Text="? Favorite"></TabHeader>
                             </ChildContent>
                             <ContentTemplate>
                                 <div class="grid-container">
@@ -152,7 +152,7 @@
                                                             <GroupFooterTemplate>
                                                                 @{
                                                                     var aggregate = (context as AggregateTemplateContext);
-                                                                    <div>Total în grup: <b>@aggregate?.Count</b></div>
+                                                                    <div>Total �n grup: <b>@aggregate?.Count</b></div>
                                                                 }
                                                             </GroupFooterTemplate>
                                                             <FooterTemplate>
@@ -182,7 +182,7 @@
                                                                     class="btn-drag"
                                                                     draggable="true"
                                                                     @ondragstart="() => HandleDragStart(item)"
-                                                                    title="Drag pentru a adăuga">
+                                                                    title="Drag pentru a adauga">
                                                                 <i class="fas fa-grip-vertical"></i>
                                                             </button>
                                                         }
@@ -228,7 +228,7 @@
                                     {
                                         <div class="alert alert-info">
                                             <i class="fas fa-info-circle"></i>
-                                            Se încarcă codurile favorite...
+                                            Se �ncarca codurile favorite...
                                         </div>
                                     }
                                 </div>
@@ -238,7 +238,7 @@
                         <!-- TAB 2: TOATE CODURILE -->
                         <TabItem>
                             <ChildContent>
-                                <TabHeader Text="🔍 Toate Codurile"></TabHeader>
+                                <TabHeader Text="?? Toate Codurile"></TabHeader>
                             </ChildContent>
                             <ContentTemplate>
                                 <div class="grid-container">
@@ -291,7 +291,7 @@
                                                             <GroupFooterTemplate>
                                                                 @{
                                                                     var aggregate = (context as AggregateTemplateContext);
-                                                                    <div>Total în grup: <b>@aggregate?.Count</b></div>
+                                                                    <div>Total �n grup: <b>@aggregate?.Count</b></div>
                                                                 }
                                                             </GroupFooterTemplate>
                                                             <FooterTemplate>
@@ -321,7 +321,7 @@
                                                                     class="btn-drag"
                                                                     draggable="true"
                                                                     @ondragstart="() => HandleDragStart(item)"
-                                                                    title="Drag pentru a adăuga">
+                                                                    title="Drag pentru a adauga">
                                                                 <i class="fas fa-grip-vertical"></i>
                                                             </button>
                                                         }
@@ -336,13 +336,13 @@
                                                            AllowGrouping="false"></GridColumn>
                                                 
                                                 <GridColumn Field="@nameof(ICD10SearchResultDto.ShortDescription)" 
-                                                           HeaderText="Descriere Scurtă" 
+                                                           HeaderText="Descriere Scurta" 
                                                            Width="250"
                                                            ClipMode="ClipMode.EllipsisWithTooltip"
                                                            AllowGrouping="false"></GridColumn>
                                                 
                                                 <GridColumn Field="@nameof(ICD10SearchResultDto.LongDescription)" 
-                                                           HeaderText="Descriere Completă" 
+                                                           HeaderText="Descriere Completa" 
                                                            Width="300"
                                                            ClipMode="ClipMode.EllipsisWithTooltip"
                                                            AllowGrouping="false"
@@ -383,7 +383,7 @@
                                     {
                                         <div class="alert alert-info">
                                             <i class="fas fa-info-circle"></i>
-                                            Se încarcă toate codurile...
+                                            Se �ncarca toate codurile...
                                         </div>
                                     }
                                 </div>

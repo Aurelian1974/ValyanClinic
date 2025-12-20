@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.ICD10Management.Queries.SearchICD10;
@@ -8,7 +8,7 @@ namespace ValyanClinic.Components.Shared;
 
 /// <summary>
 /// Code-behind pentru componenta ICD10 Autocomplete
-/// Implementează căutare inteligentă cu debounce și highlight
+/// Implementeaza cautare inteligenta cu debounce ?i highlight
 /// </summary>
 public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
 {
@@ -19,47 +19,47 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     // ==================== PARAMETERS ====================
 
     /// <summary>
-    /// Label-ul afișat deasupra input-ului
+    /// Label-ul afi?at deasupra input-ului
     /// </summary>
     [Parameter] public string Label { get; set; } = "Cod ICD-10";
 
     /// <summary>
-    /// Placeholder text în input
+    /// Placeholder text �n input
     /// </summary>
-    [Parameter] public string Placeholder { get; set; } = "Caută după cod sau descriere...";
+    [Parameter] public string Placeholder { get; set; } = "Cauta dupa cod sau descriere...";
 
     /// <summary>
-    /// Text de ajutor afișat sub input
+    /// Text de ajutor afi?at sub input
     /// </summary>
     [Parameter] public string? HelpText { get; set; }
 
     /// <summary>
-    /// Indică dacă câmpul este obligatoriu (afișează *)
+    /// Indica daca c�mpul este obligatoriu (afi?eaza *)
     /// </summary>
     [Parameter] public bool IsRequired { get; set; }
 
     /// <summary>
-    /// Filtrează după categorie specifică (ex: "Cardiovascular")
+    /// Filtreaza dupa categorie specifica (ex: "Cardiovascular")
     /// </summary>
     [Parameter] public string? Category { get; set; }
 
     /// <summary>
-    /// Afișează doar coduri frecvente (IsCommon = true)
+    /// Afi?eaza doar coduri frecvente (IsCommon = true)
     /// </summary>
     [Parameter] public bool OnlyCommon { get; set; }
 
     /// <summary>
-    /// Număr maxim de rezultate afișate în dropdown
+    /// Numar maxim de rezultate afi?ate �n dropdown
     /// </summary>
     [Parameter] public int MaxResults { get; set; } = 10;
 
     /// <summary>
-    /// Lungime minimă text pentru a declanșa căutarea
+    /// Lungime minima text pentru a declan?a cautarea
     /// </summary>
     [Parameter] public int MinSearchLength { get; set; } = 2;
 
     /// <summary>
-    /// Delay în milisecunde pentru debounce căutare
+    /// Delay �n milisecunde pentru debounce cautare
     /// </summary>
     [Parameter] public int SearchDebounceMs { get; set; } = 300;
 
@@ -76,48 +76,48 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     [Parameter] public EventCallback<string?> SelectedCodeChanged { get; set; }
 
     /// <summary>
-    /// Event callback când un cod este selectat (returnează DTO complet)
+    /// Event callback c�nd un cod este selectat (returneaza DTO complet)
     /// </summary>
     [Parameter] public EventCallback<ICD10SearchResultDto?> OnCodeSelected { get; set; }
 
     // ==================== STATE ====================
 
     /// <summary>
-    /// Text curent din input de căutare
+    /// Text curent din input de cautare
     /// </summary>
     private string SearchText { get; set; } = string.Empty;
 
     /// <summary>
-    /// Indică dacă dropdown-ul este deschis
+    /// Indica daca dropdown-ul este deschis
     /// </summary>
     private bool IsOpen { get; set; }
 
     /// <summary>
-    /// Indică dacă se efectuează o căutare (loading state)
+    /// Indica daca se efectueaza o cautare (loading state)
     /// </summary>
     private bool IsSearching { get; set; }
 
     /// <summary>
-    /// Indică dacă input-ul are focus
+    /// Indica daca input-ul are focus
     /// </summary>
     private bool IsFocused { get; set; }
 
     // ==================== DATA ====================
 
     /// <summary>
-    /// Lista de rezultate din căutare
+    /// Lista de rezultate din cautare
     /// </summary>
     private List<ICD10SearchResultDto> Results { get; set; } = new();
 
     /// <summary>
-    /// Rezultatul selectat curent (pentru highlight în dropdown)
+    /// Rezultatul selectat curent (pentru highlight �n dropdown)
     /// </summary>
     private ICD10SearchResultDto? SelectedResult { get; set; }
 
     // ==================== TIMERS ====================
 
     /// <summary>
-    /// Timer pentru debounce căutare
+    /// Timer pentru debounce cautare
     /// </summary>
     private System.Threading.Timer? _debounceTimer;
 
@@ -129,8 +129,8 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     // ==================== LIFECYCLE METHODS ====================
 
     /// <summary>
-    /// Se apelează când parametrii se schimbă
-    /// Pre-populează search text dacă există un cod selectat
+    /// Se apeleaza c�nd parametrii se schimba
+    /// Pre-populeaza search text daca exista un cod selectat
     /// </summary>
     protected override void OnParametersSet()
     {
@@ -149,10 +149,10 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     {
         SearchText = e.Value?.ToString() ?? string.Empty;
 
-        // Dispose timer anterior dacă există
+        // Dispose timer anterior daca exista
         _debounceTimer?.Dispose();
 
-        // Verifică lungime minimă
+        // Verifica lungime minima
         if (string.IsNullOrWhiteSpace(SearchText) || SearchText.Length < MinSearchLength)
         {
             Results.Clear();
@@ -161,7 +161,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
             return;
         }
 
-        // Creează timer nou pentru debounce
+        // Creeaza timer nou pentru debounce
         _debounceTimer = new System.Threading.Timer(async _ =>
         {
             await InvokeAsync(async () =>
@@ -172,7 +172,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     }
 
     /// <summary>
-    /// Efectuează căutarea efectivă prin MediatR
+    /// Efectueaza cautarea efectiva prin MediatR
     /// </summary>
     private async Task PerformSearch()
     {
@@ -188,7 +188,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
                 Category,
                 OnlyCommon,
                 OnlyLeafNodes: true,
-                MaxResults: 50 // Get more results, apoi le filtrăm
+                MaxResults: 50 // Get more results, apoi le filtram
             );
 
             var result = await Mediator.Send(query);
@@ -235,8 +235,8 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
 
         Logger.LogInformation("[ICD10Autocomplete] Selected code: {Code}", result.Code);
 
-        // ✅ RESETEAZĂ SearchText pentru a permite adăugarea următorului cod
-        // Forțează UI update prin InvokeAsync + StateHasChanged
+        // ? RESETEAZA SearchText pentru a permite adaugarea urmatorului cod
+        // For?eaza UI update prin InvokeAsync + StateHasChanged
         await InvokeAsync(() =>
         {
             SearchText = string.Empty;
@@ -279,7 +279,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     }
 
     /// <summary>
-    /// Șterge căutarea și resetează starea
+    /// ?terge cautarea ?i reseteaza starea
     /// </summary>
     private void ClearSearch()
     {
@@ -298,22 +298,22 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     // ==================== HELPER METHODS ====================
 
     /// <summary>
-    /// Convertește severitatea din engleză în română
+    /// Converte?te severitatea din engleza �n rom�na
     /// </summary>
     private string GetSeverityText(string? severity)
     {
         return severity switch
         {
-            "Mild" => "Ușoară",
-            "Moderate" => "Moderată",
-            "Severe" => "Severă",
-            "Critical" => "Critică",
+            "Mild" => "U?oara",
+            "Moderate" => "Moderata",
+            "Severe" => "Severa",
+            "Critical" => "Critica",
             _ => severity ?? ""
         };
     }
 
     /// <summary>
-    /// Evidențiază termenul de căutare în text cu tag mark
+    /// Eviden?iaza termenul de cautare �n text cu tag mark
     /// </summary>
     private MarkupString HighlightSearchTerm(string text, string searchTerm)
     {

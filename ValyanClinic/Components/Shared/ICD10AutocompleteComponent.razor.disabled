@@ -1,4 +1,4 @@
-﻿@using MediatR
+@using MediatR
 @using ValyanClinic.Application.Features.ICD10Management.Queries.SearchICD10
 @using ValyanClinic.Application.Features.ICD10Management.DTOs
 @inject IMediator Mediator
@@ -86,10 +86,10 @@
                 
                 <div class="autocomplete-footer">
                     <small class="text-muted">
-                        @Results.Count rezultate găsite
+                        @Results.Count rezultate gasite
                         @if (OnlyCommon)
                         {
-                            <span>• Doar coduri frecvente</span>
+                            <span>� Doar coduri frecvente</span>
                         }
                     </small>
                 </div>
@@ -121,7 +121,7 @@
 @code {
     // Parameters
     [Parameter] public string Label { get; set; } = "Cod ICD-10";
-    [Parameter] public string Placeholder { get; set; } = "Caută cod sau diagnostic (ex: I20, diabet, pneumonie)";
+    [Parameter] public string Placeholder { get; set; } = "Cauta cod sau diagnostic (ex: I20, diabet, pneumonie)";
     [Parameter] public string? SelectedCode { get; set; }
     [Parameter] public EventCallback<string?> SelectedCodeChanged { get; set; }
     [Parameter] public EventCallback<ICD10SearchResultDto?> OnCodeSelected { get; set; }
@@ -357,11 +357,11 @@
 
     private string GetSeverityDisplay(string? severity) => severity switch
     {
-        "Mild" => "Ușoară",
-        "Moderate" => "Moderată",
-        "Severe" => "Severă",
-        "Critical" => "Critică",
-        _ => "Nespecificată"
+        "Mild" => "U?oara",
+        "Moderate" => "Moderata",
+        "Severe" => "Severa",
+        "Critical" => "Critica",
+        _ => "Nespecificata"
     };
 
     public void Dispose()

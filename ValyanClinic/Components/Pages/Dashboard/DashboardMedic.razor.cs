@@ -337,9 +337,7 @@ public partial class DashboardMedic : ComponentBase
     {
         Logger.LogInformation("[DashboardMedic] Starting consultatie: {ProgramareId}", programareId);
 
-        // Gaseste programarea pentru a obtine PacientID
         var programare = ToateProgramarile.FirstOrDefault(p => p.ProgramareID == programareId);
-
         if (programare == null)
         {
             Logger.LogWarning("[DashboardMedic] Programare not found: {ProgramareId}", programareId);
@@ -352,56 +350,8 @@ public partial class DashboardMedic : ComponentBase
             return;
         }
 
-        try
-        {
-            // ✅ WAIT pentru ca modalul să fie complet render-at
-            // Aceasta este o măsură de precauție pentru cazurile când componenta nu este încă gata
-            await Task.Delay(50);
-
-            // ✅ Verifică dacă modalul este inițializat
-            if (ConsultatieModalRef == null)
-            {
-                Logger.LogError("[DashboardMedic] ConsultatieModalRef is null! Forcing re-render...");
-
-                // ✅ Forțează re-render și încearcă din nou
-                await InvokeAsync(StateHasChanged);
-
-                // ✅ Așteaptă două cicluri de render
-                await Task.Delay(200);
-
-                if (ConsultatieModalRef == null)
-                {
-                    Logger.LogError("[DashboardMedic] ConsultatieModalRef is still null after re-render!");
-                    // TODO: Show error toast "Eroare la deschiderea modalului. Te rugăm să reîncarci pagina."
-                    return;
-                }
-            }
-
-            Logger.LogInformation("[DashboardMedic] Opening modal with ProgramareID={ProgramareId}, PacientID={PacientId}, MedicID={MedicId}",
-                programareId, programare.PacientID, PersonalMedicalID.Value);
-
-            // ✅ NOUĂ ABORDARE: Setează parametrii ȘI deschide într-un singur apel
-            // Acest lucru garantează că parametrii sunt setați înainte ca Open() să fie executat
-            ConsultatieModalRef.ProgramareID = programareId;
-            ConsultatieModalRef.PacientID = programare.PacientID;
-            ConsultatieModalRef.MedicID = PersonalMedicalID.Value;
-
-            // ✅ Așteaptă să se seteze parametrii
-            await InvokeAsync(StateHasChanged);
-
-            // ✅ Deschide modalul
-            await ConsultatieModalRef.Open();
-
-            // ✅ Force final UI update
-            await InvokeAsync(StateHasChanged);
-
-            Logger.LogInformation("[DashboardMedic] Modal opened successfully");
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "[DashboardMedic] Error opening consultatie modal");
-            // TODO: Show error toast
-        }
+        // Navigate to consultatii page (replaces modal)
+        NavigationManager.NavigateTo($"/consultatii/{programare.ProgramareID}/{programare.PacientID}");
     }
 
     private async Task OnConsultatieCompleted()

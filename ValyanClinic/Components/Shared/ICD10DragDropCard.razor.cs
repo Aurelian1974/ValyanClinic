@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -9,10 +9,10 @@ using Syncfusion.Blazor.Grids;
 namespace ValyanClinic.Components.Shared;
 
 /// <summary>
-/// Componentă ICD-10 cu Drag & Drop din DataGrid
-/// Permite selectare intuitivă prin drag & drop din listă de coduri
-/// ✅ GRUPARE pe TOATE datele încărcate, nu doar pagina curentă
-/// ✅ SEARCH REAL-TIME cu case insensitive
+/// Componenta ICD-10 cu Drag & Drop din DataGrid
+/// Permite selectare intuitiva prin drag & drop din lista de coduri
+/// ? GRUPARE pe TOATE datele �ncarcate, nu doar pagina curenta
+/// ? SEARCH REAL-TIME cu case insensitive
 /// </summary>
 public partial class ICD10DragDropCard : ComponentBase
 {
@@ -39,22 +39,22 @@ public partial class ICD10DragDropCard : ComponentBase
     // ==================== STATE ====================
 
     /// <summary>
-    /// Referință la Syncfusion Grid pentru coduri favorite
+    /// Referin?a la Syncfusion Grid pentru coduri favorite
     /// </summary>
     private SfGrid<ICD10SearchResultDto>? FavoriteGridRef { get; set; }
 
     /// <summary>
-    /// Referință la Syncfusion Grid pentru toate codurile
+    /// Referin?a la Syncfusion Grid pentru toate codurile
     /// </summary>
     private SfGrid<ICD10SearchResultDto>? AllCodesGridRef { get; set; }
 
     /// <summary>
-    /// Indică dacă zona Principal este în drag-over state
+    /// Indica daca zona Principal este �n drag-over state
     /// </summary>
     private bool IsPrincipalDragOver { get; set; }
 
     /// <summary>
-    /// Indică dacă zona Secundare este în drag-over state
+    /// Indica daca zona Secundare este �n drag-over state
     /// </summary>
     private bool IsSecundareDragOver { get; set; }
 
@@ -67,13 +67,13 @@ public partial class ICD10DragDropCard : ComponentBase
 
     /// <summary>
     /// Lista cu coduri ICD-10 favorite (din DB - IsCommon = true)
-    /// ✅ TOATE DATELE - pentru grupare corectă
+    /// ? TOATE DATELE - pentru grupare corecta
     /// </summary>
     private List<ICD10SearchResultDto> FavoriteCodes { get; set; } = new();
 
     /// <summary>
-    /// Lista cu TOATE codurile ICD-10 (se încarcă la OnInitialized)
-    /// ✅ TOATE DATELE - pentru grupare corectă
+    /// Lista cu TOATE codurile ICD-10 (se �ncarca la OnInitialized)
+    /// ? TOATE DATELE - pentru grupare corecta
     /// </summary>
     private List<ICD10SearchResultDto> AllCodes { get; set; } = new();
 
@@ -99,15 +99,15 @@ public partial class ICD10DragDropCard : ComponentBase
         Logger.LogInformation("[ICD10DragDrop] OnInitializedAsync END - FavoriteCodes: {FavCount}, AllCodes: {AllCount}",
             FavoriteCodes.Count, AllCodes.Count);
 
-        // ✅ Forțează re-renderizare după încărcarea datelor
+        // ? For?eaza re-renderizare dupa �ncarcarea datelor
         await InvokeAsync(StateHasChanged);
     }
 
     // ==================== DATA LOADING ====================
 
     /// <summary>
-    /// Încarcă codurile favorite din database
-    /// ✅ TOATE DATELE pentru grupare corectă
+    /// �ncarca codurile favorite din database
+    /// ? TOATE DATELE pentru grupare corecta
     /// </summary>
     private async Task LoadFavoriteCodes()
     {
@@ -119,9 +119,9 @@ public partial class ICD10DragDropCard : ComponentBase
             var query = new SearchICD10Query(
                 SearchTerm: "",
                 Category: null,
-                OnlyCommon: true, // ✅ Doar coduri marcate ca IsCommon = true
+                OnlyCommon: true, // ? Doar coduri marcate ca IsCommon = true
                 OnlyLeafNodes: true,
-                MaxResults: 1000  // ✅ Load TOATE pentru grupare corectă
+                MaxResults: 1000  // ? Load TOATE pentru grupare corecta
             );
 
             var result = await Mediator.Send(query);
@@ -132,30 +132,30 @@ public partial class ICD10DragDropCard : ComponentBase
             if (result.IsSuccess && result.Value != null && result.Value.Any())
             {
                 FavoriteCodes = result.Value.ToList();
-                Logger.LogInformation("[ICD10DragDrop] ✅ Loaded {Count} favorite codes", FavoriteCodes.Count);
+                Logger.LogInformation("[ICD10DragDrop] ? Loaded {Count} favorite codes", FavoriteCodes.Count);
 
-                // ✅ Log first 3 codes pentru debug
+                // ? Log first 3 codes pentru debug
                 var sample = string.Join(", ", FavoriteCodes.Take(3).Select(c => c.Code));
                 Logger.LogInformation("[ICD10DragDrop] Sample codes: {Sample}", sample);
             }
             else
             {
-                Logger.LogWarning("[ICD10DragDrop] ❌ No favorite codes loaded - Using TEST DATA");
+                Logger.LogWarning("[ICD10DragDrop] ? No favorite codes loaded - Using TEST DATA");
 
-                // ✅ FALLBACK: Test data hardcoded
+                // ? FALLBACK: Test data hardcoded
                 FavoriteCodes = GetTestFavoriteData();
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "[ICD10DragDrop] ❌ EXCEPTION loading favorite codes - Using TEST DATA");
+            Logger.LogError(ex, "[ICD10DragDrop] ? EXCEPTION loading favorite codes - Using TEST DATA");
             FavoriteCodes = GetTestFavoriteData();
         }
     }
 
     /// <summary>
-    /// Încarcă TOATE codurile ICD-10 pentru grid-ul complet
-    /// ✅ TOATE DATELE pentru grupare corectă
+    /// �ncarca TOATE codurile ICD-10 pentru grid-ul complet
+    /// ? TOATE DATELE pentru grupare corecta
     /// </summary>
     private async Task LoadAllCodes()
     {
@@ -163,13 +163,13 @@ public partial class ICD10DragDropCard : ComponentBase
         {
             Logger.LogInformation("[ICD10DragDrop] LoadAllCodes START");
 
-            // Query pentru toate codurile (fără filtru) - TOATE
+            // Query pentru toate codurile (fara filtru) - TOATE
             var query = new SearchICD10Query(
                 SearchTerm: "",
                 Category: null,
                 OnlyCommon: false,
                 OnlyLeafNodes: true,
-                MaxResults: 1000 // ✅ Load TOATE pentru grupare corectă
+                MaxResults: 1000 // ? Load TOATE pentru grupare corecta
             );
 
             var result = await Mediator.Send(query);
@@ -180,23 +180,23 @@ public partial class ICD10DragDropCard : ComponentBase
             if (result.IsSuccess && result.Value != null && result.Value.Any())
             {
                 AllCodes = result.Value.ToList();
-                Logger.LogInformation("[ICD10DragDrop] ✅ Loaded {Count} total codes", AllCodes.Count);
+                Logger.LogInformation("[ICD10DragDrop] ? Loaded {Count} total codes", AllCodes.Count);
 
-                // ✅ Log first 3 codes pentru debug
+                // ? Log first 3 codes pentru debug
                 var sample = string.Join(", ", AllCodes.Take(3).Select(c => c.Code));
                 Logger.LogInformation("[ICD10DragDrop] Sample codes: {Sample}", sample);
             }
             else
             {
-                Logger.LogWarning("[ICD10DragDrop] ❌ No codes loaded - Using TEST DATA");
+                Logger.LogWarning("[ICD10DragDrop] ? No codes loaded - Using TEST DATA");
 
-                // ✅ FALLBACK: Test data hardcoded
+                // ? FALLBACK: Test data hardcoded
                 AllCodes = GetTestAllData();
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "[ICD10DragDrop] ❌ EXCEPTION loading all codes - Using TEST DATA");
+            Logger.LogError(ex, "[ICD10DragDrop] ? EXCEPTION loading all codes - Using TEST DATA");
             AllCodes = GetTestAllData();
         }
     }
@@ -204,7 +204,7 @@ public partial class ICD10DragDropCard : ComponentBase
     // ==================== SEARCH HANDLERS (REAL-TIME) ====================
 
     /// <summary>
-    /// Handler pentru search real-time în Favorite Grid
+    /// Handler pentru search real-time �n Favorite Grid
     /// </summary>
     private async Task OnFavoriteSearch(string searchValue)
     {
@@ -218,7 +218,7 @@ public partial class ICD10DragDropCard : ComponentBase
     }
 
     /// <summary>
-    /// Handler pentru search real-time în All Codes Grid
+    /// Handler pentru search real-time �n All Codes Grid
     /// </summary>
     private async Task OnAllCodesSearch(string searchValue)
     {
@@ -232,35 +232,35 @@ public partial class ICD10DragDropCard : ComponentBase
     }
 
     /// <summary>
-    /// Handler pentru grid actions în Favorite - captează search real-time
+    /// Handler pentru grid actions �n Favorite - capteaza search real-time
     /// </summary>
     private void FavoriteActionBegin(ActionEventArgs<ICD10SearchResultDto> args)
     {
-        // Captează doar action-ul de Search
+        // Capteaza doar action-ul de Search
         if (args.RequestType == Syncfusion.Blazor.Grids.Action.Searching)
         {
             Logger.LogDebug("[ICD10DragDrop] Favorite search triggered: {Search}", args.SearchString);
-            // Search-ul built-in va funcționa automat, noi doar logăm
+            // Search-ul built-in va func?iona automat, noi doar logam
         }
     }
 
     /// <summary>
-    /// Handler pentru grid actions în All Codes - captează search real-time
+    /// Handler pentru grid actions �n All Codes - capteaza search real-time
     /// </summary>
     private void AllCodesActionBegin(ActionEventArgs<ICD10SearchResultDto> args)
     {
-        // Captează doar action-ul de Search
+        // Capteaza doar action-ul de Search
         if (args.RequestType == Syncfusion.Blazor.Grids.Action.Searching)
         {
             Logger.LogDebug("[ICD10DragDrop] All codes search triggered: {Search}", args.SearchString);
-            // Search-ul built-in va funcționa automat, noi doar logăm
+            // Search-ul built-in va func?iona automat, noi doar logam
         }
     }
 
     // ==================== DRAG & DROP HANDLERS ====================
 
     /// <summary>
-    /// Handler pentru start drag (stochează codul dragat)
+    /// Handler pentru start drag (stocheaza codul dragat)
     /// </summary>
     private void HandleDragStart(ICD10SearchResultDto code)
     {
@@ -269,7 +269,7 @@ public partial class ICD10DragDropCard : ComponentBase
     }
 
     /// <summary>
-    /// Handler pentru drop în zona PRINCIPAL
+    /// Handler pentru drop �n zona PRINCIPAL
     /// </summary>
     private async Task HandleDropPrincipal(DragEventArgs e)
     {
@@ -281,16 +281,16 @@ public partial class ICD10DragDropCard : ComponentBase
             return;
         }
 
-        // Verifică dacă codul este deja în secundare
+        // Verifica daca codul este deja �n secundare
         if (!string.IsNullOrEmpty(CoduriICD10Secundare) &&
             CoduriICD10Secundare.Contains(DraggedCode.Code))
         {
             Logger.LogWarning("[ICD10DragDrop] Code {Code} already in secundare", DraggedCode.Code);
-            // TODO: Show toast "Codul există deja în secundare!"
+            // TODO: Show toast "Codul exista deja �n secundare!"
             return;
         }
 
-        // Setează cod principal
+        // Seteaza cod principal
         CoduriICD10Principal = DraggedCode.Code;
         await CoduriICD10PrincipalChanged.InvokeAsync(CoduriICD10Principal);
 
@@ -301,7 +301,7 @@ public partial class ICD10DragDropCard : ComponentBase
     }
 
     /// <summary>
-    /// Handler pentru drop în zona SECUNDARE
+    /// Handler pentru drop �n zona SECUNDARE
     /// </summary>
     private async Task HandleDropSecundare(DragEventArgs e)
     {
@@ -313,7 +313,7 @@ public partial class ICD10DragDropCard : ComponentBase
             return;
         }
 
-        // Verifică dacă codul este deja principal
+        // Verifica daca codul este deja principal
         if (CoduriICD10Principal == DraggedCode.Code)
         {
             Logger.LogWarning("[ICD10DragDrop] Code {Code} is principal", DraggedCode.Code);
@@ -321,7 +321,7 @@ public partial class ICD10DragDropCard : ComponentBase
             return;
         }
 
-        // Verifică dacă codul există deja în secundare
+        // Verifica daca codul exista deja �n secundare
         var existingCodes = string.IsNullOrEmpty(CoduriICD10Secundare)
             ? new List<string>()
             : CoduriICD10Secundare.Split(',', StringSplitOptions.RemoveEmptyEntries)
@@ -331,11 +331,11 @@ public partial class ICD10DragDropCard : ComponentBase
         if (existingCodes.Contains(DraggedCode.Code))
         {
             Logger.LogDebug("[ICD10DragDrop] Code {Code} already in secundare", DraggedCode.Code);
-            // TODO: Show toast "Codul a fost deja adăugat!"
+            // TODO: Show toast "Codul a fost deja adaugat!"
             return;
         }
 
-        // Adaugă cod secundar
+        // Adauga cod secundar
         if (string.IsNullOrEmpty(CoduriICD10Secundare))
         {
             CoduriICD10Secundare = DraggedCode.Code;
@@ -357,7 +357,7 @@ public partial class ICD10DragDropCard : ComponentBase
     // ==================== REMOVE HANDLERS ====================
 
     /// <summary>
-    /// Șterge codul principal
+    /// ?terge codul principal
     /// </summary>
     private async Task RemovePrincipal()
     {
@@ -369,7 +369,7 @@ public partial class ICD10DragDropCard : ComponentBase
     }
 
     /// <summary>
-    /// Șterge un cod secundar
+    /// ?terge un cod secundar
     /// </summary>
     private async Task RemoveSecundar(string codeToRemove)
     {
@@ -397,16 +397,16 @@ public partial class ICD10DragDropCard : ComponentBase
     // ==================== HELPER METHODS ====================
 
     /// <summary>
-    /// Convertește severitatea din engleză în română
+    /// Converte?te severitatea din engleza �n rom�na
     /// </summary>
     private string GetSeverityText(string? severity)
     {
         return severity switch
         {
-            "Mild" => "Ușoară",
-            "Moderate" => "Moderată",
-            "Severe" => "Severă",
-            "Critical" => "Critică",
+            "Mild" => "U?oara",
+            "Moderate" => "Moderata",
+            "Severe" => "Severa",
+            "Critical" => "Critica",
             _ => severity ?? ""
         };
     }
@@ -414,33 +414,33 @@ public partial class ICD10DragDropCard : ComponentBase
     // ==================== TEST DATA (FALLBACK) ====================
 
     /// <summary>
-    /// Returnează test data pentru favorite (fallback dacă DB goală)
+    /// Returneaza test data pentru favorite (fallback daca DB goala)
     /// </summary>
     private List<ICD10SearchResultDto> GetTestFavoriteData()
     {
         return new List<ICD10SearchResultDto>
         {
-            new() { ICD10_ID = Guid.NewGuid(), Code = "I10", ShortDescription = "Hipertensiune esențială (primară)", LongDescription = "Hipertensiune arterială esențială primară", Category = "Cardiovascular", IsCommon = true, Severity = "Moderate", RelevanceScore = 100 },
-            new() { ICD10_ID = Guid.NewGuid(), Code = "E11.9", ShortDescription = "Diabet zaharat tip 2 fără complicații", LongDescription = "Diabet zaharat tip 2 fără complicații specificate", Category = "Endocrin", IsCommon = true, Severity = "Moderate", RelevanceScore = 95 },
+            new() { ICD10_ID = Guid.NewGuid(), Code = "I10", ShortDescription = "Hipertensiune esen?iala (primara)", LongDescription = "Hipertensiune arteriala esen?iala primara", Category = "Cardiovascular", IsCommon = true, Severity = "Moderate", RelevanceScore = 100 },
+            new() { ICD10_ID = Guid.NewGuid(), Code = "E11.9", ShortDescription = "Diabet zaharat tip 2 fara complica?ii", LongDescription = "Diabet zaharat tip 2 fara complica?ii specificate", Category = "Endocrin", IsCommon = true, Severity = "Moderate", RelevanceScore = 95 },
             new() { ICD10_ID = Guid.NewGuid(), Code = "J18", ShortDescription = "Pneumonie de organism nespecificat", LongDescription = "Pneumonie de organism nespecificat", Category = "Respirator", IsCommon = true, Severity = "Severe", RelevanceScore = 90 },
-            new() { ICD10_ID = Guid.NewGuid(), Code = "I20.0", ShortDescription = "Angină pectorală instabilă", LongDescription = "Angină pectorală instabilă", Category = "Cardiovascular", IsCommon = true, Severity = "Severe", RelevanceScore = 85 },
-            new() { ICD10_ID = Guid.NewGuid(), Code = "K29.0", ShortDescription = "Gastrită acută hemoragică", LongDescription = "Gastrită acută hemoragică", Category = "Digestiv", IsCommon = true, Severity = "Moderate", RelevanceScore = 80 }
+            new() { ICD10_ID = Guid.NewGuid(), Code = "I20.0", ShortDescription = "Angina pectorala instabila", LongDescription = "Angina pectorala instabila", Category = "Cardiovascular", IsCommon = true, Severity = "Severe", RelevanceScore = 85 },
+            new() { ICD10_ID = Guid.NewGuid(), Code = "K29.0", ShortDescription = "Gastrita acuta hemoragica", LongDescription = "Gastrita acuta hemoragica", Category = "Digestiv", IsCommon = true, Severity = "Moderate", RelevanceScore = 80 }
         };
     }
 
     /// <summary>
-    /// Returnează test data pentru toate codurile (fallback dacă DB goală)
+    /// Returneaza test data pentru toate codurile (fallback daca DB goala)
     /// </summary>
     private List<ICD10SearchResultDto> GetTestAllData()
     {
         var testData = GetTestFavoriteData();
 
-        // Adaugă coduri suplimentare
+        // Adauga coduri suplimentare
         testData.AddRange(new List<ICD10SearchResultDto>
         {
             new() { ICD10_ID = Guid.NewGuid(), Code = "I21.0", ShortDescription = "Infarct miocardic acut", LongDescription = "Infarct miocardic acut transmural al peretelui anterior", Category = "Cardiovascular", IsCommon = false, Severity = "Critical", RelevanceScore = 75 },
-            new() { ICD10_ID = Guid.NewGuid(), Code = "J44.0", ShortDescription = "BPOC cu infecție acută", LongDescription = "Boală pulmonară obstructivă cronică cu infecție acută a tractului respirator inferior", Category = "Respirator", IsCommon = false, Severity = "Severe", RelevanceScore = 70 },
-            new() { ICD10_ID = Guid.NewGuid(), Code = "N18.3", ShortDescription = "Boală renală cronică stadiul 3", LongDescription = "Boală renală cronică stadiul 3 (moderată)", Category = "Urinar", IsCommon = false, Severity = "Moderate", RelevanceScore = 65 }
+            new() { ICD10_ID = Guid.NewGuid(), Code = "J44.0", ShortDescription = "BPOC cu infec?ie acuta", LongDescription = "Boala pulmonara obstructiva cronica cu infec?ie acuta a tractului respirator inferior", Category = "Respirator", IsCommon = false, Severity = "Severe", RelevanceScore = 70 },
+            new() { ICD10_ID = Guid.NewGuid(), Code = "N18.3", ShortDescription = "Boala renala cronica stadiul 3", LongDescription = "Boala renala cronica stadiul 3 (moderata)", Category = "Urinar", IsCommon = false, Severity = "Moderate", RelevanceScore = 65 }
         });
 
         return testData;
