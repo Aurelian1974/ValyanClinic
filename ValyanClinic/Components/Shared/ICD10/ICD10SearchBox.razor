@@ -5,10 +5,11 @@
     - Display favorites (⭐)
     - Keyboard navigation (↑↓ Enter)
     - Click to select
+    - Button pentru modal tabel favorite complet
 *@
 
 <div class="icd10-search-box">
-    <!-- Search Input -->
+    <!-- Search Input with Favorites Button -->
     <div class="search-input-wrapper">
         <i class="fas fa-search search-icon"></i>
         <input type="text" 
@@ -25,6 +26,18 @@
           <button class="btn-clear" @onclick="ClearSearch" title="Șterge căutare">
          <i class="fas fa-times"></i>
          </button>
+        }
+        
+        <!-- ✅ NEW: Favorites Modal Button -->
+        @if (CurrentUserId.HasValue)
+        {
+            <button type="button" 
+                    class="btn-favorites-modal" 
+                    @onclick="OpenFavoritesModal" 
+                    title="Vezi toate favoritele în tabel">
+                <i class="fas fa-star"></i>
+                <span>Favorite</span>
+            </button>
         }
         
         @if (IsSearching)
@@ -89,3 +102,9 @@
         </div>
     }
 </div>
+
+<!-- ✅ NEW: Favorites Modal -->
+<ICD10FavoritesModal @bind-IsVisible="IsFavoritesModalVisible"
+                     CurrentUserId="@CurrentUserId"
+                     OnFavoriteSelected="HandleFavoriteSelectedFromModal"
+                     @ref="_favoritesModal" />

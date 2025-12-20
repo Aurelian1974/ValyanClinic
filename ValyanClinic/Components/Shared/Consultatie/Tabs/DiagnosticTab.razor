@@ -1,105 +1,79 @@
 ﻿@*
     Tab pentru Diagnostic & Tratament
-  Include: Diagnostic pozitiv/diferențial/etiologic + Coduri ICD-10 cu favorites
+    ✅ UPDATED: Split in diagnostic principal + diagnostice secundare cu coduri ICD-10
 *@
-@using ValyanClinic.Components.Shared.ICD10
+@using ValyanClinic.Components.Shared.Consultatie
 
 <div class="tab-content-section">
     <div class="section-title">
-  <i class="fas fa-diagnoses"></i>
-  <h4>Diagnostic & Tratament</h4>
+        <i class="fas fa-diagnoses"></i>
+        <h4>Diagnostic & Tratament</h4>
     </div>
     
-    <!-- ==================== SECȚIUNEA 1: DIAGNOSTIC TEXTUAL ==================== -->
+    <!-- ==================== SECȚIUNEA 1: DIAGNOSTIC PRINCIPAL (SIMPLIFICAT) ==================== -->
     
-    @* Diagnostic Pozitiv *@
- <div class="form-group">
-        <label class="form-label required">
-      Diagnostic pozitiv
-      </label>
-        <textarea class="form-control" 
-      rows="3"
-     placeholder="Descrieți diagnosticul principal stabilit..."
-@bind="Model.DiagnosticPozitiv"
-    @oninput="OnFieldChanged">
- </textarea>
-        @if (ShowValidation && string.IsNullOrWhiteSpace(Model.DiagnosticPozitiv))
-        {
-        <div class="invalid-feedback d-block">
-   <i class="fas fa-exclamation-circle"></i>
-              Diagnosticul este obligatoriu
-   </div>
-      }
-    </div>
-    
-    @* Diagnostic Diferențial *@
-    <div class="form-group">
-        <label class="form-label">
-            Diagnostic diferențial
-        </label>
-      <textarea class="form-control" 
-         rows="3"
-          placeholder="Liste diagnostice alternative care trebuie excluse..."
-    @bind="Model.DiagnosticDiferential"
-            @oninput="OnFieldChanged">
-        </textarea>
-        <small class="form-text text-muted">
-          <i class="fas fa-info-circle"></i>
-       Diagnostice cu simptomatologie similară care trebuie luate în considerare
- </small>
-    </div>
-  
-    @* Diagnostic Etiologic *@
-    <div class="form-group">
-   <label class="form-label">
-  Diagnostic etiologic
-        </label>
-        <textarea class="form-control" 
-           rows="2"
-      placeholder="Cauza bolii (ex: infecțioasă, traumatică, genetică...)..."
-         @bind="Model.DiagnosticEtiologic"
-            @oninput="OnFieldChanged">
-      </textarea>
+    <div class="form-section">
+        <PrimaryDiagnosisSelector @bind-SelectedCode="PrimaryDiagnosisCode"
+                                  @bind-DiagnosisDetails="PrimaryDiagnosisDetails"
+                                  CurrentUserId="@CurrentUserId"
+                                  ShowValidation="@ShowValidation"
+                                  OnChanged="@OnFieldChanged" />
     </div>
 
-    <!-- ==================== SECȚIUNEA 2: CODURI ICD-10 ==================== -->
+    <!-- ==================== SECȚIUNEA 2: DIAGNOSTICE SECUNDARE (MAX 10) ==================== -->
     
-    <div class="icd10-section">
-        <div class="section-divider">
-            <i class="fas fa-code"></i>
-         <span>Coduri ICD-10</span>
+    <div class="form-section">
+        <SecondaryDiagnosesList @bind-SecondaryDiagnoses="SecondaryDiagnosesList"
+                                CurrentUserId="@CurrentUserId"
+                                ShowValidation="@ShowValidation"
+                                OnChanged="@OnFieldChanged" />
+    </div>
+    
+    <!-- ==================== SECȚIUNEA 3: DIAGNOSTICE TEXTUALE (OPȚIONALE) ==================== -->
+    
+    <div class="form-section">
+        <div class="section-subtitle">
+            <i class="fas fa-notes-medical"></i>
+            <h5>Diagnostice Descriptive (Opționale)</h5>
         </div>
-
-  <!-- ICD-10 Search Box -->
- <div class="icd10-search-container">
-       <ICD10SearchBox Placeholder="Căutați cod ICD-10 (ex: I10, Hipertensiune)..."
-           MinSearchLength="2"
-      SearchDebounceMs="300"
-MaxResults="20"
-             CurrentUserId="@CurrentUserId"
-         OnCodeSelected="@HandleCodeSelected" />
-  
-      <div class="search-help-text">
-           <i class="fas fa-lightbulb"></i>
-            <span>Căutați după cod (ex: I10) sau denumire (ex: Hipertensiune). Click pe ⭐ pentru a adăuga la favorite.</span>
-     </div>
-     </div>
-
-        <!-- Selected Codes Display -->
-  <div class="icd10-selected-container">
-   <ICD10SelectedCodes @bind-PrincipalCode="Model.CoduriICD10"
-      PrincipalCodeDetails="@PrincipalCodeDetails"
-        @bind-SecondaryCodes="SecondaryCodes"
-         OnCodeRemoved="@HandleCodeRemoved" />
+        
+        @* Diagnostic Diferențial *@
+        <div class="form-group">
+            <label class="form-label">
+                Diagnostic diferențial
+            </label>
+            <textarea class="form-control" 
+                      rows="3"
+                      placeholder="Liste diagnostice alternative care trebuie excluse..."
+                      @bind="Model.DiagnosticDiferential"
+                      @oninput="OnFieldChanged">
+            </textarea>
+            <small class="form-text text-muted">
+                <i class="fas fa-info-circle"></i>
+                Diagnostice cu simptomatologie similară care trebuie luate în considerare
+            </small>
+        </div>
+    
+        @* Diagnostic Etiologic *@
+        <div class="form-group">
+            <label class="form-label">
+                Diagnostic etiologic
+            </label>
+            <textarea class="form-control" 
+                      rows="2"
+                      placeholder="Cauza bolii (ex: infecțioasă, traumatică, genetică...)..."
+                      @bind="Model.DiagnosticEtiologic"
+                      @oninput="OnFieldChanged">
+            </textarea>
         </div>
     </div>
     
     <!-- Section Completed Indicator -->
     @if (OnSectionCompleted.HasDelegate && IsComplete)
     {
-      <div class="section-complete-indicator">
+        <div class="section-complete-indicator">
             <i class="fas fa-check-circle"></i>
-  <span>Secțiune completată</span>
+            <span>Secțiune completată</span>
         </div>
     }
 </div>

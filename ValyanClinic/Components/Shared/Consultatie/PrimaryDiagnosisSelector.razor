@@ -1,0 +1,91 @@
+﻿@*
+    Primary Diagnosis Selector - Simplified single ICD10 code selection
+    Features:
+    - Single ICD10 code selection
+    - Access to favorites
+    - Clear/Remove functionality
+    - Validation indicator
+*@
+@using ValyanClinic.Components.Shared.ICD10
+
+<div class="primary-diagnosis-selector">
+    <div class="primary-diagnosis-header">
+        <label class="form-label required">
+            <i class="fas fa-star"></i> Diagnostic Principal
+        </label>
+        @if (SelectedCode != null)
+        {
+            <button type="button" class="btn-clear-code" @onclick="ClearSelection" title="Șterge diagnostic principal">
+                <i class="fas fa-times"></i> Șterge
+            </button>
+        }
+    </div>
+
+    @if (SelectedCode == null)
+    {
+        <!-- Search Box when no code selected -->
+        <ICD10SearchBox Placeholder="Căutați codul ICD-10 pentru diagnosticul principal..."
+                        OnCodeSelected="HandleCodeSelected"
+                        CurrentUserId="@CurrentUserId"
+                        MinSearchLength="2"
+                        MaxResults="15" />
+        
+        @if (ShowValidation && SelectedCode == null)
+        {
+            <div class="validation-message">
+                <i class="fas fa-exclamation-circle"></i>
+                Diagnosticul principal este obligatoriu
+            </div>
+        }
+    }
+    else
+    {
+        <!-- Selected Code Display -->
+        <div class="selected-code-display @(ShowValidation ? "validated" : "")">
+            <div class="code-badge principal">
+                <i class="fas fa-star"></i>
+                @SelectedCode.Code
+            </div>
+            <div class="code-info">
+                <div class="code-name">@SelectedCode.ShortDescription</div>
+                @if (!string.IsNullOrEmpty(SelectedCode.Category))
+                {
+                    <div class="code-category">
+                        <span class="category-icon">@GetCategoryIcon(SelectedCode.Category)</span>
+                        <span>@SelectedCode.Category</span>
+                    </div>
+                }
+            </div>
+            <button type="button" class="btn-change-code" @onclick="() => SelectedCode = null" title="Schimbă codul">
+                <i class="fas fa-edit"></i>
+            </button>
+        </div>
+
+        <!-- Optional: Description field -->
+        <div class="diagnosis-details-field">
+            <label class="form-label">Detalii diagnostic principal (opțional)</label>
+            <textarea class="form-textarea" 
+                      rows="3" 
+                      placeholder="Descrieți detaliat diagnosticul principal..."
+                      @bind="DiagnosisDetails"
+                      @bind:event="oninput"
+                      @onchange="NotifyChange"></textarea>
+        </div>
+    }
+</div>
+
+@code {
+    private string GetCategoryIcon(string category)
+    {
+        return category switch
+        {
+            "Cardiovascular" => "❤️",
+            "Endocrin" => "🔬",
+            "Respirator" => "🫁",
+            "Digestiv" => "🍽️",
+            "Nervos" => "🧠",
+            "Simptome" => "⚕️",
+            _ => "📋"
+        };
+    }
+}

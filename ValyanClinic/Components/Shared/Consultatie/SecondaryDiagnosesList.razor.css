@@ -1,0 +1,320 @@
+﻿/* Secondary Diagnoses List - Scoped CSS */
+
+.secondary-diagnoses-list {
+    background: var(--bg-section);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.secondary-header {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+
+.form-label.required::after {
+    content: '*';
+    color: var(--danger-color);
+    margin-left: 3px;
+}
+
+.counter {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-normal);
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.counter strong {
+    color: var(--primary-color);
+    font-weight: var(--font-weight-bold);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: white;
+    border-radius: var(--radius-md);
+    border: 2px dashed var(--border);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    font-size: var(--font-size-base);
+}
+
+/* Diagnoses Container */
+.diagnoses-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Diagnosis Card */
+.diagnosis-card {
+    background: white;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.diagnosis-card.invalid {
+    border-color: var(--danger-color);
+    animation: shake 0.4s ease;
+}
+
+.diagnosis-card:hover {
+    border-color: var(--primary-light);
+    box-shadow: 0 4px 12px rgba(10, 110, 124, 0.1);
+}
+
+.diagnosis-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+    border-bottom: 1px solid var(--border);
+}
+
+.diagnosis-number {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-remove {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove:hover {
+    background: var(--danger-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.diagnosis-card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Form Group */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group .form-label {
+    font-size: var(--font-size-xs);
+    text-transform: none;
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    line-height: 1.5;
+    resize: vertical;
+    transition: all 0.2s ease;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(10, 110, 124, 0.1);
+}
+
+.form-textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* Validation Message */
+.validation-message {
+    margin-top: 4px;
+    padding: 6px 10px;
+    background: #FEE2E2;
+    border: 1px solid var(--danger-color);
+    border-radius: var(--radius-sm);
+    color: #991B1B;
+    font-size: var(--font-size-xs);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Selected Codes List */
+.selected-codes-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.code-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+    border: 1px solid #93C5FD;
+    border-radius: 20px;
+    font-size: var(--font-size-xs);
+    transition: all 0.2s ease;
+}
+
+.code-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);
+}
+
+.code-text {
+    font-weight: var(--font-weight-bold);
+    color: #1E40AF;
+    font-family: 'Plus Jakarta Sans', monospace;
+}
+
+.code-name {
+    color: #1E3A8A;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-remove-chip {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: none;
+    background: #1E40AF;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+}
+
+.btn-remove-chip:hover {
+    background: var(--danger-color);
+    transform: scale(1.1);
+}
+
+/* Limit Reached Message */
+.limit-reached-message {
+    padding: 10px 12px;
+    background: #FEF3C7;
+    border: 1px solid #FCD34D;
+    border-radius: var(--radius-sm);
+    color: #92400E;
+    font-size: var(--font-size-xs);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Add Diagnosis Button */
+.btn-add-diagnosis {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px dashed var(--primary-color);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--primary-color);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.btn-add-diagnosis:hover:not(:disabled) {
+    border-style: solid;
+    background: var(--primary-lighter);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(10, 110, 124, 0.2);
+}
+
+.btn-add-diagnosis.primary {
+    border-style: solid;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+    color: white;
+    border-color: transparent;
+}
+
+.btn-add-diagnosis.primary:hover {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+.btn-add-diagnosis:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .secondary-diagnoses-list {
+        padding: 16px;
+    }
+
+    .diagnosis-card-body {
+        padding: 12px;
+    }
+
+    .code-name {
+        max-width: 120px;
+    }
+}
+
+/* Animation */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}

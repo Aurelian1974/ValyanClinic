@@ -98,7 +98,8 @@ public class Consultatie
     public string? DiagnosticPozitiv { get; set; }
     public string? DiagnosticDiferential { get; set; }
     public string? DiagnosticEtiologic { get; set; }
-    public string? CoduriICD10 { get; set; } // Coduri ICD-10 separate prin virgula
+    public string? CoduriICD10 { get; set; } // Cod ICD-10 principal
+    public string? CoduriICD10Secundare { get; set; } // Coduri ICD-10 secundare (comma-separated)
 
     // ==================== VI. TRATAMENT ====================
     public string? TratamentMedicamentos { get; set; }

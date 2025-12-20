@@ -267,6 +267,8 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
     private void OnTimerTick(object? sender, EventArgs e)
     {
+        // ✅ RESTORE: Timer needs StateHasChanged to update UI display
+        // Modal will block re-renders using ShouldRender() when closed
         InvokeAsync(StateHasChanged);
     }
 

@@ -11,6 +11,7 @@
     position: relative;
     display: flex;
     align-items: center;
+    gap: 8px;
 }
 
 .search-icon {
@@ -22,8 +23,8 @@
 }
 
 .search-input {
-    width: 100%;
-    padding: 12px 40px 12px 42px;
+    flex: 1;
+    padding: 12px 140px 12px 42px; /* ✅ Increased right padding for buttons */
     border: 2px solid var(--border, #E2E8F0);
     border-radius: var(--radius-md, 10px);
     font-size: var(--font-size-base, 14px);
@@ -45,7 +46,7 @@
 
 .btn-clear {
     position: absolute;
-    right: 40px;
+    right: 100px; /* ✅ Moved left to make room for favorites button */
     background: none;
  border: none;
     color: var(--text-muted, #94A3B8);
@@ -59,6 +60,34 @@
 
 .btn-clear:hover {
     color: var(--danger, #EF4444);
+}
+
+/* ✅ NEW: Favorites Modal Button */
+.btn-favorites-modal {
+    position: absolute;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, var(--warning-light, #FEF3C7), var(--warning, #FDE68A));
+    border: 1.5px solid var(--warning, #F59E0B);
+    border-radius: var(--radius-sm, 8px);
+    color: #92400E;
+    font-size: var(--font-size-xs, 12px);
+    font-weight: var(--font-weight-semibold, 600);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-favorites-modal:hover {
+    background: linear-gradient(135deg, var(--warning, #FDE68A), var(--warning-dark, #FCD34D));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.btn-favorites-modal i {
+    font-size: 0.9em;
 }
 
 .loading-spinner {

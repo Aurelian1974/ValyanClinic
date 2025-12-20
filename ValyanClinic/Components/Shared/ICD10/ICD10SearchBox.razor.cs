@@ -48,7 +48,24 @@ public partial class ICD10SearchBox : ComponentBase, IDisposable
   
     private System.Threading.Timer? _debounceTimer;
 
+    /// <summary>✅ NEW: Set of favorite ICD10 IDs pentru user curent</summary>
+    private HashSet<Guid> FavoriteIds { get; set; } = new();
+
+    /// <summary>✅ NEW: Loading state pentru favorites</summary>
+    private bool IsFavoritesLoading { get; set; }
+
+    /// <summary>✅ NEW: Favorites modal visibility</summary>
+    private bool IsFavoritesModalVisible { get; set; }
+
+    /// <summary>✅ NEW: Reference to favorites modal</summary>
+    private ICD10FavoritesModal? _favoritesModal;
+
     // ==================== LIFECYCLE ====================
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFavoritesAsync();
+    }
 
     public void Dispose()
     {
@@ -100,16 +117,17 @@ public partial class ICD10SearchBox : ComponentBase, IDisposable
             {
     Results = result.Value.ToList();
           
- // TODO: Load favorites status pentru fiecare rezultat
-     // if (CurrentUserId.HasValue)
-                // {
-   //     await LoadFavoritesStatusAsync();
-       // }
+ // ✅ Mark favorites in results
+                foreach (var resultItem in Results)
+                {
+                    resultItem.IsFavorite = FavoriteIds.Contains(resultItem.ICD10_ID);
+                }
 
       ShowResults = Results.Any();
   SelectedIndex = -1;
 
-           Logger.LogInformation("[ICD10Search] Found {Count} results", Results.Count);
+           Logger.LogInformation("[ICD10Search] Found {Count} results ({FavCount} favorites)", 
+                Results.Count, Results.Count(r => r.IsFavorite));
          }
           else
     {
@@ -160,16 +178,25 @@ public partial class ICD10SearchBox : ComponentBase, IDisposable
       {
         if (result.IsFavorite)
             {
-                await ICD10Repository.RemoveFavoriteAsync(CurrentUserId.Value, result.ICD10_ID);
-      Logger.LogInformation("[ICD10Search] Removed favorite: {Code}", result.Code);
+                var success = await ICD10Repository.RemoveFavoriteAsync(CurrentUserId.Value, result.ICD10_ID);
+                if (success)
+                {
+                    FavoriteIds.Remove(result.ICD10_ID);
+                    result.IsFavorite = false;
+                    Logger.LogInformation("[ICD10Search] Removed favorite: {Code}", result.Code);
+                }
        }
             else
             {
-       await ICD10Repository.AddFavoriteAsync(CurrentUserId.Value, result.ICD10_ID);
-                Logger.LogInformation("[ICD10Search] Added favorite: {Code}", result.Code);
+       var success = await ICD10Repository.AddFavoriteAsync(CurrentUserId.Value, result.ICD10_ID);
+                if (success)
+                {
+                    FavoriteIds.Add(result.ICD10_ID);
+                    result.IsFavorite = true;
+                    Logger.LogInformation("[ICD10Search] Added favorite: {Code}", result.Code);
+                }
     }
 
-            result.IsFavorite = !result.IsFavorite;
      StateHasChanged();
         }
         catch (Exception ex)
@@ -248,14 +275,78 @@ ShowResults = false;
     private string GetCategoryIcon(string category)
     {
         return category switch
-     {
-   "Cardiovascular" => "❤️",
-     "Endocrin" => "🔬",
-     "Respirator" => "🫁",
-          "Digestiv" => "🍽️",
-   "Nervos" => "🧠",
+        {
+            "Cardiovascular" => "❤️",
+            "Endocrin" => "🔬",
+            "Respirator" => "🫁",
+            "Digestiv" => "🍽️",
+            "Nervos" => "🧠",
             "Simptome" => "⚕️",
-   _ => "📋"
-    };
+            _ => "📋"
+        };
+    }
+
+    // ==================== FAVORITES MODAL ====================
+
+    /// <summary>✅ NEW: Open favorites modal</summary>
+    private void OpenFavoritesModal()
+    {
+        Logger.LogInformation("[ICD10Search] Opening favorites modal");
+        
+        // ✅ SIMPLIFIED: Just set the visibility flag
+        // Modal will load data when it renders (via OpenAsync if @ref is used)
+        IsFavoritesModalVisible = true;
+        StateHasChanged();
+    }
+
+    /// <summary>✅ NEW: Handle favorite selection from modal</summary>
+    private async Task HandleFavoriteSelectedFromModal(ICD10SearchResultDto favorite)
+    {
+        Logger.LogInformation("[ICD10Search] Favorite selected from modal: {Code}", favorite.Code);
+        
+        // Same logic as SelectResult
+        await OnCodeSelected.InvokeAsync(favorite);
+        
+        // Clear search after selection
+        SearchTerm = string.Empty;
+        Results.Clear();
+        ShowResults = false;
+        SelectedIndex = -1;
+        
+        StateHasChanged();
+    }
+
+    // ==================== FAVORITES LOADING ====================
+
+    /// <summary>✅ NEW: Load user's favorite ICD10 codes</summary>
+    private async Task LoadFavoritesAsync()
+    {
+        if (!CurrentUserId.HasValue)
+        {
+            Logger.LogDebug("[ICD10Search] No user ID - skipping favorites load");
+            return;
+        }
+
+        try
+        {
+            IsFavoritesLoading = true;
+            StateHasChanged();
+
+            Logger.LogInformation("[ICD10Search] Loading favorites for user: {UserId}", CurrentUserId.Value);
+
+            var favorites = await ICD10Repository.GetFavoritesAsync(CurrentUserId.Value);
+            FavoriteIds = favorites.Select(f => f.ICD10_ID).ToHashSet();
+
+            Logger.LogInformation("[ICD10Search] Loaded {Count} favorites", FavoriteIds.Count);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[ICD10Search] Error loading favorites");
+        }
+        finally
+        {
+            IsFavoritesLoading = false;
+            StateHasChanged();
+        }
     }
 }

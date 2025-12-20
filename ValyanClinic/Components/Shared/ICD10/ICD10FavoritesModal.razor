@@ -1,0 +1,164 @@
+﻿@*
+    ICD10 Favorites Modal - Full table with search and sort
+    Features:
+    - Display all favorites in table format
+    - Search by code or description
+    - Sort by code/description
+    - Select from table
+*@
+@using ValyanClinic.Application.Features.ICD10Management.DTOs
+
+<div class="icd10-favorites-modal @(IsVisible ? "visible" : "")" 
+     style="display: @(IsVisible ? "flex" : "none");" 
+     @onclick="HandleOverlayClick">
+    <div class="modal-container" @onclick:stopPropagation>
+        <!-- Modal Header -->
+        <div class="modal-header">
+            <h3><i class="fas fa-star"></i> Coduri ICD-10 Favorite</h3>
+            <button type="button" class="btn-close" @onclick="Close" title="Închide">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           class="search-input" 
+                           placeholder="Căutați după cod sau denumire..."
+                           value="@SearchTerm"
+                           @oninput="@((Microsoft.AspNetCore.Components.ChangeEventArgs e) => SearchTerm = e.Value?.ToString() ?? string.Empty)" />
+                    @if (!string.IsNullOrEmpty(SearchTerm))
+                    {
+                        <button type="button" class="btn-clear" @onclick="ClearSearch" title="Șterge căutare">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    }
+                </div>
+                <div class="results-count">
+                    <i class="fas fa-info-circle"></i>
+                    Afișate: <strong>@FilteredFavorites.Count</strong> din <strong>@AllFavorites.Count</strong>
+                </div>
+            </div>
+
+            <!-- Favorites Table -->
+            @if (IsLoading)
+            {
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Se încarcă favoritele...</span>
+                </div>
+            }
+            else if (!AllFavorites.Any())
+            {
+                <div class="empty-state">
+                    <i class="far fa-star"></i>
+                    <p>Nu aveți coduri ICD-10 favorite</p>
+                    <small>Adăugați coduri la favorite pentru acces rapid</small>
+                </div>
+            }
+            else if (!FilteredFavorites.Any())
+            {
+                <div class="no-results-state">
+                    <i class="fas fa-search"></i>
+                    <p>Nu s-au găsit rezultate pentru "<strong>@SearchTerm</strong>"</p>
+                    <button type="button" class="btn-secondary-small" @onclick="ClearSearch">
+                        <i class="fas fa-times"></i> Șterge căutarea
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="table-container">
+                    <table class="favorites-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" @onclick="() => SortBy(nameof(ICD10SearchResultDto.Code))">
+                                    <span>Cod ICD-10</span>
+                                    @if (CurrentSortColumn == nameof(ICD10SearchResultDto.Code))
+                                    {
+                                        <i class="fas fa-sort-@(IsAscending ? "up" : "down")"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-sort"></i>
+                                    }
+                                </th>
+                                <th class="sortable" @onclick="() => SortBy(nameof(ICD10SearchResultDto.ShortDescription))">
+                                    <span>Denumire</span>
+                                    @if (CurrentSortColumn == nameof(ICD10SearchResultDto.ShortDescription))
+                                    {
+                                        <i class="fas fa-sort-@(IsAscending ? "up" : "down")"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-sort"></i>
+                                    }
+                                </th>
+                                <th class="category-col">Categorie</th>
+                                <th class="actions-col">Acțiuni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var favorite in FilteredFavorites)
+                            {
+                                <tr class="favorite-row" @onclick="() => SelectFavorite(favorite)">
+                                    <td class="code-cell">
+                                        <span class="code-badge">@favorite.Code</span>
+                                    </td>
+                                    <td class="description-cell">
+                                        @favorite.ShortDescription
+                                    </td>
+                                    <td class="category-cell">
+                                        @if (!string.IsNullOrEmpty(favorite.Category))
+                                        {
+                                            <span class="category-tag">
+                                                @GetCategoryIcon(favorite.Category)
+                                                @favorite.Category
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="actions-cell">
+                                        <button type="button" 
+                                                class="btn-select" 
+                                                @onclick="() => SelectFavorite(favorite)"
+                                                @onclick:stopPropagation
+                                                title="Selectează acest cod">
+                                            <i class="fas fa-check"></i> Selectează
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" @onclick="Close">
+                <i class="fas fa-times"></i> Închide
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string GetCategoryIcon(string category)
+    {
+        return category switch
+        {
+            "Cardiovascular" => "❤️",
+            "Endocrin" => "🔬",
+            "Respirator" => "🫁",
+            "Digestiv" => "🍽️",
+            "Nervos" => "🧠",
+            "Simptome" => "⚕️",
+            _ => "📋"
+        };
+    }
+}

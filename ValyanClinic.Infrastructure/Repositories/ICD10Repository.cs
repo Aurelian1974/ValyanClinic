@@ -86,7 +86,7 @@ using var connection = new SqlConnection(_connectionString);
     {
         using var connection = new SqlConnection(_connectionString);
   
-        var parameters = new { PersonalID = userId };  // ✅ FIX: PersonalID în loc de UserID
+        var parameters = new { PersonalID = userId };  // ✅ CORRECTED: PersonalID (matches DB schema)
 
         return await connection.QueryAsync<ICD10Code>(
   "sp_ICD10_GetFavorites",
@@ -101,19 +101,17 @@ using var connection = new SqlConnection(_connectionString);
     using var connection = new SqlConnection(_connectionString);
       
         var parameters = new DynamicParameters();
-        parameters.Add("PersonalID", userId, DbType.Guid);
+        parameters.Add("PersonalID", userId, DbType.Guid);  // ✅ CORRECTED: PersonalID (matches DB schema)
   parameters.Add("ICD10_ID", icd10Id, DbType.Guid);
-        parameters.Add("FavoriteId", dbType: DbType.Guid, direction: ParameterDirection.Output);
 
-        await connection.ExecuteAsync(
+        var result = await connection.ExecuteAsync(
             "sp_ICD10_AddFavorite",
    parameters,
   commandType: System.Data.CommandType.StoredProcedure
         );
 
-        // Check if FavoriteId was set (indicates success)
-        var favoriteId = parameters.Get<Guid>("FavoriteId");
-   return favoriteId != Guid.Empty;
+        // SP returns 1 on success, 0 if already favorite
+   return result >= 0;
     }
 
     /// <summary>Elimină cod ICD-10 din favorite</summary>
@@ -123,7 +121,7 @@ using var connection = new SqlConnection(_connectionString);
     
    var parameters = new
         {
-       PersonalID = userId,  // ✅ FIX: Tabelul folosește PersonalID, nu UserID
+       PersonalID = userId,  // ✅ CORRECTED: PersonalID (matches DB schema)
      ICD10_ID = icd10Id
         };
 

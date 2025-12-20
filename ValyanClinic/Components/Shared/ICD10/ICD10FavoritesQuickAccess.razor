@@ -1,0 +1,52 @@
+﻿@*
+    ICD10 Favorites Quick Access
+    Features:
+    - Display user's favorite ICD10 codes
+    - Quick selection from favorites
+    - Compact display with chips
+*@
+@using ValyanClinic.Application.Features.ICD10Management.DTOs
+
+<div class="icd10-favorites-quick-access">
+    @if (IsLoading)
+    {
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Se încarcă favoritele...</span>
+        </div>
+    }
+    else if (Favorites.Any())
+    {
+        <div class="favorites-header">
+            <i class="fas fa-star"></i>
+            <span>Favorite ({Favorites.Count})</span>
+        </div>
+        <div class="favorites-chips">
+            @foreach (var favorite in Favorites.Take(MaxDisplay))
+            {
+                <button type="button" 
+                        class="favorite-chip" 
+                        @onclick="() => SelectFavorite(favorite)"
+                        title="@favorite.LongDescription">
+                    <span class="chip-code">@favorite.Code</span>
+                    <span class="chip-name">@favorite.ShortDescription</span>
+                </button>
+            }
+            @if (Favorites.Count > MaxDisplay)
+            {
+                <button type="button" class="favorite-chip more" title="Mai multe favorite">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>+@(Favorites.Count - MaxDisplay) mai multe</span>
+                </button>
+            }
+        </div>
+    }
+    else if (!IsLoading)
+    {
+        <div class="empty-state">
+            <i class="far fa-star"></i>
+            <p>Nu aveți coduri ICD-10 favorite</p>
+            <small>Click pe ⭐ în rezultate pentru a adăuga favorite</small>
+        </div>
+    }
+</div>
