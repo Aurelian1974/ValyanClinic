@@ -1,0 +1,91 @@
+﻿@*
+    ICD10 Search Box - Autocomplete cu favorites
+    Features:
+    - Live search cu debounce
+    - Display favorites (⭐)
+    - Keyboard navigation (↑↓ Enter)
+    - Click to select
+*@
+
+<div class="icd10-search-box">
+    <!-- Search Input -->
+    <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" 
+          class="search-input" 
+            placeholder="@Placeholder"
+  value="@SearchTerm"
+               @oninput="@((e) => { SearchTerm = e.Value?.ToString() ?? string.Empty; HandleSearchTermChanged(); })"
+     @onfocus="HandleFocus"
+        @onblur="HandleBlur"
+         @onkeydown="HandleKeyDown" />
+        
+        @if (!string.IsNullOrEmpty(SearchTerm))
+      {
+          <button class="btn-clear" @onclick="ClearSearch" title="Șterge căutare">
+         <i class="fas fa-times"></i>
+         </button>
+        }
+        
+        @if (IsSearching)
+     {
+            <div class="loading-spinner">
+     <i class="fas fa-spinner fa-spin"></i>
+            </div>
+        }
+    </div>
+
+    <!-- Results Dropdown -->
+    @if (ShowResults && Results.Any())
+    {
+        <div class="search-results-dropdown">
+            @foreach (var (result, index) in Results.Select((r, i) => (r, i)))
+            {
+                <div class="result-item @(index == SelectedIndex ? "selected" : "")"
+        @onclick="() => SelectResult(result)"
+    @onmouseenter="() => SelectedIndex = index">
+        
+  <!-- Favorite Star -->
+   <button class="btn-favorite @(result.IsFavorite ? "active" : "")"
+      @onclick:stopPropagation
+            @onclick="() => ToggleFavorite(result)"
+          title="@(result.IsFavorite ? "Elimină din favorite" : "Adaugă la favorite")">
+ <i class="@(result.IsFavorite ? "fas" : "far") fa-star"></i>
+        </button>
+
+             <!-- Code & Description -->
+        <div class="result-content">
+        <div class="result-header">
+      <span class="result-code">@result.Code</span>
+             @if (result.IsCommon)
+       {
+       <span class="badge badge-common">⭐ Frecvent</span>
+    }
+       @if (!result.IsTranslated)
+        {
+  <span class="badge badge-untranslated">🌐 EN</span>
+          }
+      </div>
+         <div class="result-description">@result.ShortDescription</div>
+    @if (!string.IsNullOrEmpty(result.Category))
+      {
+         <div class="result-category">
+         <span class="category-icon">@GetCategoryIcon(result.Category)</span>
+      <span class="category-text">@result.Category</span>
+    </div>
+  }
+               </div>
+            </div>
+            }
+        </div>
+    }
+    else if (ShowResults && !IsSearching && !string.IsNullOrEmpty(SearchTerm))
+    {
+      <div class="search-results-dropdown">
+ <div class="no-results">
+     <i class="fas fa-search"></i>
+<p>Nu s-au găsit rezultate pentru "<strong>@SearchTerm</strong>"</p>
+   </div>
+        </div>
+    }
+</div>

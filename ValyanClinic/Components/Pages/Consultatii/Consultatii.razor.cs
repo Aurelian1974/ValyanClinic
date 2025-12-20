@@ -194,6 +194,16 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     private List<DiagnosisCardDto> DiagnosisList { get; set; } = new();
     private List<MedicationRowDto> MedicationList { get; set; } = new();
 
+    // ✅ NEW: Command object pentru DiagnosticTab (ICD10 integration)
+    private ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie.CreateConsultatieCommand ConsultatieCommand { get; set; } = new();
+    private bool ShowValidationErrors { get; set; } = false;
+
+    private void MarkTabAsCompleted(int tabNumber)
+{
+        // Tab completion logic
+        StateHasChanged();
+    }
+
     #endregion
 
     #region Form Fields - Tab 4: Concluzii
@@ -242,6 +252,9 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             // ✅ REFACTORED: Start timer prin serviciu
             TimerService.Start();
             IsLoading = false;
+            
+            // ✅ CRITICAL FIX: Log CurrentUserId for debugging
+            Logger.LogInformation("✅ CurrentUserId loaded: {UserId}", CurrentUserId);
         }
         catch (Exception ex)
         {
@@ -362,6 +375,49 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         DiagnosticPrincipal = consultatie.DiagnosticPozitiv ?? string.Empty;
         PlanTerapeutic = consultatie.TratamentMedicamentos ?? string.Empty;
         Concluzii = consultatie.ObservatiiMedic ?? string.Empty;
+
+        // ✅ NEW: Sync to ConsultatieCommand for DiagnosticTab
+        SyncToConsultatieCommand();
+    }
+
+    /// <summary>
+    /// Sincronizează datele din form fields în ConsultatieCommand
+    /// Necesar pentru DiagnosticTab (ICD10 integration)
+    /// </summary>
+    private void SyncToConsultatieCommand()
+    {
+        ConsultatieCommand.DiagnosticPozitiv = DiagnosticPrincipal;
+        ConsultatieCommand.DiagnosticDiferential = DiagnosticSecundar;
+        ConsultatieCommand.TratamentMedicamentos = PlanTerapeutic;
+        ConsultatieCommand.RecomandariRegimViata = Recomandari;
+      
+        // Sync ICD10 codes from DiagnosisList if exists
+     if (DiagnosisList.Any())
+        {
+   var principalDiag = DiagnosisList.FirstOrDefault(d => d.IsPrincipal);
+            if (principalDiag != null)
+ {
+         ConsultatieCommand.CoduriICD10 = principalDiag.Code;
+          }
+
+            var secondaryDiags = DiagnosisList.Where(d => !d.IsPrincipal).Select(d => d.Code).ToList();
+            if (secondaryDiags.Any())
+      {
+       ConsultatieCommand.CoduriICD10Secundare = string.Join(", ", secondaryDiags);
+      }
+      }
+    }
+
+    /// <summary>
+    /// Sincronizează datele din ConsultatieCommand înapoi în form fields
+    /// Apelat când DiagnosticTab modifică codurile ICD10
+  /// </summary>
+    private void SyncFromConsultatieCommand()
+    {
+        DiagnosticPrincipal = ConsultatieCommand.DiagnosticPozitiv ?? string.Empty;
+        DiagnosticSecundar = ConsultatieCommand.DiagnosticDiferential ?? string.Empty;
+        PlanTerapeutic = ConsultatieCommand.TratamentMedicamentos ?? string.Empty;
+        Recomandari = ConsultatieCommand.RecomandariRegimViata ?? string.Empty;
     }
 
     #endregion
@@ -512,6 +568,9 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         {
             HasUnsavedChanges = true;
         }
+
+    // ✅ NEW: Sync to ConsultatieCommand când datele se schimbă
+        SyncToConsultatieCommand();
     }
 
     private void ShowKeyboardShortcuts() => ShowShortcutsModal = true;

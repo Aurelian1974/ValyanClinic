@@ -225,7 +225,8 @@ try
     builder.Services.AddScoped<IProgramareRepository, ProgramareRepository>();
     builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository,
                                 ValyanClinic.Infrastructure.Repositories.ConsultatieRepository>(); // ✅ NOU - Consultatii
-    //builder.Services.AddScoped<IICD10Repository, ICD10Repository>(); // ✅ NOU - ICD10 Autocomplete
+    builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.Repositories.IICD10Repository, 
+                                ValyanClinic.Infrastructure.Repositories.ICD10Repository>(); // ✅ NOU - ICD10 Autocomplete
     builder.Services.AddScoped<IPacientPersonalMedicalRepository, PacientPersonalMedicalRepository>(); // ✅ NOU - Relații Pacient-Doctor
 
     // Phase1 Settings Repositories

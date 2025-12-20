@@ -1,143 +1,178 @@
-﻿/* Diagnostic Tab Styles */
+﻿/* DiagnosticTab.razor.css - Scoped styles */
+
+/* ==================== ICD10 SECTION ==================== */
 
 .icd10-section {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border: 2px solid #bae6fd;
+    margin-top: 32px;
+    padding: 24px;
+    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+    border: 2px solid #BAE6FD;
+    border-radius: var(--radius-lg, 16px);
 }
 
-.input-group {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.input-group .form-control {
-    flex: 1;
-}
-
-.input-group .btn {
-    padding: 0.75rem 1.25rem;
-    background: white;
-    border: 2px solid #e5e7eb;
-    color: #667eea;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.input-group .btn:hover {
-    background: #667eea;
-    color: white;
-    border-color: #667eea;
-    transform: translateY(-2px);
-}
-
-.icd10-codes-display {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+.section-divider {
+ display: flex;
     align-items: center;
-    margin-top: 1rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #BAE6FD;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-dark, #1E40AF);
 }
 
-.code-label {
-    font-weight: 600;
-    color: #6b7280;
+.section-divider i {
+    font-size: 1.2rem;
+    color: var(--primary-color, #3B82F6);
+}
+
+/* ==================== SEARCH CONTAINER ==================== */
+
+.icd10-search-container {
+    margin-bottom: 24px;
+}
+
+.search-help-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: var(--radius-md, 10px);
+    font-size: 0.8rem;
+    color: var(--text-secondary, #64748B);
+}
+
+.search-help-text i {
+    color: var(--warning, #F59E0B);
+    font-size: 1rem;
+}
+
+/* ==================== SELECTED CODES CONTAINER ==================== */
+
+.icd10-selected-container {
+  /* ICD10SelectedCodes component has its own styles */
+}
+
+/* ==================== SECTION COMPLETED INDICATOR ==================== */
+
+.section-complete-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 24px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+    border-radius: var(--radius-md, 10px);
+    color: var(--success, #10B981);
     font-size: 0.875rem;
-    width: 100%;
-    margin-bottom: 0.5rem;
-}
-
-.icd10-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 20px;
     font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
+ animation: fadeIn 0.3s ease;
 }
 
-.icd10-badge.icd10-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+.section-complete-indicator i {
+    font-size: 1.2rem;
 }
 
-.icd10-badge.icd10-secondary {
-    background: #e0f2fe;
-    color: #0369a1;
-    border: 2px solid #38bdf8;
-}
-
-.code-text {
-    font-family: 'Courier New', monospace;
-    letter-spacing: 0.5px;
-}
-
-.btn-remove {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: currentColor;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 0;
-}
-
-.btn-remove:hover {
-    background: rgba(255, 255, 255, 0.4);
-    transform: rotate(90deg);
-}
-
-.icd10-badge.icd10-secondary .btn-remove {
-    background: rgba(3, 105, 161, 0.1);
-}
-
-.icd10-badge.icd10-secondary .btn-remove:hover {
-    background: rgba(3, 105, 161, 0.2);
-}
-
-/* Animation for badge appearance */
-.icd10-badge {
-    animation: badgeSlideIn 0.3s ease;
-}
-
-@keyframes badgeSlideIn {
+@keyframes fadeIn {
     from {
-        opacity: 0;
-        transform: scale(0.8);
+     opacity: 0;
+      transform: translateY(-8px);
     }
     to {
-        opacity: 1;
-        transform: scale(1);
+   opacity: 1;
+    transform: translateY(0);
     }
 }
 
-/* Responsive */
+/* ==================== FORM ELEMENTS ==================== */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary, #1E293B);
+    margin-bottom: 8px;
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: var(--danger, #EF4444);
+}
+
+.form-control {
+    width: 100%;
+ padding: 12px 14px;
+  border: 2px solid var(--border, #E2E8F0);
+    border-radius: var(--radius-md, 10px);
+    font-size: var(--font-size-base, 14px);
+  font-family: inherit;
+    color: var(--text-primary, #1E293B);
+    background: var(--bg-card, #FFFFFF);
+    transition: all 0.2s ease;
+    resize: vertical;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color, #3B82F6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted, #94A3B8);
+}
+
+.form-text {
+display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--text-muted, #94A3B8);
+}
+
+.form-text i {
+    font-size: 0.85rem;
+}
+
+.invalid-feedback {
+display: flex;
+    align-items: center;
+    gap: 6px;
+ margin-top: 6px;
+    padding: 8px 12px;
+    background: #FEE2E2;
+    color: #991B1B;
+    border-radius: var(--radius-sm, 6px);
+    font-size: 0.8rem;
+}
+
+.invalid-feedback i {
+    font-size: 1rem;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
 @media (max-width: 768px) {
-    .input-group {
+    .icd10-section {
+        padding: 16px;
+        margin-top: 24px;
+    }
+    
+    .section-divider {
+        font-size: 0.9rem;
+    }
+    
+    .search-help-text {
         flex-direction: column;
-    }
-    
-    .input-group .btn {
-        width: 100%;
-    }
-    
-    .icd10-codes-display {
-        padding: 0.75rem;
-    }
-    
-    .icd10-badge {
-        font-size: 0.85rem;
-        padding: 0.4rem 0.6rem;
+        align-items: flex-start;
+ padding: 12px;
     }
 }

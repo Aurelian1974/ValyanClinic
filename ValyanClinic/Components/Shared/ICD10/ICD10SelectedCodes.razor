@@ -1,0 +1,141 @@
+﻿@*
+    ICD10 Selected Codes - Display Principal + Secundare
+    Features:
+    - Cod principal (badge verde)
+    - Coduri secundare (badges albastru)
+    - Remove button pentru fiecare
+    - Reorderable (drag & drop) - TODO Phase 2
+*@
+
+<div class="icd10-selected-codes">
+    <!-- Header -->
+  <div class="selected-codes-header">
+        <h4>
+  <i class="fas fa-list-check"></i>
+  Coduri ICD-10 Selectate
+</h4>
+        @if (HasAnyCodes)
+        {
+            <span class="codes-count">@TotalCodesCount @(TotalCodesCount == 1 ? "cod" : "coduri")</span>
+  }
+    </div>
+
+    <!-- Principal Code -->
+ <div class="code-section">
+        <div class="section-label">
+            <i class="fas fa-star"></i>
+       Diagnostic Principal
+        </div>
+        
+        @if (!string.IsNullOrEmpty(PrincipalCode))
+   {
+     <div class="code-card principal">
+    <div class="code-badge">Principal</div>
+ <div class="code-content">
+             <div class="code-header">
+<span class="code-value">@PrincipalCode</span>
+      @if (PrincipalCodeDetails != null)
+         {
+ <span class="code-description">@PrincipalCodeDetails.ShortDescription</span>
+        }
+  </div>
+        @if (PrincipalCodeDetails != null && !string.IsNullOrEmpty(PrincipalCodeDetails.Category))
+      {
+                 <div class="code-meta">
+       <span class="category-icon">@GetCategoryIcon(PrincipalCodeDetails.Category)</span>
+              <span class="category-text">@PrincipalCodeDetails.Category</span>
+        </div>
+               }
+      </div>
+                <button class="btn-remove" @onclick="RemovePrincipal" title="Elimină cod principal">
+     <i class="fas fa-times"></i>
+</button>
+        </div>
+        }
+    else
+      {
+            <div class="code-placeholder">
+   <i class="fas fa-search"></i>
+     <p>Caută și selectează un cod ICD-10 principal</p>
+            </div>
+        }
+    </div>
+
+    <!-- Secondary Codes -->
+ <div class="code-section">
+        <div class="section-label">
+       <i class="fas fa-list"></i>
+      Diagnostice Secundare
+@if (SecondaryCodes.Any())
+        {
+       <span class="count-badge">@SecondaryCodes.Count</span>
+         }
+  </div>
+        
+   @if (SecondaryCodes.Any())
+    {
+  <div class="codes-list">
+      @foreach (var (secondaryCode, index) in SecondaryCodes.Select((c, i) => (c, i)))
+         {
+       <div class="code-card secondary">
+     <div class="code-badge">Secundar @(index + 1)</div>
+    <div class="code-content">
+        <div class="code-header">
+         <span class="code-value">@secondaryCode.Code</span>
+       <span class="code-description">@secondaryCode.Description</span>
+  </div>
+           @if (!string.IsNullOrEmpty(secondaryCode.Category))
+   {
+  <div class="code-meta">
+  <span class="category-icon">@GetCategoryIcon(secondaryCode.Category)</span>
+       <span class="category-text">@secondaryCode.Category</span>
+  </div>
+    }
+  </div>
+    <button class="btn-remove" @onclick="() => RemoveSecondary(secondaryCode.Code)" title="Elimină cod secundar">
+        <i class="fas fa-times"></i>
+  </button>
+    </div>
+   }
+      </div>
+        }
+        else
+        {
+         <div class="code-placeholder">
+     <i class="fas fa-plus-circle"></i>
+      <p>Adaugă coduri ICD-10 secundare (opțional)</p>
+         </div>
+ }
+    </div>
+
+    <!-- Summary -->
+    @if (HasAnyCodes)
+    {
+        <div class="codes-summary">
+            <i class="fas fa-info-circle"></i>
+  <span>
+    @if (!string.IsNullOrEmpty(PrincipalCode) && SecondaryCodes.Any())
+            {
+         <text>1 diagnostic principal + @SecondaryCodes.Count @(SecondaryCodes.Count == 1 ? "diagnostic secundar" : "diagnostice secundare")</text>
+     }
+      else if (!string.IsNullOrEmpty(PrincipalCode))
+   {
+      <text>1 diagnostic principal</text>
+   }
+           else
+        {
+     <text>@SecondaryCodes.Count @(SecondaryCodes.Count == 1 ? "diagnostic secundar" : "diagnostice secundare")</text>
+  }
+    </span>
+      </div>
+    }
+</div>
+
+@code {
+    public class SelectedCode
+    {
+        public string Code { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+     public string? Category { get; set; }
+    }
+}

@@ -3,6 +3,7 @@
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 @using ValyanClinic.Components.Shared
+@using ValyanClinic.Components.Shared.Consultatie.Tabs
 
 <PageTitle>Consultație Medicală - ValyanClinic</PageTitle>
 
@@ -493,76 +494,11 @@
 
                 <!-- Tab 3: Diagnostic & Tratament -->
                 <div class="tab-panel @(ActiveTab == 3 ? "active" : "")">
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-diagnoses"></i>
-                            Diagnostic
-                        </h3>
-                        <div class="form-group">
-                            <label class="form-label">
-                                Diagnostic principal
-                                <span class="required">*</span>
-                            </label>
-                            <textarea class="form-control"
-                                      rows="3"
-                                      placeholder="Diagnostic stabilit..."
-                                      maxlength="500"
-                                      @bind="DiagnosticPrincipal"
-                                      @bind:event="oninput"
-                                      @bind:after="MarkFormAsDirty"></textarea>
-                            <span class="char-counter">@DiagnosticPrincipal.Length / 500</span>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Diagnostic secundar</label>
-                            <textarea class="form-control"
-                                      rows="2"
-                                      placeholder="Diagnostice asociate..."
-                                      maxlength="500"
-                                      @bind="DiagnosticSecundar"
-                                      @bind:event="oninput"
-                                      @bind:after="MarkFormAsDirty"></textarea>
-                            <span class="char-counter">@DiagnosticSecundar.Length / 500</span>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-prescription"></i>
-                            Plan Terapeutic
-                        </h3>
-                        <div class="form-group">
-                            <label class="form-label">
-                                Tratament prescris
-                                <span class="required">*</span>
-                            </label>
-                            <textarea class="form-control"
-                                      rows="5"
-                                      placeholder="Medicație, dozare, durata tratamentului..."
-                                      maxlength="2000"
-                                      @bind="PlanTerapeutic"
-                                      @bind:event="oninput"
-                                      @bind:after="MarkFormAsDirty"></textarea>
-                            <span class="char-counter">@PlanTerapeutic.Length / 2000</span>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-info-circle"></i>
-                            Recomandări
-                        </h3>
-                        <div class="form-group">
-                            <textarea class="form-control"
-                                      rows="4"
-                                      placeholder="Recomandări non-medicamentoase, regim alimentar, stil de viață..."
-                                      maxlength="1500"
-                                      @bind="Recomandari"
-                                      @bind:event="oninput"
-                                      @bind:after="MarkFormAsDirty"></textarea>
-                            <span class="char-counter">@Recomandari.Length / 1500</span>
-                        </div>
-                    </div>
+                  <DiagnosticTab Model="@ConsultatieCommand"
+                     ShowValidation="@ShowValidationErrors"
+                     CurrentUserId="@CurrentMedicId"
+                     OnChanged="@MarkFormAsDirty"
+                     OnSectionCompleted="@(() => MarkTabAsCompleted(3))" />
                 </div>
 
                 <!-- Tab 4: Concluzii -->

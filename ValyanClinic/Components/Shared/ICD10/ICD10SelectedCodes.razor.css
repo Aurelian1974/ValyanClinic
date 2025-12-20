@@ -1,0 +1,260 @@
+﻿/* ICD10SelectedCodes.razor.css - Scoped styles */
+
+.icd10-selected-codes {
+    background: var(--bg-card, #FFFFFF);
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: var(--radius-lg, 16px);
+    padding: 20px;
+}
+
+/* ==================== HEADER ==================== */
+
+.selected-codes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border, #E2E8F0);
+}
+
+.selected-codes-header h4 {
+    display: flex;
+  align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1E293B);
+    margin: 0;
+}
+
+.selected-codes-header h4 i {
+    color: var(--primary-color, #3B82F6);
+}
+
+.codes-count {
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+    color: var(--primary-dark, #1E40AF);
+    border-radius: 12px;
+    font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ==================== CODE SECTION ==================== */
+
+.code-section {
+    margin-bottom: 20px;
+}
+
+.code-section:last-of-type {
+    margin-bottom: 0;
+}
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #64748B);
+ margin-bottom: 12px;
+}
+
+.section-label i {
+    font-size: 0.9rem;
+}
+
+.count-badge {
+    padding: 2px 8px;
+    background: var(--border, #E2E8F0);
+    color: var(--text-secondary, #64748B);
+    border-radius: 10px;
+    font-size: 0.7rem;
+    margin-left: 6px;
+}
+
+/* ==================== CODE CARD ==================== */
+
+.code-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-section, #F8FAFB);
+border: 2px solid var(--border, #E2E8F0);
+    border-radius: var(--radius-md, 10px);
+    transition: all 0.2s ease;
+}
+
+.code-card:hover {
+    border-color: var(--primary-color, #3B82F6);
+box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.code-card.principal {
+    border-left: 4px solid var(--success, #10B981);
+}
+
+.code-card.secondary {
+    border-left: 4px solid var(--primary-color, #3B82F6);
+    margin-bottom: 10px;
+}
+
+.code-card.secondary:last-child {
+    margin-bottom: 0;
+}
+
+/* Code Badge */
+.code-badge {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+ letter-spacing: 0.05em;
+}
+
+.code-card.principal .code-badge {
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+    color: #065F46;
+}
+
+.code-card.secondary .code-badge {
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+ color: #1E40AF;
+}
+
+/* Code Content */
+.code-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.code-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.code-value {
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color, #3B82F6);
+}
+
+.code-description {
+    flex: 1;
+font-size: 0.875rem;
+    color: var(--text-primary, #1E293B);
+    line-height: 1.4;
+}
+
+.code-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--text-muted, #94A3B8);
+}
+
+.category-icon {
+    font-size: 1rem;
+}
+
+/* Remove Button */
+.btn-remove {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border, #E2E8F0);
+    background: var(--bg-card, #FFFFFF);
+    color: var(--text-muted, #94A3B8);
+    cursor: pointer;
+  display: flex;
+ align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-remove:hover {
+    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+    border-color: var(--danger, #EF4444);
+  color: var(--danger, #EF4444);
+    transform: scale(1.1);
+}
+
+/* ==================== PLACEHOLDER ==================== */
+
+.code-placeholder {
+    padding: 24px;
+  text-align: center;
+    background: var(--bg-section, #F8FAFB);
+    border: 2px dashed var(--border, #E2E8F0);
+ border-radius: var(--radius-md, 10px);
+    color: var(--text-muted, #94A3B8);
+}
+
+.code-placeholder i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+.code-placeholder p {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+/* ==================== CODES LIST ==================== */
+
+.codes-list {
+    /* Coduri secundare în listă verticală */
+}
+
+/* ==================== SUMMARY ==================== */
+
+.codes-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+ padding: 12px 16px;
+    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+    border-radius: var(--radius-md, 10px);
+    font-size: 0.8rem;
+    color: var(--text-secondary, #64748B);
+}
+
+.codes-summary i {
+    color: var(--primary-color, #3B82F6);
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+    .icd10-selected-codes {
+        padding: 16px;
+    }
+    
+    .code-card {
+        padding: 12px;
+    }
+    
+    .code-header {
+        flex-direction: column;
+    gap: 6px;
+    }
+    
+    .selected-codes-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

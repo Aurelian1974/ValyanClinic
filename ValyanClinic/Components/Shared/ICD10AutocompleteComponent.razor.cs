@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components;
+Ôªøusing Microsoft.AspNetCore.Components;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.ICD10Management.Queries.SearchICD10;
@@ -24,7 +24,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     [Parameter] public string Label { get; set; } = "Cod ICD-10";
 
     /// <summary>
-    /// Placeholder text Ón input
+    /// Placeholder text √Æn input
     /// </summary>
     [Parameter] public string Placeholder { get; set; } = "Cauta dupa cod sau descriere...";
 
@@ -34,7 +34,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     [Parameter] public string? HelpText { get; set; }
 
     /// <summary>
-    /// Indica daca c‚mpul este obligatoriu (afi?eaza *)
+    /// Indica daca c√¢mpul este obligatoriu (afi?eaza *)
     /// </summary>
     [Parameter] public bool IsRequired { get; set; }
 
@@ -49,7 +49,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     [Parameter] public bool OnlyCommon { get; set; }
 
     /// <summary>
-    /// Numar maxim de rezultate afi?ate Ón dropdown
+    /// Numar maxim de rezultate afi?ate √Æn dropdown
     /// </summary>
     [Parameter] public int MaxResults { get; set; } = 10;
 
@@ -59,7 +59,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     [Parameter] public int MinSearchLength { get; set; } = 2;
 
     /// <summary>
-    /// Delay Ón milisecunde pentru debounce cautare
+    /// Delay √Æn milisecunde pentru debounce cautare
     /// </summary>
     [Parameter] public int SearchDebounceMs { get; set; } = 300;
 
@@ -76,7 +76,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     [Parameter] public EventCallback<string?> SelectedCodeChanged { get; set; }
 
     /// <summary>
-    /// Event callback c‚nd un cod este selectat (returneaza DTO complet)
+    /// Event callback c√¢nd un cod este selectat (returneaza DTO complet)
     /// </summary>
     [Parameter] public EventCallback<ICD10SearchResultDto?> OnCodeSelected { get; set; }
 
@@ -110,7 +110,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     private List<ICD10SearchResultDto> Results { get; set; } = new();
 
     /// <summary>
-    /// Rezultatul selectat curent (pentru highlight Ón dropdown)
+    /// Rezultatul selectat curent (pentru highlight √Æn dropdown)
     /// </summary>
     private ICD10SearchResultDto? SelectedResult { get; set; }
 
@@ -129,7 +129,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     // ==================== LIFECYCLE METHODS ====================
 
     /// <summary>
-    /// Se apeleaza c‚nd parametrii se schimba
+    /// Se apeleaza c√¢nd parametrii se schimba
     /// Pre-populeaza search text daca exista un cod selectat
     /// </summary>
     protected override void OnParametersSet()
@@ -195,7 +195,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
 
             if (result.IsSuccess && result.Value != null)
             {
-                Results = result.Value;
+                Results = result.Value.ToList(); // ‚úÖ FIXED: Convert IEnumerable to List
                 IsOpen = Results.Any();
 
                 Logger.LogInformation("[ICD10Autocomplete] Found {Count} results", Results.Count);
@@ -298,7 +298,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     // ==================== HELPER METHODS ====================
 
     /// <summary>
-    /// Converte?te severitatea din engleza Ón rom‚na
+    /// Converte?te severitatea din engleza √Æn rom√¢na
     /// </summary>
     private string GetSeverityText(string? severity)
     {
@@ -313,7 +313,7 @@ public partial class ICD10AutocompleteComponent : ComponentBase, IDisposable
     }
 
     /// <summary>
-    /// Eviden?iaza termenul de cautare Ón text cu tag mark
+    /// Eviden?iaza termenul de cautare √Æn text cu tag mark
     /// </summary>
     private MarkupString HighlightSearchTerm(string text, string searchTerm)
     {
