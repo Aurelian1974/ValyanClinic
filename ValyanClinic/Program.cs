@@ -18,6 +18,7 @@ using ValyanClinic.Services.Blazor;
 using ValyanClinic.Services.Authentication;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using MediatR;
+using FluentValidation;
 
 // ========================================
 // SERILOG CONFIGURATION
@@ -250,6 +251,17 @@ try
     });
 
     // ========================================
+    // FLUENTVALIDATION - Automatic validation for MediatR Commands/Queries
+    // ========================================
+    // ✅ Scanează toate validators din Application layer și le înregistrează automat
+    builder.Services.AddValidatorsFromAssemblyContaining<ValyanClinic.Application.Common.Results.Result>();
+    
+    // ✅ IMPORTANT: PipelineBehavior pentru validare automată
+    // Când trimiți un Command/Query prin MediatR, validatorii vor rula automat ÎNAINTE de handler
+    // Dacă validarea eșuează, va arunca ValidationException cu toate erorile
+    builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValyanClinic.Application.Common.Behaviors.ValidationBehavior<,>));
+
+    // ========================================
     // AUTOMAPPER - OPTIMIZED
     // ========================================
     // ✅ OPTIMIZED: Scanează doar assembly-urile cu profiluri AutoMapper
@@ -283,6 +295,8 @@ try
     // NOTIFICATION SERVICES
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Services.INotificationService, ValyanClinic.Services.NotificationService>();
+    builder.Services.AddScoped<ValyanClinic.Services.ToastService>(); // Toast notifications
+    builder.Services.AddScoped<ValyanClinic.Services.INavigationGuardService, ValyanClinic.Services.NavigationGuardService>(); // ✅ ADDED: Navigation guard for unsaved changes
 
     // ========================================
     // EMAIL SERVICES
@@ -338,6 +352,17 @@ try
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Application.Services.IMC.IIMCCalculatorService,
                                 ValyanClinic.Application.Services.IMC.IMCCalculatorService>();
+
+    // ========================================
+    // CONSULTATION SERVICES - Timer & Progress
+    // ========================================
+    // ✅ Timer service pentru măsurarea duratei consultațiilor
+    builder.Services.AddScoped<ValyanClinic.Application.Services.Consultatii.IConsultationTimerService,
+                                ValyanClinic.Application.Services.Consultatii.ConsultationTimerService>();
+
+    // ✅ Form progress service pentru calculul completării formularelor
+    builder.Services.AddScoped<ValyanClinic.Application.Services.Consultatii.IFormProgressService,
+                                ValyanClinic.Application.Services.Consultatii.FormProgressService>();
 
     // ========================================
     // DRAFT STORAGE SERVICE - LocalStorage Management

@@ -1,0 +1,316 @@
+﻿/* ============================================
+   PACIENTI GRID - GLOBAL STYLES
+   Stiluri pentru template-urile Syncfusion Grid
+   Refined & Compact Version
+   ============================================ */
+
+/* ============================================
+   GRID CELL TEMPLATES - SUBTLE & COMPACT
+   ============================================ */
+
+/* Code Badge - Mai subtil */
+.code-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #475569;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    letter-spacing: 0.01em;
+}
+
+/* Patient Cell - Compact */
+.patient-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.patient-cell-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.patient-cell-avatar.male {
+    background: #dbeafe;
+}
+
+.patient-cell-avatar.male i {
+    color: #3b82f6;
+    font-size: 11px;
+}
+
+.patient-cell-avatar.female {
+    background: #fce7f3;
+}
+
+.patient-cell-avatar.female i {
+    color: #ec4899;
+    font-size: 11px;
+}
+
+.patient-cell-name {
+    font-weight: 500;
+    color: #334155;
+    font-size: 0.85rem;
+}
+
+/* CNP Display */
+.cnp-display {
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 0.82rem;
+    color: #64748b;
+    letter-spacing: 0.02em;
+}
+
+/* Age Badge - Subtil */
+.age-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #f0fdfa;
+    border: 1px solid #99f6e4;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #0f766e;
+}
+
+/* Contact Links - Simplu */
+.contact-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.15s ease;
+    padding: 1px 0;
+}
+
+.contact-link.phone {
+    color: #059669;
+}
+
+.contact-link.phone i {
+    color: #10b981;
+    font-size: 0.75rem;
+}
+
+.contact-link.phone:hover {
+    color: #047857;
+}
+
+.contact-link.email {
+    color: #6366f1;
+}
+
+.contact-link.email i {
+    color: #818cf8;
+    font-size: 0.75rem;
+}
+
+.contact-link.email:hover {
+    color: #4f46e5;
+}
+
+/* Insurance Badge - Mai subtil */
+.insurance-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.insurance-badge.insured {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.insurance-badge.uninsured {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.insurance-badge i {
+    font-size: 0.68rem;
+}
+
+/* Visits Badge - Subtil */
+.visits-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: #f5f3ff;
+    border: 1px solid #e9d5ff;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #7c3aed;
+}
+
+.visits-badge i {
+    font-size: 0.7rem;
+    color: #a78bfa;
+}
+
+/* Status Pill - Compact */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.status-pill.active {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-pill.inactive {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: statusPulseGlobal 2s ease-in-out infinite;
+}
+
+.status-pill.inactive .status-dot {
+    animation: none;
+    opacity: 0.7;
+}
+
+@keyframes statusPulseGlobal {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ============================================
+   SYNCFUSION GRID - SUBTLE BLUE THEME 
+   ============================================ */
+
+/* Grid Header - Blue dar mai subtil */
+.e-grid .e-gridheader {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    border-bottom: none !important;
+}
+
+.e-grid .e-gridheader .e-headercontent {
+    background: transparent !important;
+}
+
+.e-grid .e-gridheader table {
+    background: transparent !important;
+}
+
+.e-grid .e-headercell {
+    font-weight: 600 !important;
+    color: white !important;
+    padding: 10px 8px !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    background: transparent !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.e-grid .e-headercell .e-headercelldiv {
+    color: white !important;
+}
+
+.e-grid .e-headercell .e-headertext {
+    color: white !important;
+}
+
+.e-grid .e-sortfilter .e-icon-ascending,
+.e-grid .e-sortfilter .e-icon-descending,
+.e-grid .e-icon-filter {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.e-grid .e-filtermenudiv {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Grid Rows - Compact */
+.e-grid .e-row {
+    height: auto !important;
+}
+
+.e-grid .e-row:hover {
+    background-color: #f8fafc !important;
+}
+
+.e-grid .e-row:hover td {
+    background-color: #f8fafc !important;
+}
+
+.e-grid .e-row.e-selectionbackground,
+.e-grid .e-row.e-selectionbackground td {
+    background-color: #eff6ff !important;
+}
+
+.e-grid .e-altrow {
+    background-color: #fafbfc !important;
+}
+
+.e-grid .e-altrow td {
+    background-color: #fafbfc !important;
+}
+
+.e-grid .e-rowcell {
+    padding: 8px 8px !important;
+    border-color: #f1f5f9 !important;
+    font-size: 0.82rem !important;
+    color: #475569;
+    vertical-align: middle !important;
+    line-height: 1.4 !important;
+}
+
+/* Grid Pager - Compact */
+.e-grid .e-pager {
+    background: #fafbfc !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding: 8px 12px !important;
+}
+
+.e-grid .e-pager .e-numericitem {
+    border-radius: 4px !important;
+    font-weight: 500 !important;
+    font-size: 0.8rem !important;
+}
+
+.e-grid .e-pager .e-currentitem {
+    background: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: white !important;
+}

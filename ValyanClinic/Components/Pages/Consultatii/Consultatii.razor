@@ -1,682 +1,652 @@
-﻿@page "/consultatii/{ProgramareIdParam:guid}/{PacientIdParam:guid}"
-@attribute [Authorize(Roles = "Doctor,Medic")]
+﻿@page "/consultatii"
 @rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using ValyanClinic.Components.Shared
 
 <PageTitle>Consultație Medicală - ValyanClinic</PageTitle>
 
-<div class="consultatii-page">
-    @* ===== PAGE HEADER ===== *@
+<!-- ✅ ADDED: Toast Notifications Container -->
+<ToastContainer />
+
+<!-- ✅ ADDED: Loading Overlay -->
+<LoadingOverlay IsVisible="@IsLoading" Message="Se încarcă datele pacientului..." />
+
+<div class="consultatii-container" @onkeydown="HandleKeyDown" tabindex="0">
+    <!-- Page Header - Template Design -->
     <header class="page-header">
         <div class="page-title">
-            <h2><i class="fas fa-stethoscope"></i> Consultație Medicală</h2>
-            <p class="subtitle">Programare #@ProgramareIdParam.ToString()[..8]</p>
+            <h2>@(IsEditMode ? "Editare Consultație" : "Consultație Nouă")</h2>
+            <p>@(PacientData?.NumeComplet ?? "Completează fișa de consultație pentru pacient")</p>
         </div>
-
         <div class="header-actions">
-            <div class="consultation-timer @TimerClass">
-                <i class="fas fa-clock"></i>
-                <span class="time">@FormatTimer(TimerSeconds)</span>
-                <div class="timer-tooltip">
-                    @if (TimerSeconds < 900)
-                    {
-                        <text>Durată optimă: 15-20 min</text>
-                    }
-                    else if (TimerSeconds < 1200)
-                    {
-                        <text>✓ Durată optimă</text>
-                    }
-                    else if (TimerSeconds < 1500)
-                    {
-                        <text>⚠️ Depășit timpul recomandat</text>
-                    }
-                    else
-                    {
-                        <text>🔴 Consultație extinsă</text>
-                    }
+            <!-- ✅ UPDATED: Timer with Pause indicator -->
+            <div class="consultation-timer @TimerWarningClass @(IsTimerPaused ? "paused" : "")" 
+                 @onclick="ToggleTimerPause" 
+                 title="@(IsTimerPaused ? "Click pentru a continua (Ctrl+P)" : "Click pentru pauză (Ctrl+P)")">
+                <i class="fas @(IsTimerPaused ? "fa-pause" : "fa-clock")"></i>
+                <span class="time">@FormattedTime</span>
+                @if (IsTimerPaused)
+                {
+                    <span class="pause-badge">PAUZĂ</span>
+                }
+            </div>
+            
+            <!-- ✅ NEW: Progress indicator -->
+            <div class="progress-indicator" title="Progres completare: @ProgressPercentage%">
+                <div class="progress-bar-mini">
+                    <div class="progress-fill" style="width: @ProgressPercentage%"></div>
                 </div>
+                <span class="progress-text">@ProgressPercentage%</span>
             </div>
 
-            <button class="btn btn-outline" @onclick="SaveDraft" disabled="@IsSaving">
+            <button class="btn btn-outline" @onclick="HandleSaveDraft" disabled="@IsSaving" title="Salvează Draft (Ctrl+S)">
                 <i class="fas fa-save"></i>
-                <span>Salvează Draft</span>
+                <span class="btn-text">Salvează Draft</span>
             </button>
-
-            <button class="btn btn-primary" @onclick="SaveConsultation" disabled="@IsSaving">
+            <button class="btn btn-primary" @onclick="HandleGenerateLetter" title="Generează Scrisoare Medicală">
                 <i class="fas fa-file-medical"></i>
-                <span>@(IsSaving ? "Salvare..." : "Finalizează")</span>
+                <span class="btn-text">Generează Scrisoare</span>
+            </button>
+            
+            <!-- ✅ NEW: Keyboard shortcuts help -->
+            <button class="btn btn-icon btn-help" @onclick="ShowKeyboardShortcuts" title="Shortcut-uri tastatură (?)">
+                <i class="fas fa-keyboard"></i>
             </button>
         </div>
     </header>
 
-    @* ===== PATIENT CARD ===== *@
-    @if (Pacient != null)
+    <!-- ✅ NEW: Keyboard Shortcuts Modal/Tooltip -->
+    @if (ShowShortcutsModal)
     {
+        <div class="shortcuts-overlay" @onclick="() => ShowShortcutsModal = false">
+            <div class="shortcuts-modal" @onclick:stopPropagation>
+                <h4><i class="fas fa-keyboard"></i> Shortcut-uri Tastatură</h4>
+                <div class="shortcuts-list">
+                    <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>S</kbd> <span>Salvează Draft</span></div>
+                    <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> <span>Finalizează</span></div>
+                    <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>←</kbd> <span>Tab Anterior</span></div>
+                    <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>→</kbd> <span>Tab Următor</span></div>
+                    <div class="shortcut-item"><kbd>Alt</kbd> + <kbd>1-4</kbd> <span>Salt la Tab</span></div>
+                    <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>P</kbd> <span>Pauză Timer</span></div>
+                </div>
+                <button class="btn btn-sm btn-secondary" @onclick="() => ShowShortcutsModal = false">Închide</button>
+            </div>
+        </div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Se încarcă...</span>
+            </div>
+            <p>Se încarcă datele pacientului...</p>
+        </div>
+    }
+    else if (HasError)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            @ErrorMessage
+        </div>
+    }
+    else
+    {
+        <!-- Patient Card - Template Design (Horizontal Layout) -->
         <section class="patient-card">
             <div class="patient-avatar">
                 <i class="fas fa-user"></i>
             </div>
-
             <div class="patient-details">
-                <h3 class="patient-name">@Pacient.NumeComplet</h3>
-
+                <h3 class="patient-name">@PacientData?.NumeComplet</h3>
                 <div class="patient-meta">
                     <span class="patient-meta-item">
                         <i class="fas fa-id-card"></i>
-                        CNP: @Pacient.CNP
+                        CNP: @PacientData?.CNP
                     </span>
-
                     <span class="patient-meta-item">
                         <i class="fas fa-birthday-cake"></i>
-                        @Pacient.Varsta ani
+                        @PacientData?.Varsta ani
                     </span>
-
                     <span class="patient-meta-item">
-                        <i class="fas @(Pacient.Sex == "M" ? "fa-mars" : "fa-venus")"></i>
-                        @(Pacient.Sex == "M" ? "Masculin" : "Feminin")
+                        <i class="fas fa-@(PacientData?.Sex == "M" ? "mars" : "venus")"></i>
+                        @(PacientData?.Sex == "M" ? "Masculin" : "Feminin")
                     </span>
-
                     <span class="patient-meta-item">
                         <i class="fas fa-phone"></i>
-                        @Pacient.Telefon
+                        @(PacientData?.Telefon ?? "N/A")
                     </span>
                 </div>
             </div>
-
-            @if (!string.IsNullOrEmpty(Pacient.Alergii))
+            @if (HasAllergies || HasConditions)
             {
                 <div class="patient-tags">
-                    <span class="tag tag-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Alergie @Pacient.Alergii
-                    </span>
+                    @if (HasAllergies)
+                    {
+                        <span class="tag tag-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Alergie @AllergiesText
+                        </span>
+                    }
+                    @if (HasConditions)
+                    {
+                        <span class="tag tag-info">
+                            <i class="fas fa-heartbeat"></i>
+                            @ConditionsText
+                        </span>
+                    }
                 </div>
             }
         </section>
-    }
 
-    @* ===== ALLERGY ALERT ===== *@
-    <div class="allergy-alert @(ShowAllergyAlert ? "active" : "")">
-        <div class="allergy-alert-icon">
-            <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <div class="allergy-alert-content">
-            <div class="allergy-alert-title">⚠️ ALERTĂ ALERGIE DETECTATĂ!</div>
-            <div class="allergy-alert-message">@AllergyMessage</div>
-        </div>
-        <button class="allergy-alert-close" @onclick="@(() => ShowAllergyAlert = false)">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
+        <!-- Tabs Container - Template Design -->
+        <div class="tabs-container">
+            <!-- ✅ UPDATED: Tabs Header with Progress and Keyboard hints -->
+            <div class="tabs-header">
+                <button class="tab-btn @(ActiveTab == 1 ? "active" : "") @(IsTabCompleted(1) ? "completed" : "")"
+                        @onclick="() => SwitchTab(1)"
+                        title="Motiv & Antecedente (Alt+1)">
+                    <i class="fas fa-comment-medical"></i>
+                    <span>Motiv & Antecedente</span>
+                    <span class="tab-number">1</span>
+                    @if (IsTabCompleted(1))
+                    {
+                        <i class="fas fa-check tab-check"></i>
+                    }
+                </button>
+                <button class="tab-btn @(ActiveTab == 2 ? "active" : "") @(IsTabCompleted(2) ? "completed" : "")"
+                        @onclick="() => SwitchTab(2)"
+                        title="Examen Clinic (Alt+2)">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>Examen Clinic & Investigații</span>
+                    <span class="tab-number">2</span>
+                    @if (IsTabCompleted(2))
+                    {
+                        <i class="fas fa-check tab-check"></i>
+                    }
+                </button>
+                <button class="tab-btn @(ActiveTab == 3 ? "active" : "") @(IsTabCompleted(3) ? "completed" : "")"
+                        @onclick="() => SwitchTab(3)"
+                        title="Diagnostic & Tratament (Alt+3)">
+                    <i class="fas fa-diagnoses"></i>
+                    <span>Diagnostic & Tratament</span>
+                    <span class="tab-number">3</span>
+                    @if (IsTabCompleted(3))
+                    {
+                        <i class="fas fa-check tab-check"></i>
+                    }
+                </button>
+                <button class="tab-btn @(ActiveTab == 4 ? "active" : "") @(IsTabCompleted(4) ? "completed" : "")"
+                        @onclick="() => SwitchTab(4)"
+                        title="Concluzii (Alt+4)">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Concluzii</span>
+                    <span class="tab-number">4</span>
+                    @if (IsTabCompleted(4))
+                    {
+                        <i class="fas fa-check tab-check"></i>
+                    }
+                </button>
+                
+                <!-- ✅ NEW: Tab navigation arrows for mobile -->
+                <div class="tab-nav-arrows">
+                    <button class="btn btn-icon" @onclick="() => SwitchTab(ActiveTab - 1)" disabled="@(ActiveTab == 1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="btn btn-icon" @onclick="() => SwitchTab(ActiveTab + 1)" disabled="@(ActiveTab == 4)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
 
-    @* ===== TABS CONTAINER ===== *@
-    <div class="tabs-container">
-        <div class="tabs-progress">
-            <div class="tabs-progress-bar" style="width: @ProgressPercent%"></div>
-        </div>
-
-        <div class="tabs-header">
-            <button class="tab-btn @(ActiveTabIndex == 0 ? "active" : "")" @onclick="@(async () => await OnTabClick(0))">
-                <i class="fas fa-comment-medical"></i>
-                <span>Motiv & Antecedente</span>
-                <span class="tab-number">1</span>
-            </button>
-
-            <button class="tab-btn @(ActiveTabIndex == 1 ? "active" : "")" @onclick="@(async () => await OnTabClick(1))">
-                <i class="fas fa-stethoscope"></i>
-                <span>Examen Clinic & Investigații</span>
-                <span class="tab-number">2</span>
-            </button>
-
-            <button class="tab-btn @(ActiveTabIndex == 2 ? "active" : "")" @onclick="@(async () => await OnTabClick(2))">
-                <i class="fas fa-diagnoses"></i>
-                <span>Diagnostic & Tratament</span>
-                <span class="tab-number">3</span>
-            </button>
-
-            <button class="tab-btn @(ActiveTabIndex == 3 ? "active" : "")" @onclick="@(async () => await OnTabClick(3))">
-                <i class="fas fa-clipboard-check"></i>
-                <span>Concluzii</span>
-                <span class="tab-number">4</span>
-            </button>
-        </div>
-
-        <div class="tabs-content">
-            @* TAB 1: MOTIV & ANTECEDENTE *@
-            @if (ActiveTabIndex == 0)
-            {
-                <div class="tab-panel active">
+            <!-- Tabs Content -->
+            <div class="tabs-content">
+                <!-- Tab 1: Motiv Prezentare & Antecedente -->
+                <div class="tab-panel @(ActiveTab == 1 ? "active" : "")">
                     <div class="form-section">
                         <h3 class="section-title">
                             <i class="fas fa-comment-medical"></i>
                             Motivul Prezentării
                         </h3>
-
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <label class="form-label required">Motivul principal al consultației</label>
-                                <div class="textarea-wrapper">
-                                    <textarea class="form-textarea has-counter" rows="3" maxlength="500"
-                                              @bind="Model.MotivPrezentare" @oninput="@((e) => UpdateCharCount("motiv", e.Value?.ToString()))"
-                                              placeholder="Descrieți motivul prezentării pacientului..."></textarea>
-                                    <span class="char-counter @GetCharCounterClass(MotivCharCount, 500)">
-                                        @MotivCharCount / 500
-                                    </span>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label required">Motivul principal al consultației</label>
+                            <textarea class="form-control"
+                                      rows="4"
+                                      placeholder="Descrieți motivul prezentării pacientului..."
+                                      maxlength="1000"
+                                      @bind="MotivPrezentare"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@MotivPrezentare.Length / 1000</span>
                         </div>
                     </div>
-
-                    <div class="section-divider"></div>
-
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-book-medical"></i>
-                            Istoricul Bolii Actuale
-                        </h3>
-
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <label class="form-label">Descriere detaliată</label>
-                                <textarea class="form-textarea" rows="4"
-                                          @bind="Model.IstoricBoalaActuala"
-                                          placeholder="Descrieți detaliat evoluția și caracteristicile simptomelor..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section-divider"></div>
 
                     <div class="form-section">
                         <h3 class="section-title">
                             <i class="fas fa-history"></i>
-                            Antecedente
+                            Antecedente Personale Patologice
                         </h3>
-
-                        <div class="expandable-section @(AHCExpanded ? "open" : "")">
-                            <div class="expandable-header" @onclick="@(() => AHCExpanded = !AHCExpanded)">
-                                <h4><i class="fas fa-dna"></i> Antecedente Heredocolaterale</h4>
-                                <span class="expandable-toggle"><i class="fas fa-chevron-down"></i></span>
-                            </div>
-                            @if (AHCExpanded)
-                            {
-                                <div class="expandable-content">
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">Mamă</label>
-                                            <textarea class="form-textarea" rows="2" @bind="Model.AHC_Mama" placeholder="Afecțiuni mamă..."></textarea>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label">Tată</label>
-                                            <textarea class="form-textarea" rows="2" @bind="Model.AHC_Tata" placeholder="Afecțiuni tată..."></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group full-width">
-                                            <label class="form-label">Observații</label>
-                                            <textarea class="form-textarea" rows="2" placeholder="Detalii suplimentare..."></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
+                        <div class="form-group">
+                            <textarea class="form-control"
+                                      rows="4"
+                                      placeholder="Afecțiuni anterioare, intervenții chirurgicale..."
+                                      maxlength="2000"
+                                      @bind="AntecedentePatologice"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@AntecedentePatologice.Length / 2000</span>
                         </div>
+                    </div>
 
-                        <div class="expandable-section @(APPExpanded ? "open" : "")">
-                            <div class="expandable-header" @onclick="@(() => APPExpanded = !APPExpanded)">
-                                <h4><i class="fas fa-notes-medical"></i> Antecedente Personale Patologice</h4>
-                                <span class="expandable-toggle"><i class="fas fa-chevron-down"></i></span>
-                            </div>
-                            @if (APPExpanded)
-                            {
-                                <div class="expandable-content">
-                                    <div class="form-row">
-                                        <div class="form-group full-width">
-                                            <label class="form-label">Afecțiuni cronice</label>
-                                            <textarea class="form-textarea" rows="2" @bind="Model.APP_BoliAdult" placeholder="Listați afecțiunile cronice..."></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group full-width">
-                                            <label class="form-label">Alergii cunoscute</label>
-                                            <input type="text" class="form-input" @bind="Model.APP_Alergii" placeholder="Medicamente, alimente, substanțe..." />
-                                        </div>
-                                    </div>
-                                </div>
-                            }
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-pills"></i>
+                            Tratamente Actuale
+                        </h3>
+                        <div class="form-group">
+                            <textarea class="form-control"
+                                      rows="3"
+                                      placeholder="Medicație actuală..."
+                                      maxlength="1000"
+                                      @bind="TratamenteActuale"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@TratamenteActuale.Length / 1000</span>
                         </div>
                     </div>
                 </div>
-            }
 
-            @* TAB 2: EXAMEN CLINIC & INVESTIGAȚII *@
-            @if (ActiveTabIndex == 1)
-            {
-                <div class="tab-panel active">
+                <!-- Tab 2: Examen Clinic & Investigații - Template Design -->
+                <div class="tab-panel @(ActiveTab == 2 ? "active" : "")">
+                    <!-- Examen Clinic General Grid - 12 Styled Cards -->
                     <div class="form-section">
                         <h3 class="section-title">
                             <i class="fas fa-user-md"></i>
                             Examen Clinic General
                         </h3>
-
                         <div class="exam-grid">
-                            <div class="exam-item" id="weightItem">
+                            <!-- Card 1: Stare Generală -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-user-check"></i></div>
+                                    <div class="exam-label">Stare Generală</div>
+                                </div>
+                                <select class="exam-select" @bind="StareGenerala" @bind:after="MarkFormAsDirty">
+                                    <option value="">Selectează...</option>
+                                    <option value="Bună">Bună</option>
+                                    <option value="Relativ bună">Relativ bună</option>
+                                    <option value="Medie">Medie</option>
+                                    <option value="Alterată">Alterată</option>
+                                    <option value="Gravă">Gravă</option>
+                                </select>
+                            </div>
+
+                            <!-- Card 2: Tegumente -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-hand-paper"></i></div>
+                                    <div class="exam-label">Tegumente</div>
+                                </div>
+                                <select class="exam-select" @bind="Tegumente" @bind:after="MarkFormAsDirty">
+                                    <option value="">Selectează...</option>
+                                    <option value="Normale">Normale</option>
+                                    <option value="Palide">Palide</option>
+                                    <option value="Cianotice">Cianotice</option>
+                                    <option value="Icterice">Icterice</option>
+                                </select>
+                            </div>
+
+                            <!-- Card 3: Mucoase -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-eye"></i></div>
+                                    <div class="exam-label">Mucoase</div>
+                                </div>
+                                <select class="exam-select" @bind="Mucoase" @bind:after="MarkFormAsDirty">
+                                    <option value="">Selectează...</option>
+                                    <option value="Roz">Roz</option>
+                                    <option value="Palide">Palide</option>
+                                    <option value="Cianotice">Cianotice</option>
+                                    <option value="Icterice">Icterice</option>
+                                </select>
+                            </div>
+
+                            <!-- Card 4: Greutate -->
+                            <div class="exam-item">
                                 <div class="exam-item-header">
                                     <div class="exam-icon"><i class="fas fa-weight"></i></div>
                                     <div class="exam-label">Greutate</div>
                                 </div>
                                 <div class="exam-input-row">
-                                    <input type="number" step="0.1" class="exam-input"
-                                           @bind="GreutateKg" @oninput="OnGreutateChanged"
-                                           placeholder="70" />
+                                    <input type="number" step="0.1" class="exam-input" placeholder="70.5" 
+                                           @bind="Greutate" 
+                                           @bind:event="oninput" 
+                                           @bind:after="MarkFormAsDirty" />
                                     <span class="exam-unit">kg</span>
                                 </div>
                             </div>
 
-                            <div class="exam-item" id="heightItem">
+                            <!-- Card 5: Înălțime -->
+                            <div class="exam-item">
                                 <div class="exam-item-header">
                                     <div class="exam-icon"><i class="fas fa-ruler-vertical"></i></div>
                                     <div class="exam-label">Înălțime</div>
                                 </div>
                                 <div class="exam-input-row">
-                                    <input type="number" step="0.1" class="exam-input"
-                                           @bind="InaltimeCm" @oninput="OnInaltimeChanged"
-                                           placeholder="165" />
+                                    <input type="number" class="exam-input" placeholder="175" 
+                                           @bind="Inaltime" 
+                                           @bind:event="oninput" 
+                                           @bind:after="MarkFormAsDirty" />
                                     <span class="exam-unit">cm</span>
                                 </div>
                             </div>
 
-                            <div class="exam-item" id="imcItem">
+                            <!-- Card 6: IMC (Calculated + Visual Indicator) -->
+                            <div class="exam-item @(IMC.HasValue ? "has-value" : "")">
                                 <div class="exam-item-header">
                                     <div class="exam-icon"><i class="fas fa-calculator"></i></div>
                                     <div class="exam-label">IMC</div>
                                 </div>
-                                <div class="exam-input-row">
-                                    <input type="text" class="exam-input" value="@(IMCResult?.Value.ToString("F1") ?? "")" readonly style="background:#f1f5f9;" />
-                                    <span class="exam-unit">kg/m²</span>
-                                </div>
-                                @if (IMCResult != null)
+                                @if (IMC.HasValue)
                                 {
-                                    <div class="imc-result" style="display: flex;">
-                                        <span class="imc-badge @IMCResult.ColorClass">
-                                            @IMCResult.Interpretation
-                                        </span>
+                                    <div class="imc-result">
+                                        <div class="imc-value-display @IMCCategory">
+                                            @IMC.Value.ToString("F1")
+                                        </div>
+                                        <span class="imc-badge @IMCCategory">@IMCText</span>
                                     </div>
+                                }
+                                else
+                                {
+                                    <div class="exam-placeholder">Completați G + Î</div>
                                 }
                             </div>
 
+                            <!-- Card 7: Tensiune Arterială -->
                             <div class="exam-item">
                                 <div class="exam-item-header">
-                                    <div class="exam-icon"><i class="fas fa-tint"></i></div>
+                                    <div class="exam-icon"><i class="fas fa-heartbeat"></i></div>
                                     <div class="exam-label">Tensiune Arterială</div>
                                 </div>
                                 <div class="exam-input-row">
-                                    <input type="text" class="exam-input" @bind="Model.TensiuneArteriala" placeholder="120/80" />
+                                    <input type="number" class="exam-input" placeholder="120" style="width: 45%;" 
+                                           @bind="TensiuneSistolica" 
+                                           @bind:after="MarkFormAsDirty" />
+                                    <span class="exam-unit">/</span>
+                                    <input type="number" class="exam-input" placeholder="80" style="width: 45%;" 
+                                           @bind="TensiuneDiastolica" 
+                                           @bind:after="MarkFormAsDirty" />
                                     <span class="exam-unit">mmHg</span>
                                 </div>
                             </div>
 
+                            <!-- Card 8: Frecvență Cardiacă -->
                             <div class="exam-item">
                                 <div class="exam-item-header">
-                                    <div class="exam-icon"><i class="fas fa-heartbeat"></i></div>
-                                    <div class="exam-label">Frecv. Cardiacă</div>
+                                    <div class="exam-icon"><i class="fas fa-heart"></i></div>
+                                    <div class="exam-label">Frecvență Cardiacă</div>
                                 </div>
                                 <div class="exam-input-row">
-                                    <input type="number" class="exam-input" @bind="Model.Puls" placeholder="72" />
+                                    <input type="number" class="exam-input" placeholder="75" 
+                                           @bind="Puls" 
+                                           @bind:after="MarkFormAsDirty" />
                                     <span class="exam-unit">bpm</span>
                                 </div>
                             </div>
 
+                            <!-- Card 9: Frecvență Respiratorie -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-lungs"></i></div>
+                                    <div class="exam-label">Frecvență Respiratorie</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input type="number" class="exam-input" placeholder="16" 
+                                           @bind="FreqventaRespiratorie" 
+                                           @bind:after="MarkFormAsDirty" />
+                                    <span class="exam-unit">resp/min</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 10: Temperatură -->
                             <div class="exam-item">
                                 <div class="exam-item-header">
                                     <div class="exam-icon"><i class="fas fa-thermometer-half"></i></div>
                                     <div class="exam-label">Temperatură</div>
                                 </div>
                                 <div class="exam-input-row">
-                                    <input type="number" step="0.1" class="exam-input" @bind="Model.Temperatura" placeholder="36.6" />
+                                    <input type="number" step="0.1" class="exam-input" placeholder="36.5" 
+                                           @bind="Temperatura" 
+                                           @bind:after="MarkFormAsDirty" />
                                     <span class="exam-unit">°C</span>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-row" style="margin-top: 16px;">
-                            <div class="form-group full-width">
-                                <label class="form-label">Observații examen general</label>
-                                <textarea class="form-textarea" rows="2" placeholder="Alte constatări la examenul clinic general..."></textarea>
+                            <!-- Card 11: SpO₂ (Saturație Oxigen) -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-wind"></i></div>
+                                    <div class="exam-label">SpO₂</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input type="number" class="exam-input" placeholder="98" 
+                                           @bind="SpO2" 
+                                           @bind:after="MarkFormAsDirty" />
+                                    <span class="exam-unit">%</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 12: Edeme -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-hand-holding-water"></i></div>
+                                    <div class="exam-label">Edeme</div>
+                                </div>
+                                <select class="exam-select" @bind="Edeme" @bind:after="MarkFormAsDirty">
+                                    <option value="">Selectează...</option>
+                                    <option value="Absente">Absente</option>
+                                    <option value="Ușoare">Ușoare</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="Severe">Severe</option>
+                                </select>
                             </div>
                         </div>
                     </div>
 
-                    <div class="section-divider"></div>
-
+                    <!-- Examen Obiectiv Detaliat -->
                     <div class="form-section">
                         <h3 class="section-title">
                             <i class="fas fa-stethoscope"></i>
-                            Examen Clinic Local (pe aparate)
+                            Examen Obiectiv Detaliat
                         </h3>
-
-                        <div class="expandable-section @(ExamenCardioExpanded ? "open" : "")">
-                            <div class="expandable-header" @onclick="@(() => ExamenCardioExpanded = !ExamenCardioExpanded)">
-                                <h4><i class="fas fa-heart"></i> Cardiovascular</h4>
-                                <span class="expandable-toggle"><i class="fas fa-chevron-down"></i></span>
-                            </div>
-                            @if (ExamenCardioExpanded)
-                            {
-                                <div class="expandable-content">
-                                    <div class="form-row">
-                                        <div class="form-group full-width">
-                                            <label class="form-label">Observații</label>
-                                            <textarea class="form-textarea" rows="2" @bind="Model.ExamenCardiovascular"
-                                                      placeholder="Zgomote cardiace ritmice, bine bătute..."></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
+                        <div class="form-group">
+                            <textarea class="form-control"
+                                      rows="5"
+                                      placeholder="Aspect general, examen pe aparate și sisteme..."
+                                      maxlength="2000"
+                                      @bind="ExamenObiectiv"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@ExamenObiectiv.Length / 2000</span>
                         </div>
                     </div>
 
-                    <div class="section-divider"></div>
-
+                    <!-- Investigații Paraclinice -->
                     <div class="form-section">
                         <h3 class="section-title">
-                            <i class="fas fa-microscope"></i>
+                            <i class="fas fa-flask"></i>
                             Investigații Paraclinice
                         </h3>
-
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <label class="form-label">Alte investigații (EKG, EEG, etc.)</label>
-                                <textarea class="form-textarea" rows="2" placeholder="Alte investigații complementare..."></textarea>
-                            </div>
+                        <div class="form-group">
+                            <textarea class="form-control"
+                                      rows="4"
+                                      placeholder="Analize de laborator, imagistică..."
+                                      maxlength="1500"
+                                      @bind="InvestigatiiParaclinice"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@InvestigatiiParaclinice.Length / 1500</span>
                         </div>
                     </div>
                 </div>
-            }
 
-            @* TAB 3: DIAGNOSTIC & TRATAMENT *@
-            @if (ActiveTabIndex == 2)
-            {
-                <div class="tab-panel active">
+                <!-- Tab 3: Diagnostic & Tratament -->
+                <div class="tab-panel @(ActiveTab == 3 ? "active" : "")">
                     <div class="form-section">
                         <h3 class="section-title">
-                            <i class="fas fa-search"></i>
-                            Căutare Cod ICD-10
-                        </h3>
-                        <div class="icd-search-container">
-                            <i class="fas fa-search icd-search-icon"></i>
-                            <input type="text" class="icd-search-input" placeholder="Căutați după cod sau denumire (ex: I10, Hipertensiune)" />
-                        </div>
-
-                        <h3 class="section-title" style="margin-top: 20px;">
                             <i class="fas fa-diagnoses"></i>
-                            Diagnostice Stabilite
+                            Diagnostic
                         </h3>
+                        <div class="form-group">
+                            <label class="form-label">
+                                Diagnostic principal
+                                <span class="required">*</span>
+                            </label>
+                            <textarea class="form-control"
+                                      rows="3"
+                                      placeholder="Diagnostic stabilit..."
+                                      maxlength="500"
+                                      @bind="DiagnosticPrincipal"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@DiagnosticPrincipal.Length / 500</span>
+                        </div>
 
-                        <div class="diagnosis-cards">
-                            @for (int i = 0; i < DiagnosticCards.Count; i++)
-                            {
-                                var index = i;
-                                var card = DiagnosticCards[i];
-
-                                <div class="diagnosis-card">
-                                    <div class="diagnosis-card-header">
-                                        <span class="diagnosis-type @(card.IsPrincipal ? "principal" : "secundar")">
-                                            @(card.IsPrincipal ? "Principal" : "Secundar")
-                                        </span>
-                                        <div class="diagnosis-info">
-                                            <input type="text" class="diagnosis-code-input"
-                                                   @bind="card.CodICD10" placeholder="Cod" />
-                                            <input type="text" class="diagnosis-name-input"
-                                                   @bind="card.Denumire" placeholder="Denumire diagnostic" />
-                                        </div>
-                                        <div class="diagnosis-actions">
-                                            @if (DiagnosticCards.Count > 1)
-                                            {
-                                                <button class="btn-icon" @onclick="@(async () => await RemoveDiagnostic(index))">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            }
-                                        </div>
-                                    </div>
-                                    <div class="diagnosis-card-body">
-                                        <div class="diagnosis-details-label">Detalii diagnostic</div>
-                                        <textarea class="diagnosis-details-textarea" placeholder="Descrieți detaliat diagnosticul..."></textarea>
-                                    </div>
-                                </div>
-                            }
-
-                            <button class="add-btn" @onclick="@(async () => await AddDiagnostic())">
-                                <i class="fas fa-plus"></i> Adaugă diagnostic
-                            </button>
+                        <div class="form-group">
+                            <label class="form-label">Diagnostic secundar</label>
+                            <textarea class="form-control"
+                                      rows="2"
+                                      placeholder="Diagnostice asociate..."
+                                      maxlength="500"
+                                      @bind="DiagnosticSecundar"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@DiagnosticSecundar.Length / 500</span>
                         </div>
                     </div>
 
-                    <div class="section-divider"></div>
-
                     <div class="form-section">
                         <h3 class="section-title">
-                            <i class="fas fa-pills"></i>
-                            Prescripție Medicamentoasă
+                            <i class="fas fa-prescription"></i>
+                            Plan Terapeutic
                         </h3>
-
-                        @* Allergy Alert *@
-                        <div class="allergy-alert @(ShowAllergyAlert ? "active" : "")">
-                            <div class="allergy-alert-icon">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div class="allergy-alert-content">
-                                <div class="allergy-alert-title">⚠️ Atenție - Alergie cunoscută!</div>
-                                <div class="allergy-alert-message">@AllergyMessage</div>
-                            </div>
-                            <button class="allergy-alert-close" @onclick="@(() => ShowAllergyAlert = false)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-
-                        <table class="medication-table">
-                            <thead>
-                                <tr>
-                                    <th style="width:28%">Medicament</th>
-                                    <th style="width:12%">Doză</th>
-                                    <th style="width:20%">Frecvență</th>
-                                    <th style="width:12%">Durată</th>
-                                    <th style="width:12%">Cantitate</th>
-                                    <th style="width:8%"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (int i = 0; i < MedicationRows.Count; i++)
-                                {
-                                    var index = i;
-                                    var row = MedicationRows[i];
-
-                                    <tr>
-                                        <td>
-                                            <div class="med-name-cell">
-                                                <span class="med-icon"><i class="fas fa-capsules"></i></span>
-                                                <input type="text" class="form-input @GetAllergyMatchClass(row.Nume)"
-                                                       @bind="row.Nume" @oninput="@((e) => CheckAllergyMatch(index, e.Value?.ToString()))"
-                                                       placeholder="Medicament" />
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-input"
-                                                   @bind="row.Doza" placeholder="Doză" />
-                                        </td>
-                                        <td>
-                                            <select class="form-select" @bind="row.Frecventa">
-                                                <option value="">Selectează...</option>
-                                                <option value="1x/zi dimineața">1x/zi dimineața</option>
-                                                <option value="1x/zi seara">1x/zi seara</option>
-                                                <option value="2x/zi">2x/zi</option>
-                                                <option value="3x/zi">3x/zi</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-input"
-                                                   @bind="row.Durata" placeholder="Durată" />
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-input" placeholder="Cantitate" />
-                                        </td>
-                                        <td>
-                                            @if (MedicationRows.Count > 1)
-                                            {
-                                                <button class="btn-icon" @onclick="@(async () => await RemoveMedication(index))">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            }
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-
-                        <button class="add-btn" style="margin-top: 12px;" @onclick="@(async () => await AddMedication())">
-                            <i class="fas fa-plus"></i> Adaugă medicament
-                        </button>
-                    </div>
-
-                    <div class="section-divider"></div>
-
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-notes-medical"></i>
-                            Tratament Non-farmacologic
-                        </h3>
-
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <label class="form-label">Recomandări igieno-dietetice</label>
-                                <textarea class="form-textarea" placeholder="Regim alimentar, activitate fizică, modificări stil de viață..."></textarea>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                Tratament prescris
+                                <span class="required">*</span>
+                            </label>
+                            <textarea class="form-control"
+                                      rows="5"
+                                      placeholder="Medicație, dozare, durata tratamentului..."
+                                      maxlength="2000"
+                                      @bind="PlanTerapeutic"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@PlanTerapeutic.Length / 2000</span>
                         </div>
                     </div>
-                </div>
-            }
 
-            @* TAB 4: CONCLUZII *@
-            @if (ActiveTabIndex == 3)
-            {
-                <div class="tab-panel active">
                     <div class="form-section">
                         <h3 class="section-title">
-                            <i class="fas fa-clipboard-check"></i>
+                            <i class="fas fa-info-circle"></i>
                             Recomandări
                         </h3>
-
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <label class="form-label">Recomandări pentru pacient</label>
-                                <textarea class="form-textarea" style="min-height: 140px;" @bind="Model.InvestigatiiRecomandate"
-                                          placeholder="1. Monitorizare TA de 2x/zi&#10;2. Regim hiposodat&#10;3. Activitate fizică regulată"></textarea>
-                            </div>
+                        <div class="form-group">
+                            <textarea class="form-control"
+                                      rows="4"
+                                      placeholder="Recomandări non-medicamentoase, regim alimentar, stil de viață..."
+                                      maxlength="1500"
+                                      @bind="Recomandari"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@Recomandari.Length / 1500</span>
                         </div>
                     </div>
+                </div>
 
-                    <div class="section-divider"></div>
+                <!-- Tab 4: Concluzii -->
+                <div class="tab-panel @(ActiveTab == 4 ? "active" : "")">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-file-medical"></i>
+                            Concluzii
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label">Rezumat consultație</label>
+                            <textarea class="form-control"
+                                      rows="6"
+                                      placeholder="Rezumat general al consultației..."
+                                      maxlength="2000"
+                                      @bind="Concluzii"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@Concluzii.Length / 2000</span>
+                        </div>
+                    </div>
 
                     <div class="form-section">
                         <h3 class="section-title">
                             <i class="fas fa-calendar-check"></i>
-                            Control și Monitorizare
+                            Planificare Următoare
                         </h3>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Data programată control</label>
-                                <input type="date" class="form-input" @bind="DataUrmatoareiProgramariDate" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Investigații la control</label>
-                                <input type="text" class="form-input" placeholder="ex: Profil lipidic, HbA1c, EKG" />
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Data următoarei vizite</label>
+                            <input type="date" class="form-control" 
+                                   @bind="DataUrmatoareiVizite" 
+                                   @bind:after="MarkFormAsDirty" />
                         </div>
-
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <label class="form-label">Observații finale</label>
-                                <textarea class="form-textarea" rows="3" placeholder="Notițe suplimentare..."></textarea>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Note pentru vizita următoare</label>
+                            <textarea class="form-control"
+                                      rows="3"
+                                      placeholder="Investigații suplimentare, controale..."
+                                      maxlength="1000"
+                                      @bind="NoteUrmatoareaVizita"
+                                      @bind:event="oninput"
+                                      @bind:after="MarkFormAsDirty"></textarea>
+                            <span class="char-counter">@NoteUrmatoareaVizita.Length / 1000</span>
                         </div>
                     </div>
-
-                    <div class="section-divider"></div>
-
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-file-signature"></i>
-                            Semnătură și Validare
-                        </h3>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Data consultației</label>
-                                <input type="date" class="form-input" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Medic curant</label>
-                                <input type="text" class="form-input" value="Dr. [Nume Medic]" readonly style="background:#f1f5f9;" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Cod Parafă</label>
-                                <input type="text" class="form-input" value="DR001234" readonly style="background:#f1f5f9;" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-
-            @* ===== FOOTER NAVIGATION ===== *@
-            <div class="form-footer">
-                <div class="footer-left">
-                    <span class="autosave-indicator">
-                        @if (DraftLastSaved.HasValue)
-                        {
-                            <i class="fas fa-check-circle"></i>
-                            <text>Salvat automat la @DraftLastSaved.Value.ToString("HH:mm")</text>
-                        }
-                        else
-                        {
-                            <i class="fas fa-info-circle"></i>
-                            <text>Nesalvat</text>
-                        }
-                    </span>
-                </div>
-                <div class="footer-right">
-                    @if (ActiveTabIndex > 0)
-                    {
-                        <button class="btn btn-outline" @onclick="GoToPreviousTab">
-                            <i class="fas fa-arrow-left"></i> Înapoi
-                        </button>
-                    }
-
-                    <button class="btn btn-outline" @onclick="SaveDraft" disabled="@IsSaving">
-                        <i class="fas fa-save"></i> Salvează Draft
-                    </button>
-
-                    @if (ActiveTabIndex < 3)
-                    {
-                        <button class="btn btn-success" @onclick="GoToNextTab">
-                            <i class="fas fa-arrow-right"></i> Continuă
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-success" @onclick="SaveConsultation" disabled="@IsSaving">
-                            <i class="fas fa-check"></i> Finalizează
-                        </button>
-                    }
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-@* Toast Container *@
-<div class="toast-container" id="toastContainer"></div>
-
-@* Loading Overlay *@
-<div class="loading-overlay @(IsSaving ? "active" : "")" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Se salvează...</div>
+        <!-- ✅ UPDATED: Footer Actions with better layout -->
+        <div class="consultation-footer">
+            <div class="footer-info">
+                @if (IsSaving)
+                {
+                    <span class="save-indicator saving">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Se salvează...
+                    </span>
+                }
+                else if (LastSaveTime.HasValue)
+                {
+                    <span class="save-indicator saved">
+                        <i class="fas fa-check-circle"></i>
+                        Salvat la @LastSaveTime.Value.ToString("HH:mm")
+                    </span>
+                }
+                else if (HasUnsavedChanges)
+                {
+                    <span class="save-indicator unsaved">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Modificări nesalvate
+                    </span>
+                }
+            </div>
+            <div class="footer-actions">
+                <button class="btn btn-secondary" @onclick="HandleSaveDraft" disabled="@IsSaving" title="Ctrl+S">
+                    <i class="fas fa-save"></i>
+                    Salvează Ciornă
+                </button>
+                <button class="btn btn-primary btn-finalize" @onclick="HandleFinalize" disabled="@IsSaving" title="Ctrl+Enter">
+                    <i class="fas fa-check-double"></i>
+                    Finalizează Consultație
+                </button>
+            </div>
+        </div>
+    }
 </div>
