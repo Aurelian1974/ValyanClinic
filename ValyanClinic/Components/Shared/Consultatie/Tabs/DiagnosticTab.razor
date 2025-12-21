@@ -45,8 +45,8 @@
             <textarea class="form-control" 
                       rows="3"
                       placeholder="Liste diagnostice alternative care trebuie excluse..."
-                      @bind="Model.DiagnosticDiferential"
-                      @oninput="OnFieldChanged">
+                      value="@Model.DiagnosticDiferential"
+                      @oninput="(e) => Model.DiagnosticDiferential = e.Value?.ToString()">
             </textarea>
             <small class="form-text text-muted">
                 <i class="fas fa-info-circle"></i>
@@ -62,8 +62,8 @@
             <textarea class="form-control" 
                       rows="2"
                       placeholder="Cauza bolii (ex: infecțioasă, traumatică, genetică...)..."
-                      @bind="Model.DiagnosticEtiologic"
-                      @oninput="OnFieldChanged">
+                      value="@Model.DiagnosticEtiologic"
+                      @oninput="(e) => Model.DiagnosticEtiologic = e.Value?.ToString()">
             </textarea>
         </div>
     </div>

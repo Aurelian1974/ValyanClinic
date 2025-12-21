@@ -67,9 +67,8 @@
             <textarea class="form-textarea" 
                       rows="3" 
                       placeholder="Descrieți detaliat diagnosticul principal..."
-                      @bind="DiagnosisDetails"
-                      @bind:event="oninput"
-                      @onchange="NotifyChange"></textarea>
+                      value="@DiagnosisDetails"
+                      @oninput="HandleDetailsInput"></textarea>
         </div>
     }
 </div>

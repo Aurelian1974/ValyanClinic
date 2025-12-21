@@ -36,25 +36,35 @@ public partial class DiagnosticTab : ComponentBase
     /// <summary>✅ NEW: List of secondary diagnoses</summary>
     private List<SecondaryDiagnosis> SecondaryDiagnosesList { get; set; } = new();
 
+    /// <summary>Flag to track if initial data has been loaded (prevents re-loading on every render)</summary>
+    private bool _isInitialDataLoaded = false;
+
     // ==================== COMPUTED ====================
-    
+
     private bool IsComplete => PrimaryDiagnosisCode != null;
 
     // ==================== LIFECYCLE ====================
 
     protected override void OnParametersSet()
     {
-        // Load primary diagnosis from Model if exists
-        if (!string.IsNullOrEmpty(Model.CoduriICD10))
+        // Only load from Model on FIRST render
+        // Once data is loaded, user changes take priority
+        if (_isInitialDataLoaded)
+            return;
+
+        // Load primary diagnosis from Model if exists and we don't have one yet
+        if (!string.IsNullOrEmpty(Model.CoduriICD10) && PrimaryDiagnosisCode == null)
         {
             LoadPrimaryDiagnosisFromModel();
         }
 
-        // Load secondary diagnoses from Model if exists
-        if (!string.IsNullOrEmpty(Model.CoduriICD10Secundare))
+        // Load secondary diagnoses from Model if exists and we don't have any yet
+        if (!string.IsNullOrEmpty(Model.CoduriICD10Secundare) && !SecondaryDiagnosesList.Any())
         {
             LoadSecondaryDiagnosesFromModel();
         }
+        
+        _isInitialDataLoaded = true;
     }
 
     protected override void OnAfterRender(bool firstRender)

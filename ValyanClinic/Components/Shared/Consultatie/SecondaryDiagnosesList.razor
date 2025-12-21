@@ -109,9 +109,8 @@
                             <textarea class="form-textarea"
                                       rows="2"
                                       placeholder="Observații, evoluție, severitate..."
-                                      @bind="diagnosis.AdditionalDetails"
-                                      @bind:event="oninput"
-                                      @onchange="NotifyChange"></textarea>
+                                      value="@diagnosis.AdditionalDetails"
+                                      @oninput="(e) => HandleDetailsInput(diagnosis, e)"></textarea>
                         </div>
                     </div>
                 </div>

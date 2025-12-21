@@ -5,106 +5,262 @@
     - Display favorites (⭐)
     - Keyboard navigation (↑↓ Enter)
     - Click to select
-    - Button pentru modal tabel favorite complet
+    - ✅ INLINE expandable favorites panel (no modal)
 *@
+@using ValyanClinic.Application.Features.ICD10Management.DTOs
 
 <div class="icd10-search-box">
     <!-- Search Input with Favorites Button -->
     <div class="search-input-wrapper">
         <i class="fas fa-search search-icon"></i>
         <input type="text" 
-          class="search-input" 
-            placeholder="@Placeholder"
-  value="@SearchTerm"
+               class="search-input" 
+               placeholder="@Placeholder"
+               value="@SearchTerm"
                @oninput="@((e) => { SearchTerm = e.Value?.ToString() ?? string.Empty; HandleSearchTermChanged(); })"
-     @onfocus="HandleFocus"
-        @onblur="HandleBlur"
-         @onkeydown="HandleKeyDown" />
+               @onfocus="HandleFocus"
+               @onblur="HandleBlur"
+               @onkeydown="HandleKeyDown" />
         
         @if (!string.IsNullOrEmpty(SearchTerm))
-      {
-          <button class="btn-clear" @onclick="ClearSearch" title="Șterge căutare">
-         <i class="fas fa-times"></i>
-         </button>
+        {
+            <button class="btn-clear" @onclick="ClearSearch" title="Șterge căutare">
+                <i class="fas fa-times"></i>
+            </button>
         }
         
-        <!-- ✅ NEW: Favorites Modal Button -->
+        <!-- ✅ Favorites Toggle Button (opens inline panel) -->
         @if (CurrentUserId.HasValue)
         {
             <button type="button" 
-                    class="btn-favorites-modal" 
-                    @onclick="OpenFavoritesModal" 
-                    title="Vezi toate favoritele în tabel">
+                    class="btn-favorites-toggle @(IsFavoritesPanelOpen ? "active" : "")" 
+                    @onclick="ToggleFavoritesPanel" 
+                    title="@(IsFavoritesPanelOpen ? "Închide favoritele" : "Vezi codurile favorite")">
                 <i class="fas fa-star"></i>
                 <span>Favorite</span>
+                @if (FavoritesList.Count > 0)
+                {
+                    <span class="favorites-count">@FavoritesList.Count</span>
+                }
+                <i class="fas fa-chevron-@(IsFavoritesPanelOpen ? "up" : "down") chevron-icon"></i>
             </button>
         }
         
         @if (IsSearching)
-     {
+        {
             <div class="loading-spinner">
-     <i class="fas fa-spinner fa-spin"></i>
+                <i class="fas fa-spinner fa-spin"></i>
             </div>
         }
     </div>
 
-    <!-- Results Dropdown -->
+    <!-- ✅ INLINE Favorites Panel (expandable) -->
+    @if (IsFavoritesPanelOpen && CurrentUserId.HasValue)
+    {
+        <div class="favorites-panel">
+            <!-- Panel Header -->
+            <div class="favorites-panel-header">
+                <div class="header-title">
+                    <i class="fas fa-star"></i>
+                    <span>Coduri ICD-10 Favorite</span>
+                </div>
+                
+                <!-- Search in favorites -->
+                <div class="favorites-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           placeholder="Filtrează favorite..." 
+                           value="@FavoritesSearchTerm"
+                           @oninput="HandleFavoritesSearch" />
+                    @if (!string.IsNullOrEmpty(FavoritesSearchTerm))
+                    {
+                        <button type="button" class="btn-clear-search" @onclick="ClearFavoritesSearch">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    }
+                </div>
+                
+                <button type="button" class="btn-close-panel" @onclick="CloseFavoritesPanel" title="Închide">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Panel Body -->
+            <div class="favorites-panel-body">
+                @if (IsFavoritesLoading)
+                {
+                    <div class="favorites-loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Se încarcă favoritele...</span>
+                    </div>
+                }
+                else if (!FavoritesList.Any())
+                {
+                    <div class="favorites-empty">
+                        <i class="far fa-star"></i>
+                        <p>Nu aveți coduri ICD-10 favorite</p>
+                        <small>Adăugați coduri la favorite din rezultatele căutării</small>
+                    </div>
+                }
+                else if (!FilteredFavoritesList.Any())
+                {
+                    <div class="favorites-no-results">
+                        <i class="fas fa-search"></i>
+                        <p>Nu s-au găsit rezultate pentru "<strong>@FavoritesSearchTerm</strong>"</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="favorites-table-container">
+                        <table class="favorites-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-code" @onclick="() => SortFavoritesBy(nameof(ICD10SearchResultDto.Code))">
+                                        Cod
+                                        <i class="fas fa-sort@(GetSortIcon(nameof(ICD10SearchResultDto.Code)))"></i>
+                                    </th>
+                                    <th class="col-description" @onclick="() => SortFavoritesBy(nameof(ICD10SearchResultDto.ShortDescription))">
+                                        Denumire
+                                        <i class="fas fa-sort@(GetSortIcon(nameof(ICD10SearchResultDto.ShortDescription)))"></i>
+                                    </th>
+                                    <th class="col-category">Categorie</th>
+                                    <th class="col-action">Acțiune</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var favorite in FilteredFavoritesList)
+                                {
+                                    <tr class="favorite-row" @onclick="() => SelectFavoriteFromPanel(favorite)">
+                                        <td class="cell-code">
+                                            <span class="code-badge">@favorite.Code</span>
+                                        </td>
+                                        <td class="cell-description">
+                                            @favorite.ShortDescription
+                                        </td>
+                                        <td class="cell-category">
+                                            @if (!string.IsNullOrEmpty(favorite.Category))
+                                            {
+                                                <span class="category-tag">
+                                                    @GetCategoryIcon(favorite.Category) @favorite.Category
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="cell-action">
+                                            <button type="button" 
+                                                    class="btn-select-favorite" 
+                                                    @onclick="() => SelectFavoriteFromPanel(favorite)"
+                                                    @onclick:stopPropagation
+                                                    title="Selectează">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Results count -->
+                    <div class="favorites-footer">
+                        <span class="results-info">
+                            <i class="fas fa-info-circle"></i>
+                            Afișate: <strong>@FilteredFavoritesList.Count</strong> din <strong>@FavoritesList.Count</strong>
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- ✅ MODERN Results Dropdown -->
     @if (ShowResults && Results.Any())
     {
         <div class="search-results-dropdown">
-            @foreach (var (result, index) in Results.Select((r, i) => (r, i)))
-            {
-                <div class="result-item @(index == SelectedIndex ? "selected" : "")"
-        @onclick="() => SelectResult(result)"
-    @onmouseenter="() => SelectedIndex = index">
-        
-  <!-- Favorite Star -->
-   <button class="btn-favorite @(result.IsFavorite ? "active" : "")"
-      @onclick:stopPropagation
-            @onclick="() => ToggleFavorite(result)"
-          title="@(result.IsFavorite ? "Elimină din favorite" : "Adaugă la favorite")">
- <i class="@(result.IsFavorite ? "fas" : "far") fa-star"></i>
-        </button>
-
-             <!-- Code & Description -->
-        <div class="result-content">
-        <div class="result-header">
-      <span class="result-code">@result.Code</span>
-             @if (result.IsCommon)
-       {
-       <span class="badge badge-common">⭐ Frecvent</span>
-    }
-       @if (!result.IsTranslated)
-        {
-  <span class="badge badge-untranslated">🌐 EN</span>
-          }
-      </div>
-         <div class="result-description">@result.ShortDescription</div>
-    @if (!string.IsNullOrEmpty(result.Category))
-      {
-         <div class="result-category">
-         <span class="category-icon">@GetCategoryIcon(result.Category)</span>
-      <span class="category-text">@result.Category</span>
-    </div>
-  }
-               </div>
+            <!-- Results Header -->
+            <div class="results-header">
+                <span class="results-count">
+                    <i class="fas fa-list-ul"></i>
+                    @Results.Count rezultate
+                </span>
+                <span class="results-hint">
+                    <kbd>↑</kbd><kbd>↓</kbd> navigare • <kbd>Enter</kbd> selectare
+                </span>
             </div>
-            }
+            
+            <!-- Results List -->
+            <div class="results-list">
+                @foreach (var (result, index) in Results.Select((r, i) => (r, i)))
+                {
+                    <div class="result-item @(index == SelectedIndex ? "selected" : "")"
+                         @onclick="() => SelectResult(result)"
+                         @onmouseenter="() => SelectedIndex = index">
+                        
+                        <!-- Favorite Star -->
+                        <button type="button" 
+                                class="btn-favorite @(result.IsFavorite ? "active" : "")"
+                                @onclick:stopPropagation
+                                @onclick="() => ToggleFavorite(result)"
+                                title="@(result.IsFavorite ? "Elimină din favorite" : "Adaugă la favorite")">
+                            <i class="@(result.IsFavorite ? "fas" : "far") fa-star"></i>
+                        </button>
+
+                        <!-- Code Badge -->
+                        <div class="result-code-wrapper">
+                            <span class="code-badge">@result.Code</span>
+                        </div>
+
+                        <!-- Description & Meta -->
+                        <div class="result-content">
+                            <div class="result-description">
+                                @result.ShortDescription
+                            </div>
+                            <div class="result-meta">
+                                @if (!string.IsNullOrEmpty(result.Category))
+                                {
+                                    <span class="meta-category">
+                                        <span class="category-icon">@GetCategoryIcon(result.Category)</span>
+                                        @result.Category
+                                    </span>
+                                }
+                                @if (result.IsCommon)
+                                {
+                                    <span class="meta-badge common">
+                                        <i class="fas fa-star"></i> Frecvent
+                                    </span>
+                                }
+                                @if (!result.IsTranslated)
+                                {
+                                    <span class="meta-badge english">
+                                        <i class="fas fa-globe"></i> EN
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Select Button -->
+                        <button type="button" class="btn-select-result" title="Selectează">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                }
+            </div>
         </div>
     }
     else if (ShowResults && !IsSearching && !string.IsNullOrEmpty(SearchTerm))
     {
-      <div class="search-results-dropdown">
- <div class="no-results">
-     <i class="fas fa-search"></i>
-<p>Nu s-au găsit rezultate pentru "<strong>@SearchTerm</strong>"</p>
-   </div>
+        <div class="search-results-dropdown">
+            <div class="no-results">
+                <div class="no-results-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="no-results-text">
+                    <p>Nu s-au găsit rezultate pentru</p>
+                    <span class="search-term">"@SearchTerm"</span>
+                </div>
+                <div class="no-results-hint">
+                    Încercați alt termen sau verificați ortografia
+                </div>
+            </div>
         </div>
     }
 </div>
-
-<!-- ✅ NEW: Favorites Modal -->
-<ICD10FavoritesModal @bind-IsVisible="IsFavoritesModalVisible"
-                     CurrentUserId="@CurrentUserId"
-                     OnFavoriteSelected="HandleFavoriteSelectedFromModal"
-                     @ref="_favoritesModal" />

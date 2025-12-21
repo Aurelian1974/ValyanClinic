@@ -105,6 +105,14 @@ public partial class SecondaryDiagnosesList : ComponentBase
         await NotifyChange();
     }
 
+    /// <summary>Handle textarea input without causing re-render loops</summary>
+    private void HandleDetailsInput(SecondaryDiagnosis diagnosis, ChangeEventArgs e)
+    {
+        diagnosis.AdditionalDetails = e.Value?.ToString();
+        // Note: NOT calling NotifyChange() here to avoid re-render loops during typing
+        // The list is updated by reference, so changes are automatically reflected
+    }
+
     private async Task NotifyChange()
     {
         await OnChanged.InvokeAsync();

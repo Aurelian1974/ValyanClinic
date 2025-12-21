@@ -11,6 +11,7 @@ namespace ValyanClinic.Components.Shared.ICD10;
 /// <summary>
 /// ICD10 Search Box - Autocomplete cu favorites
 /// Features: Live search, keyboard navigation, favorites management
+/// ✅ V2: Inline expandable panel instead of modal
 /// </summary>
 public partial class ICD10SearchBox : ComponentBase, IDisposable
 {
@@ -32,9 +33,9 @@ public partial class ICD10SearchBox : ComponentBase, IDisposable
     [Parameter] public Guid? CurrentUserId { get; set; }
  
     /// <summary>Event când un cod este selectat</summary>
- [Parameter] public EventCallback<ICD10SearchResultDto> OnCodeSelected { get; set; }
+    [Parameter] public EventCallback<ICD10SearchResultDto> OnCodeSelected { get; set; }
 
-    // ==================== STATE ====================
+    // ==================== STATE - SEARCH ====================
     
     private string SearchTerm { get; set; } = string.Empty;
     
@@ -48,17 +49,31 @@ public partial class ICD10SearchBox : ComponentBase, IDisposable
   
     private System.Threading.Timer? _debounceTimer;
 
-    /// <summary>✅ NEW: Set of favorite ICD10 IDs pentru user curent</summary>
+    /// <summary>Set of favorite ICD10 IDs pentru user curent</summary>
     private HashSet<Guid> FavoriteIds { get; set; } = new();
 
-    /// <summary>✅ NEW: Loading state pentru favorites</summary>
+    // ==================== STATE - INLINE FAVORITES PANEL ====================
+
+    /// <summary>✅ NEW: Inline panel visibility (replaces modal)</summary>
+    private bool IsFavoritesPanelOpen { get; set; }
+
+    /// <summary>✅ NEW: Full favorites list</summary>
+    private List<ICD10SearchResultDto> FavoritesList { get; set; } = new();
+
+    /// <summary>✅ NEW: Filtered favorites (after search)</summary>
+    private List<ICD10SearchResultDto> FilteredFavoritesList { get; set; } = new();
+
+    /// <summary>✅ NEW: Search term within favorites panel</summary>
+    private string FavoritesSearchTerm { get; set; } = string.Empty;
+
+    /// <summary>✅ NEW: Current sort column</summary>
+    private string FavoritesSortColumn { get; set; } = nameof(ICD10SearchResultDto.Code);
+
+    /// <summary>✅ NEW: Sort direction</summary>
+    private bool FavoritesSortAscending { get; set; } = true;
+
+    /// <summary>Loading state pentru favorites</summary>
     private bool IsFavoritesLoading { get; set; }
-
-    /// <summary>✅ NEW: Favorites modal visibility</summary>
-    private bool IsFavoritesModalVisible { get; set; }
-
-    /// <summary>✅ NEW: Reference to favorites modal</summary>
-    private ICD10FavoritesModal? _favoritesModal;
 
     // ==================== LIFECYCLE ====================
 
@@ -286,28 +301,186 @@ ShowResults = false;
         };
     }
 
-    // ==================== FAVORITES MODAL ====================
+    // ==================== INLINE FAVORITES PANEL ====================
 
-    /// <summary>✅ NEW: Open favorites modal</summary>
-    private void OpenFavoritesModal()
+    /// <summary>✅ Toggle favorites panel visibility</summary>
+    private async Task ToggleFavoritesPanel()
     {
-        Logger.LogInformation("[ICD10Search] Opening favorites modal");
+        if (IsFavoritesPanelOpen)
+        {
+            CloseFavoritesPanel();
+        }
+        else
+        {
+            await OpenFavoritesPanelAsync();
+        }
+    }
+
+    /// <summary>✅ Open favorites panel and load data</summary>
+    private async Task OpenFavoritesPanelAsync()
+    {
+        Logger.LogInformation("[ICD10Search] Opening favorites panel");
         
-        // ✅ SIMPLIFIED: Just set the visibility flag
-        // Modal will load data when it renders (via OpenAsync if @ref is used)
-        IsFavoritesModalVisible = true;
+        IsFavoritesPanelOpen = true;
+        FavoritesSearchTerm = string.Empty;
+        
+        // Close search dropdown if open
+        ShowResults = false;
+        
+        await LoadFavoritesListAsync();
         StateHasChanged();
     }
 
-    /// <summary>✅ NEW: Handle favorite selection from modal</summary>
-    private async Task HandleFavoriteSelectedFromModal(ICD10SearchResultDto favorite)
+    /// <summary>✅ Close favorites panel</summary>
+    private void CloseFavoritesPanel()
     {
-        Logger.LogInformation("[ICD10Search] Favorite selected from modal: {Code}", favorite.Code);
+        Logger.LogDebug("[ICD10Search] Closing favorites panel");
+        IsFavoritesPanelOpen = false;
+        FavoritesSearchTerm = string.Empty;
+        StateHasChanged();
+    }
+
+    /// <summary>✅ Load full favorites list for panel</summary>
+    private async Task LoadFavoritesListAsync()
+    {
+        if (!CurrentUserId.HasValue)
+        {
+            Logger.LogDebug("[ICD10Search] No user ID - skipping favorites list load");
+            return;
+        }
+
+        try
+        {
+            IsFavoritesLoading = true;
+            StateHasChanged();
+
+            Logger.LogInformation("[ICD10Search] Loading favorites list for user: {UserId}", CurrentUserId.Value);
+
+            var favorites = await ICD10Repository.GetFavoritesAsync(CurrentUserId.Value);
+            
+            FavoritesList = favorites.Select(f => new ICD10SearchResultDto
+            {
+                ICD10_ID = f.ICD10_ID,
+                Code = f.Code,
+                FullCode = f.FullCode,
+                ShortDescription = f.ShortDescription,
+                LongDescription = f.LongDescription,
+                Category = f.Category,
+                Severity = f.Severity,
+                IsCommon = f.IsCommon,
+                IsLeafNode = f.IsLeafNode,
+                IsBillable = f.IsBillable,
+                IsTranslated = f.IsTranslated,
+                IsFavorite = true,
+                RelevanceScore = 100
+            }).ToList();
+
+            // Also update the HashSet for search results
+            FavoriteIds = FavoritesList.Select(f => f.ICD10_ID).ToHashSet();
+
+            ApplyFavoritesFilterAndSort();
+
+            Logger.LogInformation("[ICD10Search] Loaded {Count} favorites", FavoritesList.Count);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[ICD10Search] Error loading favorites list");
+            FavoritesList = new List<ICD10SearchResultDto>();
+            FilteredFavoritesList = new List<ICD10SearchResultDto>();
+        }
+        finally
+        {
+            IsFavoritesLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>✅ Handle search within favorites panel</summary>
+    private void HandleFavoritesSearch(ChangeEventArgs e)
+    {
+        FavoritesSearchTerm = e.Value?.ToString() ?? string.Empty;
+        ApplyFavoritesFilterAndSort();
+        StateHasChanged();
+    }
+
+    /// <summary>✅ Clear favorites search</summary>
+    private void ClearFavoritesSearch()
+    {
+        FavoritesSearchTerm = string.Empty;
+        ApplyFavoritesFilterAndSort();
+        StateHasChanged();
+    }
+
+    /// <summary>✅ Sort favorites by column</summary>
+    private void SortFavoritesBy(string columnName)
+    {
+        if (FavoritesSortColumn == columnName)
+        {
+            FavoritesSortAscending = !FavoritesSortAscending;
+        }
+        else
+        {
+            FavoritesSortColumn = columnName;
+            FavoritesSortAscending = true;
+        }
+
+        ApplyFavoritesFilterAndSort();
+        StateHasChanged();
         
-        // Same logic as SelectResult
+        Logger.LogDebug("[ICD10Search] Sorted favorites by {Column} {Direction}", 
+            columnName, FavoritesSortAscending ? "ASC" : "DESC");
+    }
+
+    /// <summary>✅ Get sort icon for column</summary>
+    private string GetSortIcon(string columnName)
+    {
+        if (FavoritesSortColumn != columnName) return "";
+        return FavoritesSortAscending ? "-up" : "-down";
+    }
+
+    /// <summary>✅ Apply filter and sort to favorites</summary>
+    private void ApplyFavoritesFilterAndSort()
+    {
+        var query = FavoritesList.AsEnumerable();
+
+        // Apply search filter
+        if (!string.IsNullOrWhiteSpace(FavoritesSearchTerm))
+        {
+            var searchLower = FavoritesSearchTerm.ToLower();
+            query = query.Where(f =>
+                f.Code.ToLower().Contains(searchLower) ||
+                f.ShortDescription.ToLower().Contains(searchLower) ||
+                (f.LongDescription?.ToLower().Contains(searchLower) ?? false) ||
+                (f.Category?.ToLower().Contains(searchLower) ?? false));
+        }
+
+        // Apply sorting
+        query = FavoritesSortColumn switch
+        {
+            nameof(ICD10SearchResultDto.Code) => FavoritesSortAscending
+                ? query.OrderBy(f => f.Code)
+                : query.OrderByDescending(f => f.Code),
+            nameof(ICD10SearchResultDto.ShortDescription) => FavoritesSortAscending
+                ? query.OrderBy(f => f.ShortDescription)
+                : query.OrderByDescending(f => f.ShortDescription),
+            _ => query.OrderBy(f => f.Code)
+        };
+
+        FilteredFavoritesList = query.ToList();
+    }
+
+    /// <summary>✅ Select a favorite from the panel</summary>
+    private async Task SelectFavoriteFromPanel(ICD10SearchResultDto favorite)
+    {
+        Logger.LogInformation("[ICD10Search] Favorite selected from panel: {Code}", favorite.Code);
+
+        // Close the panel
+        IsFavoritesPanelOpen = false;
+        
+        // Notify parent
         await OnCodeSelected.InvokeAsync(favorite);
         
-        // Clear search after selection
+        // Clear search
         SearchTerm = string.Empty;
         Results.Clear();
         ShowResults = false;
@@ -316,9 +489,9 @@ ShowResults = false;
         StateHasChanged();
     }
 
-    // ==================== FAVORITES LOADING ====================
+    // ==================== FAVORITES LOADING (for search results) ====================
 
-    /// <summary>✅ NEW: Load user's favorite ICD10 codes</summary>
+    /// <summary>Load user's favorite ICD10 IDs for marking in search results</summary>
     private async Task LoadFavoritesAsync()
     {
         if (!CurrentUserId.HasValue)
@@ -329,24 +502,16 @@ ShowResults = false;
 
         try
         {
-            IsFavoritesLoading = true;
-            StateHasChanged();
-
-            Logger.LogInformation("[ICD10Search] Loading favorites for user: {UserId}", CurrentUserId.Value);
+            Logger.LogDebug("[ICD10Search] Loading favorite IDs for user: {UserId}", CurrentUserId.Value);
 
             var favorites = await ICD10Repository.GetFavoritesAsync(CurrentUserId.Value);
             FavoriteIds = favorites.Select(f => f.ICD10_ID).ToHashSet();
 
-            Logger.LogInformation("[ICD10Search] Loaded {Count} favorites", FavoriteIds.Count);
+            Logger.LogDebug("[ICD10Search] Loaded {Count} favorite IDs", FavoriteIds.Count);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "[ICD10Search] Error loading favorites");
-        }
-        finally
-        {
-            IsFavoritesLoading = false;
-            StateHasChanged();
+            Logger.LogError(ex, "[ICD10Search] Error loading favorite IDs");
         }
     }
 }

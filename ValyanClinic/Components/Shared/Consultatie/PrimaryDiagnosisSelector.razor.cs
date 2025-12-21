@@ -44,6 +44,15 @@ public partial class PrimaryDiagnosisSelector : ComponentBase
         await NotifyChange();
     }
 
+    /// <summary>Handle textarea input without causing re-render loops</summary>
+    private async Task HandleDetailsInput(ChangeEventArgs e)
+    {
+        DiagnosisDetails = e.Value?.ToString();
+        await DiagnosisDetailsChanged.InvokeAsync(DiagnosisDetails);
+        // Note: NOT calling NotifyChange() here to avoid re-render loops during typing
+        // The parent will sync on blur or when other fields change
+    }
+
     private async Task ClearSelection()
     {
         Logger.LogInformation("[PrimaryDiagnosis] Clearing selection");
