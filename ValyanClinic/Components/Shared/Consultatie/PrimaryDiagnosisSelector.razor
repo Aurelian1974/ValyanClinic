@@ -64,16 +64,41 @@
         <!-- Optional: Description field -->
         <div class="diagnosis-details-field">
             <label class="form-label">Detalii diagnostic principal (opțional)</label>
-            <textarea class="form-textarea" 
-                      rows="3" 
-                      placeholder="Descrieți detaliat diagnosticul principal..."
-                      value="@DiagnosisDetails"
-                      @oninput="HandleDetailsInput"></textarea>
+            <div class="textarea-wrapper @GetCharacterCountClass()">
+                <textarea class="form-textarea" 
+                          rows="3" 
+                          placeholder="Descrieți detaliat diagnosticul principal..."
+                          maxlength="@MaxDetailsLength"
+                          value="@DiagnosisDetails"
+                          @oninput="HandleDetailsInput"></textarea>
+                <div class="character-counter">
+                    <span class="counter-text">@CurrentDetailsLength / @MaxDetailsLength</span>
+                </div>
+            </div>
         </div>
     }
 </div>
 
 @code {
+    // ==================== CHARACTER COUNTER ====================
+    private const int MaxDetailsLength = 500;
+    private const double WarningThreshold = 0.8;  // 80% = galben
+    private const double DangerThreshold = 0.95;  // 95% = roșu
+
+    private int CurrentDetailsLength => DiagnosisDetails?.Length ?? 0;
+
+    private string GetCharacterCountClass()
+    {
+        if (CurrentDetailsLength == 0) return "";
+        
+        double ratio = (double)CurrentDetailsLength / MaxDetailsLength;
+        
+        if (ratio >= DangerThreshold) return "counter-danger";
+        if (ratio >= WarningThreshold) return "counter-warning";
+        return "";
+    }
+
+    // ==================== HELPERS ====================
     private string GetCategoryIcon(string category)
     {
         return category switch

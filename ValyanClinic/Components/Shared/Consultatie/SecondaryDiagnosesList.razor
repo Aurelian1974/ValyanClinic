@@ -1,135 +1,162 @@
 ﻿@*
-    Secondary Diagnoses List - Multiple diagnoses with ICD10 codes
+    Secondary Diagnoses List - Compact & Elegant Design
     Features:
-    - Add up to 10 secondary diagnoses
-    - Each diagnosis: text description + multiple ICD10 codes
-    - Counter showing current/max diagnoses
-    - Remove functionality
-    - Validation
+    - Inline compact design (no large cards)
+    - Quick add with minimal space
+    - Collapsible entries
+    - Modern chip-based display
 *@
 @using ValyanClinic.Components.Shared.ICD10
 
-<div class="secondary-diagnoses-list">
-    <div class="secondary-header">
-        <label class="form-label">
-            <i class="fas fa-list-ul"></i> Diagnostic Secundar
-            <span class="counter">
-                (Puteți adăuga maxim 10 diagnostice secundare - <strong>@SecondaryDiagnoses.Count/10</strong>)
-            </span>
-        </label>
-    </div>
-
-    @if (!SecondaryDiagnoses.Any())
-    {
-        <div class="empty-state">
-            <i class="fas fa-notes-medical"></i>
-            <p>Nu ați adăugat încă diagnostice secundare</p>
-            <button type="button" class="btn-add-diagnosis primary" @onclick="AddSecondaryDiagnosis" disabled="@IsMaxReached">
-                <i class="fas fa-plus"></i> Adaugă primul diagnostic secundar
-            </button>
+<div class="secondary-diagnoses-container">
+    <!-- Compact Header with inline Add button -->
+    <div class="secondary-header-compact">
+        <div class="header-left">
+            <i class="fas fa-list-ul"></i>
+            <span class="header-title">Diagnostic Secundar</span>
+            <span class="header-counter">@SecondaryDiagnoses.Count/10</span>
         </div>
-    }
-    else
-    {
-        <div class="diagnoses-container">
-            @foreach (var (diagnosis, index) in SecondaryDiagnoses.Select((d, i) => (d, i)))
-            {
-                <div class="diagnosis-card @(ShowValidation && !ValidateDiagnosis(diagnosis) ? "invalid" : "")">
-                    <div class="diagnosis-card-header">
-                        <div class="diagnosis-number">
-                            <i class="fas fa-notes-medical"></i>
-                            Diagnostic Secundar #@(index + 1)
-                        </div>
-                        <button type="button" class="btn-remove" @onclick="() => RemoveSecondaryDiagnosis(index)" title="Elimină diagnostic">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-
-                    <div class="diagnosis-card-body">
-                        <!-- Text Description -->
-                        <div class="form-group">
-                            <label class="form-label required">Descriere diagnostic</label>
-                            <textarea class="form-textarea"
-                                      rows="2"
-                                      placeholder="Descrieți diagnosticul secundar..."
-                                      @bind="diagnosis.Description"
-                                      @bind:event="oninput"
-                                      @onchange="NotifyChange"></textarea>
-                            @if (ShowValidation && string.IsNullOrWhiteSpace(diagnosis.Description))
-                            {
-                                <div class="validation-message">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    Descrierea este obligatorie
-                                </div>
-                            }
-                        </div>
-
-                        <!-- ICD10 Codes -->
-                        <div class="form-group">
-                            <label class="form-label">Coduri ICD-10 (maxim 10)</label>
-                            
-                            <!-- Search Box -->
-                            @if (diagnosis.ICD10Codes.Count < 10)
-                            {
-                                <ICD10SearchBox Placeholder="Adaugă cod ICD-10..."
-                                                OnCodeSelected="(code) => AddICD10Code(diagnosis, code)"
-                                                CurrentUserId="@CurrentUserId"
-                                                MinSearchLength="2"
-                                                MaxResults="10" />
-                            }
-                            else
-                            {
-                                <div class="limit-reached-message">
-                                    <i class="fas fa-info-circle"></i>
-                                    Limită atinsă: 10 coduri ICD-10 per diagnostic
-                                </div>
-                            }
-
-                            <!-- Selected Codes Display -->
-                            @if (diagnosis.ICD10Codes.Any())
-                            {
-                                <div class="selected-codes-list">
-                                    @foreach (var icd10Code in diagnosis.ICD10Codes)
-                                    {
-                                        <div class="code-chip">
-                                            <span class="code-text">@(icd10Code.Code)</span>
-                                            <span class="code-name">@icd10Code.ShortDescription</span>
-                                            <button type="button" class="btn-remove-chip" @onclick="() => RemoveICD10Code(diagnosis, icd10Code)" title="Elimină cod">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    }
-                                </div>
-                            }
-                        </div>
-
-                        <!-- Optional: Additional Details -->
-                        <div class="form-group">
-                            <label class="form-label">Detalii suplimentare (opțional)</label>
-                            <textarea class="form-textarea"
-                                      rows="2"
-                                      placeholder="Observații, evoluție, severitate..."
-                                      value="@diagnosis.AdditionalDetails"
-                                      @oninput="(e) => HandleDetailsInput(diagnosis, e)"></textarea>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-
-        <!-- Add Button (if under limit) -->
+        
         @if (!IsMaxReached)
         {
-            <button type="button" class="btn-add-diagnosis" @onclick="AddSecondaryDiagnosis">
-                <i class="fas fa-plus"></i> Adaugă diagnostic secundar (@SecondaryDiagnoses.Count/10)
+            <button type="button" class="btn-add-compact" @onclick="AddSecondaryDiagnosis" title="Adaugă diagnostic secundar">
+                <i class="fas fa-plus"></i>
+                <span>Adaugă</span>
             </button>
+        }
+    </div>
+
+    <!-- Diagnoses List - Compact Inline Style -->
+    <div class="diagnoses-list-compact">
+        @if (!SecondaryDiagnoses.Any())
+        {
+            <div class="empty-state-compact">
+                <i class="fas fa-plus-circle"></i>
+                <span>Click "Adaugă" pentru a adăuga diagnostice secundare</span>
+            </div>
         }
         else
         {
-            <div class="limit-reached-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                Ați atins limita maximă de 10 diagnostice secundare
-            </div>
+            @foreach (var (diagnosis, index) in SecondaryDiagnoses.Select((d, i) => (d, i)))
+            {
+                <div class="diagnosis-entry @(_expandedIndex == index ? "expanded" : "") @(ShowValidation && !ValidateDiagnosis(diagnosis) ? "invalid" : "")">
+                    <!-- Compact Row (always visible) -->
+                    <div class="diagnosis-row" @onclick="() => ToggleExpand(index)">
+                        <div class="row-number">#@(index + 1)</div>
+                        
+                        <div class="row-content">
+                            @if (diagnosis.ICD10Codes.Any())
+                            {
+                                <div class="icd-codes-preview">
+                                    @foreach (var icdCode in diagnosis.ICD10Codes.Take(3))
+                                    {
+                                        <span class="code-mini-badge">@icdCode.Code</span>
+                                    }
+                                    @if (diagnosis.ICD10Codes.Count > 3)
+                                    {
+                                        <span class="code-more">+@(diagnosis.ICD10Codes.Count - 3)</span>
+                                    }
+                                </div>
+                            }
+                            
+                            <span class="row-description @(string.IsNullOrWhiteSpace(diagnosis.Description) ? "placeholder" : "")">
+                                @(string.IsNullOrWhiteSpace(diagnosis.Description) ? "Click pentru a edita..." : TruncateText(diagnosis.Description, 60))
+                            </span>
+                        </div>
+                        
+                        <div class="row-actions">
+                            <button type="button" class="btn-expand" title="@(_expandedIndex == index ? "Restrânge" : "Extinde")">
+                                <i class="fas fa-chevron-@(_expandedIndex == index ? "up" : "down")"></i>
+                            </button>
+                            <button type="button" class="btn-delete" @onclick="() => RemoveSecondaryDiagnosis(index)" @onclick:stopPropagation title="Șterge">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Expandable Details Panel -->
+                    @if (_expandedIndex == index)
+                    {
+                        <div class="diagnosis-details-panel">
+                            <!-- ICD10 Search -->
+                            <div class="detail-section">
+                                <label class="detail-label">
+                                    <i class="fas fa-tag"></i> Coduri ICD-10
+                                    <span class="codes-count">(@diagnosis.ICD10Codes.Count/10)</span>
+                                </label>
+                                
+                                @if (diagnosis.ICD10Codes.Count < 10)
+                                {
+                                    <div class="icd-search-compact">
+                                        <ICD10SearchBox Placeholder="Caută și adaugă cod ICD-10..."
+                                                        OnCodeSelected="(code) => AddICD10Code(diagnosis, code)"
+                                                        CurrentUserId="@CurrentUserId"
+                                                        MinSearchLength="2"
+                                                        MaxResults="8" />
+                                    </div>
+                                }
+                                
+                                @if (diagnosis.ICD10Codes.Any())
+                                {
+                                    <div class="selected-codes-compact">
+                                        @foreach (var icd10Code in diagnosis.ICD10Codes)
+                                        {
+                                            <div class="code-tag">
+                                                <span class="tag-code">@icd10Code.Code</span>
+                                                <span class="tag-name">@TruncateText(icd10Code.ShortDescription, 35)</span>
+                                                <button type="button" class="btn-remove-tag" @onclick="() => RemoveICD10Code(diagnosis, icd10Code)" title="Elimină">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            
+                            <!-- Description -->
+                            <div class="detail-section">
+                                <label class="detail-label">
+                                    <i class="fas fa-align-left"></i> Descriere
+                                    @if (ShowValidation && string.IsNullOrWhiteSpace(diagnosis.Description))
+                                    {
+                                        <span class="required-indicator">* obligatoriu</span>
+                                    }
+                                </label>
+                                <textarea class="compact-textarea @(ShowValidation && string.IsNullOrWhiteSpace(diagnosis.Description) ? "invalid" : "")"
+                                          rows="2"
+                                          placeholder="Descrieți diagnosticul secundar..."
+                                          @bind="diagnosis.Description"
+                                          @bind:event="oninput"></textarea>
+                            </div>
+                            
+                            <!-- Optional Details (collapsible) -->
+                            <div class="detail-section optional">
+                                <label class="detail-label clickable" @onclick="() => _toggleOptionalDetails = !_toggleOptionalDetails" @onclick:stopPropagation>
+                                    <i class="fas fa-info-circle"></i> Detalii suplimentare
+                                    <i class="fas fa-chevron-@(_toggleOptionalDetails ? "up" : "down") toggle-icon"></i>
+                                </label>
+                                @if (_toggleOptionalDetails)
+                                {
+                                    <textarea class="compact-textarea"
+                                              rows="2"
+                                              placeholder="Observații, evoluție, severitate..."
+                                              value="@diagnosis.AdditionalDetails"
+                                              @oninput="(e) => HandleDetailsInput(diagnosis, e)"></textarea>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         }
+    </div>
+    
+    <!-- Bottom limit indicator -->
+    @if (IsMaxReached)
+    {
+        <div class="limit-indicator">
+            <i class="fas fa-check-circle"></i>
+            <span>Ați atins limita maximă de 10 diagnostice secundare</span>
+        </div>
     }
 </div>

@@ -5,7 +5,7 @@ using ValyanClinic.Application.Features.ICD10Management.DTOs;
 namespace ValyanClinic.Components.Shared.Consultatie;
 
 /// <summary>
-/// Secondary Diagnoses List - Multiple diagnoses with ICD10 codes
+/// Secondary Diagnoses List - Compact & Elegant Design
 /// </summary>
 public partial class SecondaryDiagnosesList : ComponentBase
 {
@@ -26,9 +26,35 @@ public partial class SecondaryDiagnosesList : ComponentBase
     /// <summary>Event when any change occurs</summary>
     [Parameter] public EventCallback OnChanged { get; set; }
 
+    // ==================== STATE ====================
+    
+    private int? _expandedIndex = null;
+    private bool _toggleOptionalDetails = false;
+
     // ==================== COMPUTED ====================
     
     private bool IsMaxReached => SecondaryDiagnoses.Count >= 10;
+
+    // ==================== UI HELPERS ====================
+    
+    private void ToggleExpand(int index)
+    {
+        if (_expandedIndex == index)
+        {
+            _expandedIndex = null;
+        }
+        else
+        {
+            _expandedIndex = index;
+            _toggleOptionalDetails = false;
+        }
+    }
+    
+    private static string TruncateText(string? text, int maxLength)
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+        return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
+    }
 
     // ==================== HANDLERS ====================
     

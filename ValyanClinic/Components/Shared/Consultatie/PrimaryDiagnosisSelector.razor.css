@@ -215,6 +215,77 @@
     color: var(--text-muted);
 }
 
+/* ==================== CHARACTER COUNTER ==================== */
+
+.textarea-wrapper {
+    position: relative;
+}
+
+.textarea-wrapper .form-textarea {
+    padding-bottom: 28px; /* Space for counter */
+}
+
+.character-counter {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+}
+
+.counter-text {
+    font-size: 11px;
+    font-weight: 500;
+    color: #9CA3AF;
+    font-family: 'SF Mono', 'Consolas', monospace;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+/* Warning State - 80%+ */
+.textarea-wrapper.counter-warning .form-textarea {
+    border-color: #F59E0B;
+    background: #FFFBEB;
+}
+
+.textarea-wrapper.counter-warning .form-textarea:focus {
+    border-color: #D97706;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.textarea-wrapper.counter-warning .counter-text {
+    color: #92400E;
+    background: #FEF3C7;
+    font-weight: 600;
+}
+
+/* Danger State - 95%+ */
+.textarea-wrapper.counter-danger .form-textarea {
+    border-color: #EF4444;
+    background: #FEF2F2;
+}
+
+.textarea-wrapper.counter-danger .form-textarea:focus {
+    border-color: #DC2626;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.textarea-wrapper.counter-danger .counter-text {
+    color: #991B1B;
+    background: #FEE2E2;
+    font-weight: 700;
+    animation: pulse-danger 1s ease-in-out infinite;
+}
+
+@keyframes pulse-danger {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .primary-diagnosis-header {
