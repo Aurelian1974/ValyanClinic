@@ -674,6 +674,8 @@ textarea.form-control {
     border: 1px solid var(--border-color);
     transition: all 0.2s ease;
     position: relative;
+    overflow: hidden;
+    min-width: 0; /* Prevent flex/grid overflow */
 }
 
 .exam-item:hover {
@@ -722,19 +724,24 @@ textarea.form-control {
 .exam-input-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0; /* Prevent flex overflow */
 }
 
 .exam-input {
     flex: 1;
-    padding: 8px 10px;
+    min-width: 0; /* Allow shrinking */
+    padding: 8px 6px;
     border: 1.5px solid var(--border-color);
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--text-primary);
     text-align: center;
     transition: all 0.2s ease;
+    box-sizing: border-box;
 }
 
 .exam-input:focus {
@@ -749,10 +756,10 @@ textarea.form-control {
 }
 
 .exam-unit {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
-    min-width: 40px;
-    text-align: left;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .exam-select {
