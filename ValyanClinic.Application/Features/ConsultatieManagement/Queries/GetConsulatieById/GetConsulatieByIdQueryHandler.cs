@@ -92,6 +92,7 @@ public class GetConsulatieByIdQueryHandler : IRequestHandler<GetConsulatieByIdQu
                 Tegumente = consultatie.Tegumente,
                 Mucoase = consultatie.Mucoase,
                 GangliniLimfatici = consultatie.GangliniLimfatici,
+                Edeme = consultatie.Edeme,
                 Greutate = consultatie.Greutate,
                 Inaltime = consultatie.Inaltime,
                 IMC = consultatie.IMC,

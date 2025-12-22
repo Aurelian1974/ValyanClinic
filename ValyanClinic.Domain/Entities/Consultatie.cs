@@ -64,6 +64,7 @@ public class Consultatie
     public string? Tegumente { get; set; }
     public string? Mucoase { get; set; }
     public string? GangliniLimfatici { get; set; }
+    public string? Edeme { get; set; } // ✅ ADDED: Edeme field from UI
 
     // B. Semne Vitale
     public decimal? Greutate { get; set; } // kg

@@ -44,7 +44,8 @@ public class IMCCalculatorService : IIMCCalculatorService
         // Determinare categorie
         var category = GetCategory(imcRotunjit);
 
-        _logger.LogInformation(
+        // LogDebug pentru a evita spam în consolă la fiecare render
+        _logger.LogDebug(
             "IMC calculat: {IMC} - Categorie: {Category} (Greutate: {Greutate}kg, Inaltime: {Inaltime}cm)",
             imcRotunjit,
             category,

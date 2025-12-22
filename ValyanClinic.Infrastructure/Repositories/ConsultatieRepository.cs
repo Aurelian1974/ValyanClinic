@@ -403,19 +403,45 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@OraConsultatie", consultatie.OraConsultatie);
             parameters.Add("@TipConsultatie", consultatie.TipConsultatie);
 
-            // Essential fields for draft (cele mai frecvent completate)
+            // Tab 1: Motiv & Antecedente
             parameters.Add("@MotivPrezentare", consultatie.MotivPrezentare);
             parameters.Add("@IstoricBoalaActuala", consultatie.IstoricBoalaActuala);
+            parameters.Add("@APP_Medicatie", consultatie.APP_Medicatie);
+
+            // Tab 2: Semne Vitale
             parameters.Add("@Greutate", consultatie.Greutate);
             parameters.Add("@Inaltime", consultatie.Inaltime);
             parameters.Add("@IMC", consultatie.IMC);
             parameters.Add("@Temperatura", consultatie.Temperatura);
             parameters.Add("@TensiuneArteriala", consultatie.TensiuneArteriala);
             parameters.Add("@Puls", consultatie.Puls);
+            parameters.Add("@FreccventaRespiratorie", consultatie.FreccventaRespiratorie);
+            parameters.Add("@SaturatieO2", consultatie.SaturatieO2);
+
+            // Tab 2: Examen General
+            parameters.Add("@StareGenerala", consultatie.StareGenerala);
+            parameters.Add("@Tegumente", consultatie.Tegumente);
+            parameters.Add("@Mucoase", consultatie.Mucoase);
+            parameters.Add("@Edeme", consultatie.Edeme);
+            parameters.Add("@ExamenCardiovascular", consultatie.ExamenCardiovascular);
+
+            // Tab 2: Investigații
+            parameters.Add("@InvestigatiiLaborator", consultatie.InvestigatiiLaborator);
+
+            // Tab 3: Diagnostic
             parameters.Add("@DiagnosticPozitiv", consultatie.DiagnosticPozitiv);
+            parameters.Add("@DiagnosticDiferential", consultatie.DiagnosticDiferential);
             parameters.Add("@CoduriICD10", consultatie.CoduriICD10);
+            parameters.Add("@CoduriICD10Secundare", consultatie.CoduriICD10Secundare);
+
+            // Tab 3: Tratament
             parameters.Add("@TratamentMedicamentos", consultatie.TratamentMedicamentos);
+            parameters.Add("@RecomandariRegimViata", consultatie.RecomandariRegimViata);
+
+            // Tab 4: Concluzii
+            parameters.Add("@Concluzie", consultatie.Concluzie);
             parameters.Add("@ObservatiiMedic", consultatie.ObservatiiMedic);
+            parameters.Add("@DataUrmatoareiProgramari", consultatie.DataUrmatoareiProgramari);
 
             // Audit - use CreatDe for both create and update in draft mode
             var userId = consultatie.ModificatDe ?? consultatie.CreatDe;

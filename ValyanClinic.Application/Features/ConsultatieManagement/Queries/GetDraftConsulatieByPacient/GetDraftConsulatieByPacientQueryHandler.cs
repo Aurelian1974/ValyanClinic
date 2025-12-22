@@ -58,9 +58,10 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                     "Nu există consultație draft pentru acest pacient");
             }
 
-            // Map to DetailDto
+            // Map to DetailDto - COMPLETE mapping including all UI fields
             var dto = new ConsulatieDetailDto
             {
+                // Primary Keys
                 ConsultatieID = consultatie.ConsultatieID,
                 ProgramareID = consultatie.ProgramareID,
                 PacientID = consultatie.PacientID,
@@ -68,26 +69,86 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                 DataConsultatie = consultatie.DataConsultatie,
                 OraConsultatie = consultatie.OraConsultatie,
                 TipConsultatie = consultatie.TipConsultatie,
+                
+                // Tab 1: Motiv & Antecedente
                 MotivPrezentare = consultatie.MotivPrezentare,
                 IstoricBoalaActuala = consultatie.IstoricBoalaActuala,
+                APP_Medicatie = consultatie.APP_Medicatie,
+                
+                // Tab 2: Examen General
+                StareGenerala = consultatie.StareGenerala,
+                Constitutie = consultatie.Constitutie,
+                Atitudine = consultatie.Atitudine,
+                Facies = consultatie.Facies,
+                Tegumente = consultatie.Tegumente,
+                Mucoase = consultatie.Mucoase,
+                GangliniLimfatici = consultatie.GangliniLimfatici,
+                Edeme = consultatie.Edeme,
+                
+                // Tab 2: Semne Vitale
                 Greutate = consultatie.Greutate,
                 Inaltime = consultatie.Inaltime,
                 IMC = consultatie.IMC,
                 Temperatura = consultatie.Temperatura,
                 TensiuneArteriala = consultatie.TensiuneArteriala,
                 Puls = consultatie.Puls,
+                FreccventaRespiratorie = consultatie.FreccventaRespiratorie,
+                SaturatieO2 = consultatie.SaturatieO2,
+                Glicemie = consultatie.Glicemie,
+                
+                // Tab 2: Examen pe Aparate
+                ExamenCardiovascular = consultatie.ExamenCardiovascular,
+                ExamenRespiratoriu = consultatie.ExamenRespiratoriu,
+                ExamenDigestiv = consultatie.ExamenDigestiv,
+                ExamenUrinar = consultatie.ExamenUrinar,
+                ExamenNervos = consultatie.ExamenNervos,
+                ExamenLocomotor = consultatie.ExamenLocomotor,
+                ExamenEndocrin = consultatie.ExamenEndocrin,
+                ExamenORL = consultatie.ExamenORL,
+                ExamenOftalmologic = consultatie.ExamenOftalmologic,
+                ExamenDermatologic = consultatie.ExamenDermatologic,
+                
+                // Tab 2: Investigații
+                InvestigatiiLaborator = consultatie.InvestigatiiLaborator,
+                InvestigatiiImagistice = consultatie.InvestigatiiImagistice,
+                InvestigatiiEKG = consultatie.InvestigatiiEKG,
+                AlteInvestigatii = consultatie.AlteInvestigatii,
+                
+                // Tab 3: Diagnostic
                 DiagnosticPozitiv = consultatie.DiagnosticPozitiv,
+                DiagnosticDiferential = consultatie.DiagnosticDiferential,
+                DiagnosticEtiologic = consultatie.DiagnosticEtiologic,
                 CoduriICD10 = consultatie.CoduriICD10,
+                CoduriICD10Secundare = consultatie.CoduriICD10Secundare,
+                
+                // Tab 3: Tratament
                 TratamentMedicamentos = consultatie.TratamentMedicamentos,
+                TratamentNemedicamentos = consultatie.TratamentNemedicamentos,
+                RecomandariDietetice = consultatie.RecomandariDietetice,
+                RecomandariRegimViata = consultatie.RecomandariRegimViata,
+                InvestigatiiRecomandate = consultatie.InvestigatiiRecomandate,
+                ConsulturiSpecialitate = consultatie.ConsulturiSpecialitate,
+                
+                // Tab 4: Concluzii
+                DataUrmatoareiProgramari = consultatie.DataUrmatoareiProgramari,
+                RecomandariSupraveghere = consultatie.RecomandariSupraveghere,
+                Prognostic = consultatie.Prognostic,
+                Concluzie = consultatie.Concluzie,
                 ObservatiiMedic = consultatie.ObservatiiMedic,
+                NotePacient = consultatie.NotePacient,
+                
+                // Metadata
                 Status = consultatie.Status,
                 DataFinalizare = consultatie.DataFinalizare,
                 DurataMinute = consultatie.DurataMinute,
+                DocumenteAtatate = consultatie.DocumenteAtatate,
                 DataCreare = consultatie.DataCreare,
                 CreatDe = consultatie.CreatDe,
                 DataUltimeiModificari = consultatie.DataUltimeiModificari,
                 ModificatDe = consultatie.ModificatDe,
-                PacientNumeComplet = "N/A", // Will be populated separately if needed
+                
+                // JOIN data (populated separately if needed)
+                PacientNumeComplet = "N/A",
                 MedicNumeComplet = "N/A"
             };
 

@@ -53,28 +53,58 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 imc = Math.Round(request.Greutate.Value / (inaltimeMetri * inaltimeMetri), 2);
             }
 
-            // Map to entity (only essential fields)
+            // Map to entity (all fields from UI)
             var consultatie = new Consultatie
             {
                 ConsultatieID = request.ConsultatieID ?? Guid.NewGuid(),
-                ProgramareID = request.ProgramareID, // ✅ Can be null for walk-in patients
+                ProgramareID = request.ProgramareID, // Can be null for walk-in patients
                 PacientID = request.PacientID,
                 MedicID = request.MedicID,
                 DataConsultatie = request.DataConsultatie,
                 OraConsultatie = request.OraConsultatie,
                 TipConsultatie = request.TipConsultatie,
+                
+                // Tab 1: Motiv & Antecedente
                 MotivPrezentare = request.MotivPrezentare,
                 IstoricBoalaActuala = request.IstoricBoalaActuala,
+                APP_Medicatie = request.APP_Medicatie,
+                
+                // Tab 2: Semne Vitale
                 Greutate = request.Greutate,
                 Inaltime = request.Inaltime,
                 IMC = imc,
                 Temperatura = request.Temperatura,
                 TensiuneArteriala = request.TensiuneArteriala,
                 Puls = request.Puls,
+                FreccventaRespiratorie = request.FreccventaRespiratorie,
+                SaturatieO2 = request.SaturatieO2,
+                
+                // Tab 2: Examen General
+                StareGenerala = request.StareGenerala,
+                Tegumente = request.Tegumente,
+                Mucoase = request.Mucoase,
+                Edeme = request.Edeme,
+                ExamenCardiovascular = request.ExamenCardiovascular,
+                
+                // Tab 2: Investigații
+                InvestigatiiLaborator = request.InvestigatiiLaborator,
+                
+                // Tab 3: Diagnostic
                 DiagnosticPozitiv = request.DiagnosticPozitiv,
+                DiagnosticDiferential = request.DiagnosticDiferential,
                 CoduriICD10 = request.CoduriICD10,
+                CoduriICD10Secundare = request.CoduriICD10Secundare,
+                
+                // Tab 3: Tratament
                 TratamentMedicamentos = request.TratamentMedicamentos,
+                RecomandariRegimViata = request.RecomandariRegimViata,
+                
+                // Tab 4: Concluzii
+                Concluzie = request.Concluzie,
                 ObservatiiMedic = request.ObservatiiMedic,
+                DataUrmatoareiProgramari = request.DataUrmatoareiProgramari,
+                
+                // Status & Audit
                 Status = "In desfasurare", // Draft always in progress
                 CreatDe = request.CreatDeSauModificatDe,
                 ModificatDe = request.CreatDeSauModificatDe,

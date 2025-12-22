@@ -97,10 +97,27 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     private string TimerWarningClass => TimerService.WarningClass;
     private TimeSpan ElapsedTime => TimerService.ElapsedTime;
 
-    // ✅ REFACTORED: IMC folosește serviciul dedicat
-    private IMCResult? IMCResult => (Greutate.HasValue && Inaltime.HasValue && Inaltime.Value > 0)
-        ? IMCCalculator.Calculate(Greutate.Value, Inaltime.Value)
-        : null;
+    // ✅ REFACTORED: IMC folosește serviciul dedicat cu cache pentru a evita recalculare la fiecare render
+    private IMCResult? _cachedIMCResult;
+    private decimal? _lastGreutate;
+    private decimal? _lastInaltime;
+    
+    private IMCResult? IMCResult
+    {
+        get
+        {
+            // Recalculează doar dacă valorile s-au schimbat
+            if (Greutate != _lastGreutate || Inaltime != _lastInaltime)
+            {
+                _lastGreutate = Greutate;
+                _lastInaltime = Inaltime;
+                _cachedIMCResult = (Greutate.HasValue && Inaltime.HasValue && Inaltime.Value > 0)
+                    ? IMCCalculator.Calculate(Greutate.Value, Inaltime.Value)
+                    : null;
+            }
+            return _cachedIMCResult;
+        }
+    }
 
     private decimal? IMC => IMCResult?.Value;
     private string IMCCategory => IMCResult?.ColorClass ?? string.Empty;
@@ -357,12 +374,18 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
     private void MapConsultatieToFormFields(ConsulatieDetailDto consultatie)
     {
+        // Tab 1: Motiv & Antecedente
         MotivPrezentare = consultatie.MotivPrezentare ?? string.Empty;
         AntecedentePatologice = consultatie.IstoricBoalaActuala ?? string.Empty;
+        TratamenteActuale = consultatie.APP_Medicatie ?? string.Empty;
+
+        // Tab 2: Semne Vitale
         Greutate = consultatie.Greutate;
         Inaltime = consultatie.Inaltime;
         Temperatura = consultatie.Temperatura;
         Puls = consultatie.Puls;
+        FreqventaRespiratorie = consultatie.FreccventaRespiratorie;
+        SpO2 = consultatie.SaturatieO2;
 
         if (!string.IsNullOrEmpty(consultatie.TensiuneArteriala) && consultatie.TensiuneArteriala.Contains('/'))
         {
@@ -374,11 +397,37 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             }
         }
 
-        DiagnosticPrincipal = consultatie.DiagnosticPozitiv ?? string.Empty;
-        PlanTerapeutic = consultatie.TratamentMedicamentos ?? string.Empty;
-        Concluzii = consultatie.ObservatiiMedic ?? string.Empty;
+        // Tab 2: Examen General
+        StareGenerala = consultatie.StareGenerala ?? string.Empty;
+        Tegumente = consultatie.Tegumente ?? string.Empty;
+        Mucoase = consultatie.Mucoase ?? string.Empty;
+        Edeme = consultatie.Edeme ?? string.Empty;
+        ExamenObiectiv = consultatie.ExamenCardiovascular ?? string.Empty;
 
-        // ✅ NEW: Sync to ConsultatieCommand for DiagnosticTab
+        // Tab 2: Investigații
+        InvestigatiiParaclinice = consultatie.InvestigatiiLaborator ?? string.Empty;
+
+        // Tab 3: Diagnostic
+        DiagnosticPrincipal = consultatie.DiagnosticPozitiv ?? string.Empty;
+        DiagnosticSecundar = consultatie.DiagnosticDiferential ?? string.Empty;
+        
+        // Tab 3: Tratament
+        PlanTerapeutic = consultatie.TratamentMedicamentos ?? string.Empty;
+        Recomandari = consultatie.RecomandariRegimViata ?? string.Empty;
+        
+        // Tab 4: Concluzii
+        Concluzii = consultatie.Concluzie ?? consultatie.ObservatiiMedic ?? string.Empty;
+        
+        // Parse DataUrmatoareiProgramari if exists
+        if (!string.IsNullOrEmpty(consultatie.DataUrmatoareiProgramari))
+        {
+            if (DateTime.TryParse(consultatie.DataUrmatoareiProgramari, out var dataVizita))
+            {
+                DataUrmatoareiVizite = dataVizita;
+            }
+        }
+
+        // ✅ Sync to ConsultatieCommand for DiagnosticTab
         SyncToConsultatieCommand();
     }
 
@@ -470,18 +519,47 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 DataConsultatie = DateTime.Today,
                 OraConsultatie = DateTime.Now.TimeOfDay,
                 TipConsultatie = "Prima consultatie",
+                
+                // Tab 1: Motiv & Antecedente
                 MotivPrezentare = string.IsNullOrWhiteSpace(MotivPrezentare) ? null : MotivPrezentare,
                 IstoricBoalaActuala = string.IsNullOrWhiteSpace(AntecedentePatologice) ? null : AntecedentePatologice,
+                APP_Medicatie = string.IsNullOrWhiteSpace(TratamenteActuale) ? null : TratamenteActuale,
+                
+                // Tab 2: Semne Vitale
                 Greutate = Greutate,
                 Inaltime = Inaltime,
                 IMC = IMC,
                 Temperatura = Temperatura,
                 TensiuneArteriala = (TensiuneSistolica.HasValue && TensiuneDiastolica.HasValue) ? $"{TensiuneSistolica}/{TensiuneDiastolica}" : null,
                 Puls = Puls,
+                FreccventaRespiratorie = FreqventaRespiratorie,
+                SaturatieO2 = SpO2,
+                
+                // Tab 2: Examen General
+                StareGenerala = string.IsNullOrWhiteSpace(StareGenerala) ? null : StareGenerala,
+                Tegumente = string.IsNullOrWhiteSpace(Tegumente) ? null : Tegumente,
+                Mucoase = string.IsNullOrWhiteSpace(Mucoase) ? null : Mucoase,
+                Edeme = string.IsNullOrWhiteSpace(Edeme) ? null : Edeme,
+                ExamenCardiovascular = string.IsNullOrWhiteSpace(ExamenObiectiv) ? null : ExamenObiectiv,
+                
+                // Tab 2: Investigații
+                InvestigatiiLaborator = string.IsNullOrWhiteSpace(InvestigatiiParaclinice) ? null : InvestigatiiParaclinice,
+                
+                // Tab 3: Diagnostic
                 DiagnosticPozitiv = string.IsNullOrWhiteSpace(DiagnosticPrincipal) ? null : DiagnosticPrincipal,
-                CoduriICD10 = DiagnosisList.Any() ? string.Join(", ", DiagnosisList.Select(d => d.Code)) : null,
+                DiagnosticDiferential = string.IsNullOrWhiteSpace(DiagnosticSecundar) ? null : DiagnosticSecundar,
+                CoduriICD10 = DiagnosisList.Any(d => d.IsPrincipal) ? DiagnosisList.First(d => d.IsPrincipal).Code : null,
+                CoduriICD10Secundare = DiagnosisList.Any(d => !d.IsPrincipal) ? string.Join(", ", DiagnosisList.Where(d => !d.IsPrincipal).Select(d => d.Code)) : null,
+                
+                // Tab 3: Tratament
                 TratamentMedicamentos = string.IsNullOrWhiteSpace(PlanTerapeutic) ? null : PlanTerapeutic,
+                RecomandariRegimViata = string.IsNullOrWhiteSpace(Recomandari) ? null : Recomandari,
+                
+                // Tab 4: Concluzii
+                Concluzie = string.IsNullOrWhiteSpace(Concluzii) ? null : Concluzii,
                 ObservatiiMedic = string.IsNullOrWhiteSpace(Concluzii) ? null : Concluzii,
+                DataUrmatoareiProgramari = DataUrmatoareiVizite.HasValue ? DataUrmatoareiVizite.Value.ToString("dd.MM.yyyy") : null,
+                
                 CreatDeSauModificatDe = CurrentUserId
             };
 
