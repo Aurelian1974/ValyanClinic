@@ -1,0 +1,10 @@
+@namespace ValyanClinic.Components.Shared.Consultatie
+
+<div class="timer-display @WarningClass">
+    <i class="fas fa-clock"></i>
+    <span class="time">@FormattedTime</span>
+    @if (IsPaused)
+    {
+        <span class="paused-indicator">(PAUZĂ)</span>
+    }
+</div>

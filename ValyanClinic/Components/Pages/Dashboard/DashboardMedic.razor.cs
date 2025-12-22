@@ -6,6 +6,7 @@ using System.Security.Claims;
 using ValyanClinic.Application.Features.ProgramareManagement.Queries.GetProgramareList;
 using ValyanClinic.Application.Features.ProgramareManagement.DTOs;
 using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalById;
+using ValyanClinic.Services;
 
 namespace ValyanClinic.Components.Pages.Dashboard;
 
@@ -15,6 +16,7 @@ public partial class DashboardMedic : ComponentBase
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<DashboardMedic> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IConsultatieNavigationService ConsultatieNav { get; set; } = default!;
 
     // State (Modal reference REMOVED - now using dedicated page)
     private string DoctorName { get; set; } = "Doctor";
@@ -363,10 +365,12 @@ public partial class DashboardMedic : ComponentBase
 
         try
         {
-            // ✅ NAVIGATE to new Consultatii page instead of opening modal
-            Logger.LogInformation("[DashboardMedic] Navigating to Consultatii page with PacientID={PacientId}", programare.PacientID);
+            // ✅ NAVIGATE to Consultatii page - folosim serviciu pentru context (fără ID-uri în URL)
+            Logger.LogInformation("[DashboardMedic] Navigating to Consultatii page with PacientID={PacientId}, ProgramareID={ProgramareId}", 
+                programare.PacientID, programare.ProgramareID);
             
-            NavigationManager.NavigateTo($"/consultatii?pacientId={programare.PacientID}");
+            ConsultatieNav.SetContext(programare.ProgramareID, programare.PacientID);
+            NavigationManager.NavigateTo("/consultatii");
         }
         catch (Exception ex)
         {

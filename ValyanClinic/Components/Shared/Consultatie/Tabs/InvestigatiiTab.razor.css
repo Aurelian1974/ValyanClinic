@@ -147,3 +147,33 @@ textarea.form-control {
         font-size: 0.9rem;
     }
 }
+
+/* ===== ANALIZE MEDICALE SECTION ===== */
+.analize-section {
+    margin-top: var(--spacing-lg, 1.5rem);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.analize-section .section-title {
+    background: linear-gradient(135deg, var(--primary-lightest, #eff6ff), var(--primary-light, #dbeafe));
+    margin-bottom: 0;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.section-title .badge-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    background: linear-gradient(135deg, var(--primary-color, #3b82f6), var(--primary-dark, #2563eb));
+    color: white;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}

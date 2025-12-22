@@ -11,6 +11,8 @@ using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 using ValyanClinic.Application.Services.IMC;
 using ValyanClinic.Application.Services.Consultatii;
+using ValyanClinic.Application.Features.AnalizeMedicale.Queries;
+using ValyanClinic.Application.ViewModels;
 
 namespace ValyanClinic.Components.Pages.Consultatii;
 
@@ -30,22 +32,18 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     [Inject] private IIMCCalculatorService IMCCalculator { get; set; } = default!;
     [Inject] private IConsultationTimerService TimerService { get; set; } = default!;
     [Inject] private IFormProgressService ProgressService { get; set; } = default!;
+    
+    // ✅ Navigation service - context fără ID-uri în URL
+    [Inject] private IConsultatieNavigationService ConsultatieNav { get; set; } = default!;
 
     #endregion
 
-    #region Parameters
+    #region State from Navigation Service
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "pacientId")]
-    public Guid? PacientId { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "programareId")]
-    public Guid? ProgramareId { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "consultatieId")]
-    public Guid? ConsultatieId { get; set; }
+    // ID-urile vin din serviciul de navigare, nu din URL
+    private Guid? PacientId => ConsultatieNav.PacientId;
+    private Guid? ProgramareId => ConsultatieNav.ProgramareId;
+    private Guid? ConsultatieId { get; set; } // Setat local după creare/încărcare
 
     #endregion
 
@@ -65,6 +63,10 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     private DateTime? LastSaveTime { get; set; }
     private bool HasUnsavedChanges { get; set; } = false;
     private bool _disposed = false;
+    
+    // Analize medicale (OCR)
+    private List<AnalizeMedicaleGroupDto>? AnalizeMedicaleGroups { get; set; }
+    private bool IsLoadingAnalize { get; set; } = false;
 
     #endregion
 
@@ -247,23 +249,35 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 return;
             }
 
-            // ✅ Subscribe la timer events pentru UI refresh
-            TimerService.OnTick += OnTimerTick;
+            // ✅ Timer UI is handled by isolated ConsultationTimer component
+            // No subscription needed here - avoids full page re-render every second
 
             await LoadCurrentUserInfo();
             await LoadPacientDataViaMediatr();
+            
+            // ✅ Load analize medicale (OCR) în paralel - nu blochează UI
+            _ = LoadAnalizeMedicaleAsync();
+
+            // ✅ SIMPLIFIED: Toate consultațiile vin din programări (nu walk-in pentru moment)
+            // Contextul vine din IConsultatieNavigationService (setat de Dashboard/ListaProgramari)
+            if (!ConsultatieNav.HasValidContext)
+            {
+                Logger.LogWarning("❌ Navigation context invalid - ProgramareId or PacientId missing");
+                HasError = true;
+                ErrorMessage = "Context navigare invalid. Vă rugăm să accesați consultația din Dashboard sau Lista Programări.";
+                IsLoading = false;
+                return;
+            }
 
             if (IsEditMode && ConsultatieId.HasValue)
             {
+                // Editare consultație existentă
                 await LoadExistingConsultatieViaMediatr();
-            }
-            else if (ProgramareId.HasValue)
-            {
-                await CheckProgramareConsultatieViaMediatr();
             }
             else
             {
-                await CheckExistingDraftConsultatieAsync();
+                // Consultație nouă sau draft din programare
+                await CheckOrCreateConsultatieForProgramare();
             }
 
             // ✅ REFACTORED: Start timer prin serviciu
@@ -282,12 +296,8 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         }
     }
 
-    private void OnTimerTick(object? sender, EventArgs e)
-    {
-        // ✅ RESTORE: Timer needs StateHasChanged to update UI display
-        // Modal will block re-renders using ShouldRender() when closed
-        InvokeAsync(StateHasChanged);
-    }
+    // ✅ REMOVED: OnTimerTick - Timer UI now handled by isolated ConsultationTimer component
+    // This prevents full page re-render every second, improving performance significantly
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -332,6 +342,36 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             throw new Exception("Pacient not found");
     }
 
+    /// <summary>
+    /// Încarcă analizele medicale importate (OCR) pentru pacient
+    /// </summary>
+    private async Task LoadAnalizeMedicaleAsync()
+    {
+        if (!PacientId.HasValue) return;
+        
+        IsLoadingAnalize = true;
+        
+        try
+        {
+            var result = await Mediator.Send(new GetAnalizeMedicaleByPacientQuery(PacientId.Value));
+            if (result.IsSuccess)
+            {
+                AnalizeMedicaleGroups = result.Value;
+                Logger.LogInformation("[Consultatii] Loaded {Count} analize groups for PacientId: {PacientId}", 
+                    AnalizeMedicaleGroups?.Count ?? 0, PacientId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "[Consultatii] Failed to load analize medicale - continuing without them");
+            AnalizeMedicaleGroups = new List<AnalizeMedicaleGroupDto>();
+        }
+        finally
+        {
+            IsLoadingAnalize = false;
+        }
+    }
+
     private async Task LoadExistingConsultatieViaMediatr()
     {
         var query = new ValyanClinic.Application.Features.ConsultatieManagement.Queries.GetConsulatieById.GetConsulatieByIdQuery(ConsultatieId!.Value);
@@ -340,35 +380,31 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             MapConsultatieToFormFields(result.Value);
     }
 
-    private async Task CheckProgramareConsultatieViaMediatr()
+    /// <summary>
+    /// SIMPLIFIED: Caută sau creează consultație pentru programare
+    /// Toate consultațiile vin din programări - nu avem walk-in
+    /// </summary>
+    private async Task CheckOrCreateConsultatieForProgramare()
     {
+        Logger.LogInformation("[Consultatii] CheckOrCreateConsultatieForProgramare - ProgramareId: {ProgramareId}", ProgramareId);
+        
+        // 1. Caută consultație existentă pentru această programare
         var query = new ValyanClinic.Application.Features.ConsultatieManagement.Queries.GetConsulatieByProgramare.GetConsulatieByProgramareQuery(ProgramareId!.Value);
         var result = await Mediator.Send(query);
+        
         if (result.IsSuccess && result.Value != null)
         {
+            // Consultație existentă găsită - încarcă datele
+            Logger.LogInformation("[Consultatii] Found existing consultatie: {ConsultatieId} for ProgramareId: {ProgramareId}", 
+                result.Value.ConsultatieID, ProgramareId);
             ConsultatieId = result.Value.ConsultatieID;
             MapConsultatieToFormFields(result.Value);
         }
         else
         {
-            await CheckExistingDraftConsultatieAsync();
-        }
-    }
-
-    private async Task CheckExistingDraftConsultatieAsync()
-    {
-        var query = new ValyanClinic.Application.Features.ConsultatieManagement.Queries.GetDraftConsulatieByPacient.GetDraftConsulatieByPacientQuery(
-            pacientId: PacientId!.Value,
-            medicId: CurrentMedicId != Guid.Empty ? CurrentMedicId : null,
-            dataConsultatie: DateTime.Today,
-            programareId: ProgramareId
-        );
-        var result = await Mediator.Send(query);
-        if (result.IsSuccess && result.Value != null)
-        {
-            ConsultatieId = result.Value.ConsultatieID;
-            MapConsultatieToFormFields(result.Value);
-            ToastService.ShowInfo("Informare", "S-a găsit o consultație nefinalizată. Datele au fost încărcate.");
+            // Nu există consultație - va fi creată la primul auto-save
+            Logger.LogInformation("[Consultatii] No consultatie found for ProgramareId: {ProgramareId} - will create on first save", ProgramareId);
+            // ConsultatieId rămâne null - HandleSaveDraft va crea una nouă cu ProgramareId setat
         }
     }
 
@@ -510,6 +546,15 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         try
         {
             IsSaving = true;
+            
+            // Debug logging for ICD10 codes and ProgramareID
+            Logger.LogInformation("[Consultatii] HandleSaveDraft - ProgramareId from URL: {ProgramareId}, ConsultatieId: {ConsultatieId}",
+                ProgramareId?.ToString() ?? "NULL",
+                ConsultatieId?.ToString() ?? "NULL");
+            Logger.LogInformation("[Consultatii] HandleSaveDraft - ConsultatieCommand.CoduriICD10: {ICD10}, CoduriICD10Secundare: {ICD10Sec}",
+                ConsultatieCommand.CoduriICD10 ?? "NULL",
+                ConsultatieCommand.CoduriICD10Secundare ?? "NULL");
+            
             var command = new ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveConsultatieDraft.SaveConsultatieDraftCommand
             {
                 ConsultatieID = ConsultatieId,
@@ -546,10 +591,15 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 InvestigatiiLaborator = string.IsNullOrWhiteSpace(InvestigatiiParaclinice) ? null : InvestigatiiParaclinice,
                 
                 // Tab 3: Diagnostic
-                DiagnosticPozitiv = string.IsNullOrWhiteSpace(DiagnosticPrincipal) ? null : DiagnosticPrincipal,
-                DiagnosticDiferential = string.IsNullOrWhiteSpace(DiagnosticSecundar) ? null : DiagnosticSecundar,
-                CoduriICD10 = DiagnosisList.Any(d => d.IsPrincipal) ? DiagnosisList.First(d => d.IsPrincipal).Code : null,
-                CoduriICD10Secundare = DiagnosisList.Any(d => !d.IsPrincipal) ? string.Join(", ", DiagnosisList.Where(d => !d.IsPrincipal).Select(d => d.Code)) : null,
+                // Use ConsultatieCommand values - they are synced from DiagnosticTab via SyncToModel()
+                DiagnosticPozitiv = !string.IsNullOrWhiteSpace(ConsultatieCommand.DiagnosticPozitiv) 
+                    ? ConsultatieCommand.DiagnosticPozitiv 
+                    : (string.IsNullOrWhiteSpace(DiagnosticPrincipal) ? null : DiagnosticPrincipal),
+                DiagnosticDiferential = !string.IsNullOrWhiteSpace(ConsultatieCommand.DiagnosticDiferential)
+                    ? ConsultatieCommand.DiagnosticDiferential
+                    : (string.IsNullOrWhiteSpace(DiagnosticSecundar) ? null : DiagnosticSecundar),
+                CoduriICD10 = ConsultatieCommand.CoduriICD10,
+                CoduriICD10Secundare = ConsultatieCommand.CoduriICD10Secundare,
                 
                 // Tab 3: Tratament
                 TratamentMedicamentos = string.IsNullOrWhiteSpace(PlanTerapeutic) ? null : PlanTerapeutic,
@@ -712,8 +762,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         if (_disposed) return;
         _disposed = true;
 
-        // ✅ Unsubscribe from timer events
-        TimerService.OnTick -= OnTimerTick;
+        // ✅ Timer events handled by ConsultationTimer component (isolated re-renders)
 
         // ✅ Dispose timer service
         await TimerService.DisposeAsync();

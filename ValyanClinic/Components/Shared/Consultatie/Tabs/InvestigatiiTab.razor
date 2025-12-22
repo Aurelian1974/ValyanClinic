@@ -1,9 +1,11 @@
 ﻿@*
     Tab Investigații - Consultație
-    Include: Laborator, Imagistice, EKG, Alte investigații
+    Include: Laborator, Imagistice, EKG, Alte investigații + Analize Medicale OCR
 *@
+@using ValyanClinic.Components.Shared.Medical
 
 <div class="tab-pane @(IsActive ? "active" : "")" id="tab-investigatii">
+    @* Secțiunea 1: Investigații manuale *@
     <div class="section-card">
         <h5 class="section-title">
             <i class="fas fa-vial"></i>
@@ -52,6 +54,22 @@
             </div>
         </div>
     </div>
+
+    @* Secțiunea 2: Analize Medicale importate (OCR) *@
+    @if (PacientId.HasValue)
+    {
+        <div class="section-card analize-section">
+            <h5 class="section-title">
+                <i class="fas fa-file-medical-alt"></i>
+                Analize Medicale Importate
+                @if (AnalizeMedicaleGroups?.Any() == true)
+                {
+                    <span class="badge-count">@AnalizeMedicaleGroups.Sum(g => g.TotalAnalize)</span>
+                }
+            </h5>
+            <AnalizeMedicaleViewer Groups="@AnalizeMedicaleGroups" IsLoading="@IsLoadingAnalize" />
+        </div>
+    }
 
     @* Section Completed Indicator *@
     @if (IsSectionCompleted)

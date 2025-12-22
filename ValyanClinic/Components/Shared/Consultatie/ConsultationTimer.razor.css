@@ -1,0 +1,68 @@
+/* Timer Display - Scoped CSS */
+.timer-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--font-size-lg, 16px);
+    font-weight: var(--font-weight-semibold, 600);
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: var(--text-primary, #1e3a5f);
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    transition: all 0.3s ease;
+}
+
+.timer-display i {
+    color: var(--primary-color, #3b82f6);
+}
+
+.timer-display .time {
+    min-width: 48px;
+    text-align: center;
+}
+
+.timer-display .paused-indicator {
+    font-size: var(--font-size-xs, 11px);
+    color: var(--warning-color, #f59e0b);
+    font-weight: var(--font-weight-bold, 700);
+    animation: pulse 1s infinite;
+}
+
+/* Warning state (15+ minutes) */
+.timer-display.warning {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+.timer-display.warning i {
+    color: #f59e0b;
+}
+
+/* Danger state (20+ minutes) */
+.timer-display.danger {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border-color: #ef4444;
+    color: #991b1b;
+    animation: pulse-danger 1s infinite;
+}
+
+.timer-display.danger i {
+    color: #ef4444;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes pulse-danger {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    50% { 
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+    }
+}

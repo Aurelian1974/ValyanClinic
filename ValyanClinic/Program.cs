@@ -16,6 +16,7 @@ using ValyanClinic.Services.Caching;
 using ValyanClinic.Services.Security;
 using ValyanClinic.Services.Blazor;
 using ValyanClinic.Services.Authentication;
+using ValyanClinic.Services;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using MediatR;
 using FluentValidation;
@@ -233,6 +234,11 @@ try
     builder.Services.AddScoped<ISystemSettingsRepository, ValyanClinic.Infrastructure.Repositories.Settings.SystemSettingsRepository>();
     builder.Services.AddScoped<IAuditLogRepository, ValyanClinic.Infrastructure.Repositories.Settings.AuditLogRepository>();
     builder.Services.AddScoped<IUserSessionRepository, ValyanClinic.Infrastructure.Repositories.Settings.UserSessionRepository>();
+
+    // ========================================
+    // NAVIGATION SERVICES
+    // ========================================
+    builder.Services.AddScoped<IConsultatieNavigationService, ConsultatieNavigationService>();
 
     // ========================================
     // CACHING

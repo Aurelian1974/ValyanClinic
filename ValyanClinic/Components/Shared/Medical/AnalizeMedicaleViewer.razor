@@ -1,0 +1,138 @@
+@*
+    Componentă pentru afișarea analizelor medicale parsate din PDF/OCR
+    Include: Grupare pe documente și categorii, indicator valori anormale
+*@
+
+<div class="analize-medicale-container">
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Se încarcă analizele...</span>
+        </div>
+    }
+    else if (Groups == null || !Groups.Any())
+    {
+        <div class="no-data-message">
+            <i class="fas fa-flask"></i>
+            <span>Nu există analize medicale importate pentru acest pacient</span>
+        </div>
+    }
+    else
+    {
+        @foreach (var group in Groups)
+        {
+            <div class="analize-group">
+                <!-- Header Document -->
+                <div class="group-header">
+                    <div class="group-info">
+                        <i class="fas fa-file-medical"></i>
+                        <span class="group-date">@group.DataDocument.ToString("dd.MM.yyyy")</span>
+                        @if (!string.IsNullOrEmpty(group.SursaDocument))
+                        {
+                            <span class="group-source">@group.SursaDocument</span>
+                        }
+                    </div>
+                    <div class="group-stats">
+                        <span class="stat-item">
+                            <i class="fas fa-vial"></i>
+                            @group.TotalAnalize analize
+                        </span>
+                        @if (group.HasAbnormalValues)
+                        {
+                            <span class="stat-item abnormal">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                @group.AnormalCount în afara limitelor
+                            </span>
+                        }
+                    </div>
+                </div>
+                
+                <!-- Grupare pe Categorii -->
+                <div class="categories-container">
+                    @foreach (var category in GetCategoriesFromGroup(group))
+                    {
+                        var categoryAnalize = GetAnalizeByCategory(group, category);
+                        var categoryAbnormal = categoryAnalize.Count(a => a.InAfaraLimitelor);
+                        
+                        <div class="category-section">
+                            <div class="category-header" @onclick="() => ToggleCategory(group.BatchId, category)">
+                                <div class="category-info">
+                                    <i class="fas @GetCategoryIcon(category)"></i>
+                                    <span class="category-name">@(string.IsNullOrEmpty(category) ? "Alte analize" : category)</span>
+                                    <span class="category-count">(@categoryAnalize.Count)</span>
+                                </div>
+                                <div class="category-indicators">
+                                    @if (categoryAbnormal > 0)
+                                    {
+                                        <span class="abnormal-badge">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            @categoryAbnormal
+                                        </span>
+                                    }
+                                    <i class="fas @(IsCategoryExpanded(group.BatchId, category) ? "fa-chevron-up" : "fa-chevron-down") toggle-icon"></i>
+                                </div>
+                            </div>
+                            
+                            @if (IsCategoryExpanded(group.BatchId, category))
+                            {
+                                <div class="category-content">
+                                    <table class="analize-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="col-status"></th>
+                                                <th class="col-analiza">Analiză</th>
+                                                <th class="col-rezultat">Rezultat</th>
+                                                <th class="col-unitate">Unitate</th>
+                                                <th class="col-interval">Interval referință</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var analiza in categoryAnalize)
+                                            {
+                                                <tr class="@(analiza.InAfaraLimitelor ? "row-abnormal" : "")">
+                                                    <td class="col-status">
+                                                        @if (analiza.InAfaraLimitelor)
+                                                        {
+                                                            <span class="status-indicator abnormal" title="În afara intervalului de referință">
+                                                                <i class="fas fa-exclamation-circle"></i>
+                                                            </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="status-indicator normal" title="În limite normale">
+                                                                <i class="fas fa-check-circle"></i>
+                                                            </span>
+                                                        }
+                                                    </td>
+                                                    <td class="col-analiza">
+                                                        <span class="analiza-name">@analiza.NumeAnaliza</span>
+                                                    </td>
+                                                    <td class="col-rezultat @(analiza.InAfaraLimitelor ? "value-abnormal" : "")">
+                                                        @analiza.Rezultat
+                                                    </td>
+                                                    <td class="col-unitate">@analiza.UnitateMasura</td>
+                                                    <td class="col-interval">@analiza.IntervalReferinta</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                
+                @if (!string.IsNullOrEmpty(group.NumeDocument))
+                {
+                    <div class="group-footer">
+                        <small>
+                            <i class="fas fa-file-pdf"></i>
+                            @group.NumeDocument
+                        </small>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>

@@ -3,6 +3,7 @@
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 @using ValyanClinic.Components.Shared
+@using ValyanClinic.Components.Shared.Consultatie
 @using ValyanClinic.Components.Shared.Consultatie.Tabs
 
 <PageTitle>Consultație Medicală - ValyanClinic</PageTitle>
@@ -21,16 +22,10 @@
             <p>@(PacientData?.NumeComplet ?? "Completează fișa de consultație pentru pacient")</p>
         </div>
         <div class="header-actions">
-            <!-- ✅ UPDATED: Timer with Pause indicator -->
-            <div class="consultation-timer @TimerWarningClass @(IsTimerPaused ? "paused" : "")" 
-                 @onclick="ToggleTimerPause" 
+            <!-- ✅ REFACTORED: Isolated timer component - no full page re-render -->
+            <div class="timer-wrapper" @onclick="ToggleTimerPause" 
                  title="@(IsTimerPaused ? "Click pentru a continua (Ctrl+P)" : "Click pentru pauză (Ctrl+P)")">
-                <i class="fas @(IsTimerPaused ? "fa-pause" : "fa-clock")"></i>
-                <span class="time">@FormattedTime</span>
-                @if (IsTimerPaused)
-                {
-                    <span class="pause-badge">PAUZĂ</span>
-                }
+                <ConsultationTimer />
             </div>
             
             <!-- ✅ NEW: Progress indicator -->
@@ -490,6 +485,24 @@
                             <span class="char-counter">@InvestigatiiParaclinice.Length / 1500</span>
                         </div>
                     </div>
+                    
+                    <!-- Analize Medicale Importate (OCR) -->
+                    @if (PacientId.HasValue)
+                    {
+                        <div class="form-section analize-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-file-medical-alt"></i>
+                                Analize Medicale Importate
+                                @if (AnalizeMedicaleGroups?.Any() == true)
+                                {
+                                    <span class="badge-count">@AnalizeMedicaleGroups.Sum(g => g.TotalAnalize)</span>
+                                }
+                            </h3>
+                            <ValyanClinic.Components.Shared.Medical.AnalizeMedicaleViewer 
+                                Groups="@AnalizeMedicaleGroups" 
+                                IsLoading="@IsLoadingAnalize" />
+                        </div>
+                    }
                 </div>
 
                 <!-- Tab 3: Diagnostic & Tratament -->

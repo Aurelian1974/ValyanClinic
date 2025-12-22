@@ -1,0 +1,466 @@
+
+--- PAGE 1 ---
+Clinica Sante nu face concurenta medicilor! Ne ocupam cu pasiune doar de analize medicale!
+Multumim tuturor, medici si pacienti, pentru incredere!
+Clinica Sante - Laborator Buzau
+str. Ion Baiesu bl. C3, parter, Buzau
+buzau@clinica-sante.ro
+www.clinica-sante.ro
+ 
+acreditat pentru
+ANALIZE MEDICALE
+SR EN ISO 15189:2013
+CERTIFICAT DE ACREDITARE
+LM 005
+www.clinica-sante.ro
+www.analizeonline.ro
+SPECIALISTI IN ANALIZE MEDICALE DIN 1995!
+Buletin de analize medicale nr. 4697409
+Data raportului: 18.03.2024  15:37:48
+Rezultatele se vor interpreta in context clinic de catre medicul curant
+ Valori in afara limitelor admise
+pentru varsta si sexul respectiv
+Nume/Prenume: Paraschiv Felicia Daniela
+Data cerere: 18.03.2024
+Recoltat la: Patarlagele
+Data si ora recoltare: 18.03.2024  08:53
+Varsta: 51 ani, 3 luni
+Contract: CASA DE ASIGURARI DE SANATATE BUZAU
+CNP: 2721124103773
+Medic trimitator:Uruc Constantin
+Data receptie: 18.03.2024  14:19
+Tel: 0748648348
+Adresa: SAT VALEA CATINEI, nr. 36, CATINA
+Adresa unitate recoltare: Str. str. Alexandru Ioan 
+Cuza, nr. 10, PATARLAGELE
+HEMATOLOGIE
+   REZULTATE
+INTERVAL BIOLOGIC DE REFERINTA   
+ANALIZE
+UM
+Hemoleucograma completa
+Tip substanta: Sange EDTA; metoda: Variatia impedantei, Spectrofotometrie, Citometrie de flux
+Hematii (RBC)
+[3.8 - 5.8]
+ 
+x10^6/ mm3
+ 4.76  
+Hemoglobina (HGB)
+[11.5 - 16]
+ 
+g/dL
+ 10.6  
+Hematocrit (HCT)
+[37 - 47]
+ 
+%
+ 33.5  
+Volum mediu eritrocitar (MCV)
+[80 - 100]
+ 
+µm^3
+ 70.3  
+Hemoglobina eritrocitara medie (MCH)
+[27 - 32]
+ 
+pg
+ 22.3  
+Conc. medie de hemoglob. eritrocitara (MCHC)
+[32 - 36]
+ 
+g/dL
+ 31.7  
+Indice de distributie a eritrocitelor (RDW-CV)
+[11 - 16]
+ 
+%
+ 17.7  
+Trombocite (PLT)
+[150 - 500]
+ 
+x10^3/ mm3
+ 303  
+Volum mediu trombocitar (MPV)
+[6 - 11]
+ 
+µm^3
+ 10  
+Trombocrit (PCT)
+[0.15 - 0.5]
+ 
+%
+ 0.303  
+Indice de distributie a trombocitelor (PDW)
+[11 - 18]
+ 
+%
+ 17.8  
+Leucocite (WBC)
+[4 - 10]
+ 
+x10^3/ mm3
+ 8.14  
+Limfocite %
+[21.6 - 48.7]
+ 
+%
+ 20.7  
+Limfocite
+[1 - 5]
+ 
+x10^3/ mm3
+ 1.69  
+Monocite %
+[3.9 - 10.2]
+ 
+%
+ 7.3  
+Monocite
+[0.2 - 1.5]
+ 
+x10^3/ mm3
+ 0.6  
+Eosinofile %
+[0.9 - 7.6]
+ 
+%
+ 0.7  
+Eosinofile
+[0 - 0.7]
+ 
+x10^3/ mm3
+ 0.06  
+Basofile %
+[0 - 2]
+ 
+%
+ 0.2  
+Basofile
+[0 - 0.25]
+ 
+x10^3/ mm3
+ 0.01  
+Neutrofile %
+[40.1 - 69.8]
+ 
+%
+ 71.1  
+ Pagina 1 din 4
+FL-5.8-01, ed. 5/29.09.2014, rev. 2/02.11.2015
+Data tiparirii: 18.03.2024 15:52
+
+--- PAGE 2 ---
+Buletin de analize medicale nr. 4697409
+Nume/Prenume: Paraschiv Felicia Daniela
+Data cerere: 18.03.2024
+Recoltat la: Patarlagele
+Data si ora recoltare: 18.03.2024  08:53
+Varsta: 51 ani, 3 luni
+Contract: CASA DE ASIGURARI DE SANATATE BUZAU
+CNP: 2721124103773
+Medic trimitator:Uruc Constantin
+Data receptie: 18.03.2024  14:19
+Tel: 0748648348
+Adresa: SAT VALEA CATINEI, nr. 36, CATINA
+Adresa unitate recoltare: Str. str. Alexandru Ioan 
+Cuza, nr. 10, PATARLAGELE
+HEMATOLOGIE
+   REZULTATE
+INTERVAL BIOLOGIC DE REFERINTA   
+ANALIZE
+UM
+Hemoleucograma completa
+Tip substanta: Sange EDTA; metoda: Variatia impedantei, Spectrofotometrie, Citometrie de flux
+Neutrofile
+[2 - 8]
+ 
+x10^3/ mm3
+ 5.78  
+VSH
+Tip substanta: Sange EDTA; metoda: Westergren
+VSH
+[0 - 30]
+ 
+mm/h
+ 15  
+Validat de
+BIOCHIMIE
+   REZULTATE
+INTERVAL BIOLOGIC DE REFERINTA   
+ANALIZE
+UM
+Sideremie
+[23 - 134]
+ Sarcina:
+saptamana 12 de sarcina: 42 – 177
+la termen: 25 – 137
+6 saptamani postpartum 16 – 150
+µg/dL
+ 12.36  
+Tip substanta: Ser; metoda Spectrofotometrie
+Glucoza serica (glicemie)
+[74 - 106]
+ 
+mg/dL
+ 90.82  
+Tip substanta: Ser; metoda Spectrofotometrie
+Colesterol seric total
+<200
+ Normal: < 200 mg/dL;
+Moderat crescut: 200 - 239 mg/dL;
+Crescut: >= 240 mg/dL
+mg/dL
+ 172.51  
+Tip substanta: Ser; metoda Spectrofotometrie
+Trigliceride serice
+Tip substanta: Ser; metoda: Spectrofotometrie
+Trigliceride
+<150
+ < 150 mg/dl: normal
+150-199 mg/dl: ridicat borderline;
+200-499 mg/dl: ridicat;
+>=500 mg/dl: foarte ridicat.
+mg/dL
+ 122.86  
+HDL colesterol
+[40 - 120]
+ < 40 mg/dl: risc ridicat;
+>= 60 mg/dl: risc redus.
+mg/dL
+ 47.51  
+Tip substanta: Ser; metoda Spectrofotometrie
+LDL colesterol
+<100
+ < 100 mg/dl: optim;
+100-129 mg/dl: aproape optim;
+130-159 mg/dl: ridicat borderline;
+160-189 mg/dl: ridicat;
+>=190 mg/dl: foarte ridicat
+mg/dL
+ 119.16  
+Tip substanta: Ser; metoda Spectrofotometrie
+TGO / AST
+<34
+ 
+U/L
+ 20.37  
+Tip substanta: Ser; metoda Spectrofotometrie
+TGP / ALT
+[10 - 49]
+ 
+U/L
+ 21.35  
+ Pagina 2 din 4
+FL-5.8-01, ed. 5/29.09.2014, rev. 2/02.11.2015
+Data tiparirii: 18.03.2024 15:52
+
+--- PAGE 3 ---
+Buletin de analize medicale nr. 4697409
+Nume/Prenume: Paraschiv Felicia Daniela
+Data cerere: 18.03.2024
+Recoltat la: Patarlagele
+Data si ora recoltare: 18.03.2024  08:53
+Varsta: 51 ani, 3 luni
+Contract: CASA DE ASIGURARI DE SANATATE BUZAU
+CNP: 2721124103773
+Medic trimitator:Uruc Constantin
+Data receptie: 18.03.2024  14:19
+Tel: 0748648348
+Adresa: SAT VALEA CATINEI, nr. 36, CATINA
+Adresa unitate recoltare: Str. str. Alexandru Ioan 
+Cuza, nr. 10, PATARLAGELE
+BIOCHIMIE
+   REZULTATE
+INTERVAL BIOLOGIC DE REFERINTA   
+ANALIZE
+UM
+Tip substanta: Ser; metoda Spectrofotometrie
+Examen sumar urina+sediment
+Tip substanta: Urina spontana; metoda: Reflectometrie si microscopie optica
+pH
+[4.6 - 8]
+ 
+ 5.5  
+Densitate
+[1.015 - 1.025]
+ 
+ 1.008  
+Bilirubina
+Negativ
+ 
+mg/dL
+ Negativ  
+Urobilinogen
+Normal
+ 
+mg/dL
+ Normal  
+Corpi cetonici
+Negativ
+ 
+mg/dL
+ Negativ  
+^ Acid ascorbic
+Negativ
+ 
+mg/dL
+ Negativ  
+Glucoza
+Normal
+ 
+mg/dL
+ Normal  
+Proteine
+Negativ
+ 
+mg/dL
+ Negativ  
+Hematii
+Negativ
+ 
+Ery/µL
+ Negativ  
+Leucocite
+Negativ
+ 
+Leu/ul
+ Negativ  
+Nitriti
+Negativ
+ 
+ Negativ  
+^ Culoare
+ 
+ Galben deschis  
+Sediment: Celule epiteliale plate
+ 
+ Relativ Frecvente  
+Sediment: Flora microbiana
+ 
+ Rara  
+Bilirubina totala
+[0.1 - 1.2]
+ 
+mg/dL
+ 0.37  
+Tip substanta: Ser; metoda Spectrofotometrie
+Uree serica
+[19.26 - 49.22]
+ 
+mg/dL
+ 18.55  
+Tip substanta: Ser; metoda Spectrofotometrie
+ ^ Creatinina serica, cu estimarea ratei de filtrare glomerulara
+Tip substanta: Ser; metoda: Spectrofotometrie
+Creatinina serica
+[0.5 - 1.1]
+ 
+mg/dL
+ 0.71  
+Rata de filtrare glomerulara
+>90
+ Categorii de RFG in caz de boala 
+cronica renala:
+G1   >=90: Normala sau crescuta
+G2   60-89: Scadere usoara (raportata la 
+valoarea corespunzatoare tanarului 
+adult)
+G3   45-59: Scadere usoara pana la 
+moderata
+G3a 30-44: Scadere moderata pana la 
+severa
+G3b 15-29: Scadere severa
+G4      <15: Insuficienta renala
+ml/min/1.73m
+^2
+ 98.6  
+ Pagina 3 din 4
+FL-5.8-01, ed. 5/29.09.2014, rev. 2/02.11.2015
+Data tiparirii: 18.03.2024 15:52
+
+--- PAGE 4 ---
+Buletin de analize medicale nr. 4697409
+Nume/Prenume: Paraschiv Felicia Daniela
+Data cerere: 18.03.2024
+Recoltat la: Patarlagele
+Data si ora recoltare: 18.03.2024  08:53
+Varsta: 51 ani, 3 luni
+Contract: CASA DE ASIGURARI DE SANATATE BUZAU
+CNP: 2721124103773
+Medic trimitator:Uruc Constantin
+Data receptie: 18.03.2024  14:19
+Tel: 0748648348
+Adresa: SAT VALEA CATINEI, nr. 36, CATINA
+Adresa unitate recoltare: Str. str. Alexandru Ioan 
+Cuza, nr. 10, PATARLAGELE
+BIOCHIMIE
+   REZULTATE
+INTERVAL BIOLOGIC DE REFERINTA   
+ANALIZE
+UM
+Validat de
+IMUNOLOGIE
+   REZULTATE
+INTERVAL BIOLOGIC DE REFERINTA   
+ANALIZE
+UM
+ ^ 25-OH Vitamina D
+[30 - 100]
+ < 20 ng/mL: Deficit;  
+20 - 30 ng/mL: Nivel insuficient;  
+30 - 100 ng/mL: Nivel optim;  
+> 100 ng/mL: Nivel toxic;
+ng/mL
+ 15.23  
+Tip substanta: Ser; metoda Chemiluminiscenta (CLIA)
+Validat de
+COAGULARE SI HEMOSTAZA
+   REZULTATE
+INTERVAL BIOLOGIC DE REFERINTA   
+ANALIZE
+UM
+Fibrinogen
+[156 - 400]
+ 
+mg/dL
+ 358.195  
+Tip substanta: Plasma citrat; metoda Coagulometrie
+Validat de
+Verificat si autorizat de
+Toate probele cu rezultate finale si fara comentarii aditionale sunt considerate conforme .
+Rezultatele se refera numai la probele analizate.
+CLINICA SANTE nu isi asuma responsabilitatea asupra corectitudinii informatiilor declarate de pacient .
+Este interzisa reproducerea partiala sau totala a buletinului de analiza in alte scopuri decat cel pentru care a fost eliberat, sau reproducerea acestuia fara acordul scris al 
+laboratorului care a efectuat analiza.
+NOTA:
+Analizele marcate cu "^" nu sunt acoperite de acreditarea RENAR.
+Punctele de recoltare marcate cu "^" nu se regasesc in Anexa nr. 22 la Certificatul de Acreditare nr. LM 005.
+Pentru detalii suplimentare privind acreditarea, va rugam sa solicitati certificatul de acreditare la office @clinica-sante.ro.
+Opiniile si interpretarile continute de prezentul raport nu sunt acoperite de acreditarea RENAR.
+█▀▀▀▀▀█    ▀█▄▀  ▀▄▀▄▄█▄▄▀▄▄▀▀▀▄   ▄▀ █▀▀▀▀▀█
+█ ███ █ █▄█▀ ██▄▀ ▄ ▄▄▄▀▄▀▄ ▀▄▀▄ ▀ █▄ █ ███ █
+█ ▀▀▀ █ █▀ ▄▄ █▄ ▀▄▀█▀▀▀█▄▄█▀██ ▄ ▀▀▀ █ ▀▀▀ █
+▀▀▀▀▀▀▀ █▄█▄█ █ █ ▀▄█ ▀ █▄█▄█▄▀ █▄▀ █ ▀▀▀▀▀▀▀
+█▄▀█▀▀▀  ▄▀▄▄▄  █ █ ▀▀███▄  ▄▄█▀ ▀▀▄▄ ▀▀██▀▄▄
+▄█ █▄▄▀█▄ ▄▀█▄▀█▄▀ ▀▀ ▀▀█▄▀▀▄  █▄▀▀▄▀█▀▀▄▄▄▀ 
+▄▄█▄▀ ▀ ██  ▀▄▄█▀█▀█ ██▀▀    ▀▄▀   ▄▄█▀ ▄█▄▄█
+▄██▀▀ ▀ ▄█ ▄▀▄   ▄▀▀▀  █▀ █ █▀▄█▄ ▀ ▄▄▀ ▄██  
+▀ ██▄▄▀█▀▄▀   █▄▄ ▀█▄█  ▀▄   ██▀   █▄▄ ▄▄█▄ █
+▄█▀▄▀█▀  ▄ ▄▀ ▀▄▄ ▀█▀▄ ███▀▀▄▀▄███▀█   ▀ ▄▄▀▄
+▀▀▄██▀▀▀█ ▄ ▄▄█▀▄▄▀▀█▀▀▀█   ▄▄▄ ▄▄▀ █▀▀▀█▄█ ▄
+▄ █ █ ▀ █ █  ▄  ▀▀ ▀█ ▀ █▀█▄█▄▄▀▄ ▀▀█ ▀ █▄█▄ 
+ ▀▀ ▀▀▀███ ▄ █▄▀▄▀▄▄███▀██ ▄▄██▀▄   █▀▀▀▀▀▄▀▄
+██▀█▄▄▀█▀▀  ▄█▀█▄██▄▀▄ ▄▄▄█▄▀▀▄██▄▀▄▀▀  █▄▄█ 
+▀ ▄ █▄▀   ▄▀▄▀▀▄▄█▀▄▀▄▄▀▀█▀ ▄▄█▀  ▀ ▄ █ ▀ ▄ ▀
+▄█  ▀▄▀▀▀ █ ▄ █   ▀  ▄ ▀▄ ▄▄▄██▀█▄█▀  ▄█ ▄█▀ 
+▀▀▀▄▄▄▀ ▀▀▄ ▄██  ▀▄▄▀▄▄█▄  ▄▄▄██ ▀ ▄██ ▄▀▄▄█▄
+ ▄▄▄█ ▀▀█ ▀▀▀██  ██ █▀▄▄▄▀▀▄█▄▄█▄▀▀▄█▀▄▄ ▀▄█▄
+▀  ▀▀ ▀ █▄ ▀▄▀ █▀▀▀ █▀▀▀█▄ ▄ ██  ▀▀▄█▀▀▀██▄▀█
+█▀▀▀▀▀█ ▄ ▄▄▄█ ██████ ▀ ██▄█▄▀▄▀▄████ ▀ █▄█▀ 
+█ ███ █ █ ▀▄▄ ▄█ ▀▄ ▀█▀█▀▄▀▀  ▄█ ▀▀█▀█▀▀██ █▄
+█ ▀▀▀ █ ▀▀█ ▄█▄▄▀▄▄██ █▀  █ ▄   ▄ ▀▄▀▄▀ ▄▀▄▀ 
+▀▀▀▀▀▀▀ ▀▀▀        ▀   ▀▀  ▀ ▀▀▀   ▀▀ ▀ ▀  ▀ 
+Scanati pentru varianta digitala
+ Pagina 4 din 4
+FL-5.8-01, ed. 5/29.09.2014, rev. 2/02.11.2015
+Data tiparirii: 18.03.2024 15:52

@@ -1,0 +1,122 @@
+[
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Hematii (RBC)",
+    "rezultat": "4.76",
+    "unitate_masura": "x10^6/ mm3",
+    "interval_referinta_min": 3.8,
+    "interval_referinta_max": 5.8,
+    "interval_referinta_text": "[3.8 - 5.8]",
+    "in_afara_limitelor": false
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Hemoglobina (HGB)",
+    "rezultat": "10.6",
+    "unitate_masura": "g/dL",
+    "interval_referinta_min": 11.5,
+    "interval_referinta_max": 16.0,
+    "interval_referinta_text": "[11.5 - 16]",
+    "in_afara_limitelor": true
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Hematocrit (HCT)",
+    "rezultat": "33.5",
+    "unitate_masura": "%",
+    "interval_referinta_min": 37.0,
+    "interval_referinta_max": 47.0,
+    "interval_referinta_text": "[37 - 47]",
+    "in_afara_limitelor": true
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Volum mediu eritrocitar (MCV)",
+    "rezultat": "70.3",
+    "unitate_masura": "µm^3",
+    "interval_referinta_min": 80.0,
+    "interval_referinta_max": 100.0,
+    "interval_referinta_text": "[80 - 100]",
+    "in_afara_limitelor": true
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Hemoglobina eritrocitara medie (MCH)",
+    "rezultat": "22.3",
+    "unitate_masura": "pg",
+    "interval_referinta_min": 27.0,
+    "interval_referinta_max": 32.0,
+    "interval_referinta_text": "[27 - 32]",
+    "in_afara_limitelor": true
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Conc. medie de hemoglob. eritrocitara (MCHC)",
+    "rezultat": "31.7",
+    "unitate_masura": "g/dL",
+    "interval_referinta_min": 32.0,
+    "interval_referinta_max": 36.0,
+    "interval_referinta_text": "[32 - 36]",
+    "in_afara_limitelor": true
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Indice de distributie a eritrocitelor (RDW-CV)",
+    "rezultat": "17.7",
+    "unitate_masura": "%",
+    "interval_referinta_min": 11.0,
+    "interval_referinta_max": 16.0,
+    "interval_referinta_text": "[11 - 16]",
+    "in_afara_limitelor": true
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Trombocite (PLT)",
+    "rezultat": "303",
+    "unitate_masura": "x10^3/ mm3",
+    "interval_referinta_min": 150.0,
+    "interval_referinta_max": 500.0,
+    "interval_referinta_text": "[150 - 500]",
+    "in_afara_limitelor": false
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Volum mediu trombocitar (MPV)",
+    "rezultat": "10",
+    "unitate_masura": "µm^3",
+    "interval_referinta_min": 6.0,
+    "interval_referinta_max": 11.0,
+    "interval_referinta_text": "[6 - 11]",
+    "in_afara_limitelor": false
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Trombocrit (PCT)",
+    "rezultat": "0.303",
+    "unitate_masura": "%",
+    "interval_referinta_min": 0.15,
+    "interval_referinta_max": 0.5,
+    "interval_referinta_text": "[0.15 - 0.5]",
+    "in_afara_limitelor": false
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Indice de distributie a trombocitelor (PDW)",
+    "rezultat": "17.8",
+    "unitate_masura": "%",
+    "interval_referinta_min": 11.0,
+    "interval_referinta_max": 18.0,
+    "interval_referinta_text": "[11 - 18]",
+    "in_afara_limitelor": false
+  },
+  {
+    "categorie": "IMUNOLOGIE",
+    "nume_analiza": "Leucocite (WBC)",
+    "rezultat": "8.14",
+    "unitate_masura": "%",
+    "interval_referinta_min": 1.0,
+    "interval_referinta_max": 5.0,
+    "interval_referinta_text": "[1 - 5]",
+    "in_afara_limitelor": true
+  }
+]

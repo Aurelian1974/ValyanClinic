@@ -532,6 +532,9 @@ public class ConsultatieRepository : IConsultatieRepository
 
             // Căutăm consultații cu Status != 'Finalizata' (nefinalizate)
             // Stored procedure sp_Consultatie_SaveDraft setează Status = 'In desfasurare'
+            // Logic: 
+            //   - If @ProgramareID is provided, find draft with that ProgramareID OR with NULL ProgramareID (can be associated)
+            //   - If @ProgramareID is NULL, find any draft for this patient/date
             var sql = @"
                 SELECT TOP 1 *
                 FROM Consultatii
@@ -539,8 +542,10 @@ public class ConsultatieRepository : IConsultatieRepository
                   AND [Status] NOT IN ('Finalizata', 'Anulata')
                   AND CAST(DataConsultatie AS DATE) = CAST(@DataConsultatie AS DATE)
                   AND (@MedicID IS NULL OR MedicID = @MedicID)
-                  AND (@ProgramareID IS NULL OR ProgramareID = @ProgramareID)
-                ORDER BY DataCreare DESC";
+                  AND (@ProgramareID IS NULL OR ProgramareID = @ProgramareID OR ProgramareID IS NULL)
+                ORDER BY 
+                  CASE WHEN ProgramareID = @ProgramareID THEN 0 ELSE 1 END,  -- Prefer exact match first
+                  DataCreare DESC";
 
             var parameters = new
             {

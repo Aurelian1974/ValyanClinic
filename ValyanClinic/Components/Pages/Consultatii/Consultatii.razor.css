@@ -43,6 +43,20 @@
     align-items: center;
 }
 
+/* ✅ Timer Wrapper - click handler for pause/resume */
+.timer-wrapper {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.timer-wrapper:hover {
+    transform: scale(1.02);
+}
+
+.timer-wrapper:active {
+    transform: scale(0.98);
+}
+
 /* ✅ NEW: Progress Indicator in Header */
 .progress-indicator {
     display: flex;
@@ -1429,9 +1443,10 @@ textarea.form-control {
         justify-content: flex-start;
     }
 
-    .consultation-timer {
+    .timer-wrapper {
         order: -1;
         width: 100%;
+        display: flex;
         justify-content: center;
     }
 
@@ -1700,6 +1715,28 @@ textarea.form-control {
     .tab-btn span:nth-of-type(1) {
         display: inline;
     }
+}
+
+/* ===== ANALIZE MEDICALE SECTION ===== */
+.analize-section {
+    margin-top: var(--spacing-xl);
+    border-top: 2px solid var(--primary-lightest);
+    padding-top: var(--spacing-lg);
+}
+
+.section-title .badge-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-radius: var(--border-radius-pill);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    margin-left: var(--spacing-sm);
 }
 
 /* ===== DEPRECATED CLASSES ===== */
