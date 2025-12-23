@@ -83,6 +83,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     #region UI State
 
     private bool ShowShortcutsModal { get; set; } = false;
+    private bool ShowScrisoarePreview { get; set; } = false;
     private int ActiveTab { get; set; } = 1;
 
     #endregion
@@ -686,10 +687,17 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         }
     }
 
-    private async Task HandleGenerateLetter()
+    private void HandleGenerateLetter()
     {
-        await Task.CompletedTask;
-        Logger.LogInformation("Generate letter requested");
+        Logger.LogInformation("Generate letter requested - opening Scrisoare Medicală preview");
+        ShowScrisoarePreview = true;
+        StateHasChanged();
+    }
+
+    private void CloseScrisoarePreview()
+    {
+        ShowScrisoarePreview = false;
+        StateHasChanged();
     }
 
     private void MarkFormAsDirty()

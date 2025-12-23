@@ -372,6 +372,12 @@ try
                                 ValyanClinic.Application.Services.Consultatii.FormProgressService>();
 
     // ========================================
+    // SCRISOARE MEDICALA SERVICE - Document Generation
+    // ========================================
+    builder.Services.AddScoped<ValyanClinic.Application.Services.ScrisoareMedicala.IScrisoareMedicalaService,
+                                ValyanClinic.Application.Services.ScrisoareMedicala.ScrisoareMedicalaService>();
+
+    // ========================================
     // DRAFT STORAGE SERVICE - LocalStorage Management
     // ========================================
     builder.Services.AddScoped(typeof(ValyanClinic.Infrastructure.Services.DraftStorage.IDraftStorageService<>),

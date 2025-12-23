@@ -1,0 +1,845 @@
+/*
+ * Scrisoare Medicală Preview - Scoped CSS
+ * Design conform template Anexa 43
+ * Ordin MS nr. 1411/2016
+ */
+
+/* ==================== CSS Variables ==================== */
+:root {
+    --sm-primary: #3b82f6;
+    --sm-primary-dark: #2563eb;
+    --sm-text-dark: #1a1a1a;
+    --sm-text-body: #333;
+    --sm-text-muted: #666;
+    --sm-border: #ddd;
+    --sm-bg-light: #f8f9fa;
+}
+
+/* ==================== Overlay ==================== */
+.scrisoare-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.scrisoare-wrapper {
+    width: 100%;
+    max-width: 210mm;
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ==================== Toolbar ==================== */
+.toolbar {
+    position: sticky;
+    top: 0;
+    background: #3b82f6;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+}
+
+.toolbar-title {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toolbar-title i {
+    opacity: 0.8;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    white-space: nowrap;
+}
+
+.toolbar-btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.toolbar-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.toolbar-btn-primary {
+    background: #fff;
+    color: #3b82f6;
+}
+
+.toolbar-btn-primary:hover {
+    background: #f0f0f0;
+}
+
+/* ==================== Document Container ==================== */
+.document-container {
+    padding: 20mm 18mm;
+    background: #fff;
+}
+
+/* ==================== Header ==================== */
+.doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #3b82f6;
+    margin-bottom: 20px;
+}
+
+.clinic-info {
+    flex: 1;
+}
+
+.clinic-name {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #3b82f6;
+    margin-bottom: 4px;
+}
+
+.clinic-details {
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+.clinic-details span {
+    display: block;
+}
+
+.header-right {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.doc-logo {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.8rem;
+}
+
+.anexa-badge {
+    background: #3b82f6;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* ==================== Document Title ==================== */
+.doc-title {
+    text-align: center;
+    margin: 25px 0;
+}
+
+.doc-title h1 {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+}
+
+.doc-number {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* ==================== Patient Box ==================== */
+.patient-box {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px 18px;
+    margin-bottom: 20px;
+}
+
+.patient-box-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #3b82f6;
+    margin-bottom: 10px;
+}
+
+.patient-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 20px;
+}
+
+.patient-field {
+    display: flex;
+    font-size: 0.85rem;
+}
+
+.patient-label {
+    color: #666;
+    min-width: 110px;
+}
+
+.patient-value {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+/* ==================== Intro Text ==================== */
+.intro-text {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-left: 4px solid #3b82f6;
+    padding: 15px 18px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.7;
+}
+
+/* ==================== Sections ==================== */
+.section {
+    margin-bottom: 18px;
+    /* Previne ruperea secțiunilor între pagini */
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.section-title {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #3b82f6;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-title i {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.section-content {
+    font-size: 0.9rem;
+    color: #333;
+    text-align: justify;
+}
+
+.section-content p {
+    margin-bottom: 8px;
+}
+
+.section-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* ==================== Subsections ==================== */
+.subsection {
+    margin-bottom: 12px;
+}
+
+.subsection-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+}
+
+.subsection-content {
+    font-size: 0.85rem;
+    color: #333;
+    padding-left: 12px;
+}
+
+/* ==================== Data Grid ==================== */
+.data-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.data-item {
+    background: #f8f9fa;
+    padding: 8px 10px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.data-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #666;
+    margin-bottom: 2px;
+}
+
+.data-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.data-unit {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: #666;
+}
+
+/* ==================== Diagnosis Box ==================== */
+.diagnosis-box {
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.diagnosis-header {
+    background: #3b82f6;
+    color: #fff;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.diagnosis-content {
+    padding: 12px;
+}
+
+.diagnosis-item {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #ddd;
+}
+
+.diagnosis-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.diagnosis-type {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-bottom: 4px;
+}
+
+.diagnosis-type.principal {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.diagnosis-type.secundar {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.diagnosis-code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #3b82f6;
+}
+
+.diagnosis-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-left: 8px;
+}
+
+.diagnosis-details {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+    padding-left: 4px;
+    font-style: italic;
+}
+
+/* ==================== Oncologic Status ==================== */
+.oncologic-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    background-color: #eff6ff !important;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 2px solid #3b82f6 !important;
+    margin-bottom: 15px;
+    font-size: 0.85rem;
+    /* Previne ruperea între pagini */
+    page-break-inside: avoid;
+    break-inside: avoid;
+    /* Asigură vizibilitatea în PDF */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+}
+
+.oncologic-status .status-label {
+    font-weight: 700;
+    color: #000 !important;
+}
+
+.oncologic-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #000 !important;
+    font-weight: 600;
+}
+
+/* ==================== Lab Results ==================== */
+.lab-results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.lab-section {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.lab-section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #3b82f6;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+.lab-section.pathologic {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.lab-section.pathologic .lab-section-title {
+    color: #dc2626;
+}
+
+.lab-item {
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+}
+
+.lab-item:last-child {
+    margin-bottom: 0;
+}
+
+/* ==================== Treatment Table ==================== */
+.treatment-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+    /* Previne ruperea tabelului între pagini */
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.treatment-table th {
+    background: #f8f9fa;
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 700;
+    color: #1a1a1a;
+    border-bottom: 2px solid #ddd;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.treatment-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.treatment-table tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.treatment-table tr:last-child td {
+    border-bottom: none;
+}
+
+.med-name {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.med-note {
+    font-size: 0.75rem;
+    color: #3b82f6;
+    font-style: italic;
+}
+
+/* ==================== Recommendations List ==================== */
+.recommendations-list {
+    padding-left: 20px;
+    margin: 0;
+}
+
+.recommendations-list li {
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+}
+
+/* ==================== Checkbox Sections ==================== */
+.checkbox-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    /* Previne ruperea secțiunii între pagini */
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.checkbox-section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #3b82f6;
+    margin-bottom: 10px;
+    /* Păstrează titlul cu conținutul */
+    page-break-after: avoid;
+    break-after: avoid;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Previne ruperea checkbox group între pagini */
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #3b82f6;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 12px;
+    color: #3b82f6;
+    font-weight: bold;
+    background: #fff;
+}
+
+.checkbox.checked {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.checkbox.checkbox-small {
+    width: 14px;
+    height: 14px;
+    font-size: 10px;
+}
+
+.checkbox-label {
+    flex: 1;
+    color: #333;
+}
+
+.checkbox-label .field-value {
+    font-weight: 600;
+    color: #3b82f6;
+}
+
+/* ==================== Notes Box ==================== */
+.notes-box {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    /* Previne ruperea între pagini */
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.notes-box-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #b45309;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notes-box p {
+    font-size: 0.8rem;
+    color: #92400e;
+    margin-bottom: 8px;
+    text-align: justify;
+}
+
+.notes-box p:last-child {
+    margin-bottom: 0;
+}
+
+.attention-box {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 10px 0;
+    /* Previne ruperea între pagini */
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.attention-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 6px;
+}
+
+.attention-box p {
+    font-size: 0.8rem;
+    color: #991b1b;
+}
+
+/* ==================== Footer ==================== */
+.doc-footer {
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.footer-section h4 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.doctor-signature {
+    text-align: left;
+}
+
+.doctor-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.doctor-specialty {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.doctor-stamp {
+    margin-top: 10px;
+    width: 80px;
+    height: 80px;
+    border: 2px dashed #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    color: #666;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.emit-date {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #3b82f6;
+    margin-bottom: 15px;
+}
+
+.transmission-section {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.transmission-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #3b82f6;
+    margin-bottom: 8px;
+}
+
+.transmission-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.transmission-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+}
+
+/* ==================== Footnotes ==================== */
+.footnotes {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed #ddd;
+}
+
+.footnotes p {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 6px;
+    text-align: justify;
+}
+
+/* ==================== Print Styles ==================== */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    .scrisoare-overlay {
+        position: static;
+        background: none;
+        padding: 0;
+    }
+
+    .scrisoare-wrapper {
+        box-shadow: none;
+        max-width: none;
+        width: 100%;
+    }
+
+    .toolbar {
+        display: none !important;
+    }
+
+    .document-container {
+        padding: 15mm !important;
+    }
+
+    /* === Page Break Rules === */
+    .section,
+    .checkbox-section,
+    .treatment-table,
+    .checkbox-group,
+    .notes-box,
+    .attention-box,
+    .subsection,
+    .footer-section {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .section-title,
+    .subsection-title {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+
+    /* Permite page break înainte de secțiuni mari */
+    .section {
+        page-break-before: auto;
+        break-before: auto;
+    }
+
+    /* Evită ruperea rândurilor de tabel */
+    tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Păstrează titlurile cu conținutul lor */
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }}

@@ -5,6 +5,7 @@
 @using ValyanClinic.Components.Shared
 @using ValyanClinic.Components.Shared.Consultatie
 @using ValyanClinic.Components.Shared.Consultatie.Tabs
+@using ValyanClinic.Components.Shared.Documents
 
 <PageTitle>Consultație Medicală - ValyanClinic</PageTitle>
 
@@ -599,3 +600,8 @@
         </div>
     }
 </div>
+
+<!-- Scrisoare Medicală Preview Modal -->
+<ScrisoareMedicalaPreview IsVisible="@ShowScrisoarePreview"
+                          OnClose="CloseScrisoarePreview"
+                          UseMockData="true" />

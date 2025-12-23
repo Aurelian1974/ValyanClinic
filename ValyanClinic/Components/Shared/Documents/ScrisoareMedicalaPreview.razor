@@ -1,0 +1,497 @@
+@*
+    Scrisoare Medicală - Anexa 43
+    Component pentru vizualizare și printare conform Ordin MS nr. 1411/2016
+*@
+
+@using ValyanClinic.Application.Features.ConsultatieManagement.DTOs
+
+@if (IsVisible)
+{
+    <div class="scrisoare-overlay" @onclick="HandleOverlayClick">
+        <div class="scrisoare-wrapper" @onclick:stopPropagation>
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-title">
+                    <i class="fas fa-file-medical"></i>
+                    Scrisoare Medicală - Anexa 43
+                </div>
+                <div class="toolbar-actions">
+                    <button class="toolbar-btn toolbar-btn-secondary" @onclick="Close">
+                        <i class="fas fa-arrow-left"></i> Înapoi la Consultație
+                    </button>
+                    <button class="toolbar-btn toolbar-btn-secondary" @onclick="HandlePrint">
+                        <i class="fas fa-print"></i> Printează
+                    </button>
+                    <button class="toolbar-btn toolbar-btn-primary" @onclick="HandleSavePdf">
+                        <i class="fas fa-file-pdf"></i> Salvează PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Document Container -->
+            <div class="document-container" id="scrisoare-print-area">
+                <!-- Header -->
+                <header class="doc-header">
+                    <div class="clinic-info">
+                        <div class="clinic-name">@Model.NumeClinica</div>
+                        <div class="clinic-details">
+                            <span>@Model.TipClinica</span>
+                            <span>@Model.AdresaClinica</span>
+                            <span>Tel: @Model.TelefonClinica | Email: @Model.EmailClinica</span>
+                            <span>CUI: @Model.CUIClinica | Reg. Com.: @Model.RegistruComertClinica</span>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <div class="anexa-badge">
+                            ANEXA nr. 43<br>
+                            <small>Ordin MS nr. 1411/2016</small>
+                        </div>
+                        <div class="doc-logo">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Document Title -->
+                <div class="doc-title">
+                    <h1><i class="fas fa-envelope-open-text"></i> Scrisoare Medicală</h1>
+                    <div class="doc-number">Contract/convenție nr. @Model.ContractCAS | @Model.CASJudet</div>
+                </div>
+
+                <!-- Intro Text -->
+                <div class="intro-text">
+                    <strong>Stimate coleg,</strong> vă informăm că <strong>@Model.PacientNumeComplet</strong>, 
+                    născut(ă) la data de <strong>@Model.DataNasteriiFormatata</strong>, 
+                    CNP <strong>@Model.PacientCNP</strong>, a fost consultat(ă) în serviciul nostru 
+                    la data de <strong>@Model.DataConsultatieFormatata</strong>. 
+                    Nr. din Registrul de consultații: <strong>@Model.NumarRegistruConsultatii</strong>.
+                </div>
+
+                <!-- Patient Info -->
+                <div class="patient-box">
+                    <div class="patient-box-title"><i class="fas fa-user"></i> Date Pacient</div>
+                    <div class="patient-grid">
+                        <div class="patient-field">
+                            <span class="patient-label">Nume:</span>
+                            <span class="patient-value">@Model.PacientNumeComplet</span>
+                        </div>
+                        <div class="patient-field">
+                            <span class="patient-label">CNP:</span>
+                            <span class="patient-value">@Model.PacientCNP</span>
+                        </div>
+                        <div class="patient-field">
+                            <span class="patient-label">Data nașterii:</span>
+                            <span class="patient-value">@Model.DataNasteriiFormatata</span>
+                        </div>
+                        <div class="patient-field">
+                            <span class="patient-label">Vârstă:</span>
+                            <span class="patient-value">@Model.PacientVarsta ani</span>
+                        </div>
+                        <div class="patient-field">
+                            <span class="patient-label">Sex:</span>
+                            <span class="patient-value">@Model.PacientSex</span>
+                        </div>
+                        <div class="patient-field">
+                            <span class="patient-label">Data consultației:</span>
+                            <span class="patient-value">@Model.DataConsultatieFormatata</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Motivul Prezentării -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-comment-medical"></i> Motivele Prezentării</h2>
+                    <div class="section-content">
+                        <p>@Model.MotivPrezentare</p>
+                    </div>
+                </div>
+
+                <!-- Oncologic Status -->
+                <div style="display:flex;align-items:center;gap:15px;background-color:#eff6ff;border:2px solid #3b82f6;padding:10px 15px;border-radius:6px;margin-bottom:15px;font-size:0.85rem;">
+                    <div style="font-weight:700;color:#000000;">Pacient diagnosticat cu afecțiune oncologică:</div>
+                    <div style="display:flex;align-items:center;gap:5px;color:#000000;font-weight:600;">
+                        <span style="width:18px;height:18px;border:2px solid #3b82f6;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;@(Model.EsteAfectiuneOncologica ? "background-color:#3b82f6;color:#ffffff;" : "background-color:#ffffff;")">@(Model.EsteAfectiuneOncologica ? "✓" : "")</span>
+                        <span style="color:#000000;">DA</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:5px;color:#000000;font-weight:600;">
+                        <span style="width:18px;height:18px;border:2px solid #3b82f6;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;@(!Model.EsteAfectiuneOncologica ? "background-color:#3b82f6;color:#ffffff;" : "background-color:#ffffff;")">@(!Model.EsteAfectiuneOncologica ? "✓" : "")</span>
+                        <span style="color:#000000;">NU</span>
+                    </div>
+                </div>
+
+                <!-- Diagnostic -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-diagnoses"></i> Diagnostic și Cod de Diagnostic</h2>
+                    <div class="diagnosis-box">
+                        <div class="diagnosis-header">Diagnostice Stabilite</div>
+                        <div class="diagnosis-content">
+                            @if (Model.DiagnosticPrincipal != null)
+                            {
+                                <div class="diagnosis-item">
+                                    <span class="diagnosis-type principal">Principal</span>
+                                    <span class="diagnosis-code">@Model.DiagnosticPrincipal.CodICD10</span>
+                                    <span class="diagnosis-name">@Model.DiagnosticPrincipal.Denumire</span>
+                                    @if (!string.IsNullOrWhiteSpace(Model.DiagnosticPrincipal.Detalii))
+                                    {
+                                        <div class="diagnosis-details">@Model.DiagnosticPrincipal.Detalii</div>
+                                    }
+                                </div>
+                            }
+                            @foreach (var diagnostic in Model.DiagnosticeSecundare)
+                            {
+                                <div class="diagnosis-item">
+                                    <span class="diagnosis-type secundar">Secundar</span>
+                                    <span class="diagnosis-code">@diagnostic.CodICD10</span>
+                                    <span class="diagnosis-name">@diagnostic.Denumire</span>
+                                    @if (!string.IsNullOrWhiteSpace(diagnostic.Detalii))
+                                    {
+                                        <div class="diagnosis-details">@diagnostic.Detalii</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Anamneza -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-history"></i> Anamneză</h2>
+                    <div class="section-content">
+                        <div class="subsection">
+                            <div class="subsection-title">Antecedente Heredocolaterale:</div>
+                            <div class="subsection-content">@Model.AntecendenteHeredoColaterale</div>
+                        </div>
+                        <div class="subsection">
+                            <div class="subsection-title">Antecedente Patologice Personale:</div>
+                            <div class="subsection-content">@Model.AntecendentePatologicePersonale</div>
+                        </div>
+                        <div class="subsection">
+                            <div class="subsection-title">Alergii:</div>
+                            <div class="subsection-content">@(Model.Alergii ?? "Nu sunt cunoscute.")</div>
+                        </div>
+                        <div class="subsection">
+                            <div class="subsection-title">Medicație Cronică Anterioară:</div>
+                            <div class="subsection-content">@(Model.MedicatieCronicaAnterioara ?? "Nu există.")</div>
+                        </div>
+                        <div class="subsection">
+                            <div class="subsection-title">Factori de Risc:</div>
+                            <div class="subsection-content">@(Model.FactoriDeRisc ?? "Nu au fost identificați.")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Examen Clinic -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-stethoscope"></i> Examen Clinic</h2>
+                    <div class="section-content">
+                        <div class="subsection">
+                            <div class="subsection-title">Examen Clinic General:</div>
+                            <div class="data-grid">
+                                <div class="data-item">
+                                    <div class="data-label">Stare generală</div>
+                                    <div class="data-value">@Model.StareGenerala</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">TA</div>
+                                    <div class="data-value">@Model.TensiuneArteriala <span class="data-unit">mmHg</span></div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Puls</div>
+                                    <div class="data-value">@Model.Puls <span class="data-unit">bpm</span></div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Temp</div>
+                                    <div class="data-value">@Model.Temperatura <span class="data-unit">°C</span></div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Greutate</div>
+                                    <div class="data-value">@Model.Greutate <span class="data-unit">kg</span></div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Înălțime</div>
+                                    <div class="data-value">@Model.Inaltime <span class="data-unit">cm</span></div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">IMC</div>
+                                    <div class="data-value">@Model.IMC?.ToString("F1") <span class="data-unit">kg/m²</span></div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">SpO2</div>
+                                    <div class="data-value">@Model.SaturatieO2 <span class="data-unit">%</span></div>
+                                </div>
+                            </div>
+                            <div class="subsection-content">@Model.ExamenClinicGeneral</div>
+                        </div>
+                        <div class="subsection">
+                            <div class="subsection-title">Examen Clinic Local (Cardiovascular):</div>
+                            <div class="subsection-content">@Model.ExamenClinicLocal</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Examene de Laborator -->
+                @if (Model.RezultateNormale.Any() || Model.RezultatePatologice.Any())
+                {
+                    <div class="section">
+                        <h2 class="section-title"><i class="fas fa-flask"></i> Examene de Laborator</h2>
+                        <div class="lab-results">
+                            @if (Model.RezultateNormale.Any())
+                            {
+                                <div class="lab-section">
+                                    <div class="lab-section-title"><i class="fas fa-check-circle"></i> Valori Normale</div>
+                                    @foreach (var rezultat in Model.RezultateNormale)
+                                    {
+                                        <div class="lab-item">@rezultat.Denumire: @rezultat.Valoare @rezultat.Unitate</div>
+                                    }
+                                </div>
+                            }
+                            @if (Model.RezultatePatologice.Any())
+                            {
+                                <div class="lab-section pathologic">
+                                    <div class="lab-section-title"><i class="fas fa-exclamation-triangle"></i> Valori Patologice</div>
+                                    @foreach (var rezultat in Model.RezultatePatologice)
+                                    {
+                                        <div class="lab-item">@rezultat.Denumire: @rezultat.Valoare @rezultat.Unitate @(rezultat.ValoareNormala != null ? $"({rezultat.ValoareNormala})" : "")</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Examene Paraclinice -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-microscope"></i> Examene Paraclinice</h2>
+                    <div class="section-content">
+                        @if (!string.IsNullOrWhiteSpace(Model.RezultatEKG))
+                        {
+                            <div class="subsection">
+                                <div class="subsection-title">EKG (@Model.DataConsultatieFormatata):</div>
+                                <div class="subsection-content">@Model.RezultatEKG</div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.RezultatEcografie))
+                        {
+                            <div class="subsection">
+                                <div class="subsection-title">Ecocardiografie (@Model.DataConsultatieFormatata):</div>
+                                <div class="subsection-content">@Model.RezultatEcografie</div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.RezultatRx))
+                        {
+                            <div class="subsection">
+                                <div class="subsection-title">Rx:</div>
+                                <div class="subsection-content">@Model.RezultatRx</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Tratament Efectuat -->
+                @if (!string.IsNullOrWhiteSpace(Model.TratamentAnterior))
+                {
+                    <div class="section">
+                        <h2 class="section-title"><i class="fas fa-prescription-bottle"></i> Tratament Efectuat (Anterior Consultației)</h2>
+                        <div class="section-content">
+                            <p>@Model.TratamentAnterior</p>
+                        </div>
+                    </div>
+                }
+
+                <!-- Alte Informații -->
+                @if (!string.IsNullOrWhiteSpace(Model.AlteInformatii))
+                {
+                    <div class="section">
+                        <h2 class="section-title"><i class="fas fa-info-circle"></i> Alte Informații</h2>
+                        <div class="section-content">
+                            <p>@Model.AlteInformatii</p>
+                        </div>
+                    </div>
+                }
+
+                <!-- Tratament Recomandat -->
+                @if (Model.TratamentRecomandat.Any())
+                {
+                    <div class="section">
+                        <h2 class="section-title"><i class="fas fa-pills"></i> Tratament Recomandat</h2>
+                        <div class="section-content">
+                            <table class="treatment-table">
+                                <thead>
+                                    <tr>
+                                        <th>Medicament</th>
+                                        <th>Doză</th>
+                                        <th>Frecvență</th>
+                                        <th>Durată</th>
+                                        <th>Obs.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var med in Model.TratamentRecomandat)
+                                    {
+                                        <tr>
+                                            <td><span class="med-name">@med.Denumire</span></td>
+                                            <td>@med.Doza</td>
+                                            <td>@med.Frecventa</td>
+                                            <td>@med.Durata</td>
+                                            <td>@if (!string.IsNullOrWhiteSpace(med.Observatii)) { <span class="med-note">@med.Observatii</span> }</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+
+                <!-- Recomandări -->
+                @if (Model.Recomandari.Any())
+                {
+                    <div class="section">
+                        <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Recomandări</h2>
+                        <div class="section-content">
+                            <ol class="recommendations-list">
+                                @foreach (var recomandare in Model.Recomandari)
+                                {
+                                    <li>@recomandare</li>
+                                }
+                            </ol>
+                        </div>
+                    </div>
+                }
+
+                <!-- Notes Box -->
+                <div class="notes-box">
+                    <div class="notes-box-title"><i class="fas fa-sticky-note"></i> Notă Importantă</div>
+                    <p>Se va specifica durata pentru care se poate prescrie de medicul din ambulatoriu, inclusiv medicul de familie, fiecare dintre medicamentele recomandate.</p>
+                    <div class="attention-box">
+                        <div class="attention-title"><i class="fas fa-exclamation-circle"></i> ATENȚIE!</div>
+                        <p>Nerespectarea obligației medicului de specialitate din ambulatoriu sau din spital de a inițiate tratamentul prin prescrierea primei rețete pentru medicamente cu sau fără contribuție personală, astfel cum este prevăzut în protocoalele terapeutice, precum și de a elibera prescripția medicală / bilete de trimitere / concediu medical / recomandări pentru îngrijiri la domiciliu / prescripții pentru dispozitive medicale în fiecare caz pentru care este necesar, se sancționează potrivit contractului încheiat de furnizor cu casa de asigurări de sănătate!</p>
+                    </div>
+                    <p>Valabilitatea scrisorii medicale începe de la data eliberării acesteia și este în concordanță cu protocolul terapeutic.</p>
+                </div>
+
+                <!-- Indicație Internare -->
+                <div class="checkbox-section">
+                    <div class="checkbox-section-title"><i class="fas fa-hospital"></i> Indicație de Revenire pentru Internare</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.AreIndicatieInternare ? "background:#3b82f6;color:#fff;" : "")">@(Model.AreIndicatieInternare ? "✓" : "")</span>
+                            <span class="checkbox-label">Da, revine pentru internare în termen de @(Model.TermenInternare ?? "____________")</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(!Model.AreIndicatieInternare ? "background:#3b82f6;color:#fff;" : "")">@(!Model.AreIndicatieInternare ? "✓" : "")</span>
+                            <span class="checkbox-label">Nu, nu este necesară revenirea pentru internare</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prescripție Medicală -->
+                <div class="checkbox-section">
+                    <div class="checkbox-section-title"><i class="fas fa-prescription"></i> Prescripție Medicală</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.SaEliberatPrescriptie ? "background:#3b82f6;color:#fff;" : "")">@(Model.SaEliberatPrescriptie ? "✓" : "")</span>
+                            <span class="checkbox-label">S-a eliberat prescripție medicală - <span class="field-value">@(Model.SeriePrescriptie ?? "____________")</span></span>
+                        </div>
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.NuSaEliberatPrescriptieNuAFostNecesar ? "background:#3b82f6;color:#fff;" : "")">@(Model.NuSaEliberatPrescriptieNuAFostNecesar ? "✓" : "")</span>
+                            <span class="checkbox-label">Nu s-a eliberat prescripție medicală deoarece nu a fost necesar</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.NuSaEliberatPrescriptie ? "background:#3b82f6;color:#fff;" : "")">@(Model.NuSaEliberatPrescriptie ? "✓" : "")</span>
+                            <span class="checkbox-label">Nu s-a eliberat prescripție medicală</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Concediu Medical -->
+                <div class="checkbox-section">
+                    <div class="checkbox-section-title"><i class="fas fa-file-medical-alt"></i> Concediu Medical</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.SaEliberatConcediuMedical ? "background:#3b82f6;color:#fff;" : "")">@(Model.SaEliberatConcediuMedical ? "✓" : "")</span>
+                            <span class="checkbox-label">S-a eliberat concediu medical - seria și numărul: @(Model.SerieConcediuMedical ?? "____________")</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.NuSaEliberatConcediuNuAFostNecesar ? "background:#3b82f6;color:#fff;" : "")">@(Model.NuSaEliberatConcediuNuAFostNecesar ? "✓" : "")</span>
+                            <span class="checkbox-label">Nu s-a eliberat concediu medical deoarece nu a fost necesar</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.NuSaEliberatConcediuMedical ? "background:#3b82f6;color:#fff;" : "")">@(Model.NuSaEliberatConcediuMedical ? "✓" : "")</span>
+                            <span class="checkbox-label">Nu s-a eliberat concediu medical</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Îngrijiri la Domiciliu -->
+                <div class="checkbox-section">
+                    <div class="checkbox-section-title"><i class="fas fa-home"></i> Îngrijiri Medicale la Domiciliu</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.SaEliberatRecomandareIngrijiriDomiciliu ? "background:#3b82f6;color:#fff;" : "")">@(Model.SaEliberatRecomandareIngrijiriDomiciliu ? "✓" : "")</span>
+                            <span class="checkbox-label">S-a eliberat recomandare pentru îngrijiri medicale la domiciliu/paliative la domiciliu</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.NuSaEliberatIngrijiriNuAFostNecesar ? "background:#3b82f6;color:#fff;" : "")">@(Model.NuSaEliberatIngrijiriNuAFostNecesar ? "✓" : "")</span>
+                            <span class="checkbox-label">Nu s-a eliberat recomandare pentru îngrijiri medicale la domiciliu deoarece nu a fost necesar</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dispozitive Medicale -->
+                <div class="checkbox-section">
+                    <div class="checkbox-section-title"><i class="fas fa-medkit"></i> Dispozitive Medicale</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.SaEliberatPrescriptieDispozitive ? "background:#3b82f6;color:#fff;" : "")">@(Model.SaEliberatPrescriptieDispozitive ? "✓" : "")</span>
+                            <span class="checkbox-label">S-a eliberat prescripție medicală pentru dispozitive medicale în ambulatoriu</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <span class="checkbox" style="@(Model.NuSaEliberatDispozitiveNuAFostNecesar ? "background:#3b82f6;color:#fff;" : "")">@(Model.NuSaEliberatDispozitiveNuAFostNecesar ? "✓" : "")</span>
+                            <span class="checkbox-label">Nu s-a eliberat prescripție medicală pentru dispozitive medicale deoarece nu a fost necesar</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <footer class="doc-footer">
+                    <div class="footer-grid">
+                        <div class="footer-section doctor-signature">
+                            <h4>Medic Curant</h4>
+                            <div class="doctor-name">@Model.MedicNumeComplet</div>
+                            <div class="doctor-specialty">@Model.MedicSpecializare</div>
+                            <div class="doctor-specialty">Cod Parafă: @Model.MedicCodParafa</div>
+                            <div class="doctor-stamp">
+                                Parafă<br>&amp; Semnătură
+                            </div>
+                        </div>
+                        <div class="footer-section">
+                            <h4>Data Emiterii</h4>
+                            <div class="emit-date">@Model.DataEmitereFormatata</div>
+
+                            <div class="transmission-section">
+                                <div class="transmission-title">Calea de Transmitere</div>
+                                <div class="transmission-options">
+                                    <div class="transmission-option">
+                                        <span class="checkbox checkbox-small" style="@(Model.TransmiterePrinAsigurat ? "background:#3b82f6;color:#fff;" : "")">@(Model.TransmiterePrinAsigurat ? "✓" : "")</span>
+                                        <span>Prin asigurat</span>
+                                    </div>
+                                    <div class="transmission-option">
+                                        <span class="checkbox checkbox-small" style="@(Model.TransmiterePrinEmail ? "background:#3b82f6;color:#fff;" : "")">@(Model.TransmiterePrinEmail ? "✓" : "")</span>
+                                        <span>Prin poștă electronică: @(Model.EmailTransmitere ?? "____________")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footnotes -->
+                    <div class="footnotes">
+                        <p><strong>*)</strong> Scrisoarea medicală se întocmește în două exemplare, din care un exemplar rămâne la medicul care a efectuat consultația/serviciul în ambulatoriul de specialitate, iar un exemplar este transmis medicului de familie/medicului de specialitate din ambulatoriul de specialitate.</p>
+                        <p>Scrisoarea medicală sau biletul de ieșire din spital sunt documente tipizate care se întocmesc la data externării, într-un singur exemplar care este transmis medicului de familie/medicului de specialitate din ambulatoriul de specialitate, direct, prin intermediul asiguratului ori prin poștă electronică.</p>
+                        <p>Scrisoarea medicală trimisă prin poștă electronică este semnată cu semnătura electronică extinsă/calificată.</p>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+}
