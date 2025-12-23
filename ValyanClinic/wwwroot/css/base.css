@@ -230,3 +230,74 @@ main {
         max-width: unset;
     }
 }
+
+/* ========================================
+   PRINT STYLES - Scrisoare Medicala
+   Când body are clasa 'printing-scrisoare', 
+   ascunde tot în afară de document
+   ======================================== */
+@media print {
+    /* Forțează printarea culorilor */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    /* Când se printează scrisoarea, ascunde navigarea și sidebar */
+    body.printing-scrisoare .nav-menu,
+    body.printing-scrisoare .sidebar,
+    body.printing-scrisoare .navbar,
+    body.printing-scrisoare header:not(.doc-header),
+    body.printing-scrisoare .page-header,
+    body.printing-scrisoare .consultatie-header,
+    body.printing-scrisoare .consultatie-tabs,
+    body.printing-scrisoare .patient-card,
+    body.printing-scrisoare .consultatii-container > *:not(.scrisoare-overlay),
+    body.printing-scrisoare .content > *:not(.scrisoare-overlay),
+    body.printing-scrisoare #blazor-error-ui {
+        display: none !important;
+    }
+
+    /* Scoate padding și margin de pe containere */
+    body.printing-scrisoare .page,
+    body.printing-scrisoare .main-wrapper,
+    body.printing-scrisoare .main-content,
+    body.printing-scrisoare .content {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Scrisoarea ocupă tot spațiul */
+    body.printing-scrisoare .scrisoare-overlay {
+        position: static !important;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        overflow: visible !important;
+    }
+
+    body.printing-scrisoare .scrisoare-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
+
+    body.printing-scrisoare .scrisoare-wrapper .toolbar {
+        display: none !important;
+    }
+
+    body.printing-scrisoare .document-container {
+        padding: 5mm !important;
+    }
+
+    /* Configurare pagină */
+    @page {
+        size: A4;
+        margin: 8mm;
+    }
+}

@@ -137,7 +137,17 @@ public partial class ScrisoareMedicalaPreview : ComponentBase
 
     private async Task HandlePrint()
     {
+        // Adaugă clasa pe body pentru a ascunde restul paginii la print
+        await JSRuntime.InvokeVoidAsync("eval", "document.body.classList.add('printing-scrisoare')");
+        
+        // Așteaptă puțin pentru aplicarea stilurilor
+        await Task.Delay(100);
+        
+        // Printează
         await JSRuntime.InvokeVoidAsync("window.print");
+        
+        // Scoate clasa după print
+        await JSRuntime.InvokeVoidAsync("eval", "document.body.classList.remove('printing-scrisoare')");
     }
 
     private async Task HandleSavePdf()

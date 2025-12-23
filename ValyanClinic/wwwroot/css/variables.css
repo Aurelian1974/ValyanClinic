@@ -203,8 +203,10 @@
 }
 
 /* ==========================================
-   DARK MODE SUPPORT (Optional for future)
+   DARK MODE SUPPORT (DISABLED - causes issues)
+   TODO: Implement proper dark mode with toggle
    ========================================== */
+/* 
 @media (prefers-color-scheme: dark) {
     :root {
         --text-color: #f1f5f9;
@@ -213,6 +215,7 @@
         --border-color: #334155;
     }
 }
+*/
 
 /* ==========================================
    RESPONSIVE TYPOGRAPHY ADJUSTMENTS

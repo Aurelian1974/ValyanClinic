@@ -1,7 +1,7 @@
-﻿/* Consultatie Header Styles */
+﻿/* Consultatie Header Styles - Blue Theme */
 
 .consultatie-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
     color: white;
     padding: 1.5rem 2rem;
     border-radius: 12px 12px 0 0;

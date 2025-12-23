@@ -2,18 +2,10 @@
  * Scrisoare Medicală Preview - Scoped CSS
  * Design conform template Anexa 43
  * Ordin MS nr. 1411/2016
+ * 
+ * NOTA: Folosim culorile direct (nu :root) deoarece 
+ * CSS scoped nu suportă :root selector
  */
-
-/* ==================== CSS Variables ==================== */
-:root {
-    --sm-primary: #3b82f6;
-    --sm-primary-dark: #2563eb;
-    --sm-text-dark: #1a1a1a;
-    --sm-text-body: #333;
-    --sm-text-muted: #666;
-    --sm-border: #ddd;
-    --sm-bg-light: #f8f9fa;
-}
 
 /* ==================== Overlay ==================== */
 .scrisoare-overlay {
