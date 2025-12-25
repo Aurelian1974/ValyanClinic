@@ -61,7 +61,7 @@ public class CreateUtilizatorCommandHandler : IRequestHandler<CreateUtilizatorCo
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 Salt = salt,
-                Rol = request.Rol,
+                RolID = request.RolID,
                 EsteActiv = request.EsteActiv,
                 DataCreare = DateTime.Now,
                 CreatDe = request.CreatDe,

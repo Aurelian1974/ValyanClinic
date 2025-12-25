@@ -96,7 +96,7 @@
                                             <label>Nume Complet</label>
                                             <div class="info-value primary-text">@PacientData.NumeComplet</div>
                                         </div>
-                                        @if (!string.IsNullOrEmpty(PacientData.CNP))
+                                        @if (CanViewField("CNP") && !string.IsNullOrEmpty(PacientData.CNP))
                                         {
                                             <div class="info-item">
                                                 <label>CNP</label>
@@ -344,6 +344,8 @@
                                         <i class="fas fa-heartbeat"></i>
                                         Date Medicale
                                     </h3>
+                                @if (CanViewField("Alergii"))
+                                {
                                     <div class="info-grid">
                                         <div class="info-item full-width">
                                             <label>Alergii</label>
@@ -362,6 +364,11 @@
                                                 </div>
                                             }
                                         </div>
+                                    </div>
+                                }
+                                @if (CanViewField("BoliCronice"))
+                                {
+                                    <div class="info-grid">
                                         <div class="info-item full-width">
                                             <label>Boli Cronice</label>
                                             @if (!string.IsNullOrEmpty(PacientData.Boli_Cronice))
@@ -379,6 +386,9 @@
                                                 </div>
                                             }
                                         </div>
+                                    </div>
+                                }
+                                    <div class="info-grid">
                                         <div class="info-item full-width">
                                             <label>Medic Familie</label>
                                             @if (!string.IsNullOrEmpty(PacientData.Medic_Familie))

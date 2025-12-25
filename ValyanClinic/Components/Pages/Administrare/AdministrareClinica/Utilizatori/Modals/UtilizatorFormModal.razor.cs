@@ -49,7 +49,7 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
     public class RolOption
     {
         public string Text { get; set; } = string.Empty;
-        public string Value { get; set; } = string.Empty;
+        public Guid Value { get; set; }
     }
 
     protected override async Task OnInitializedAsync()
@@ -57,12 +57,14 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
         Model = new UtilizatorFormModel();
         Logger.LogInformation("UtilizatorFormModal initialized");
 
-        // Initialize role options
-        InitializeRolOptions();
+        // Load role options from database
+        await LoadRolOptions();
 
         // Load personal medical options
         await LoadPersonalMedicalOptions();
     }
+
+    protected override bool ShouldRender() => !_disposed;
 
     public void Dispose()
     {
@@ -87,17 +89,45 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
         }
     }
 
-    private void InitializeRolOptions()
+    private async Task LoadRolOptions()
     {
-        RolOptions = new List<RolOption>
+        if (_disposed) return;
+
+        try
         {
-            new() { Text = "Administrator", Value = "Administrator" },
-        new() { Text = "Doctor", Value = "Doctor" },
-            new() { Text = "Asistent", Value = "Asistent" },
-            new() { Text = "Receptioner", Value = "Receptioner" },
-            new() { Text = "Manager", Value = "Manager" },
- new() { Text = "Utilizator", Value = "Utilizator" }
-        };
+            // Use MediatR to get roles from database
+            var result = await Mediator.Send(new ValyanClinic.Application.Features.RolManagement.Queries.GetRolList.GetRolListQuery());
+
+            if (_disposed) return;
+
+            if (result.IsSuccess && result.Value != null)
+            {
+                RolOptions = result.Value
+                    .Where(r => r.EsteActiv)
+                    .Select(r => new RolOption
+                    {
+                        Text = r.Denumire,
+                        Value = r.Id
+                    })
+                    .OrderBy(r => r.Text)
+                    .ToList();
+
+                Logger.LogInformation("Loaded {Count} role options from database", RolOptions.Count);
+            }
+            else
+            {
+                Logger.LogWarning("Failed to load roles from database");
+                RolOptions = new List<RolOption>();
+            }
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Error loading role options");
+                RolOptions = new List<RolOption>();
+            }
+        }
     }
 
     private async Task LoadPersonalMedicalOptions()
@@ -164,8 +194,8 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
 
             Model = new UtilizatorFormModel
             {
-                EsteActiv = true,
-                Rol = "Utilizator" // Default role
+                EsteActiv = true
+                // RolID will be set when selecting from dropdown
             };
 
             IsVisible = true;
@@ -219,7 +249,7 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
                     PersonalMedicalID = data.PersonalMedicalID,
                     Username = data.Username,
                     Email = data.Email,
-                    Rol = data.Rol,
+                    RolID = data.RolID ?? Guid.Empty,
                     EsteActiv = data.EsteActiv,
                     Password = string.Empty // Don't load password (security)
                 };
@@ -302,7 +332,7 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
                     UtilizatorID = Model.UtilizatorID!.Value,
                     Username = Model.Username,
                     Email = Model.Email,
-                    Rol = Model.Rol,
+                    RolID = Model.RolID,
                     EsteActiv = Model.EsteActiv,
                     Password = string.IsNullOrWhiteSpace(Model.Password) ? null : Model.Password, // ✅ ADDED: Send password if provided
                     ModificatDe = "CurrentUser" // TODO: Get from auth context
@@ -339,11 +369,11 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
 
                 var command = new CreateUtilizatorCommand
                 {
-                    PersonalMedicalID = Model.PersonalMedicalID!.Value,
+                    PersonalMedicalID = Model.PersonalMedicalID,
                     Username = Model.Username,
                     Email = Model.Email,
                     Password = Model.Password, // Will be hashed by handler with BCrypt
-                    Rol = Model.Rol,
+                    RolID = Model.RolID,
                     EsteActiv = Model.EsteActiv,
                     CreatDe = "CurrentUser" // TODO: Get from auth context
                 };
@@ -423,7 +453,7 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
     {
         public Guid? UtilizatorID { get; set; }
 
-        [Required(ErrorMessage = "Personal Medical este obligatoriu")]
+        // Personal Medical - optional for superadmin
         public Guid? PersonalMedicalID { get; set; }
 
         [Required(ErrorMessage = "Username este obligatoriu")]
@@ -435,7 +465,7 @@ public partial class UtilizatorFormModal : ComponentBase, IDisposable
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Rol este obligatoriu")]
-        public string Rol { get; set; } = "Utilizator";
+        public Guid RolID { get; set; }
 
         public bool EsteActiv { get; set; } = true;
 

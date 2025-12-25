@@ -17,6 +17,7 @@ using ValyanClinic.Services.Security;
 using ValyanClinic.Services.Blazor;
 using ValyanClinic.Services.Authentication;
 using ValyanClinic.Services;
+using ValyanClinic.Application.Authorization;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using MediatR;
 using FluentValidation;
@@ -128,8 +129,11 @@ try
             };
         });
 
-    // Authorization Services
-    builder.Services.AddAuthorizationCore();
+    // ========================================
+    // AUTHORIZATION - Policy-Based Authorization
+    // ========================================
+    // Înlocuiește AddAuthorizationCore() simplu cu configurația noastră
+    builder.Services.AddValyanClinicAuthorization();
 
     // Blazor Authentication State Provider
     builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
@@ -229,6 +233,9 @@ try
     builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.Repositories.IICD10Repository, 
                                 ValyanClinic.Infrastructure.Repositories.ICD10Repository>(); // ✅ NOU - ICD10 Autocomplete
     builder.Services.AddScoped<IPacientPersonalMedicalRepository, PacientPersonalMedicalRepository>(); // ✅ NOU - Relații Pacient-Doctor
+    builder.Services.AddScoped<IRolRepository, RolRepository>(); // ✅ NOU - Administrare Roluri și Permisiuni
+    builder.Services.AddScoped<ValyanClinic.Application.Interfaces.IFieldPermissionService, 
+                                ValyanClinic.Application.Services.FieldPermissionService>(); // ✅ NOU - Permisiuni granulare la nivel de câmp
 
     // Phase1 Settings Repositories
     builder.Services.AddScoped<ISystemSettingsRepository, ValyanClinic.Infrastructure.Repositories.Settings.SystemSettingsRepository>();

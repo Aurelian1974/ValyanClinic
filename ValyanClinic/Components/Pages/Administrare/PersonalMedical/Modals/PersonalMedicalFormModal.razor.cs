@@ -1,10 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.PersonalMedicalManagement.Commands.CreatePersonalMedical;
 using ValyanClinic.Application.Features.PersonalMedicalManagement.Commands.UpdatePersonalMedical;
 using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalById;
 using ValyanClinic.Domain.Interfaces.Repositories;
+using ValyanClinic.Application.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace ValyanClinic.Components.Pages.Administrare.PersonalMedical.Modals;
@@ -16,6 +18,8 @@ public partial class PersonalMedicalFormModal : ComponentBase, IDisposable
     [Inject] private IDepartamentRepository DepartamentRepository { get; set; } = default!;
     [Inject] private IPozitieRepository PozitieRepository { get; set; } = default!;
     [Inject] private ISpecializareRepository SpecializareRepository { get; set; } = default!;
+    [Inject] private IFieldPermissionService FieldPermissions { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     [Parameter] public EventCallback OnPersonalMedicalSaved { get; set; }
     [Parameter] public EventCallback OnClosed { get; set; }
@@ -46,9 +50,40 @@ public partial class PersonalMedicalFormModal : ComponentBase, IDisposable
         Model = new PersonalMedicalFormModel();
         Logger.LogInformation("PersonalMedicalFormModal initialized");
 
-        // Load lookup data
+        // Load lookup data and permissions
         await LoadLookupData();
+        await LoadFieldPermissionsAsync();
     }
+
+    #region Field Permissions
+    
+    private bool CanEditField(string fieldName) => 
+        FieldPermissions.CanEditField("Personal", fieldName);
+    
+    private bool CanViewField(string fieldName) => 
+        FieldPermissions.CanViewField("Personal", fieldName);
+    
+    private FieldState GetFieldState(string fieldName, bool isEditMode = true) => 
+        FieldPermissions.GetFieldState("Personal", fieldName, isEditMode);
+    
+    private async Task LoadFieldPermissionsAsync()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = authState.User?.Identity?.Name;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                await FieldPermissions.LoadPermissionsAsync(userId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading field permissions");
+        }
+    }
+    
+    #endregion
 
     public void Dispose()
     {

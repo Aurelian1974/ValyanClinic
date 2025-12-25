@@ -1,0 +1,42 @@
+/* PermissionTextBox - Stiluri pentru câmpuri cu verificare permisiuni */
+
+.readonly-field {
+    background-color: var(--gray-100, #f3f4f6) !important;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.readonly-field:focus {
+    box-shadow: none !important;
+    border-color: var(--gray-300, #d1d5db) !important;
+}
+
+.form-text.text-warning {
+    color: var(--warning-color, #f59e0b);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.form-text.text-warning i {
+    font-size: 0.65rem;
+}
+
+/* Indicator vizual pentru câmpuri protected */
+.protected-field-indicator {
+    position: relative;
+}
+
+.protected-field-indicator::after {
+    content: "\f023"; /* FontAwesome lock icon */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400, #9ca3af);
+    font-size: 0.75rem;
+}

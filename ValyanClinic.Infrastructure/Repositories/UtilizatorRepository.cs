@@ -153,7 +153,7 @@ public class UtilizatorRepository : BaseRepository, IUtilizatorRepository
             utilizator.Email,
             utilizator.PasswordHash,
             utilizator.Salt,
-            utilizator.Rol,
+            utilizator.RolID,
             utilizator.EsteActiv,
             utilizator.CreatDe
         };
@@ -169,7 +169,7 @@ public class UtilizatorRepository : BaseRepository, IUtilizatorRepository
             utilizator.UtilizatorID,
             utilizator.Username,
             utilizator.Email,
-            utilizator.Rol,
+            utilizator.RolID,
             utilizator.EsteActiv,
             utilizator.ModificatDe
         };

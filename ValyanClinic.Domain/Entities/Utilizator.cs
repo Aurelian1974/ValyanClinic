@@ -9,8 +9,8 @@ public class Utilizator
     // Primary Key
     public Guid UtilizatorID { get; set; }
 
-    // Foreign Key către PersonalMedical (relație 1:1)
-    public Guid PersonalMedicalID { get; set; }
+    // Foreign Key către PersonalMedical (relație 1:1) - nullable pentru superadmin
+    public Guid? PersonalMedicalID { get; set; }
 
     // Credentiale
     public string Username { get; set; } = string.Empty;
@@ -18,8 +18,14 @@ public class Utilizator
     public string PasswordHash { get; set; } = string.Empty;
     public string Salt { get; set; } = string.Empty;
 
-    // Rol și permisiuni
-    public string Rol { get; set; } = string.Empty; // Administrator, Doctor, Asistent, Receptioner, Manager, Utilizator
+    // Rol (FK către Roluri)
+    public Guid? RolID { get; set; }
+    
+    // Denumirea rolului (mapată din JOIN)
+    public string? RolDenumire { get; set; }
+    
+    // Navigation property pentru Rol
+    public Rol? Rol { get; set; }
 
     // Status
     public bool EsteActiv { get; set; } = true;

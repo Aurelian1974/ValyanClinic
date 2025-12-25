@@ -14,8 +14,9 @@ public class LoginResultDto
     /// <summary>
     /// Personal medical identifier (for medical staff)
     /// Used for linking to PersonalMedical table
+    /// Nullable for superadmin users without PersonalMedical attachment
     /// </summary>
-    public Guid PersonalMedicalID { get; set; }
+    public Guid? PersonalMedicalID { get; set; }
 
     /// <summary>
     /// Username used for authentication

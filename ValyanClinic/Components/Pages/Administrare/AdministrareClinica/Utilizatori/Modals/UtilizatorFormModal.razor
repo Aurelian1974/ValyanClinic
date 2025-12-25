@@ -96,18 +96,18 @@ AllowFiltering="true"
         
        <div class="form-group">
            <label for="rol">Rol <span class="required">*</span></label>
-   <SfDropDownList TValue="string" 
+   <SfDropDownList TValue="Guid" 
     TItem="RolOption"
            ID="rol"
          Placeholder="Selecteaza rolul"
       DataSource="@RolOptions"
-    @bind-Value="@Model.Rol"
+    @bind-Value="@Model.RolID"
     AllowFiltering="false"
 ShowClearButton="false"
            CssClass="form-control">
     <DropDownListFieldSettings Text="Text" Value="Value"></DropDownListFieldSettings>
   </SfDropDownList>
-       <ValidationMessage For="@(() => Model.Rol)" />
+       <ValidationMessage For="@(() => Model.RolID)" />
          </div>
        
        <div class="form-group">

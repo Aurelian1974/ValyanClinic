@@ -67,7 +67,7 @@ public class LoginCommandHandlerTests
         result.Value.Should().NotBeNull();
         result.Value!.Username.Should().Be(mockUser.Username);
         result.Value.Email.Should().Be(mockUser.Email);
-        result.Value.Rol.Should().Be(mockUser.Rol);
+        result.Value.Rol.Should().Be(mockUser.RolDenumire);
         result.Value.UtilizatorID.Should().Be(mockUser.UtilizatorID);
         result.Value.PersonalMedicalID.Should().Be(mockUser.PersonalMedicalID);
     }
@@ -542,7 +542,8 @@ public class LoginCommandHandlerTests
             PersonalMedicalID = Guid.NewGuid(),
             Username = "testuser",
             Email = "test@example.com",
-            Rol = "Doctor",
+            RolID = Guid.NewGuid(),
+            RolDenumire = "Doctor",
             PasswordHash = "$2a$11$hashedpassword",
             Salt = "randomsalt",
             EsteActiv = true,

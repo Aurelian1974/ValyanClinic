@@ -1,0 +1,47 @@
+@namespace ValyanClinic.Components.Shared.Authorization
+@using ValyanClinic.Application.Interfaces
+@using Syncfusion.Blazor.Calendars
+@typeparam TValue
+
+@* 
+    PermissionDatePicker - DatePicker cu verificare automată de permisiuni.
+*@
+
+@if (_fieldState != FieldState.Hidden)
+{
+    <div class="form-group @CssClass">
+        @if (!string.IsNullOrEmpty(Label))
+        {
+            <label for="@Id">
+                @if (Required)
+                {
+                    <span class="required">*</span>
+                }
+                @Label
+            </label>
+        }
+        
+        <SfDatePicker TValue="TValue"
+                      ID="@Id"
+                      @bind-Value="Value"
+                      Placeholder="@Placeholder"
+                      Readonly="@IsReadOnly"
+                      Enabled="@IsEnabled"
+                      Format="@Format"
+                      ShowTodayButton="@ShowTodayButton"
+                      CssClass="@GetInputCssClass()">
+        </SfDatePicker>
+        
+        @if (!string.IsNullOrEmpty(HelpText))
+        {
+            <small class="form-text text-muted">@HelpText</small>
+        }
+        
+        @if (_fieldState == FieldState.ReadOnly && ShowReadOnlyMessage)
+        {
+            <small class="form-text text-warning">
+                <i class="fas fa-lock"></i> Nu aveți permisiunea de a edita acest câmp
+            </small>
+        }
+    </div>
+}

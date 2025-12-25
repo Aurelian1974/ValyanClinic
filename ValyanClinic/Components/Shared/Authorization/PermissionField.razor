@@ -1,0 +1,54 @@
+@namespace ValyanClinic.Components.Shared.Authorization
+@using ValyanClinic.Application.Interfaces
+
+@* 
+    PermissionField - Wrapper generic pentru orice input cu verificare permisiuni.
+    Permite să înfășurați orice conținut și să aplicați logica de permisiuni.
+    
+    Utilizare:
+    <PermissionField Entity="Pacient" Field="CNP" IsEditMode="@IsEditMode">
+        <SfTextBox @bind-Value="Model.CNP" Readonly="@context.IsReadOnly" />
+    </PermissionField>
+*@
+
+@if (State != FieldState.Hidden)
+{
+    <div class="permission-field @CssClass @(State == FieldState.ReadOnly ? "readonly" : "")">
+        @if (!string.IsNullOrEmpty(Label))
+        {
+            <label class="permission-field-label">
+                @if (Required)
+                {
+                    <span class="required">*</span>
+                }
+                @Label
+                @if (State == FieldState.ReadOnly && ShowLockIcon)
+                {
+                    <i class="fas fa-lock lock-icon" title="Nu aveți permisiunea de a edita"></i>
+                }
+            </label>
+        }
+        
+        @ChildContent(new FieldContext(State, State == FieldState.ReadOnly))
+        
+        @if (!string.IsNullOrEmpty(HelpText))
+        {
+            <small class="form-text text-muted">@HelpText</small>
+        }
+        
+        @if (State == FieldState.ReadOnly && ShowReadOnlyMessage && !string.IsNullOrEmpty(ReadOnlyMessage))
+        {
+            <small class="form-text text-warning">
+                <i class="fas fa-info-circle"></i> @ReadOnlyMessage
+            </small>
+        }
+    </div>
+}
+else if (ShowHiddenPlaceholder)
+{
+    <div class="permission-field hidden-placeholder">
+        <small class="text-muted">
+            <i class="fas fa-eye-slash"></i> Câmp ascuns - lipsă permisiuni
+        </small>
+    </div>
+}

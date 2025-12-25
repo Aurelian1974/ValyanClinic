@@ -198,7 +198,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
             PersonalMedicalID = utilizator.PersonalMedicalID,
             Username = utilizator.Username,
             Email = utilizator.Email ?? string.Empty,
-            Rol = utilizator.Rol ?? "User",
+            Rol = utilizator.RolDenumire ?? "User",
             RequiresPasswordReset = resetPasswordOnFirstLogin && utilizator.DataUltimaAutentificare == null
         };
     }

@@ -3,10 +3,11 @@
 public class UtilizatorListDto
 {
     public Guid UtilizatorID { get; set; }
-    public Guid PersonalMedicalID { get; set; }
+    public Guid? PersonalMedicalID { get; set; }
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
-    public string Rol { get; set; } = string.Empty;
+    public Guid? RolID { get; set; }
+    public string Rol { get; set; } = string.Empty; // RolDenumire mapped here
     public bool EsteActiv { get; set; }
     public DateTime DataCreare { get; set; }
     public DateTime? DataUltimaAutentificare { get; set; }

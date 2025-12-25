@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
@@ -10,11 +11,16 @@ using ValyanClinic.Components.Pages.Administrare.AdministrareClinica.Utilizatori
 
 namespace ValyanClinic.Components.Pages.Administrare.AdministrareClinica.Utilizatori;
 
-public partial class AdministrareUtilizatori : ComponentBase
+public partial class AdministrareUtilizatori : ComponentBase, IDisposable
 {
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<AdministrareUtilizatori> Logger { get; set; } = default!;
     [Inject] private IFilterOptionsService FilterOptionsService { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    // Dispose tracking
+    private bool _disposed = false;
+    private IDisposable? _locationChangingRegistration;
 
     // Grid reference
     private SfGrid<UtilizatorListDto>? GridRef { get; set; }
@@ -80,16 +86,31 @@ public partial class AdministrareUtilizatori : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         Logger.LogInformation("Initializing AdministrareUtilizatori page");
+        
+        // Register navigation handler to cleanup before navigation
+        _locationChangingRegistration = NavigationManager.RegisterLocationChangingHandler(OnLocationChanging);
+        
         await LoadData();
+    }
+
+    private ValueTask OnLocationChanging(LocationChangingContext context)
+    {
+        Logger.LogInformation("Navigation detected - marking as disposed to prevent render errors");
+        _disposed = true;
+        return ValueTask.CompletedTask;
     }
 
     private async Task LoadData()
     {
+        if (_disposed) return;
+
         try
         {
             IsLoading = true;
             HasError = false;
             await InvokeAsync(StateHasChanged);
+
+            if (_disposed) return;
 
             Logger.LogInformation("Loading utilizatori data");
 
@@ -102,6 +123,8 @@ public partial class AdministrareUtilizatori : ComponentBase
             };
 
             var result = await Mediator.Send(query);
+
+            if (_disposed) return;
 
             if (result.IsSuccess && result.Value != null)
             {
@@ -122,14 +145,20 @@ public partial class AdministrareUtilizatori : ComponentBase
         }
         catch (Exception ex)
         {
-            HasError = true;
-            ErrorMessage = $"Eroare: {ex.Message}";
-            Logger.LogError(ex, "Error loading utilizatori data");
+            if (!_disposed)
+            {
+                HasError = true;
+                ErrorMessage = $"Eroare: {ex.Message}";
+                Logger.LogError(ex, "Error loading utilizatori data");
+            }
         }
         finally
         {
-            IsLoading = false;
-            await InvokeAsync(StateHasChanged);
+            if (!_disposed)
+            {
+                IsLoading = false;
+                await InvokeAsync(StateHasChanged);
+            }
         }
     }
 
@@ -400,6 +429,7 @@ public partial class AdministrareUtilizatori : ComponentBase
 
     private async Task HandleModalClosed()
     {
+        if (_disposed) return;
         Logger.LogInformation("Modal closed");
         // Refresh data if needed
         await InvokeAsync(StateHasChanged);
@@ -407,6 +437,7 @@ public partial class AdministrareUtilizatori : ComponentBase
 
     private async Task HandleEditFromModal(Guid utilizatorId)
     {
+        if (_disposed) return;
         Logger.LogInformation("Edit from modal: {UtilizatorID}", utilizatorId);
 
         if (UtilizatorFormModalRef != null)
@@ -417,10 +448,56 @@ public partial class AdministrareUtilizatori : ComponentBase
 
     private async Task HandleDeleteFromModal(Guid utilizatorId)
     {
+        if (_disposed) return;
         Logger.LogInformation("Delete from modal: {UtilizatorID}", utilizatorId);
 
         // TODO: Implement ConfirmDeleteModal
         await ShowToast("Informare", "Functionalitate delete in dezvoltare", "e-toast-info");
+    }
+
+    // ========================================
+    // LIFECYCLE & DISPOSE
+    // ========================================
+
+    protected override bool ShouldRender() => !_disposed;
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        try
+        {
+            Logger.LogDebug("AdministrareUtilizatori disposing");
+
+            // Dispose navigation registration first
+            _locationChangingRegistration?.Dispose();
+            _locationChangingRegistration = null;
+
+            AllUtilizatoriList?.Clear();
+            FilteredUtilizatoriList?.Clear();
+            CurrentPageData?.Clear();
+            StatusOptions?.Clear();
+            RolOptions?.Clear();
+
+            AllUtilizatoriList = new();
+            FilteredUtilizatoriList = new();
+            CurrentPageData = new();
+            StatusOptions = new();
+            RolOptions = new();
+
+            GridRef = null;
+            ToastRef = null;
+            UtilizatorFormModalRef = null;
+            UtilizatorViewModalRef = null;
+            SelectedUtilizator = null;
+
+            Logger.LogDebug("AdministrareUtilizatori disposed successfully");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error in AdministrareUtilizatori dispose");
+        }
     }
 }
 

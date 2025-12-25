@@ -1,0 +1,187 @@
+@rendermode InteractiveServer
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-user-shield"></i>
+                <h2>Detalii Rol</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" title="Inchide">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Se incarca...</span>
+                    </div>
+                    <p>Se incarca datele...</p>
+                </div>
+            }
+            else if (HasError)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @ErrorMessage
+                </div>
+            }
+            else if (RolData != null)
+            {
+                <div class="info-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-shield"></i>
+                        Informatii Rol
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item full-width">
+                            <label>Denumire Rol</label>
+                            <div class="info-value primary-text">
+                                @RolData.Denumire
+                                @if (RolData.EsteSistem)
+                                {
+                                    <span class="badge-system" title="Rol de sistem - nu poate fi sters">
+                                        <i class="fas fa-lock"></i> Sistem
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="info-item full-width">
+                            <label>Descriere</label>
+                            @if (!string.IsNullOrEmpty(RolData.Descriere))
+                            {
+                                <div class="info-value description-text">@RolData.Descriere</div>
+                            }
+                            else
+                            {
+                                <div class="info-value info-value-empty">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Nu este inregistrata
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Ordine Afisare</label>
+                            <div class="info-value">@RolData.OrdineAfisare</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Status</label>
+                            <div class="info-value">
+                                <span class="@(RolData.EsteActiv ? "badge-success" : "badge-danger")">
+                                    @(RolData.EsteActiv ? "Activ" : "Inactiv")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-key"></i>
+                        Permisiuni (@RolData.Permisiuni.Count)
+                    </h3>
+                    @if (RolData.Permisiuni.Any())
+                    {
+                        <div class="permissions-list">
+                            @foreach (var permisiune in RolData.Permisiuni)
+                            {
+                                <span class="permission-badge">
+                                    <i class="fas fa-check"></i>
+                                    @permisiune
+                                </span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-permissions">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Acest rol nu are permisiuni atribuite</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="info-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-info-circle"></i>
+                        Informatii Tehnice
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>ID Rol</label>
+                            <div class="info-value technical-text">@RolData.Id.ToString()</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Data Crearii</label>
+                            <div class="info-value">@RolData.DataCrearii.ToString("dd.MM.yyyy HH:mm")</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Creat De</label>
+                            @if (!string.IsNullOrEmpty(RolData.CreatDe))
+                            {
+                                <div class="info-value">@RolData.CreatDe</div>
+                            }
+                            else
+                            {
+                                <div class="info-value info-value-empty">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Nu este specificat
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Data Ultimei Modificari</label>
+                            <div class="info-value">@RolData.DataUltimeiModificari.ToString("dd.MM.yyyy HH:mm")</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Modificat De</label>
+                            @if (!string.IsNullOrEmpty(RolData.ModificatDe))
+                            {
+                                <div class="info-value">@RolData.ModificatDe</div>
+                            }
+                            else
+                            {
+                                <div class="info-value info-value-empty">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Nu este specificat
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" @onclick="Close">
+                <i class="fas fa-times"></i>
+                Inchide
+            </button>
+            <button class="btn btn-info" @onclick="HandleManagePermissions" disabled="@(RolData == null)">
+                <i class="fas fa-key"></i>
+                Gestioneaza Permisiuni
+            </button>
+            <button class="btn btn-primary" @onclick="HandleEdit" disabled="@(RolData == null)">
+                <i class="fas fa-edit"></i>
+                Editeaza
+            </button>
+            @if (RolData != null && !RolData.EsteSistem)
+            {
+                <button class="btn btn-danger" @onclick="HandleDelete">
+                    <i class="fas fa-trash"></i>
+                    Sterge
+                </button>
+            }
+        </div>
+    </div>
+</div>

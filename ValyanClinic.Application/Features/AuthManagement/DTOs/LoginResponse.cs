@@ -33,8 +33,9 @@ public class LoginResponse
 
     /// <summary>
     /// Personal medical identifier (for medical staff)
+    /// Nullable for superadmin users without PersonalMedical attachment
     /// </summary>
-    public Guid PersonalMedicalID { get; set; }
+    public Guid? PersonalMedicalID { get; set; }
 
     /// <summary>
     /// Indicates if user must reset password on first login

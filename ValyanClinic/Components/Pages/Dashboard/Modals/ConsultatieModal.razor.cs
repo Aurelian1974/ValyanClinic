@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
@@ -8,6 +9,7 @@ using ValyanClinic.Application.Features.ProgramareManagement.DTOs;
 using ValyanClinic.Application.Services.IMC;
 using ValyanClinic.Infrastructure.Services.DraftStorage;
 using ValyanClinic.Application.Services.Draft;
+using ValyanClinic.Application.Interfaces;
 
 namespace ValyanClinic.Components.Pages.Dashboard.Modals;
 
@@ -19,6 +21,8 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     [Inject] private IIMCCalculatorService IMCCalculator { get; set; } = default!;
     [Inject] private IDraftStorageService<CreateConsultatieCommand> DraftService { get; set; } = default!;
     [Inject] private DraftAutoSaveHelper<CreateConsultatieCommand> DraftAutoSaveHelper { get; set; } = default!;
+    [Inject] private IFieldPermissionService FieldPermissions { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     // Parameters
     [Parameter] public Guid ProgramareID { get; set; }
@@ -59,6 +63,36 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
     // ✅ Property pentru LastSaveTime - returnează cached value
     private DateTime LastSaveTime => _cachedLastSaveTime;
 
+    #region Field Permissions
+    
+    private bool CanEditField(string fieldName) => 
+        FieldPermissions.CanEditField("Consultatie", fieldName);
+    
+    private bool CanViewField(string fieldName) => 
+        FieldPermissions.CanViewField("Consultatie", fieldName);
+    
+    private FieldState GetFieldState(string fieldName, bool isEditMode = true) => 
+        FieldPermissions.GetFieldState("Consultatie", fieldName, isEditMode);
+    
+    private async Task LoadFieldPermissionsAsync()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = authState.User?.Identity?.Name;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                await FieldPermissions.LoadPermissionsAsync(userId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading field permissions");
+        }
+    }
+    
+    #endregion
+
     // Public Methods
     public async Task Open()
     {
@@ -74,6 +108,9 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
 
             IsVisible = true;
             await InvokeAsync(StateHasChanged);
+
+            // ✅ Load field permissions
+            await LoadFieldPermissionsAsync();
 
             // ✅ Load cached LastSaveTime
             await LoadLastSaveTimeFromStorage();

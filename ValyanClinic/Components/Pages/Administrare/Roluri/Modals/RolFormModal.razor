@@ -1,0 +1,103 @@
+@rendermode InteractiveServer
+@using ValyanClinic.Components.Pages.Administrare.Roluri.Models
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas @(Model.IsEditMode ? "fa-edit" : "fa-plus-circle")"></i>
+                <h2>@(Model.IsEditMode ? "Editează Rol" : "Adaugă Rol")</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" type="button">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Se încarcă datele...</p>
+                </div>
+            }
+            else
+            {
+                @if (HasError)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>@ErrorMessage</span>
+                    </div>
+                }
+
+                <EditForm Model="@Model" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="info-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Informații Rol</span>
+                        </h3>
+                        <div class="info-grid">
+                            <div class="form-group full-width">
+                                <label for="denumire">Denumire <span class="required">*</span></label>
+                                <InputText id="denumire" class="form-control" @bind-Value="Model.Denumire" placeholder="Ex: Doctor, Asistent, Manager, etc." />
+                                <ValidationMessage For="@(() => Model.Denumire)" />
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="descriere">Descriere</label>
+                                <InputTextArea id="descriere" class="form-control" @bind-Value="Model.Descriere" rows="3" placeholder="Descriere responsabilităților și accesului..." />
+                                <ValidationMessage For="@(() => Model.Descriere)" />
+                                <small class="form-text text-muted">Maxim 500 caractere</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="ordine">Ordine Afișare</label>
+                                <InputNumber id="ordine" class="form-control" @bind-Value="Model.OrdineAfisare" min="0" max="999" />
+                                <ValidationMessage For="@(() => Model.OrdineAfisare)" />
+                                <small class="form-text text-muted">Ordinea în liste și meniuri</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="este-activ">Status</label>
+                                <InputSelect id="este-activ" class="form-control" @bind-Value="Model.EsteActiv">
+                                    <option value="true">Activ</option>
+                                    <option value="false">Inactiv</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => Model.EsteActiv)" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-note">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Pentru a gestiona permisiunile, salvează rolul și folosește butonul "Permisiuni".</span>
+                    </div>
+                </EditForm>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @onclick="Close" disabled="@IsSaving">
+                <i class="fas fa-times"></i>
+                <span>Anulează</span>
+            </button>
+            <button type="button" class="btn btn-primary" @onclick="HandleSubmit" disabled="@IsSaving">
+                @if (IsSaving)
+                {
+                    <span class="spinner-border spinner-border-sm"></span>
+                    <span>Se salvează...</span>
+                }
+                else
+                {
+                    <i class="fas fa-save"></i>
+                    <span>@(Model.IsEditMode ? "Actualizează" : "Salvează")</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,133 @@
+@rendermode InteractiveServer
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-container modal-lg @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-key"></i>
+                <h2>Gestionare Permisiuni - @(RolDenumire ?? "...")</h2>
+            </div>
+            <button class="btn-close" @onclick="Close" title="Inchide" disabled="@IsSaving">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (IsLoading)
+            {
+                <div class="loading-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Se incarca...</span>
+                    </div>
+                    <p>Se incarca permisiunile...</p>
+                </div>
+            }
+            else if (HasError)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @ErrorMessage
+                </div>
+            }
+            else
+            {
+                <div class="permissions-header">
+                    <div class="permissions-info">
+                        <span class="selected-count">
+                            <i class="fas fa-check-circle"></i>
+                            @SelectedPermisiuni.Count permisiuni selectate din @TotalPermisiuni
+                        </span>
+                    </div>
+                    <div class="permissions-actions">
+                        <button class="btn btn-sm btn-outline-primary" @onclick="SelectAll" title="Selecteaza toate">
+                            <i class="fas fa-check-double"></i>
+                            Selecteaza toate
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="DeselectAll" title="Deselecteaza toate">
+                            <i class="fas fa-times"></i>
+                            Deselecteaza toate
+                        </button>
+                    </div>
+                </div>
+
+                <div class="permissions-container">
+                    @foreach (var categorie in CategoriiPermisiuni)
+                    {
+                        <div class="permission-category">
+                            <div class="category-header" @onclick="() => ToggleCategory(categorie.Categorie)">
+                                <div class="category-title">
+                                    <i class="fas @GetCategoryIcon(categorie.Categorie)"></i>
+                                    <span>@categorie.Categorie</span>
+                                    <span class="category-count">
+                                        (@GetSelectedCountForCategory(categorie.Categorie) / @categorie.Permisiuni.Count)
+                                    </span>
+                                </div>
+                                <div class="category-actions">
+                                    <button class="btn-category-toggle" 
+                                            @onclick:stopPropagation
+                                            @onclick="() => SelectAllInCategory(categorie.Categorie)"
+                                            title="Selecteaza toate din categorie">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn-category-toggle" 
+                                            @onclick:stopPropagation
+                                            @onclick="() => DeselectAllInCategory(categorie.Categorie)"
+                                            title="Deselecteaza toate din categorie">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <i class="fas @(ExpandedCategories.Contains(categorie.Categorie) ? "fa-chevron-up" : "fa-chevron-down") category-expand"></i>
+                                </div>
+                            </div>
+                            
+                            @if (ExpandedCategories.Contains(categorie.Categorie))
+                            {
+                                <div class="category-content">
+                                    @foreach (var permisiune in categorie.Permisiuni)
+                                    {
+                                        <div class="permission-item @(SelectedPermisiuni.Contains(permisiune.Cod) ? "selected" : "")">
+                                            <label class="permission-checkbox">
+                                                <input type="checkbox" 
+                                                       checked="@SelectedPermisiuni.Contains(permisiune.Cod)"
+                                                       @onchange="() => TogglePermission(permisiune.Cod)" />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <div class="permission-info" @onclick="() => TogglePermission(permisiune.Cod)">
+                                                <span class="permission-name">@permisiune.Denumire</span>
+                                                @if (!string.IsNullOrEmpty(permisiune.Descriere))
+                                                {
+                                                    <span class="permission-description">@permisiune.Descriere</span>
+                                                }
+                                                <span class="permission-code">@permisiune.Cod</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" @onclick="Close" disabled="@IsSaving">
+                <i class="fas fa-times"></i>
+                Anuleaza
+            </button>
+            <button class="btn btn-primary" @onclick="HandleSave" disabled="@(IsLoading || IsSaving)">
+                @if (IsSaving)
+                {
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Se salveaza...</span>
+                    </div>
+                    <span>Se salveaza...</span>
+                }
+                else
+                {
+                    <i class="fas fa-save"></i>
+                    <span>Salveaza Permisiuni</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>

@@ -101,17 +101,27 @@
                                                 </SfTextBox>
                                                 <small class="form-text text-muted">Se genereaza automat la salvare</small>
                                             </div>
-                                            <div class="form-group">
-                                                <label for="cnp">CNP</label>
-                                                <SfTextBox ID="cnp" 
-                                                          @bind-Value="FormModel.CNP"
-                                                          Placeholder="1234567890123"
-                                                          MaxLength="13"
-                                                          CssClass="form-control">
-                                                </SfTextBox>
-                                                <ValidationMessage For="@(() => FormModel.CNP)" />
-                                                <small class="form-text text-muted">Optional - 13 cifre</small>
-                                            </div>
+                                            @if (CanViewField("CNP"))
+                                            {
+                                                <div class="form-group">
+                                                    <label for="cnp">
+                                                        CNP
+                                                        @if (!CanEditField("CNP"))
+                                                        {
+                                                            <i class="fas fa-lock text-muted ms-1" title="Nu aveți permisiunea de editare"></i>
+                                                        }
+                                                    </label>
+                                                    <SfTextBox ID="cnp" 
+                                                              @bind-Value="FormModel.CNP"
+                                                              Placeholder="1234567890123"
+                                                              MaxLength="13"
+                                                              Readonly="@(!CanEditField("CNP"))"
+                                                              CssClass="@(CanEditField("CNP") ? "form-control" : "form-control readonly-field")">
+                                                    </SfTextBox>
+                                                    <ValidationMessage For="@(() => FormModel.CNP)" />
+                                                    <small class="form-text text-muted">Optional - 13 cifre</small>
+                                                </div>
+                                            }
                                         </div>
                                     </div>
 
@@ -323,45 +333,79 @@
                             @if (ActiveTab == "medical")
                             {
                                 <div class="tab-pane active">
-                                    <div class="info-card">
-                                        <h3 class="card-title">
-                                            <i class="fas fa-heartbeat"></i>
-                                            <span>Informatii Medicale</span>
-                                        </h3>
-                                        <div class="info-grid">
-                                            <div class="form-group full-width">
-                                                <label for="alergii">Alergii</label>
-                                                <SfTextBox ID="alergii"
-                                                          @bind-Value="FormModel.Alergii"
-                                                          Placeholder="Alergii cunoscute (ex: Penicilina, Polen, etc.)"
-                                                          Multiline="true"
-                                                          RowCount="3"
-                                                          CssClass="form-control">
-                                                </SfTextBox>
-                                                <ValidationMessage For="@(() => FormModel.Alergii)" />
-                                            </div>
-                                            <div class="form-group full-width">
-                                                <label for="boli-cronice">Boli Cronice</label>
-                                                <SfTextBox ID="boli-cronice"
-                                                          @bind-Value="FormModel.Boli_Cronice"
-                                                          Placeholder="Boli cronice diagnosticate"
-                                                          Multiline="true"
-                                                          RowCount="3"
-                                                          CssClass="form-control">
-                                                </SfTextBox>
-                                                <ValidationMessage For="@(() => FormModel.Boli_Cronice)" />
-                                            </div>
-                                            <div class="form-group full-width">
-                                                <label for="medic-familie">Medic de Familie</label>
-                                                <SfTextBox ID="medic-familie" 
-                                                          @bind-Value="FormModel.Medic_Familie"
-                                                          Placeholder="Dr. Nume Prenume"
-                                                          CssClass="form-control">
-                                                </SfTextBox>
-                                                <ValidationMessage For="@(() => FormModel.Medic_Familie)" />
+                                    @if (CanViewField("Alergii") || CanViewField("BoliCronice"))
+                                    {
+                                        <div class="info-card">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-heartbeat"></i>
+                                                <span>Informatii Medicale</span>
+                                                @if (!CanEditField("Alergii") && !CanEditField("BoliCronice"))
+                                                {
+                                                    <span class="badge bg-secondary ms-2">Doar vizualizare</span>
+                                                }
+                                            </h3>
+                                            <div class="info-grid">
+                                                @if (CanViewField("Alergii"))
+                                                {
+                                                    <div class="form-group full-width">
+                                                        <label for="alergii">
+                                                            Alergii
+                                                            @if (!CanEditField("Alergii"))
+                                                            {
+                                                                <i class="fas fa-lock text-muted ms-1" title="Nu aveți permisiunea de editare"></i>
+                                                            }
+                                                        </label>
+                                                        <SfTextBox ID="alergii"
+                                                                  @bind-Value="FormModel.Alergii"
+                                                                  Placeholder="Alergii cunoscute (ex: Penicilina, Polen, etc.)"
+                                                                  Multiline="true"
+                                                                  RowCount="3"
+                                                                  Readonly="@(!CanEditField("Alergii"))"
+                                                                  CssClass="@(CanEditField("Alergii") ? "form-control" : "form-control readonly-field")">
+                                                        </SfTextBox>
+                                                        <ValidationMessage For="@(() => FormModel.Alergii)" />
+                                                    </div>
+                                                }
+                                                @if (CanViewField("BoliCronice"))
+                                                {
+                                                    <div class="form-group full-width">
+                                                        <label for="boli-cronice">
+                                                            Boli Cronice
+                                                            @if (!CanEditField("BoliCronice"))
+                                                            {
+                                                                <i class="fas fa-lock text-muted ms-1" title="Nu aveți permisiunea de editare"></i>
+                                                            }
+                                                        </label>
+                                                        <SfTextBox ID="boli-cronice"
+                                                                  @bind-Value="FormModel.Boli_Cronice"
+                                                                  Placeholder="Boli cronice diagnosticate"
+                                                                  Multiline="true"
+                                                                  RowCount="3"
+                                                                  Readonly="@(!CanEditField("BoliCronice"))"
+                                                                  CssClass="@(CanEditField("BoliCronice") ? "form-control" : "form-control readonly-field")">
+                                                        </SfTextBox>
+                                                        <ValidationMessage For="@(() => FormModel.Boli_Cronice)" />
+                                                    </div>
+                                                }
+                                                <div class="form-group full-width">
+                                                    <label for="medic-familie">Medic de Familie</label>
+                                                    <SfTextBox ID="medic-familie" 
+                                                              @bind-Value="FormModel.Medic_Familie"
+                                                              Placeholder="Dr. Nume Prenume"
+                                                              CssClass="form-control">
+                                                    </SfTextBox>
+                                                    <ValidationMessage For="@(() => FormModel.Medic_Familie)" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-lock me-2"></i>
+                                            Nu aveți permisiunea de a vizualiza datele medicale ale pacientului.
+                                        </div>
+                                    }
                                 </div>
                             }
 

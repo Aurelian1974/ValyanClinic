@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalById;
 using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPacientiByDoctor;
+using ValyanClinic.Application.Interfaces;
 
 namespace ValyanClinic.Components.Pages.Administrare.PersonalMedical.Modals;
 
@@ -10,6 +12,8 @@ public partial class PersonalMedicalViewModal : ComponentBase
 {
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<PersonalMedicalViewModal> Logger { get; set; } = default!;
+    [Inject] private IFieldPermissionService FieldPermissions { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     [Parameter] public EventCallback<Guid> OnEditRequested { get; set; }
     [Parameter] public EventCallback<Guid> OnDeleteRequested { get; set; }
@@ -48,6 +52,7 @@ public partial class PersonalMedicalViewModal : ComponentBase
             PacientiAsociati = new(); // ✅ ADDED: Reset listă pacienți
 
             await InvokeAsync(StateHasChanged);
+            await LoadFieldPermissionsAsync();
             await LoadPersonalMedicalData(personalID);
         }
         catch (Exception ex)
@@ -79,6 +84,30 @@ public partial class PersonalMedicalViewModal : ComponentBase
         CurrentPersonalID = Guid.Empty;
         PacientiAsociati = new(); // ✅ ADDED: Reset listă pacienți
     }
+
+    #region Field Permissions
+    
+    private bool CanViewField(string fieldName) => 
+        FieldPermissions.CanViewField("Personal", fieldName);
+    
+    private async Task LoadFieldPermissionsAsync()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userId = authState.User?.Identity?.Name;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                await FieldPermissions.LoadPermissionsAsync(userId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading field permissions");
+        }
+    }
+    
+    #endregion
 
     /// <summary>
     /// Reîncarcă datele pentru ID-ul curent (folosit după editări)

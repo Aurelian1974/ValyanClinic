@@ -1,5 +1,5 @@
 ﻿@page "/administrare/administrare-clinica/utilizatori"
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using ValyanClinic.Application.Features.UtilizatorManagement.Queries.GetUtilizatorList
 @using ValyanClinic.Services.DataGrid
 @using MediatR

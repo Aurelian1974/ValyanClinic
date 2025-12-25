@@ -23,6 +23,8 @@ public partial class UtilizatorViewModal : ComponentBase, IDisposable
     private Guid CurrentUtilizatorId { get; set; }
     private bool _disposed = false;
 
+    protected override bool ShouldRender() => !_disposed;
+
     public async Task Open(Guid utilizatorId)
     {
         if (_disposed) return;

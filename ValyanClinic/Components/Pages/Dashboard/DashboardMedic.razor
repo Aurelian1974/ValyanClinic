@@ -1,5 +1,6 @@
 ﻿@page "/dashboard/medic"
-@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Doctor,Medic")]
+@using ValyanClinic.Application.Authorization
+@attribute [Authorize(Policy = Policies.RequiresDoctor)]
 @rendermode InteractiveServer
 @using ValyanClinic.Components.Pages.Dashboard.Modals
 

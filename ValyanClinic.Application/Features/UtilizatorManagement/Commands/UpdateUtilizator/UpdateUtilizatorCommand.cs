@@ -8,7 +8,7 @@ public record UpdateUtilizatorCommand : IRequest<Result<bool>>
     public Guid UtilizatorID { get; init; }
     public string Username { get; init; } = string.Empty;
     public string Email { get; init; } = string.Empty;
-    public string Rol { get; init; } = string.Empty;
+    public Guid RolID { get; init; } // Foreign key to Roluri table
     public bool EsteActiv { get; init; }
     public string ModificatDe { get; init; } = "System";
 

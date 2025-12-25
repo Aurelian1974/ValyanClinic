@@ -1,9 +1,12 @@
-﻿using MediatR;
+﻿using System.Security.Claims;
+using MediatR;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById;
 using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Queries.GetDoctoriByPacient;
 using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.DTOs;
+using ValyanClinic.Application.Interfaces;
 
 namespace ValyanClinic.Components.Pages.Pacienti.Modals;
 
@@ -15,6 +18,36 @@ public partial class PacientViewModal : ComponentBase
     #region Injected Services
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<PacientViewModal> Logger { get; set; } = default!;
+    [Inject] private IFieldPermissionService FieldPermissions { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
+    #endregion
+
+    #region Field Permission Helpers
+    private bool _permissionsLoaded;
+    
+    private bool CanViewField(string fieldName) => 
+        FieldPermissions.CanViewField("Pacient", fieldName);
+    
+    private async Task LoadFieldPermissionsAsync()
+    {
+        if (_permissionsLoaded) return;
+        
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var roleClaim = authState.User.FindFirst(ClaimTypes.Role);
+            
+            if (roleClaim != null)
+            {
+                await FieldPermissions.LoadPermissionsAsync(roleClaim.Value);
+                _permissionsLoaded = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to load field permissions");
+        }
+    }
     #endregion
 
     #region Parameters
@@ -91,6 +124,8 @@ public partial class PacientViewModal : ComponentBase
     {
         if (IsVisible && PacientId.HasValue && PacientId.Value != Guid.Empty)
         {
+            // ✅ Încarcă permisiunile pentru vizualizare
+            await LoadFieldPermissionsAsync();
             await LoadPacientData(PacientId.Value);
         }
     }

@@ -55,7 +55,7 @@ public class UpdateUtilizatorCommandHandler : IRequestHandler<UpdateUtilizatorCo
             // Update properties
             utilizator.Username = request.Username;
             utilizator.Email = request.Email;
-            utilizator.Rol = request.Rol;
+            utilizator.RolID = request.RolID;
             utilizator.EsteActiv = request.EsteActiv;
             utilizator.ModificatDe = request.ModificatDe;
             utilizator.DataUltimeiModificari = DateTime.Now;

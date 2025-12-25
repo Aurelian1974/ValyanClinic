@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.PacientManagement.Commands.CreatePacient;
@@ -10,6 +12,7 @@ using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Queries
 using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.DTOs;
 using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Commands.RemoveRelatie;
 using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Commands.ActivateRelatie; // ✅ ADDED
+using ValyanClinic.Application.Interfaces;
 using ValyanClinic.Services;
 
 namespace ValyanClinic.Components.Pages.Pacienti.Modals;
@@ -21,6 +24,8 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
     [Inject] private ILogger<PacientAddEditModal> Logger { get; set; } = default!;
     [Inject] private INotificationService NotificationService { get; set; } = default!;
+    [Inject] private IFieldPermissionService FieldPermissions { get; set; } = default!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
@@ -54,8 +59,58 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     private bool ShowConfirmActivateDoctor { get; set; }
     private DoctorAsociatDto? DoctorToActivate { get; set; }
 
+    // ✅ Permisiuni la nivel de câmp - încărcate din DB
+    private bool _permissionsLoaded;
+    
     // Form Model
     private PacientFormModel FormModel { get; set; } = new();
+
+    #region Field Permission Helpers
+    
+    /// <summary>
+    /// Verifică dacă un câmp poate fi editat (bazat pe permisiuni din DB).
+    /// </summary>
+    private bool CanEditField(string fieldName) => 
+        FieldPermissions.CanEditField("Pacient", fieldName);
+    
+    /// <summary>
+    /// Verifică dacă un câmp poate fi vizualizat.
+    /// </summary>
+    private bool CanViewField(string fieldName) => 
+        FieldPermissions.CanViewField("Pacient", fieldName);
+    
+    /// <summary>
+    /// Returnează starea unui câmp (Hidden, ReadOnly, Editable).
+    /// </summary>
+    private FieldState GetFieldState(string fieldName) => 
+        FieldPermissions.GetFieldState("Pacient", fieldName, IsEditMode);
+    
+    /// <summary>
+    /// Încarcă permisiunile din DB pentru rolul curent.
+    /// </summary>
+    private async Task LoadFieldPermissionsAsync()
+    {
+        if (_permissionsLoaded) return;
+        
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var roleClaim = authState.User.FindFirst(ClaimTypes.Role);
+            
+            if (roleClaim != null)
+            {
+                await FieldPermissions.LoadPermissionsAsync(roleClaim.Value);
+                _permissionsLoaded = true;
+                Logger.LogDebug("Field permissions loaded for role: {Role}", roleClaim.Value);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to load field permissions");
+        }
+    }
+    
+    #endregion
 
     // Dropdown Options
     private List<string> SexOptions { get; set; } = new() { "M", "F" };
@@ -107,14 +162,20 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     {
         if (_disposed) return; // ADDED: Guard check
 
-        if (IsVisible && IsEditMode)
+        if (IsVisible)
         {
-            await LoadPacientData();
-            await LoadDoctoriAsociati();
-        }
-        else if (IsVisible && !IsEditMode)
-        {
-            ResetForm();
+            // ✅ Încarcă permisiunile la nivel de câmp când modalul devine vizibil
+            await LoadFieldPermissionsAsync();
+            
+            if (IsEditMode)
+            {
+                await LoadPacientData();
+                await LoadDoctoriAsociati();
+            }
+            else
+            {
+                ResetForm();
+            }
         }
     }
 

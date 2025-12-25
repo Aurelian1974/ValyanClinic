@@ -1,10 +1,11 @@
 ﻿@page "/monitorizare/audit-log"
+@using ValyanClinic.Application.Authorization
 @using ValyanClinic.Application.Features.Settings.Queries.GetAuditLogs
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Calendars
 @using Syncfusion.Blazor.Buttons
-@attribute [Authorize]
+@attribute [Authorize(Policy = Policies.CanViewAuditLog)]
 
 <PageTitle>Audit Log - ValyanClinic</PageTitle>
 

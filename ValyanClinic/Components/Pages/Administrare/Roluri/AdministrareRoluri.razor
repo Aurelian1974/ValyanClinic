@@ -1,0 +1,344 @@
+@page "/administrare/roluri"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using ValyanClinic.Application.Features.RolManagement.Queries.GetRolList
+@using ValyanClinic.Application.Features.RolManagement.Queries.GetPermisiuniDefinitii
+@using ValyanClinic.Application.Authorization
+@using MediatR
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Notifications
+@using ValyanClinic.Components.Shared.Modals
+@using ValyanClinic.Components.Pages.Administrare.Roluri.Modals
+@using FilterType = Syncfusion.Blazor.Grids.FilterType
+@attribute [Authorize(Policy = Policies.RequiresAdmin)]
+
+<PageTitle>Administrare Roluri și Permisiuni</PageTitle>
+
+<div class="roluri-container">
+    <div class="roluri-header">
+        <h1>
+            <i class="fas fa-user-shield"></i>
+            Administrare Roluri și Permisiuni
+        </h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" @onclick="HandleAddNew">
+                <i class="fas fa-plus"></i>
+                Adaugă Rol
+            </button>
+            <button class="btn btn-secondary" @onclick="HandleRefresh">
+                <i class="fas fa-sync-alt"></i>
+                Reîncarcă
+            </button>
+        </div>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Se încarcă...</span>
+            </div>
+            <p>Se încarcă datele...</p>
+        </div>
+    }
+    else if (HasError)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            @ErrorMessage
+        </div>
+    }
+    else
+    {
+        <div class="search-filter-section">
+            <div class="search-and-filter">
+                <div class="global-search">
+                    <div class="search-box-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               class="search-input"
+                               placeholder="Caută rol..."
+                               value="@GlobalSearchText"
+                               @oninput="OnSearchInput"
+                               @onkeydown="OnSearchKeyDown" />
+                        @if (!string.IsNullOrEmpty(GlobalSearchText))
+                        {
+                            <button class="search-clear-btn" @onclick="ClearSearch" type="button">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+            
+            <div class="total-records">
+                <i class="fas fa-database"></i>
+                <span>Total: <strong>@TotalRecords</strong> roluri</span>
+            </div>
+        </div>
+
+        <div class="action-toolbar @(SelectedRol != null ? "active" : "")">
+            <div class="toolbar-info">
+                @if (SelectedRol != null)
+                {
+                    <div class="selected-item-info">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="selected-label">Selectat:</span>
+                        <strong>@SelectedRol.Denumire</strong>
+                        @if (SelectedRol.EsteSistem)
+                        {
+                            <span class="selected-badge badge-info">
+                                <i class="fas fa-lock"></i> Sistem
+                            </span>
+                        }
+                        <span class="selected-badge @(SelectedRol.EsteActiv ? "badge-success" : "badge-danger")">
+                            @(SelectedRol.EsteActiv ? "Activ" : "Inactiv")
+                        </span>
+                        <span class="permission-count">
+                            <i class="fas fa-key"></i> @SelectedRol.NumarPermisiuni permisiuni
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-selection-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Selectează un rol pentru a activa acțiunile</span>
+                    </div>
+                }
+            </div>
+            <div class="toolbar-actions">
+                <button class="toolbar-btn btn-permissions" 
+                        @onclick="() => HandleManagePermissions()"
+                        disabled="@(SelectedRol == null)"
+                        title="Gestionează permisiuni">
+                    <i class="fas fa-key"></i>
+                    <span>Permisiuni</span>
+                </button>
+                <button class="toolbar-btn btn-view" 
+                        @onclick="() => HandleViewSelected()"
+                        disabled="@(SelectedRol == null)"
+                        title="Vizualizează detalii">
+                    <i class="fas fa-eye"></i>
+                    <span>Vizualizează</span>
+                </button>
+                <button class="toolbar-btn btn-edit" 
+                        @onclick="() => HandleEditSelected()"
+                        disabled="@(SelectedRol == null || SelectedRol.EsteSistem)"
+                        title="@(SelectedRol?.EsteSistem == true ? "Rolurile de sistem nu pot fi editate" : "Editează informații")">
+                    <i class="fas fa-edit"></i>
+                    <span>Editează</span>
+                </button>
+                <button class="toolbar-btn btn-delete" 
+                        @onclick="() => HandleDeleteSelected()"
+                        disabled="@(SelectedRol == null || SelectedRol.EsteSistem)"
+                        title="@(SelectedRol?.EsteSistem == true ? "Rolurile de sistem nu pot fi șterse" : "Șterge rol")">
+                    <i class="fas fa-trash"></i>
+                    <span>Șterge</span>
+                </button>
+            </div>
+        </div>
+
+        @if (CurrentPageData != null && CurrentPageData.Any())
+        {
+            <div class="grid-container">
+                <SfGrid @ref="GridRef"
+                        DataSource="@CurrentPageData"
+                        Height="100%"
+                        AllowPaging="false"
+                        AllowSorting="true"
+                        AllowFiltering="false"
+                        AllowResizing="true"
+                        AllowReordering="true"
+                        AllowGrouping="false"
+                        AllowTextWrap="true"
+                        ShowColumnChooser="true"
+                        GridLines="GridLine.Both"
+                        EnableVirtualization="false"
+                        EnableColumnVirtualization="false"
+                        RowHeight="38">
+                    
+                    <GridFilterSettings Type="FilterType.Excel"></GridFilterSettings>
+                    
+                    <GridSelectionSettings Type="GridSelectionType.Single"></GridSelectionSettings>
+                    
+                    <GridEvents TValue="RolListDto" 
+                               RowSelected="OnRowSelected"
+                               RowDeselected="OnRowDeselected"
+                               OnActionBegin="OnGridActionBegin">
+                    </GridEvents>
+                    
+                    <GridColumns>
+                        <GridColumn Field="@nameof(RolListDto.Id)" 
+                                   HeaderText="ID" 
+                                   Width="100"
+                                   IsPrimaryKey="true"
+                                   Visible="false">
+                        </GridColumn>
+                        
+                        <GridColumn Field="@nameof(RolListDto.OrdineAfisare)" 
+                                   HeaderText="#" 
+                                   Width="60"
+                                   TextAlign="TextAlign.Center">
+                        </GridColumn>
+                        
+                        <GridColumn Field="@nameof(RolListDto.Denumire)" 
+                                   HeaderText="Denumire Rol" 
+                                   Width="200">
+                            <Template>
+                                @{
+                                    var rol = context as RolListDto;
+                                    if (rol != null)
+                                    {
+                                        <div class="rol-name-cell">
+                                            <i class="fas @GetRolIcon(rol.Denumire) rol-icon"></i>
+                                            <span>@rol.Denumire</span>
+                                            @if (rol.EsteSistem)
+                                            {
+                                                <span class="system-badge" title="Rol de sistem">
+                                                    <i class="fas fa-lock"></i>
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+                        
+                        <GridColumn Field="@nameof(RolListDto.Descriere)" 
+                                   HeaderText="Descriere" 
+                                   Width="350">
+                        </GridColumn>
+                        
+                        <GridColumn Field="@nameof(RolListDto.NumarPermisiuni)" 
+                                   HeaderText="Permisiuni" 
+                                   Width="120"
+                                   TextAlign="TextAlign.Center">
+                            <Template>
+                                @{
+                                    var rol = context as RolListDto;
+                                    if (rol != null)
+                                    {
+                                        <span class="permission-badge">
+                                            <i class="fas fa-key"></i>
+                                            @rol.NumarPermisiuni
+                                        </span>
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+                        
+                        <GridColumn Field="@nameof(RolListDto.EsteActiv)" 
+                                   HeaderText="Status" 
+                                   Width="100"
+                                   TextAlign="TextAlign.Center">
+                            <Template>
+                                @{
+                                    var rol = context as RolListDto;
+                                    if (rol != null)
+                                    {
+                                        <span class="badge @(rol.EsteActiv ? "badge-success" : "badge-danger")">
+                                            @(rol.EsteActiv ? "Activ" : "Inactiv")
+                                        </span>
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+                        
+                        <GridColumn Field="@nameof(RolListDto.DataUltimeiModificari)" 
+                                   HeaderText="Ultima Modificare" 
+                                   Width="160"
+                                   Format="dd.MM.yyyy HH:mm">
+                        </GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </div>
+        }
+        else
+        {
+            <div class="no-data-container">
+                <i class="fas fa-user-shield"></i>
+                <p>Nu există roluri definite</p>
+                <button class="btn btn-primary" @onclick="HandleAddNew">
+                    <i class="fas fa-plus"></i>
+                    Adaugă primul rol
+                </button>
+            </div>
+        }
+
+        <div class="custom-pager">
+            <div class="pager-info">
+                <span class="pager-text">
+                    <i class="fas fa-info-circle"></i>
+                    Pagina <strong>@CurrentPage</strong> din <strong>@TotalPages</strong>
+                </span>
+                <span class="pager-text">
+                    <i class="fas fa-list-ol"></i>
+                    Afișate <strong>@DisplayedRecordsStart-@DisplayedRecordsEnd</strong> din <strong>@TotalRecords</strong>
+                </span>
+            </div>
+            
+            <div class="pager-controls">
+                <button class="pager-btn pager-btn-first" 
+                        @onclick="GoToFirstPage" 
+                        disabled="@(!HasPreviousPage)"
+                        title="Prima pagină">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                
+                <button class="pager-btn pager-btn-prev" 
+                        @onclick="GoToPreviousPage" 
+                        disabled="@(!HasPreviousPage)"
+                        title="Pagina anterioară">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+                
+                @{
+                    var (start, end) = GetPagerRange(5);
+                    for (int i = start; i <= end; i++)
+                    {
+                        int pageNum = i;
+                        var isActive = pageNum == CurrentPage;
+                        <button class="pager-btn pager-btn-number @(isActive ? "active" : "")" 
+                                @onclick="() => GoToPage(pageNum)"
+                                disabled="@isActive"
+                                title="Pagina @pageNum">
+                            @pageNum
+                        </button>
+                    }
+                }
+                
+                <button class="pager-btn pager-btn-next" 
+                        @onclick="GoToNextPage" 
+                        disabled="@(!HasNextPage)"
+                        title="Pagina următoare">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+                
+                <button class="pager-btn pager-btn-last" 
+                        @onclick="GoToLastPage" 
+                        disabled="@(!HasNextPage)"
+                        title="Ultima pagină">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+<SfToast @ref="ToastRef">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
+
+<ConfirmDeleteModal @ref="confirmDeleteModal" 
+                    OnConfirmed="HandleDeleteConfirmed" />
+
+<RolFormModal @ref="rolFormModal"
+              OnRolSaved="HandleRolSaved" />
+
+<RolViewModal @ref="rolViewModal"
+              OnEditRequested="HandleEditFromView"
+              OnDeleteRequested="HandleDeleteFromView"
+              OnManagePermissionsRequested="HandleManagePermissionsFromView" />
+
+<RolPermisiuniModal @ref="rolPermisiuniModal"
+                    OnPermisiuniSaved="HandlePermisiuniSaved" />

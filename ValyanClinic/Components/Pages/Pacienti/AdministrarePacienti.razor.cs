@@ -7,6 +7,8 @@ using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientList;
 using ValyanClinic.Application.Features.PacientManagement.Commands.DeletePacient;
+using ValyanClinic.Application.Authorization;
+using ValyanClinic.Domain.Interfaces.Repositories;
 using System.Security.Claims;
 
 namespace ValyanClinic.Components.Pages.Pacienti;
@@ -59,6 +61,14 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private ValyanClinic.Application.Services.Pacienti.IPacientDataService DataService { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!; // ✅ ADDED for auth logging
+    [Inject] private IRolRepository RolRepository { get; set; } = default!; // ✅ ADDED for permission checking
+
+    // Permission flags - loaded from database
+    private bool CanCreatePacient { get; set; } = false;
+    private bool CanEditPacient { get; set; } = false;
+    private bool CanDeletePacient { get; set; } = false;
+    private bool CanViewSensitiveData { get; set; } = false;
+    private string UserRole { get; set; } = string.Empty;
 
     // Syncfusion Grid Reference
     private SfGrid<PacientListDto>? GridRef { get; set; }
@@ -131,7 +141,7 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
     /// </remarks>
     protected override async Task OnInitializedAsync()
     {
-        // ✅ SIMPLIFIED: Authorization check (essential only)
+        // ✅ Authorization check and permission loading
         try
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -145,31 +155,20 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
                 return;
             }
             
-            var roleClaims = user.Claims.Where(c => 
-                c.Type == ClaimTypes.Role || 
-                c.Type.Contains("role", StringComparison.OrdinalIgnoreCase)).ToList();
+            // ✅ Obține rolul din claims - autorizarea este gestionată de Policy (CanViewPatients)
+            var roleClaim = user.FindFirst(ClaimTypes.Role);
+            if (roleClaim == null)
+            {
+                Logger.LogError("User {Username} has NO role claim", user.Identity?.Name);
+                return;
+            }
             
-            if (!roleClaims.Any())
-            {
-                Logger.LogError("User {Username} has NO roles assigned", user.Identity?.Name);
-            }
-            else
-            {
-                var userRoles = roleClaims.Select(c => c.Value).ToList();
-                var allowedRoles = new[] { "Admin", "Doctor", "Asistent", "Receptionist" };
-                var isAuthorized = userRoles.Any(r => allowedRoles.Contains(r, StringComparer.OrdinalIgnoreCase));
-                
-                if (isAuthorized)
-                {
-                    Logger.LogInformation("User {Username} authorized with role: {Role}", 
-                        user.Identity?.Name, string.Join(", ", userRoles));
-                }
-                else
-                {
-                    Logger.LogError("User {Username} NOT authorized - Role: {Role}", 
-                        user.Identity?.Name, userRoles.FirstOrDefault() ?? "NONE");
-                }
-            }
+            UserRole = roleClaim.Value;
+            Logger.LogInformation("User {Username} authenticated with role: {Role}", 
+                user.Identity?.Name, UserRole);
+            
+            // ✅ Încarcă permisiunile din baza de date pentru controlul vizibilității UI
+            await LoadPermissionsAsync(UserRole);
         }
         catch (Exception ex)
         {
@@ -227,6 +226,47 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
                 _isInitializing = false;
                 _anyInstanceInitializing = false;
             }
+        }
+    }
+
+    /// <summary>
+    /// Loads permissions for the user's role from the database.
+    /// Sets CanCreatePacient, CanEditPacient, CanDeletePacient flags.
+    /// </summary>
+    private async Task LoadPermissionsAsync(string roleDenumire)
+    {
+        if (string.IsNullOrEmpty(roleDenumire))
+        {
+            Logger.LogWarning("Cannot load permissions - role is empty");
+            return;
+        }
+
+        try
+        {
+            Logger.LogInformation("Loading permissions for role: {Role}", roleDenumire);
+            
+            var permissions = await RolRepository.GetPermisiuniForRolByDenumireAsync(roleDenumire);
+            var permissionList = permissions.ToList();
+            
+            Logger.LogInformation("Loaded {Count} permissions for role {Role}", permissionList.Count, roleDenumire);
+
+            // Set permission flags based on database permissions
+            CanCreatePacient = permissionList.Contains(Permissions.Pacient.Create);
+            CanEditPacient = permissionList.Contains(Permissions.Pacient.Edit);
+            CanDeletePacient = permissionList.Contains(Permissions.Pacient.Delete);
+            CanViewSensitiveData = permissionList.Contains(Permissions.Pacient.ViewSensitiveData);
+
+            Logger.LogInformation("Permissions set - Create: {Create}, Edit: {Edit}, Delete: {Delete}, ViewSensitive: {Sensitive}",
+                CanCreatePacient, CanEditPacient, CanDeletePacient, CanViewSensitiveData);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading permissions for role: {Role}", roleDenumire);
+            // Default to no permissions on error
+            CanCreatePacient = false;
+            CanEditPacient = false;
+            CanDeletePacient = false;
+            CanViewSensitiveData = false;
         }
     }
 
