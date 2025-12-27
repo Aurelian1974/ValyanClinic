@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using MediatR;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ValyanClinic.Application.Common.Results;
@@ -22,13 +23,15 @@ public class PacientDataServiceTests
 {
     private readonly Mock<IMediator> _mockMediator;
     private readonly Mock<ILogger<PacientDataService>> _mockLogger;
+    private readonly IMemoryCache _memoryCache;
     private readonly PacientDataService _service;
 
     public PacientDataServiceTests()
     {
         _mockMediator = new Mock<IMediator>();
         _mockLogger = new Mock<ILogger<PacientDataService>>();
-        _service = new PacientDataService(_mockMediator.Object, _mockLogger.Object);
+        _memoryCache = new MemoryCache(new MemoryCacheOptions());
+        _service = new PacientDataService(_mockMediator.Object, _memoryCache, _mockLogger.Object);
     }
 
     #region Helper Methods

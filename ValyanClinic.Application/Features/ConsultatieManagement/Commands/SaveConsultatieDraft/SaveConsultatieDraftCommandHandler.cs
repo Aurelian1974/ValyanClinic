@@ -108,8 +108,8 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 Status = "In desfasurare", // Draft always in progress
                 CreatDe = request.CreatDeSauModificatDe,
                 ModificatDe = request.CreatDeSauModificatDe,
-                DataCreare = DateTime.UtcNow,
-                DataUltimeiModificari = DateTime.UtcNow
+                DataCreare = DateTime.Now,
+                DataUltimeiModificari = DateTime.Now
             };
 
             // Call repository (executes sp_Consultatie_SaveDraft with INSERT/UPDATE logic)

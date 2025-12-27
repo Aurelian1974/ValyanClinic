@@ -34,11 +34,17 @@ public interface IPacientDataService
 
     /// <summary>
     /// Loads filter options (unique judete, etc.) from server for dropdown population.
+    /// Results are cached for performance.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Result containing filter options or errors</returns>
     Task<Result<PacientFilterOptions>> LoadFilterOptionsAsync(
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Invalidates the filter options cache (call when patient data changes).
+    /// </summary>
+    void InvalidateFilterOptionsCache();
 }
 
 /// <summary>

@@ -62,31 +62,50 @@
                             </div>
                         }
                     </div>
-                    <button class="btn-refresh" @onclick="HandleRefresh" title="Reincarca datele">
-                        <i class="fas fa-sync-alt @(IsLoading ? "fa-spin" : "")"></i>
-                        <span>Actualizeaza</span>
-                    </button>
+                    <div class="header-actions">
+                        <button class="btn-export" @onclick="HandleExportExcel" title="Exporta in Excel" disabled="@(IsLoading || CurrentPageData.Count == 0)">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Export</span>
+                        </button>
+                        <button class="btn-refresh" @onclick="HandleRefresh" title="Reincarca datele">
+                            <i class="fas fa-sync-alt @(IsLoading ? "fa-spin" : "")"></i>
+                            <span>Actualizeaza</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
         @if (IsLoading && !DataLoaded)
         {
-            <!-- Premium Loading State -->
-            <div class="loading-state">
-                <div class="loading-content">
-                    <div class="loading-spinner">
-                        <div class="spinner-ring"></div>
-                        <div class="spinner-ring"></div>
-                        <div class="spinner-ring"></div>
-                        <i class="fas fa-heartbeat loading-icon"></i>
+            <!-- Skeleton Loading State -->
+            <div class="skeleton-container">
+                <div class="skeleton-header">
+                    <div class="skeleton-title">
+                        <div class="skeleton-line long" style="width: 200px; height: 14px;"></div>
+                        <div class="skeleton-line short" style="width: 120px; height: 10px;"></div>
                     </div>
-                    <h3>Se incarca datele pacientilor</h3>
-                    <p>Va rugam asteptati...</p>
-                    <div class="loading-bar">
-                        <div class="loading-bar-fill"></div>
+                    <div class="skeleton-actions">
+                        <div class="skeleton-line skeleton-btn"></div>
+                        <div class="skeleton-line skeleton-btn"></div>
                     </div>
                 </div>
+                @for (int i = 0; i < 8; i++)
+                {
+                    <div class="skeleton-row">
+                        <div class="skeleton-line skeleton-avatar"></div>
+                        <div class="skeleton-content">
+                            <div class="skeleton-line long"></div>
+                            <div class="skeleton-line medium"></div>
+                        </div>
+                        <div class="skeleton-line short" style="width: 80px;"></div>
+                        <div class="skeleton-line short" style="width: 100px;"></div>
+                        <div class="skeleton-actions">
+                            <div class="skeleton-line skeleton-btn"></div>
+                            <div class="skeleton-line skeleton-btn"></div>
+                        </div>
+                    </div>
+                }
             </div>
         }
         else if (HasError)
@@ -217,9 +236,39 @@
                                     <DropDownListFieldSettings Text="Text" Value="Value"/>
                                 </SfDropDownList>
                             </div>
+
+                            <!-- Saved Filters Dropdown -->
+                            <div class="filter-group saved-filters-group">
+                                <label class="filter-label">
+                                    <i class="fas fa-bookmark"></i>
+                                    Filtre Salvate
+                                </label>
+                                <div class="saved-filters-container">
+                                    <select class="saved-filters-select" @onchange="OnSavedFilterSelected">
+                                        <option value="">Selecteaza...</option>
+                                        @foreach (var saved in SavedFilters)
+                                        {
+                                            <option value="@saved.Name">@saved.Name</option>
+                                        }
+                                    </select>
+                                    @if (SavedFilters.Count > 0 && !string.IsNullOrEmpty(SelectedSavedFilter))
+                                    {
+                                        <button class="btn-delete-saved" @onclick="DeleteCurrentSavedFilter" title="Sterge filtrul selectat">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
                         </div>
 
                         <div class="filters-actions">
+                            <button class="btn-action btn-save-filter" 
+                                    @onclick="ShowSaveFilterDialog" 
+                                    disabled="@(ActiveFiltersCount == 0)"
+                                    title="Salveaza combinatia curenta de filtre">
+                                <i class="fas fa-save"></i>
+                                Salveaza Filtru
+                            </button>
                             <button class="btn-action btn-clear-filters" 
                                     @onclick="ClearAllFilters" 
                                     disabled="@(ActiveFiltersCount == 0)">
@@ -294,8 +343,8 @@
                         @if (SelectedPacient != null)
                         {
                             <div class="selected-patient">
-                                <div class="patient-avatar">
-                                    <i class="fas fa-user"></i>
+                                <div class="patient-avatar-initials @(SelectedPacient.Sex == "M" ? "male" : "female")">
+                                    @GetInitials(SelectedPacient.NumeComplet)
                                 </div>
                                 <div class="patient-details">
                                     <span class="patient-name">@SelectedPacient.NumeComplet</span>
@@ -331,6 +380,53 @@
                 </div>
             </section>
 
+            @if (HasNoResults)
+            {
+                <!-- Empty State - Illustrated -->
+                <div class="empty-state">
+                    <div class="empty-content">
+                        <div class="empty-illustration">
+                            <svg viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Clipboard background -->
+                                <rect x="50" y="20" width="100" height="120" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2"/>
+                                <!-- Clipboard clip -->
+                                <rect x="70" y="12" width="60" height="16" rx="4" fill="#3b82f6"/>
+                                <circle cx="100" cy="20" r="6" fill="#f1f5f9"/>
+                                <!-- Lines on clipboard -->
+                                <rect x="65" y="45" width="70" height="8" rx="4" fill="#e2e8f0"/>
+                                <rect x="65" y="60" width="55" height="8" rx="4" fill="#e2e8f0"/>
+                                <rect x="65" y="75" width="65" height="8" rx="4" fill="#e2e8f0"/>
+                                <rect x="65" y="90" width="45" height="8" rx="4" fill="#e2e8f0"/>
+                                <!-- Magnifying glass -->
+                                <circle cx="145" cy="95" r="25" stroke="#3b82f6" stroke-width="4" fill="white"/>
+                                <line x1="163" y1="113" x2="180" y2="130" stroke="#3b82f6" stroke-width="6" stroke-linecap="round"/>
+                                <!-- Question mark in magnifying glass -->
+                                <text x="145" y="102" text-anchor="middle" font-size="24" fill="#94a3b8" font-weight="bold">?</text>
+                            </svg>
+                        </div>
+                        @if (ActiveFiltersCount > 0)
+                        {
+                            <h3>Niciun pacient gasit</h3>
+                            <p>Nu exista pacienti care sa corespunda criteriilor de cautare. Incercati sa modificati sau sa stergeti filtrele aplicate.</p>
+                            <button class="btn-empty-action" @onclick="ClearAllFilters">
+                                <i class="fas fa-eraser"></i>
+                                Sterge Filtrele
+                            </button>
+                        }
+                        else
+                        {
+                            <h3>Nu exista pacienti inregistrati</h3>
+                            <p>Lista de pacienti este goala. Adaugati primul pacient pentru a incepe.</p>
+                            <button class="btn-empty-action" @onclick="HandleRefresh">
+                                <i class="fas fa-sync-alt"></i>
+                                Actualizeaza Lista
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
             <!-- Data Grid -->
             <section class="data-section">
                 <div class="grid-wrapper">
@@ -383,7 +479,7 @@
                                         var pacient = (context as PacientListDto);
                                         <div class="patient-cell">
                                             <div class="patient-cell-avatar @(pacient?.Sex == "M" ? "male" : "female")">
-                                                <i class="fas @(pacient?.Sex == "M" ? "fa-mars" : "fa-venus")"></i>
+                                                @GetInitials(pacient?.NumeComplet ?? "")
                                             </div>
                                             <span class="patient-cell-name">@pacient?.NumeComplet</span>
                                         </div>
@@ -526,10 +622,40 @@
                                     }
                                 </Template>
                             </GridColumn>
+                            
+                            <GridColumn HeaderText="Actiuni" 
+                                       Width="140"
+                                       TextAlign="TextAlign.Center"
+                                       AllowFiltering="false"
+                                       AllowSorting="false">
+                                <Template>
+                                    @{
+                                        var pacient = (context as PacientListDto);
+                                        if (pacient != null)
+                                        {
+                                            <div class="quick-actions">
+                                                <button class="quick-action-btn view" 
+                                                        @onclick="() => HandleQuickView(pacient.Id, pacient.NumeComplet)"
+                                                        @onclick:stopPropagation="true"
+                                                        title="Vizualizeaza detalii">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="quick-action-btn doctors" 
+                                                        @onclick="() => HandleQuickDoctors(pacient.Id, pacient.NumeComplet)"
+                                                        @onclick:stopPropagation="true"
+                                                        title="Gestioneaza doctori">
+                                                    <i class="fas fa-user-md"></i>
+                                                </button>
+                                            </div>
+                                        }
+                                    }
+                                </Template>
+                            </GridColumn>
                         </GridColumns>
                     </SfGrid>
                 </div>
             </section>
+            }
         }
     </div>
 </div>
@@ -538,6 +664,57 @@
 <SfToast @ref="ToastRef" Title="@ToastTitle" Content="@ToastContent" CssClass="@ToastCssClass">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
+
+<!-- Save Filter Dialog -->
+@if (ShowSaveFilterModal)
+{
+    <div class="modal-overlay" @onclick="CloseSaveFilterDialog">
+        <div class="save-filter-modal" @onclick:stopPropagation="true">
+            <div class="save-filter-header">
+                <h4><i class="fas fa-bookmark"></i> Salveaza Filtru</h4>
+                <button class="btn-close-modal" @onclick="CloseSaveFilterDialog">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="save-filter-body">
+                <label class="save-filter-label">Numele filtrului:</label>
+                <input type="text" 
+                       class="save-filter-input" 
+                       @bind="NewFilterName" 
+                       @bind:event="oninput"
+                       placeholder="ex: Pacienti activi din Bucuresti"
+                       maxlength="50" />
+                <div class="save-filter-preview">
+                    <span class="preview-label">Filtre incluse:</span>
+                    <div class="preview-tags">
+                        @if (!string.IsNullOrEmpty(GlobalSearchText))
+                        {
+                            <span class="preview-tag"><i class="fas fa-search"></i> @GlobalSearchText</span>
+                        }
+                        @if (!string.IsNullOrEmpty(FilterJudet))
+                        {
+                            <span class="preview-tag"><i class="fas fa-map-marker-alt"></i> @FilterJudet</span>
+                        }
+                        @if (!string.IsNullOrEmpty(FilterAsigurat))
+                        {
+                            <span class="preview-tag"><i class="fas fa-shield-alt"></i> @(FilterAsigurat == "true" ? "Asigurat" : "Neasigurat")</span>
+                        }
+                        @if (!string.IsNullOrEmpty(FilterStatus))
+                        {
+                            <span class="preview-tag"><i class="fas fa-toggle-on"></i> @(FilterStatus == "true" ? "Activ" : "Inactiv")</span>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="save-filter-footer">
+                <button class="btn-cancel" @onclick="CloseSaveFilterDialog">Anuleaza</button>
+                <button class="btn-save" @onclick="SaveCurrentFilter" disabled="@(string.IsNullOrWhiteSpace(NewFilterName))">
+                    <i class="fas fa-save"></i> Salveaza
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
 <!-- Modals -->
 <PacientViewModal IsVisible="@ShowViewModal"

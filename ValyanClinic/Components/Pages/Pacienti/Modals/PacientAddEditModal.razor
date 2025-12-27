@@ -3,19 +3,26 @@
 @using ValyanClinic.Application.Features.PacientManagement.Commands.CreatePacient
 @using ValyanClinic.Application.Features.PacientManagement.Commands.UpdatePacient
 @using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById
+@using ValyanClinic.Components.Pages.Pacienti.Modals.Components
 @using Syncfusion.Blazor.Calendars
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Inputs
 @using MediatR
 
-<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick">
-    <div class="modal-container modal-large @(IsVisible ? "show" : "")" @onclick:stopPropagation>
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="HandleOverlayClick" @onkeydown="HandleKeyDown">
+    <div class="modal-container modal-large @(IsVisible ? "show" : "")" @onclick:stopPropagation tabindex="0">
         <div class="modal-header">
             <div class="modal-title">
                 <i class="fas fa-@(IsEditMode ? "user-edit" : "user-plus")"></i>
                 <h2>@(IsEditMode ? "Editare Pacient" : "Adaugare Pacient Nou")</h2>
+                @if (_hasUnsavedChanges)
+                {
+                    <span class="unsaved-indicator" title="Aveți modificări nesalvate">
+                        <i class="fas fa-circle text-warning"></i>
+                    </span>
+                }
             </div>
-            <button class="btn-close" @onclick="Close" title="Inchide">
+            <button class="btn-close" @onclick="TryClose" title="Inchide (Esc)">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -45,30 +52,50 @@
                     <!-- Tabs Navigation -->
                     <div class="tabs-container">
                         <div class="tab-buttons">
-                            <button type="button" class="tab-button @(ActiveTab == "personal" ? "active" : "")" 
+                            <button type="button" class="tab-button @(ActiveTab == "personal" ? "active" : "") @GetTabValidationClass("personal")" 
                                     @onclick='() => SetActiveTab("personal")'>
                                 <i class="fas fa-user"></i>
                                 Date Personale
+                                @if (TabValidationState.TryGetValue("personal", out var personalValid) && !personalValid)
+                                {
+                                    <i class="fas fa-exclamation-circle tab-error-icon"></i>
+                                }
                             </button>
-                            <button type="button" class="tab-button @(ActiveTab == "contact" ? "active" : "")" 
+                            <button type="button" class="tab-button @(ActiveTab == "contact" ? "active" : "") @GetTabValidationClass("contact")" 
                                     @onclick='() => SetActiveTab("contact")'>
                                 <i class="fas fa-address-book"></i>
                                 Contact
+                                @if (TabValidationState.TryGetValue("contact", out var contactValid) && !contactValid)
+                                {
+                                    <i class="fas fa-exclamation-circle tab-error-icon"></i>
+                                }
                             </button>
-                            <button type="button" class="tab-button @(ActiveTab == "adresa" ? "active" : "")" 
+                            <button type="button" class="tab-button @(ActiveTab == "adresa" ? "active" : "") @GetTabValidationClass("adresa")" 
                                     @onclick='() => SetActiveTab("adresa")'>
                                 <i class="fas fa-map-marker-alt"></i>
                                 Adresa
+                                @if (TabValidationState.TryGetValue("adresa", out var adresaValid) && !adresaValid)
+                                {
+                                    <i class="fas fa-exclamation-circle tab-error-icon"></i>
+                                }
                             </button>
-                            <button type="button" class="tab-button @(ActiveTab == "medical" ? "active" : "")" 
+                            <button type="button" class="tab-button @(ActiveTab == "medical" ? "active" : "") @GetTabValidationClass("medical")" 
                                     @onclick='() => SetActiveTab("medical")'>
                                 <i class="fas fa-heartbeat"></i>
                                 Date Medicale
+                                @if (TabValidationState.TryGetValue("medical", out var medicalValid) && !medicalValid)
+                                {
+                                    <i class="fas fa-exclamation-circle tab-error-icon"></i>
+                                }
                             </button>
-                            <button type="button" class="tab-button @(ActiveTab == "asigurare" ? "active" : "")" 
+                            <button type="button" class="tab-button @(ActiveTab == "asigurare" ? "active" : "") @GetTabValidationClass("asigurare")" 
                                     @onclick='() => SetActiveTab("asigurare")'>
                                 <i class="fas fa-shield-alt"></i>
                                 Asigurare
+                                @if (TabValidationState.TryGetValue("asigurare", out var asigurareValid) && !asigurareValid)
+                                {
+                                    <i class="fas fa-exclamation-circle tab-error-icon"></i>
+                                }
                             </button>
                             @if (IsEditMode)
                             {
@@ -110,16 +137,23 @@
                                                         {
                                                             <i class="fas fa-lock text-muted ms-1" title="Nu aveți permisiunea de editare"></i>
                                                         }
+                                                        else
+                                                        {
+                                                            <small class="text-info ms-1" title="Sexul și data nașterii se completează automat din CNP">
+                                                                <i class="fas fa-magic"></i>
+                                                            </small>
+                                                        }
                                                     </label>
                                                     <SfTextBox ID="cnp" 
-                                                              @bind-Value="FormModel.CNP"
+                                                              Value="@FormModel.CNP"
+                                                              ValueChanged="@((string val) => OnCNPChanged(val))"
                                                               Placeholder="1234567890123"
                                                               MaxLength="13"
                                                               Readonly="@(!CanEditField("CNP"))"
                                                               CssClass="@(CanEditField("CNP") ? "form-control" : "form-control readonly-field")">
                                                     </SfTextBox>
                                                     <ValidationMessage For="@(() => FormModel.CNP)" />
-                                                    <small class="form-text text-muted">Optional - 13 cifre</small>
+                                                    <small class="form-text text-muted">Optional - 13 cifre. Sexul și data nașterii se completează automat.</small>
                                                 </div>
                                             }
                                         </div>
@@ -291,28 +325,53 @@
                                                 <ValidationMessage For="@(() => FormModel.Adresa)" />
                                             </div>
                                             <div class="form-group">
-                                                <label for="localitate">Localitate</label>
-                                                <SfTextBox ID="localitate" 
-                                                          @bind-Value="FormModel.Localitate"
-                                                          Placeholder="Bucuresti"
-                                                          CssClass="form-control">
-                                                </SfTextBox>
-                                                <ValidationMessage For="@(() => FormModel.Localitate)" />
-                                            </div>
-                                            <div class="form-group">
                                                 <label for="judet">Judet</label>
                                                 <SfDropDownList ID="judet"
                                                                TValue="string"
                                                                TItem="string"
                                                                Placeholder="Selecteaza judet..."
                                                                DataSource="@JudeteList"
-                                                               @bind-Value="@FormModel.Judet"
+                                                               Value="@FormModel.Judet"
+                                                               ValueChanged="@((string val) => OnJudetChanged(val))"
                                                                AllowFiltering="true"
                                                                FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
                                                                ShowClearButton="true"
                                                                CssClass="form-control">
                                                 </SfDropDownList>
                                                 <ValidationMessage For="@(() => FormModel.Judet)" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="localitate">
+                                                    Localitate
+                                                    @if (_isLoadingLocalitati)
+                                                    {
+                                                        <span class="spinner-border spinner-border-sm text-primary ms-1"></span>
+                                                    }
+                                                </label>
+                                                @if (LocalitatiList.Any())
+                                                {
+                                                    <SfDropDownList ID="localitate"
+                                                                   TValue="string"
+                                                                   TItem="string"
+                                                                   Placeholder="Selecteaza localitate..."
+                                                                   DataSource="@LocalitatiList"
+                                                                   @bind-Value="@FormModel.Localitate"
+                                                                   AllowFiltering="true"
+                                                                   FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                                   ShowClearButton="true"
+                                                                   Enabled="@(!_isLoadingLocalitati)"
+                                                                   CssClass="form-control">
+                                                    </SfDropDownList>
+                                                }
+                                                else
+                                                {
+                                                    <SfTextBox ID="localitate" 
+                                                              @bind-Value="FormModel.Localitate"
+                                                              Placeholder="@(string.IsNullOrEmpty(FormModel.Judet) ? "Selectează mai întâi județul" : "Introdu localitate")"
+                                                              CssClass="form-control">
+                                                    </SfTextBox>
+                                                }
+                                                <ValidationMessage For="@(() => FormModel.Localitate)" />
                                             </div>
                                             <div class="form-group">
                                                 <label for="cod-postal">Cod Postal</label>
@@ -462,196 +521,23 @@
                                 </div>
                             }
 
-                            <!-- Tab 6: Doctori (doar în EditMode) -->
+                            <!-- Tab 6: Doctori (doar în EditMode) - EXTRACTED TO COMPONENT -->
                             @if (ActiveTab == "doctori" && IsEditMode)
                             {
                                 <div class="tab-pane active">
-                                   @if (IsLoadingDoctori)
-                                 {
-  <div class="loading-container" style="text-align: center; padding: 3rem;">
-          <div class="spinner-border text-primary" role="status">
-         <span class="visually-hidden">Se încarcă...</span>
-               </div>
-      <p>Se încarcă doctori...</p>
-        </div>
-          }
-        else if (DoctoriAsociati.Any())
- {
-         <!-- Doctori activi -->
-  @if (DoctoriActivi.Any())
-                   {
-           <div class="info-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-         <h3 class="card-title" style="margin: 0;">
-    <i class="fas fa-check-circle text-success"></i>
-      Doctori Activi (@DoctoriActivi.Count)
-    </h3>
-           <button type="button" class="btn btn-primary btn-sm" @onclick="OpenAddDoctorModal">
-         <i class="fas fa-plus"></i> Adaugă doctor
-   </button>
-        </div>
+                                    <DoctoriTabContent 
+                                        DoctoriAsociati="@DoctoriAsociati"
+                                        IsLoading="@IsLoadingDoctori"
+                                        OnAddDoctor="@OpenAddDoctorModal"
+                                        OnDeactivateDoctor="@RemoveDoctor"
+                                        OnReactivateDoctor="@ActivateDoctor" />
+                                </div>
+                            }
+                        </div>
+                    </div>
 
-          @foreach (var doctor in DoctoriActivi)
-          {
-    <div class="doctor-card" style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
-           <div class="doctor-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-     <div>
-    <h5 style="margin: 0; font-size: 1.125rem; color: #111827;">
-       <i class="fas fa-user-md text-primary"></i>
-    @doctor.DoctorNumeComplet
-       </h5>
-              @if (!string.IsNullOrEmpty(doctor.DoctorSpecializare))
-     {
- <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #6b7280;">@doctor.DoctorSpecializare</p>
- }
-      </div>
-        @if (!string.IsNullOrEmpty(doctor.TipRelatie))
-          {
-         <span class="badge @GetBadgeClass(doctor.TipRelatie)" style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 6px;">
-         @doctor.TipRelatie
-         </span>
-          }
-         </div>
-
-        <div class="info-grid" style="gap: 0.75rem;">
-   @if (!string.IsNullOrEmpty(doctor.DoctorTelefon))
-     {
-    <div class="info-item">
-         <label style="font-size: 0.8125rem; color: #6b7280;">Telefon</label>
-         <div class="info-value" style="font-size: 0.875rem;">
-  <a href="tel:@doctor.DoctorTelefon" class="contact-link">
-      <i class="fas fa-phone"></i>
-             @doctor.DoctorTelefon
-             </a>
-       </div>
-             </div>
-       }
-             @if (!string.IsNullOrEmpty(doctor.DoctorEmail))
-     {
-<div class="info-item">
-   <label style="font-size: 0.8125rem; color: #6b7280;">Email</label>
-                 <div class="info-value" style="font-size: 0.875rem;">
-      <a href="mailto:@doctor.DoctorEmail" class="contact-link">
-     <i class="fas fa-envelope"></i>
-     @doctor.DoctorEmail
-           </a>
-   </div>
-  </div>
-        }
-            <div class="info-item">
-            <label style="font-size: 0.8125rem; color: #6b7280;">Data asocierii</label>
-                <div class="info-value" style="font-size: 0.875rem;">
-      @doctor.DataAsocierii.ToString("dd.MM.yyyy") 
-             <span style="color: #6b7280;">(@FormatZile(doctor.ZileDeAsociere))</span>
-         </div>
-           </div>
-        @if (!string.IsNullOrEmpty(doctor.Motiv))
-      {
-      <div class="info-item full-width">
-                 <label style="font-size: 0.8125rem; color: #6b7280;">Motiv asociere</label>
-        <div class="info-value" style="font-size: 0.875rem;">
-       <i class="fas fa-info-circle text-info"></i>
-     @doctor.Motiv
-   </div>
-</div>
-    }
-  </div>
-
-      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #f3f4f6;">
-       <button type="button" class="btn btn-sm btn-danger" @onclick="() => RemoveDoctor(doctor)" style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #fca5a5, #ef4444); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);">
-   <i class="fas fa-times"></i> Dezactivează
-    </button>
-              </div>
-            </div>
-      }
-     </div>
-           }
-
-  <!-- Doctori inactivi (istoric) -->
-       @if (DoctoriInactivi.Any())
-    {
-          <div class="info-card" style="margin-top: 1.5rem;">
-            <h3 class="card-title">
-        <i class="fas fa-history text-muted"></i>
-    Istoric Relații Inactive (@DoctoriInactivi.Count)
-   </h3>
-      @foreach (var doctor in DoctoriInactivi)
-             {
- <div class="doctor-card-inactive" style="background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
-       <div class="doctor-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-             <div>
-    <h5 style="margin: 0; font-size: 1.125rem; color: #6b7280;">
-         <i class="fas fa-user-md"></i>
-         @doctor.DoctorNumeComplet
-    </h5>
- @if (!string.IsNullOrEmpty(doctor.DoctorSpecializare))
-     {
-         <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #6b7280;">@doctor.DoctorSpecializare</p>
-                 }
-              </div>
-             <span class="badge badge-secondary" style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 6px; background: #94a3b8; color: white;">INACTIV</span>
-</div>
-
-               <div class="info-grid" style="gap: 0.75rem;">
- <div class="info-item">
-<label style="font-size: 0.8125rem; color: #6b7280;">Perioada</label>
-        <div class="info-value" style="font-size: 0.875rem; color: #6b7280;">
-    @doctor.DataAsocierii.ToString("dd.MM.yyyy") - 
-           @(doctor.DataDezactivarii?.ToString("dd.MM.yyyy") ?? "N/A")
-       </div>
-     </div>
-    @if (doctor.ZileDeAsociere > 0)
- {
-    <div class="info-item">
-            <label style="font-size: 0.8125rem; color: #6b7280;">Zile de asociere</label>
-<div class="info-value" style="font-size: 0.875rem; color: #6b7280;">
-     @FormatZile(doctor.ZileDeAsociere)
-         </div>
-  </div>
-     }
-    </div>
-
-    <!-- ✅ ADDED: Acțiuni pentru doctorii inactivi -->
-  <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #e5e7eb; display: flex; gap: 0.75rem;">
-             <button type="button" 
-   class="btn btn-sm btn-success" 
- @onclick="() => ActivateDoctor(doctor)" 
-  title="Reactivează relația cu acest doctor"
-       style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; transition: all 0.2s ease;">
-                  <i class="fas fa-redo"></i> Reactivează
-         </button>
-       @if (!string.IsNullOrEmpty(doctor.DoctorTelefon))
-        {
-            <a href="tel:@doctor.DoctorTelefon" 
-        class="btn btn-sm btn-outline-secondary"
-      style="padding: 0.5rem 1rem; background: white; color: #6b7280; border: 1px solid #d1d5db; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; text-decoration: none;">
-    <i class="fas fa-phone"></i> Contactează
-        </a>
-          }
-  </div>
-          </div>
-              }
-              </div>
-         }
-         }
-         else
-             {
-         <!-- Empty State -->
-          <div class="empty-state" style="text-align: center; padding: 3rem; color: #6b7280;">
-  <i class="fas fa-user-md fa-3x" style="margin-bottom: 1.5rem; color: #d1d5db;"></i>
-                <p style="font-size: 1.125rem; margin-bottom: 1.5rem; color: #374151;">Nu există doctori asociați acestui pacient.</p>
-      <button type="button" class="btn btn-primary" @onclick="OpenAddDoctorModal" style="padding: 0.625rem 1.25rem; background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); display: inline-flex; align-items: center; gap: 0.5rem;">
-                  <i class="fas fa-plus"></i> Adaugă primul doctor
-      </button>
-      </div>
-            }
-          </div>
-          }
- </div>
-          </div>
-
-           <!-- Observatii (vizibil pe toate tab-urile) -->
-          <div class="observatii-section">
+                    <!-- Observatii (vizibil pe toate tab-urile) -->
+                    <div class="observatii-section">
                         <div class="info-card">
                             <h3 class="card-title">
                                 <i class="fas fa-comment-alt"></i>
@@ -676,25 +562,66 @@
         </div>
 
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @onclick="Close" disabled="@IsSaving">
-                <i class="fas fa-times"></i>
-                Anuleaza
-            </button>
-            <button type="button" class="btn btn-primary" @onclick="HandleSubmit" disabled="@IsSaving">
-                @if (IsSaving)
-                {
-                    <span class="spinner-border spinner-border-sm" role="status"></span>
-                    <span>Se salveaza...</span>
-                }
-                else
-                {
-                    <i class="fas fa-save"></i>
-                    <span>@(IsEditMode ? "Actualizeaza" : "Salveaza")</span>
-                }
-            </button>
+            <div class="keyboard-shortcuts-hint">
+                <small class="text-muted">
+                    <kbd>Ctrl+S</kbd> Salvează | <kbd>Esc</kbd> Închide
+                </small>
+            </div>
+            <div class="footer-buttons">
+                <button type="button" class="btn btn-secondary" @onclick="TryClose" disabled="@IsSaving">
+                    <i class="fas fa-times"></i>
+                    Anuleaza
+                </button>
+                <button type="button" class="btn btn-primary" @onclick="HandleSubmit" disabled="@IsSaving">
+                    @if (IsSaving)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                        <span>Se salveaza...</span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-save"></i>
+                        <span>@(IsEditMode ? "Actualizeaza" : "Salveaza")</span>
+                    }
+                </button>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- ✅ Confirm modal pentru închidere cu modificări nesalvate -->
+@if (ShowConfirmCloseModal)
+{
+    <div class="modal-overlay visible" style="z-index: 1060;" @onclick:stopPropagation>
+        <div class="modal-container modal-small show" @onclick:stopPropagation>
+            <div class="modal-header modal-header-warning">
+                <div class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h2>Modificări Nesalvate</h2>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-message">
+                    <p style="font-size: 1rem; margin-bottom: 1rem;">
+                        <i class="fas fa-save text-warning me-2"></i>
+                        Aveți modificări nesalvate. Sigur doriți să închideți?
+                    </p>
+                    <p style="color: #6b7280; font-size: 0.875rem;">
+                        Modificările vor fi pierdute dacă nu le salvați.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="CancelClose">
+                    <i class="fas fa-arrow-left"></i> Continuă editarea
+                </button>
+                <button type="button" class="btn btn-danger" @onclick="ConfirmCloseAndDiscard">
+                    <i class="fas fa-trash"></i> Renunță la modificări
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
 <!-- Modal adaugare doctor (doar când IsEditMode) -->
 @if (IsEditMode && ShowAddDoctorModal)

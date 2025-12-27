@@ -41,7 +41,7 @@ public class PreBlazorAuthenticationMiddleware
          new Claim(ClaimTypes.Name, credentials.Username),
     new Claim(ClaimTypes.Email, credentials.Email),
      new Claim(ClaimTypes.Role, credentials.Rol),
-    new Claim("LoginTime", DateTime.UtcNow.ToString("O"))
+    new Claim("LoginTime", DateTime.Now.ToString("O"))
             };
 
                     var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

@@ -1,0 +1,125 @@
+@* ===================================
+   DoctorCard Component - Afișare Doctor Asociat
+   Reutilizabil pentru doctori activi și inactivi
+   =================================== *@
+
+@using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.DTOs
+
+<div class="doctor-card @(IsInactive ? "doctor-card--inactive" : "")">>
+    <div class="doctor-card__header">
+        <div class="doctor-card__info">
+            <h5 class="doctor-card__name">
+                <i class="fas fa-user-md @(IsInactive ? "" : "text-primary")"></i>
+                @Doctor.DoctorNumeComplet
+            </h5>
+            @if (!string.IsNullOrEmpty(Doctor.DoctorSpecializare))
+            {
+                <p class="doctor-card__specialization">@Doctor.DoctorSpecializare</p>
+            }
+        </div>
+        @if (IsInactive)
+        {
+            <span class="badge badge-inactive">INACTIV</span>
+        }
+        else if (!string.IsNullOrEmpty(Doctor.TipRelatie))
+        {
+            <span class="badge @GetBadgeClass(Doctor.TipRelatie)">@Doctor.TipRelatie</span>
+        }
+    </div>
+
+    <div class="doctor-card__details">
+        @if (!IsInactive)
+        {
+            @* Contact pentru doctori activi *@
+            @if (!string.IsNullOrEmpty(Doctor.DoctorTelefon))
+            {
+                <div class="doctor-card__detail-item">
+                    <label>Telefon</label>
+                    <div class="doctor-card__detail-value">
+                        <a href="tel:@Doctor.DoctorTelefon" class="contact-link">
+                            <i class="fas fa-phone"></i>
+                            @Doctor.DoctorTelefon
+                        </a>
+                    </div>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Doctor.DoctorEmail))
+            {
+                <div class="doctor-card__detail-item">
+                    <label>Email</label>
+                    <div class="doctor-card__detail-value">
+                        <a href="mailto:@Doctor.DoctorEmail" class="contact-link">
+                            <i class="fas fa-envelope"></i>
+                            @Doctor.DoctorEmail
+                        </a>
+                    </div>
+                </div>
+            }
+            <div class="doctor-card__detail-item">
+                <label>Data asocierii</label>
+                <div class="doctor-card__detail-value">
+                    @Doctor.DataAsocierii.ToString("dd.MM.yyyy")
+                    <span class="text-muted">(@FormatZile(Doctor.ZileDeAsociere))</span>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(Doctor.Motiv))
+            {
+                <div class="doctor-card__detail-item doctor-card__detail-item--full">
+                    <label>Motiv asociere</label>
+                    <div class="doctor-card__detail-value">
+                        <i class="fas fa-info-circle text-info"></i>
+                        @Doctor.Motiv
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            @* Detalii pentru doctori inactivi *@
+            <div class="doctor-card__detail-item">
+                <label>Perioada</label>
+                <div class="doctor-card__detail-value">
+                    @Doctor.DataAsocierii.ToString("dd.MM.yyyy") -
+                    @(Doctor.DataDezactivarii?.ToString("dd.MM.yyyy") ?? "N/A")
+                </div>
+            </div>
+            @if (Doctor.ZileDeAsociere > 0)
+            {
+                <div class="doctor-card__detail-item">
+                    <label>Zile de asociere</label>
+                    <div class="doctor-card__detail-value">
+                        @FormatZile(Doctor.ZileDeAsociere)
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="doctor-card__actions">
+        @if (IsInactive)
+        {
+            <button type="button" 
+                    class="btn btn-sm btn-reactivate" 
+                    @onclick="() => OnReactivate.InvokeAsync(Doctor)"
+                    title="Reactivează relația cu acest doctor">
+                <i class="fas fa-redo"></i> Reactivează
+            </button>
+            @if (!string.IsNullOrEmpty(Doctor.DoctorTelefon))
+            {
+                <a href="tel:@Doctor.DoctorTelefon" 
+                   class="btn btn-sm btn-contact"
+                   title="Contactează doctorul">
+                    <i class="fas fa-phone"></i> Contactează
+                </a>
+            }
+        }
+        else
+        {
+            <button type="button" 
+                    class="btn btn-sm btn-deactivate" 
+                    @onclick="() => OnDeactivate.InvokeAsync(Doctor)">
+                <i class="fas fa-times"></i> Dezactivează
+            </button>
+        }
+    </div>
+</div>

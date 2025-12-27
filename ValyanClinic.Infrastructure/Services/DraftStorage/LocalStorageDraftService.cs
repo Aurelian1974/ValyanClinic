@@ -46,7 +46,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
                 EntityId = entityId,
                 UserId = userId,
                 Data = data,
-                SavedAt = DateTime.UtcNow,
+                SavedAt = DateTime.Now,
                 Version = 1
             };
 
@@ -99,7 +99,7 @@ public class LocalStorageDraftService<T> : IDraftStorageService<T> where T : cla
             }
 
             // Check expiration (7 days)
-            var age = DateTime.UtcNow - draft.SavedAt;
+            var age = DateTime.Now - draft.SavedAt;
             if (age.TotalDays > 7)
             {
                 _logger.LogWarning(

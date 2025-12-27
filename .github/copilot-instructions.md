@@ -101,6 +101,7 @@ sc create ValyanClinic binPath="D:\Services\ValyanClinic\ValyanClinic.exe"
 - **Policy-Based Authorization** - use `[Authorize(Policy = Policies.XXX)]` instead of role-based
 - FluentValidation on all MediatR Commands
 - Never log CNP (Romanian SSN), passwords, or sensitive medical data
+- **DateTime Convention**: Always use `DateTime.Now` (local time), NEVER use `DateTime.UtcNow` - the clinic operates in a single timezone (Romania)
 
 ### Authorization (Policy-Based)
 ```csharp
@@ -140,3 +141,12 @@ sc create ValyanClinic binPath="D:\Services\ValyanClinic\ValyanClinic.exe"
 - ❌ Client-side pagination for large datasets - use server-side
 - ❌ Global CSS - use scoped `.razor.css` files
 - ❌ Skipping `IDisposable` - always clean up subscriptions/timers
+- ❌ Using `DateTime.UtcNow` - always use `DateTime.Now` (local Romania time)
+- ❌ Leaving compiler warnings - fix null reference issues with `??`, `?.` or `!` operators
+- ❌ Ignoring async/await - use `_ = MethodAsync();` for intentional fire-and-forget
+
+## Build Quality Standards
+- **Zero Errors**: Build must complete without errors
+- **Minimal Warnings**: Use `Directory.Build.props` to suppress intentional warnings (CS0414, CS4014, BL0005)
+- **Null Safety**: Always handle nullable references with proper null checks or null-forgiving operators
+- **Package Compatibility**: Keep NuGet packages compatible (avoid version conflicts like NU1608)

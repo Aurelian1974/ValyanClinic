@@ -34,7 +34,7 @@ public class UpdatePozitieCommandHandler : IRequestHandler<UpdatePozitieCommand,
             pozitie.Denumire = request.Denumire;
             pozitie.Descriere = request.Descriere;
             pozitie.EsteActiv = request.EsteActiv;
-            pozitie.DataUltimeiModificari = DateTime.UtcNow;
+            pozitie.DataUltimeiModificari = DateTime.Now;
             pozitie.ModificatDe = request.ModificatDe;
 
             var success = await _repository.UpdateAsync(pozitie, cancellationToken);

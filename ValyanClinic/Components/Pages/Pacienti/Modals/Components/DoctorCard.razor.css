@@ -1,0 +1,233 @@
+/* ===================================
+   DoctorCard Component Styles
+   =================================== */
+
+.doctor-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.doctor-card:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.doctor-card--inactive {
+    background: #f9fafb;
+}
+
+.doctor-card--inactive:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Header */
+.doctor-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.doctor-card__info {
+    flex: 1;
+}
+
+.doctor-card__name {
+    margin: 0;
+    font-size: 1.125rem;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.doctor-card--inactive .doctor-card__name {
+    color: #6b7280;
+}
+
+.doctor-card__specialization {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* Badges */
+.badge {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 6px;
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    color: white;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #34d399, #10b981);
+    color: white;
+}
+
+.badge-info {
+    background: linear-gradient(135deg, #67e8f9, #06b6d4);
+    color: white;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, #fcd34d, #f59e0b);
+    color: #78350f;
+}
+
+.badge-secondary {
+    background: #94a3b8;
+    color: white;
+}
+
+.badge-inactive {
+    background: #94a3b8;
+    color: white;
+}
+
+/* Details Grid */
+.doctor-card__details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+}
+
+.doctor-card__detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.doctor-card__detail-item--full {
+    grid-column: 1 / -1;
+}
+
+.doctor-card__detail-item label {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.doctor-card__detail-value {
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.doctor-card--inactive .doctor-card__detail-value {
+    color: #6b7280;
+}
+
+/* Contact Links */
+.contact-link {
+    color: #3b82f6;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    transition: color 0.2s ease;
+}
+
+.contact-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+/* Actions */
+.doctor-card__actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #f3f4f6;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.doctor-card--inactive .doctor-card__actions {
+    border-top-color: #e5e7eb;
+}
+
+.btn-deactivate {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #fca5a5, #ef4444);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-deactivate:hover {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+    transform: translateY(-1px);
+}
+
+.btn-reactivate {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-reactivate:hover {
+    background: linear-gradient(135deg, #34d399, #047857);
+    transform: translateY(-1px);
+}
+
+.btn-contact {
+    padding: 0.5rem 1rem;
+    background: white;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-contact:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    color: #374151;
+}
+
+/* Text utilities */
+.text-primary {
+    color: #3b82f6 !important;
+}
+
+.text-muted {
+    color: #6b7280 !important;
+}
+
+.text-info {
+    color: #06b6d4 !important;
+}

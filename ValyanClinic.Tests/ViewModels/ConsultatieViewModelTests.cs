@@ -71,7 +71,7 @@ public class ConsultatieViewModelTests
     {
         // Arrange
         var programareId = Guid.NewGuid();
-        var savedTime = DateTime.UtcNow.AddMinutes(-10);
+        var savedTime = DateTime.Now.AddMinutes(-10);
 
         var draftCommand = new CreateConsultatieCommand
         {

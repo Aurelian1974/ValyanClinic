@@ -170,7 +170,7 @@ public class CreateConsulatieCommandHandler : IRequestHandler<CreateConsulatieCo
                 DurataMinute = 0, // Will be set by timer in UI
 
                 // Audit
-                DataCreare = DateTime.UtcNow,
+                DataCreare = DateTime.Now,
                 CreatDe = request.CreatDe
             };
 

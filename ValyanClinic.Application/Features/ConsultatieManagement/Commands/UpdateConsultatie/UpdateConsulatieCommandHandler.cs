@@ -131,7 +131,7 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
                 Status = request.Status,
                 DataFinalizare = request.DataFinalizare,
                 DurataMinute = request.DurataMinute,
-                DataUltimeiModificari = DateTime.UtcNow,
+                DataUltimeiModificari = DateTime.Now,
                 ModificatDe = request.ModificatDe
             };
 

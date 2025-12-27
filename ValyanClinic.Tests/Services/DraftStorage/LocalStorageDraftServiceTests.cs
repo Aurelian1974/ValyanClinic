@@ -139,7 +139,7 @@ public class LocalStorageDraftServiceTests
         result.Data!.Name.Should().Be("Test");
         result.Data.Value.Should().Be(99);
         result.SavedAt.Should().NotBeNull();
-        result.SavedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        result.SavedAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(5));
     }
 
     [Fact(DisplayName = "LoadDraftAsync - Returnează Invalid pentru JSON corrupt")]
@@ -168,7 +168,7 @@ public class LocalStorageDraftServiceTests
             EntityId = entityId,
             UserId = "user123",
             Data = new TestData { Name = "Old", Value = 1 },
-            SavedAt = DateTime.UtcNow.AddDays(-8), // 8 zile în urmă
+            SavedAt = DateTime.Now.AddDays(-8), // 8 zile în urmă
             Version = 1
         };
 
@@ -258,7 +258,7 @@ public class LocalStorageDraftServiceTests
     {
         // Arrange
         var entityId = Guid.NewGuid();
-        var beforeSave = DateTime.UtcNow;
+        var beforeSave = DateTime.Now;
         var data = new TestData { Name = "Test", Value = 1 };
         await _service.SaveDraftAsync(entityId, data, "user123");
 
@@ -268,7 +268,7 @@ public class LocalStorageDraftServiceTests
         // Assert
         result.Should().NotBeNull();
         result.Should().BeOnOrAfter(beforeSave);
-        result.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        result.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(5));
     }
 
     [Fact(DisplayName = "GetLastSaveTimeAsync - Returnează null pentru draft inexistent")]
@@ -304,7 +304,7 @@ public class LocalStorageDraftServiceTests
             EntityId = expiredEntity,
             UserId = "user123",
             Data = new TestData { Name = "Expired", Value = 2 },
-            SavedAt = DateTime.UtcNow.AddDays(-10),
+            SavedAt = DateTime.Now.AddDays(-10),
             Version = 1
         };
         var key = $"draft_TestData_{expiredEntity}";

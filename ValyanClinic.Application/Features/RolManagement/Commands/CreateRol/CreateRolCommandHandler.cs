@@ -45,8 +45,8 @@ public class CreateRolCommandHandler : IRequestHandler<CreateRolCommand, Result<
                 EsteActiv = request.EsteActiv,
                 OrdineAfisare = request.OrdineAfisare,
                 CreatDe = request.CreatDe,
-                DataCrearii = DateTime.UtcNow,
-                DataUltimeiModificari = DateTime.UtcNow
+                DataCrearii = DateTime.Now,
+                DataUltimeiModificari = DateTime.Now
             };
 
             // Salvează rolul

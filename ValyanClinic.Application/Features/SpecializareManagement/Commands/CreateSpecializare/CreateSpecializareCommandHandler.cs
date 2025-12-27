@@ -32,8 +32,8 @@ public class CreateSpecializareCommandHandler : IRequestHandler<CreateSpecializa
                 Categorie = request.Categorie,
                 Descriere = request.Descriere,
                 EsteActiv = request.EsteActiv,
-                DataCrearii = DateTime.UtcNow,
-                DataUltimeiModificari = DateTime.UtcNow,
+                DataCrearii = DateTime.Now,
+                DataUltimeiModificari = DateTime.Now,
                 CreatDe = request.CreatDe,
                 ModificatDe = request.CreatDe
             };

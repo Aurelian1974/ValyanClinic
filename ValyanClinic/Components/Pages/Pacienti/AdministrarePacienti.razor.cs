@@ -8,6 +8,7 @@ using Syncfusion.Blazor.Notifications;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientList;
 using ValyanClinic.Application.Features.PacientManagement.Commands.DeletePacient;
 using ValyanClinic.Application.Authorization;
+using ValyanClinic.Application.Services.Location;
 using ValyanClinic.Domain.Interfaces.Repositories;
 using System.Security.Claims;
 
@@ -62,6 +63,7 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
     [Inject] private ValyanClinic.Application.Services.Pacienti.IPacientDataService DataService { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!; // ✅ ADDED for auth logging
     [Inject] private IRolRepository RolRepository { get; set; } = default!; // ✅ ADDED for permission checking
+    [Inject] private IJudeteService JudeteService { get; set; } = default!; // ✅ ADDED for loading judete from database
 
     // Permission flags - loaded from database
     private bool CanCreatePacient { get; set; } = false;
@@ -381,33 +383,39 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
     // ✅ REMOVED: ApplyClientFilters() - no longer needed (server-side filtering)
 
     /// <summary>
-    /// Loads the list of counties (judete) for filtering options.
+    /// Loads the list of counties (judete) from database for filtering options.
+    /// Uses centralized IJudeteService with caching for performance.
     /// </summary>
     /// <remarks>
-    /// This method initializes the JudeteList with a predefined set of counties.
+    /// Judete are loaded from database via sp_Location_GetJudete stored procedure
+    /// and cached in-memory for 1 hour to minimize database calls.
     /// </remarks>
-    private Task LoadJudeteAsync()
+    private async Task LoadJudeteAsync()
     {
-        if (_disposed) return Task.CompletedTask;
+        if (_disposed) return;
 
         try
         {
-            JudeteList = new List<string>
+            Logger.LogInformation("[AdministrarePacienti] Loading judete from database...");
+            
+            var result = await JudeteService.GetJudeteAsync();
+            
+            if (result.IsSuccess)
             {
-                "Bucuresti", "Alba", "Arad", "Arges", "Bacau", "Bihor", "Bistrita-Nasaud",
-                "Botosani", "Brasov", "Braila", "Buzau", "Caras-Severin", "Calarasi",
-                "Cluj", "Constanta", "Covasna", "Dambovita", "Dolj", "Galati", "Giurgiu",
-                "Gorj", "Harghita", "Hunedoara", "Ialomita", "Iasi", "Ilfov", "Maramures",
-                "Mehedinti", "Mures", "Neamt", "Olt", "Prahova", "Satu Mare", "Salaj",
-                "Sibiu", "Suceava", "Teleorman", "Timis", "Tulcea", "Vaslui", "Valcea", "Vrancea"
-            };
+                JudeteList = result.Value.Select(j => j.Nume).ToList();
+                Logger.LogInformation("[AdministrarePacienti] Loaded {Count} judete from database", JudeteList.Count);
+            }
+            else
+            {
+                Logger.LogWarning("[AdministrarePacienti] Failed to load judete: {Error}", result.FirstError);
+                JudeteList = new List<string>();
+            }
         }
-        catch
+        catch (Exception ex)
         {
+            Logger.LogError(ex, "[AdministrarePacienti] Error loading judete from database");
             JudeteList = new List<string>();
         }
-
-        return Task.CompletedTask;
     }
 
     #region Filter & Search Methods

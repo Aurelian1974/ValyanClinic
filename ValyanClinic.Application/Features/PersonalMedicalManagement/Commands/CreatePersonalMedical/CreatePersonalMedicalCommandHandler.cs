@@ -44,7 +44,7 @@ public class CreatePersonalMedicalCommandHandler : IRequestHandler<CreatePersona
                 PozitieID = request.PozitieID,
                 SpecializareID = request.SpecializareID,
                 SubspecializareID = request.SubspecializareID,
-                DataCreare = DateTime.UtcNow
+                DataCreare = DateTime.Now
             };
 
             var newId = await _repository.CreateAsync(personalMedical, cancellationToken);

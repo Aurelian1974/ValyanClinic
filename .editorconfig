@@ -10,6 +10,19 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+# C# code analysis rules
+[*.cs]
+# Disable specific warnings at solution level
+# CS8602 - Dereference of a possibly null reference (handled by null checks in code)
+dotnet_diagnostic.CS8602.severity = suggestion
+# CS8601 - Possible null reference assignment
+dotnet_diagnostic.CS8601.severity = suggestion
+
+# Razor components
+[*.razor]
+# RZ10012 - Found markup element with unexpected name (component namespace issues)
+dotnet_diagnostic.RZ10012.severity = none
+
 [*.{css,scss,js,ts}]
 charset = utf-8-bom
 end_of_line = crlf

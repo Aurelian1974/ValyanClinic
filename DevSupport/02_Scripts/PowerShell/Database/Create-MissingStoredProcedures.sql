@@ -77,10 +77,11 @@ BEGIN
     AS
     BEGIN
         SET NOCOUNT ON;
-        EXEC sp_Localitati_GetByJudetId @JudetId;
+        -- Note: sp_Localitati_GetByJudetId uses @IdJudet as parameter name
+        EXEC sp_Localitati_GetByJudetId @IdJudet = @JudetId;
     END
     ')
-    PRINT '? sp_Location_GetLocalitatiByJudetId creat ca wrapper'
+    PRINT ''? sp_Location_GetLocalitatiByJudetId creat ca wrapper''
 END
 GO
 

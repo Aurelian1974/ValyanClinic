@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Domain.Entities;
 using ValyanClinic.Domain.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 
@@ -47,22 +48,22 @@ public class GetPacientListQueryHandler : IRequestHandler<GetPacientListQuery, R
             _logger.LogInformation("Repository returned {Count} items, Total={Total}",
                 items?.Count() ?? 0, totalCount);
 
-            var dtoList = items.Select(p => new PacientListDto
+            var dtoList = (items ?? Enumerable.Empty<Pacient>()).Select(p => new PacientListDto
             {
                 Id = p.Id,
-                Cod_Pacient = p.Cod_Pacient,
+                Cod_Pacient = p.Cod_Pacient ?? string.Empty,
                 CNP = p.CNP,
                 Nume = p.Nume,
                 Prenume = p.Prenume,
-                NumeComplet = p.NumeComplet,
+                NumeComplet = p.NumeComplet ?? string.Empty,
                 Data_Nasterii = p.Data_Nasterii,
                 Varsta = p.Varsta,
-                Sex = p.Sex,
+                Sex = p.Sex ?? string.Empty,
                 Telefon = p.Telefon,
                 Email = p.Email,
                 Judet = p.Judet,
                 Localitate = p.Localitate,
-                AdresaCompleta = p.AdresaCompleta,
+                AdresaCompleta = p.AdresaCompleta ?? string.Empty,
                 Asigurat = p.Asigurat,
                 Casa_Asigurari = p.Casa_Asigurari,
                 Ultima_Vizita = p.Ultima_Vizita,

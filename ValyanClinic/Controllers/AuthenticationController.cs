@@ -238,9 +238,9 @@ public class AuthenticationController : ControllerBase
         return new[]
         {
             new Claim(ClaimTypes.NameIdentifier, userData.UtilizatorID.ToString()),
-            new Claim(ClaimTypes.Name, userData.Username),
-            new Claim(ClaimTypes.Email, userData.Email),
-            new Claim(ClaimTypes.Role, userData.Rol),
+            new Claim(ClaimTypes.Name, userData.Username ?? string.Empty),
+            new Claim(ClaimTypes.Email, userData.Email ?? string.Empty),
+            new Claim(ClaimTypes.Role, userData.Rol ?? string.Empty),
             new Claim(CLAIM_PERSONAL_MEDICAL_ID, userData.PersonalMedicalID.ToString())
         };
     }

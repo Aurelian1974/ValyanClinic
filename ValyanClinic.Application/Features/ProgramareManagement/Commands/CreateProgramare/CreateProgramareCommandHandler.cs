@@ -108,7 +108,7 @@ public class CreateProgramareCommandHandler : IRequestHandler<CreateProgramareCo
                 TipProgramare = request.TipProgramare,
                 Status = request.Status,
                 Observatii = request.Observatii,
-                DataCreare = DateTime.UtcNow,
+                DataCreare = DateTime.Now,
                 CreatDe = request.CreatDe
             };
 

@@ -130,7 +130,7 @@ public class UpdateProgramareCommandHandler : IRequestHandler<UpdateProgramareCo
             existingProgramare.TipProgramare = request.TipProgramare;
             existingProgramare.Status = request.Status;
             existingProgramare.Observatii = request.Observatii;
-            existingProgramare.DataUltimeiModificari = DateTime.UtcNow;
+            existingProgramare.DataUltimeiModificari = DateTime.Now;
             existingProgramare.ModificatDe = request.ModificatDe;
 
             // ==================== SALVARE ÎN DB ====================

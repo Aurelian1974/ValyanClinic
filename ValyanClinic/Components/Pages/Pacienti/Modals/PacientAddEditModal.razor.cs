@@ -1,18 +1,22 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using System.Text.Json;
 using MediatR;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.PacientManagement.Commands.CreatePacient;
 using ValyanClinic.Application.Features.PacientManagement.Commands.UpdatePacient;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientById;
+using ValyanClinic.Application.Features.PacientManagement.Queries.CheckDuplicatePacient;
 using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Queries.GetDoctoriByPacient;
 using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.DTOs;
 using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Commands.RemoveRelatie;
 using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Commands.ActivateRelatie; // ✅ ADDED
 using ValyanClinic.Application.Interfaces;
+using ValyanClinic.Application.Services.Location;
 using ValyanClinic.Services;
 
 namespace ValyanClinic.Components.Pages.Pacienti.Modals;
@@ -26,6 +30,7 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     [Inject] private INotificationService NotificationService { get; set; } = default!;
     [Inject] private IFieldPermissionService FieldPermissions { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
+    [Inject] private IJudeteService JudeteService { get; set; } = default!; // ✅ ADDED for loading judete from database
 
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
@@ -115,16 +120,407 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     // Dropdown Options
     private List<string> SexOptions { get; set; } = new() { "M", "F" };
 
-    // Judete list
-    private List<string> JudeteList { get; set; } = new()
-  {
-    "Bucuresti", "Alba", "Arad", "Arges", "Bacau", "Bihor", "Bistrita-Nasaud",
-        "Botosani", "Brasov", "Braila", "Buzau", "Caras-Severin", "Calarasi",
-        "Cluj", "Constanta", "Covasna", "Dambovita", "Dolj", "Galati", "Giurgiu",
-        "Gorj", "Harghita", "Hunedoara", "Ialomita", "Iasi", "Ilfov", "Maramures",
-        "Mehedinti", "Mures", "Neamt", "Olt", "Prahova", "Satu Mare", "Salaj",
-        "Sibiu", "Suceava", "Teleorman", "Timis", "Tulcea", "Vaslui", "Valcea", "Vrancea"
+    // Judete list - loaded from database via IJudeteService
+    private List<string> JudeteList { get; set; } = new();
+    private bool _judeteLoaded = false;
+
+    // ✅ ADDED: Localitati list - loaded when judet is selected
+    private List<string> LocalitatiList { get; set; } = new();
+    private bool _isLoadingLocalitati = false;
+    private string? _selectedJudet = null;
+
+    // ✅ ADDED: Unsaved changes detection
+    private string? _originalFormJson = null;
+    private bool _hasUnsavedChanges => HasFormChanged();
+
+    // ✅ ADDED: Tab validation state
+    private Dictionary<string, bool> TabValidationState { get; set; } = new()
+    {
+        { "personal", true },
+        { "contact", true },
+        { "adresa", true },
+        { "medical", true },
+        { "asigurare", true },
+        { "doctori", true }
     };
+
+    // ✅ ADDED: Confirm close modal
+    private bool ShowConfirmCloseModal { get; set; }
+
+    // ✅ ADDED: Duplicate check result
+    private bool _isDuplicateCheckPending = false;
+    private string? _duplicateWarning = null;
+
+    /// <summary>
+    /// Checks if form has unsaved changes by comparing JSON serialization.
+    /// </summary>
+    private bool HasFormChanged()
+    {
+        if (string.IsNullOrEmpty(_originalFormJson)) return false;
+        try
+        {
+            var currentJson = JsonSerializer.Serialize(FormModel);
+            return currentJson != _originalFormJson;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Saves the original form state for change detection.
+    /// </summary>
+    private void SaveOriginalFormState()
+    {
+        try
+        {
+            _originalFormJson = JsonSerializer.Serialize(FormModel);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "[PacientAddEditModal] Failed to serialize form for change detection");
+        }
+    }
+
+    /// <summary>
+    /// Loads judete from database using centralized IJudeteService.
+    /// Results are cached in-memory for 1 hour for performance.
+    /// </summary>
+    private async Task LoadJudeteAsync()
+    {
+        if (_disposed || _judeteLoaded) return;
+
+        try
+        {
+            Logger.LogDebug("[PacientAddEditModal] Loading judete from database...");
+            
+            var result = await JudeteService.GetJudeteAsync();
+            
+            if (_disposed) return;
+            
+            if (result.IsSuccess)
+            {
+                JudeteList = result.Value.Select(j => j.Nume).ToList();
+                _judeteLoaded = true;
+                Logger.LogDebug("[PacientAddEditModal] Loaded {Count} judete from database", JudeteList.Count);
+            }
+            else
+            {
+                Logger.LogWarning("[PacientAddEditModal] Failed to load judete: {Error}", result.FirstError);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[PacientAddEditModal] Error loading judete");
+        }
+    }
+
+    /// <summary>
+    /// ✅ ADDED: Loads localitati from database when judet is selected.
+    /// </summary>
+    private async Task LoadLocalitatiAsync(string? judetName)
+    {
+        if (_disposed || string.IsNullOrEmpty(judetName)) 
+        {
+            LocalitatiList = new List<string>();
+            return;
+        }
+
+        // Skip if same judet
+        if (_selectedJudet == judetName && LocalitatiList.Any()) return;
+
+        _selectedJudet = judetName;
+        _isLoadingLocalitati = true;
+
+        try
+        {
+            Logger.LogDebug("[PacientAddEditModal] Loading localitati for judet: {Judet}", judetName);
+            
+            var result = await JudeteService.GetLocalitatiByJudetNameAsync(judetName);
+            
+            if (_disposed) return;
+            
+            if (result.IsSuccess)
+            {
+                LocalitatiList = result.Value.Select(l => l.Nume).ToList();
+                Logger.LogDebug("[PacientAddEditModal] Loaded {Count} localitati for {Judet}", LocalitatiList.Count, judetName);
+            }
+            else
+            {
+                LocalitatiList = new List<string>();
+                Logger.LogWarning("[PacientAddEditModal] Failed to load localitati: {Error}", result.FirstError);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[PacientAddEditModal] Error loading localitati");
+            LocalitatiList = new List<string>();
+        }
+        finally
+        {
+            _isLoadingLocalitati = false;
+        }
+    }
+
+    /// <summary>
+    /// ✅ ADDED: Handles judet selection change and loads localitati.
+    /// </summary>
+    private async Task OnJudetChanged(string? newJudet)
+    {
+        if (_disposed) return;
+        
+        FormModel.Judet = newJudet;
+        FormModel.Localitate = null; // Reset localitate when judet changes
+        await LoadLocalitatiAsync(newJudet);
+        ValidateTab("adresa");
+        StateHasChanged();
+    }
+
+    #region CNP Auto-Parse
+
+    /// <summary>
+    /// ✅ ADDED: Parses CNP and auto-fills Data Nasterii and Sex.
+    /// Romanian CNP format: SAALLZZJJNNNC
+    /// S = Sex (1,2 = M/F born 1900-1999; 5,6 = M/F born 2000+)
+    /// AA = Year, LL = Month, ZZ = Day
+    /// JJ = County code, NNN = Sequential number, C = Checksum
+    /// </summary>
+    private void ParseCNPAndFillFields()
+    {
+        if (string.IsNullOrEmpty(FormModel.CNP) || FormModel.CNP.Length != 13) return;
+
+        try
+        {
+            var cnp = FormModel.CNP;
+            
+            // Extract sex from first digit
+            var sexDigit = int.Parse(cnp[0].ToString());
+            FormModel.Sex = (sexDigit % 2 == 1) ? "M" : "F";
+
+            // Extract birth date
+            int century = sexDigit switch
+            {
+                1 or 2 => 1900,
+                3 or 4 => 1800,
+                5 or 6 => 2000,
+                7 or 8 => 2000, // Rezident
+                _ => 1900
+            };
+
+            int year = century + int.Parse(cnp.Substring(1, 2));
+            int month = int.Parse(cnp.Substring(3, 2));
+            int day = int.Parse(cnp.Substring(5, 2));
+
+            // Validate date
+            if (month >= 1 && month <= 12 && day >= 1 && day <= 31)
+            {
+                try
+                {
+                    FormModel.Data_Nasterii = new DateTime(year, month, day);
+                    Logger.LogDebug("[PacientAddEditModal] CNP parsed: Sex={Sex}, BirthDate={Date}", 
+                        FormModel.Sex, FormModel.Data_Nasterii.ToString("dd.MM.yyyy"));
+                }
+                catch
+                {
+                    // Invalid date combination, ignore
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "[PacientAddEditModal] Failed to parse CNP: {CNP}", FormModel.CNP);
+        }
+    }
+
+    /// <summary>
+    /// ✅ ADDED: Handles CNP input change with debouncing.
+    /// </summary>
+    private void OnCNPChanged(string? newCnp)
+    {
+        FormModel.CNP = newCnp;
+        
+        if (!string.IsNullOrEmpty(newCnp) && newCnp.Length == 13)
+        {
+            ParseCNPAndFillFields();
+            StateHasChanged();
+        }
+        
+        ValidateTab("personal");
+    }
+
+    #endregion
+
+    #region Tab Validation
+
+    /// <summary>
+    /// ✅ ADDED: Validates fields in a specific tab and updates state.
+    /// </summary>
+    private void ValidateTab(string tabName)
+    {
+        bool isValid = tabName switch
+        {
+            "personal" => !string.IsNullOrWhiteSpace(FormModel.Nume) && 
+                          !string.IsNullOrWhiteSpace(FormModel.Prenume) &&
+                          !string.IsNullOrWhiteSpace(FormModel.Sex),
+            "contact" => true, // All optional
+            "adresa" => true, // All optional
+            "medical" => true, // All optional
+            "asigurare" => !FormModel.Asigurat || 
+                           (!string.IsNullOrEmpty(FormModel.CNP_Asigurat) || !string.IsNullOrEmpty(FormModel.Nr_Card_Sanatate)),
+            "doctori" => true,
+            _ => true
+        };
+
+        TabValidationState[tabName] = isValid;
+    }
+
+    /// <summary>
+    /// ✅ ADDED: Validates all tabs and returns overall validity.
+    /// </summary>
+    private bool ValidateAllTabs()
+    {
+        ValidateTab("personal");
+        ValidateTab("contact");
+        ValidateTab("adresa");
+        ValidateTab("medical");
+        ValidateTab("asigurare");
+        
+        return TabValidationState.Values.All(v => v);
+    }
+
+    /// <summary>
+    /// ✅ ADDED: Gets tab validation icon class.
+    /// </summary>
+    private string GetTabValidationClass(string tabName)
+    {
+        if (!TabValidationState.ContainsKey(tabName)) return "";
+        return TabValidationState[tabName] ? "tab-valid" : "tab-invalid";
+    }
+
+    #endregion
+
+    #region Duplicate Detection
+
+    /// <summary>
+    /// ✅ ADDED: Checks if a patient with same CNP or Name+BirthDate exists.
+    /// </summary>
+    private async Task<bool> CheckForDuplicatesAsync()
+    {
+        if (_disposed) return false;
+
+        _isDuplicateCheckPending = true;
+        _duplicateWarning = null;
+
+        try
+        {
+            // Check by CNP if provided
+            if (!string.IsNullOrEmpty(FormModel.CNP))
+            {
+                var query = new CheckDuplicatePacientQuery
+                {
+                    CNP = FormModel.CNP,
+                    ExcludeId = IsEditMode ? PacientId : null
+                };
+
+                var result = await Mediator.Send(query);
+                
+                if (result.IsSuccess && result.Value.HasDuplicate)
+                {
+                    _duplicateWarning = $"⚠️ Există deja un pacient cu CNP {FormModel.CNP}: {result.Value.DuplicatePacientName}";
+                    return true;
+                }
+            }
+
+            // Check by Name + BirthDate
+            if (!string.IsNullOrEmpty(FormModel.Nume) && !string.IsNullOrEmpty(FormModel.Prenume))
+            {
+                var query = new CheckDuplicatePacientQuery
+                {
+                    Nume = FormModel.Nume,
+                    Prenume = FormModel.Prenume,
+                    DataNasterii = FormModel.Data_Nasterii,
+                    ExcludeId = IsEditMode ? PacientId : null
+                };
+
+                var result = await Mediator.Send(query);
+                
+                if (result.IsSuccess && result.Value.HasDuplicate)
+                {
+                    _duplicateWarning = $"⚠️ Există deja un pacient similar: {result.Value.DuplicatePacientName}";
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "[PacientAddEditModal] Error checking duplicates");
+            return false; // Continue with save if check fails
+        }
+        finally
+        {
+            _isDuplicateCheckPending = false;
+        }
+    }
+
+    #endregion
+
+    #region Keyboard Navigation
+
+    /// <summary>
+    /// ✅ ADDED: Handles keyboard shortcuts (Ctrl+S for save, Escape for close).
+    /// </summary>
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (_disposed) return;
+
+        // Ctrl+S = Save
+        if (e.CtrlKey && e.Key == "s")
+        {
+            await HandleSubmit();
+        }
+        // Escape = Try to close
+        else if (e.Key == "Escape")
+        {
+            await TryClose();
+        }
+    }
+
+    /// <summary>
+    /// ✅ ADDED: Attempts to close with unsaved changes check.
+    /// </summary>
+    private async Task TryClose()
+    {
+        if (_hasUnsavedChanges)
+        {
+            ShowConfirmCloseModal = true;
+        }
+        else
+        {
+            await Close();
+        }
+    }
+
+    /// <summary>
+    /// ✅ ADDED: Confirms closing and discards changes.
+    /// </summary>
+    private async Task ConfirmCloseAndDiscard()
+    {
+        ShowConfirmCloseModal = false;
+        await Close();
+    }
+
+    /// <summary>
+    /// ✅ ADDED: Cancels close operation.
+    /// </summary>
+    private void CancelClose()
+    {
+        ShowConfirmCloseModal = false;
+    }
+
+    #endregion
 
     // Dispose pentru cleanup corect
     public void Dispose()
@@ -167,15 +563,32 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
             // ✅ Încarcă permisiunile la nivel de câmp când modalul devine vizibil
             await LoadFieldPermissionsAsync();
             
+            // ✅ Încarcă județele din baza de date
+            await LoadJudeteAsync();
+            
             if (IsEditMode)
             {
                 await LoadPacientData();
                 await LoadDoctoriAsociati();
+                
+                // ✅ ADDED: Load localitati if judet is set
+                if (!string.IsNullOrEmpty(FormModel.Judet))
+                {
+                    await LoadLocalitatiAsync(FormModel.Judet);
+                }
+                
+                // ✅ ADDED: Save original state for change detection
+                SaveOriginalFormState();
             }
             else
             {
                 ResetForm();
+                // ✅ ADDED: Save original state for new form
+                SaveOriginalFormState();
             }
+            
+            // ✅ ADDED: Validate all tabs initially
+            ValidateAllTabs();
         }
     }
 
@@ -489,18 +902,53 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
         if (_disposed) return; // ADDED: Guard check
 
         ActiveTab = tab;
+        ValidateTab(tab); // ✅ ADDED: Validate when switching tabs
     }
 
     private async Task HandleSubmit()
     {
         if (_disposed) return; // ADDED: Guard check
 
+        // ✅ ADDED: Validate all tabs first
+        if (!ValidateAllTabs())
+        {
+            // Find first invalid tab and switch to it
+            var firstInvalidTab = TabValidationState.FirstOrDefault(t => !t.Value).Key;
+            if (!string.IsNullOrEmpty(firstInvalidTab))
+            {
+                ActiveTab = firstInvalidTab;
+                await NotificationService.ShowWarningAsync(
+                    "Vă rugăm să completați toate câmpurile obligatorii.", "Validare");
+            }
+            return;
+        }
+
         IsSaving = true;
         HasError = false;
         ErrorMessage = null;
+        _duplicateWarning = null;
 
         try
         {
+            // ✅ ADDED: Check for duplicates before saving (only for new patients or CNP change)
+            if (!IsEditMode || (_originalFormJson != null && HasFormChanged()))
+            {
+                var hasDuplicate = await CheckForDuplicatesAsync();
+                if (hasDuplicate && !string.IsNullOrEmpty(_duplicateWarning))
+                {
+                    // Show warning but allow user to proceed
+                    var confirmed = await JSRuntime.InvokeAsync<bool>(
+                        "confirm", 
+                        $"{_duplicateWarning}\n\nDoriți să continuați salvarea?");
+                    
+                    if (!confirmed)
+                    {
+                        IsSaving = false;
+                        return;
+                    }
+                }
+            }
+
             if (IsEditMode)
             {
                 await UpdatePacient();

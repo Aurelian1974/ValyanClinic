@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using MediatR;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientList;
+using ValyanClinic.Services.Export;
 using Microsoft.Extensions.Logging;
 
 namespace ValyanClinic.Components.Pages.Pacienti;
@@ -18,6 +20,8 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
     [Inject] private ILogger<VizualizarePacienti> Logger { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private ValyanClinic.Application.Services.Pacienti.IPacientDataService DataService { get; set; } = default!;
+    [Inject] private IExcelExportService ExcelExportService { get; set; } = default!;
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
     // Grid reference
     private SfGrid<PacientListDto>? GridRef;
@@ -60,6 +64,13 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
     private string? FilterJudet { get; set; }
     private string? FilterAsigurat { get; set; }
     private string? FilterStatus { get; set; }
+
+    // Saved Filters State
+    private List<SavedFilter> SavedFilters { get; set; } = new();
+    private string SelectedSavedFilter { get; set; } = string.Empty;
+    private bool ShowSaveFilterModal { get; set; } = false;
+    private string NewFilterName { get; set; } = string.Empty;
+    private const string SavedFiltersStorageKey = "VizualizarePacienti_SavedFilters";
 
     // Debounce timer for global search
     private CancellationTokenSource? _searchDebounceTokenSource;
@@ -121,6 +132,9 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
 
             // Load filter options
             await LoadFilterOptionsFromServer();
+
+            // Load saved filters from localStorage
+            await LoadSavedFiltersAsync();
 
             // Load first page
             await LoadPagedData();
@@ -584,6 +598,7 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
 
         // Clear cached filter options pentru a reincarca cu date noi
         FilterOptionsLoaded = false;
+        DataService.InvalidateFilterOptionsCache(); // Invalidate cache on manual refresh
         await LoadFilterOptionsFromServer();
 
         CurrentPage = 1;
@@ -596,6 +611,72 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
         }
 
         await ShowToast("Succes", "Datele au fost reincarcate cu succes", "e-toast-success");
+    }
+
+    /// <summary>
+    /// Export current filtered data to Excel
+    /// </summary>
+    private async Task HandleExportExcel()
+    {
+        if (_disposed || CurrentPageData.Count == 0) return;
+
+        try
+        {
+            Logger.LogInformation("[Export] Starting Excel export for {Count} pacienti", CurrentPageData.Count);
+            
+            // Export all filtered data, not just current page
+            var filters = new ValyanClinic.Application.Services.Pacienti.PacientFilters
+            {
+                SearchText = GlobalSearchText,
+                Judet = FilterJudet,
+                Asigurat = string.IsNullOrEmpty(FilterAsigurat) ? null : FilterAsigurat == "true",
+                Activ = string.IsNullOrEmpty(FilterStatus) ? null : FilterStatus == "true"
+            };
+
+            var pagination = new ValyanClinic.Application.Services.Pacienti.PaginationOptions
+            {
+                PageNumber = 1,
+                PageSize = TotalRecords > 0 ? TotalRecords : 10000 // Export all filtered records
+            };
+
+            var sorting = new ValyanClinic.Application.Services.Pacienti.SortOptions
+            {
+                Column = CurrentSortColumn,
+                Direction = CurrentSortDirection
+            };
+
+            var result = await DataService.LoadPagedDataAsync(filters, pagination, sorting);
+
+            if (!result.IsSuccess || result.Value.Items.Count == 0)
+            {
+                await ShowErrorToastAsync("Nu există date pentru export");
+                return;
+            }
+
+            var exportData = result.Value.Items;
+            var bytes = await ExcelExportService.ExportPacientiToExcelAsync(exportData);
+
+            // Download file using JS Interop
+            var fileName = $"Pacienti_{DateTime.Now:yyyy-MM-dd_HH-mm}.xlsx";
+            await DownloadFileFromBytes(bytes, fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+            await ShowSuccessToastAsync($"Exportate {exportData.Count} înregistrări în Excel");
+            Logger.LogInformation("[Export] Excel export completed: {FileName}", fileName);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[Export] Error exporting to Excel");
+            await ShowErrorToastAsync($"Eroare la export: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Downloads a file from byte array using JS interop
+    /// </summary>
+    private async Task DownloadFileFromBytes(byte[] bytes, string fileName, string contentType)
+    {
+        var base64 = Convert.ToBase64String(bytes);
+        await JSRuntime.InvokeVoidAsync("downloadFileFromBase64", base64, fileName, contentType);
     }
 
     private async Task HandleViewSelected()
@@ -672,6 +753,45 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
         }
     }
 
+    /// <summary>
+    /// Quick action - View pacient from row hover button
+    /// </summary>
+    private async Task HandleQuickView(Guid pacientId, string pacientName)
+    {
+        if (_disposed) return;
+
+        Logger.LogInformation("[QuickAction] View pacient: {PacientId} - {PacientName}", pacientId, pacientName);
+        await OpenViewModalAsync(pacientId, pacientName);
+    }
+
+    /// <summary>
+    /// Quick action - Manage doctors from row hover button
+    /// </summary>
+    private async Task HandleQuickDoctors(Guid pacientId, string pacientName)
+    {
+        if (_disposed) return;
+
+        Logger.LogInformation("[QuickAction] Manage doctors for: {PacientId} - {PacientName}", pacientId, pacientName);
+
+        try
+        {
+            SelectedPacientId = pacientId;
+            SelectedPacientNume = pacientName;
+
+            ShowViewModal = false;
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(50);
+
+            ShowDoctoriModal = true;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[QuickAction] Error opening doctors modal for {PacientName}", pacientName);
+            await ShowErrorToastAsync($"Eroare: {ex.Message}");
+        }
+    }
+
     private async Task HandleModalClosed()
     {
         if (_disposed) return;
@@ -721,6 +841,156 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
     }
 
     /// <summary>
+    /// Gets initials from a full name (e.g., "Ion Popescu" -> "IP")
+    /// </summary>
+    private static string GetInitials(string? fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName))
+            return "?";
+
+        var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        
+        if (parts.Length == 0)
+            return "?";
+        
+        if (parts.Length == 1)
+            return parts[0][0].ToString().ToUpper();
+        
+        // Take first letter of first and last name
+        return $"{parts[0][0]}{parts[^1][0]}".ToUpper();
+    }
+
+    /// <summary>
+    /// Checks if there are no results to display (for empty state)
+    /// </summary>
+    private bool HasNoResults => DataLoaded && !IsLoading && CurrentPageData.Count == 0;
+
+    #region Saved Filters
+
+    /// <summary>
+    /// Load saved filters from localStorage on initialization
+    /// </summary>
+    private async Task LoadSavedFiltersAsync()
+    {
+        try
+        {
+            var json = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", SavedFiltersStorageKey);
+            if (!string.IsNullOrEmpty(json))
+            {
+                SavedFilters = System.Text.Json.JsonSerializer.Deserialize<List<SavedFilter>>(json) ?? new();
+                Logger.LogInformation("[SavedFilters] Loaded {Count} saved filters", SavedFilters.Count);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "[SavedFilters] Error loading saved filters from localStorage");
+            SavedFilters = new();
+        }
+    }
+
+    /// <summary>
+    /// Save filters to localStorage
+    /// </summary>
+    private async Task PersistSavedFiltersAsync()
+    {
+        try
+        {
+            var json = System.Text.Json.JsonSerializer.Serialize(SavedFilters);
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", SavedFiltersStorageKey, json);
+            Logger.LogInformation("[SavedFilters] Persisted {Count} filters to localStorage", SavedFilters.Count);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[SavedFilters] Error persisting saved filters");
+        }
+    }
+
+    private void ShowSaveFilterDialog()
+    {
+        NewFilterName = string.Empty;
+        ShowSaveFilterModal = true;
+    }
+
+    private void CloseSaveFilterDialog()
+    {
+        ShowSaveFilterModal = false;
+        NewFilterName = string.Empty;
+    }
+
+    private async Task SaveCurrentFilter()
+    {
+        if (string.IsNullOrWhiteSpace(NewFilterName)) return;
+
+        // Check for duplicate name
+        if (SavedFilters.Any(f => f.Name.Equals(NewFilterName.Trim(), StringComparison.OrdinalIgnoreCase)))
+        {
+            await ShowErrorToastAsync("Există deja un filtru cu acest nume");
+            return;
+        }
+
+        var newFilter = new SavedFilter
+        {
+            Name = NewFilterName.Trim(),
+            SearchText = GlobalSearchText,
+            Judet = FilterJudet,
+            Asigurat = FilterAsigurat,
+            Status = FilterStatus,
+            CreatedAt = DateTime.Now
+        };
+
+        SavedFilters.Add(newFilter);
+        await PersistSavedFiltersAsync();
+
+        CloseSaveFilterDialog();
+        await ShowSuccessToastAsync($"Filtrul '{newFilter.Name}' a fost salvat");
+        Logger.LogInformation("[SavedFilters] Created new filter: {Name}", newFilter.Name);
+    }
+
+    private async Task OnSavedFilterSelected(ChangeEventArgs e)
+    {
+        var filterName = e.Value?.ToString();
+        if (string.IsNullOrEmpty(filterName))
+        {
+            SelectedSavedFilter = string.Empty;
+            return;
+        }
+
+        SelectedSavedFilter = filterName;
+        var filter = SavedFilters.FirstOrDefault(f => f.Name == filterName);
+        if (filter != null)
+        {
+            // Apply saved filter values
+            GlobalSearchText = filter.SearchText ?? string.Empty;
+            FilterJudet = filter.Judet;
+            FilterAsigurat = filter.Asigurat;
+            FilterStatus = filter.Status;
+
+            Logger.LogInformation("[SavedFilters] Applied filter: {Name}", filterName);
+
+            // Apply filters and reload data
+            CurrentPage = 1;
+            await LoadPagedData();
+        }
+    }
+
+    private async Task DeleteCurrentSavedFilter()
+    {
+        if (string.IsNullOrEmpty(SelectedSavedFilter)) return;
+
+        var filter = SavedFilters.FirstOrDefault(f => f.Name == SelectedSavedFilter);
+        if (filter != null)
+        {
+            SavedFilters.Remove(filter);
+            await PersistSavedFiltersAsync();
+            await ShowSuccessToastAsync($"Filtrul '{SelectedSavedFilter}' a fost șters");
+            Logger.LogInformation("[SavedFilters] Deleted filter: {Name}", SelectedSavedFilter);
+            SelectedSavedFilter = string.Empty;
+        }
+    }
+
+    #endregion
+
+    /// <summary>
     /// Static class containing filter name constants to avoid magic strings.
     /// </summary>
     private static class FilterNames
@@ -729,5 +999,18 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
         public const string FilterJudet = nameof(FilterJudet);
         public const string FilterAsigurat = nameof(FilterAsigurat);
         public const string FilterStatus = nameof(FilterStatus);
+    }
+
+    /// <summary>
+    /// Represents a saved filter configuration
+    /// </summary>
+    public class SavedFilter
+    {
+        public string Name { get; set; } = string.Empty;
+        public string? SearchText { get; set; }
+        public string? Judet { get; set; }
+        public string? Asigurat { get; set; }
+        public string? Status { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

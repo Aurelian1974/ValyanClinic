@@ -258,6 +258,12 @@ BEGIN
         FROM STRING_SPLIT(@Permisiuni, ',')
         WHERE TRIM(value) <> '';
         
+        -- Actualizeaza Data_Ultimei_Modificari pentru rol
+        UPDATE dbo.Roluri
+        SET [Data_Ultimei_Modificari] = GETDATE(),
+            [Modificat_De] = @CreatDe
+        WHERE [RolID] = @RolID;
+        
         COMMIT TRANSACTION;
         
         SELECT @@ROWCOUNT AS InsertedCount;

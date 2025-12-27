@@ -35,7 +35,7 @@ public class UpdateSpecializareCommandHandler : IRequestHandler<UpdateSpecializa
             specializare.Categorie = request.Categorie;
             specializare.Descriere = request.Descriere;
             specializare.EsteActiv = request.EsteActiv;
-            specializare.DataUltimeiModificari = DateTime.UtcNow;
+            specializare.DataUltimeiModificari = DateTime.Now;
             specializare.ModificatDe = request.ModificatDe;
 
             var success = await _repository.UpdateAsync(specializare, cancellationToken);

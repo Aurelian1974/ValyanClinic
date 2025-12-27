@@ -279,7 +279,7 @@ try
     // AUTOMAPPER - OPTIMIZED
     // ========================================
     // ✅ OPTIMIZED: Scanează doar assembly-urile cu profiluri AutoMapper
-    builder.Services.AddAutoMapper(
+    builder.Services.AddAutoMapper(cfg => {}, 
         typeof(ValyanClinic.Application.Common.Results.Result).Assembly // Application layer
                                                                         // Adaugă aici alte assembly-uri cu profiluri AutoMapper dacă sunt necesare
     );
@@ -360,6 +360,10 @@ try
     // ✅ NEW: PacientDataService - Business logic for patient list management
     builder.Services.AddScoped<ValyanClinic.Application.Services.Pacienti.IPacientDataService,
                                 ValyanClinic.Application.Services.Pacienti.PacientDataService>();
+
+    // ✅ JudeteService - Centralized service for loading Judete/Localitati from database with caching
+    builder.Services.AddScoped<ValyanClinic.Application.Services.Location.IJudeteService,
+                                ValyanClinic.Application.Services.Location.JudeteService>();
 
     // ========================================
     // IMC CALCULATOR SERVICE - Medical Services

@@ -1,0 +1,72 @@
+@* ===================================
+   DoctoriTabContent Component
+   Extracted from PacientAddEditModal
+   =================================== *@
+
+@using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.DTOs
+
+<div class="doctori-tab-content">
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Se încarcă...</span>
+            </div>
+            <p>Se încarcă doctori...</p>
+        </div>
+    }
+    else if (DoctoriAsociati.Any())
+    {
+        @* Doctori activi *@
+        @if (DoctoriActivi.Any())
+        {
+            <div class="info-card">
+                <div class="doctori-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-check-circle text-success"></i>
+                        Doctori Activi (@DoctoriActivi.Count())
+                    </h3>
+                    <button type="button" class="btn btn-primary btn-sm" @onclick="OnAddDoctor">
+                        <i class="fas fa-plus"></i> Adaugă doctor
+                    </button>
+                </div>
+
+                @foreach (var doctor in DoctoriActivi)
+                {
+                    <DoctorCard Doctor="@doctor"
+                                IsInactive="false"
+                                OnDeactivate="OnDeactivateDoctor" />
+                }
+            </div>
+        }
+
+        @* Doctori inactivi (istoric) *@
+        @if (DoctoriInactivi.Any())
+        {
+            <div class="info-card doctori-inactivi-section">
+                <h3 class="card-title">
+                    <i class="fas fa-history text-muted"></i>
+                    Istoric Relații Inactive (@DoctoriInactivi.Count())
+                </h3>
+                
+                @foreach (var doctor in DoctoriInactivi)
+                {
+                    <DoctorCard Doctor="@doctor"
+                                IsInactive="true"
+                                OnReactivate="OnReactivateDoctor" />
+                }
+            </div>
+        }
+    }
+    else
+    {
+        @* Empty State *@
+        <div class="empty-state">
+            <i class="fas fa-user-md fa-3x"></i>
+            <p>Nu există doctori asociați acestui pacient.</p>
+            <button type="button" class="btn btn-primary" @onclick="OnAddDoctor">
+                <i class="fas fa-plus"></i> Adaugă primul doctor
+            </button>
+        </div>
+    }
+</div>
