@@ -1,39 +1,87 @@
 window.keyboardShortcuts = (function () {
     let dotnetRef = null;
     let handler = null;
+    let keyupHandler = null;
+    let keypressHandler = null;
+    let registered = false;
+    let lastCtrlAt = 0;
+    let lastMetaAt = 0;
+
+    function ensureDebugElement() {
+        try {
+            let el = document.getElementById('ks-debug-badge');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'ks-debug-badge';
+                el.style.position = 'fixed';
+                el.style.left = '20px';
+                el.style.bottom = '20px';
+                el.style.background = 'rgba(0,0,0,0.7)';
+                el.style.color = '#fff';
+                el.style.padding = '6px 8px';
+                el.style.borderRadius = '6px';
+                el.style.fontSize = '12px';
+                el.style.zIndex = '2000';
+                el.style.pointerEvents = 'none';
+                el.textContent = 'KS: initializing...';
+                document.body.appendChild(el);
+            }
+            return el;
+        }
+        catch (e) {
+            // ignore
+            return null;
+        }
+    }
+
+    function updateDebug(msg) {
+        try {
+            const el = document.getElementById('ks-debug-badge');
+            if (el) el.textContent = 'KS: ' + msg;
+            console.debug('keyboardShortcuts debug:', msg);
+        }
+        catch (e) { }
+    }
 
     function isTypingInInput() {
         const el = document.activeElement;
         if (!el) return false;
         const tag = el.tagName;
-        if (tag === 'INPUT' || tag === 'TEXTAREA') return true;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
         if (el.isContentEditable) return true;
         return false;
     }
 
-    function onKey(e) {
+    function handleKey(e) {
         try {
+            updateDebug((e.ctrlKey ? 'Ctrl+' : '') + (e.metaKey ? 'Meta+' : '') + e.key + " (code=" + e.code + ", keyCode=" + e.keyCode + ")");
+        
+        // Track Control/Meta timestamps to handle certain browser quirks where control keydown is delivered separately
+        if (e.key === 'Control') lastCtrlAt = Date.now();
+        if (e.key === 'Meta') lastMetaAt = Date.now();
+
             // High-priority shortcuts that should work even when typing in inputs
-            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
-                console.debug('keyboardShortcuts: Ctrl+N intercepted');
-                e.preventDefault();
-                try { e.stopImmediatePropagation(); e.stopPropagation(); } catch (ex) {}
+            // Detect Ctrl+N with multiple fallbacks (modifiers set OR short delay after Control press)
+            if (((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'n' || e.code === 'KeyN'))
+                || ((e.key.toLowerCase() === 'n' || e.code === 'KeyN') && (Date.now() - lastCtrlAt) < 600)
+                || ((e.key.toLowerCase() === 'n' || e.code === 'KeyN') && (Date.now() - lastMetaAt) < 600)) {
+                try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (ex) { }
+                updateDebug('Ctrl+N -> new (fallback)');
                 dotnetRef?.invokeMethodAsync('OnKeyboardShortcut', 'new');
                 return;
             }
 
             if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'e')) {
-                e.preventDefault();
-                try { e.stopImmediatePropagation(); e.stopPropagation(); } catch (ex) {}
+                try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (ex) { }
+                updateDebug('Ctrl+E -> edit');
                 dotnetRef?.invokeMethodAsync('OnKeyboardShortcut', 'edit');
                 return;
             }
 
-            // F2 alone should also trigger edit when not typing in an input
-            if (e.key === 'F2' && !isTypingInInput()) {
-                console.debug('keyboardShortcuts: F2 intercepted');
-                e.preventDefault();
-                try { e.stopImmediatePropagation(); e.stopPropagation(); } catch (ex) {}
+            // F2 alone should also trigger edit when not typing in an input (check code variant too)
+            if ((e.key === 'F2' || e.code === 'F2') && !isTypingInInput()) {
+                try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch (ex) { }
+                updateDebug('F2 -> edit');
                 dotnetRef?.invokeMethodAsync('OnKeyboardShortcut', 'edit');
                 return;
             }
@@ -41,21 +89,24 @@ window.keyboardShortcuts = (function () {
             if (e.key === 'Delete') {
                 // Only trigger delete when not typing to avoid accidental deletions in inputs
                 if (isTypingInInput()) return;
-                e.preventDefault();
+                try { e.preventDefault(); } catch { }
+                updateDebug('Delete -> delete');
                 dotnetRef?.invokeMethodAsync('OnKeyboardShortcut', 'delete');
                 return;
             }
 
             // Allow some shortcuts even when typing
             if (e.key === 'Escape') {
-                e.preventDefault();
+                try { e.preventDefault(); } catch { }
+                updateDebug('Escape -> escape');
                 dotnetRef?.invokeMethodAsync('OnKeyboardShortcut', 'escape');
                 return;
             }
 
             // Ctrl/Cmd + F -> focus search (allow even when typing)
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
-                e.preventDefault();
+                try { e.preventDefault(); } catch { }
+                updateDebug('Ctrl+F -> focusSearch');
                 dotnetRef?.invokeMethodAsync('OnKeyboardShortcut', 'focusSearch');
                 return;
             }
@@ -65,37 +116,78 @@ window.keyboardShortcuts = (function () {
 
             // Global shortcuts
             if (e.key === 'F5') {
-                e.preventDefault();
+                try { e.preventDefault(); } catch { }
+                updateDebug('F5 -> reload');
                 dotnetRef?.invokeMethodAsync('OnKeyboardShortcut', 'reload');
                 return;
             }
         }
         catch (err) {
-            console.debug('keyboardShortcuts onKey error', err);
+            console.debug('keyboardShortcuts handleKey error', err);
         }
+    }
+
+    function handleKeyUp(e) {
+        try {
+            // As fallback, log keyup (some browsers swallow keydown for certain combos)
+            updateDebug('keyup:' + e.key);
+        }
+        catch (ex) { }
     }
 
     return {
         register: function (dotnetObjectRef) {
             try {
                 dotnetRef = dotnetObjectRef;
-                handler = onKey;
-                // Use capture and passive:false so we can reliably intercept browser shortcuts like Ctrl+N
+                handler = handleKey;
+                keyupHandler = handleKeyUp;
+
+                ensureDebugElement();
+                updateDebug('registered');
+
+                // Multiple listeners as fallback: document/window, capture and bubble
+                document.addEventListener('keydown', handler, { capture: true, passive: false });
                 window.addEventListener('keydown', handler, { capture: true, passive: false });
-                console.debug('keyboardShortcuts registered (capture:true)');
+                document.addEventListener('keydown', handler, { capture: false, passive: false });
+                document.addEventListener('keyup', keyupHandler, { capture: false, passive: true });
+                // Add keypress as fallback for some browser/IME scenarios
+                keypressHandler = function (e) { updateDebug('keypress:' + e.key + ' code=' + e.code); };
+                document.addEventListener('keypress', keypressHandler, { capture: false, passive: true });
+
+                registered = true;
+                console.debug('keyboardShortcuts registered (multiple listeners)');
             }
             catch (err) {
                 console.debug('keyboardShortcuts register error', err);
+                updateDebug('register error');
             }
         },
         unregister: function () {
             try {
                 if (handler) {
-                    // remove with capture:true to match registration
+                    document.removeEventListener('keydown', handler, { capture: true });
                     window.removeEventListener('keydown', handler, { capture: true });
+                    document.removeEventListener('keydown', handler, { capture: false });
                 }
+
+                if (keyupHandler) {
+                    document.removeEventListener('keyup', keyupHandler, { capture: false });
+                }
+
+                if (keypressHandler) {
+                    document.removeEventListener('keypress', keypressHandler, { capture: false });
+                }
+
+                const el = document.getElementById('ks-debug-badge');
+                if (el && el.parentNode) el.parentNode.removeChild(el);
+
                 handler = null;
+                keyupHandler = null;
+                keypressHandler = null;
                 dotnetRef = null;
+                registered = false;
+
+                console.debug('keyboardShortcuts unregistered');
             }
             catch (err) {
                 console.debug('keyboardShortcuts unregister error', err);
@@ -109,6 +201,7 @@ window.keyboardShortcuts = (function () {
             catch (err) {
                 console.debug('keyboardShortcuts focusSearch error', err);
             }
-        }
+        },
+        _debug_update: function (msg) { updateDebug(msg); }
     };
 })();
