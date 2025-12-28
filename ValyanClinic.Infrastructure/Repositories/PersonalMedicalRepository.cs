@@ -93,6 +93,42 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
         return countResult?.TotalCount ?? 0;
     }
 
+    public async Task<PersonalMedicalFilterMetadataDto> GetFilterMetadataAsync(CancellationToken cancellationToken = default)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        var departamente = (await connection.QueryAsync<string>(
+            "SELECT DISTINCT Departament FROM PersonalMedical WHERE Departament IS NOT NULL ORDER BY Departament")).ToList();
+
+        var pozitii = (await connection.QueryAsync<string>(
+            "SELECT DISTINCT Pozitie FROM PersonalMedical WHERE Pozitie IS NOT NULL ORDER BY Pozitie")).ToList();
+
+        return new PersonalMedicalFilterMetadataDto
+        {
+            AvailableDepartamente = departamente.Select(d => new FilterOption { Value = d, Text = d }).ToList(),
+            AvailablePozitii = pozitii.Select(p => new FilterOption { Value = p, Text = p }).ToList(),
+        };
+    }
+
+    public async Task<PersonalMedicalStatisticsDto> GetStatisticsAsync(CancellationToken cancellationToken = default)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        var totals = await connection.QueryFirstOrDefaultAsync<dynamic>(
+            @"
+            SELECT
+                SUM(CASE WHEN EsteActiv = 1 THEN 1 ELSE 0 END) AS TotalActiv,
+                SUM(CASE WHEN EsteActiv = 0 THEN 1 ELSE 0 END) AS TotalInactiv
+            FROM PersonalMedical
+            ");
+
+        return new PersonalMedicalStatisticsDto
+        {
+            TotalActiv = (int)(totals?.TotalActiv ?? 0),
+            TotalInactiv = (int)(totals?.TotalInactiv ?? 0)
+        };
+    }
+
     public async Task<Guid> CreateAsync(PersonalMedical personalMedical, CancellationToken cancellationToken = default)
     {
         var parameters = new

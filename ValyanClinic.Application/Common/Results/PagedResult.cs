@@ -12,18 +12,46 @@ public class PagedResult<T> : Result<IEnumerable<T>>
     public bool HasPreviousPage => CurrentPage > 1;
     public bool HasNextPage => CurrentPage < TotalPages;
 
-    protected PagedResult(
+        // Additional optional metadata container (e.g., filter options, statistics)
+        public object? MetaData { get; set; }
+
+        protected PagedResult(
+            IEnumerable<T> items,
+            int currentPage,
+            int pageSize,
+            int totalCount,
+            string? successMessage = null)
+            : base(true, items, new List<string>(), successMessage)
+        {
+            CurrentPage = currentPage;
+            PageSize = pageSize;
+            TotalCount = totalCount;
+            TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        }
+
+    // Original signature retained for backward compatibility
+    public static PagedResult<T> Success(
         IEnumerable<T> items,
         int currentPage,
         int pageSize,
         int totalCount,
-        string? successMessage = null)
-        : base(true, items, new List<string>(), successMessage)
+        string? message = null)
     {
-        CurrentPage = currentPage;
-        PageSize = pageSize;
-        TotalCount = totalCount;
-        TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        return new PagedResult<T>(items, currentPage, pageSize, totalCount, message);
+    }
+
+    // NEW: explicit method to return metadata along with paged result
+    public static PagedResult<T> SuccessWithMeta(
+        IEnumerable<T> items,
+        int currentPage,
+        int pageSize,
+        int totalCount,
+        object? metaData,
+        string? message = null)
+    {
+        var result = new PagedResult<T>(items, currentPage, pageSize, totalCount, message);
+        result.MetaData = metaData;
+        return result;
     }
 
     protected PagedResult(List<string> errors)
@@ -33,16 +61,6 @@ public class PagedResult<T> : Result<IEnumerable<T>>
         PageSize = 10;
         TotalCount = 0;
         TotalPages = 0;
-    }
-
-    public static PagedResult<T> Success(
-        IEnumerable<T> items,
-        int currentPage,
-        int pageSize,
-        int totalCount,
-        string? message = null)
-    {
-        return new PagedResult<T>(items, currentPage, pageSize, totalCount, message);
     }
 
     public new static PagedResult<T> Failure(string error)

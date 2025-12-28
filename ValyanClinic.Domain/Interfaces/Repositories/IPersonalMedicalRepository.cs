@@ -29,6 +29,10 @@ public interface IPersonalMedicalRepository
         bool? esteActiv = null,
         CancellationToken cancellationToken = default);
 
+    // New: metadata & statistics for filters & dashboard (domain DTOs)
+    Task<PersonalMedicalFilterMetadataDto> GetFilterMetadataAsync(CancellationToken cancellationToken = default);
+    Task<PersonalMedicalStatisticsDto> GetStatisticsAsync(CancellationToken cancellationToken = default);
+
     // Commands
     Task<Guid> CreateAsync(PersonalMedical personalMedical, CancellationToken cancellationToken = default);
     Task<bool> UpdateAsync(PersonalMedical personalMedical, CancellationToken cancellationToken = default);

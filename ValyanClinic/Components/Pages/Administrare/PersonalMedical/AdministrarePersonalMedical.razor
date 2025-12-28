@@ -19,6 +19,24 @@
             Administrare Personal Medical
         </h1>
         <div class="header-actions">
+            <div class="dropdown export-dropdown">
+                <button class="btn btn-export" @onclick="ToggleExportMenu">
+                    <i class="fas fa-download"></i>
+                    <span class="export-label">Export</span>
+                    <i class="fas fa-chevron-down export-chevron"></i>
+                </button>
+                <div class="dropdown-menu @(IsExportMenuOpen ? "show" : "")">
+                    <button class="dropdown-item export-csv" @onclick="ExportCsv">
+                        <i class="fas fa-file-csv"></i>
+                        <span>Export CSV</span>
+                    </button>
+                    <button class="dropdown-item export-excel" @onclick="ExportExcel">
+                        <i class="fas fa-file-excel"></i>
+                        <span>Export Excel</span>
+                    </button>
+                </div>
+            </div>
+
             <button class="btn btn-primary" @onclick="HandleAddNew">
                 <i class="fas fa-plus"></i>
                 Adauga Personal Medical
@@ -395,6 +413,29 @@
                             }
                         </Template>
                     </GridColumn>
+
+                    <!-- Quick actions column -->
+                    <GridColumn HeaderText="Acțiuni Rapide" Width="180" AllowReordering="false" AllowResizing="false">
+                        <Template>
+                            @{
+                                var personal = (context as PersonalMedicalListDto);
+                                <div class="quick-actions">
+                                    <button class="quick-btn btn-view" title="Vizualizare rapidă" @onclick="() => QuickView(personal.PersonalID)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="quick-btn btn-edit" title="Editare rapidă" @onclick="() => QuickEdit(personal.PersonalID)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="quick-btn btn-toggle" title="@(personal?.EsteActiv == true ? "Dezactivează" : "Activează")" @onclick="() => QuickToggleStatus(personal.PersonalID, personal?.EsteActiv)">
+                                        <i class="fas fa-@(personal?.EsteActiv == true ? "pause" : "play")"></i>
+                                    </button>
+                                    <button class="quick-btn btn-delete" title="Șterge" @onclick="() => QuickDelete(personal.PersonalID)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
                 </GridColumns>
             </SfGrid>
         </div>
@@ -462,6 +503,22 @@
 <SfToast @ref="ToastRef" Title="@ToastTitle" Content="@ToastContent" CssClass="@ToastCssClass">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
+
+<script src="/js/export-download.js"></script>
+<script src="/js/keyboard-shortcuts.js"></script>
+
+<!-- Tiny keyboard shortcuts hint (non-intrusive) -->
+<div class="keyboard-shortcuts-footer" role="note" aria-label="Scurtături tastatură" title="Scurtături tastatură">
+    <small>
+        <i class="fas fa-keyboard"></i>
+        <strong>Scurtături:</strong>
+        <span class="ks-item"><kbd>Ctrl+N</kbd> Adaugă</span>
+        <span class="ks-item"><kbd>Ctrl+E</kbd>/<kbd>F2</kbd> Editează</span>
+        <span class="ks-item"><kbd>Del</kbd> Șterge</span>
+        <span class="ks-item"><kbd>Ctrl+F</kbd> Caută</span>
+        <span class="ks-item"><kbd>Esc</kbd> Închide</span>
+    </small>
+</div>
 
 <PersonalMedicalViewModal @ref="personalMedicalViewModal" 
                           OnEditRequested="HandleEditFromModal"

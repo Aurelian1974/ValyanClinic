@@ -75,11 +75,35 @@ public class GetPersonalMedicalListQueryHandler : IRequestHandler<GetPersonalMed
                 "Lista personal medical obtinuta: {Count} din {Total} inregistrari",
                 dtoList.Count, totalCount);
 
-            return PagedResult<PersonalMedicalListDto>.Success(
+            // Fetch filter metadata and statistics (separate small queries)
+            var metadata = await _repository.GetFilterMetadataAsync(cancellationToken);
+            var statistics = await _repository.GetStatisticsAsync(cancellationToken);
+
+            // Map domain metadata to application-level metadata DTO
+            var appMetadata = new PersonalMedicalFilterMetadata
+            {
+                AvailableDepartamente = metadata.AvailableDepartamente.Select(d => new FilterOptionDto { Value = d.Value, Text = d.Text }).ToList(),
+                AvailablePozitii = metadata.AvailablePozitii.Select(p => new FilterOptionDto { Value = p.Value, Text = p.Text }).ToList(),
+            };
+
+            var appStatistics = new PersonalMedicalStatistics
+            {
+                TotalActiv = statistics.TotalActiv,
+                TotalInactiv = statistics.TotalInactiv
+            };
+
+            var combinedMeta = new PersonalMedicalListMeta
+            {
+                Filters = appMetadata,
+                Stats = appStatistics
+            };
+
+            return PagedResult<PersonalMedicalListDto>.SuccessWithMeta(
                 dtoList,
                 request.PageNumber,
                 request.PageSize,
                 totalCount,
+                combinedMeta,
                 $"S-au gasit {totalCount} persoane din personalul medical");
         }
         catch (Exception ex)

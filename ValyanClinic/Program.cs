@@ -290,6 +290,12 @@ try
     builder.Services.AddScoped<BreadcrumbService>();
 
     // ========================================
+    // EXPORT SERVICES
+    // ========================================
+    // Service to export PersonalMedical lists to CSV/Excel
+    builder.Services.AddScoped<ValyanClinic.Application.Services.Export.IPersonalMedicalExportService, ValyanClinic.Application.Services.Export.PersonalMedicalExportService>();
+
+    // ========================================
     // DATAGRID SERVICES
     // ========================================
     builder.Services.AddScoped(typeof(IDataGridStateService<>), typeof(DataGridStateService<>));
