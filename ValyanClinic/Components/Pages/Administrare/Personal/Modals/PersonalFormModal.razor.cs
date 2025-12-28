@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.PersonalManagement.Commands.CreatePersonal;
 using ValyanClinic.Application.Features.PersonalManagement.Commands.UpdatePersonal;
 using ValyanClinic.Application.Features.PersonalManagement.Queries.GetPersonalById;
+using ValyanClinic.Application.Services.Location;
 using ValyanClinic.Components.Pages.Administrare.Personal.Models;
 using ValyanClinic.Domain.Interfaces.Repositories;
 using Syncfusion.Blazor.DropDowns;
@@ -16,6 +17,7 @@ public partial class PersonalFormModal : ComponentBase
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<PersonalFormModal> Logger { get; set; } = default!;
     [Inject] private ILocationRepository LocationRepository { get; set; } = default!;
+    [Inject] private IPhotonService PhotonService { get; set; } = default!;
 
     [Parameter] public EventCallback OnPersonalSaved { get; set; }
     [Parameter] public EventCallback OnClosed { get; set; }
@@ -36,6 +38,24 @@ public partial class PersonalFormModal : ComponentBase
     private List<LocationOption> LocalitatiDomiciliuOptions { get; set; } = new();
     private List<LocationOption> LocalitatiResedintaOptions { get; set; } = new();
 
+    // Street autocomplete data (Photon API)
+    private List<StreetOption> StradaDomiciliuOptions { get; set; } = new();
+    private List<StreetOption> StradaResedintaOptions { get; set; } = new();
+    private bool IsLoadingStradaDomiciliu { get; set; }
+    private bool IsLoadingStradaResedinta { get; set; }
+    
+    // Flag pentru avertizare când există multiple coduri poștale pentru aceeași stradă
+    private bool HasMultiplePostCodesDomiciliu { get; set; }
+    private bool HasMultiplePostCodesResedinta { get; set; }
+    
+    // Liste cu codurile poștale disponibile pentru dropdown
+    private List<string> AvailablePostCodesDomiciliu { get; set; } = new();
+    private List<string> AvailablePostCodesResedinta { get; set; } = new();
+    
+    // Debounce cancellation tokens
+    private CancellationTokenSource? _stradaDomiciliuCts;
+    private CancellationTokenSource? _stradaResedintaCts;
+
     // Loading states pentru UX imbunatatit
     private bool IsLoadingLocalitatiDomiciliu { get; set; }
     private bool IsLoadingLocalitatiResedinta { get; set; }
@@ -47,6 +67,14 @@ public partial class PersonalFormModal : ComponentBase
     {
         public int Id { get; set; }
         public string Nume { get; set; } = string.Empty;
+    }
+
+    public class StreetOption
+    {
+        public string Name { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public string? City { get; set; }
+        public string? PostCode { get; set; }
     }
 
     protected override async Task OnInitializedAsync()
@@ -76,11 +104,16 @@ public partial class PersonalFormModal : ComponentBase
         {
             Logger.LogInformation("=== START: Copying Domiciliu data to Resedinta ===");
 
-            // Copiem datele text
-            Model.Adresa_Resedinta = Model.Adresa_Domiciliu;
+            // Copiem toate campurile de adresa
+            Model.Strada_Resedinta = Model.Strada_Domiciliu;
+            Model.Numar_Resedinta = Model.Numar_Domiciliu;
+            Model.Bloc_Resedinta = Model.Bloc_Domiciliu;
+            Model.Scara_Resedinta = Model.Scara_Domiciliu;
+            Model.Etaj_Resedinta = Model.Etaj_Domiciliu;
+            Model.Apartament_Resedinta = Model.Apartament_Domiciliu;
             Model.Cod_Postal_Resedinta = Model.Cod_Postal_Domiciliu;
 
-            Logger.LogInformation("Copied Adresa and Cod Postal");
+            Logger.LogInformation("Copied all address fields");
 
             // IMPORTANT: Load localitati INAINTE de a seta judetul si orasul
             if (!string.IsNullOrEmpty(Model.Judet_Domiciliu))
@@ -126,6 +159,319 @@ public partial class PersonalFormModal : ComponentBase
         catch (Exception ex)
         {
             Logger.LogError(ex, "=== ERROR: Failed to copy Domiciliu to Resedinta ===");
+        }
+    }
+
+    #endregion
+
+    #region Photon Street Autocomplete
+
+    // Debounce timer
+    private System.Timers.Timer? _debounceDomiciliuTimer;
+    private System.Timers.Timer? _debounceResedintaTimer;
+    private const int DebounceDelay = 400; // ms
+
+    /// <summary>
+    /// Handler pentru input pe campul strada domiciliu - cu debounce.
+    /// </summary>
+    private void OnStradaDomiciliuInput(ChangeEventArgs args)
+    {
+        var query = args.Value?.ToString() ?? string.Empty;
+        Model.Strada_Domiciliu = query; // Update model value (replaces @bind)
+        
+        // Verifică dacă utilizatorul a selectat o stradă din listă (pentru a actualiza codul poștal)
+        var selectedStreet = StradaDomiciliuOptions.FirstOrDefault(s => 
+            s.Name.Equals(query, StringComparison.OrdinalIgnoreCase));
+        if (selectedStreet != null && !string.IsNullOrEmpty(selectedStreet.PostCode))
+        {
+            // Colectează toate codurile poștale disponibile pentru această stradă
+            AvailablePostCodesDomiciliu = StradaDomiciliuOptions
+                .Where(s => s.Name.Equals(query, StringComparison.OrdinalIgnoreCase) 
+                         && !string.IsNullOrEmpty(s.PostCode))
+                .Select(s => s.PostCode!)
+                .Distinct()
+                .OrderBy(p => p)
+                .ToList();
+            
+            HasMultiplePostCodesDomiciliu = AvailablePostCodesDomiciliu.Count > 1;
+            
+            // Setează primul cod poștal ca default
+            Model.Cod_Postal_Domiciliu = selectedStreet.PostCode;
+            Logger.LogInformation("Auto-filled PostCode for Domiciliu: {PostCode} (available: {Count})", 
+                selectedStreet.PostCode, AvailablePostCodesDomiciliu.Count);
+            
+            InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            HasMultiplePostCodesDomiciliu = false;
+            AvailablePostCodesDomiciliu.Clear();
+        }
+        
+        // Reset timer
+        _debounceDomiciliuTimer?.Stop();
+        _debounceDomiciliuTimer?.Dispose();
+        
+        if (query.Length < 3)
+        {
+            StradaDomiciliuOptions.Clear();
+            AvailablePostCodesDomiciliu.Clear();
+            HasMultiplePostCodesDomiciliu = false;
+            InvokeAsync(StateHasChanged);
+            return;
+        }
+        
+        // Start debounce timer
+        _debounceDomiciliuTimer = new System.Timers.Timer(DebounceDelay);
+        _debounceDomiciliuTimer.Elapsed += async (s, e) =>
+        {
+            _debounceDomiciliuTimer?.Stop();
+            await SearchStradaDomiciliu(query);
+        };
+        _debounceDomiciliuTimer.AutoReset = false;
+        _debounceDomiciliuTimer.Start();
+    }
+
+    /// <summary>
+    /// Cauta strazi pentru domiciliu folosind Photon API.
+    /// </summary>
+    private async Task SearchStradaDomiciliu(string query)
+    {
+        try
+        {
+            // Cancel previous request
+            _stradaDomiciliuCts?.Cancel();
+            _stradaDomiciliuCts = new CancellationTokenSource();
+
+            await InvokeAsync(() =>
+            {
+                IsLoadingStradaDomiciliu = true;
+                StateHasChanged();
+            });
+
+            // Adaugam orasul curent pentru rezultate mai precise
+            var searchQuery = !string.IsNullOrEmpty(Model.Oras_Domiciliu)
+                ? $"{query} {Model.Oras_Domiciliu}"
+                : query;
+
+            Logger.LogInformation("Photon search: '{Query}'", searchQuery);
+
+            var result = await PhotonService.SearchStreetsAsync(searchQuery, 10, _stradaDomiciliuCts.Token);
+
+            await InvokeAsync(() =>
+            {
+                if (result.IsSuccess && result.Value != null)
+                {
+                    var allStreets = result.Value
+                        .Select(s => new StreetOption
+                        {
+                            Name = s.Name,
+                            DisplayName = s.DisplayName,
+                            City = s.City,
+                            PostCode = s.PostCode
+                        })
+                        .ToList();
+                    
+                    // Filtrăm după localitatea selectată (dacă există)
+                    if (!string.IsNullOrEmpty(Model.Oras_Domiciliu))
+                    {
+                        var orasLower = Model.Oras_Domiciliu.ToLowerInvariant();
+                        StradaDomiciliuOptions = allStreets
+                            .Where(s => !string.IsNullOrEmpty(s.City) && 
+                                       s.City.ToLowerInvariant().Contains(orasLower))
+                            .ToList();
+                        
+                        // Dacă nu găsim nimic în orașul selectat, arătăm toate rezultatele
+                        if (StradaDomiciliuOptions.Count == 0)
+                        {
+                            StradaDomiciliuOptions = allStreets;
+                            Logger.LogInformation("No streets found in city '{City}', showing all {Count} results", 
+                                Model.Oras_Domiciliu, allStreets.Count);
+                        }
+                    }
+                    else
+                    {
+                        StradaDomiciliuOptions = allStreets;
+                    }
+
+                    Logger.LogInformation("Photon returned {Count} streets for '{Query}' (filtered from {Total})", 
+                        StradaDomiciliuOptions.Count, query, allStreets.Count);
+                }
+                else
+                {
+                    Logger.LogWarning("Photon search failed: {Error}", result.FirstError);
+                    StradaDomiciliuOptions.Clear();
+                }
+
+                IsLoadingStradaDomiciliu = false;
+                StateHasChanged();
+            });
+        }
+        catch (OperationCanceledException)
+        {
+            // Ignoring cancelled requests
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error in SearchStradaDomiciliu");
+            await InvokeAsync(() =>
+            {
+                StradaDomiciliuOptions.Clear();
+                IsLoadingStradaDomiciliu = false;
+                StateHasChanged();
+            });
+        }
+    }
+
+    /// <summary>
+    /// Handler pentru input pe campul strada resedinta - cu debounce.
+    /// </summary>
+    private void OnStradaResedintaInput(ChangeEventArgs args)
+    {
+        var query = args.Value?.ToString() ?? string.Empty;
+        Model.Strada_Resedinta = query; // Update model value (replaces @bind)
+        
+        // Verifică dacă utilizatorul a selectat o stradă din listă (pentru a actualiza codul poștal)
+        var selectedStreet = StradaResedintaOptions.FirstOrDefault(s => 
+            s.Name.Equals(query, StringComparison.OrdinalIgnoreCase));
+        if (selectedStreet != null && !string.IsNullOrEmpty(selectedStreet.PostCode))
+        {
+            // Colectează toate codurile poștale disponibile pentru această stradă
+            AvailablePostCodesResedinta = StradaResedintaOptions
+                .Where(s => s.Name.Equals(query, StringComparison.OrdinalIgnoreCase) 
+                         && !string.IsNullOrEmpty(s.PostCode))
+                .Select(s => s.PostCode!)
+                .Distinct()
+                .OrderBy(p => p)
+                .ToList();
+            
+            HasMultiplePostCodesResedinta = AvailablePostCodesResedinta.Count > 1;
+            
+            // Setează primul cod poștal ca default
+            Model.Cod_Postal_Resedinta = selectedStreet.PostCode;
+            Logger.LogInformation("Auto-filled PostCode for Resedinta: {PostCode} (available: {Count})", 
+                selectedStreet.PostCode, AvailablePostCodesResedinta.Count);
+            
+            InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            HasMultiplePostCodesResedinta = false;
+            AvailablePostCodesResedinta.Clear();
+        }
+        
+        // Reset timer
+        _debounceResedintaTimer?.Stop();
+        _debounceResedintaTimer?.Dispose();
+        
+        if (query.Length < 3)
+        {
+            StradaResedintaOptions.Clear();
+            AvailablePostCodesResedinta.Clear();
+            HasMultiplePostCodesResedinta = false;
+            InvokeAsync(StateHasChanged);
+            return;
+        }
+        
+        // Start debounce timer
+        _debounceResedintaTimer = new System.Timers.Timer(DebounceDelay);
+        _debounceResedintaTimer.Elapsed += async (s, e) =>
+        {
+            _debounceResedintaTimer?.Stop();
+            await SearchStradaResedinta(query);
+        };
+        _debounceResedintaTimer.AutoReset = false;
+        _debounceResedintaTimer.Start();
+    }
+
+    /// <summary>
+    /// Cauta strazi pentru resedinta folosind Photon API.
+    /// </summary>
+    private async Task SearchStradaResedinta(string query)
+    {
+        try
+        {
+            // Cancel previous request
+            _stradaResedintaCts?.Cancel();
+            _stradaResedintaCts = new CancellationTokenSource();
+
+            await InvokeAsync(() =>
+            {
+                IsLoadingStradaResedinta = true;
+                StateHasChanged();
+            });
+
+            // Adaugam orasul curent pentru rezultate mai precise
+            var searchQuery = !string.IsNullOrEmpty(Model.Oras_Resedinta)
+                ? $"{query} {Model.Oras_Resedinta}"
+                : query;
+
+            Logger.LogInformation("Photon search for resedinta: '{Query}'", searchQuery);
+
+            var result = await PhotonService.SearchStreetsAsync(searchQuery, 10, _stradaResedintaCts.Token);
+
+            await InvokeAsync(() =>
+            {
+                if (result.IsSuccess && result.Value != null)
+                {
+                    var allStreets = result.Value
+                        .Select(s => new StreetOption
+                        {
+                            Name = s.Name,
+                            DisplayName = s.DisplayName,
+                            City = s.City,
+                            PostCode = s.PostCode
+                        })
+                        .ToList();
+                    
+                    // Filtrăm după localitatea selectată (dacă există)
+                    if (!string.IsNullOrEmpty(Model.Oras_Resedinta))
+                    {
+                        var orasLower = Model.Oras_Resedinta.ToLowerInvariant();
+                        StradaResedintaOptions = allStreets
+                            .Where(s => !string.IsNullOrEmpty(s.City) && 
+                                       s.City.ToLowerInvariant().Contains(orasLower))
+                            .ToList();
+                        
+                        // Dacă nu găsim nimic în orașul selectat, arătăm toate rezultatele
+                        if (StradaResedintaOptions.Count == 0)
+                        {
+                            StradaResedintaOptions = allStreets;
+                            Logger.LogInformation("No streets found in city '{City}', showing all {Count} results", 
+                                Model.Oras_Resedinta, allStreets.Count);
+                        }
+                    }
+                    else
+                    {
+                        StradaResedintaOptions = allStreets;
+                    }
+
+                    Logger.LogInformation("Photon returned {Count} streets for resedinta (filtered from {Total})", 
+                        StradaResedintaOptions.Count, allStreets.Count);
+                }
+                else
+                {
+                    Logger.LogWarning("Photon search for resedinta failed: {Error}", result.FirstError);
+                    StradaResedintaOptions.Clear();
+                }
+
+                IsLoadingStradaResedinta = false;
+                StateHasChanged();
+            });
+        }
+        catch (OperationCanceledException)
+        {
+            // Ignoring cancelled requests
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error in SearchStradaResedinta");
+            await InvokeAsync(() =>
+            {
+                StradaResedintaOptions.Clear();
+                IsLoadingStradaResedinta = false;
+                StateHasChanged();
+            });
         }
     }
 
@@ -406,11 +752,12 @@ public partial class PersonalFormModal : ComponentBase
                     Telefon_Serviciu = data.Telefon_Serviciu,
                     Email_Personal = data.Email_Personal,
                     Email_Serviciu = data.Email_Serviciu,
-                    Adresa_Domiciliu = data.Adresa_Domiciliu,
+                    // Adresa din DB vine ca string complet - o punem in Strada pentru retrocompatibilitate
+                    Strada_Domiciliu = data.Adresa_Domiciliu ?? string.Empty,
                     Judet_Domiciliu = data.Judet_Domiciliu,
                     Oras_Domiciliu = data.Oras_Domiciliu,
                     Cod_Postal_Domiciliu = data.Cod_Postal_Domiciliu,
-                    Adresa_Resedinta = data.Adresa_Resedinta,
+                    Strada_Resedinta = data.Adresa_Resedinta,
                     Judet_Resedinta = data.Judet_Resedinta,
                     Oras_Resedinta = data.Oras_Resedinta,
                     Cod_Postal_Resedinta = data.Cod_Postal_Resedinta,
@@ -563,11 +910,11 @@ public partial class PersonalFormModal : ComponentBase
                     Telefon_Serviciu = Model.Telefon_Serviciu,
                     Email_Personal = Model.Email_Personal,
                     Email_Serviciu = Model.Email_Serviciu,
-                    Adresa_Domiciliu = Model.Adresa_Domiciliu,
+                    Adresa_Domiciliu = Model.Adresa_Domiciliu_Complet,
                     Judet_Domiciliu = Model.Judet_Domiciliu,
                     Oras_Domiciliu = Model.Oras_Domiciliu,
                     Cod_Postal_Domiciliu = Model.Cod_Postal_Domiciliu,
-                    Adresa_Resedinta = Model.Adresa_Resedinta,
+                    Adresa_Resedinta = Model.Adresa_Resedinta_Complet,
                     Judet_Resedinta = Model.Judet_Resedinta,
                     Oras_Resedinta = Model.Oras_Resedinta,
                     Cod_Postal_Resedinta = Model.Cod_Postal_Resedinta,
@@ -625,11 +972,11 @@ public partial class PersonalFormModal : ComponentBase
                     Telefon_Serviciu = Model.Telefon_Serviciu,
                     Email_Personal = Model.Email_Personal,
                     Email_Serviciu = Model.Email_Serviciu,
-                    Adresa_Domiciliu = Model.Adresa_Domiciliu,
+                    Adresa_Domiciliu = Model.Adresa_Domiciliu_Complet,
                     Judet_Domiciliu = Model.Judet_Domiciliu,
                     Oras_Domiciliu = Model.Oras_Domiciliu,
                     Cod_Postal_Domiciliu = Model.Cod_Postal_Domiciliu,
-                    Adresa_Resedinta = Model.Adresa_Resedinta,
+                    Adresa_Resedinta = Model.Adresa_Resedinta_Complet,
                     Judet_Resedinta = Model.Judet_Resedinta,
                     Oras_Resedinta = Model.Oras_Resedinta,
                     Cod_Postal_Resedinta = Model.Cod_Postal_Resedinta,

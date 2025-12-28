@@ -53,8 +53,31 @@ public class PersonalFormModel
     [MaxLength(100)]
     public string? Email_Serviciu { get; set; }
 
-    [Required(ErrorMessage = "Adresa domiciliului este obligatorie")]
-    public string Adresa_Domiciliu { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Strada domiciliului este obligatorie")]
+    [MaxLength(200)]
+    public string Strada_Domiciliu { get; set; } = string.Empty;
+
+    [MaxLength(20)]
+    public string? Numar_Domiciliu { get; set; }
+
+    [MaxLength(20)]
+    public string? Bloc_Domiciliu { get; set; }
+
+    [MaxLength(10)]
+    public string? Scara_Domiciliu { get; set; }
+
+    [MaxLength(10)]
+    public string? Etaj_Domiciliu { get; set; }
+
+    [MaxLength(10)]
+    public string? Apartament_Domiciliu { get; set; }
+
+    /// <summary>
+    /// Adresa completă formatată pentru afișare (readonly computed).
+    /// </summary>
+    public string Adresa_Domiciliu_Complet => FormatAdresa(
+        Strada_Domiciliu, Numar_Domiciliu, Bloc_Domiciliu, 
+        Scara_Domiciliu, Etaj_Domiciliu, Apartament_Domiciliu);
 
     [Required(ErrorMessage = "Judetul domiciliului este obligatoriu")]
     [MaxLength(50)]
@@ -67,7 +90,31 @@ public class PersonalFormModel
     [MaxLength(10)]
     public string? Cod_Postal_Domiciliu { get; set; }
 
-    public string? Adresa_Resedinta { get; set; }
+    [MaxLength(200)]
+    public string? Strada_Resedinta { get; set; }
+
+    [MaxLength(20)]
+    public string? Numar_Resedinta { get; set; }
+
+    [MaxLength(20)]
+    public string? Bloc_Resedinta { get; set; }
+
+    [MaxLength(10)]
+    public string? Scara_Resedinta { get; set; }
+
+    [MaxLength(10)]
+    public string? Etaj_Resedinta { get; set; }
+
+    [MaxLength(10)]
+    public string? Apartament_Resedinta { get; set; }
+
+    /// <summary>
+    /// Adresa completă formatată pentru afișare (readonly computed).
+    /// </summary>
+    public string? Adresa_Resedinta_Complet => string.IsNullOrEmpty(Strada_Resedinta) 
+        ? null 
+        : FormatAdresa(Strada_Resedinta, Numar_Resedinta, Bloc_Resedinta, 
+                       Scara_Resedinta, Etaj_Resedinta, Apartament_Resedinta);
 
     [MaxLength(50)]
     public string? Judet_Resedinta { get; set; }
@@ -108,4 +155,37 @@ public class PersonalFormModel
 
     public bool IsEditMode => Id_Personal.HasValue;
     public string ModalTitle => IsEditMode ? "Editeaza Personal" : "Adauga Personal";
+
+    #region Helper Methods
+
+    /// <summary>
+    /// Formatează adresa completă din componente individuale.
+    /// </summary>
+    private static string FormatAdresa(string? strada, string? numar, string? bloc, 
+                                        string? scara, string? etaj, string? apartament)
+    {
+        if (string.IsNullOrWhiteSpace(strada))
+            return string.Empty;
+
+        var parts = new List<string> { strada };
+
+        if (!string.IsNullOrWhiteSpace(numar))
+            parts.Add($"Nr. {numar}");
+
+        if (!string.IsNullOrWhiteSpace(bloc))
+            parts.Add($"Bl. {bloc}");
+
+        if (!string.IsNullOrWhiteSpace(scara))
+            parts.Add($"Sc. {scara}");
+
+        if (!string.IsNullOrWhiteSpace(etaj))
+            parts.Add($"Et. {etaj}");
+
+        if (!string.IsNullOrWhiteSpace(apartament))
+            parts.Add($"Ap. {apartament}");
+
+        return string.Join(", ", parts);
+    }
+
+    #endregion
 }

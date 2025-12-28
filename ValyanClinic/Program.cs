@@ -306,6 +306,34 @@ try
         return new ValyanClinic.Infrastructure.Security.BCryptPasswordHasher(logger);
     });
     // ========================================
+    // PHOTON API (Street Autocomplete)
+    // ========================================
+    // Serviciu pentru autocomplete de străzi folosind Photon API (OpenStreetMap)
+    builder.Services.AddHttpClient<ValyanClinic.Application.Services.Location.IPhotonService, ValyanClinic.Application.Services.Location.PhotonService>(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(10);
+        client.DefaultRequestHeaders.Add("User-Agent", "ValyanClinic/1.0");
+    });
+
+    // ========================================
+    // NOMENCLATOR MEDICAMENTE ANM
+    // ========================================
+    // Configurare sincronizare automată nomenclator
+    builder.Services.Configure<ValyanClinic.Application.Services.Medicamente.NomenclatorSyncOptions>(
+        builder.Configuration.GetSection(ValyanClinic.Application.Services.Medicamente.NomenclatorSyncOptions.SectionName));
+    
+    // Serviciu pentru căutare și sincronizare medicamente
+    builder.Services.AddHttpClient<ValyanClinic.Application.Services.Medicamente.INomenclatorMedicamenteService, 
+        ValyanClinic.Application.Services.Medicamente.NomenclatorMedicamenteService>(client =>
+    {
+        client.Timeout = TimeSpan.FromMinutes(5); // Download poate dura
+        client.DefaultRequestHeaders.Add("User-Agent", "ValyanClinic/1.0");
+    });
+    
+    // Background service pentru sincronizare automată săptămânală
+    builder.Services.AddHostedService<ValyanClinic.Application.Services.Medicamente.NomenclatorSyncBackgroundService>();
+
+    // ========================================
     // NOTIFICATION SERVICES
     // ========================================
     builder.Services.AddScoped<ValyanClinic.Services.INotificationService, ValyanClinic.Services.NotificationService>();

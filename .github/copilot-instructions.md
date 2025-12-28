@@ -76,6 +76,17 @@ sc create ValyanClinic binPath="D:\Services\ValyanClinic\ValyanClinic.exe"
 
 ## Database Patterns
 
+**Primary Keys**: Always use `UNIQUEIDENTIFIER` with `NEWSEQUENTIALID()` for all table IDs:
+```sql
+[Id] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWSEQUENTIALID(),
+CONSTRAINT [PK_TableName] PRIMARY KEY CLUSTERED ([Id] ASC)
+```
+
+**C# Mapping**: Use `Guid` type for all entity IDs:
+```csharp
+public Guid Id { get; set; }
+```
+
 **Stored Procedures** organized by feature in `DevSupport/01_Database/02_StoredProcedures/`:
 ```
 02_StoredProcedures/

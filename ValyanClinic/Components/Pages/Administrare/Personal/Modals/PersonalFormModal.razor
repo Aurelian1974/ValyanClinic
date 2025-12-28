@@ -219,10 +219,60 @@
                                             <span>Adresa Domiciliu</span>
                                         </h3>
                                         <div class="info-grid">
+                                            @* Strada cu autocomplete Photon *@
                                             <div class="form-group full-width">
-                                                <label for="adresa-domiciliu">Adresa <span class="required">*</span></label>
-                                                <InputText id="adresa-domiciliu" class="form-control" @bind-Value="Model.Adresa_Domiciliu" />
-                                                <ValidationMessage For="@(() => Model.Adresa_Domiciliu)" />
+                                                <label for="strada-domiciliu">Strada <span class="required">*</span></label>
+                                                <div class="autocomplete-wrapper">
+                                                    <input type="text" 
+                                                           id="strada-domiciliu" 
+                                                           class="form-control"
+                                                           placeholder="Cauta strada (min. 3 caractere)"
+                                                           value="@Model.Strada_Domiciliu"
+                                                           @oninput="OnStradaDomiciliuInput"
+                                                           list="strada-domiciliu-list"
+                                                           autocomplete="off" />
+                                                    <datalist id="strada-domiciliu-list">
+                                                        @foreach (var street in StradaDomiciliuOptions)
+                                                        {
+                                                            <option value="@street.Name">@street.DisplayName</option>
+                                                        }
+                                                    </datalist>
+                                                    @if (IsLoadingStradaDomiciliu)
+                                                    {
+                                                        <span class="autocomplete-spinner">
+                                                            <i class="fas fa-spinner fa-spin"></i>
+                                                        </span>
+                                                    }
+                                                </div>
+                                                <ValidationMessage For="@(() => Model.Strada_Domiciliu)" />
+                                            </div>
+                                            
+                                            @* Numar, Bloc, Scara, Etaj, Apartament - pe un rand *@
+                                            <div class="form-group">
+                                                <label for="numar-domiciliu">Numar</label>
+                                                <InputText id="numar-domiciliu" class="form-control" @bind-Value="Model.Numar_Domiciliu" placeholder="Nr." />
+                                                <ValidationMessage For="@(() => Model.Numar_Domiciliu)" />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="bloc-domiciliu">Bloc</label>
+                                                <InputText id="bloc-domiciliu" class="form-control" @bind-Value="Model.Bloc_Domiciliu" placeholder="Bl." />
+                                                <ValidationMessage For="@(() => Model.Bloc_Domiciliu)" />
+                                            </div>
+                                            
+                                            <div class="form-group form-group-small">
+                                                <label for="scara-domiciliu">Scara</label>
+                                                <InputText id="scara-domiciliu" class="form-control" @bind-Value="Model.Scara_Domiciliu" placeholder="Sc." />
+                                            </div>
+                                            
+                                            <div class="form-group form-group-small">
+                                                <label for="etaj-domiciliu">Etaj</label>
+                                                <InputText id="etaj-domiciliu" class="form-control" @bind-Value="Model.Etaj_Domiciliu" placeholder="Et." />
+                                            </div>
+                                            
+                                            <div class="form-group form-group-small">
+                                                <label for="apartament-domiciliu">Apartament</label>
+                                                <InputText id="apartament-domiciliu" class="form-control" @bind-Value="Model.Apartament_Domiciliu" placeholder="Ap." />
                                             </div>
                                             
                                             <div class="form-group">
@@ -269,7 +319,24 @@
                                             
                                             <div class="form-group">
                                                 <label for="cod-postal-domiciliu">Cod Postal</label>
-                                                <InputText id="cod-postal-domiciliu" class="form-control" @bind-Value="Model.Cod_Postal_Domiciliu" />
+                                                @if (HasMultiplePostCodesDomiciliu && AvailablePostCodesDomiciliu.Count > 1)
+                                                {
+                                                    <SfDropDownList TValue="string" TItem="string"
+                                                                   id="cod-postal-domiciliu"
+                                                                   @bind-Value="Model.Cod_Postal_Domiciliu"
+                                                                   DataSource="@AvailablePostCodesDomiciliu"
+                                                                   Placeholder="Selectați codul poștal"
+                                                                   CssClass="form-control">
+                                                    </SfDropDownList>
+                                                    <small class="form-text text-warning">
+                                                        <i class="fas fa-exclamation-triangle"></i>
+                                                        Strada traversează mai multe zone - selectați codul poștal corect pentru adresa dumneavoastră.
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <InputText id="cod-postal-domiciliu" class="form-control" @bind-Value="Model.Cod_Postal_Domiciliu" />
+                                                }
                                                 <ValidationMessage For="@(() => Model.Cod_Postal_Domiciliu)" />
                                             </div>
                                         </div>
@@ -289,10 +356,57 @@
                                             }
                                         </h3>
                                         <div class="info-grid">
+                                            @* Strada resedinta cu autocomplete Photon *@
                                             <div class="form-group full-width">
-                                                <label for="adresa-resedinta">Adresa</label>
-                                                <InputText id="adresa-resedinta" class="form-control" @bind-Value="Model.Adresa_Resedinta" />
-                                                <ValidationMessage For="@(() => Model.Adresa_Resedinta)" />
+                                                <label for="strada-resedinta">Strada</label>
+                                                <div class="autocomplete-wrapper">
+                                                    <input type="text" 
+                                                           id="strada-resedinta" 
+                                                           class="form-control"
+                                                           placeholder="Cauta strada (min. 3 caractere)"
+                                                           value="@Model.Strada_Resedinta"
+                                                           @oninput="OnStradaResedintaInput"
+                                                           list="strada-resedinta-list"
+                                                           autocomplete="off" />
+                                                    <datalist id="strada-resedinta-list">
+                                                        @foreach (var street in StradaResedintaOptions)
+                                                        {
+                                                            <option value="@street.Name">@street.DisplayName</option>
+                                                        }
+                                                    </datalist>
+                                                    @if (IsLoadingStradaResedinta)
+                                                    {
+                                                        <span class="autocomplete-spinner">
+                                                            <i class="fas fa-spinner fa-spin"></i>
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </div>
+                                            
+                                            @* Numar, Bloc, Scara, Etaj, Apartament - pe un rand *@
+                                            <div class="form-group">
+                                                <label for="numar-resedinta">Numar</label>
+                                                <InputText id="numar-resedinta" class="form-control" @bind-Value="Model.Numar_Resedinta" placeholder="Nr." />
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="bloc-resedinta">Bloc</label>
+                                                <InputText id="bloc-resedinta" class="form-control" @bind-Value="Model.Bloc_Resedinta" placeholder="Bl." />
+                                            </div>
+                                            
+                                            <div class="form-group form-group-small">
+                                                <label for="scara-resedinta">Scara</label>
+                                                <InputText id="scara-resedinta" class="form-control" @bind-Value="Model.Scara_Resedinta" placeholder="Sc." />
+                                            </div>
+                                            
+                                            <div class="form-group form-group-small">
+                                                <label for="etaj-resedinta">Etaj</label>
+                                                <InputText id="etaj-resedinta" class="form-control" @bind-Value="Model.Etaj_Resedinta" placeholder="Et." />
+                                            </div>
+                                            
+                                            <div class="form-group form-group-small">
+                                                <label for="apartament-resedinta">Apartament</label>
+                                                <InputText id="apartament-resedinta" class="form-control" @bind-Value="Model.Apartament_Resedinta" placeholder="Ap." />
                                             </div>
                                             
                                             <div class="form-group">
@@ -339,7 +453,24 @@
                                             
                                             <div class="form-group">
                                                 <label for="cod-postal-resedinta">Cod Postal</label>
-                                                <InputText id="cod-postal-resedinta" class="form-control" @bind-Value="Model.Cod_Postal_Resedinta" />
+                                                @if (HasMultiplePostCodesResedinta && AvailablePostCodesResedinta.Count > 1)
+                                                {
+                                                    <SfDropDownList TValue="string" TItem="string"
+                                                                   id="cod-postal-resedinta"
+                                                                   @bind-Value="Model.Cod_Postal_Resedinta"
+                                                                   DataSource="@AvailablePostCodesResedinta"
+                                                                   Placeholder="Selectați codul poștal"
+                                                                   CssClass="form-control">
+                                                    </SfDropDownList>
+                                                    <small class="form-text text-warning">
+                                                        <i class="fas fa-exclamation-triangle"></i>
+                                                        Strada traversează mai multe zone - selectați codul poștal corect pentru adresa dumneavoastră.
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <InputText id="cod-postal-resedinta" class="form-control" @bind-Value="Model.Cod_Postal_Resedinta" />
+                                                }
                                                 <ValidationMessage For="@(() => Model.Cod_Postal_Resedinta)" />
                                             </div>
                                         </div>

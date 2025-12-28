@@ -156,6 +156,30 @@
     grid-column: 1 / -1;
 }
 
+/* Small form groups for compact fields like Scara, Etaj, Apartament */
+.form-group.form-group-small {
+    min-width: 80px;
+    max-width: 120px;
+}
+
+/* Autocomplete wrapper for street search */
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.autocomplete-wrapper input.form-control {
+    padding-right: 35px;
+}
+
+.autocomplete-spinner {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #60a5fa;
+}
+
 .form-group label {
     font-size: var(--modal-label);
     font-weight: var(--font-weight-semibold);
