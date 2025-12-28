@@ -36,19 +36,22 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
         bool? esteActiv = null,
         string sortColumn = "Nume",
         string sortDirection = "ASC",
+        string? columnFiltersJson = null,
         CancellationToken cancellationToken = default)
     {
-        var parameters = new
+        var parameters = new DynamicParameters();
+        parameters.Add("PageNumber", pageNumber);
+        parameters.Add("PageSize", pageSize);
+        parameters.Add("SearchText", searchText);
+        parameters.Add("Departament", departament);
+        parameters.Add("Pozitie", pozitie);
+        parameters.Add("EsteActiv", esteActiv);
+        parameters.Add("SortColumn", sortColumn);
+        parameters.Add("SortDirection", sortDirection);
+        if (!string.IsNullOrWhiteSpace(columnFiltersJson))
         {
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            SearchText = searchText,
-            Departament = departament,
-            Pozitie = pozitie,
-            EsteActiv = esteActiv,
-            SortColumn = sortColumn,
-            SortDirection = sortDirection
-        };
+            parameters.Add("ColumnFiltersJson", columnFiltersJson);
+        }
 
         // SP returneaza 2 result sets: datele si count-ul
         using var connection = _connectionFactory.CreateConnection();
@@ -67,19 +70,22 @@ public class PersonalMedicalRepository : BaseRepository, IPersonalMedicalReposit
         string? departament = null,
         string? pozitie = null,
         bool? esteActiv = null,
+        string? columnFiltersJson = null,
         CancellationToken cancellationToken = default)
     {
-        var parameters = new
+        var parameters = new DynamicParameters();
+        parameters.Add("PageNumber", 1);
+        parameters.Add("PageSize", 1);
+        parameters.Add("SearchText", searchText);
+        parameters.Add("Departament", departament);
+        parameters.Add("Pozitie", pozitie);
+        parameters.Add("EsteActiv", esteActiv);
+        parameters.Add("SortColumn", "Nume");
+        parameters.Add("SortDirection", "ASC");
+        if (!string.IsNullOrWhiteSpace(columnFiltersJson))
         {
-            PageNumber = 1,
-            PageSize = 1,
-            SearchText = searchText,
-            Departament = departament,
-            Pozitie = pozitie,
-            EsteActiv = esteActiv,
-            SortColumn = "Nume",
-            SortDirection = "ASC"
-        };
+            parameters.Add("ColumnFiltersJson", columnFiltersJson);
+        }
 
         using var connection = _connectionFactory.CreateConnection();
         using var multi = await connection.QueryMultipleAsync(

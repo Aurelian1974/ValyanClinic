@@ -167,6 +167,54 @@
                             <DropDownListFieldSettings Text="Text" Value="Value"/>
                         </SfDropDownList>
                     </div>
+
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-id-card"></i>
+                            Nume (coloana)
+                        </label>
+                        <div class="filter-item-row">
+                            <div class="operator-with-help">
+                                <SfDropDownList TValue="string" TItem="FilterOption" DataSource="@OperatorOptions" @bind-Value="AdvancedNumeOperator" CssClass="filter-dropdown form-select-operator" AllowFiltering="false" ShowClearButton="false" EnablePersistence="false" IgnoreAccent="true">
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                                <span class="op-help" title="Contains — căutare subșir; Equals — egal; StartsWith — începe cu; EndsWith — se termină cu"><i class="fas fa-info-circle"></i></span>
+                            </div>
+                            <input class="form-control" type="text" @bind="AdvancedNume" placeholder="Ex: Ion" />
+                        </div>
+                    </div>
+
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-stethoscope"></i>
+                            Specializare
+                        </label>
+                        <div class="filter-item-row">
+                            <div class="operator-with-help">
+                                <SfDropDownList TValue="string" TItem="FilterOption" DataSource="@OperatorOptions" @bind-Value="AdvancedSpecializareOperator" CssClass="filter-dropdown form-select-operator" AllowFiltering="false" ShowClearButton="false" EnablePersistence="false" IgnoreAccent="true">
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                                <span class="op-help" title="Contains — căutare subșir; Equals — egal; StartsWith — începe cu; EndsWith — se termină cu"><i class="fas fa-info-circle"></i></span>
+                            </div>
+                            <input class="form-control" type="text" @bind="AdvancedSpecializare" placeholder="Ex: Cardiologie" />
+                        </div>
+                    </div>
+
+                    <div class="filter-item">
+                        <label class="filter-label">
+                            <i class="fas fa-file-signature"></i>
+                            Numar licenta
+                        </label>
+                        <div class="filter-item-row">
+                            <div class="operator-with-help">
+                                <SfDropDownList TValue="string" TItem="FilterOption" DataSource="@OperatorOptions" @bind-Value="AdvancedNumarLicentaOperator" CssClass="filter-dropdown form-select-operator" AllowFiltering="false" ShowClearButton="false" EnablePersistence="false" IgnoreAccent="true">
+                                    <DropDownListFieldSettings Text="Text" Value="Value" />
+                                </SfDropDownList>
+                                <span class="op-help" title="Contains — căutare subșir; Equals — egal; StartsWith — începe cu; EndsWith — se termină cu"><i class="fas fa-info-circle"></i></span>
+                            </div>
+                            <input class="form-control" type="text" @bind="AdvancedNumarLicenta" placeholder="Ex: 12345" />
+                        </div>
+                    </div>
                 </div>
 
                 <div class="filter-actions">
@@ -323,6 +371,15 @@
                                AllowReordering="true"
                                AllowResizing="true"
                                AllowGrouping="false">
+                        <Template>
+                            @{
+                                var personal = (context as PersonalMedicalListDto);
+                                <div class="name-cell">
+                                    <span id="row-anchor-@personal.PersonalID" style="display:none"></span>
+                                    <strong>@personal?.NumeComplet</strong>
+                                </div>
+                            }
+                        </Template>
                     </GridColumn>
                     
                     <GridColumn Field="@nameof(PersonalMedicalListDto.Specializare)" 
@@ -506,6 +563,7 @@
 
 <script src="/js/export-download.js"></script>
 <script src="/js/keyboard-shortcuts.js"></script>
+<script src="/js/personalmedical-effects.js"></script>
 
 <!-- Tiny keyboard shortcuts hint (non-intrusive) -->
 <div class="keyboard-shortcuts-footer" role="note" aria-label="Scurtături tastatură" title="Scurtături tastatură">

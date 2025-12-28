@@ -11,6 +11,11 @@ public record GetPersonalMedicalListQuery : IRequest<PagedResult<PersonalMedical
     public string? FilterDepartament { get; init; }
     public string? FilterPozitie { get; init; }
     public bool? FilterEsteActiv { get; init; }
+
+    // Advanced per-column filters (optional)
+    // Example: Column = "Nume", Operator = "Contains", Value = "Ion"
+    public List<ColumnFilterDto>? ColumnFilters { get; init; }
+
     public string SortColumn { get; init; } = "Nume";
     public string SortDirection { get; init; } = "ASC";
 }

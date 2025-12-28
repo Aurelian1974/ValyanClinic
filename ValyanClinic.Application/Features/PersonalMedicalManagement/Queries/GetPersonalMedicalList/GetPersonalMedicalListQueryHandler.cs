@@ -28,6 +28,87 @@ public class GetPersonalMedicalListQueryHandler : IRequestHandler<GetPersonalMed
                 request.FilterDepartament, request.FilterPozitie, request.FilterEsteActiv,
                 request.SortColumn, request.SortDirection);
 
+            // If ColumnFilters are present, send them to the repository for DB-side filtering (preferred)
+            if (request.ColumnFilters != null && request.ColumnFilters.Any())
+            {
+                var cfJson = System.Text.Json.JsonSerializer.Serialize(request.ColumnFilters);
+                _logger.LogInformation("Applying advanced column filters (DB-side): {Filters}", cfJson);
+
+                var totalCountFiltered = await _repository.GetCountAsync(
+                    searchText: request.GlobalSearchText,
+                    departament: request.FilterDepartament,
+                    pozitie: request.FilterPozitie,
+                    esteActiv: request.FilterEsteActiv,
+                    columnFiltersJson: cfJson,
+                    cancellationToken: cancellationToken);
+
+                if (totalCountFiltered == 0)
+                {
+                    return PagedResult<PersonalMedicalListDto>.Success(
+                        Enumerable.Empty<PersonalMedicalListDto>(),
+                        request.PageNumber,
+                        request.PageSize,
+                        0);
+                }
+
+                var personalListFiltered = await _repository.GetAllAsync(
+                    pageNumber: request.PageNumber,
+                    pageSize: request.PageSize,
+                    searchText: request.GlobalSearchText,
+                    departament: request.FilterDepartament,
+                    pozitie: request.FilterPozitie,
+                    esteActiv: request.FilterEsteActiv,
+                    sortColumn: request.SortColumn,
+                    sortDirection: request.SortDirection,
+                    columnFiltersJson: cfJson,
+                    cancellationToken: cancellationToken);
+
+                var dtoListFiltered = personalListFiltered.Select(p => new PersonalMedicalListDto
+                {
+                    PersonalID = p.PersonalID,
+                    Nume = p.Nume,
+                    Prenume = p.Prenume,
+                    Specializare = p.Specializare,
+                    NumarLicenta = p.NumarLicenta,
+                    Telefon = p.Telefon,
+                    Email = p.Email,
+                    Departament = p.Departament,
+                    Pozitie = p.Pozitie,
+                    EsteActiv = p.EsteActiv,
+                    DataCreare = p.DataCreare
+                }).ToList();
+
+                // Fetch metadata/stats as usual
+                var metadataFiltered = await _repository.GetFilterMetadataAsync(cancellationToken);
+                var statisticsFiltered = await _repository.GetStatisticsAsync(cancellationToken);
+
+                var appMetadataFiltered = new PersonalMedicalFilterMetadata
+                {
+                    AvailableDepartamente = metadataFiltered.AvailableDepartamente.Select(d => new FilterOptionDto { Value = d.Value, Text = d.Text }).ToList(),
+                    AvailablePozitii = metadataFiltered.AvailablePozitii.Select(p => new FilterOptionDto { Value = p.Value, Text = p.Text }).ToList(),
+                };
+
+                var appStatisticsFiltered = new PersonalMedicalStatistics
+                {
+                    TotalActiv = statisticsFiltered.TotalActiv,
+                    TotalInactiv = statisticsFiltered.TotalInactiv
+                };
+
+                var combinedMetaFiltered = new PersonalMedicalListMeta
+                {
+                    Filters = appMetadataFiltered,
+                    Stats = appStatisticsFiltered
+                };
+
+                return PagedResult<PersonalMedicalListDto>.SuccessWithMeta(
+                    dtoListFiltered,
+                    request.PageNumber,
+                    request.PageSize,
+                    totalCountFiltered,
+                    combinedMetaFiltered,
+                    $"S-au gasit {totalCountFiltered} persoane (filtrate)");
+            }
+
             var totalCount = await _repository.GetCountAsync(
                 searchText: request.GlobalSearchText,
                 departament: request.FilterDepartament,

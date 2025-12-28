@@ -82,6 +82,25 @@
     align-items: center;
 }
 
+/* Advanced filter small operator select and row layout */
+.filter-item-row { display:flex; gap:8px; align-items:center; }
+.form-select-operator { width: 160px; flex: 0 0 160px; }
+.form-control { flex: 1 1 auto; }
+.operator-with-help { display:flex; align-items:center; gap:6px; }
+.op-help { color: #6b7280; margin-left:4px; cursor:help; }
+.op-help i { font-size: 14px; }
+
+/* Row highlight animation when items are created/updated */
+.row-highlight {
+    animation: pm-row-highlight 2s ease-in-out;
+}
+
+@keyframes pm-row-highlight {
+    0% { background-color: rgba(253, 230, 138, 0.95); }
+    40% { background-color: rgba(253, 230, 138, 0.6); }
+    100% { background-color: transparent; }
+}
+
 .quick-btn {
     width: 34px;
     height: 34px;

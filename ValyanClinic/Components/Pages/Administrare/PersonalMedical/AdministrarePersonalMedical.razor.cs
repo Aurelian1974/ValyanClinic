@@ -99,11 +99,31 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
         public string SortDirection { get; set; } = "ASC";
     }
 
+    private string? AdvancedNume { get; set; }
+    private string AdvancedNumeOperator { get; set; } = "Contains";
+
+    private string? AdvancedSpecializare { get; set; }
+    private string AdvancedSpecializareOperator { get; set; } = "Contains";
+
+    private string? AdvancedNumarLicenta { get; set; }
+    private string AdvancedNumarLicentaOperator { get; set; } = "Contains";
+
+    private List<FilterOption> OperatorOptions { get; set; } = new()
+    {
+        new FilterOption { Value = "Contains", Text = "Conține" },
+        new FilterOption { Value = "Equals", Text = "Egal cu" },
+        new FilterOption { Value = "StartsWith", Text = "Începe cu" },
+        new FilterOption { Value = "EndsWith", Text = "Se termină cu" }
+    };
+
     private int ActiveFiltersCount =>
         (string.IsNullOrEmpty(FilterDepartament) ? 0 : 1) +
         (string.IsNullOrEmpty(FilterPozitie) ? 0 : 1) +
         (string.IsNullOrEmpty(FilterEsteActiv) ? 0 : 1) +
-        (string.IsNullOrEmpty(GlobalSearchText) ? 0 : 1);
+        (string.IsNullOrEmpty(GlobalSearchText) ? 0 : 1) +
+        (string.IsNullOrEmpty(AdvancedNume) ? 0 : 1) +
+        (string.IsNullOrEmpty(AdvancedSpecializare) ? 0 : 1) +
+        (string.IsNullOrEmpty(AdvancedNumarLicenta) ? 0 : 1);
 
     private bool HasPreviousPage => CurrentPage > 1;
     private bool HasNextPage => CurrentPage < TotalPages;
@@ -189,11 +209,28 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
                     _personalHubConnection.On<string, Guid>("PersonalChanged", async (action, id) =>
                     {
                         Logger.LogInformation("SignalR PersonalChanged received: {Action} {Id}", action, id);
-                        // For now, refresh the current page to reflect changes
+
+                        if (_disposed)
+                        {
+                            Logger.LogDebug("SignalR message ignored because component is disposed");
+                            return;
+                        }
+
+                        // Apply in-place updates where possible to avoid full reload and UI flicker
                         await InvokeAsync(async () =>
                         {
-                            await LoadPagedData();
-                            await ShowActionToast("Actualizat", "Lista", $"Eveniment: {action}", "e-toast-info");
+                            if (_disposed) return;
+
+                            try
+                            {
+                                await HandlePersonalChangedAsync(action, id);
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.LogDebug(ex, "Error applying in-place SignalR update");
+                                // fallback: attempt a full refresh if in-place update fails
+                                try { await LoadPagedData(); } catch { }
+                            }
                         });
                     });
 
@@ -288,15 +325,268 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
         {
             if (_personalHubConnection != null)
             {
+                try
+                {
+                    // Remove handlers first to avoid receiving callbacks while stopping
+                    _personalHubConnection.Remove("PersonalChanged");
+                }
+                catch { }
+
                 await _personalHubConnection.StopAsync();
                 await _personalHubConnection.DisposeAsync();
-                _personalHubConnection = null;
                 Logger.LogDebug("PersonalMedical SignalR connection stopped and disposed");
             }
         }
         catch (Exception ex)
         {
             Logger.LogDebug(ex, "Error stopping SignalR connection");
+        }
+        finally
+        {
+            _personalHubConnection = null;
+        }
+    }
+
+    // Apply a minimal in-place update in response to a SignalR event
+    private async Task HandlePersonalChangedAsync(string action, Guid personalId)
+    {
+        if (_disposed) return;
+
+        action = action?.Trim() ?? string.Empty;
+
+        switch (action)
+        {
+            case "Created":
+                await ApplyCreatedAsync(personalId);
+                break;
+            case "Updated":
+                await ApplyUpdatedAsync(personalId);
+                break;
+            case "Deleted":
+                await ApplyDeletedAsync(personalId);
+                break;
+            default:
+                // Unknown action - fallback to full refresh
+                await LoadPagedData();
+                break;
+        }
+    }
+
+    private PersonalMedicalListDto MapToListDto(ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalById.PersonalMedicalDetailDto detail)
+    {
+        return new PersonalMedicalListDto
+        {
+            PersonalID = detail.PersonalID,
+            Nume = detail.Nume,
+            Prenume = detail.Prenume,
+            Specializare = detail.Specializare,
+            NumarLicenta = detail.NumarLicenta,
+            Telefon = detail.Telefon,
+            Email = detail.Email,
+            Departament = detail.Departament,
+            Pozitie = detail.Pozitie,
+            EsteActiv = detail.EsteActiv,
+            DataCreare = detail.DataCreare
+        };
+    }
+
+    private bool MatchesCurrentFilters(PersonalMedicalListDto dto)
+    {
+        // Simple filter checks: GlobalSearchText, FilterDepartament, FilterPozitie, FilterEsteActiv
+        if (!string.IsNullOrWhiteSpace(FilterDepartament) && !string.Equals(dto.Departament, FilterDepartament, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (!string.IsNullOrWhiteSpace(FilterPozitie) && !string.Equals(dto.Pozitie, FilterPozitie, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (!string.IsNullOrWhiteSpace(FilterEsteActiv))
+        {
+            var filterVal = FilterEsteActiv == "true";
+            if (dto.EsteActiv.HasValue && dto.EsteActiv.Value != filterVal) return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(GlobalSearchText))
+        {
+            var s = GlobalSearchText.Trim();
+            if (!( (dto.Nume?.Contains(s, StringComparison.OrdinalIgnoreCase) == true) ||
+                   (dto.Prenume?.Contains(s, StringComparison.OrdinalIgnoreCase) == true) ||
+                   (dto.NumeComplet?.Contains(s, StringComparison.OrdinalIgnoreCase) == true) ||
+                   (dto.Departament?.Contains(s, StringComparison.OrdinalIgnoreCase) == true) ||
+                   (dto.Pozitie?.Contains(s, StringComparison.OrdinalIgnoreCase) == true) ))
+                return false;
+        }
+
+        return true;
+    }
+
+    private async Task ApplyCreatedAsync(Guid personalId)
+    {
+        // Only fetch and insert if created item matches current filters
+        try
+        {
+            var result = await Mediator.Send(new ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalById.GetPersonalMedicalByIdQuery(personalId));
+            if (!result.IsSuccess || result.Value == null) return;
+
+            var dto = MapToListDto(result.Value);
+
+            if (!MatchesCurrentFilters(dto))
+            {
+                // Item doesn't match current filters; just increment TotalRecords
+                TotalRecords++;
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            TotalRecords++;
+
+            // If we are on first page, insert at top to reflect recency
+            if (CurrentPage == 1)
+            {
+                CurrentPageData.Insert(0, dto);
+
+                // Trim to page size
+                if (CurrentPageData.Count > CurrentPageSize)
+                {
+                    CurrentPageData.RemoveAt(CurrentPageData.Count - 1);
+                }
+
+                await InvokeAsync(StateHasChanged);
+
+                // Try to highlight newly inserted row
+                try
+                {
+                    if (!_disposed)
+                    {
+                        await InvokeAsync(async () =>
+                        {
+                            await Task.Yield();
+                            await JSRuntime.InvokeVoidAsync("personalMedicalEffects.highlightRow", personalId, 2000);
+                        });
+                    }
+                }
+                catch (Exception jsEx)
+                {
+                    Logger.LogDebug(jsEx, "Highlight JS failed for created PersonalID {PersonalId}", personalId);
+                }
+            }
+            else
+            {
+                // Not on first page - we don't modify data but total count changed
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogDebug(ex, "Error applying Created event for PersonalID {PersonalId}", personalId);
+        }
+    }
+
+    private async Task ApplyUpdatedAsync(Guid personalId)
+    {
+        try
+        {
+            var result = await Mediator.Send(new ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalById.GetPersonalMedicalByIdQuery(personalId));
+            if (!result.IsSuccess || result.Value == null) return;
+
+            var dto = MapToListDto(result.Value);
+
+            var idx = CurrentPageData.FindIndex(p => p.PersonalID == personalId);
+            if (idx >= 0)
+            {
+                // If updated item still matches filters, replace; otherwise remove
+                if (MatchesCurrentFilters(dto))
+                {
+                    CurrentPageData[idx] = dto;
+                    await InvokeAsync(StateHasChanged);
+
+                    // Highlight updated row
+                    try
+                    {
+                        if (!_disposed)
+                        {
+                            await InvokeAsync(async () =>
+                            {
+                                await Task.Yield();
+                                await JSRuntime.InvokeVoidAsync("personalMedicalEffects.highlightRow", personalId, 2000);
+                            });
+                        }
+                    }
+                    catch (Exception jsEx)
+                    {
+                        Logger.LogDebug(jsEx, "Highlight JS failed for updated PersonalID {PersonalId}", personalId);
+                    }
+                }
+                else
+                {
+                    CurrentPageData.RemoveAt(idx);
+                    TotalRecords = Math.Max(0, TotalRecords - 1);
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            else
+            {
+                // Not on current page - if it matches filters and we're on first page, we can insert
+                if (MatchesCurrentFilters(dto) && CurrentPage == 1)
+                {
+                    CurrentPageData.Insert(0, dto);
+                    if (CurrentPageData.Count > CurrentPageSize) CurrentPageData.RemoveAt(CurrentPageData.Count - 1);
+                    await InvokeAsync(StateHasChanged);
+
+                    // Highlight updated/inserted row after bringing it to current page
+                    try
+                    {
+                        if (!_disposed)
+                        {
+                            await InvokeAsync(async () =>
+                            {
+                                await Task.Yield();
+                                await JSRuntime.InvokeVoidAsync("personalMedicalEffects.highlightRow", personalId, 2000);
+                            });
+                        }
+                    }
+                    catch (Exception jsEx)
+                    {
+                        Logger.LogDebug(jsEx, "Highlight JS failed for updated PersonalID {PersonalId}", personalId);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogDebug(ex, "Error applying Updated event for PersonalID {PersonalId}", personalId);
+        }
+    }
+
+    private async Task ApplyDeletedAsync(Guid personalId)
+    {
+        try
+        {
+            var idx = CurrentPageData.FindIndex(p => p.PersonalID == personalId);
+            if (idx >= 0)
+            {
+                CurrentPageData.RemoveAt(idx);
+                TotalRecords = Math.Max(0, TotalRecords - 1);
+
+                // If page is now empty but there are more pages, step back and reload
+                if (CurrentPageData.Count == 0 && CurrentPage > 1)
+                {
+                    CurrentPage = Math.Max(1, CurrentPage - 1);
+                    await LoadPagedData();
+                    return;
+                }
+
+                await InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                // Item not on current page; just decrement total if applicable
+                if (TotalRecords > 0) TotalRecords = Math.Max(0, TotalRecords - 1);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogDebug(ex, "Error applying Deleted event for PersonalID {PersonalId}", personalId);
         }
     }
 
@@ -336,6 +626,17 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
                 SortColumn = CurrentSortColumn,
                 SortDirection = CurrentSortDirection
             };
+
+            // Attach column filters if any advanced column filters are supplied
+            var columnFilters = new List<ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalList.ColumnFilterDto>();
+            if (!string.IsNullOrWhiteSpace(AdvancedNume)) columnFilters.Add(new ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalList.ColumnFilterDto { Column = "Nume", Operator = AdvancedNumeOperator ?? "Contains", Value = AdvancedNume });
+            if (!string.IsNullOrWhiteSpace(AdvancedSpecializare)) columnFilters.Add(new ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalList.ColumnFilterDto { Column = "Specializare", Operator = AdvancedSpecializareOperator ?? "Contains", Value = AdvancedSpecializare });
+            if (!string.IsNullOrWhiteSpace(AdvancedNumarLicenta)) columnFilters.Add(new ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalList.ColumnFilterDto { Column = "NumarLicenta", Operator = AdvancedNumarLicentaOperator ?? "Contains", Value = AdvancedNumarLicenta });
+
+            if (columnFilters.Any())
+            {
+                query = query with { ColumnFilters = columnFilters };
+            }
 
             var result = await Mediator.Send(query);
 

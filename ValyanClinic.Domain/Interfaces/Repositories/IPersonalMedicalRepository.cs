@@ -20,6 +20,7 @@ public interface IPersonalMedicalRepository
         bool? esteActiv = null,
         string sortColumn = "Nume",
         string sortDirection = "ASC",
+        string? columnFiltersJson = null,
         CancellationToken cancellationToken = default);
 
     Task<int> GetCountAsync(
@@ -27,6 +28,7 @@ public interface IPersonalMedicalRepository
         string? departament = null,
         string? pozitie = null,
         bool? esteActiv = null,
+        string? columnFiltersJson = null,
         CancellationToken cancellationToken = default);
 
     // New: metadata & statistics for filters & dashboard (domain DTOs)

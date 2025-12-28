@@ -38,5 +38,22 @@ public class GetPersonalMedicalListQueryValidator : AbstractValidator<GetPersona
             .WithMessage("SortDirection invalid - foloseste 'ASC' sau 'DESC'");
 
         // No validation needed for nullable boolean FilterEsteActiv - server-side will interpret correctly
+
+        // Column filters validation (if provided)
+        RuleForEach(x => x.ColumnFilters).ChildRules(cf =>
+        {
+            cf.RuleFor(f => f.Column)
+              .NotEmpty().WithMessage("Column filter requires a Column name")
+              .Must(col => AllowedSortColumns.Contains(col) || col.Equals("NumeComplet", StringComparison.OrdinalIgnoreCase))
+              .WithMessage("Invalid column name in ColumnFilters");
+
+            cf.RuleFor(f => f.Operator)
+              .NotEmpty()
+              .Must(op => new[] { "Contains", "Equals", "StartsWith", "EndsWith" }.Contains(op))
+              .WithMessage("Operator invalid in ColumnFilters");
+
+            cf.RuleFor(f => f.Value)
+              .NotEmpty().WithMessage("Filter value required").MaximumLength(200);
+        });
     }
-}
+} 
