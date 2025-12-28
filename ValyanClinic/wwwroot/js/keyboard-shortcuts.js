@@ -15,13 +15,25 @@ window.keyboardShortcuts = (function () {
         try {
             // High-priority shortcuts that should work even when typing in inputs
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
+                console.debug('keyboardShortcuts: Ctrl+N intercepted');
                 e.preventDefault();
+                try { e.stopImmediatePropagation(); e.stopPropagation(); } catch (ex) {}
                 dotnetRef?.invokeMethodAsync('OnKeyboardShortcut', 'new');
                 return;
             }
 
-            if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'e' || e.key === 'F2')) {
+            if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'e')) {
                 e.preventDefault();
+                try { e.stopImmediatePropagation(); e.stopPropagation(); } catch (ex) {}
+                dotnetRef?.invokeMethodAsync('OnKeyboardShortcut', 'edit');
+                return;
+            }
+
+            // F2 alone should also trigger edit when not typing in an input
+            if (e.key === 'F2' && !isTypingInInput()) {
+                console.debug('keyboardShortcuts: F2 intercepted');
+                e.preventDefault();
+                try { e.stopImmediatePropagation(); e.stopPropagation(); } catch (ex) {}
                 dotnetRef?.invokeMethodAsync('OnKeyboardShortcut', 'edit');
                 return;
             }
@@ -70,6 +82,7 @@ window.keyboardShortcuts = (function () {
                 handler = onKey;
                 // Use capture and passive:false so we can reliably intercept browser shortcuts like Ctrl+N
                 window.addEventListener('keydown', handler, { capture: true, passive: false });
+                console.debug('keyboardShortcuts registered (capture:true)');
             }
             catch (err) {
                 console.debug('keyboardShortcuts register error', err);
@@ -77,7 +90,10 @@ window.keyboardShortcuts = (function () {
         },
         unregister: function () {
             try {
-                if (handler) window.removeEventListener('keydown', handler);
+                if (handler) {
+                    // remove with capture:true to match registration
+                    window.removeEventListener('keydown', handler, { capture: true });
+                }
                 handler = null;
                 dotnetRef = null;
             }
