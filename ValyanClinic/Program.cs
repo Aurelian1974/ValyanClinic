@@ -296,6 +296,14 @@ try
     builder.Services.AddScoped<ValyanClinic.Application.Services.Export.IPersonalMedicalExportService, ValyanClinic.Application.Services.Export.PersonalMedicalExportService>();
 
     // ========================================
+    // SIGNALR: PersonalMedical realtime notifications
+    // ========================================
+    builder.Services.AddSignalR();
+
+    // Application-level notifier implementation (uses IHubContext)
+    builder.Services.AddScoped<ValyanClinic.Application.Interfaces.IPersonalMedicalNotifier, ValyanClinic.Services.SignalR.PersonalMedicalNotifier>();
+
+    // ========================================
     // DATAGRID SERVICES
     // ========================================
     builder.Services.AddScoped(typeof(IDataGridStateService<>), typeof(DataGridStateService<>));
@@ -515,6 +523,11 @@ try
     // API CONTROLLERS (TREBUIE SĂ FIE ÎNAINTEA BLAZOR)
     // ========================================
     app.MapControllers();
+
+    // ========================================
+    // SIGNALR HUBS
+    // ========================================
+    app.MapHub<ValyanClinic.Hubs.PersonalMedicalHub>("/personalmedicalHub");
 
     // ========================================
     // BLAZOR

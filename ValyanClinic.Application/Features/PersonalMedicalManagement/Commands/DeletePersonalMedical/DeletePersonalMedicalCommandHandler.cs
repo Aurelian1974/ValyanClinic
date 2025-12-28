@@ -9,13 +9,16 @@ public class DeletePersonalMedicalCommandHandler : IRequestHandler<DeletePersona
 {
     private readonly IPersonalMedicalRepository _repository;
     private readonly ILogger<DeletePersonalMedicalCommandHandler> _logger;
+    private readonly ValyanClinic.Application.Interfaces.IPersonalMedicalNotifier? _notifier;
 
     public DeletePersonalMedicalCommandHandler(
         IPersonalMedicalRepository repository,
-        ILogger<DeletePersonalMedicalCommandHandler> logger)
+        ILogger<DeletePersonalMedicalCommandHandler> logger,
+        ValyanClinic.Application.Interfaces.IPersonalMedicalNotifier? notifier = null)
     {
         _repository = repository;
         _logger = logger;
+        _notifier = notifier;
     }
 
     public async Task<Result<bool>> Handle(DeletePersonalMedicalCommand request, CancellationToken cancellationToken)
@@ -29,6 +32,19 @@ public class DeletePersonalMedicalCommandHandler : IRequestHandler<DeletePersona
             if (success)
             {
                 _logger.LogInformation("Personal medical sters cu succes: {PersonalID}", request.PersonalID);
+
+                try
+                {
+                    if (_notifier != null)
+                    {
+                        await _notifier.NotifyPersonalChangedAsync("Deleted", request.PersonalID, cancellationToken);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogDebug(ex, "Notifier failed for Deleted event");
+                }
+
                 return Result<bool>.Success(true, "Personal medical sters cu succes");
             }
 

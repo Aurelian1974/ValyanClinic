@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using ValyanClinic.Components.Pages.Administrare.PersonalMedical.Modals;
 using ValyanClinic.Components.Shared.Modals;
 using Microsoft.JSInterop;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ValyanClinic.Components.Pages.Administrare.PersonalMedical;
 
@@ -151,6 +152,8 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
     private DotNetObjectReference<AdministrarePersonalMedical>? _dotNetRef;
 
+    private Microsoft.AspNetCore.SignalR.Client.HubConnection? _personalHubConnection;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -174,6 +177,33 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
                 _dotNetRef = DotNetObjectReference.Create(this);
                 await JSRuntime.InvokeVoidAsync("keyboardShortcuts.register", _dotNetRef);
                 Logger.LogDebug("Registered keyboard shortcuts");
+
+                // Setup SignalR connection for realtime updates
+                try
+                {
+                    _personalHubConnection = new Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilder()
+                        .WithUrl(NavigationManager.ToAbsoluteUri("/personalmedicalHub"))
+                        .WithAutomaticReconnect()
+                        .Build();
+
+                    _personalHubConnection.On<string, Guid>("PersonalChanged", async (action, id) =>
+                    {
+                        Logger.LogInformation("SignalR PersonalChanged received: {Action} {Id}", action, id);
+                        // For now, refresh the current page to reflect changes
+                        await InvokeAsync(async () =>
+                        {
+                            await LoadPagedData();
+                            await ShowActionToast("Actualizat", "Lista", $"Eveniment: {action}", "e-toast-info");
+                        });
+                    });
+
+                    await _personalHubConnection.StartAsync();
+                    Logger.LogDebug("PersonalMedical SignalR connected");
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning(ex, "Failed to start PersonalMedical SignalR connection");
+                }
             }
             catch (Exception ex)
             {
@@ -245,8 +275,29 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
             DateTime.Now.ToString("HH:mm:ss.fff"));
         }
 
+        // Fire-and-forget: stop and dispose SignalR connection gracefully
+        _ = StopAndDisposeSignalRAsync();
+
         Logger.LogWarning("🏁 [PersonalMedical] Dispose END - Time: {Time}, Total elapsed: {Elapsed}ms (Syncfusion cleanup handled by Blazor)",
                 DateTime.Now.ToString("HH:mm:ss.fff"), (DateTime.Now - disposeTime).TotalMilliseconds);
+    }
+
+    private async Task StopAndDisposeSignalRAsync()
+    {
+        try
+        {
+            if (_personalHubConnection != null)
+            {
+                await _personalHubConnection.StopAsync();
+                await _personalHubConnection.DisposeAsync();
+                _personalHubConnection = null;
+                Logger.LogDebug("PersonalMedical SignalR connection stopped and disposed");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogDebug(ex, "Error stopping SignalR connection");
+        }
     }
 
 

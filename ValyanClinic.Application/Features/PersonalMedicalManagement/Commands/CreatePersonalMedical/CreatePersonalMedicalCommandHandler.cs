@@ -10,13 +10,16 @@ public class CreatePersonalMedicalCommandHandler : IRequestHandler<CreatePersona
 {
     private readonly IPersonalMedicalRepository _repository;
     private readonly ILogger<CreatePersonalMedicalCommandHandler> _logger;
+    private readonly ValyanClinic.Application.Interfaces.IPersonalMedicalNotifier? _notifier;
 
     public CreatePersonalMedicalCommandHandler(
         IPersonalMedicalRepository repository,
-        ILogger<CreatePersonalMedicalCommandHandler> logger)
+        ILogger<CreatePersonalMedicalCommandHandler> logger,
+        ValyanClinic.Application.Interfaces.IPersonalMedicalNotifier? notifier = null)
     {
         _repository = repository;
         _logger = logger;
+        _notifier = notifier;
     }
 
     public async Task<Result<Guid>> Handle(
@@ -56,6 +59,20 @@ public class CreatePersonalMedicalCommandHandler : IRequestHandler<CreatePersona
             }
 
             _logger.LogInformation("PersonalMedical created successfully: {PersonalID}", newId);
+
+            // Notify listeners (if notifier is available)
+            try
+            {
+                if (_notifier != null)
+                {
+                    await _notifier.NotifyPersonalChangedAsync("Created", newId, cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Notifier failed for Created event");
+            }
+
             return Result<Guid>.Success(newId);
         }
         catch (Exception ex)

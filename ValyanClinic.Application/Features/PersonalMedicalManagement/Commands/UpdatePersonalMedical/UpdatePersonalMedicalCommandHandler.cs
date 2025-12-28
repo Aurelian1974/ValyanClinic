@@ -10,13 +10,16 @@ public class UpdatePersonalMedicalCommandHandler : IRequestHandler<UpdatePersona
 {
     private readonly IPersonalMedicalRepository _repository;
     private readonly ILogger<UpdatePersonalMedicalCommandHandler> _logger;
+    private readonly ValyanClinic.Application.Interfaces.IPersonalMedicalNotifier? _notifier;
 
     public UpdatePersonalMedicalCommandHandler(
         IPersonalMedicalRepository repository,
-        ILogger<UpdatePersonalMedicalCommandHandler> logger)
+        ILogger<UpdatePersonalMedicalCommandHandler> logger,
+        ValyanClinic.Application.Interfaces.IPersonalMedicalNotifier? notifier = null)
     {
         _repository = repository;
         _logger = logger;
+        _notifier = notifier;
     }
 
     public async Task<Result<bool>> Handle(
@@ -69,6 +72,19 @@ public class UpdatePersonalMedicalCommandHandler : IRequestHandler<UpdatePersona
             }
 
             _logger.LogInformation("PersonalMedical updated successfully: {PersonalID}", request.PersonalID);
+
+            try
+            {
+                if (_notifier != null)
+                {
+                    await _notifier.NotifyPersonalChangedAsync("Updated", request.PersonalID, cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Notifier failed for Updated event");
+            }
+
             return Result<bool>.Success(true);
         }
         catch (Exception ex)
