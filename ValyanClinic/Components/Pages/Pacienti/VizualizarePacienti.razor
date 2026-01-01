@@ -431,6 +431,7 @@
             <section class="data-section">
                 <div class="grid-wrapper">
                     <SfGrid @ref="GridRef"
+                            @key="@_gridKey"
                             DataSource="@CurrentPageData"
                             Height="100%"
                             AllowPaging="true"

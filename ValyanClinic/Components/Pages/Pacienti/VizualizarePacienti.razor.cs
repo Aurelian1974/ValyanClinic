@@ -25,6 +25,9 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
 
     // Grid reference
     private SfGrid<PacientListDto>? GridRef;
+    
+    // ✅ CRITICAL: Unique key for Grid - forces recreation on navigation
+    private string _gridKey = Guid.NewGuid().ToString();
 
     // Toast reference
     private SfToast? ToastRef;
@@ -80,6 +83,7 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
     private bool _disposed = false;
     private bool _initialized = false;
     private bool _isInitializing = false;
+    private bool _isExporting = false; // ✅ NEW: Track export in progress
 
     // Filter Options
     private List<FilterOption> JudetOptions { get; set; } = new();
@@ -121,6 +125,9 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
 
         try
         {
+            // ✅ CRITICAL: Subscribe to navigation BEFORE it happens
+            NavigationManager.LocationChanged += OnLocationChanged;
+
             // ✅ ADDED: CRITICAL - Delay MĂRIT pentru cleanup complet
             Logger.LogInformation("Waiting for previous component cleanup...");
             await Task.Delay(800); // MĂRIT pentru Syncfusion Grid cleanup
@@ -165,40 +172,65 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
         }
     }
 
-    // ✅ IMPROVED: Dispose with proper cleanup
+    // ✅ CRITICAL: Handle location changes - cleanup BEFORE navigation completes
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        Logger.LogDebug("Location changed - cleaning up Syncfusion components");
+        
+        // Set flag immediately
+        _disposed = true;
+        
+        // Cleanup Syncfusion via JavaScript
+        try
+        {
+            _ = JSRuntime.InvokeVoidAsync("cleanupSyncfusionBeforeNavigation");
+        }
+        catch
+        {
+            // Ignore - might already be disposed
+        }
+    }
+
+    // ✅ FIXED: Complete disposal with Syncfusion cleanup via JS
     public void Dispose()
     {
         if (_disposed) return;
 
-        // Setează flag imediat pentru a bloca noi operații
+        Logger.LogDebug("VizualizarePacienti Dispose() START");
         _disposed = true;
 
-        // CRITICAL: Cleanup SINCRON pentru Syncfusion Grid
+        // ✅ CRITICAL: Unsubscribe from navigation events
+        NavigationManager.LocationChanged -= OnLocationChanged;
+
+        if (_isExporting)
+        {
+            Logger.LogWarning("Export in progress - skipping cleanup");
+            return;
+        }
+
         try
         {
-            Logger.LogDebug("VizualizarePacienti disposing - SYNCHRONOUS cleanup");
+            // ✅ CRITICAL: Cleanup Syncfusion via JavaScript FIRST
+            _ = JSRuntime.InvokeVoidAsync("cleanupSyncfusionBeforeNavigation");
+            
+            // Clear grid reference
+            GridRef = null;
 
-            // ❌ NU setăm GridRef = null - lăsăm Syncfusion să gestioneze propriul lifecycle
-            // GridRef = null; // ELIMINAT - cauzează probleme cu referințele
-
-            // Cancel orice operații în curs
+            // Cancel operations
             _searchDebounceTokenSource?.Cancel();
             _searchDebounceTokenSource?.Dispose();
             _searchDebounceTokenSource = null;
 
-            // Clear data IMEDIAT
+            // Clear data
             CurrentPageData?.Clear();
             CurrentPageData = new();
 
-            Logger.LogDebug("VizualizarePacienti disposed - Data cleared, GridRef preserved");
+            Logger.LogDebug("VizualizarePacienti Dispose() COMPLETE");
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error in synchronous dispose");
+            Logger.LogError(ex, "Error in Dispose");
         }
-
-        // CRITICAL: ELIMINAT async cleanup forțat - lăsăm Blazor disposal natural
-        Logger.LogDebug("VizualizarePacienti dispose COMPLETE - Natural Blazor disposal will handle GridRef");
     }
 
     private void InitializeStaticFilterOptions()
@@ -620,8 +652,17 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
     {
         if (_disposed || CurrentPageData.Count == 0) return;
 
+        // ✅ GUARD: Prevent concurrent exports
+        if (_isExporting)
+        {
+            Logger.LogWarning("[Export] Export already in progress - skipping");
+            return;
+        }
+
         try
         {
+            _isExporting = true; // ✅ Set flag BEFORE export starts
+
             Logger.LogInformation("[Export] Starting Excel export for {Count} pacienti", CurrentPageData.Count);
             
             // Export all filtered data, not just current page
@@ -647,6 +688,8 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
 
             var result = await DataService.LoadPagedDataAsync(filters, pagination, sorting);
 
+            if (_disposed) return; // ✅ Check after async operation
+
             if (!result.IsSuccess || result.Value.Items.Count == 0)
             {
                 await ShowErrorToastAsync("Nu există date pentru export");
@@ -656,17 +699,38 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
             var exportData = result.Value.Items;
             var bytes = await ExcelExportService.ExportPacientiToExcelAsync(exportData);
 
+            if (_disposed) return; // ✅ Check after async operation
+
             // Download file using JS Interop
             var fileName = $"Pacienti_{DateTime.Now:yyyy-MM-dd_HH-mm}.xlsx";
             await DownloadFileFromBytes(bytes, fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
-            await ShowSuccessToastAsync($"Exportate {exportData.Count} înregistrări în Excel");
-            Logger.LogInformation("[Export] Excel export completed: {FileName}", fileName);
+            if (_disposed) return; // ✅ Check after async operation
+
+            // ✅ CRITICAL: Wait for JavaScript download to complete (200ms setTimeout in fileDownload.js)
+            await Task.Delay(250); // 200ms + 50ms safety margin
+
+            if (!_disposed) // ✅ Only show toast if still mounted
+            {
+                await ShowSuccessToastAsync($"Exportate {exportData.Count} înregistrări în Excel");
+                Logger.LogInformation("[Export] Excel export completed: {FileName}", fileName);
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            Logger.LogDebug("[Export] Component disposed during export (navigation away)");
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "[Export] Error exporting to Excel");
-            await ShowErrorToastAsync($"Eroare la export: {ex.Message}");
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "[Export] Error exporting to Excel");
+                await ShowErrorToastAsync($"Eroare la export: {ex.Message}");
+            }
+        }
+        finally
+        {
+            _isExporting = false; // ✅ Clear flag when done
         }
     }
 
