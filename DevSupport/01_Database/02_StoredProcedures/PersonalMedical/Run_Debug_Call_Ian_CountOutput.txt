@@ -1,0 +1,43 @@
+Tag
+---
+DEBUG_COLUMN_FILTERS
+Column Operator Value
+------ -------- -----
+Nume Contains ian
+ColumnFiltersJsonLength ColumnFiltersJsonIsJson
+----------------------- -----------------------
+55 1
+ColumnFiltersJson
+-----------------
+[{"Column":"Nume","Operator":"Contains","Value":"ian"}]
+SqlLength
+---------
+2912
+Part1
+-----
+
+        SELECT
+            PersonalID, Nume, Prenume, Specializare, NumarLicenta, Telefon, Email, Departament, Pozitie, EsteActiv, DataCreare
+        FROM dbo.PersonalMedical PM
+        WHERE 1=1 AND NOT EXISTS (
+            SELECT 1 FROM #ColumnFilt
+Part2
+-----
+
+Part3
+-----
+
+CountSqlLength
+--------------
+3030
+CountPart1
+----------
+SELECT @out = COUNT(1) FROM dbo.PersonalMedical PM WHERE 1=1 AND NOT EXISTS (
+                SELECT 1 FROM #ColumnFilters f
+                WHERE f.[Column] IN ('Nume','Specializare','NumarLicenta')
+                  AND NOT (
+                    (
+ 
+CountPart2
+----------
+

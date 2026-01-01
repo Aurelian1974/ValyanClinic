@@ -1,0 +1,10 @@
+ProcDef
+-------
+
+-- Use CREATE OR ALTER so this script is idempotent
+CREATE   PROCEDURE [dbo].[sp_PersonalMedical_GetAll]
+    @PageNumber INT = 1,
+    @PageSize INT = 20,
+    @SearchText NVARCHAR(200) = NULL,
+    @Departament NVARCHAR(200) = NULL,
+    @Pozitie NVAR

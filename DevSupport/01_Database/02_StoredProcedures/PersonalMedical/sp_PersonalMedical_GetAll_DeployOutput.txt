@@ -1,0 +1,4 @@
+Msg 156, Level 15, State 1, Server DESKTOP-3Q8HI82\ERP, Procedure sp_PersonalMedical_GetAll, Line 194
+Incorrect syntax near the keyword 'IF'.
+Msg 102, Level 15, State 1, Server DESKTOP-3Q8HI82\ERP, Procedure sp_PersonalMedical_GetAll, Line 269
+Incorrect syntax near 'END'.

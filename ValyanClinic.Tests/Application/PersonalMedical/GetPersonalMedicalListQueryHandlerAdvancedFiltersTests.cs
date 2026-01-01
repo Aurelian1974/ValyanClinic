@@ -29,13 +29,49 @@ namespace ValyanClinic.Tests.Application.PersonalMedical
             };
 
             mockRepo.Setup(r => r.GetAllAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<bool?>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(sampleData);
+                .ReturnsAsync((int pn, int ps, string? s1, string? d1, string? p1, bool? e1, string sc, string sd, string? columnFiltersJson, CancellationToken ct) =>
+                {
+                    var items = sampleData.AsEnumerable();
+                    if (!string.IsNullOrEmpty(columnFiltersJson))
+                    {
+                        var filters = System.Text.Json.JsonSerializer.Deserialize<List<ColumnFilterDto>>(columnFiltersJson);
+                        foreach (var f in filters)
+                        {
+                            if (f.Column == "Nume")
+                            {
+                                if (f.Operator == "Contains") items = items.Where(x => !string.IsNullOrEmpty(x.Nume) && x.Nume.Contains(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "Equals") items = items.Where(x => x.Nume == f.Value);
+                                if (f.Operator == "StartsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Nume) && x.Nume.StartsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "EndsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Nume) && x.Nume.EndsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                            }
+                            if (f.Column == "Specializare")
+                            {
+                                if (f.Operator == "Contains") items = items.Where(x => !string.IsNullOrEmpty(x.Specializare) && x.Specializare.Contains(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "Equals") items = items.Where(x => x.Specializare == f.Value);
+                                if (f.Operator == "StartsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Specializare) && x.Specializare.StartsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "EndsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Specializare) && x.Specializare.EndsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                            }
+                            if (f.Column == "NumarLicenta")
+                            {
+                                if (f.Operator == "Contains") items = items.Where(x => !string.IsNullOrEmpty(x.NumarLicenta) && x.NumarLicenta.Contains(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "Equals") items = items.Where(x => x.NumarLicenta == f.Value);
+                                if (f.Operator == "StartsWith") items = items.Where(x => !string.IsNullOrEmpty(x.NumarLicenta) && x.NumarLicenta.StartsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "EndsWith") items = items.Where(x => !string.IsNullOrEmpty(x.NumarLicenta) && x.NumarLicenta.EndsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                            }
+                        }
+                    }
+                    return items.ToList();
+                });
 
             mockRepo.Setup(r => r.GetFilterMetadataAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValyanClinic.Domain.Entities.PersonalMedicalFilterMetadataDto { AvailableDepartamente = new List<ValyanClinic.Domain.Entities.FilterOption>(), AvailablePozitii = new List<ValyanClinic.Domain.Entities.FilterOption>() });
 
             mockRepo.Setup(r => r.GetStatisticsAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new PersonalMedicalStatisticsDto { TotalActiv = 2, TotalInactiv = 1 });
+
+            var expectedCount = sampleData.Count(x => x.Nume.Contains("Ion"));
+            mockRepo.Setup(r => r.GetCountAsync(It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<bool?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expectedCount);
 
             var handler = new GetPersonalMedicalListQueryHandler(mockRepo.Object, logger.Object);
 
@@ -70,13 +106,49 @@ namespace ValyanClinic.Tests.Application.PersonalMedical
             };
 
             mockRepo.Setup(r => r.GetAllAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<bool?>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(sampleData);
+                .ReturnsAsync((int pn, int ps, string? s1, string? d1, string? p1, bool? e1, string sc, string sd, string? columnFiltersJson, CancellationToken ct) =>
+                {
+                    var items = sampleData.AsEnumerable();
+                    if (!string.IsNullOrEmpty(columnFiltersJson))
+                    {
+                        var filters = System.Text.Json.JsonSerializer.Deserialize<List<ColumnFilterDto>>(columnFiltersJson);
+                        foreach (var f in filters)
+                        {
+                            if (f.Column == "Nume")
+                            {
+                                if (f.Operator == "Contains") items = items.Where(x => !string.IsNullOrEmpty(x.Nume) && x.Nume.Contains(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "Equals") items = items.Where(x => x.Nume == f.Value);
+                                if (f.Operator == "StartsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Nume) && x.Nume.StartsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "EndsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Nume) && x.Nume.EndsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                            }
+                            if (f.Column == "Specializare")
+                            {
+                                if (f.Operator == "Contains") items = items.Where(x => !string.IsNullOrEmpty(x.Specializare) && x.Specializare.Contains(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "Equals") items = items.Where(x => x.Specializare == f.Value);
+                                if (f.Operator == "StartsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Specializare) && x.Specializare.StartsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "EndsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Specializare) && x.Specializare.EndsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                            }
+                            if (f.Column == "NumarLicenta")
+                            {
+                                if (f.Operator == "Contains") items = items.Where(x => !string.IsNullOrEmpty(x.NumarLicenta) && x.NumarLicenta.Contains(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "Equals") items = items.Where(x => x.NumarLicenta == f.Value);
+                                if (f.Operator == "StartsWith") items = items.Where(x => !string.IsNullOrEmpty(x.NumarLicenta) && x.NumarLicenta.StartsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "EndsWith") items = items.Where(x => !string.IsNullOrEmpty(x.NumarLicenta) && x.NumarLicenta.EndsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                            }
+                        }
+                    }
+                    return items.ToList();
+                });
 
             mockRepo.Setup(r => r.GetFilterMetadataAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new PersonalMedicalFilterMetadataDto { AvailableDepartamente = new List<ValyanClinic.Domain.Entities.FilterOption>(), AvailablePozitii = new List<ValyanClinic.Domain.Entities.FilterOption>() });
 
             mockRepo.Setup(r => r.GetStatisticsAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new PersonalMedicalStatisticsDto { TotalActiv = 2, TotalInactiv = 1 });
+
+            var expectedCount = sampleData.Count(x => x.Specializare.StartsWith("Cardio"));
+            mockRepo.Setup(r => r.GetCountAsync(It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<bool?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expectedCount);
 
             var handler = new GetPersonalMedicalListQueryHandler(mockRepo.Object, logger.Object);
 
@@ -111,13 +183,49 @@ namespace ValyanClinic.Tests.Application.PersonalMedical
             };
 
             mockRepo.Setup(r => r.GetAllAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<bool?>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(sampleData);
+                .ReturnsAsync((int pn, int ps, string? s1, string? d1, string? p1, bool? e1, string sc, string sd, string? columnFiltersJson, CancellationToken ct) =>
+                {
+                    var items = sampleData.AsEnumerable();
+                    if (!string.IsNullOrEmpty(columnFiltersJson))
+                    {
+                        var filters = System.Text.Json.JsonSerializer.Deserialize<List<ColumnFilterDto>>(columnFiltersJson);
+                        foreach (var f in filters)
+                        {
+                            if (f.Column == "Nume")
+                            {
+                                if (f.Operator == "Contains") items = items.Where(x => !string.IsNullOrEmpty(x.Nume) && x.Nume.Contains(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "Equals") items = items.Where(x => x.Nume == f.Value);
+                                if (f.Operator == "StartsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Nume) && x.Nume.StartsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "EndsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Nume) && x.Nume.EndsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                            }
+                            if (f.Column == "Specializare")
+                            {
+                                if (f.Operator == "Contains") items = items.Where(x => !string.IsNullOrEmpty(x.Specializare) && x.Specializare.Contains(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "Equals") items = items.Where(x => x.Specializare == f.Value);
+                                if (f.Operator == "StartsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Specializare) && x.Specializare.StartsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "EndsWith") items = items.Where(x => !string.IsNullOrEmpty(x.Specializare) && x.Specializare.EndsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                            }
+                            if (f.Column == "NumarLicenta")
+                            {
+                                if (f.Operator == "Contains") items = items.Where(x => !string.IsNullOrEmpty(x.NumarLicenta) && x.NumarLicenta.Contains(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "Equals") items = items.Where(x => x.NumarLicenta == f.Value);
+                                if (f.Operator == "StartsWith") items = items.Where(x => !string.IsNullOrEmpty(x.NumarLicenta) && x.NumarLicenta.StartsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                                if (f.Operator == "EndsWith") items = items.Where(x => !string.IsNullOrEmpty(x.NumarLicenta) && x.NumarLicenta.EndsWith(f.Value, StringComparison.OrdinalIgnoreCase));
+                            }
+                        }
+                    }
+                    return items.ToList();
+                });
 
             mockRepo.Setup(r => r.GetFilterMetadataAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new PersonalMedicalFilterMetadataDto { AvailableDepartamente = new List<ValyanClinic.Domain.Entities.FilterOption>(), AvailablePozitii = new List<ValyanClinic.Domain.Entities.FilterOption>() });
 
             mockRepo.Setup(r => r.GetStatisticsAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new PersonalMedicalStatisticsDto { TotalActiv = 2, TotalInactiv = 1 });
+
+            var expectedCount = sampleData.Count(x => x.Nume.Contains("Ionescu") && x.Specializare == "Cardiologie");
+            mockRepo.Setup(r => r.GetCountAsync(It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<bool?>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expectedCount);
 
             var handler = new GetPersonalMedicalListQueryHandler(mockRepo.Object, logger.Object);
 

@@ -1,0 +1,23 @@
+ColumnFiltersJsonLength ColumnFiltersJsonIsJson
+----------------------- -----------------------
+57 1
+ColumnFiltersJson
+-----------------
+[{"Column":"Nume","Operator":"Contains","Value":"Iancu"}]
+SqlLength
+---------
+2426
+Part1
+-----
+
+        SELECT
+            PersonalID, Nume, Prenume, Specializare, NumarLicenta, Telefon, Email, Departament, Pozitie, EsteActiv, DataCreare
+        FROM dbo.PersonalMedical PM
+        WHERE 1=1 AND NOT EXISTS (
+            SELECT 1 FROM OPENJSON(@C
+Part2
+-----
+
+Part3
+-----
+

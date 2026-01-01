@@ -1,0 +1,23 @@
+ColumnFiltersJsonLength ColumnFiltersJsonIsJson
+----------------------- -----------------------
+62 1
+ColumnFiltersJson
+-----------------
+[{"Column":"Nume","Operator":"Equals","Value":"__NO_MATCH__"}]
+SqlLength
+---------
+2489
+Part1
+-----
+
+        SELECT
+            PersonalID, Nume, Prenume, Specializare, NumarLicenta, Telefon, Email, Departament, Pozitie, EsteActiv, DataCreare
+        FROM dbo.PersonalMedical PM
+        WHERE 1=1 AND NOT EXISTS (
+            SELECT 1 FROM #ColumnFilt
+Part2
+-----
+
+Part3
+-----
+

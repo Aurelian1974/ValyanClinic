@@ -1,0 +1,8 @@
+GeneratedSQL                                                                                                                                                                                                                                                    
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        SELECT
+            PersonalID, Nume, Prenume, Specializare, NumarLicenta, Telefon, Email, Departament, Pozitie, EsteActiv, DataCreare
+        FROM dbo.PersonalMedical PM
+        WHERE 1=1 AND NOT EXISTS (
+            SELECT 1 FROM OPENJSON(@C

@@ -1,0 +1,12 @@
+Tag
+---
+DEBUG_COLUMN_FILTERS
+Column Operator Value
+------ -------- -----
+Nume StartsWith Ian
+PersonalID Nume Prenume Specializare NumarLicenta Telefon Email Departament Pozitie EsteActiv DataCreare
+---------- ---- ------- ------------ ------------ ------- ----- ----------- ------- --------- ----------
+79BB0EA1-6A87-4CCE-9D0D-C1EE3066035E Iancu Ionel Boli infec?ioase MED122456 0740568384 ia.iancuqc@yahoo.com Pneumologie 1 Medic primar 1 2025-11-02 18:30:25.5466667
+TotalCount
+----------
+2

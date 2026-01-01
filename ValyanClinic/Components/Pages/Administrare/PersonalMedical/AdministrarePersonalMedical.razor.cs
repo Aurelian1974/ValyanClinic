@@ -718,10 +718,18 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
 
         Logger.LogInformation("Clearing all filters");
 
+        // Clear all filters including advanced ones
         GlobalSearchText = string.Empty;
         FilterDepartament = null;
         FilterPozitie = null;
         FilterEsteActiv = null;
+
+        AdvancedNume = null;
+        AdvancedNumeOperator = "Contains";
+        AdvancedSpecializare = null;
+        AdvancedSpecializareOperator = "Contains";
+        AdvancedNumarLicenta = null;
+        AdvancedNumarLicentaOperator = "Contains";
 
         CurrentPage = 1;
         await LoadPagedData();
@@ -749,6 +757,18 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
                 break;
             case nameof(GlobalSearchText):
                 GlobalSearchText = string.Empty;
+                break;
+            case nameof(AdvancedNume):
+                AdvancedNume = null;
+                AdvancedNumeOperator = "Contains";
+                break;
+            case nameof(AdvancedSpecializare):
+                AdvancedSpecializare = null;
+                AdvancedSpecializareOperator = "Contains";
+                break;
+            case nameof(AdvancedNumarLicenta):
+                AdvancedNumarLicenta = null;
+                AdvancedNumarLicentaOperator = "Contains";
                 break;
         }
 

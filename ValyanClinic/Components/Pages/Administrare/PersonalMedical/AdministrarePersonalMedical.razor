@@ -111,108 +111,112 @@
         <div class="advanced-filter-panel @(IsAdvancedFilterExpanded ? "expanded" : "")">
             <div class="filter-content">
                 <div class="filter-grid">
-                    <div class="filter-item">
-                        <label class="filter-label">
-                            <i class="fas fa-circle-check"></i>
-                            Status
-                        </label>
-                        <SfDropDownList TValue="string" 
-                                       TItem="FilterOption"
-                                       DataSource="@StatusOptions"
-                                       @bind-Value="@FilterEsteActiv"
-                                       Placeholder="Toate statusurile"
-                                       CssClass="filter-dropdown"
-                                       AllowFiltering="false"
-                                       ShowClearButton="false"
-                                       EnablePersistence="false"
-                                       IgnoreAccent="true">
-                            <DropDownListFieldSettings Text="Text" Value="Value"/>
-                        </SfDropDownList>
-                    </div>
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <label class="filter-label">
+                                <i class="fas fa-circle-check"></i>
+                                Status
+                            </label>
+                            <SfDropDownList TValue="string" 
+                                           TItem="FilterOption"
+                                           DataSource="@StatusOptions"
+                                           @bind-Value="@FilterEsteActiv"
+                                           Placeholder="Toate statusurile"
+                                           CssClass="filter-dropdown"
+                                           AllowFiltering="false"
+                                           ShowClearButton="false"
+                                           EnablePersistence="false"
+                                           IgnoreAccent="true">
+                                <DropDownListFieldSettings Text="Text" Value="Value"/>
+                            </SfDropDownList>
+                        </div>
 
-                    <div class="filter-item">
-                        <label class="filter-label">
-                            <i class="fas fa-building"></i>
-                            Departament
-                        </label>
-                        <SfDropDownList TValue="string" 
-                                       TItem="FilterOption"
-                                       DataSource="@DepartamentOptions"
-                                       @bind-Value="@FilterDepartament"
-                                       Placeholder="Toate departamentele"
-                                       CssClass="filter-dropdown"
-                                       AllowFiltering="false"
-                                       ShowClearButton="false"
-                                       EnablePersistence="false"
-                                       IgnoreAccent="true">
-                            <DropDownListFieldSettings Text="Text" Value="Value"/>
-                        </SfDropDownList>
-                    </div>
+                        <div class="filter-item">
+                            <label class="filter-label">
+                                <i class="fas fa-building"></i>
+                                Departament
+                            </label>
+                            <SfDropDownList TValue="string" 
+                                           TItem="FilterOption"
+                                           DataSource="@DepartamentOptions"
+                                           @bind-Value="@FilterDepartament"
+                                           Placeholder="Toate departamentele"
+                                           CssClass="filter-dropdown"
+                                           AllowFiltering="false"
+                                           ShowClearButton="false"
+                                           EnablePersistence="false"
+                                           IgnoreAccent="true">
+                                <DropDownListFieldSettings Text="Text" Value="Value"/>
+                            </SfDropDownList>
+                        </div>
 
-                    <div class="filter-item">
-                        <label class="filter-label">
-                            <i class="fas fa-user-tie"></i>
-                            Pozitie
-                        </label>
-                        <SfDropDownList TValue="string" 
-                                       TItem="FilterOption"
-                                       DataSource="@PozitieOptions"
-                                       @bind-Value="@FilterPozitie"
-                                       Placeholder="Toate pozitiile"
-                                       CssClass="filter-dropdown"
-                                       AllowFiltering="false"
-                                       ShowClearButton="false"
-                                       EnablePersistence="false"
-                                       IgnoreAccent="true">
-                            <DropDownListFieldSettings Text="Text" Value="Value"/>
-                        </SfDropDownList>
-                    </div>
-
-                    <div class="filter-item">
-                        <label class="filter-label">
-                            <i class="fas fa-id-card"></i>
-                            Nume (coloana)
-                        </label>
-                        <div class="filter-item-row">
-                            <div class="operator-with-help">
-                                <SfDropDownList TValue="string" TItem="FilterOption" DataSource="@OperatorOptions" @bind-Value="AdvancedNumeOperator" CssClass="filter-dropdown form-select-operator" AllowFiltering="false" ShowClearButton="false" EnablePersistence="false" IgnoreAccent="true">
-                                    <DropDownListFieldSettings Text="Text" Value="Value" />
-                                </SfDropDownList>
-                                <span class="op-help" title="Contains — căutare subșir; Equals — egal; StartsWith — începe cu; EndsWith — se termină cu"><i class="fas fa-info-circle"></i></span>
-                            </div>
-                            <input class="form-control" type="text" @bind="AdvancedNume" placeholder="Ex: Ion" />
+                        <div class="filter-item">
+                            <label class="filter-label">
+                                <i class="fas fa-user-tie"></i>
+                                Pozitie
+                            </label>
+                            <SfDropDownList TValue="string" 
+                                           TItem="FilterOption"
+                                           DataSource="@PozitieOptions"
+                                           @bind-Value="@FilterPozitie"
+                                           Placeholder="Toate pozitiile"
+                                           CssClass="filter-dropdown"
+                                           AllowFiltering="false"
+                                           ShowClearButton="false"
+                                           EnablePersistence="false"
+                                           IgnoreAccent="true">
+                                <DropDownListFieldSettings Text="Text" Value="Value"/>
+                            </SfDropDownList>
                         </div>
                     </div>
 
-                    <div class="filter-item">
-                        <label class="filter-label">
-                            <i class="fas fa-stethoscope"></i>
-                            Specializare
-                        </label>
-                        <div class="filter-item-row">
-                            <div class="operator-with-help">
-                                <SfDropDownList TValue="string" TItem="FilterOption" DataSource="@OperatorOptions" @bind-Value="AdvancedSpecializareOperator" CssClass="filter-dropdown form-select-operator" AllowFiltering="false" ShowClearButton="false" EnablePersistence="false" IgnoreAccent="true">
-                                    <DropDownListFieldSettings Text="Text" Value="Value" />
-                                </SfDropDownList>
-                                <span class="op-help" title="Contains — căutare subșir; Equals — egal; StartsWith — începe cu; EndsWith — se termină cu"><i class="fas fa-info-circle"></i></span>
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <label class="filter-label">
+                                <i class="fas fa-id-card"></i>
+                                Nume (coloana)
+                            </label>
+                            <div class="filter-item-row">
+                                <div class="operator-with-help">
+                                    <SfDropDownList TValue="string" TItem="FilterOption" DataSource="@OperatorOptions" @bind-Value="AdvancedNumeOperator" CssClass="filter-dropdown form-select-operator" AllowFiltering="false" ShowClearButton="false" EnablePersistence="false" IgnoreAccent="true">
+                                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                                    </SfDropDownList>
+                                    <span class="op-help" title="Contains — căutare subșir; Equals — egal; StartsWith — începe cu; EndsWith — se termină cu"><i class="fas fa-info-circle"></i></span>
+                                </div>
+                                <input class="form-control" type="text" @bind="AdvancedNume" placeholder="Ex: Ion" />
                             </div>
-                            <input class="form-control" type="text" @bind="AdvancedSpecializare" placeholder="Ex: Cardiologie" />
                         </div>
-                    </div>
 
-                    <div class="filter-item">
-                        <label class="filter-label">
-                            <i class="fas fa-file-signature"></i>
-                            Numar licenta
-                        </label>
-                        <div class="filter-item-row">
-                            <div class="operator-with-help">
-                                <SfDropDownList TValue="string" TItem="FilterOption" DataSource="@OperatorOptions" @bind-Value="AdvancedNumarLicentaOperator" CssClass="filter-dropdown form-select-operator" AllowFiltering="false" ShowClearButton="false" EnablePersistence="false" IgnoreAccent="true">
-                                    <DropDownListFieldSettings Text="Text" Value="Value" />
-                                </SfDropDownList>
-                                <span class="op-help" title="Contains — căutare subșir; Equals — egal; StartsWith — începe cu; EndsWith — se termină cu"><i class="fas fa-info-circle"></i></span>
+                        <div class="filter-item">
+                            <label class="filter-label">
+                                <i class="fas fa-stethoscope"></i>
+                                Specializare
+                            </label>
+                            <div class="filter-item-row">
+                                <div class="operator-with-help">
+                                    <SfDropDownList TValue="string" TItem="FilterOption" DataSource="@OperatorOptions" @bind-Value="AdvancedSpecializareOperator" CssClass="filter-dropdown form-select-operator" AllowFiltering="false" ShowClearButton="false" EnablePersistence="false" IgnoreAccent="true">
+                                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                                    </SfDropDownList>
+                                    <span class="op-help" title="Contains — căutare subșir; Equals — egal; StartsWith — începe cu; EndsWith — se termină cu"><i class="fas fa-info-circle"></i></span>
+                                </div>
+                                <input class="form-control" type="text" @bind="AdvancedSpecializare" placeholder="Ex: Cardiologie" />
                             </div>
-                            <input class="form-control" type="text" @bind="AdvancedNumarLicenta" placeholder="Ex: 12345" />
+                        </div>
+
+                        <div class="filter-item">
+                            <label class="filter-label">
+                                <i class="fas fa-file-signature"></i>
+                                Numar licenta
+                            </label>
+                            <div class="filter-item-row">
+                                <div class="operator-with-help">
+                                    <SfDropDownList TValue="string" TItem="FilterOption" DataSource="@OperatorOptions" @bind-Value="AdvancedNumarLicentaOperator" CssClass="filter-dropdown form-select-operator" AllowFiltering="false" ShowClearButton="false" EnablePersistence="false" IgnoreAccent="true">
+                                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                                    </SfDropDownList>
+                                    <span class="op-help" title="Contains — căutare subșir; Equals — egal; StartsWith — începe cu; EndsWith — se termină cu"><i class="fas fa-info-circle"></i></span>
+                                </div>
+                                <input class="form-control" type="text" @bind="AdvancedNumarLicenta" placeholder="Ex: 12345" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -264,13 +268,31 @@
                                     <i class="fas fa-times" @onclick="() => ClearFilter(nameof(FilterPozitie))"></i>
                                 </span>
                             }
-                        </div>
-                    </div>
+                            @if (!string.IsNullOrEmpty(AdvancedNume))
+                            {
+                                <span class="filter-chip">
+                                    Nume: @AdvancedNume
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(AdvancedNume))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(AdvancedSpecializare))
+                            {
+                                <span class="filter-chip">
+                                    Specializare: @AdvancedSpecializare
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(AdvancedSpecializare))"></i>
+                                </span>
+                            }
+                            @if (!string.IsNullOrEmpty(AdvancedNumarLicenta))
+                            {
+                                <span class="filter-chip">
+                                    Numar Licenta: @AdvancedNumarLicenta
+                                    <i class="fas fa-times" @onclick="() => ClearFilter(nameof(AdvancedNumarLicenta))"></i>
+                                </span>
+                            }
+                        </div> <!-- .filter-chips -->
+                    </div> <!-- .active-filters -->
                 }
-            </div>
-        </div>
 
-        <div class="action-toolbar @(SelectedPersonal != null ? "active" : "")">
             <div class="toolbar-info">
                 @if (SelectedPersonal != null)
                 {
@@ -289,29 +311,8 @@
                     </div>
                 }
             </div>
-            <div class="toolbar-actions">
-                <button class="toolbar-btn btn-view" 
-                        @onclick="() => HandleViewSelected()"
-                        disabled="@(SelectedPersonal == null)"
-                        title="Vizualizeaza detalii">
-                    <i class="fas fa-eye"></i>
-                    <span>Vizualizeaza</span>
-                </button>
-                <button class="toolbar-btn btn-edit" 
-                        @onclick="() => HandleEditSelected()"
-                        disabled="@(SelectedPersonal == null)"
-                        title="Editeaza informatii">
-                    <i class="fas fa-edit"></i>
-                    <span>Editeaza</span>
-                </button>
-                <button class="toolbar-btn btn-delete" 
-                        @onclick="() => HandleDeleteSelected()"
-                        disabled="@(SelectedPersonal == null)"
-                        title="Sterge personal medical">
-                    <i class="fas fa-trash"></i>
-                    <span>Sterge</span>
-                </button>
-            </div>
+            <!-- Toolbar actions removed — actions are available in the grid's quick actions column -->
+        </div>
         </div>
 
         <div class="page-size-selector">

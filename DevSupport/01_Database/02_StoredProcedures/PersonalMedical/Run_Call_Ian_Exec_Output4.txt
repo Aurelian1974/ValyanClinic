@@ -1,0 +1,22 @@
+Tag
+---
+DEBUG_COLUMN_FILTERS
+Column Operator Value
+------ -------- -----
+Nume Contains ian
+PersonalID Nume Prenume Specializare NumarLicenta Telefon Email Departament Pozitie EsteActiv DataCreare
+---------- ---- ------- ------------ ------------ ------- ----- ----------- ------- --------- ----------
+79BB0EA1-6A87-4CCE-9D0D-C1EE3066035E Iancu Ionel Boli infec?ioase MED122456 0740568384 ia.iancuqc@yahoo.com Pneumologie 1 Medic primar 1 2025-11-02 18:30:25.5466667
+B69555CC-6729-4BEE-B868-D0F51C4BF753 Iancu Valeria Pneumologie MED987655 0740999999 ia.iancu@yahoo.com Pneumologie 1 Medic primar 1 2025-11-04 16:09:39.0000000
+CF95B8D4-ED43-46B3-B46A-3CC098C1C2FC Parvulescu Marian Pneumologie pediatrica MD456888 0740595685 doctor@valyanmed.ro Pneumologie 1 Medic specialist 1 2025-12-28 12:25:11.8600000
+Msg 102, Level 15, State 1, Server DESKTOP-3Q8HI82\ERP, Line 15
+Incorrect syntax near 'Specializare'.
+Msg 105, Level 15, State 1, Server DESKTOP-3Q8HI82\ERP, Line 28
+Unclosed quotation mark after the character string ') COLLATE SQL_Latin1_General_CP1_CS_AS)
+                    )
+                )
+            )
+        )'.
+TotalCount
+----------
+0

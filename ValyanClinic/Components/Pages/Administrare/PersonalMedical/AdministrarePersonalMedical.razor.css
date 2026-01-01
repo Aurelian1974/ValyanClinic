@@ -432,16 +432,23 @@
 }
 
 .filter-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     margin-bottom: 16px;
+}
+
+.filter-row {
+    display: flex;
+    gap: 16px;
 }
 
 .filter-item {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .filter-label {
