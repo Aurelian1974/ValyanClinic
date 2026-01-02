@@ -312,7 +312,7 @@ Manual test:
 - [x] **Etapa 2.1**: SaveConsultatieDraftCommandHandler refactorizat ✅ **DONE - 2 Ian 2026**
 - [x] **Etapa 2.2**: GetConsulatieByIdQueryHandler refactorizat ✅ **DONE - 2 Ian 2026**
 - [x] **Etapa 2.3**: GetDraftConsulatieByPacientQueryHandler refactorizat ✅ **DONE - 2 Ian 2026**
-- [ ] **Etapa 2.4**: GetConsulatieByProgramareQueryHandler refactorizat
+- [x] **Etapa 2.4**: GetConsulatieByProgramareQueryHandler refactorizat ✅ **DONE - 2 Ian 2026**
 - [ ] **Etapa 2.5**: UpdateConsulatieCommandHandler verificat
 - [ ] **Etapa 2.6**: CreateConsulatieCommandHandler refactorizat
 - [x] **Etapa 3**: Database deployment complet ✅ **DONE - 2 Ian 2026**
@@ -328,7 +328,7 @@ Manual test:
 | After 2.1 | ✅ SUCCESS | 0 | 5adc14f |
 | After 2.2 | ✅ SUCCESS | 0 | 663eb7d |
 | After 2.3 | ✅ SUCCESS | 0 | 5586146 |
-| After 2.4 | ⏳ Pending | - | - |
+| After 2.4 | ✅ SUCCESS | 0 | f402e5a |
 | After 2.5 | ⏳ Pending | - | - |
 | After 2.6 | ⏳ Pending | - | - |
 
