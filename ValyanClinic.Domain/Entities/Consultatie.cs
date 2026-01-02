@@ -172,4 +172,46 @@ public class Consultatie
             };
         }
     }
+
+    // ==================== NAVIGATION PROPERTIES (Normalized Structure) ====================
+    
+    /// <summary>
+    /// Navigation property catre Motive Prezentare (1:1)
+    /// </summary>
+    public virtual ConsultatieMotivePrezentare? MotivePrezentare { get; set; }
+    
+    /// <summary>
+    /// Navigation property catre Antecedente Medicale (1:1)
+    /// </summary>
+    public virtual ConsultatieAntecedente? Antecedente { get; set; }
+    
+    /// <summary>
+    /// Navigation property catre Examen Obiectiv (1:1)
+    /// </summary>
+    public virtual ConsultatieExamenObiectiv? ExamenObiectiv { get; set; }
+    
+    /// <summary>
+    /// Navigation property catre Investigatii (1:1)
+    /// </summary>
+    public virtual ConsultatieInvestigatii? Investigatii { get; set; }
+    
+    /// <summary>
+    /// Navigation property catre Diagnostic (1:1)
+    /// </summary>
+    public virtual ConsultatieDiagnostic? Diagnostic { get; set; }
+    
+    /// <summary>
+    /// Navigation property catre Tratament (1:1)
+    /// </summary>
+    public virtual ConsultatieTratament? Tratament { get; set; }
+    
+    /// <summary>
+    /// Navigation property catre Concluzii (1:1)
+    /// </summary>
+    public virtual ConsultatieConcluzii? Concluzii { get; set; }
+    
+    /// <summary>
+    /// Navigation property catre Analize Medicale (1:N)
+    /// </summary>
+    public virtual ICollection<ConsultatieAnalizaMedicala>? AnalizeMedicale { get; set; }
 }
