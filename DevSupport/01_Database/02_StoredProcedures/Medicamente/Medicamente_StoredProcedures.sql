@@ -2,7 +2,7 @@
 -- Stored Procedures pentru Medicamente Nomenclator
 -- =============================================
 
--- SP: Căutare medicamente pentru autocomplete
+-- SP: Căutare medicamente pentru autocomplete cu filtrare avansată
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'Medicamente_Search')
     DROP PROCEDURE [dbo].[Medicamente_Search]
 GO
@@ -15,7 +15,20 @@ BEGIN
     SET NOCOUNT ON;
     
     -- Case-insensitive search cu UPPER pentru siguranță
-    DECLARE @SearchTermUpper NVARCHAR(100) = UPPER(@SearchTerm);
+    DECLARE @SearchTermUpper NVARCHAR(100) = UPPER(LTRIM(RTRIM(@SearchTerm)));
+    
+    -- Split search term în cuvinte pentru căutare inteligentă
+    -- Ex: "sortis 10mg" -> caută "sortis" în denumire și "10mg" în concentrație
+    DECLARE @Words TABLE (Word NVARCHAR(50));
+    
+    -- Simple word split (funcționează pentru majoritatea cazurilor)
+    INSERT INTO @Words (Word)
+    SELECT UPPER(LTRIM(RTRIM(value))) 
+    FROM STRING_SPLIT(@SearchTermUpper, ' ')
+    WHERE LTRIM(RTRIM(value)) <> '';
+    
+    -- Numără cuvinte pentru prioritizare
+    DECLARE @WordCount INT = (SELECT COUNT(*) FROM @Words);
     
     SELECT TOP (@MaxResults)
         [Id],
@@ -41,17 +54,49 @@ BEGIN
         [DataActualizare],
         [DataImport],
         [DataUltimaActualizare],
-        [Activ]
+        [Activ],
+        -- Scoring pentru prioritizare rezultate
+        (
+            -- Match exact în denumire (prioritate maximă)
+            CASE WHEN UPPER([DenumireComerciala]) LIKE @SearchTermUpper + '%' THEN 1000 ELSE 0 END +
+            CASE WHEN UPPER([DenumireComerciala]) = @SearchTermUpper THEN 500 ELSE 0 END +
+            
+            -- Match în DCI
+            CASE WHEN UPPER([DCI]) LIKE @SearchTermUpper + '%' THEN 100 ELSE 0 END +
+            
+            -- Match multi-cuvânt (ex: "sortis 10mg")
+            CASE WHEN @WordCount > 1 THEN
+                (SELECT COUNT(*) * 200 FROM @Words w 
+                 WHERE UPPER([DenumireComerciala]) LIKE '%' + w.Word + '%' 
+                    OR UPPER([Concentratie]) LIKE '%' + w.Word + '%'
+                    OR UPPER([FormaFarmaceutica]) LIKE '%' + w.Word + '%')
+            ELSE 0 END +
+            
+            -- Match parțial în denumire
+            CASE WHEN UPPER([DenumireComerciala]) LIKE '%' + @SearchTermUpper + '%' THEN 50 ELSE 0 END
+        ) AS Score
     FROM [dbo].[Medicamente_Nomenclator]
     WHERE [Activ] = 1
       AND (
-          UPPER([DenumireComerciala]) LIKE @SearchTermUpper + '%'
-          OR UPPER([DenumireComerciala]) LIKE '%' + @SearchTermUpper + '%'
-          OR UPPER([DCI]) LIKE @SearchTermUpper + '%'
-          OR UPPER([CodCIM]) LIKE @SearchTermUpper + '%'
+          -- Căutare de bază
+          UPPER([DenumireComerciala]) LIKE '%' + @SearchTermUpper + '%'
+          OR UPPER([DCI]) LIKE '%' + @SearchTermUpper + '%'
+          OR UPPER([CodCIM]) LIKE '%' + @SearchTermUpper + '%'
+          
+          -- Căutare avansată multi-cuvânt
+          OR (
+              @WordCount > 1 
+              AND NOT EXISTS (
+                  SELECT 1 FROM @Words w
+                  WHERE UPPER([DenumireComerciala]) NOT LIKE '%' + w.Word + '%'
+                    AND UPPER([Concentratie]) NOT LIKE '%' + w.Word + '%'
+                    AND UPPER([FormaFarmaceutica]) NOT LIKE '%' + w.Word + '%'
+                    AND UPPER([DCI]) NOT LIKE '%' + w.Word + '%'
+              )
+          )
       )
     ORDER BY 
-        CASE WHEN UPPER([DenumireComerciala]) LIKE @SearchTermUpper + '%' THEN 0 ELSE 1 END,
+        Score DESC,
         [DenumireComerciala]
 END
 GO
