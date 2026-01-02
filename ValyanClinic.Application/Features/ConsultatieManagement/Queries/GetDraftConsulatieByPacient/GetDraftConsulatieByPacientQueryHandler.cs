@@ -58,10 +58,10 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                     "Nu există consultație draft pentru acest pacient");
             }
 
-            // Map to DetailDto - COMPLETE mapping including all UI fields
+            // Map to DetailDto - NORMALIZED structure with null-safe navigation
             var dto = new ConsulatieDetailDto
             {
-                // Primary Keys
+                // Primary Keys - from Consultatii master table
                 ConsultatieID = consultatie.ConsultatieID,
                 ProgramareID = consultatie.ProgramareID,
                 PacientID = consultatie.PacientID,
@@ -70,74 +70,97 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                 OraConsultatie = consultatie.OraConsultatie,
                 TipConsultatie = consultatie.TipConsultatie,
                 
-                // Tab 1: Motiv & Antecedente
-                MotivPrezentare = consultatie.MotivPrezentare,
-                IstoricBoalaActuala = consultatie.IstoricBoalaActuala,
-                APP_Medicatie = consultatie.APP_Medicatie,
+                // Tab 1: Motiv Prezentare - from ConsultatieMotivePrezentare
+                MotivPrezentare = consultatie.MotivePrezentare?.MotivPrezentare,
+                IstoricBoalaActuala = consultatie.MotivePrezentare?.IstoricBoalaActuala,
                 
-                // Tab 2: Examen General
-                StareGenerala = consultatie.StareGenerala,
-                Constitutie = consultatie.Constitutie,
-                Atitudine = consultatie.Atitudine,
-                Facies = consultatie.Facies,
-                Tegumente = consultatie.Tegumente,
-                Mucoase = consultatie.Mucoase,
-                GangliniLimfatici = consultatie.GangliniLimfatici,
-                Edeme = consultatie.Edeme,
+                // Tab 1: Antecedente Personale - from ConsultatieAntecedente
+                AHC_Tata = consultatie.Antecedente?.AHC_Tata,
+                AHC_Mama = consultatie.Antecedente?.AHC_Mama,
+                AHC_Frati = consultatie.Antecedente?.AHC_Frati,
+                AHC_Bunici = consultatie.Antecedente?.AHC_Bunici,
+                AHC_Altele = consultatie.Antecedente?.AHC_Altele,
+                AF_Nastere = consultatie.Antecedente?.AF_Nastere,
+                AF_Dezvoltare = consultatie.Antecedente?.AF_Dezvoltare,
+                AF_Menstruatie = consultatie.Antecedente?.AF_Menstruatie,
+                AF_Sarcini = consultatie.Antecedente?.AF_Sarcini,
+                AF_Alaptare = consultatie.Antecedente?.AF_Alaptare,
+                APP_BoliCopilarieAdolescenta = consultatie.Antecedente?.APP_BoliCopilarieAdolescenta,
+                APP_BoliAdult = consultatie.Antecedente?.APP_BoliAdult,
+                APP_Interventii = consultatie.Antecedente?.APP_Interventii,
+                APP_Traumatisme = consultatie.Antecedente?.APP_Traumatisme,
+                APP_Transfuzii = consultatie.Antecedente?.APP_Transfuzii,
+                APP_Alergii = consultatie.Antecedente?.APP_Alergii,
+                APP_Medicatie = consultatie.Antecedente?.APP_Medicatie,
+                Profesie = consultatie.Antecedente?.Profesie,
+                ConditiiLocuinta = consultatie.Antecedente?.ConditiiLocuinta,
+                ConditiiMunca = consultatie.Antecedente?.ConditiiMunca,
+                ObiceiuriAlimentare = consultatie.Antecedente?.ObiceiuriAlimentare,
+                Toxice = consultatie.Antecedente?.Toxice,
                 
-                // Tab 2: Semne Vitale
-                Greutate = consultatie.Greutate,
-                Inaltime = consultatie.Inaltime,
-                IMC = consultatie.IMC,
-                Temperatura = consultatie.Temperatura,
-                TensiuneArteriala = consultatie.TensiuneArteriala,
-                Puls = consultatie.Puls,
-                FreccventaRespiratorie = consultatie.FreccventaRespiratorie,
-                SaturatieO2 = consultatie.SaturatieO2,
-                Glicemie = consultatie.Glicemie,
+                // Tab 2: Examen General - from ConsultatieExamenObiectiv
+                StareGenerala = consultatie.ExamenObiectiv?.StareGenerala,
+                Constitutie = consultatie.ExamenObiectiv?.Constitutie,
+                Atitudine = consultatie.ExamenObiectiv?.Atitudine,
+                Facies = consultatie.ExamenObiectiv?.Facies,
+                Tegumente = consultatie.ExamenObiectiv?.Tegumente,
+                Mucoase = consultatie.ExamenObiectiv?.Mucoase,
+                GangliniLimfatici = consultatie.ExamenObiectiv?.GangliniLimfatici,
+                Edeme = consultatie.ExamenObiectiv?.Edeme,
                 
-                // Tab 2: Examen pe Aparate
-                ExamenCardiovascular = consultatie.ExamenCardiovascular,
-                ExamenRespiratoriu = consultatie.ExamenRespiratoriu,
-                ExamenDigestiv = consultatie.ExamenDigestiv,
-                ExamenUrinar = consultatie.ExamenUrinar,
-                ExamenNervos = consultatie.ExamenNervos,
-                ExamenLocomotor = consultatie.ExamenLocomotor,
-                ExamenEndocrin = consultatie.ExamenEndocrin,
-                ExamenORL = consultatie.ExamenORL,
-                ExamenOftalmologic = consultatie.ExamenOftalmologic,
-                ExamenDermatologic = consultatie.ExamenDermatologic,
+                // Tab 2: Semne Vitale - from ConsultatieExamenObiectiv
+                Greutate = consultatie.ExamenObiectiv?.Greutate,
+                Inaltime = consultatie.ExamenObiectiv?.Inaltime,
+                IMC = consultatie.ExamenObiectiv?.IMC,
+                Temperatura = consultatie.ExamenObiectiv?.Temperatura,
+                TensiuneArteriala = consultatie.ExamenObiectiv?.TensiuneArteriala,
+                Puls = consultatie.ExamenObiectiv?.Puls,
+                FreccventaRespiratorie = consultatie.ExamenObiectiv?.FreccventaRespiratorie,
+                SaturatieO2 = consultatie.ExamenObiectiv?.SaturatieO2,
+                Glicemie = consultatie.ExamenObiectiv?.Glicemie,
                 
-                // Tab 2: Investigații
-                InvestigatiiLaborator = consultatie.InvestigatiiLaborator,
-                InvestigatiiImagistice = consultatie.InvestigatiiImagistice,
-                InvestigatiiEKG = consultatie.InvestigatiiEKG,
-                AlteInvestigatii = consultatie.AlteInvestigatii,
+                // Tab 2: Examen pe Aparate - from ConsultatieExamenObiectiv
+                ExamenCardiovascular = consultatie.ExamenObiectiv?.ExamenCardiovascular,
+                ExamenRespiratoriu = consultatie.ExamenObiectiv?.ExamenRespiratoriu,
+                ExamenDigestiv = consultatie.ExamenObiectiv?.ExamenDigestiv,
+                ExamenUrinar = consultatie.ExamenObiectiv?.ExamenUrinar,
+                ExamenNervos = consultatie.ExamenObiectiv?.ExamenNervos,
+                ExamenLocomotor = consultatie.ExamenObiectiv?.ExamenLocomotor,
+                ExamenEndocrin = consultatie.ExamenObiectiv?.ExamenEndocrin,
+                ExamenORL = consultatie.ExamenObiectiv?.ExamenORL,
+                ExamenOftalmologic = consultatie.ExamenObiectiv?.ExamenOftalmologic,
+                ExamenDermatologic = consultatie.ExamenObiectiv?.ExamenDermatologic,
                 
-                // Tab 3: Diagnostic
-                DiagnosticPozitiv = consultatie.DiagnosticPozitiv,
-                DiagnosticDiferential = consultatie.DiagnosticDiferential,
-                DiagnosticEtiologic = consultatie.DiagnosticEtiologic,
-                CoduriICD10 = consultatie.CoduriICD10,
-                CoduriICD10Secundare = consultatie.CoduriICD10Secundare,
+                // Tab 2: Investigații - from ConsultatieInvestigatii
+                InvestigatiiLaborator = consultatie.Investigatii?.InvestigatiiLaborator,
+                InvestigatiiImagistice = consultatie.Investigatii?.InvestigatiiImagistice,
+                InvestigatiiEKG = consultatie.Investigatii?.InvestigatiiEKG,
+                AlteInvestigatii = consultatie.Investigatii?.AlteInvestigatii,
                 
-                // Tab 3: Tratament
-                TratamentMedicamentos = consultatie.TratamentMedicamentos,
-                TratamentNemedicamentos = consultatie.TratamentNemedicamentos,
-                RecomandariDietetice = consultatie.RecomandariDietetice,
-                RecomandariRegimViata = consultatie.RecomandariRegimViata,
-                InvestigatiiRecomandate = consultatie.InvestigatiiRecomandate,
-                ConsulturiSpecialitate = consultatie.ConsulturiSpecialitate,
+                // Tab 3: Diagnostic - from ConsultatieDiagnostic
+                DiagnosticPozitiv = consultatie.Diagnostic?.DiagnosticPozitiv,
+                DiagnosticDiferential = consultatie.Diagnostic?.DiagnosticDiferential,
+                DiagnosticEtiologic = consultatie.Diagnostic?.DiagnosticEtiologic,
+                CoduriICD10 = consultatie.Diagnostic?.CoduriICD10,
+                CoduriICD10Secundare = consultatie.Diagnostic?.CoduriICD10Secundare,
                 
-                // Tab 4: Concluzii
-                DataUrmatoareiProgramari = consultatie.DataUrmatoareiProgramari,
-                RecomandariSupraveghere = consultatie.RecomandariSupraveghere,
-                Prognostic = consultatie.Prognostic,
-                Concluzie = consultatie.Concluzie,
-                ObservatiiMedic = consultatie.ObservatiiMedic,
-                NotePacient = consultatie.NotePacient,
+                // Tab 3: Tratament - from ConsultatieTratament
+                TratamentMedicamentos = consultatie.Tratament?.TratamentMedicamentos,
+                TratamentNemedicamentos = consultatie.Tratament?.TratamentNemedicamentos,
+                RecomandariDietetice = consultatie.Tratament?.RecomandariDietetice,
+                RecomandariRegimViata = consultatie.Tratament?.RecomandariRegimViata,
+                InvestigatiiRecomandate = consultatie.Tratament?.InvestigatiiRecomandate,
+                ConsulturiSpecialitate = consultatie.Tratament?.ConsulturiSpecialitate,
+                DataUrmatoareiProgramari = consultatie.Tratament?.DataUrmatoareiProgramari,
+                RecomandariSupraveghere = consultatie.Tratament?.RecomandariSupraveghere,
                 
-                // Metadata
+                // Tab 4: Concluzii - from ConsultatieConcluzii
+                Prognostic = consultatie.Concluzii?.Prognostic,
+                Concluzie = consultatie.Concluzii?.Concluzie,
+                ObservatiiMedic = consultatie.Concluzii?.ObservatiiMedic,
+                NotePacient = consultatie.Concluzii?.NotePacient,
+                
+                // Metadata - from Consultatii master table
                 Status = consultatie.Status,
                 DataFinalizare = consultatie.DataFinalizare,
                 DurataMinute = consultatie.DurataMinute,
