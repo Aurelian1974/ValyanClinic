@@ -175,7 +175,7 @@ BEGIN
         LEFT JOIN ConsultatieTratament trat ON c.ConsultatieID = trat.ConsultatieID
         LEFT JOIN ConsultatieConcluzii conc ON c.ConsultatieID = conc.ConsultatieID
         
-        WHERE c.PacientID = @PacientID
+        WHERE (@PacientID IS NULL OR @PacientID = '00000000-0000-0000-0000-000000000000' OR c.PacientID = @PacientID)
           AND c.[Status] NOT IN ('Finalizata', 'Anulata')
           AND CAST(c.DataConsultatie AS DATE) = CAST(@DataConsultatie AS DATE)
           AND (@MedicID IS NULL OR c.MedicID = @MedicID)

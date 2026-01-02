@@ -258,6 +258,24 @@ public class ConsultatieRepository : IConsultatieRepository
                 return null;
             }
 
+            // DEBUG: Log what we got from SP
+            try
+            {
+                var dict = (IDictionary<string, object>)row;
+                _logger.LogInformation(
+                    "[ConsultatieRepository] GetByProgramareIdAsync - SP returned {ColumnCount} columns. Sample: MotivePrezentare_Id={MotivId}, MotivPrezentare_MotivPrezentare={Motiv}, Antecedente_Id={AntId}, Antecedente_APP_Medicatie={Medicatie}",
+                    dict.Count,
+                    dict.ContainsKey("MotivePrezentare_Id") ? dict["MotivePrezentare_Id"] : "MISSING",
+                    dict.ContainsKey("MotivePrezentare_MotivPrezentare") ? dict["MotivePrezentare_MotivPrezentare"] : "MISSING",
+                    dict.ContainsKey("Antecedente_Id") ? dict["Antecedente_Id"] : "MISSING",
+                    dict.ContainsKey("Antecedente_APP_Medicatie") ? dict["Antecedente_APP_Medicatie"] : "MISSING"
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[ConsultatieRepository] Failed to log dynamic object properties");
+            }
+
             // Map master entity
             var consultatie = new Consultatie
             {
@@ -454,8 +472,13 @@ public class ConsultatieRepository : IConsultatieRepository
             }.Count(s => s != null);
 
             _logger.LogInformation(
-                "[ConsultatieRepository] Consultatie found by ProgramareID: {ProgramareID} - ConsultatieID: {ConsultatieID} with {Sections} populated sections",
-                programareId, consultatie.ConsultatieID, populatedSections);
+                "[ConsultatieRepository] GetByProgramareIdAsync RESULT - ConsultatieID: {ConsultatieID}, {Sections} populated sections. MotivePrezentare={HasMotiv} (Motiv='{Motiv}'), Antecedente={HasAnt} (APP_Medicatie='{Med}')",
+                consultatie.ConsultatieID, 
+                populatedSections,
+                consultatie.MotivePrezentare != null,
+                consultatie.MotivePrezentare?.MotivPrezentare ?? "NULL",
+                consultatie.Antecedente != null,
+                consultatie.Antecedente?.APP_Medicatie ?? "NULL");
 
             return consultatie;
         }
