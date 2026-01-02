@@ -54,7 +54,40 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
             }
 
             // Determină ConsultatieID (CREATE sau UPDATE)
-            var consultatieId = request.ConsultatieID ?? Guid.NewGuid();
+            // ✅ FIX: Verifică dacă există draft pentru acest pacient/medic/dată înainte de a crea GUID nou
+            Guid consultatieId;
+            if (request.ConsultatieID.HasValue && request.ConsultatieID.Value != Guid.Empty)
+            {
+                // Avem deja ConsultatieID - UPDATE
+                consultatieId = request.ConsultatieID.Value;
+            }
+            else
+            {
+                // Nu avem ConsultatieID - verificăm dacă există draft
+                var existingDraft = await _repository.GetDraftByPacientAsync(
+                    request.PacientID,
+                    request.MedicID,
+                    request.DataConsultatie,
+                    request.ProgramareID,
+                    cancellationToken);
+
+                if (existingDraft != null)
+                {
+                    // Există draft - reutilizăm ID-ul
+                    consultatieId = existingDraft.ConsultatieID;
+                    _logger.LogInformation(
+                        "[SaveConsultatieDraftHandler] Found existing draft: {ConsultatieID}", 
+                        consultatieId);
+                }
+                else
+                {
+                    // Nu există draft - creăm unul nou
+                    consultatieId = Guid.NewGuid();
+                    _logger.LogInformation(
+                        "[SaveConsultatieDraftHandler] Creating new draft: {ConsultatieID}", 
+                        consultatieId);
+                }
+            }
 
             // 1. MASTER Entity: Consultatie (doar core fields)
             var consultatie = new Consultatie
