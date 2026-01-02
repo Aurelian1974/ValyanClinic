@@ -27,28 +27,91 @@
                 <tbody>
                     @foreach (var medication in Medications)
                     {
-                        <tr>
-                            <td>
-                                <strong>@medication.Name</strong>
-                                @if (!string.IsNullOrEmpty(medication.Notes))
-                                {
-                                    <br />
-                                    <small class="text-muted">@medication.Notes</small>
-                                }
-                            </td>
-                            <td>@medication.Dose</td>
-                            <td>@medication.Frequency</td>
-                            <td>@medication.Duration</td>
-                            <td>@medication.Quantity</td>
-                            <td>
-                                <button type="button" 
-                                        class="btn btn-sm btn-danger"
-                                        @onclick="() => RemoveMedication(medication.Id)"
-                                        title="Șterge medicament">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        @if (EditingMedicationId == medication.Id)
+                        {
+                            @* ROW IN EDIT MODE *@
+                            <tr class="editing-row">
+                                <td>
+                                    <input type="text" 
+                                           class="form-control form-control-sm"
+                                           @bind="EditingMedication.Name" />
+                                    <input type="text" 
+                                           class="form-control form-control-sm mt-1"
+                                           placeholder="Observații..."
+                                           @bind="EditingMedication.Notes" />
+                                </td>
+                                <td>
+                                    <input type="text" 
+                                           class="form-control form-control-sm"
+                                           @bind="EditingMedication.Dose" />
+                                </td>
+                                <td>
+                                    <input type="text" 
+                                           class="form-control form-control-sm"
+                                           @bind="EditingMedication.Frequency" />
+                                </td>
+                                <td>
+                                    <input type="text" 
+                                           class="form-control form-control-sm"
+                                           @bind="EditingMedication.Duration" />
+                                </td>
+                                <td>
+                                    <input type="text" 
+                                           class="form-control form-control-sm"
+                                           @bind="EditingMedication.Quantity" />
+                                </td>
+                                <td>
+                                    <div class="btn-group-vertical btn-group-sm">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-success mb-1"
+                                                @onclick="SaveEdit"
+                                                title="Salvează modificările">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-secondary"
+                                                @onclick="CancelEdit"
+                                                title="Anulează">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @* ROW IN VIEW MODE *@
+                            <tr>
+                                <td>
+                                    <strong>@medication.Name</strong>
+                                    @if (!string.IsNullOrEmpty(medication.Notes))
+                                    {
+                                        <br />
+                                        <small class="text-muted">@medication.Notes</small>
+                                    }
+                                </td>
+                                <td>@medication.Dose</td>
+                                <td>@medication.Frequency</td>
+                                <td>@medication.Duration</td>
+                                <td>@medication.Quantity</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-warning"
+                                                @onclick="() => StartEdit(medication)"
+                                                title="Editează medicament">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-danger"
+                                                @onclick="() => RemoveMedication(medication.Id)"
+                                                title="Șterge medicament">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>

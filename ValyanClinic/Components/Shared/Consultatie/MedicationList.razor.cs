@@ -36,6 +36,12 @@ public partial class MedicationList : ComponentBase
     
     private System.Threading.CancellationTokenSource? _searchCts;
 
+    // ==================== EDITING STATE ====================
+    
+    private Guid? EditingMedicationId { get; set; }
+    
+    private MedicationRowDto EditingMedication { get; set; } = new();
+
     // ==================== COMPUTED ====================
     
     private string ValidationCss => ShowValidation && string.IsNullOrWhiteSpace(NewMedication.Name) 
@@ -166,6 +172,70 @@ public partial class MedicationList : ComponentBase
             await OnChanged.InvokeAsync();
             StateHasChanged();
         }
+    }
+
+    /// <summary>
+    /// Începe editarea unui medicament
+    /// </summary>
+    private void StartEdit(MedicationRowDto medication)
+    {
+        EditingMedicationId = medication.Id;
+        
+        // Creăm o copie pentru editare
+        EditingMedication = new MedicationRowDto
+        {
+            Id = medication.Id,
+            Name = medication.Name,
+            Dose = medication.Dose,
+            Frequency = medication.Frequency,
+            Duration = medication.Duration,
+            Quantity = medication.Quantity,
+            Notes = medication.Notes
+        };
+        
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Salvează modificările
+    /// </summary>
+    private async Task SaveEdit()
+    {
+        if (!EditingMedication.IsValid)
+        {
+            Logger.LogWarning("Încercare de salvare medicament invalid");
+            return;
+        }
+
+        var original = Medications.FirstOrDefault(m => m.Id == EditingMedicationId);
+        if (original != null)
+        {
+            // Actualizăm medicamentul original cu valorile editate
+            original.Name = EditingMedication.Name;
+            original.Dose = EditingMedication.Dose;
+            original.Frequency = EditingMedication.Frequency;
+            original.Duration = EditingMedication.Duration;
+            original.Quantity = EditingMedication.Quantity;
+            original.Notes = EditingMedication.Notes;
+
+            await MedicationsChanged.InvokeAsync(Medications);
+            await OnChanged.InvokeAsync();
+        }
+
+        // Reset edit state
+        EditingMedicationId = null;
+        EditingMedication = new MedicationRowDto();
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Anulează editarea
+    /// </summary>
+    private void CancelEdit()
+    {
+        EditingMedicationId = null;
+        EditingMedication = new MedicationRowDto();
+        StateHasChanged();
     }
 
     /// <summary>

@@ -65,6 +65,11 @@
     background-color: #f0f9ff;
 }
 
+.medication-table tbody tr.editing-row {
+    background-color: #fef3c7;
+    border: 2px solid #f59e0b;
+}
+
 .medication-table td {
     padding: 0.75rem;
     font-size: 0.875rem;
@@ -75,9 +80,58 @@
     font-weight: 600;
 }
 
-.medication-table .btn-danger {
+.medication-table .btn-danger,
+.medication-table .btn-warning,
+.medication-table .btn-success,
+.medication-table .btn-secondary {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
+}
+
+.medication-table .btn-group {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.medication-table .btn-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.medication-table .btn-warning {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+    border: none;
+}
+
+.medication-table .btn-warning:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.medication-table .btn-success {
+    background: linear-gradient(135deg, #34d399, #10b981);
+    color: white;
+    border: none;
+}
+
+.medication-table .btn-success:hover {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.medication-table .btn-secondary {
+    background: #9ca3af;
+    color: white;
+    border: none;
+}
+
+.medication-table .btn-secondary:hover {
+    background: #6b7280;
+}
+
+.medication-table .editing-row .form-control-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
 }
 
 /* ==================== NO MEDICATIONS MESSAGE ==================== */
