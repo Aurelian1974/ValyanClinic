@@ -6,6 +6,8 @@
     background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
     border-radius: 12px;
     border: 1px solid #bae6fd;
+    position: relative;
+    overflow: visible;
 }
 
 .medication-section .section-subtitle {
@@ -182,6 +184,7 @@
 .add-medication-form .form-group {
     flex: 1;
     position: relative;
+    overflow: visible;
 }
 
 .add-medication-form .form-label {
@@ -221,17 +224,18 @@
 
 .autocomplete-dropdown {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 1px);
     left: 0;
     right: 0;
-    max-height: 350px;
+    max-height: min(350px, calc(100vh - var(--dropdown-top, 300px) - 100px));
     overflow-y: auto;
+    overflow-x: hidden;
     background: white;
     border: 1px solid #d1d5db;
     border-top: none;
     border-radius: 0 0 6px 6px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
+    z-index: 1050;
     padding-bottom: 1.5rem;
 }
 
