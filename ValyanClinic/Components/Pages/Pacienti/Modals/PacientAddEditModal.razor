@@ -317,11 +317,31 @@
                                         <div class="info-grid">
                                             <div class="form-group full-width">
                                                 <label for="adresa">Adresa (Strada, Nr.)</label>
-                                                <SfTextBox ID="adresa" 
-                                                          @bind-Value="FormModel.Adresa"
-                                                          Placeholder="Str. Exemplu nr. 123"
-                                                          CssClass="form-control">
-                                                </SfTextBox>
+                                                <div class="autocomplete-wrapper">
+                                                    <input type="text"
+                                                           id="adresa"
+                                                           class="form-control"
+                                                           value="@FormModel.Adresa"
+                                                           @oninput="OnAdresaInput"
+                                                           placeholder="Str. Exemplu nr. 123"
+                                                           list="strada-list"
+                                                           autocomplete="off" />
+                                                    @if (IsLoadingStrada)
+                                                    {
+                                                        <span class="autocomplete-spinner">
+                                                            <i class="fas fa-spinner fa-spin"></i>
+                                                        </span>
+                                                    }
+                                                    @if (StradaOptions.Any())
+                                                    {
+                                                        <datalist id="strada-list">
+                                                            @foreach (var strada in StradaOptions)
+                                                            {
+                                                                <option value="@strada.Name">@strada.DisplayName</option>
+                                                            }
+                                                        </datalist>
+                                                    }
+                                                </div>
                                                 <ValidationMessage For="@(() => FormModel.Adresa)" />
                                             </div>
                                             <div class="form-group">

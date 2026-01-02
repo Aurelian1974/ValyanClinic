@@ -31,6 +31,7 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     [Inject] private IFieldPermissionService FieldPermissions { get; set; } = default!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
     [Inject] private IJudeteService JudeteService { get; set; } = default!; // ✅ ADDED for loading judete from database
+    [Inject] private IPhotonService PhotonService { get; set; } = default!; // ✅ ADDED for street autocomplete
 
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
@@ -128,6 +129,20 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     private List<string> LocalitatiList { get; set; } = new();
     private bool _isLoadingLocalitati = false;
     private string? _selectedJudet = null;
+
+    // ✅ ADDED: Street autocomplete data (Photon API)
+    private List<StreetOption> StradaOptions { get; set; } = new();
+    private bool IsLoadingStrada { get; set; }
+    private System.Timers.Timer? _debounceStradaTimer;
+    private const int DebounceDelay = 400; // ms
+
+    public class StreetOption
+    {
+        public string Name { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public string? City { get; set; }
+        public string? PostCode { get; set; }
+    }
 
     // ✅ ADDED: Unsaved changes detection
     private string? _originalFormJson = null;
@@ -276,6 +291,136 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
         ValidateTab("adresa");
         StateHasChanged();
     }
+
+    #region Street Autocomplete (Photon API)
+
+    /// <summary>
+    /// Handler pentru input pe câmpul adresă (strada) - cu debounce.
+    /// </summary>
+    private void OnAdresaInput(ChangeEventArgs args)
+    {
+        var query = args.Value?.ToString() ?? string.Empty;
+        FormModel.Adresa = query; // Update model value
+        
+        // Verifică dacă utilizatorul a selectat o stradă din listă (pentru a actualiza codul poștal)
+        var selectedStreet = StradaOptions.FirstOrDefault(s => 
+            s.Name.Equals(query, StringComparison.OrdinalIgnoreCase));
+        if (selectedStreet != null && !string.IsNullOrEmpty(selectedStreet.PostCode))
+        {
+            FormModel.Cod_Postal = selectedStreet.PostCode;
+            Logger.LogInformation("Auto-filled PostCode: {PostCode}", selectedStreet.PostCode);
+            InvokeAsync(StateHasChanged);
+        }
+        
+        // Reset timer
+        _debounceStradaTimer?.Stop();
+        _debounceStradaTimer?.Dispose();
+        
+        if (query.Length < 3)
+        {
+            StradaOptions.Clear();
+            InvokeAsync(StateHasChanged);
+            return;
+        }
+        
+        // Start debounce timer
+        _debounceStradaTimer = new System.Timers.Timer(DebounceDelay);
+        _debounceStradaTimer.Elapsed += async (s, e) =>
+        {
+            _debounceStradaTimer?.Stop();
+            await SearchStrada(query);
+        };
+        _debounceStradaTimer.AutoReset = false;
+        _debounceStradaTimer.Start();
+    }
+
+    /// <summary>
+    /// Caută străzi folosind Photon API.
+    /// </summary>
+    private async Task SearchStrada(string query)
+    {
+        try
+        {
+            await InvokeAsync(() =>
+            {
+                IsLoadingStrada = true;
+                StateHasChanged();
+            });
+
+            // Adăugăm orașul și județul curent pentru rezultate mai precise
+            var searchQuery = query;
+            if (!string.IsNullOrEmpty(FormModel.Localitate))
+            {
+                searchQuery += $" {FormModel.Localitate}";
+            }
+            if (!string.IsNullOrEmpty(FormModel.Judet))
+            {
+                searchQuery += $" {FormModel.Judet}";
+            }
+
+            Logger.LogInformation("Photon search: '{Query}'", searchQuery);
+
+            var result = await PhotonService.SearchStreetsAsync(searchQuery, 10, CancellationToken.None);
+
+            await InvokeAsync(() =>
+            {
+                if (result.IsSuccess && result.Value != null)
+                {
+                    var allStreets = result.Value
+                        .Select(s => new StreetOption
+                        {
+                            Name = s.Name,
+                            DisplayName = s.DisplayName,
+                            City = s.City,
+                            PostCode = s.PostCode
+                        })
+                        .ToList();
+                    
+                    // Filtrăm după localitatea selectată (dacă există)
+                    if (!string.IsNullOrEmpty(FormModel.Localitate))
+                    {
+                        var localitate = FormModel.Localitate.ToLowerInvariant();
+                        StradaOptions = allStreets
+                            .Where(s => !string.IsNullOrEmpty(s.City) && 
+                                       s.City.ToLowerInvariant().Contains(localitate))
+                            .ToList();
+                        
+                        // Dacă nu găsim nimic în orașul selectat, arătăm toate rezultatele
+                        if (StradaOptions.Count == 0)
+                        {
+                            StradaOptions = allStreets;
+                        }
+                    }
+                    else
+                    {
+                        StradaOptions = allStreets;
+                    }
+
+                    Logger.LogInformation("Photon returned {Count} streets", StradaOptions.Count);
+                }
+                else
+                {
+                    StradaOptions.Clear();
+                    Logger.LogWarning("Photon search failed: {Error}", result.FirstError);
+                }
+
+                IsLoadingStrada = false;
+                StateHasChanged();
+            });
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error searching streets");
+            await InvokeAsync(() =>
+            {
+                StradaOptions.Clear();
+                IsLoadingStrada = false;
+                StateHasChanged();
+            });
+        }
+    }
+
+    #endregion
 
     #region CNP Auto-Parse
 
@@ -534,11 +679,18 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
             // Setează flag IMEDIAT
             _disposed = true;
 
+            // Cleanup timers
+            _debounceStradaTimer?.Stop();
+            _debounceStradaTimer?.Dispose();
+            _debounceStradaTimer = null;
+
             // Clear toate listele pentru a elibera memoria
             DoctoriAsociati?.Clear();
             DoctoriAsociati = new();
             JudeteList?.Clear();
             SexOptions?.Clear();
+            StradaOptions?.Clear();
+            LocalitatiList?.Clear();
 
             // Reset state flags
             ShowAddDoctorModal = false;

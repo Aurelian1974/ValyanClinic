@@ -557,6 +557,33 @@
 }
 
 /* ===================================
+   Autocomplete Wrapper (Photon API)
+   =================================== */
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.autocomplete-wrapper input {
+    width: 100%;
+    padding-right: 36px; /* Space for spinner */
+}
+
+.autocomplete-spinner {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #3b82f6;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.autocomplete-wrapper datalist {
+    display: none; /* Browser will handle display */
+}
+
+/* ===================================
    Modal Small Variant
    =================================== */
 .modal-small {
