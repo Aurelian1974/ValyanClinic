@@ -313,13 +313,15 @@ Manual test:
 - [x] **Etapa 2.2**: GetConsulatieByIdQueryHandler refactorizat ✅ **DONE - 2 Ian 2026**
 - [x] **Etapa 2.3**: GetDraftConsulatieByPacientQueryHandler refactorizat ✅ **DONE - 2 Ian 2026**
 - [x] **Etapa 2.4**: GetConsulatieByProgramareQueryHandler refactorizat ✅ **DONE - 2 Ian 2026**
-- [ ] **Etapa 2.5**: UpdateConsulatieCommandHandler verificat
-- [ ] **Etapa 2.6**: CreateConsulatieCommandHandler refactorizat
+- [x] **Etapa 2.5**: UpdateConsulatieCommandHandler verificat ✅ **DONE - 2 Ian 2026**
+- [x] **Etapa 2.6**: CreateConsulatieCommandHandler refactorizat ✅ **DONE - 2 Ian 2026**
 - [x] **Etapa 3**: Database deployment complet ✅ **DONE - 2 Ian 2026**
-- [ ] **Etapa 4**: UI components actualizate
+- [x] **Etapa 4**: UI components actualizate ✅ **DONE - 2 Ian 2026** (UI folosește Commands refactorizate - nu necesită modificări)
 - [ ] **Etapa 5**: Testing complet
 
 ### Build Status Tracking
+
+**✅ IMPORTANT**: UI-ul (Consultatii.razor.cs) folosește Commands (SaveConsultatieDraftCommand, CreateConsulatieCommand, FinalizeConsulatieCommand) care au fost refactorizate în Etapa 2. Nu necesită modificări suplimentare.
 
 | Checkpoint | Build Status | Errors | Commit |
 |------------|-------------|--------|--------|
@@ -329,8 +331,8 @@ Manual test:
 | After 2.2 | ✅ SUCCESS | 0 | 663eb7d |
 | After 2.3 | ✅ SUCCESS | 0 | 5586146 |
 | After 2.4 | ✅ SUCCESS | 0 | f402e5a |
-| After 2.5 | ⏳ Pending | - | - |
-| After 2.6 | ⏳ Pending | - | - |
+| After 2.5 | ✅ SUCCESS | 0 | 309b785 |
+| After 2.6 | ✅ SUCCESS | 0 | 6ca5986 |
 
 ---
 
