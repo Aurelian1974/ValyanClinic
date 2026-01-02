@@ -67,4 +67,41 @@ public interface IConsultatieRepository
         DateTime? dataConsultatie = null,
         Guid? programareId = null,
         CancellationToken cancellationToken = default);
+
+    // ==================== NORMALIZED STRUCTURE UPSERT METHODS ====================
+
+    /// <summary>
+    /// Upsert (INSERT/UPDATE) ConsultatieMotivePrezentare (1:1)
+    /// </summary>
+    Task UpsertMotivePrezentareAsync(Guid consultatieId, ConsultatieMotivePrezentare entity);
+
+    /// <summary>
+    /// Upsert (INSERT/UPDATE) ConsultatieAntecedente (1:1)
+    /// </summary>
+    Task UpsertAntecedenteAsync(Guid consultatieId, ConsultatieAntecedente entity);
+
+    /// <summary>
+    /// Upsert (INSERT/UPDATE) ConsultatieExamenObiectiv (1:1)
+    /// </summary>
+    Task UpsertExamenObiectivAsync(Guid consultatieId, ConsultatieExamenObiectiv entity);
+
+    /// <summary>
+    /// Upsert (INSERT/UPDATE) ConsultatieInvestigatii (1:1)
+    /// </summary>
+    Task UpsertInvestigatiiAsync(Guid consultatieId, ConsultatieInvestigatii entity);
+
+    /// <summary>
+    /// Upsert (INSERT/UPDATE) ConsultatieDiagnostic (1:1)
+    /// </summary>
+    Task UpsertDiagnosticAsync(Guid consultatieId, ConsultatieDiagnostic entity);
+
+    /// <summary>
+    /// Upsert (INSERT/UPDATE) ConsultatieTratament (1:1)
+    /// </summary>
+    Task UpsertTratamentAsync(Guid consultatieId, ConsultatieTratament entity);
+
+    /// <summary>
+    /// Upsert (INSERT/UPDATE) ConsultatieConcluzii (1:1)
+    /// </summary>
+    Task UpsertConcluziiAsync(Guid consultatieId, ConsultatieConcluzii entity);
 }

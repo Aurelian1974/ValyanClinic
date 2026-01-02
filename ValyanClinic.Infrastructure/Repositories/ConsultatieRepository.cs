@@ -583,4 +583,261 @@ public class ConsultatieRepository : IConsultatieRepository
             throw;
         }
     }
+
+    // ==================== NORMALIZED STRUCTURE UPSERT METHODS ====================
+
+    public async Task UpsertMotivePrezentareAsync(Guid consultatieId, ConsultatieMotivePrezentare entity)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ConsultatieID", consultatieId);
+            parameters.Add("@MotivPrezentare", entity.MotivPrezentare);
+            parameters.Add("@IstoricBoalaActuala", entity.IstoricBoalaActuala);
+            parameters.Add("@CreatDe", entity.CreatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe);
+
+            await connection.ExecuteAsync(
+                "ConsultatieMotivePrezentare_Upsert",
+                parameters,
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 30);
+
+            _logger.LogInformation("[ConsultatieRepository] MotivePrezentare upserted for: {ConsultatieID}", consultatieId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error upserting MotivePrezentare for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
+
+    public async Task UpsertAntecedenteAsync(Guid consultatieId, ConsultatieAntecedente entity)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ConsultatieID", consultatieId);
+            parameters.Add("@AHC_Mama", entity.AHC_Mama);
+            parameters.Add("@AHC_Tata", entity.AHC_Tata);
+            parameters.Add("@AHC_Frati", entity.AHC_Frati);
+            parameters.Add("@AHC_Bunici", entity.AHC_Bunici);
+            parameters.Add("@AHC_Altele", entity.AHC_Altele);
+            parameters.Add("@AF_Nastere", entity.AF_Nastere);
+            parameters.Add("@AF_Dezvoltare", entity.AF_Dezvoltare);
+            parameters.Add("@AF_Menstruatie", entity.AF_Menstruatie);
+            parameters.Add("@AF_Sarcini", entity.AF_Sarcini);
+            parameters.Add("@AF_Alaptare", entity.AF_Alaptare);
+            parameters.Add("@APP_BoliCopilarieAdolescenta", entity.APP_BoliCopilarieAdolescenta);
+            parameters.Add("@APP_BoliAdult", entity.APP_BoliAdult);
+            parameters.Add("@APP_Interventii", entity.APP_Interventii);
+            parameters.Add("@APP_Traumatisme", entity.APP_Traumatisme);
+            parameters.Add("@APP_Transfuzii", entity.APP_Transfuzii);
+            parameters.Add("@APP_Alergii", entity.APP_Alergii);
+            parameters.Add("@APP_Medicatie", entity.APP_Medicatie);
+            parameters.Add("@Profesie", entity.Profesie);
+            parameters.Add("@ConditiiLocuinta", entity.ConditiiLocuinta);
+            parameters.Add("@ConditiiMunca", entity.ConditiiMunca);
+            parameters.Add("@ObiceiuriAlimentare", entity.ObiceiuriAlimentare);
+            parameters.Add("@Toxice", entity.Toxice);
+            parameters.Add("@CreatDe", entity.CreatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe);
+
+            await connection.ExecuteAsync(
+                "ConsultatieAntecedente_Upsert",
+                parameters,
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 30);
+
+            _logger.LogInformation("[ConsultatieRepository] Antecedente upserted for: {ConsultatieID}", consultatieId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error upserting Antecedente for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
+
+    public async Task UpsertExamenObiectivAsync(Guid consultatieId, ConsultatieExamenObiectiv entity)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ConsultatieID", consultatieId);
+            parameters.Add("@StareGenerala", entity.StareGenerala);
+            parameters.Add("@Constitutie", entity.Constitutie);
+            parameters.Add("@Atitudine", entity.Atitudine);
+            parameters.Add("@Facies", entity.Facies);
+            parameters.Add("@Tegumente", entity.Tegumente);
+            parameters.Add("@Mucoase", entity.Mucoase);
+            parameters.Add("@GangliniLimfatici", entity.GangliniLimfatici);
+            parameters.Add("@Edeme", entity.Edeme);
+            parameters.Add("@Greutate", entity.Greutate);
+            parameters.Add("@Inaltime", entity.Inaltime);
+            parameters.Add("@IMC", entity.IMC);
+            parameters.Add("@Temperatura", entity.Temperatura);
+            parameters.Add("@TensiuneArteriala", entity.TensiuneArteriala);
+            parameters.Add("@Puls", entity.Puls);
+            parameters.Add("@FreccventaRespiratorie", entity.FreccventaRespiratorie);
+            parameters.Add("@SaturatieO2", entity.SaturatieO2);
+            parameters.Add("@Glicemie", entity.Glicemie);
+            parameters.Add("@ExamenCardiovascular", entity.ExamenCardiovascular);
+            parameters.Add("@ExamenRespiratoriu", entity.ExamenRespiratoriu);
+            parameters.Add("@ExamenDigestiv", entity.ExamenDigestiv);
+            parameters.Add("@ExamenUrinar", entity.ExamenUrinar);
+            parameters.Add("@ExamenNervos", entity.ExamenNervos);
+            parameters.Add("@ExamenLocomotor", entity.ExamenLocomotor);
+            parameters.Add("@ExamenEndocrin", entity.ExamenEndocrin);
+            parameters.Add("@ExamenORL", entity.ExamenORL);
+            parameters.Add("@ExamenOftalmologic", entity.ExamenOftalmologic);
+            parameters.Add("@ExamenDermatologic", entity.ExamenDermatologic);
+            parameters.Add("@CreatDe", entity.CreatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe);
+
+            await connection.ExecuteAsync(
+                "ConsultatieExamenObiectiv_Upsert",
+                parameters,
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 30);
+
+            _logger.LogInformation("[ConsultatieRepository] ExamenObiectiv upserted for: {ConsultatieID}", consultatieId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error upserting ExamenObiectiv for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
+
+    public async Task UpsertInvestigatiiAsync(Guid consultatieId, ConsultatieInvestigatii entity)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ConsultatieID", consultatieId);
+            parameters.Add("@InvestigatiiLaborator", entity.InvestigatiiLaborator);
+            parameters.Add("@InvestigatiiImagistice", entity.InvestigatiiImagistice);
+            parameters.Add("@InvestigatiiEKG", entity.InvestigatiiEKG);
+            parameters.Add("@AlteInvestigatii", entity.AlteInvestigatii);
+            parameters.Add("@CreatDe", entity.CreatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe);
+
+            await connection.ExecuteAsync(
+                "ConsultatieInvestigatii_Upsert",
+                parameters,
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 30);
+
+            _logger.LogInformation("[ConsultatieRepository] Investigatii upserted for: {ConsultatieID}", consultatieId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error upserting Investigatii for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
+
+    public async Task UpsertDiagnosticAsync(Guid consultatieId, ConsultatieDiagnostic entity)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ConsultatieID", consultatieId);
+            parameters.Add("@DiagnosticPozitiv", entity.DiagnosticPozitiv);
+            parameters.Add("@DiagnosticDiferential", entity.DiagnosticDiferential);
+            parameters.Add("@DiagnosticEtiologic", entity.DiagnosticEtiologic);
+            parameters.Add("@CoduriICD10", entity.CoduriICD10);
+            parameters.Add("@CoduriICD10Secundare", entity.CoduriICD10Secundare);
+            parameters.Add("@CreatDe", entity.CreatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe);
+
+            await connection.ExecuteAsync(
+                "ConsultatieDiagnostic_Upsert",
+                parameters,
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 30);
+
+            _logger.LogInformation("[ConsultatieRepository] Diagnostic upserted for: {ConsultatieID}", consultatieId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error upserting Diagnostic for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
+
+    public async Task UpsertTratamentAsync(Guid consultatieId, ConsultatieTratament entity)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ConsultatieID", consultatieId);
+            parameters.Add("@TratamentMedicamentos", entity.TratamentMedicamentos);
+            parameters.Add("@TratamentNemedicamentos", entity.TratamentNemedicamentos);
+            parameters.Add("@RecomandariDietetice", entity.RecomandariDietetice);
+            parameters.Add("@RecomandariRegimViata", entity.RecomandariRegimViata);
+            parameters.Add("@InvestigatiiRecomandate", entity.InvestigatiiRecomandate);
+            parameters.Add("@ConsulturiSpecialitate", entity.ConsulturiSpecialitate);
+            parameters.Add("@DataUrmatoareiProgramari", entity.DataUrmatoareiProgramari);
+            parameters.Add("@RecomandariSupraveghere", entity.RecomandariSupraveghere);
+            parameters.Add("@CreatDe", entity.CreatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe);
+
+            await connection.ExecuteAsync(
+                "ConsultatieTratament_Upsert",
+                parameters,
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 30);
+
+            _logger.LogInformation("[ConsultatieRepository] Tratament upserted for: {ConsultatieID}", consultatieId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error upserting Tratament for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
+
+    public async Task UpsertConcluziiAsync(Guid consultatieId, ConsultatieConcluzii entity)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ConsultatieID", consultatieId);
+            parameters.Add("@Prognostic", entity.Prognostic);
+            parameters.Add("@Concluzie", entity.Concluzie);
+            parameters.Add("@ObservatiiMedic", entity.ObservatiiMedic);
+            parameters.Add("@NotePacient", entity.NotePacient);
+            parameters.Add("@DocumenteAtatate", entity.DocumenteAtatate);
+            parameters.Add("@CreatDe", entity.CreatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe);
+
+            await connection.ExecuteAsync(
+                "ConsultatieConcluzii_Upsert",
+                parameters,
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 30);
+
+            _logger.LogInformation("[ConsultatieRepository] Concluzii upserted for: {ConsultatieID}", consultatieId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error upserting Concluzii for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
 }
