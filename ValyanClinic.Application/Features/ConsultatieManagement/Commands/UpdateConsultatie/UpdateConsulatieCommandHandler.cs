@@ -48,7 +48,7 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
                 imc = Math.Round(request.Greutate.Value / (inaltimeMetri * inaltimeMetri), 2);
             }
 
-            // Map to entity
+            // 1. MASTER Entity: Consultatie (core fields only - NORMALIZED structure)
             var consultatie = new Consultatie
             {
                 ConsultatieID = request.ConsultatieID,
@@ -58,8 +58,35 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
                 DataConsultatie = request.DataConsultatie,
                 OraConsultatie = request.OraConsultatie,
                 TipConsultatie = request.TipConsultatie,
+                Status = request.Status,
+                DataFinalizare = request.DataFinalizare,
+                DurataMinute = request.DurataMinute,
+                DataUltimeiModificari = DateTime.Now,
+                ModificatDe = request.ModificatDe
+            };
+
+            var success = await _repository.UpdateAsync(consultatie, cancellationToken);
+
+            if (!success)
+            {
+                _logger.LogWarning("[UpdateConsulatieHandler] Failed to update master Consultatie");
+                return Result<bool>.Failure("Eroare la actualizarea consultatiei");
+            }
+
+            // 2. ConsultatieMotivePrezentare (1:1) - always upsert for full update
+            await _repository.UpsertMotivePrezentareAsync(request.ConsultatieID, new ConsultatieMotivePrezentare
+            {
+                ConsultatieID = request.ConsultatieID,
                 MotivPrezentare = request.MotivPrezentare,
                 IstoricBoalaActuala = request.IstoricBoalaActuala,
+                ModificatDe = request.ModificatDe,
+                DataUltimeiModificari = DateTime.Now
+            });
+
+            // 3. ConsultatieAntecedente (1:1) - always upsert for full update
+            await _repository.UpsertAntecedenteAsync(request.ConsultatieID, new ConsultatieAntecedente
+            {
+                ConsultatieID = request.ConsultatieID,
                 AHC_Mama = request.AHC_Mama,
                 AHC_Tata = request.AHC_Tata,
                 AHC_Frati = request.AHC_Frati,
@@ -82,6 +109,14 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
                 ConditiiMunca = request.ConditiiMunca,
                 ObiceiuriAlimentare = request.ObiceiuriAlimentare,
                 Toxice = request.Toxice,
+                ModificatDe = request.ModificatDe,
+                DataUltimeiModificari = DateTime.Now
+            });
+
+            // 4. ConsultatieExamenObiectiv (1:1) - always upsert for full update
+            await _repository.UpsertExamenObiectivAsync(request.ConsultatieID, new ConsultatieExamenObiectiv
+            {
+                ConsultatieID = request.ConsultatieID,
                 StareGenerala = request.StareGenerala,
                 Constitutie = request.Constitutie,
                 Atitudine = request.Atitudine,
@@ -108,14 +143,39 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
                 ExamenORL = request.ExamenORL,
                 ExamenOftalmologic = request.ExamenOftalmologic,
                 ExamenDermatologic = request.ExamenDermatologic,
+                ModificatDe = request.ModificatDe,
+                DataUltimeiModificari = DateTime.Now
+            });
+
+            // 5. ConsultatieInvestigatii (1:1) - always upsert for full update
+            await _repository.UpsertInvestigatiiAsync(request.ConsultatieID, new ConsultatieInvestigatii
+            {
+                ConsultatieID = request.ConsultatieID,
                 InvestigatiiLaborator = request.InvestigatiiLaborator,
                 InvestigatiiImagistice = request.InvestigatiiImagistice,
                 InvestigatiiEKG = request.InvestigatiiEKG,
                 AlteInvestigatii = request.AlteInvestigatii,
+                ModificatDe = request.ModificatDe,
+                DataUltimeiModificari = DateTime.Now
+            });
+
+            // 6. ConsultatieDiagnostic (1:1) - always upsert for full update
+            await _repository.UpsertDiagnosticAsync(request.ConsultatieID, new ConsultatieDiagnostic
+            {
+                ConsultatieID = request.ConsultatieID,
                 DiagnosticPozitiv = request.DiagnosticPozitiv,
                 DiagnosticDiferential = request.DiagnosticDiferential,
                 DiagnosticEtiologic = request.DiagnosticEtiologic,
                 CoduriICD10 = request.CoduriICD10,
+                CoduriICD10Secundare = request.CoduriICD10Secundare,
+                ModificatDe = request.ModificatDe,
+                DataUltimeiModificari = DateTime.Now
+            });
+
+            // 7. ConsultatieTratament (1:1) - always upsert for full update
+            await _repository.UpsertTratamentAsync(request.ConsultatieID, new ConsultatieTratament
+            {
+                ConsultatieID = request.ConsultatieID,
                 TratamentMedicamentos = request.TratamentMedicamentos,
                 TratamentNemedicamentos = request.TratamentNemedicamentos,
                 RecomandariDietetice = request.RecomandariDietetice,
@@ -124,26 +184,25 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
                 ConsulturiSpecialitate = request.ConsulturiSpecialitate,
                 DataUrmatoareiProgramari = request.DataUrmatoareiProgramari,
                 RecomandariSupraveghere = request.RecomandariSupraveghere,
+                ModificatDe = request.ModificatDe,
+                DataUltimeiModificari = DateTime.Now
+            });
+
+            // 8. ConsultatieConcluzii (1:1) - always upsert for full update
+            await _repository.UpsertConcluziiAsync(request.ConsultatieID, new ConsultatieConcluzii
+            {
+                ConsultatieID = request.ConsultatieID,
                 Prognostic = request.Prognostic,
                 Concluzie = request.Concluzie,
                 ObservatiiMedic = request.ObservatiiMedic,
                 NotePacient = request.NotePacient,
-                Status = request.Status,
-                DataFinalizare = request.DataFinalizare,
-                DurataMinute = request.DurataMinute,
-                DataUltimeiModificari = DateTime.Now,
-                ModificatDe = request.ModificatDe
-            };
+                ModificatDe = request.ModificatDe,
+                DataUltimeiModificari = DateTime.Now
+            });
 
-            var success = await _repository.UpdateAsync(consultatie, cancellationToken);
-
-            if (!success)
-            {
-                _logger.LogWarning("[UpdateConsulatieHandler] Failed to update consultatie ID: {ConsultatieID}", request.ConsultatieID);
-                return Result<bool>.Failure("Eroare la actualizarea consultatiei");
-            }
-
-            _logger.LogInformation("[UpdateConsulatieHandler] Consultatie updated successfully: {ConsultatieID}", request.ConsultatieID);
+            _logger.LogInformation(
+                "[UpdateConsulatieHandler] Consultatie updated successfully with normalized structure: {ConsultatieID}", 
+                request.ConsultatieID);
             return Result<bool>.Success(true, "Consultatie actualizată cu succes");
         }
         catch (Exception ex)
