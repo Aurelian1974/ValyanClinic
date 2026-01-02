@@ -1,0 +1,17 @@
+Msg 102, Level 15, State 1, Server DESKTOP-3Q8HI82\ERP, Procedure Medicamente_GetByCod, Line 32
+Incorrect syntax near '20'.
+Msg 137, Level 15, State 2, Server DESKTOP-3Q8HI82\ERP, Procedure Medicamente_GetByCod, Line 63
+Must declare the scalar variable "@DenumireComerciala".
+Msg 137, Level 15, State 1, Server DESKTOP-3Q8HI82\ERP, Procedure Medicamente_GetByCod, Line 87
+Must declare the scalar variable "@IsNew".
+Msg 137, Level 15, State 2, Server DESKTOP-3Q8HI82\ERP, Procedure Medicamente_GetByCod, Line 98
+Must declare the scalar variable "@DenumireComerciala".
+Msg 137, Level 15, State 1, Server DESKTOP-3Q8HI82\ERP, Procedure Medicamente_GetByCod, Line 103
+Must declare the scalar variable "@IsNew".
+Msg 137, Level 15, State 2, Server DESKTOP-3Q8HI82\ERP, Procedure Medicamente_GetByCod, Line 112
+Must declare the scalar variable "@CodANM".
+Msg 137, Level 15, State 1, Server DESKTOP-3Q8HI82\ERP, Procedure Medicamente_GetByCod, Line 115
+Must declare the scalar variable "@IsNew".
+Msg 207, Level 16, State 1, Server DESKTOP-3Q8HI82\ERP, Procedure Medicamente_GetStats, Line 11
+Invalid column name 'Producator'.
+Stored procedures pentru Medicamente au fost create.

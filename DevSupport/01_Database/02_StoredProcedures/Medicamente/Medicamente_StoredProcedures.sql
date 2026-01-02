@@ -78,21 +78,24 @@ BEGIN
     FROM [dbo].[Medicamente_Nomenclator]
     WHERE [Activ] = 1
       AND (
-          -- Căutare de bază
-          UPPER([DenumireComerciala]) LIKE '%' + @SearchTermUpper + '%'
-          OR UPPER([DCI]) LIKE '%' + @SearchTermUpper + '%'
-          OR UPPER([CodCIM]) LIKE '%' + @SearchTermUpper + '%'
+          -- Căutare de bază (un singur cuvânt)
+          @WordCount = 1 AND (
+              UPPER([DenumireComerciala]) LIKE '%' + @SearchTermUpper + '%'
+              OR UPPER([DCI]) LIKE '%' + @SearchTermUpper + '%'
+              OR UPPER([CodCIM]) LIKE '%' + @SearchTermUpper + '%'
+          )
           
-          -- Căutare avansată multi-cuvânt
+          -- Căutare avansată multi-cuvânt (TOATE cuvintele trebuie prezente)
           OR (
               @WordCount > 1 
-              AND NOT EXISTS (
-                  SELECT 1 FROM @Words w
-                  WHERE UPPER([DenumireComerciala]) NOT LIKE '%' + w.Word + '%'
-                    AND UPPER([Concentratie]) NOT LIKE '%' + w.Word + '%'
-                    AND UPPER([FormaFarmaceutica]) NOT LIKE '%' + w.Word + '%'
-                    AND UPPER([DCI]) NOT LIKE '%' + w.Word + '%'
-              )
+              AND (
+                  SELECT COUNT(DISTINCT w.Word) 
+                  FROM @Words w
+                  WHERE UPPER([DenumireComerciala]) LIKE '%' + w.Word + '%'
+                     OR UPPER([Concentratie]) LIKE '%' + w.Word + '%'
+                     OR UPPER([FormaFarmaceutica]) LIKE '%' + w.Word + '%'
+                     OR UPPER([DCI]) LIKE '%' + w.Word + '%'
+              ) = @WordCount
           )
       )
     ORDER BY 
