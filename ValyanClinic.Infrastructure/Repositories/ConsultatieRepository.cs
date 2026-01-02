@@ -234,14 +234,230 @@ public class ConsultatieRepository : IConsultatieRepository
         {
             using var connection = _connectionFactory.CreateConnection();
 
-            var parameters = new { ProgramareID = programareId };
+            // ✅ Reuse sp_Consultatie_GetDraftByPacient with ProgramareID filter
+            // We need to provide a dummy PacientID, but the SP will filter by ProgramareID first
+            var parameters = new DynamicParameters();
+            parameters.Add("@PacientID", Guid.Empty); // SP will ignore this when ProgramareID is provided
+            parameters.Add("@MedicID", (Guid?)null);
+            parameters.Add("@DataConsultatie", DateTime.Today);
+            parameters.Add("@ProgramareID", programareId);
 
-            var result = await connection.QueryFirstOrDefaultAsync<Consultatie>(
-                "sp_Consultatie_GetByProgramare",
+            // Use same logic as GetDraftByPacientAsync to load all navigation properties
+            var result = await connection.QueryAsync<dynamic>(
+                "sp_Consultatie_GetDraftByPacient",
                 parameters,
-                commandType: CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure
+            );
 
-            return result;
+            var row = result.FirstOrDefault();
+            if (row == null)
+            {
+                _logger.LogInformation(
+                    "[ConsultatieRepository] No consultatie found for ProgramareID: {ProgramareID}",
+                    programareId);
+                return null;
+            }
+
+            // Map master entity
+            var consultatie = new Consultatie
+            {
+                ConsultatieID = row.ConsultatieID,
+                ProgramareID = row.ProgramareID,
+                PacientID = row.PacientID,
+                MedicID = row.MedicID,
+                DataConsultatie = row.DataConsultatie,
+                OraConsultatie = row.OraConsultatie,
+                TipConsultatie = row.TipConsultatie,
+                Status = row.Status,
+                DataFinalizare = row.DataFinalizare,
+                DurataMinute = row.DurataMinute,
+                DataCreare = row.DataCreare,
+                CreatDe = row.CreatDe,
+                DataUltimeiModificari = row.DataUltimeiModificari,
+                ModificatDe = row.ModificatDe
+            };
+
+            // Map ConsultatieMotivePrezentare
+            if (row.MotivePrezentare_Id != null)
+            {
+                consultatie.MotivePrezentare = new ConsultatieMotivePrezentare
+                {
+                    Id = row.MotivePrezentare_Id,
+                    ConsultatieID = consultatie.ConsultatieID,
+                    MotivPrezentare = row.MotivePrezentare_MotivPrezentare,
+                    IstoricBoalaActuala = row.MotivePrezentare_IstoricBoalaActuala,
+                    DataCreare = row.MotivePrezentare_DataCreare,
+                    CreatDe = row.MotivePrezentare_CreatDe,
+                    DataUltimeiModificari = row.MotivePrezentare_DataUltimeiModificari,
+                    ModificatDe = row.MotivePrezentare_ModificatDe
+                };
+            }
+
+            // Map ConsultatieAntecedente
+            if (row.Antecedente_Id != null)
+            {
+                consultatie.Antecedente = new ConsultatieAntecedente
+                {
+                    Id = row.Antecedente_Id,
+                    ConsultatieID = consultatie.ConsultatieID,
+                    APP_Medicatie = row.Antecedente_APP_Medicatie,
+                    AHC_Mama = row.Antecedente_AHC_Mama,
+                    AHC_Tata = row.Antecedente_AHC_Tata,
+                    AHC_Frati = row.Antecedente_AHC_Frati,
+                    AHC_Bunici = row.Antecedente_AHC_Bunici,
+                    AHC_Altele = row.Antecedente_AHC_Altele,
+                    AF_Nastere = row.Antecedente_AF_Nastere,
+                    AF_Dezvoltare = row.Antecedente_AF_Dezvoltare,
+                    AF_Menstruatie = row.Antecedente_AF_Menstruatie,
+                    AF_Sarcini = row.Antecedente_AF_Sarcini,
+                    AF_Alaptare = row.Antecedente_AF_Alaptare,
+                    APP_BoliCopilarieAdolescenta = row.Antecedente_APP_BoliCopilarieAdolescenta,
+                    APP_BoliAdult = row.Antecedente_APP_BoliAdult,
+                    APP_Interventii = row.Antecedente_APP_Interventii,
+                    APP_Traumatisme = row.Antecedente_APP_Traumatisme,
+                    APP_Transfuzii = row.Antecedente_APP_Transfuzii,
+                    APP_Alergii = row.Antecedente_APP_Alergii,
+                    Profesie = row.Antecedente_Profesie,
+                    ConditiiLocuinta = row.Antecedente_ConditiiLocuinta,
+                    ConditiiMunca = row.Antecedente_ConditiiMunca,
+                    ObiceiuriAlimentare = row.Antecedente_ObiceiuriAlimentare,
+                    Toxice = row.Antecedente_Toxice,
+                    DataCreare = row.Antecedente_DataCreare,
+                    CreatDe = row.Antecedente_CreatDe,
+                    DataUltimeiModificari = row.Antecedente_DataUltimeiModificari,
+                    ModificatDe = row.Antecedente_ModificatDe
+                };
+            }
+
+            // Map ConsultatieExamenObiectiv
+            if (row.ExamenObiectiv_Id != null)
+            {
+                consultatie.ExamenObiectiv = new ConsultatieExamenObiectiv
+                {
+                    Id = row.ExamenObiectiv_Id,
+                    ConsultatieID = consultatie.ConsultatieID,
+                    StareGenerala = row.ExamenObiectiv_StareGenerala,
+                    Tegumente = row.ExamenObiectiv_Tegumente,
+                    Mucoase = row.ExamenObiectiv_Mucoase,
+                    Edeme = row.ExamenObiectiv_Edeme,
+                    Greutate = row.ExamenObiectiv_Greutate,
+                    Inaltime = row.ExamenObiectiv_Inaltime,
+                    IMC = row.ExamenObiectiv_IMC,
+                    Temperatura = row.ExamenObiectiv_Temperatura,
+                    TensiuneArteriala = row.ExamenObiectiv_TensiuneArteriala,
+                    Puls = row.ExamenObiectiv_Puls,
+                    FreccventaRespiratorie = row.ExamenObiectiv_FreccventaRespiratorie,
+                    SaturatieO2 = row.ExamenObiectiv_SaturatieO2,
+                    Glicemie = row.ExamenObiectiv_Glicemie,
+                    ExamenCardiovascular = row.ExamenObiectiv_ExamenCardiovascular,
+                    ExamenRespiratoriu = row.ExamenObiectiv_ExamenRespiratoriu,
+                    ExamenDigestiv = row.ExamenObiectiv_ExamenDigestiv,
+                    ExamenUrinar = row.ExamenObiectiv_ExamenUrinar,
+                    ExamenNervos = row.ExamenObiectiv_ExamenNervos,
+                    Constitutie = row.ExamenObiectiv_Constitutie,
+                    Atitudine = row.ExamenObiectiv_Atitudine,
+                    Facies = row.ExamenObiectiv_Facies,
+                    GangliniLimfatici = row.ExamenObiectiv_GangliniLimfatici,
+                    ExamenLocomotor = row.ExamenObiectiv_ExamenLocomotor,
+                    ExamenEndocrin = row.ExamenObiectiv_ExamenEndocrin,
+                    ExamenORL = row.ExamenObiectiv_ExamenORL,
+                    ExamenOftalmologic = row.ExamenObiectiv_ExamenOftalmologic,
+                    ExamenDermatologic = row.ExamenObiectiv_ExamenDermatologic,
+                    DataCreare = row.ExamenObiectiv_DataCreare,
+                    CreatDe = row.ExamenObiectiv_CreatDe,
+                    DataUltimeiModificari = row.ExamenObiectiv_DataUltimeiModificari,
+                    ModificatDe = row.ExamenObiectiv_ModificatDe
+                };
+            }
+
+            // Map ConsultatieInvestigatii
+            if (row.Investigatii_Id != null)
+            {
+                consultatie.Investigatii = new ConsultatieInvestigatii
+                {
+                    Id = row.Investigatii_Id,
+                    ConsultatieID = consultatie.ConsultatieID,
+                    InvestigatiiLaborator = row.Investigatii_InvestigatiiLaborator,
+                    InvestigatiiImagistice = row.Investigatii_InvestigatiiImagistice,
+                    InvestigatiiEKG = row.Investigatii_InvestigatiiEKG,
+                    AlteInvestigatii = row.Investigatii_AlteInvestigatii,
+                    DataCreare = row.Investigatii_DataCreare,
+                    CreatDe = row.Investigatii_CreatDe,
+                    DataUltimeiModificari = row.Investigatii_DataUltimeiModificari,
+                    ModificatDe = row.Investigatii_ModificatDe
+                };
+            }
+
+            // Map ConsultatieDiagnostic
+            if (row.Diagnostic_Id != null)
+            {
+                consultatie.Diagnostic = new ConsultatieDiagnostic
+                {
+                    Id = row.Diagnostic_Id,
+                    ConsultatieID = consultatie.ConsultatieID,
+                    DiagnosticPozitiv = row.Diagnostic_DiagnosticPozitiv,
+                    DiagnosticDiferential = row.Diagnostic_DiagnosticDiferential,
+                    DiagnosticEtiologic = row.Diagnostic_DiagnosticEtiologic,
+                    CoduriICD10 = row.Diagnostic_CoduriICD10,
+                    CoduriICD10Secundare = row.Diagnostic_CoduriICD10Secundare,
+                    DataCreare = row.Diagnostic_DataCreare,
+                    CreatDe = row.Diagnostic_CreatDe,
+                    DataUltimeiModificari = row.Diagnostic_DataUltimeiModificari,
+                    ModificatDe = row.Diagnostic_ModificatDe
+                };
+            }
+
+            // Map ConsultatieTratament
+            if (row.Tratament_Id != null)
+            {
+                consultatie.Tratament = new ConsultatieTratament
+                {
+                    Id = row.Tratament_Id,
+                    ConsultatieID = consultatie.ConsultatieID,
+                    TratamentMedicamentos = row.Tratament_TratamentMedicamentos,
+                    TratamentNemedicamentos = row.Tratament_TratamentNemedicamentos,
+                    RecomandariDietetice = row.Tratament_RecomandariDietetice,
+                    RecomandariRegimViata = row.Tratament_RecomandariRegimViata,
+                    InvestigatiiRecomandate = row.Tratament_InvestigatiiRecomandate,
+                    ConsulturiSpecialitate = row.Tratament_ConsulturiSpecialitate,
+                    DataUrmatoareiProgramari = row.Tratament_DataUrmatoareiProgramari,
+                    RecomandariSupraveghere = row.Tratament_RecomandariSupraveghere,
+                    DataCreare = row.Tratament_DataCreare,
+                    CreatDe = row.Tratament_CreatDe,
+                    DataUltimeiModificari = row.Tratament_DataUltimeiModificari,
+                    ModificatDe = row.Tratament_ModificatDe
+                };
+            }
+
+            // Map ConsultatieConcluzii
+            if (row.Concluzii_Id != null)
+            {
+                consultatie.Concluzii = new ConsultatieConcluzii
+                {
+                    Id = row.Concluzii_Id,
+                    ConsultatieID = consultatie.ConsultatieID,
+                    Prognostic = row.Concluzii_Prognostic,
+                    Concluzie = row.Concluzii_Concluzie,
+                    ObservatiiMedic = row.Concluzii_ObservatiiMedic,
+                    NotePacient = row.Concluzii_NotePacient,
+                    DocumenteAtatate = row.Concluzii_DocumenteAtatate,
+                    DataCreare = row.Concluzii_DataCreare,
+                    CreatDe = row.Concluzii_CreatDe,
+                    DataUltimeiModificari = row.Concluzii_DataUltimeiModificari,
+                    ModificatDe = row.Concluzii_ModificatDe
+                };
+            }
+
+            var populatedSections = new object?[] { 
+                consultatie.MotivePrezentare, consultatie.Antecedente, consultatie.ExamenObiectiv, 
+                consultatie.Investigatii, consultatie.Diagnostic, consultatie.Tratament, consultatie.Concluzii 
+            }.Count(s => s != null);
+
+            _logger.LogInformation(
+                "[ConsultatieRepository] Consultatie found by ProgramareID: {ProgramareID} - ConsultatieID: {ConsultatieID} with {Sections} populated sections",
+                programareId, consultatie.ConsultatieID, populatedSections);
+
+            return consultatie;
         }
         catch (Exception ex)
         {
