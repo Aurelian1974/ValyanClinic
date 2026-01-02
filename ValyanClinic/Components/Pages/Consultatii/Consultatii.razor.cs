@@ -742,7 +742,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     [JSInvokable] public async Task OnKeyboardSaveDraft() => await HandleSaveDraft();
     [JSInvokable] public async Task OnKeyboardFinalize() => await HandleFinalize();
     [JSInvokable] public void OnKeyboardPreviousTab() { if (ActiveTab > 1) { SwitchTab(ActiveTab - 1); StateHasChanged(); } }
-    [JSInvokable] public void OnKeyboardNextTab() { if (ActiveTab < 4) { SwitchTab(ActiveTab + 1); StateHasChanged(); } }
+    [JSInvokable] public void OnKeyboardNextTab() { if (ActiveTab < 5) { SwitchTab(ActiveTab + 1); StateHasChanged(); } }
     [JSInvokable] public void OnKeyboardSwitchTab(int tab) { SwitchTab(tab); StateHasChanged(); }
     [JSInvokable] public void OnKeyboardToggleTimer() { ToggleTimerPause(); StateHasChanged(); }
 
