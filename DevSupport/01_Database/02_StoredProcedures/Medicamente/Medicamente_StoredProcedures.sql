@@ -14,26 +14,45 @@ AS
 BEGIN
     SET NOCOUNT ON;
     
+    -- Case-insensitive search cu UPPER pentru siguranță
+    DECLARE @SearchTermUpper NVARCHAR(100) = UPPER(@SearchTerm);
+    
     SELECT TOP (@MaxResults)
         [Id],
-        [CodANM],
-        [NumeComercial],
+        [CodCIM],
+        [DenumireComerciala],
         [DCI],
         [FormaFarmaceutica],
-        [CodATC],
         [Concentratie],
-        [Producator]
+        [FirmaTaraProducatoareAPP],
+        [FirmaTaraDetinatoareAPP],
+        [CodATC],
+        [ActiuneTerapeutica],
+        [Prescriptie],
+        [NrDataAmbalajAPP],
+        [Ambalaj],
+        [VolumAmbalaj],
+        [ValabilitateAmbalaj],
+        [Bulina],
+        [Diez],
+        [Stea],
+        [Triunghi],
+        [Dreptunghi],
+        [DataActualizare],
+        [DataImport],
+        [DataUltimaActualizare],
+        [Activ]
     FROM [dbo].[Medicamente_Nomenclator]
     WHERE [Activ] = 1
       AND (
-          [NumeComercial] LIKE @SearchTerm + '%'
-          OR [NumeComercial] LIKE '%' + @SearchTerm + '%'
-          OR [DCI] LIKE @SearchTerm + '%'
-          OR [CodANM] LIKE @SearchTerm + '%'
+          UPPER([DenumireComerciala]) LIKE @SearchTermUpper + '%'
+          OR UPPER([DenumireComerciala]) LIKE '%' + @SearchTermUpper + '%'
+          OR UPPER([DCI]) LIKE @SearchTermUpper + '%'
+          OR UPPER([CodCIM]) LIKE @SearchTermUpper + '%'
       )
     ORDER BY 
-        CASE WHEN [NumeComercial] LIKE @SearchTerm + '%' THEN 0 ELSE 1 END,
-        [NumeComercial]
+        CASE WHEN UPPER([DenumireComerciala]) LIKE @SearchTermUpper + '%' THEN 0 ELSE 1 END,
+        [DenumireComerciala]
 END
 GO
 
@@ -43,65 +62,105 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'Medicamente_Ge
 GO
 
 CREATE PROCEDURE [dbo].[Medicamente_GetByCod]
-    @CodANM NVARCHAR(20)
+    @CodCIM NVARCHAR(20)
 AS
 BEGIN
     SET NOCOUNT ON;
     
     SELECT 
         [Id],
-        [CodANM],
-        [NumeComercial],
+        [CodCIM],
+        [DenumireComerciala],
         [DCI],
         [FormaFarmaceutica],
-        [CodATC],
         [Concentratie],
-        [Producator],
-        [TaraProducator],
-        [PrescriptieMedicala],
-        [Compensat],
-        [ProcentCompensare]
-    FROM [dbo].[Medicamente_Nomenclator]
-    WHERE [CodANM] = @CodANM AND [Activ] = 1
-END
-GO
-
--- SP: Upsert medicament (pentru import)
-IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'Medicamente_Upsert')
-    DROP PROCEDURE [dbo].[Medicamente_Upsert]
-GO
-
-CREATE PROCEDURE [dbo].[Medicamente_Upsert]
-    @CodANM NVARCHAR(20),
-    @NumeComercial NVARCHAR(500),
+        [FirmaTaraProducatoareAPP],
+        [FirmaTaraDetinatoareAPP],
+        [CodATC],
+        [ActiuneTerapeutica],
+        [Prescriptie],
+        [NrDataAmbalajAPP],
+        [Ambalaj],
+        [VolumAmbalaj],
+        [ValabilitateAmbalaj],
+        [Bulina],
+        [Diez],
+        [Stea],
+        [Triunghi],
+        [Dreptunghi],
+        [DataActualizare],
+        [DataImport],
+        [DataUltimaActualizare],
+        CIM NVARCHAR(20),
+    @DenumireComerciala NVARCHAR(500),
     @DCI NVARCHAR(500) = NULL,
     @FormaFarmaceutica NVARCHAR(200) = NULL,
-    @CodATC NVARCHAR(20) = NULL,
     @Concentratie NVARCHAR(200) = NULL,
-    @Producator NVARCHAR(500) = NULL,
-    @TaraProducator NVARCHAR(100) = NULL,
+    @FirmaTaraProducatoareAPP NVARCHAR(500) = NULL,
+    @FirmaTaraDetinatoareAPP NVARCHAR(500) = NULL,
+    @CodATC NVARCHAR(20) = NULL,
+    @ActiuneTerapeutica NVARCHAR(500) = NULL,
+    @Prescriptie NVARCHAR(50) = NULL,
+    @NrDataAmbalajAPP NVARCHAR(200) = NULL,
+    @Ambalaj NVARCHAR(500) = NULL,
+    @VolumAmbalaj NVARCHAR(100) = NULL,
+    @ValabilitateAmbalaj NVARCHAR(100) = NULL,
+    @Bulina NVARCHAR(10) = NULL,
+    @Diez NVARCHAR(10) = NULL,
+    @Stea NVARCHAR(10) = NULL,
+    @Triunghi NVARCHAR(10) = NULL,
+    @Dreptunghi NVARCHAR(10) = NULL,
+    @DataActualizare NVARCHAR(50) = NULL,
     @SursaFisier NVARCHAR(500) = NULL,
     @IsNew BIT OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
     
-    IF EXISTS (SELECT 1 FROM [dbo].[Medicamente_Nomenclator] WHERE [CodANM] = @CodANM)
+    IF EXISTS (SELECT 1 FROM [dbo].[Medicamente_Nomenclator] WHERE [CodCIM] = @CodCIM)
     BEGIN
         -- Update
         UPDATE [dbo].[Medicamente_Nomenclator]
         SET 
-            [NumeComercial] = @NumeComercial,
+            [DenumireComerciala] = @DenumireComerciala,
             [DCI] = @DCI,
             [FormaFarmaceutica] = @FormaFarmaceutica,
-            [CodATC] = @CodATC,
             [Concentratie] = @Concentratie,
-            [Producator] = @Producator,
-            [TaraProducator] = @TaraProducator,
+            [FirmaTaraProducatoareAPP] = @FirmaTaraProducatoareAPP,
+            [FirmaTaraDetinatoareAPP] = @FirmaTaraDetinatoareAPP,
+            [CodATC] = @CodATC,
+            [ActiuneTerapeutica] = @ActiuneTerapeutica,
+            [Prescriptie] = @Prescriptie,
+            [NrDataAmbalajAPP] = @NrDataAmbalajAPP,
+            [Ambalaj] = @Ambalaj,
+            [VolumAmbalaj] = @VolumAmbalaj,
+            [ValabilitateAmbalaj] = @ValabilitateAmbalaj,
+            [Bulina] = @Bulina,
+            [Diez] = @Diez,
+            [Stea] = @Stea,
+            [Triunghi] = @Triunghi,
+            [Dreptunghi] = @Dreptunghi,
+            [DataActualizare] = @DataActualizare,
             [DataUltimaActualizare] = GETDATE(),
             [SursaFisier] = @SursaFisier,
             [Activ] = 1
-        WHERE [CodANM] = @CodANM;
+        WHERE [CodCIM] = @CodCIM;
+        
+        SET @IsNew = 0;
+    END
+    ELSE
+    BEGIN
+        -- Insert
+        INSERT INTO [dbo].[Medicamente_Nomenclator]
+            ([CodCIM], [DenumireComerciala], [DCI], [FormaFarmaceutica], [Concentratie],
+             [FirmaTaraProducatoareAPP], [FirmaTaraDetinatoareAPP], [CodATC], [ActiuneTerapeutica],
+             [Prescriptie], [NrDataAmbalajAPP], [Ambalaj], [VolumAmbalaj], [ValabilitateAmbalaj],
+             [Bulina], [Diez], [Stea], [Triunghi], [Dreptunghi], [DataActualizare], [SursaFisier])
+        VALUES
+            (@CodCIM, @DenumireComerciala, @DCI, @FormaFarmaceutica, @Concentratie,
+             @FirmaTaraProducatoareAPP, @FirmaTaraDetinatoareAPP, @CodATC, @ActiuneTerapeutica,
+             @Prescriptie, @NrDataAmbalajAPP, @Ambalaj, @VolumAmbalaj, @ValabilitateAmbalaj,
+             @Bulina, @Diez, @Stea, @Triunghi, @Dreptunghi, @DataActualizare
         
         SET @IsNew = 0;
     END
