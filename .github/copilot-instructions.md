@@ -47,6 +47,58 @@ Component.razor.css  # Scoped styles ONLY - use CSS variables
 - **Styling**: Use CSS variables from `ValyanClinic/wwwroot/css/variables.css` - blue pastel theme
 - **Performance**: Override `ShouldRender()`, use `@key` directive, implement `IDisposable`
 
+### Syncfusion Grid - Navigation Safety Pattern (CRITICAL)
+When using Syncfusion `SfGrid` in pages with navigation, follow this pattern to prevent `removeChild` errors:
+
+```csharp
+// 1. Add @key to SfGrid in .razor file
+<SfGrid @ref="GridRef" @key="@_gridKey" DataSource="@Data">
+
+// 2. In code-behind (.razor.cs):
+private string _gridKey = Guid.NewGuid().ToString();
+private bool _disposed = false;
+
+protected override async Task OnInitializedAsync()
+{
+    // Subscribe to navigation BEFORE it happens
+    NavigationManager.LocationChanged += OnLocationChanged;
+    // ... rest of initialization
+}
+
+// Handle navigation - cleanup BEFORE Blazor destroys DOM
+private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+{
+    _disposed = true;
+    _ = JSRuntime.InvokeVoidAsync("cleanupSyncfusionBeforeNavigation");
+}
+
+public void Dispose()
+{
+    if (_disposed) return;
+    _disposed = true;
+    
+    NavigationManager.LocationChanged -= OnLocationChanged;
+    _ = JSRuntime.InvokeVoidAsync("cleanupSyncfusionBeforeNavigation");
+    GridRef = null;
+    // ... cleanup
+}
+```
+
+```javascript
+// 3. In wwwroot/js/fileDownload.js - add Syncfusion cleanup:
+window.cleanupSyncfusionBeforeNavigation = function() {
+    window._blazorNavigating = true;
+    try {
+        if (window.sfBlazor?.instances) {
+            Object.keys(window.sfBlazor.instances).forEach(key => {
+                try { window.sfBlazor.instances[key]?.destroy(); } catch(e) {}
+            });
+        }
+    } catch(e) {}
+    setTimeout(() => { window._blazorNavigating = false; }, 500);
+};
+```
+
 ### Design System (Strict - Blue Theme Only)
 | Element | Style |
 |---------|-------|
@@ -144,6 +196,7 @@ public Guid Id { get; set; }
 | CSS Variables | `ValyanClinic/wwwroot/css/variables.css` |
 | Database Scripts | `DevSupport/01_Database/` |
 | Test Infrastructure | `ValyanClinic.Tests/Infrastructure/` |
+| JS Utilities | `ValyanClinic/wwwroot/js/fileDownload.js` |
 
 ## Anti-Patterns to Avoid
 - ❌ Logic in `.razor` files - use `.razor.cs` code-behind
@@ -155,9 +208,18 @@ public Guid Id { get; set; }
 - ❌ Using `DateTime.UtcNow` - always use `DateTime.Now` (local Romania time)
 - ❌ Leaving compiler warnings - fix null reference issues with `??`, `?.` or `!` operators
 - ❌ Ignoring async/await - use `_ = MethodAsync();` for intentional fire-and-forget
+- ❌ Syncfusion Grid without `@key` directive - causes `removeChild` errors on navigation
+- ❌ Not subscribing to `NavigationManager.LocationChanged` in pages with complex components
 
 ## Build Quality Standards
 - **Zero Errors**: Build must complete without errors
 - **Minimal Warnings**: Use `Directory.Build.props` to suppress intentional warnings (CS0414, CS4014, BL0005)
 - **Null Safety**: Always handle nullable references with proper null checks or null-forgiving operators
 - **Package Compatibility**: Keep NuGet packages compatible (avoid version conflicts like NU1608)
+
+## Syncfusion Blazor Guidelines
+- **Version**: Use Syncfusion.Blazor packages version 28.x compatible with .NET 9
+- **Grid Navigation**: Always use `@key` directive and `LocationChanged` handler (see pattern above)
+- **Disposal**: Never call `GridRef.Dispose()` directly - let Blazor handle it, just set `GridRef = null`
+- **Animations**: Call `cleanupSyncfusionBeforeNavigation()` via JS interop before navigation
+- **Server-side**: Use server-side paging/sorting for large datasets (>100 records)
