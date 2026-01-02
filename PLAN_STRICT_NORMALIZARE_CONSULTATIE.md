@@ -325,6 +325,7 @@ Manual test:
 
 **🎉 NORMALIZARE 100% COMPLETĂ**:
 - ✅ Database: 10 tables + 17 SPs deployed (ValyanMed on .\ERP)
+- ✅ **Consultatii table refactorizată:** 85 coloane → 14 coloane master (DROP 71 denormalized columns)
 - ✅ Infrastructure: 7 Upsert methods implemented
 - ✅ Domain: 8 navigation properties added
 - ✅ Application: 6 handlers refactored (SaveDraft, GetById, GetDraft, GetByProgramare, Update, Create)
