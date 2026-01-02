@@ -232,6 +232,7 @@
     border-radius: 0 0 6px 6px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
+    padding-bottom: 0.5rem;
 }
 
 .autocomplete-header {
