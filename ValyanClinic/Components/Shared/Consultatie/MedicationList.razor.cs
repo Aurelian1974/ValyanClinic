@@ -90,7 +90,7 @@ public partial class MedicationList : ComponentBase
     {
         try
         {
-            var result = await MedicamenteService.SearchAsync(searchTerm, maxResults: 10, cancellationToken);
+            var result = await MedicamenteService.SearchAsync(searchTerm, maxResults: 100, cancellationToken);
             
             if (result.IsSuccess && result.Value != null)
             {

@@ -145,6 +145,12 @@
                 @if (ShowAutocomplete && MedicationSearchResults.Any())
                 {
                     <div class="autocomplete-dropdown">
+                        <div class="autocomplete-header">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                @MedicationSearchResults.Count rezultat(e) găsit(e)
+                            </small>
+                        </div>
                         @foreach (var result in MedicationSearchResults)
                         {
                             <div class="autocomplete-item" 
@@ -157,6 +163,10 @@
                                 @if (!string.IsNullOrEmpty(result.FormaFarmaceutica))
                                 {
                                     <div class="medication-form">@result.FormaFarmaceutica @result.Concentratie</div>
+                                }
+                                @if (!string.IsNullOrEmpty(result.Ambalaj))
+                                {
+                                    <div class="medication-packaging">📦 @result.Ambalaj</div>
                                 }
                             </div>
                         }

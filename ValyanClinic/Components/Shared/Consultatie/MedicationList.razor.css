@@ -224,7 +224,7 @@
     top: 100%;
     left: 0;
     right: 0;
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
     background: white;
     border: 1px solid #d1d5db;
@@ -232,6 +232,20 @@
     border-radius: 0 0 6px 6px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
+}
+
+.autocomplete-header {
+    padding: 0.5rem 0.75rem;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.autocomplete-header small {
+    color: #6b7280;
+    font-size: 0.75rem;
 }
 
 .autocomplete-item {
@@ -264,6 +278,12 @@
 .autocomplete-item .medication-form {
     font-size: 0.75rem;
     color: #9ca3af;
+}
+
+.autocomplete-item .medication-packaging {
+    font-size: 0.7rem;
+    color: #10b981;
+    margin-top: 0.125rem;
 }
 
 /* ==================== FORM ACTIONS ==================== */
