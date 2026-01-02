@@ -654,18 +654,18 @@
                             </GridColumn>
                         </GridColumns>
                     </SfGrid>
-
-                    <!-- ✅ REUSABLE: Pagination Control Component -->
-                    <PaginationControl CurrentPage="@CurrentPage"
-                                     PageSize="@CurrentPageSize"
-                                     TotalRecords="@TotalRecords"
-                                     PageSizeOptions="@PageSizeArray"
-                                     OnFirstPage="@GoToFirstPage"
-                                     OnPreviousPage="@GoToPreviousPage"
-                                     OnNextPage="@GoToNextPage"
-                                     OnLastPage="@GoToLastPage"
-                                     OnPageSizeChanged="@ChangePageSize" />
                 </div>
+                
+                <!-- ✅ REUSABLE: Pagination Control Component -->
+                <PaginationControl CurrentPage="@CurrentPage"
+                                 PageSize="@CurrentPageSize"
+                                 TotalRecords="@TotalRecords"
+                                 PageSizeOptions="@PageSizeArray"
+                                 OnFirstPage="@GoToFirstPage"
+                                 OnPreviousPage="@GoToPreviousPage"
+                                 OnNextPage="@GoToNextPage"
+                                 OnLastPage="@GoToLastPage"
+                                 OnPageSizeChanged="@ChangePageSize" />
             </section>
             }
         }
