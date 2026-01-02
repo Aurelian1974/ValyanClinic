@@ -152,24 +152,38 @@ public class NomenclatorSyncBackgroundService : BackgroundService
 
     private DateTime CalculateNextSyncTime()
     {
-        var now = DateTime.Now;
-        var preferredTime = now.Date.AddHours(_options.PreferredHour);
+        using var scope = _scopeFactory.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<INomenclatorMedicamenteService>();
         
-        // Dacă ora preferată e în trecut, mergem la ziua următoare
-        if (preferredTime <= now)
+        // Obținem ultima sincronizare reușită din DB
+        var statsResult = service.GetStatsAsync().GetAwaiter().GetResult();
+        DateTime referenceDate;
+        
+        if (statsResult.IsSuccess && statsResult.Value?.UltimaSincronizareReusita.HasValue == true)
         {
-            preferredTime = preferredTime.AddDays(1);
+            // Calculăm de la ultima sincronizare reușită
+            referenceDate = statsResult.Value.UltimaSincronizareReusita.Value;
+            _logger.LogDebug("Calculez următoarea sincronizare de la ultima reușită: {Date}", referenceDate);
+        }
+        else
+        {
+            // Dacă nu avem istoric, folosim data curentă
+            referenceDate = DateTime.Now;
+            _logger.LogDebug("Nu există istoric de sincronizare, calculez de la data curentă: {Date}", referenceDate);
+        }
+        
+        // Adăugăm intervalul la data de referință
+        var nextSync = referenceDate.AddHours(_options.IntervalHours);
+        
+        // Ajustăm la ora preferată
+        nextSync = nextSync.Date.AddHours(_options.PreferredHour);
+        
+        // Dacă data calculată e în trecut, folosim următoarea zi la ora preferată
+        if (nextSync <= DateTime.Now)
+        {
+            nextSync = DateTime.Now.Date.AddDays(1).AddHours(_options.PreferredHour);
         }
 
-        // Apoi adăugăm intervalul
-        var intervalDays = _options.IntervalHours / 24.0;
-        
-        // Găsim următoarea zi care se potrivește cu intervalul
-        while ((preferredTime - now).TotalHours < _options.IntervalHours * 0.9)
-        {
-            preferredTime = preferredTime.AddDays(1);
-        }
-
-        return preferredTime;
+        return nextSync;
     }
 }
