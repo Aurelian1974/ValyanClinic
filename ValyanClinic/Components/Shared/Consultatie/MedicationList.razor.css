@@ -257,6 +257,8 @@
 
 .autocomplete-item:last-child {
     border-bottom: none;
+    padding-bottom: 1rem;
+    margin-bottom: 0.25rem;
 }
 
 .autocomplete-item:hover {
