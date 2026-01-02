@@ -559,8 +559,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@ConsultatieID", consultatieId);
             parameters.Add("@MotivPrezentare", entity.MotivPrezentare);
             parameters.Add("@IstoricBoalaActuala", entity.IstoricBoalaActuala);
-            parameters.Add("@CreatDe", entity.CreatDe);
-            parameters.Add("@ModificatDe", entity.ModificatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(
                 "ConsultatieMotivePrezentare_Upsert",
@@ -607,8 +606,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@ConditiiMunca", entity.ConditiiMunca);
             parameters.Add("@ObiceiuriAlimentare", entity.ObiceiuriAlimentare);
             parameters.Add("@Toxice", entity.Toxice);
-            parameters.Add("@CreatDe", entity.CreatDe);
-            parameters.Add("@ModificatDe", entity.ModificatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(
                 "ConsultatieAntecedente_Upsert",
@@ -660,8 +658,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@ExamenORL", entity.ExamenORL);
             parameters.Add("@ExamenOftalmologic", entity.ExamenOftalmologic);
             parameters.Add("@ExamenDermatologic", entity.ExamenDermatologic);
-            parameters.Add("@CreatDe", entity.CreatDe);
-            parameters.Add("@ModificatDe", entity.ModificatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(
                 "ConsultatieExamenObiectiv_Upsert",
@@ -690,8 +687,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@InvestigatiiImagistice", entity.InvestigatiiImagistice);
             parameters.Add("@InvestigatiiEKG", entity.InvestigatiiEKG);
             parameters.Add("@AlteInvestigatii", entity.AlteInvestigatii);
-            parameters.Add("@CreatDe", entity.CreatDe);
-            parameters.Add("@ModificatDe", entity.ModificatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(
                 "ConsultatieInvestigatii_Upsert",
@@ -721,8 +717,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@DiagnosticEtiologic", entity.DiagnosticEtiologic);
             parameters.Add("@CoduriICD10", entity.CoduriICD10);
             parameters.Add("@CoduriICD10Secundare", entity.CoduriICD10Secundare);
-            parameters.Add("@CreatDe", entity.CreatDe);
-            parameters.Add("@ModificatDe", entity.ModificatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(
                 "ConsultatieDiagnostic_Upsert",
@@ -755,8 +750,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@ConsulturiSpecialitate", entity.ConsulturiSpecialitate);
             parameters.Add("@DataUrmatoareiProgramari", entity.DataUrmatoareiProgramari);
             parameters.Add("@RecomandariSupraveghere", entity.RecomandariSupraveghere);
-            parameters.Add("@CreatDe", entity.CreatDe);
-            parameters.Add("@ModificatDe", entity.ModificatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(
                 "ConsultatieTratament_Upsert",
@@ -786,8 +780,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@ObservatiiMedic", entity.ObservatiiMedic);
             parameters.Add("@NotePacient", entity.NotePacient);
             parameters.Add("@DocumenteAtatate", entity.DocumenteAtatate);
-            parameters.Add("@CreatDe", entity.CreatDe);
-            parameters.Add("@ModificatDe", entity.ModificatDe);
+            parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(
                 "ConsultatieConcluzii_Upsert",
