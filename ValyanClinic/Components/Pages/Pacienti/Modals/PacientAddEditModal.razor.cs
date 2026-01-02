@@ -762,6 +762,26 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
             if (result.IsSuccess && result.Value != null)
             {
                 var pacient = result.Value;
+                
+                // Separă adresa în stradă și număr (dacă există)
+                string? strada = pacient.Adresa;
+                string? numar = null;
+                
+                if (!string.IsNullOrWhiteSpace(pacient.Adresa))
+                {
+                    // Încearcă să găsească numărul la sfârșit (ex: "Str. Zorilor 123A")
+                    var match = System.Text.RegularExpressions.Regex.Match(
+                        pacient.Adresa, 
+                        @"^(.+?)\s+(\d+[A-Za-z]?|[A-Za-z]\d+)\s*$"
+                    );
+                    
+                    if (match.Success)
+                    {
+                        strada = match.Groups[1].Value.Trim();
+                        numar = match.Groups[2].Value.Trim();
+                    }
+                }
+                
                 FormModel = new PacientFormModel
                 {
                     Nume = pacient.Nume,
@@ -775,7 +795,8 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
                     Email = pacient.Email,
                     Judet = pacient.Judet,
                     Localitate = pacient.Localitate,
-                    Adresa = pacient.Adresa,
+                    Adresa = strada,
+                    Numar = numar,
                     Cod_Postal = pacient.Cod_Postal,
                     Asigurat = pacient.Asigurat,
                     CNP_Asigurat = pacient.CNP_Asigurat,
@@ -1123,6 +1144,13 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     {
         if (_disposed) return; // ADDED: Guard check
 
+        // Concatenează strada și numărul pentru salvare
+        var adresaCompleta = string.IsNullOrWhiteSpace(FormModel.Adresa) 
+            ? null 
+            : string.IsNullOrWhiteSpace(FormModel.Numar)
+                ? FormModel.Adresa.Trim()
+                : $"{FormModel.Adresa.Trim()} {FormModel.Numar.Trim()}";
+
         var command = new CreatePacientCommand
         {
             Nume = FormModel.Nume,
@@ -1136,7 +1164,7 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
             Email = FormModel.Email,
             Judet = FormModel.Judet,
             Localitate = FormModel.Localitate,
-            Adresa = FormModel.Adresa,
+            Adresa = adresaCompleta,
             Cod_Postal = FormModel.Cod_Postal,
             Asigurat = FormModel.Asigurat,
             CNP_Asigurat = FormModel.CNP_Asigurat,
@@ -1203,6 +1231,13 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
     {
         if (_disposed) return; // ADDED: Guard check
 
+        // Concatenează strada și numărul pentru salvare
+        var adresaCompleta = string.IsNullOrWhiteSpace(FormModel.Adresa) 
+            ? null 
+            : string.IsNullOrWhiteSpace(FormModel.Numar)
+                ? FormModel.Adresa.Trim()
+                : $"{FormModel.Adresa.Trim()} {FormModel.Numar.Trim()}";
+
         var command = new UpdatePacientCommand
         {
             Id = PacientId!.Value,
@@ -1216,7 +1251,7 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
             Email = FormModel.Email,
             Judet = FormModel.Judet,
             Localitate = FormModel.Localitate,
-            Adresa = FormModel.Adresa,
+            Adresa = adresaCompleta,
             Cod_Postal = FormModel.Cod_Postal,
             Asigurat = FormModel.Asigurat,
             CNP_Asigurat = FormModel.CNP_Asigurat,
@@ -1304,6 +1339,9 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
         public string? Judet { get; set; }
         public string? Localitate { get; set; }
         public string? Adresa { get; set; }
+        
+        [StringLength(20, ErrorMessage = "Numărul nu poate depăși 20 de caractere")]
+        public string? Numar { get; set; }
 
         [StringLength(6, ErrorMessage = "Codul poștal nu poate depăși 6 caractere")]
         public string? Cod_Postal { get; set; }

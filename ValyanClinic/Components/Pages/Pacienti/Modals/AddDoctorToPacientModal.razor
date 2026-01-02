@@ -148,19 +148,3 @@
       </div>
     </div>
 </div>
-
-<!-- ✅ ADDED: Toast pentru notificări -->
-<Syncfusion.Blazor.Notifications.SfToast @ref="ToastRef" />
-
-@code {
-    private Syncfusion.Blazor.Notifications.SfToast? ToastRef;
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender && ToastRef != null)
-        {
-            NotificationService.RegisterToast(ToastRef);
-   Logger.LogDebug("[AddDoctorToPacientModal] Toast registered successfully");
-        }
-    }
-}

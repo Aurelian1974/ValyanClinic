@@ -749,16 +749,12 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
             // Reload current page data
             _shouldRender = true; // ✅ ADDED: Trigger re-render after save
             await LoadPagedDataAsync();
-            await JSRuntime.InvokeVoidAsync("alert", "Pacient salvat cu succes!");
+            // Toast notification already shown in PacientAddEditModal
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error reloading data after save");
-
-            if (!_disposed)
-            {
-                await JSRuntime.InvokeVoidAsync("alert", "Pacient salvat, dar reîncărcarea datelor a eșuat.");
-            }
+            // Modal already shows error notification if save failed
         }
     }
 
