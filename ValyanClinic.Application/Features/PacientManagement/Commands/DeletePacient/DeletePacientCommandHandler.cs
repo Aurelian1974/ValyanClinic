@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Exceptions;
 using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Application.Interfaces;
 using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.PacientManagement.Commands.DeletePacient;
@@ -13,13 +14,16 @@ public class DeletePacientCommandHandler : IRequestHandler<DeletePacientCommand,
 {
     private readonly IPacientRepository _pacientRepository;
     private readonly ILogger<DeletePacientCommandHandler> _logger;
+    private readonly IPacientNotifier? _notifier;
 
     public DeletePacientCommandHandler(
         IPacientRepository pacientRepository,
-        ILogger<DeletePacientCommandHandler> logger)
+        ILogger<DeletePacientCommandHandler> logger,
+        IPacientNotifier? notifier = null)
     {
         _pacientRepository = pacientRepository;
         _logger = logger;
+        _notifier = notifier;
     }
 
     public async Task<Result> Handle(DeletePacientCommand request, CancellationToken cancellationToken)
@@ -66,10 +70,24 @@ public class DeletePacientCommandHandler : IRequestHandler<DeletePacientCommand,
             if (!success)
             {
                 _logger.LogError("Delete operation failed for pacient: {Id}", request.Id);
-                return Result.Failure("Operațiunea de ștergere a eșuat.");
+                return Result.Failure("Țergerea pacientului a eșuat.");
             }
 
             _logger.LogInformation("Pacient deleted successfully: {Id}", request.Id);
+
+            // 3. Notificare SignalR
+            try
+            {
+                if (_notifier != null)
+                {
+                    await _notifier.NotifyPacientChangedAsync("Deleted", request.Id, cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Notifier failed for Deleted event");
+            }
+
             _logger.LogInformation("========== DeletePacientCommandHandler END (SUCCESS) ==========");
 
             return Result.Success(message);

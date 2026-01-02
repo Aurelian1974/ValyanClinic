@@ -7,10 +7,11 @@ using MediatR;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientList;
 using ValyanClinic.Services.Export;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ValyanClinic.Components.Pages.Pacienti;
 
-public partial class VizualizarePacienti : ComponentBase, IDisposable
+public partial class VizualizarePacienti : ComponentBase, IAsyncDisposable
 {
     // ✅ ADDED: Static lock pentru ABSOLUTE protection
     private static readonly object _initLock = new object();
@@ -84,6 +85,10 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
     private bool _initialized = false;
     private bool _isInitializing = false;
     private bool _isExporting = false; // ✅ NEW: Track export in progress
+    private bool _hasRendered = false;
+
+    // SignalR Hub Connection
+    private HubConnection? _pacientHubConnection;
 
     // Filter Options
     private List<FilterOption> JudetOptions { get; set; } = new();
@@ -172,6 +177,110 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
         }
     }
 
+    // ✅ ADDED: OnAfterRenderAsync pentru SignalR connection
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_hasRendered && !_disposed)
+        {
+            _hasRendered = true;
+
+            try
+            {
+                // Connect to SignalR hub
+                _pacientHubConnection = new HubConnectionBuilder()
+                    .WithUrl(NavigationManager.ToAbsoluteUri("/pacientHub"))
+                    .WithAutomaticReconnect()
+                    .Build();
+
+                _pacientHubConnection.On<string, Guid>("PacientChanged", async (action, id) =>
+                {
+                    if (_disposed) return;
+
+                    Logger.LogDebug($"SignalR: Received PacientChanged event - Action: {action}, Id: {id}");
+
+                    try
+                    {
+                        await HandlePacientChangedAsync(action, id);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, $"Error handling PacientChanged event for {action}");
+                    }
+                });
+
+                await _pacientHubConnection.StartAsync();
+                Logger.LogInformation("SignalR connection established for VizualizarePacienti");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to establish SignalR connection");
+            }
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    // Handle SignalR events
+    private async Task HandlePacientChangedAsync(string action, Guid pacientId)
+    {
+        await InvokeAsync(async () =>
+        {
+            try
+            {
+                switch (action)
+                {
+                    case "Created":
+                        await ApplyCreatedAsync(pacientId);
+                        break;
+                    case "Updated":
+                        await ApplyUpdatedAsync(pacientId);
+                        break;
+                    case "Deleted":
+                        await ApplyDeletedAsync(pacientId);
+                        break;
+                }
+
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, $"Error applying {action} for pacient {pacientId}");
+            }
+        });
+    }
+
+    private async Task ApplyCreatedAsync(Guid pacientId)
+    {
+        Logger.LogDebug($"Applying Created for pacient {pacientId}");
+        // Reload current page to show new record
+        await LoadPagedData();
+    }
+
+    private async Task ApplyUpdatedAsync(Guid pacientId)
+    {
+        Logger.LogDebug($"Applying Updated for pacient {pacientId}");
+        
+        // Find and update the record in current page
+        var existingPacient = CurrentPageData.FirstOrDefault(p => p.Id == pacientId);
+        if (existingPacient != null)
+        {
+            // Reload the page to get updated data
+            await LoadPagedData();
+        }
+    }
+
+    private async Task ApplyDeletedAsync(Guid pacientId)
+    {
+        Logger.LogDebug($"Applying Deleted for pacient {pacientId}");
+        
+        // Remove from current page and reload
+        var existingPacient = CurrentPageData.FirstOrDefault(p => p.Id == pacientId);
+        if (existingPacient != null)
+        {
+            await LoadPagedData();
+        }
+    }
+
     // ✅ CRITICAL: Handle location changes - cleanup BEFORE navigation completes
     private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
@@ -192,7 +301,7 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
     }
 
     // ✅ FIXED: Complete disposal with Syncfusion cleanup via JS
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         if (_disposed) return;
 
@@ -210,6 +319,9 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
 
         try
         {
+            // ✅ CRITICAL: Stop SignalR connection
+            await StopAndDisposeSignalRAsync();
+
             // ✅ CRITICAL: Cleanup Syncfusion via JavaScript FIRST
             _ = JSRuntime.InvokeVoidAsync("cleanupSyncfusionBeforeNavigation");
             
@@ -230,6 +342,32 @@ public partial class VizualizarePacienti : ComponentBase, IDisposable
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error in Dispose");
+        }
+    }
+
+    private async Task StopAndDisposeSignalRAsync()
+    {
+        if (_pacientHubConnection != null)
+        {
+            try
+            {
+                // Remove event handler
+                _pacientHubConnection.Remove("PacientChanged");
+
+                // Stop connection
+                await _pacientHubConnection.StopAsync();
+                await _pacientHubConnection.DisposeAsync();
+
+                Logger.LogDebug("SignalR connection stopped and disposed");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error stopping SignalR connection");
+            }
+            finally
+            {
+                _pacientHubConnection = null;
+            }
         }
     }
 

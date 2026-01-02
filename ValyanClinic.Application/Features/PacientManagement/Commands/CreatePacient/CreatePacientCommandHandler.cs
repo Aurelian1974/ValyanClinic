@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Application.Interfaces;
 using ValyanClinic.Domain.Entities;
 using ValyanClinic.Domain.Interfaces.Repositories;
 
@@ -13,13 +14,16 @@ public class CreatePacientCommandHandler : IRequestHandler<CreatePacientCommand,
 {
     private readonly IPacientRepository _pacientRepository;
     private readonly ILogger<CreatePacientCommandHandler> _logger;
+    private readonly IPacientNotifier? _notifier;
 
     public CreatePacientCommandHandler(
         IPacientRepository pacientRepository,
-        ILogger<CreatePacientCommandHandler> logger)
+        ILogger<CreatePacientCommandHandler> logger,
+        IPacientNotifier? notifier = null)
     {
         _pacientRepository = pacientRepository;
         _logger = logger;
+        _notifier = notifier;
     }
 
     public async Task<Result<Guid>> Handle(CreatePacientCommand request, CancellationToken cancellationToken)
@@ -82,6 +86,20 @@ public class CreatePacientCommandHandler : IRequestHandler<CreatePacientCommand,
             var createdPacient = await _pacientRepository.CreateAsync(pacient, cancellationToken);
 
             _logger.LogInformation("Pacient created successfully with ID: {Id}", createdPacient.Id);
+
+            // 5. Notificare SignalR
+            try
+            {
+                if (_notifier != null)
+                {
+                    await _notifier.NotifyPacientChangedAsync("Created", createdPacient.Id, cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Notifier failed for Created event");
+            }
+
             _logger.LogInformation("========== CreatePacientCommandHandler END (SUCCESS) ==========");
 
             return Result<Guid>.Success(

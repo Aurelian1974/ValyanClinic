@@ -296,12 +296,13 @@ try
     builder.Services.AddScoped<ValyanClinic.Application.Services.Export.IPersonalMedicalExportService, ValyanClinic.Application.Services.Export.PersonalMedicalExportService>();
 
     // ========================================
-    // SIGNALR: PersonalMedical realtime notifications
+    // SIGNALR: Realtime notifications
     // ========================================
     builder.Services.AddSignalR();
 
-    // Application-level notifier implementation (uses IHubContext)
+    // Application-level notifier implementations (uses IHubContext)
     builder.Services.AddScoped<ValyanClinic.Application.Interfaces.IPersonalMedicalNotifier, ValyanClinic.Services.SignalR.PersonalMedicalNotifier>();
+    builder.Services.AddScoped<ValyanClinic.Application.Interfaces.IPacientNotifier, ValyanClinic.Services.SignalR.PacientNotifier>();
 
     // ========================================
     // DATAGRID SERVICES
@@ -528,6 +529,7 @@ try
     // SIGNALR HUBS
     // ========================================
     app.MapHub<ValyanClinic.Hubs.PersonalMedicalHub>("/personalmedicalHub");
+    app.MapHub<ValyanClinic.Hubs.PacientHub>("/pacientHub");
 
     // ========================================
     // BLAZOR

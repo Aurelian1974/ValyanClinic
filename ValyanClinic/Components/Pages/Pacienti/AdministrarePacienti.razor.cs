@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Blazor.Grids;
@@ -90,6 +91,10 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
     private bool _disposed = false;
     private bool _initialized = false;
     private bool _isInitializing = false;
+    private bool _hasRendered = false;
+
+    // SignalR Hub Connection
+    private Microsoft.AspNetCore.SignalR.Client.HubConnection? _pacientHubConnection;
 
     // ✅ CHANGED: SERVER-SIDE PAGING - Data pentru pagina curenta
     private List<PacientListDto> CurrentPageData { get; set; } = new();
@@ -506,6 +511,61 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
 
     #endregion
 
+    /// <summary>
+    /// Lifecycle method executat după render - init SignalR
+    /// </summary>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_disposed)
+        {
+            _hasRendered = true;
+
+            try
+            {
+                // Setup SignalR connection for realtime updates
+                _pacientHubConnection = new Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilder()
+                    .WithUrl(NavigationManager.ToAbsoluteUri("/pacientHub"))
+                    .WithAutomaticReconnect()
+                    .Build();
+
+                _pacientHubConnection.On<string, Guid>("PacientChanged", async (action, id) =>
+                {
+                    Logger.LogInformation("SignalR PacientChanged received: {Action} {Id}", action, id);
+
+                    if (_disposed)
+                    {
+                        Logger.LogDebug("SignalR message ignored because component is disposed");
+                        return;
+                    }
+
+                    // Apply in-place updates where possible to avoid full reload and UI flicker
+                    await InvokeAsync(async () =>
+                    {
+                        if (_disposed) return;
+
+                        try
+                        {
+                            await HandlePacientChangedAsync(action, id);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogDebug(ex, "Error applying in-place SignalR update");
+                            // fallback: attempt a full refresh if in-place update fails
+                            try { await LoadPagedDataAsync(); } catch { }
+                        }
+                    });
+                });
+
+                await _pacientHubConnection.StartAsync();
+                Logger.LogDebug("Pacient SignalR connected");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Failed to start Pacient SignalR connection");
+            }
+        }
+    }
+
     #region Pagination Methods (NEW)
 
     /// <summary>
@@ -786,6 +846,9 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
             CurrentPageData?.Clear(); // ✅ CHANGED: Clear CurrentPageData instead of AllPacienti
             CurrentPageData = new();
 
+            // Fire-and-forget: stop and dispose SignalR connection gracefully
+            _ = StopAndDisposeSignalRAsync();
+
             Logger.LogDebug("AdministrarePacienti disposed - Data cleared, GridRef preserved");
         }
         catch (Exception ex)
@@ -795,6 +858,124 @@ public partial class AdministrarePacienti : ComponentBase, IDisposable
 
         Logger.LogDebug("AdministrarePacienti dispose COMPLETE - Natural Blazor disposal will handle GridRef");
     }
+
+    private async Task StopAndDisposeSignalRAsync()
+    {
+        try
+        {
+            if (_pacientHubConnection != null)
+            {
+                try
+                {
+                    // Remove handlers first to avoid receiving callbacks while stopping
+                    _pacientHubConnection.Remove("PacientChanged");
+                }
+                catch { }
+
+                await _pacientHubConnection.StopAsync();
+                await _pacientHubConnection.DisposeAsync();
+                Logger.LogDebug("Pacient SignalR connection stopped and disposed");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogDebug(ex, "Error stopping SignalR connection");
+        }
+        finally
+        {
+            _pacientHubConnection = null;
+        }
+    }
+
+    #region SignalR Event Handlers
+
+    /// <summary>
+    /// Handle pentru SignalR notification - decide ce acțiune să aplice
+    /// </summary>
+    private async Task HandlePacientChangedAsync(string action, Guid pacientId)
+    {
+        if (_disposed) return;
+
+        action = action?.Trim() ?? string.Empty;
+
+        switch (action)
+        {
+            case "Created":
+                await ApplyCreatedAsync(pacientId);
+                break;
+            case "Updated":
+                await ApplyUpdatedAsync(pacientId);
+                break;
+            case "Deleted":
+                await ApplyDeletedAsync(pacientId);
+                break;
+            default:
+                // Unknown action - fallback to full refresh
+                await LoadPagedDataAsync();
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Aplică modificarea pentru pacient creat - adaugă pe prima pagină dacă suntem pe ea
+    /// </summary>
+    private async Task ApplyCreatedAsync(Guid pacientId)
+    {
+        try
+        {
+            if (CurrentPage == 1)
+            {
+                // Reload pentru a include noul pacient
+                await LoadPagedDataAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogDebug(ex, "Error applying Created event for PacientID {PacientId}", pacientId);
+        }
+    }
+
+    /// <summary>
+    /// Aplică modificarea pentru pacient actualizat - actualizează în list dacă e vizibil
+    /// </summary>
+    private async Task ApplyUpdatedAsync(Guid pacientId)
+    {
+        try
+        {
+            var idx = CurrentPageData.FindIndex(p => p.Id == pacientId);
+            if (idx >= 0)
+            {
+                // Reload pentru a reflecta modificările
+                await LoadPagedDataAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogDebug(ex, "Error applying Updated event for PacientID {PacientId}", pacientId);
+        }
+    }
+
+    /// <summary>
+    /// Aplică modificarea pentru pacient șters - elimină din listă dacă e vizibil
+    /// </summary>
+    private async Task ApplyDeletedAsync(Guid pacientId)
+    {
+        try
+        {
+            var idx = CurrentPageData.FindIndex(p => p.Id == pacientId);
+            if (idx >= 0)
+            {
+                // Reload pentru a reflecta ștergerea
+                await LoadPagedDataAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogDebug(ex, "Error applying Deleted event for PacientID {PacientId}", pacientId);
+        }
+    }
+
+    #endregion
 
     /// <summary>
     /// Optimizes component rendering by controlling when re-renders occur.

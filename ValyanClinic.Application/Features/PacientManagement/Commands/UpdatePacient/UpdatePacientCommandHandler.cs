@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Exceptions;
 using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Application.Interfaces;
 using ValyanClinic.Domain.Entities;
 using ValyanClinic.Domain.Interfaces.Repositories;
 
@@ -14,13 +15,16 @@ public class UpdatePacientCommandHandler : IRequestHandler<UpdatePacientCommand,
 {
     private readonly IPacientRepository _pacientRepository;
     private readonly ILogger<UpdatePacientCommandHandler> _logger;
+    private readonly IPacientNotifier? _notifier;
 
     public UpdatePacientCommandHandler(
         IPacientRepository pacientRepository,
-        ILogger<UpdatePacientCommandHandler> logger)
+        ILogger<UpdatePacientCommandHandler> logger,
+        IPacientNotifier? notifier = null)
     {
         _pacientRepository = pacientRepository;
         _logger = logger;
+        _notifier = notifier;
     }
 
     public async Task<Result<Guid>> Handle(UpdatePacientCommand request, CancellationToken cancellationToken)
@@ -81,6 +85,20 @@ public class UpdatePacientCommandHandler : IRequestHandler<UpdatePacientCommand,
             var updatedPacient = await _pacientRepository.UpdateAsync(existingPacient, cancellationToken);
 
             _logger.LogInformation("Pacient updated successfully: {Id}", updatedPacient.Id);
+
+            // 5. Notificare SignalR
+            try
+            {
+                if (_notifier != null)
+                {
+                    await _notifier.NotifyPacientChangedAsync("Updated", updatedPacient.Id, cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Notifier failed for Updated event");
+            }
+
             _logger.LogInformation("========== UpdatePacientCommandHandler END (SUCCESS) ==========");
 
             return Result<Guid>.Success(
