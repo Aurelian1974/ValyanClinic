@@ -310,7 +310,7 @@ Manual test:
 
 - [x] **Etapa 1**: Matricea de mapare creată și verificată ✅ **DONE - 2 Ian 2026**
 - [x] **Etapa 2.1**: SaveConsultatieDraftCommandHandler refactorizat ✅ **DONE - 2 Ian 2026**
-- [ ] **Etapa 2.2**: GetConsulatieByIdQueryHandler refactorizat
+- [x] **Etapa 2.2**: GetConsulatieByIdQueryHandler refactorizat ✅ **DONE - 2 Ian 2026**
 - [ ] **Etapa 2.3**: GetDraftConsulatieByPacientQueryHandler refactorizat
 - [ ] **Etapa 2.4**: GetConsulatieByProgramareQueryHandler refactorizat
 - [ ] **Etapa 2.5**: UpdateConsulatieCommandHandler verificat
@@ -326,7 +326,7 @@ Manual test:
 | Post-Revert | ✅ SUCCESS | 0 | 732a8c9 |
 | After Upsert Methods | ✅ SUCCESS | 0 | 8012430 |
 | After 2.1 | ✅ SUCCESS | 0 | 5adc14f |
-| After 2.2 | ⏳ Pending | - | - |
+| After 2.2 | ✅ SUCCESS | 0 | 663eb7d |
 | After 2.3 | ⏳ Pending | - | - |
 | After 2.4 | ⏳ Pending | - | - |
 | After 2.5 | ⏳ Pending | - | - |
