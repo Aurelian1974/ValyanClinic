@@ -498,63 +498,16 @@
             </SfGrid>
         </div>
 
-        <div class="custom-pager">
-            <div class="pager-info">
-                <span class="pager-text">
-                    <i class="fas fa-info-circle"></i>
-                    Pagina <strong>@CurrentPage</strong> din <strong>@TotalPages</strong>
-                </span>
-                <span class="pager-text">
-                    <i class="fas fa-list-ol"></i>
-                    Afisate <strong>@DisplayedRecordsStart-@DisplayedRecordsEnd</strong> din <strong>@TotalRecords</strong>
-                </span>
-            </div>
-            
-            <div class="pager-controls">
-                <button class="pager-btn pager-btn-first" 
-                        @onclick="GoToFirstPage" 
-                        disabled="@(!HasPreviousPage)"
-                        title="Prima pagina">
-                    <i class="fas fa-angle-double-left"></i>
-                </button>
-                
-                <button class="pager-btn pager-btn-prev" 
-                        @onclick="GoToPreviousPage" 
-                        disabled="@(!HasPreviousPage)"
-                        title="Pagina anterioara">
-                    <i class="fas fa-angle-left"></i>
-                </button>
-                
-                @{
-                    var (start, end) = GetPagerRange(5);
-                    for (int i = start; i <= end; i++)
-                    {
-                        int pageNum = i;
-                        var isActive = pageNum == CurrentPage;
-                        <button class="pager-btn pager-btn-number @(isActive ? "active" : "")" 
-                                @onclick="() => GoToPage(pageNum)"
-                                disabled="@isActive"
-                                title="Pagina @pageNum">
-                            @pageNum
-                        </button>
-                    }
-                }
-                
-                <button class="pager-btn pager-btn-next" 
-                        @onclick="GoToNextPage" 
-                        disabled="@(!HasNextPage)"
-                        title="Pagina urmatoare">
-                    <i class="fas fa-angle-right"></i>
-                </button>
-                
-                <button class="pager-btn pager-btn-last" 
-                        @onclick="GoToLastPage" 
-                        disabled="@(!HasNextPage)"
-                        title="Ultima pagina">
-                    <i class="fas fa-angle-double-right"></i>
-                </button>
-            </div>
-        </div>
+        <!-- ✅ REUSABLE: Pagination Control Component -->
+        <PaginationControl CurrentPage="@CurrentPage"
+                         PageSize="@CurrentPageSize"
+                         TotalRecords="@TotalRecords"
+                         PageSizeOptions="@PageSizeArray"
+                         OnFirstPage="@GoToFirstPage"
+                         OnPreviousPage="@GoToPreviousPage"
+                         OnNextPage="@GoToNextPage"
+                         OnLastPage="@GoToLastPage"
+                         OnPageSizeChanged="@ChangePageSize" />
     }
 </div>
 

@@ -1,0 +1,59 @@
+@* 
+    Reusable Pagination Control Component
+    Used for server-side pagination across all grid pages
+*@
+
+@if (TotalRecords > 0)
+{
+    <div class="pagination-container">
+        <div class="pagination-info">
+            <span>
+                Afișare <strong>@((CurrentPage - 1) * PageSize + 1)</strong> 
+                - <strong>@Math.Min(CurrentPage * PageSize, TotalRecords)</strong> 
+                din <strong>@TotalRecords</strong> înregistrări
+            </span>
+        </div>
+        
+        <div class="pagination-controls">
+            <button class="btn btn-sm btn-outline-secondary" 
+                    @onclick="OnFirstPage" 
+                    disabled="@(CurrentPage == 1)">
+                <i class="fas fa-angle-double-left"></i> Prima
+            </button>
+            
+            <button class="btn btn-sm btn-outline-secondary" 
+                    @onclick="OnPreviousPage" 
+                    disabled="@(CurrentPage == 1)">
+                <i class="fas fa-angle-left"></i> Anterioara
+            </button>
+            
+            <span class="pagination-page-info">
+                Pagina <strong>@CurrentPage</strong> din <strong>@TotalPages</strong>
+            </span>
+            
+            <button class="btn btn-sm btn-outline-secondary" 
+                    @onclick="OnNextPage" 
+                    disabled="@(CurrentPage >= TotalPages)">
+                Următoarea <i class="fas fa-angle-right"></i>
+            </button>
+            
+            <button class="btn btn-sm btn-outline-secondary" 
+                    @onclick="OnLastPage" 
+                    disabled="@(CurrentPage >= TotalPages)">
+                Ultima <i class="fas fa-angle-double-right"></i>
+            </button>
+        </div>
+        
+        <div class="pagination-page-size">
+            <label>Înregistrări/pagină:</label>
+            <select class="form-select form-select-sm" 
+                    @bind="SelectedPageSize" 
+                    @bind:after="HandlePageSizeChanged">
+                @foreach (var size in PageSizeOptions)
+                {
+                    <option value="@size">@size</option>
+                }
+            </select>
+        </div>
+    </div>
+}

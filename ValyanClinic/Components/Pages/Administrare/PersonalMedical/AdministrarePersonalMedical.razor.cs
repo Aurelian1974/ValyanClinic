@@ -1251,6 +1251,9 @@ public partial class AdministrarePersonalMedical : ComponentBase, IDisposable
         _ = PersistUiStateAsync();
     }
 
+    // Alias for PaginationControl component compatibility
+    private async Task ChangePageSize(int newPageSize) => await OnPageSizeChanged(newPageSize);
+
     private async Task OnPageSizeChangedNative(ChangeEventArgs e)
     {
         if (_disposed) return; // Guard check

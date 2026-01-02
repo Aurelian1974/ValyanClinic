@@ -524,6 +524,46 @@ public partial class VizualizarePacienti : ComponentBase, IAsyncDisposable
         }
     }
 
+    // ✅ PAGINATION: Navigation methods
+    private int TotalPages => TotalRecords > 0 ? (int)Math.Ceiling((double)TotalRecords / CurrentPageSize) : 0;
+
+    private async Task GoToFirstPage()
+    {
+        if (_disposed || CurrentPage == 1) return;
+        CurrentPage = 1;
+        await LoadPagedData();
+    }
+
+    private async Task GoToPreviousPage()
+    {
+        if (_disposed || CurrentPage <= 1) return;
+        CurrentPage--;
+        await LoadPagedData();
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (_disposed || CurrentPage >= TotalPages) return;
+        CurrentPage++;
+        await LoadPagedData();
+    }
+
+    private async Task GoToLastPage()
+    {
+        if (_disposed || CurrentPage == TotalPages) return;
+        CurrentPage = TotalPages;
+        await LoadPagedData();
+    }
+
+    private async Task ChangePageSize(int newPageSize)
+    {
+        if (_disposed || CurrentPageSize == newPageSize) return;
+        
+        CurrentPageSize = newPageSize;
+        CurrentPage = 1; // Reset to first page
+        await LoadPagedData();
+    }
+
     private void ToggleAdvancedFilter()
     {
         if (_disposed) return;
