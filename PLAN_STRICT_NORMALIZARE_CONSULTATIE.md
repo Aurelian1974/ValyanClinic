@@ -309,7 +309,7 @@ Manual test:
 ### Completion Status
 
 - [x] **Etapa 1**: Matricea de mapare creată și verificată ✅ **DONE - 2 Ian 2026**
-- [ ] **Etapa 2.1**: SaveConsultatieDraftCommandHandler refactorizat
+- [x] **Etapa 2.1**: SaveConsultatieDraftCommandHandler refactorizat ✅ **DONE - 2 Ian 2026**
 - [ ] **Etapa 2.2**: GetConsulatieByIdQueryHandler refactorizat
 - [ ] **Etapa 2.3**: GetDraftConsulatieByPacientQueryHandler refactorizat
 - [ ] **Etapa 2.4**: GetConsulatieByProgramareQueryHandler refactorizat
@@ -323,8 +323,9 @@ Manual test:
 
 | Checkpoint | Build Status | Errors | Commit |
 |------------|-------------|--------|--------|
-| Post-Revert | ✅ SUCCESS | 0 | (current) |
-| After 2.1 | ⏳ Pending | - | - |
+| Post-Revert | ✅ SUCCESS | 0 | 732a8c9 |
+| After Upsert Methods | ✅ SUCCESS | 0 | 8012430 |
+| After 2.1 | ✅ SUCCESS | 0 | 5adc14f |
 | After 2.2 | ⏳ Pending | - | - |
 | After 2.3 | ⏳ Pending | - | - |
 | After 2.4 | ⏳ Pending | - | - |
