@@ -53,58 +53,19 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 imc = Math.Round(request.Greutate.Value / (inaltimeMetri * inaltimeMetri), 2);
             }
 
-            // Map to entity (all fields from UI)
+            // Determină ConsultatieID (CREATE sau UPDATE)
+            var consultatieId = request.ConsultatieID ?? Guid.NewGuid();
+
+            // 1. MASTER Entity: Consultatie (doar core fields)
             var consultatie = new Consultatie
             {
-                ConsultatieID = request.ConsultatieID ?? Guid.NewGuid(),
+                ConsultatieID = consultatieId,
                 ProgramareID = request.ProgramareID, // Can be null for walk-in patients
                 PacientID = request.PacientID,
                 MedicID = request.MedicID,
                 DataConsultatie = request.DataConsultatie,
                 OraConsultatie = request.OraConsultatie,
                 TipConsultatie = request.TipConsultatie,
-                
-                // Tab 1: Motiv & Antecedente
-                MotivPrezentare = request.MotivPrezentare,
-                IstoricBoalaActuala = request.IstoricBoalaActuala,
-                APP_Medicatie = request.APP_Medicatie,
-                
-                // Tab 2: Semne Vitale
-                Greutate = request.Greutate,
-                Inaltime = request.Inaltime,
-                IMC = imc,
-                Temperatura = request.Temperatura,
-                TensiuneArteriala = request.TensiuneArteriala,
-                Puls = request.Puls,
-                FreccventaRespiratorie = request.FreccventaRespiratorie,
-                SaturatieO2 = request.SaturatieO2,
-                
-                // Tab 2: Examen General
-                StareGenerala = request.StareGenerala,
-                Tegumente = request.Tegumente,
-                Mucoase = request.Mucoase,
-                Edeme = request.Edeme,
-                ExamenCardiovascular = request.ExamenCardiovascular,
-                
-                // Tab 2: Investigații
-                InvestigatiiLaborator = request.InvestigatiiLaborator,
-                
-                // Tab 3: Diagnostic
-                DiagnosticPozitiv = request.DiagnosticPozitiv,
-                DiagnosticDiferential = request.DiagnosticDiferential,
-                CoduriICD10 = request.CoduriICD10,
-                CoduriICD10Secundare = request.CoduriICD10Secundare,
-                
-                // Tab 3: Tratament
-                TratamentMedicamentos = request.TratamentMedicamentos,
-                RecomandariRegimViata = request.RecomandariRegimViata,
-                
-                // Tab 4: Concluzii
-                Concluzie = request.Concluzie,
-                ObservatiiMedic = request.ObservatiiMedic,
-                DataUrmatoareiProgramari = request.DataUrmatoareiProgramari,
-                
-                // Status & Audit
                 Status = "In desfasurare", // Draft always in progress
                 CreatDe = request.CreatDeSauModificatDe,
                 ModificatDe = request.CreatDeSauModificatDe,
@@ -112,17 +73,143 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 DataUltimeiModificari = DateTime.Now
             };
 
-            // Call repository (executes sp_Consultatie_SaveDraft with INSERT/UPDATE logic)
-            var consultatieId = await _repository.SaveDraftAsync(consultatie, cancellationToken);
+            // Call repository SaveDraft pentru MASTER entity
+            var savedId = await _repository.SaveDraftAsync(consultatie, cancellationToken);
 
-            if (consultatieId == Guid.Empty)
+            if (savedId == Guid.Empty)
             {
-                _logger.LogWarning("[SaveConsultatieDraftHandler] Failed to save draft");
+                _logger.LogWarning("[SaveConsultatieDraftHandler] Failed to save master Consultatie");
                 return Result<Guid>.Failure("Eroare la salvarea draft-ului");
             }
 
+            // 2. ConsultatieMotivePrezentare (1:1) - condiționat
+            if (!string.IsNullOrWhiteSpace(request.MotivPrezentare) || 
+                !string.IsNullOrWhiteSpace(request.IstoricBoalaActuala))
+            {
+                await _repository.UpsertMotivePrezentareAsync(consultatieId, new ConsultatieMotivePrezentare
+                {
+                    ConsultatieID = consultatieId,
+                    MotivPrezentare = request.MotivPrezentare,
+                    IstoricBoalaActuala = request.IstoricBoalaActuala,
+                    CreatDe = request.CreatDeSauModificatDe,
+                    DataCreare = DateTime.Now,
+                    DataUltimeiModificari = DateTime.Now
+                });
+            }
+
+            // 3. ConsultatieAntecedente (1:1) - condiționat
+            if (!string.IsNullOrWhiteSpace(request.APP_Medicatie))
+            {
+                await _repository.UpsertAntecedenteAsync(consultatieId, new ConsultatieAntecedente
+                {
+                    ConsultatieID = consultatieId,
+                    APP_Medicatie = request.APP_Medicatie,
+                    CreatDe = request.CreatDeSauModificatDe,
+                    DataCreare = DateTime.Now,
+                    DataUltimeiModificari = DateTime.Now
+                });
+            }
+
+            // 4. ConsultatieExamenObiectiv (1:1) - condiționat
+            if (request.Greutate.HasValue || request.Inaltime.HasValue || 
+                imc.HasValue || request.Temperatura.HasValue ||
+                !string.IsNullOrWhiteSpace(request.TensiuneArteriala) ||
+                request.Puls.HasValue || request.FreccventaRespiratorie.HasValue ||
+                request.SaturatieO2.HasValue || 
+                !string.IsNullOrWhiteSpace(request.StareGenerala) ||
+                !string.IsNullOrWhiteSpace(request.Tegumente) ||
+                !string.IsNullOrWhiteSpace(request.Mucoase) ||
+                !string.IsNullOrWhiteSpace(request.Edeme) ||
+                !string.IsNullOrWhiteSpace(request.ExamenCardiovascular))
+            {
+                await _repository.UpsertExamenObiectivAsync(consultatieId, new ConsultatieExamenObiectiv
+                {
+                    ConsultatieID = consultatieId,
+                    Greutate = request.Greutate,
+                    Inaltime = request.Inaltime,
+                    IMC = imc,
+                    Temperatura = request.Temperatura,
+                    TensiuneArteriala = request.TensiuneArteriala,
+                    Puls = request.Puls,
+                    FreccventaRespiratorie = request.FreccventaRespiratorie,
+                    SaturatieO2 = request.SaturatieO2,
+                    StareGenerala = request.StareGenerala,
+                    Tegumente = request.Tegumente,
+                    Mucoase = request.Mucoase,
+                    Edeme = request.Edeme,
+                    ExamenCardiovascular = request.ExamenCardiovascular,
+                    CreatDe = request.CreatDeSauModificatDe,
+                    DataCreare = DateTime.Now,
+                    DataUltimeiModificari = DateTime.Now
+                });
+            }
+
+            // 5. ConsultatieInvestigatii (1:1) - condiționat
+            if (!string.IsNullOrWhiteSpace(request.InvestigatiiLaborator))
+            {
+                await _repository.UpsertInvestigatiiAsync(consultatieId, new ConsultatieInvestigatii
+                {
+                    ConsultatieID = consultatieId,
+                    InvestigatiiLaborator = request.InvestigatiiLaborator,
+                    CreatDe = request.CreatDeSauModificatDe,
+                    DataCreare = DateTime.Now,
+                    DataUltimeiModificari = DateTime.Now
+                });
+            }
+
+            // 6. ConsultatieDiagnostic (1:1) - condiționat
+            if (!string.IsNullOrWhiteSpace(request.DiagnosticPozitiv) ||
+                !string.IsNullOrWhiteSpace(request.DiagnosticDiferential) ||
+                !string.IsNullOrWhiteSpace(request.CoduriICD10) ||
+                !string.IsNullOrWhiteSpace(request.CoduriICD10Secundare))
+            {
+                await _repository.UpsertDiagnosticAsync(consultatieId, new ConsultatieDiagnostic
+                {
+                    ConsultatieID = consultatieId,
+                    DiagnosticPozitiv = request.DiagnosticPozitiv,
+                    DiagnosticDiferential = request.DiagnosticDiferential,
+                    CoduriICD10 = request.CoduriICD10,
+                    CoduriICD10Secundare = request.CoduriICD10Secundare,
+                    CreatDe = request.CreatDeSauModificatDe,
+                    DataCreare = DateTime.Now,
+                    DataUltimeiModificari = DateTime.Now
+                });
+            }
+
+            // 7. ConsultatieTratament (1:1) - condiționat
+            if (!string.IsNullOrWhiteSpace(request.TratamentMedicamentos) ||
+                !string.IsNullOrWhiteSpace(request.RecomandariRegimViata) ||
+                !string.IsNullOrWhiteSpace(request.DataUrmatoareiProgramari))
+            {
+                await _repository.UpsertTratamentAsync(consultatieId, new ConsultatieTratament
+                {
+                    ConsultatieID = consultatieId,
+                    TratamentMedicamentos = request.TratamentMedicamentos,
+                    RecomandariRegimViata = request.RecomandariRegimViata,
+                    DataUrmatoareiProgramari = request.DataUrmatoareiProgramari,
+                    CreatDe = request.CreatDeSauModificatDe,
+                    DataCreare = DateTime.Now,
+                    DataUltimeiModificari = DateTime.Now
+                });
+            }
+
+            // 8. ConsultatieConcluzii (1:1) - condiționat
+            if (!string.IsNullOrWhiteSpace(request.Concluzie) ||
+                !string.IsNullOrWhiteSpace(request.ObservatiiMedic))
+            {
+                await _repository.UpsertConcluziiAsync(consultatieId, new ConsultatieConcluzii
+                {
+                    ConsultatieID = consultatieId,
+                    Concluzie = request.Concluzie,
+                    ObservatiiMedic = request.ObservatiiMedic,
+                    CreatDe = request.CreatDeSauModificatDe,
+                    DataCreare = DateTime.Now,
+                    DataUltimeiModificari = DateTime.Now
+                });
+            }
+
             _logger.LogInformation(
-                "[SaveConsultatieDraftHandler] Draft saved successfully: {ConsultatieID}",
+                "[SaveConsultatieDraftHandler] Draft saved successfully with normalized structure: {ConsultatieID}",
                 consultatieId);
 
             return Result<Guid>.Success(consultatieId, "Draft salvat cu succes");
