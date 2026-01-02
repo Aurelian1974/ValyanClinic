@@ -394,6 +394,8 @@ public class ConsultatieRepository : IConsultatieRepository
         {
             using var connection = _connectionFactory.CreateConnection();
 
+            // ✅ NORMALIZED STRUCTURE: Only 14 master columns (no denormalized data)
+            // Denormalized data is saved via Upsert methods in Handler
             var parameters = new DynamicParameters();
             parameters.Add("@ConsultatieID", consultatie.ConsultatieID, DbType.Guid, ParameterDirection.InputOutput);
             parameters.Add("@ProgramareID", consultatie.ProgramareID);
@@ -402,46 +404,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@DataConsultatie", consultatie.DataConsultatie);
             parameters.Add("@OraConsultatie", consultatie.OraConsultatie);
             parameters.Add("@TipConsultatie", consultatie.TipConsultatie);
-
-            // Tab 1: Motiv & Antecedente
-            parameters.Add("@MotivPrezentare", consultatie.MotivPrezentare);
-            parameters.Add("@IstoricBoalaActuala", consultatie.IstoricBoalaActuala);
-            parameters.Add("@APP_Medicatie", consultatie.APP_Medicatie);
-
-            // Tab 2: Semne Vitale
-            parameters.Add("@Greutate", consultatie.Greutate);
-            parameters.Add("@Inaltime", consultatie.Inaltime);
-            parameters.Add("@IMC", consultatie.IMC);
-            parameters.Add("@Temperatura", consultatie.Temperatura);
-            parameters.Add("@TensiuneArteriala", consultatie.TensiuneArteriala);
-            parameters.Add("@Puls", consultatie.Puls);
-            parameters.Add("@FreccventaRespiratorie", consultatie.FreccventaRespiratorie);
-            parameters.Add("@SaturatieO2", consultatie.SaturatieO2);
-
-            // Tab 2: Examen General
-            parameters.Add("@StareGenerala", consultatie.StareGenerala);
-            parameters.Add("@Tegumente", consultatie.Tegumente);
-            parameters.Add("@Mucoase", consultatie.Mucoase);
-            parameters.Add("@Edeme", consultatie.Edeme);
-            parameters.Add("@ExamenCardiovascular", consultatie.ExamenCardiovascular);
-
-            // Tab 2: Investigații
-            parameters.Add("@InvestigatiiLaborator", consultatie.InvestigatiiLaborator);
-
-            // Tab 3: Diagnostic
-            parameters.Add("@DiagnosticPozitiv", consultatie.DiagnosticPozitiv);
-            parameters.Add("@DiagnosticDiferential", consultatie.DiagnosticDiferential);
-            parameters.Add("@CoduriICD10", consultatie.CoduriICD10);
-            parameters.Add("@CoduriICD10Secundare", consultatie.CoduriICD10Secundare);
-
-            // Tab 3: Tratament
-            parameters.Add("@TratamentMedicamentos", consultatie.TratamentMedicamentos);
-            parameters.Add("@RecomandariRegimViata", consultatie.RecomandariRegimViata);
-
-            // Tab 4: Concluzii
-            parameters.Add("@Concluzie", consultatie.Concluzie);
-            parameters.Add("@ObservatiiMedic", consultatie.ObservatiiMedic);
-            parameters.Add("@DataUrmatoareiProgramari", consultatie.DataUrmatoareiProgramari);
+            parameters.Add("@DurataMinute", consultatie.DurataMinute);
 
             // Audit - use CreatDe for both create and update in draft mode
             var userId = consultatie.ModificatDe ?? consultatie.CreatDe;
@@ -455,7 +418,7 @@ public class ConsultatieRepository : IConsultatieRepository
 
             var consultatieId = parameters.Get<Guid>("@ConsultatieID");
 
-            _logger.LogInformation("[ConsultatieRepository] Consultatie draft saved: {ConsultatieID}", consultatieId);
+            _logger.LogInformation("[ConsultatieRepository] Consultatie draft saved (master only): {ConsultatieID}", consultatieId);
 
             return consultatieId;
         }
