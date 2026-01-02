@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 
 namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
 
@@ -92,6 +93,9 @@ public class CreateConsultatieCommand : IRequest<Result<Guid>>
     public string? TratamentNemedicamentos { get; set; }
     public string? RecomandariDietetice { get; set; }
     public string? RecomandariRegimViata { get; set; }
+
+    /// <summary>Lista medicamentelor prescrise</summary>
+    public List<MedicationRowDto>? MedicationList { get; set; }
 
     // ==================== RECOMANDARI ====================
     public string? InvestigatiiRecomandate { get; set; }

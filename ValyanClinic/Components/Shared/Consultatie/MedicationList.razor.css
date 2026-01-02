@@ -1,0 +1,277 @@
+/* ==================== MEDICATION LIST SECTION ==================== */
+
+.medication-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border-radius: 12px;
+    border: 1px solid #bae6fd;
+}
+
+.medication-section .section-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #60a5fa;
+}
+
+.medication-section .section-subtitle i {
+    color: #3b82f6;
+    font-size: 1.25rem;
+}
+
+.medication-section .section-subtitle h5 {
+    margin: 0;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+/* ==================== MEDICATION TABLE ==================== */
+
+.medication-table-wrapper {
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.medication-table {
+    width: 100%;
+    background: white;
+    border-collapse: collapse;
+}
+
+.medication-table thead {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    color: white;
+}
+
+.medication-table th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-bottom: 2px solid #2563eb;
+}
+
+.medication-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s;
+}
+
+.medication-table tbody tr:hover {
+    background-color: #f0f9ff;
+}
+
+.medication-table td {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.medication-table td strong {
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.medication-table .btn-danger {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* ==================== NO MEDICATIONS MESSAGE ==================== */
+
+.no-medications-message {
+    padding: 1.5rem;
+    text-align: center;
+    background: white;
+    border: 2px dashed #93c5fd;
+    border-radius: 8px;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+.no-medications-message i {
+    color: #60a5fa;
+    margin-right: 0.5rem;
+}
+
+/* ==================== ADD MEDICATION FORM ==================== */
+
+.add-medication-form {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.add-medication-form h6 {
+    color: #1e40af;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.add-medication-form h6 i {
+    color: #3b82f6;
+}
+
+.add-medication-form .form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.add-medication-form .form-group {
+    flex: 1;
+    position: relative;
+}
+
+.add-medication-form .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.add-medication-form .form-label.required::after {
+    content: '*';
+    color: #ef4444;
+    margin-left: 0.25rem;
+}
+
+.add-medication-form .form-control {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.add-medication-form .form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.add-medication-form .form-control.is-invalid {
+    border-color: #ef4444;
+}
+
+/* ==================== AUTOCOMPLETE DROPDOWN ==================== */
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+}
+
+.autocomplete-item {
+    padding: 0.75rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s;
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover {
+    background-color: #f0f9ff;
+}
+
+.autocomplete-item .medication-name {
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 0.25rem;
+}
+
+.autocomplete-item .medication-dci {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+.autocomplete-item .medication-form {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* ==================== FORM ACTIONS ==================== */
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.form-actions .btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-actions .btn-primary {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    color: white;
+}
+
+.form-actions .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+.form-actions .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.form-actions .btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.form-actions .btn-secondary:hover {
+    background: #d1d5db;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+    .add-medication-form .form-row {
+        flex-direction: column;
+    }
+    
+    .medication-table-wrapper {
+        font-size: 0.75rem;
+    }
+    
+    .medication-table th,
+    .medication-table td {
+        padding: 0.5rem;
+    }
+}

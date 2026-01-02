@@ -1,0 +1,161 @@
+@*
+    Componentă pentru gestionarea listei de medicamente prescrise
+    ✅ NEW: Medication management with ANM nomenclator autocomplete
+*@
+
+<div class="medication-section">
+    <div class="section-subtitle">
+        <i class="fas fa-pills"></i>
+        <h5>Plan Terapeutic - Medicamente Prescrise</h5>
+    </div>
+
+    @* Tabel medicamente *@
+    @if (Medications != null && Medications.Any())
+    {
+        <div class="medication-table-wrapper">
+            <table class="medication-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Medicament</th>
+                        <th style="width: 15%;">Dozaj</th>
+                        <th style="width: 15%;">Frecvență</th>
+                        <th style="width: 15%;">Durată</th>
+                        <th style="width: 15%;">Cantitate</th>
+                        <th style="width: 10%;">Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var medication in Medications)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@medication.Name</strong>
+                                @if (!string.IsNullOrEmpty(medication.Notes))
+                                {
+                                    <br />
+                                    <small class="text-muted">@medication.Notes</small>
+                                }
+                            </td>
+                            <td>@medication.Dose</td>
+                            <td>@medication.Frequency</td>
+                            <td>@medication.Duration</td>
+                            <td>@medication.Quantity</td>
+                            <td>
+                                <button type="button" 
+                                        class="btn btn-sm btn-danger"
+                                        @onclick="() => RemoveMedication(medication.Id)"
+                                        title="Șterge medicament">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="no-medications-message">
+            <i class="fas fa-info-circle"></i>
+            <span>Nu au fost adăugate medicamente. Utilizați formularul de mai jos pentru a adăuga.</span>
+        </div>
+    }
+
+    @* Formular adăugare medicament nou *@
+    <div class="add-medication-form">
+        <h6><i class="fas fa-plus-circle"></i> Adaugă Medicament</h6>
+        
+        <div class="form-row">
+            @* Autocomplete medicament din nomenclator ANM *@
+            <div class="form-group col-md-6">
+                <label class="form-label required">
+                    Denumire medicament
+                </label>
+                <input type="text" 
+                       class="form-control @ValidationCss"
+                       placeholder="Caută medicament din nomenclator ANM..."
+                       value="@NewMedication.Name"
+                       @oninput="OnMedicationSearchInput" />
+                
+                @* Dropdown autocomplete *@
+                @if (ShowAutocomplete && MedicationSearchResults.Any())
+                {
+                    <div class="autocomplete-dropdown">
+                        @foreach (var result in MedicationSearchResults)
+                        {
+                            <div class="autocomplete-item" 
+                                 @onclick="() => SelectMedication(result)">
+                                <div class="medication-name">@result.DenumireComerciala</div>
+                                @if (!string.IsNullOrEmpty(result.DCI))
+                                {
+                                    <div class="medication-dci">DCI: @result.DCI</div>
+                                }
+                                @if (!string.IsNullOrEmpty(result.FormaFarmaceutica))
+                                {
+                                    <div class="medication-form">@result.FormaFarmaceutica @result.Concentratie</div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="form-group col-md-3">
+                <label class="form-label">Dozaj</label>
+                <input type="text" 
+                       class="form-control"
+                       placeholder="ex: 500mg"
+                       @bind="NewMedication.Dose" />
+            </div>
+
+            <div class="form-group col-md-3">
+                <label class="form-label">Frecvență</label>
+                <input type="text" 
+                       class="form-control"
+                       placeholder="ex: 1x3/zi"
+                       @bind="NewMedication.Frequency" />
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label class="form-label">Durată tratament</label>
+                <input type="text" 
+                       class="form-control"
+                       placeholder="ex: 7 zile"
+                       @bind="NewMedication.Duration" />
+            </div>
+
+            <div class="form-group col-md-4">
+                <label class="form-label">Cantitate</label>
+                <input type="text" 
+                       class="form-control"
+                       placeholder="ex: 1 cutie"
+                       @bind="NewMedication.Quantity" />
+            </div>
+
+            <div class="form-group col-md-4">
+                <label class="form-label">Observații</label>
+                <input type="text" 
+                       class="form-control"
+                       placeholder="După masă, cu apă..."
+                       @bind="NewMedication.Notes" />
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" 
+                    class="btn btn-primary"
+                    @onclick="AddMedication"
+                    disabled="@(!NewMedication.IsValid)">
+                <i class="fas fa-plus"></i> Adaugă Medicament
+            </button>
+            <button type="button" 
+                    class="btn btn-secondary"
+                    @onclick="ClearForm">
+                <i class="fas fa-times"></i> Anulează
+            </button>
+        </div>
+    </div>
+</div>

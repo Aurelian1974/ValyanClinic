@@ -67,6 +67,12 @@
             </textarea>
         </div>
     </div>
+
+    <!-- ==================== SECȚIUNEA 4: TRATAMENT - MEDICAMENTE PRESCRISE ==================== -->
+    
+    <MedicationList @bind-Medications="MedicationsList"
+                    ShowValidation="@ShowValidation"
+                    OnChanged="@OnFieldChanged" />
     
     <!-- Section Completed Indicator -->
     @if (OnSectionCompleted.HasDelegate && IsComplete)

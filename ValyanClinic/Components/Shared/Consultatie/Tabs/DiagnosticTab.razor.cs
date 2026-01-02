@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
+using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 using ValyanClinic.Application.Features.ICD10Management.DTOs;
 
 namespace ValyanClinic.Components.Shared.Consultatie.Tabs;
 
 /// <summary>
-/// Tab Diagnostic & Tratament - ✅ UPDATED: With primary and secondary diagnoses split
+/// Tab Diagnostic & Tratament - ✅ UPDATED: With medications list
 /// </summary>
 public partial class DiagnosticTab : ComponentBase
 {
@@ -35,6 +36,13 @@ public partial class DiagnosticTab : ComponentBase
     
     /// <summary>✅ NEW: List of secondary diagnoses</summary>
     private List<SecondaryDiagnosis> SecondaryDiagnosesList { get; set; } = new();
+
+    /// <summary>✅ NEW: List of prescribed medications</summary>
+    private List<MedicationRowDto> MedicationsList
+    {
+        get => Model.MedicationList ?? new();
+        set => Model.MedicationList = value;
+    }
 
     /// <summary>Flag to track if initial data has been loaded (prevents re-loading on every render)</summary>
     private bool _isInitialDataLoaded = false;
