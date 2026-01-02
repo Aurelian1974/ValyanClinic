@@ -57,36 +57,58 @@ public class CreateConsulatieCommandHandler : IRequestHandler<CreateConsulatieCo
                 imc = Math.Round(request.Greutate.Value / (inaltimeMetri * inaltimeMetri), 2);
             }
 
-            // Creare entitate Domain
+            var consultatieId = Guid.NewGuid();
+
+            // 1. MASTER Entity: Consultatie (core fields only - NORMALIZED structure)
             var consultatie = new Consultatie
             {
-                ConsultatieID = Guid.NewGuid(),
+                ConsultatieID = consultatieId,
                 ProgramareID = request.ProgramareID,
                 PacientID = request.PacientID,
                 MedicID = request.MedicID,
                 DataConsultatie = request.DataConsultatie,
                 OraConsultatie = request.OraConsultatie,
                 TipConsultatie = request.TipConsultatie,
+                Status = request.Status,
+                DataFinalizare = request.DataFinalizare,
+                DurataMinute = 0, // Will be set by timer in UI
+                DataCreare = DateTime.Now,
+                CreatDe = request.CreatDe
+            };
 
-                // Motive Prezentare
+            // Call repository (executes sp_Consultatie_Create)
+            var createdId = await _repository.CreateAsync(consultatie, cancellationToken);
+
+            if (createdId == Guid.Empty)
+            {
+                _logger.LogWarning("[CreateConsulatieHandler] Failed to create master Consultatie");
+                return Result<Guid>.Failure("Eroare la crearea consultatiei în baza de date");
+            }
+
+            // 2. ConsultatieMotivePrezentare (1:1) - always upsert for complete create
+            await _repository.UpsertMotivePrezentareAsync(consultatieId, new ConsultatieMotivePrezentare
+            {
+                ConsultatieID = consultatieId,
                 MotivPrezentare = request.MotivPrezentare,
                 IstoricBoalaActuala = request.IstoricBoalaActuala,
+                CreatDe = request.CreatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // Antecedente Heredo-Colaterale
+            // 3. ConsultatieAntecedente (1:1) - always upsert for complete create
+            await _repository.UpsertAntecedenteAsync(consultatieId, new ConsultatieAntecedente
+            {
+                ConsultatieID = consultatieId,
                 AHC_Mama = request.AHC_Mama,
                 AHC_Tata = request.AHC_Tata,
                 AHC_Frati = request.AHC_Frati,
                 AHC_Bunici = request.AHC_Bunici,
                 AHC_Altele = request.AHC_Altele,
-
-                // Antecedente Fiziologice
                 AF_Nastere = request.AF_Nastere,
                 AF_Dezvoltare = request.AF_Dezvoltare,
                 AF_Menstruatie = request.AF_Menstruatie,
                 AF_Sarcini = request.AF_Sarcini,
                 AF_Alaptare = request.AF_Alaptare,
-
-                // Antecedente Personale Patologice
                 APP_BoliCopilarieAdolescenta = request.APP_BoliCopilarieAdolescenta,
                 APP_BoliAdult = request.APP_BoliAdult,
                 APP_Interventii = request.APP_Interventii,
@@ -94,15 +116,19 @@ public class CreateConsulatieCommandHandler : IRequestHandler<CreateConsulatieCo
                 APP_Transfuzii = request.APP_Transfuzii,
                 APP_Alergii = request.APP_Alergii,
                 APP_Medicatie = request.APP_Medicatie,
-
-                // Conditii Socio-Economice
                 Profesie = request.Profesie,
                 ConditiiLocuinta = request.ConditiiLocuinta,
                 ConditiiMunca = request.ConditiiMunca,
                 ObiceiuriAlimentare = request.ObiceiuriAlimentare,
                 Toxice = request.Toxice,
+                CreatDe = request.CreatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // Examen General
+            // 4. ConsultatieExamenObiectiv (1:1) - always upsert for complete create
+            await _repository.UpsertExamenObiectivAsync(consultatieId, new ConsultatieExamenObiectiv
+            {
+                ConsultatieID = consultatieId,
                 StareGenerala = request.StareGenerala,
                 Constitutie = request.Constitutie,
                 Atitudine = request.Atitudine,
@@ -110,19 +136,15 @@ public class CreateConsulatieCommandHandler : IRequestHandler<CreateConsulatieCo
                 Tegumente = request.Tegumente,
                 Mucoase = request.Mucoase,
                 GangliniLimfatici = request.GangliniLimfatici,
-
-                // Semne Vitale
                 Greutate = request.Greutate,
                 Inaltime = request.Inaltime,
-                IMC = imc, // Calculated or provided
+                IMC = imc,
                 Temperatura = request.Temperatura,
                 TensiuneArteriala = request.TensiuneArteriala,
                 Puls = request.Puls,
                 FreccventaRespiratorie = request.FreccventaRespiratorie,
                 SaturatieO2 = request.SaturatieO2,
                 Glicemie = request.Glicemie,
-
-                // Examen pe Aparate
                 ExamenCardiovascular = request.ExamenCardiovascular,
                 ExamenRespiratoriu = request.ExamenRespiratoriu,
                 ExamenDigestiv = request.ExamenDigestiv,
@@ -133,58 +155,65 @@ public class CreateConsulatieCommandHandler : IRequestHandler<CreateConsulatieCo
                 ExamenORL = request.ExamenORL,
                 ExamenOftalmologic = request.ExamenOftalmologic,
                 ExamenDermatologic = request.ExamenDermatologic,
+                CreatDe = request.CreatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // Investigatii
+            // 5. ConsultatieInvestigatii (1:1) - always upsert for complete create
+            await _repository.UpsertInvestigatiiAsync(consultatieId, new ConsultatieInvestigatii
+            {
+                ConsultatieID = consultatieId,
                 InvestigatiiLaborator = request.InvestigatiiLaborator,
                 InvestigatiiImagistice = request.InvestigatiiImagistice,
                 InvestigatiiEKG = request.InvestigatiiEKG,
                 AlteInvestigatii = request.AlteInvestigatii,
+                CreatDe = request.CreatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // Diagnostic
+            // 6. ConsultatieDiagnostic (1:1) - always upsert for complete create
+            await _repository.UpsertDiagnosticAsync(consultatieId, new ConsultatieDiagnostic
+            {
+                ConsultatieID = consultatieId,
                 DiagnosticPozitiv = request.DiagnosticPozitiv,
                 DiagnosticDiferential = request.DiagnosticDiferential,
                 DiagnosticEtiologic = request.DiagnosticEtiologic,
                 CoduriICD10 = request.CoduriICD10,
+                CoduriICD10Secundare = request.CoduriICD10Secundare,
+                CreatDe = request.CreatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // Tratament
+            // 7. ConsultatieTratament (1:1) - always upsert for complete create
+            await _repository.UpsertTratamentAsync(consultatieId, new ConsultatieTratament
+            {
+                ConsultatieID = consultatieId,
                 TratamentMedicamentos = request.TratamentMedicamentos,
                 TratamentNemedicamentos = request.TratamentNemedicamentos,
                 RecomandariDietetice = request.RecomandariDietetice,
                 RecomandariRegimViata = request.RecomandariRegimViata,
-
-                // Recomandari
                 InvestigatiiRecomandate = request.InvestigatiiRecomandate,
                 ConsulturiSpecialitate = request.ConsulturiSpecialitate,
                 DataUrmatoareiProgramari = request.DataUrmatoareiProgramari,
                 RecomandariSupraveghere = request.RecomandariSupraveghere,
+                CreatDe = request.CreatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // Prognostic & Concluzie
+            // 8. ConsultatieConcluzii (1:1) - always upsert for complete create
+            await _repository.UpsertConcluziiAsync(consultatieId, new ConsultatieConcluzii
+            {
+                ConsultatieID = consultatieId,
                 Prognostic = request.Prognostic,
                 Concluzie = request.Concluzie,
                 ObservatiiMedic = request.ObservatiiMedic,
                 NotePacient = request.NotePacient,
-
-                // Status
-                Status = request.Status,
-                DataFinalizare = request.DataFinalizare,
-                DurataMinute = 0, // Will be set by timer in UI
-
-                // Audit
-                DataCreare = DateTime.Now,
-                CreatDe = request.CreatDe
-            };
-
-            // Call repository (executes sp_Consultatie_Create)
-            var consultatieId = await _repository.CreateAsync(consultatie, cancellationToken);
-
-            if (consultatieId == Guid.Empty)
-            {
-                _logger.LogWarning("[CreateConsulatieHandler] Failed to create consultatie - Repository returned empty GUID");
-                return Result<Guid>.Failure("Eroare la crearea consultatiei în baza de date");
-            }
+                CreatDe = request.CreatDe,
+                DataCreare = DateTime.Now
+            });
 
             _logger.LogInformation(
-                "[CreateConsulatieHandler] Consultatie created successfully with ID: {ConsultatieID}",
+                "[CreateConsulatieHandler] Consultatie created successfully with normalized structure: {ConsultatieID}",
                 consultatieId);
 
             return Result<Guid>.Success(
