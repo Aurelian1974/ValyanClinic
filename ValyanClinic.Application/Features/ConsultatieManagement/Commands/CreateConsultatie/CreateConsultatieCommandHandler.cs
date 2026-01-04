@@ -85,12 +85,14 @@ public class CreateConsultatieCommandHandler : IRequestHandler<CreateConsultatie
                 DataCreare = DateTime.Now
             });
 
-            // 3. ConsultatieAntecedente (1:1) - SIMPLIFIED
+            // 3. ConsultatieAntecedente (1:1) - SIMPLIFIED + Anexa 43
             await _repository.UpsertAntecedenteAsync(consultatieId, new ConsultatieAntecedente
             {
                 ConsultatieID = consultatieId,
                 IstoricMedicalPersonal = request.IstoricMedicalPersonal,
                 IstoricFamilial = request.IstoricFamilial,
+                TratamentAnterior = request.TratamentAnterior,
+                FactoriDeRisc = request.FactoriDeRisc,
                 CreatDe = creatDe,
                 DataCreare = DateTime.Now
             });

@@ -19,12 +19,18 @@ public class CreateConsultatieCommand : IRequest<Result<Guid>>
     public string? MotivPrezentare { get; set; }
     public string? IstoricBoalaActuala { get; set; }
 
-    // ==================== ANTECEDENTE (SIMPLIFICAT) ====================
+    // ==================== ANTECEDENTE (SIMPLIFICAT + Anexa 43) ====================
     /// <summary>Istoric medical personal (boli anterioare, intervenții, alergii, tratamente cronice)</summary>
     public string? IstoricMedicalPersonal { get; set; }
     
     /// <summary>Istoric familial (boli ereditare, antecedente în familie)</summary>
     public string? IstoricFamilial { get; set; }
+
+    /// <summary>Tratament urmat anterior (medicație, proceduri, intervenții) - Anexa 43</summary>
+    public string? TratamentAnterior { get; set; }
+
+    /// <summary>Factori de risc identificați (HTA, diabet, fumat, sedentarism, etc.) - Anexa 43</summary>
+    public string? FactoriDeRisc { get; set; }
 
     // ==================== EXAMEN OBIECTIV ====================
     public string? StareGenerala { get; set; }
@@ -69,10 +75,6 @@ public class CreateConsultatieCommand : IRequest<Result<Guid>>
     public string? CoduriICD10Secundare { get; set; } // Coduri secundare (comma-separated)
 
     // ==================== TRATAMENT ====================
-    
-    /// <summary>Tratament efectuat anterior consultației</summary>
-    public string? TratamentAnterior { get; set; }
-    
     public string? TratamentMedicamentos { get; set; }
     public string? TratamentNemedicamentos { get; set; }
     public string? RecomandariDietetice { get; set; }

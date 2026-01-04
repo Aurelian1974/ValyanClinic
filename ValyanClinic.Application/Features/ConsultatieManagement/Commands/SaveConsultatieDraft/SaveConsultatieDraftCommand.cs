@@ -28,6 +28,10 @@ public class SaveConsultatieDraftCommand : IRequest<Result<Guid>>
     public string? IstoricMedicalPersonal { get; set; }
     /// <summary>Istoric familial - antecedente heredocolaterale</summary>
     public string? IstoricFamilial { get; set; }
+    /// <summary>Tratament urmat anterior (medicație, proceduri, intervenții) - Anexa 43</summary>
+    public string? TratamentAnterior { get; set; }
+    /// <summary>Factori de risc identificați (HTA, diabet, fumat, etc.) - Anexa 43</summary>
+    public string? FactoriDeRisc { get; set; }
 
     // ==================== TAB 2: EXAMEN CLINIC ====================
     
@@ -67,6 +71,33 @@ public class SaveConsultatieDraftCommand : IRequest<Result<Guid>>
     public string? Concluzie { get; set; } // Concluzii din UI
     public string? ObservatiiMedic { get; set; }
     public string? DataUrmatoareiProgramari { get; set; } // NoteUrmatoareaVizita din UI
+    
+    // ==================== SCRISOARE MEDICALĂ - ANEXA 43 ====================
+    /// <summary>Pacient diagnosticat cu afecțiune oncologică</summary>
+    public bool EsteAfectiuneOncologica { get; set; }
+    public string? DetaliiAfectiuneOncologica { get; set; }
+    
+    /// <summary>Indicație de revenire pentru internare</summary>
+    public bool AreIndicatieInternare { get; set; }
+    public string? TermenInternare { get; set; }
+    
+    /// <summary>Prescripție medicală</summary>
+    public bool? SaEliberatPrescriptie { get; set; }
+    public string? SeriePrescriptie { get; set; }
+    
+    /// <summary>Concediu medical</summary>
+    public bool? SaEliberatConcediuMedical { get; set; }
+    public string? SerieConcediuMedical { get; set; }
+    
+    /// <summary>Îngrijiri medicale la domiciliu</summary>
+    public bool? SaEliberatIngrijiriDomiciliu { get; set; }
+    
+    /// <summary>Dispozitive medicale</summary>
+    public bool? SaEliberatDispozitiveMedicale { get; set; }
+    
+    /// <summary>Calea de transmitere</summary>
+    public bool TransmiterePrinEmail { get; set; }
+    public string? EmailTransmitere { get; set; }
 
     // ==================== AUDIT ====================
     public Guid CreatDeSauModificatDe { get; set; }

@@ -13,6 +13,7 @@ using ValyanClinic.Application.Services.IMC;
 using ValyanClinic.Application.Services.Consultatii;
 using ValyanClinic.Application.Features.AnalizeMedicale.Queries;
 using ValyanClinic.Application.ViewModels;
+using Syncfusion.Blazor.RichTextEditor;
 
 namespace ValyanClinic.Components.Pages.Consultatii;
 
@@ -82,6 +83,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
     #region UI State
 
+    private const int TotalTabs = 5;
     private bool ShowShortcutsModal { get; set; } = false;
     private bool ShowScrisoarePreview { get; set; } = false;
     private int ActiveTab { get; set; } = 1;
@@ -184,6 +186,32 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     private string IstoricBoalaActuala { get; set; } = string.Empty;
     private string IstoricMedicalPersonal { get; set; } = string.Empty;
     private string IstoricFamilial { get; set; } = string.Empty;
+    
+    // Câmpuri noi conform Scrisoare Medicală (Anexa 43)
+    private string TratamentAnterior { get; set; } = string.Empty;
+    private string FactoriDeRisc { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Toolbar items pentru Rich Text Editor - compact pentru uz medical
+    /// </summary>
+    private List<ToolbarItemModel> RteToolbarItems { get; set; } = new List<ToolbarItemModel>
+    {
+        new ToolbarItemModel() { Command = ToolbarCommand.Bold },
+        new ToolbarItemModel() { Command = ToolbarCommand.Italic },
+        new ToolbarItemModel() { Command = ToolbarCommand.Underline },
+        new ToolbarItemModel() { Command = ToolbarCommand.FontColor },
+        new ToolbarItemModel() { Command = ToolbarCommand.BackgroundColor },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.FontSize },
+        new ToolbarItemModel() { Command = ToolbarCommand.LowerCase },
+        new ToolbarItemModel() { Command = ToolbarCommand.UpperCase },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.OrderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.UnorderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.Undo },
+        new ToolbarItemModel() { Command = ToolbarCommand.Redo },
+        new ToolbarItemModel() { Command = ToolbarCommand.ClearFormat }
+    };
 
     #endregion
 
@@ -232,6 +260,18 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     private string Concluzii { get; set; } = string.Empty;
     private DateTime? DataUrmatoareiVizite { get; set; }
     private string NoteUrmatoareaVizita { get; set; } = string.Empty;
+
+    // Câmpuri Scrisoare Medicală (Anexa 43)
+    private bool EsteAfectiuneOncologica { get; set; } = false;
+    private bool AreIndicatieInternare { get; set; } = false;
+    private bool SaEliberatPrescriptie { get; set; } = false;
+    private string SeriePrescriptie { get; set; } = string.Empty;
+    private bool SaEliberatConcediuMedical { get; set; } = false;
+    private string SerieConcediuMedical { get; set; } = string.Empty;
+    private bool SaEliberatIngrijiriDomiciliu { get; set; } = false;
+    private bool SaEliberatDispozitiveMedicale { get; set; } = false;
+    private bool TransmiterePrinEmail { get; set; } = false;
+    private string EmailTransmitere { get; set; } = string.Empty;
 
     #endregion
 
@@ -465,6 +505,18 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 DataUrmatoareiVizite = dataVizita;
             }
         }
+        
+        // Tab 4: Scrisoare Medicală - Anexa 43
+        EsteAfectiuneOncologica = consultatie.EsteAfectiuneOncologica;
+        AreIndicatieInternare = consultatie.AreIndicatieInternare;
+        SaEliberatPrescriptie = consultatie.SaEliberatPrescriptie ?? false;
+        SeriePrescriptie = consultatie.SeriePrescriptie ?? string.Empty;
+        SaEliberatConcediuMedical = consultatie.SaEliberatConcediuMedical ?? false;
+        SerieConcediuMedical = consultatie.SerieConcediuMedical ?? string.Empty;
+        SaEliberatIngrijiriDomiciliu = consultatie.SaEliberatIngrijiriDomiciliu ?? false;
+        SaEliberatDispozitiveMedicale = consultatie.SaEliberatDispozitiveMedicale ?? false;
+        TransmiterePrinEmail = consultatie.TransmiterePrinEmail;
+        EmailTransmitere = consultatie.EmailTransmitere ?? string.Empty;
 
         // ✅ Sync to ConsultatieCommand for DiagnosticTab
         SyncToConsultatieCommand();
@@ -536,7 +588,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
     private void SwitchTab(int tabNumber)
     {
-        if (tabNumber < 1 || tabNumber > 4) return;
+        if (tabNumber < 1 || tabNumber > TotalTabs) return;
         ActiveTab = tabNumber;
     }
 
@@ -573,6 +625,8 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 IstoricBoalaActuala = string.IsNullOrWhiteSpace(IstoricBoalaActuala) ? null : IstoricBoalaActuala,
                 IstoricMedicalPersonal = string.IsNullOrWhiteSpace(IstoricMedicalPersonal) ? null : IstoricMedicalPersonal,
                 IstoricFamilial = string.IsNullOrWhiteSpace(IstoricFamilial) ? null : IstoricFamilial,
+                TratamentAnterior = string.IsNullOrWhiteSpace(TratamentAnterior) ? null : TratamentAnterior,
+                FactoriDeRisc = string.IsNullOrWhiteSpace(FactoriDeRisc) ? null : FactoriDeRisc,
                 
                 // Tab 2: Semne Vitale
                 Greutate = Greutate,
@@ -613,6 +667,18 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 Concluzie = string.IsNullOrWhiteSpace(Concluzii) ? null : Concluzii,
                 ObservatiiMedic = string.IsNullOrWhiteSpace(Concluzii) ? null : Concluzii,
                 DataUrmatoareiProgramari = DataUrmatoareiVizite.HasValue ? DataUrmatoareiVizite.Value.ToString("dd.MM.yyyy") : null,
+                
+                // Tab 4: Scrisoare Medicală - Anexa 43
+                EsteAfectiuneOncologica = EsteAfectiuneOncologica,
+                AreIndicatieInternare = AreIndicatieInternare,
+                SaEliberatPrescriptie = SaEliberatPrescriptie,
+                SeriePrescriptie = string.IsNullOrWhiteSpace(SeriePrescriptie) ? null : SeriePrescriptie,
+                SaEliberatConcediuMedical = SaEliberatConcediuMedical,
+                SerieConcediuMedical = string.IsNullOrWhiteSpace(SerieConcediuMedical) ? null : SerieConcediuMedical,
+                SaEliberatIngrijiriDomiciliu = SaEliberatIngrijiriDomiciliu,
+                SaEliberatDispozitiveMedicale = SaEliberatDispozitiveMedicale,
+                TransmiterePrinEmail = TransmiterePrinEmail,
+                EmailTransmitere = string.IsNullOrWhiteSpace(EmailTransmitere) ? null : EmailTransmitere,
                 
                 CreatDeSauModificatDe = CurrentUserId
             };
@@ -745,7 +811,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     [JSInvokable] public async Task OnKeyboardSaveDraft() => await HandleSaveDraft();
     [JSInvokable] public async Task OnKeyboardFinalize() => await HandleFinalize();
     [JSInvokable] public void OnKeyboardPreviousTab() { if (ActiveTab > 1) { SwitchTab(ActiveTab - 1); StateHasChanged(); } }
-    [JSInvokable] public void OnKeyboardNextTab() { if (ActiveTab < 5) { SwitchTab(ActiveTab + 1); StateHasChanged(); } }
+    [JSInvokable] public void OnKeyboardNextTab() { if (ActiveTab < TotalTabs) { SwitchTab(ActiveTab + 1); StateHasChanged(); } }
     [JSInvokable] public void OnKeyboardSwitchTab(int tab) { SwitchTab(tab); StateHasChanged(); }
     [JSInvokable] public void OnKeyboardToggleTimer() { ToggleTimerPause(); StateHasChanged(); }
 

@@ -134,6 +134,20 @@ public class GetConsulatieByProgramareQueryHandler : IRequestHandler<GetConsulat
                 ObservatiiMedic = consultatie.Concluzii?.ObservatiiMedic,
                 NotePacient = consultatie.Concluzii?.NotePacient,
                 
+                // Scrisoare Medicala - Anexa 43
+                EsteAfectiuneOncologica = consultatie.Concluzii?.EsteAfectiuneOncologica ?? false,
+                DetaliiAfectiuneOncologica = consultatie.Concluzii?.DetaliiAfectiuneOncologica,
+                AreIndicatieInternare = consultatie.Concluzii?.AreIndicatieInternare ?? false,
+                TermenInternare = consultatie.Concluzii?.TermenInternare,
+                SaEliberatPrescriptie = consultatie.Concluzii?.SaEliberatPrescriptie,
+                SeriePrescriptie = consultatie.Concluzii?.SeriePrescriptie,
+                SaEliberatConcediuMedical = consultatie.Concluzii?.SaEliberatConcediuMedical,
+                SerieConcediuMedical = consultatie.Concluzii?.SerieConcediuMedical,
+                SaEliberatIngrijiriDomiciliu = consultatie.Concluzii?.SaEliberatIngrijiriDomiciliu,
+                SaEliberatDispozitiveMedicale = consultatie.Concluzii?.SaEliberatDispozitiveMedicale,
+                TransmiterePrinEmail = consultatie.Concluzii?.TransmiterePrinEmail ?? false,
+                EmailTransmitere = consultatie.Concluzii?.EmailTransmitere,
+                
                 // Metadata - from Consultatii master table
                 Status = consultatie.Status,
                 DataFinalizare = consultatie.DataFinalizare,

@@ -6,6 +6,7 @@
 @using ValyanClinic.Components.Shared.Consultatie
 @using ValyanClinic.Components.Shared.Consultatie.Tabs
 @using ValyanClinic.Components.Shared.Documents
+@using Syncfusion.Blazor.RichTextEditor
 
 <PageTitle>Consultație Medicală - ValyanClinic</PageTitle>
 
@@ -202,7 +203,7 @@
                     <button class="btn btn-icon" @onclick="() => SwitchTab(ActiveTab - 1)" disabled="@(ActiveTab == 1)">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button class="btn btn-icon" @onclick="() => SwitchTab(ActiveTab + 1)" disabled="@(ActiveTab == 5)">
+                    <button class="btn btn-icon" @onclick="() => SwitchTab(ActiveTab + 1)" disabled="@(ActiveTab == TotalTabs)">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -220,14 +221,13 @@
                                     <i class="fas fa-comment-medical"></i>
                                     Motiv Prezentare
                                 </h4>
-                                <div class="form-group">
-                                    <textarea class="form-control anamneza-textarea"
-                                              placeholder="Descrieți motivul prezentării pacientului la consultație..."
-                                              maxlength="2000"
-                                              @bind="MotivPrezentare"
-                                              @bind:event="oninput"
-                                              @bind:after="MarkFormAsDirty"></textarea>
-                                    <span class="char-counter">@MotivPrezentare.Length / 2000</span>
+                                <div class="form-group rte-container">
+                                    <SfRichTextEditor @bind-Value="MotivPrezentare"
+                                                      Placeholder="Descrieți motivul prezentării pacientului la consultație..."
+                                                      ShowCharCount="true"
+                                                      EnableResize="true">
+                                        <RichTextEditorToolbarSettings Items="@RteToolbarItems" />
+                                    </SfRichTextEditor>
                                 </div>
                             </div>
 
@@ -236,14 +236,28 @@
                                     <i class="fas fa-notes-medical"></i>
                                     Istoric Medical Personal
                                 </h4>
-                                <div class="form-group">
-                                    <textarea class="form-control anamneza-textarea"
-                                              placeholder="Boli anterioare, intervenții chirurgicale, alergii, tratamente cronice..."
-                                              maxlength="4000"
-                                              @bind="IstoricMedicalPersonal"
-                                              @bind:event="oninput"
-                                              @bind:after="MarkFormAsDirty"></textarea>
-                                    <span class="char-counter">@IstoricMedicalPersonal.Length / 4000</span>
+                                <div class="form-group rte-container">
+                                    <SfRichTextEditor @bind-Value="IstoricMedicalPersonal"
+                                                      Placeholder="Boli anterioare, intervenții chirurgicale, alergii, tratamente cronice..."
+                                                      ShowCharCount="true"
+                                                      EnableResize="true">
+                                        <RichTextEditorToolbarSettings Items="@RteToolbarItems" />
+                                    </SfRichTextEditor>
+                                </div>
+                            </div>
+
+                            <div class="form-section compact">
+                                <h4 class="section-title-sm">
+                                    <i class="fas fa-pills"></i>
+                                    Tratament Anterior
+                                </h4>
+                                <div class="form-group rte-container">
+                                    <SfRichTextEditor @bind-Value="TratamentAnterior"
+                                                      Placeholder="Tratamente urmate anterior (medicație, proceduri, intervenții)..."
+                                                      ShowCharCount="true"
+                                                      EnableResize="true">
+                                        <RichTextEditorToolbarSettings Items="@RteToolbarItems" />
+                                    </SfRichTextEditor>
                                 </div>
                             </div>
                         </div>
@@ -255,14 +269,13 @@
                                     <i class="fas fa-history"></i>
                                     Istoricul Bolii Prezente
                                 </h4>
-                                <div class="form-group">
-                                    <textarea class="form-control anamneza-textarea"
-                                              placeholder="Evoluția simptomelor, când au apărut, factori agravanți/amelioranți..."
-                                              maxlength="4000"
-                                              @bind="IstoricBoalaActuala"
-                                              @bind:event="oninput"
-                                              @bind:after="MarkFormAsDirty"></textarea>
-                                    <span class="char-counter">@IstoricBoalaActuala.Length / 4000</span>
+                                <div class="form-group rte-container">
+                                    <SfRichTextEditor @bind-Value="IstoricBoalaActuala"
+                                                      Placeholder="Evoluția simptomelor, când au apărut, factori agravanți/amelioranți..."
+                                                      ShowCharCount="true"
+                                                      EnableResize="true">
+                                        <RichTextEditorToolbarSettings Items="@RteToolbarItems" />
+                                    </SfRichTextEditor>
                                 </div>
                             </div>
 
@@ -271,14 +284,28 @@
                                     <i class="fas fa-users"></i>
                                     Istoric Familial
                                 </h4>
-                                <div class="form-group">
-                                    <textarea class="form-control anamneza-textarea"
-                                              placeholder="Boli ereditare în familie (diabet, HTA, boli cardiace, cancer, etc.)..."
-                                              maxlength="4000"
-                                              @bind="IstoricFamilial"
-                                              @bind:event="oninput"
-                                              @bind:after="MarkFormAsDirty"></textarea>
-                                    <span class="char-counter">@IstoricFamilial.Length / 4000</span>
+                                <div class="form-group rte-container">
+                                    <SfRichTextEditor @bind-Value="IstoricFamilial"
+                                                      Placeholder="Boli ereditare în familie (diabet, HTA, boli cardiace, cancer, etc.)..."
+                                                      ShowCharCount="true"
+                                                      EnableResize="true">
+                                        <RichTextEditorToolbarSettings Items="@RteToolbarItems" />
+                                    </SfRichTextEditor>
+                                </div>
+                            </div>
+
+                            <div class="form-section compact">
+                                <h4 class="section-title-sm">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Factori de Risc
+                                </h4>
+                                <div class="form-group rte-container">
+                                    <SfRichTextEditor @bind-Value="FactoriDeRisc"
+                                                      Placeholder="Factori de risc identificați (HTA, diabet, fumat, sedentarism, obezitate, etc.)..."
+                                                      ShowCharCount="true"
+                                                      EnableResize="true">
+                                        <RichTextEditorToolbarSettings Items="@RteToolbarItems" />
+                                    </SfRichTextEditor>
                                 </div>
                             </div>
                         </div>
@@ -554,6 +581,181 @@
                                       @bind:event="oninput"
                                       @bind:after="MarkFormAsDirty"></textarea>
                             <span class="char-counter">@Concluzii.Length / 2000</span>
+                        </div>
+                    </div>
+
+                    <!-- Secțiune: Informații Scrisoare Medicală (Anexa 43) - Design Elegant -->
+                    <div class="form-section scrisoare-medicala-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-file-prescription"></i>
+                            Informații Scrisoare Medicală
+                            <span class="section-subtitle">Anexa 43 - Ordin MS nr. 1411/2016</span>
+                        </h3>
+                        
+                        <div class="medical-options-grid">
+                            <!-- Card: Afecțiune Oncologică -->
+                            <div class="medical-option-card @(EsteAfectiuneOncologica ? "active warning" : "")">
+                                <label class="option-card-content" for="chkAfectiuneOncologica">
+                                    <div class="option-icon warning">
+                                        <i class="fas fa-ribbon"></i>
+                                    </div>
+                                    <div class="option-details">
+                                        <span class="option-title">Afecțiune Oncologică</span>
+                                        <span class="option-description">Pacientul prezintă afecțiune oncologică</span>
+                                    </div>
+                                    <div class="option-toggle">
+                                        <input type="checkbox" class="toggle-checkbox" id="chkAfectiuneOncologica"
+                                               @bind="EsteAfectiuneOncologica" @bind:after="MarkFormAsDirty" />
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Card: Indicație Internare -->
+                            <div class="medical-option-card @(AreIndicatieInternare ? "active info" : "")">
+                                <label class="option-card-content" for="chkIndicatieInternare">
+                                    <div class="option-icon info">
+                                        <i class="fas fa-hospital"></i>
+                                    </div>
+                                    <div class="option-details">
+                                        <span class="option-title">Indicație Internare</span>
+                                        <span class="option-description">Recomandare pentru internare în spital</span>
+                                    </div>
+                                    <div class="option-toggle">
+                                        <input type="checkbox" class="toggle-checkbox" id="chkIndicatieInternare"
+                                               @bind="AreIndicatieInternare" @bind:after="MarkFormAsDirty" />
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Card: Prescripție Medicală -->
+                            <div class="medical-option-card expandable @(SaEliberatPrescriptie ? "active primary expanded" : "")">
+                                <label class="option-card-content" for="chkPrescriptie">
+                                    <div class="option-icon primary">
+                                        <i class="fas fa-prescription"></i>
+                                    </div>
+                                    <div class="option-details">
+                                        <span class="option-title">Prescripție Medicală</span>
+                                        <span class="option-description">S-a eliberat rețetă medicală</span>
+                                    </div>
+                                    <div class="option-toggle">
+                                        <input type="checkbox" class="toggle-checkbox" id="chkPrescriptie"
+                                               @bind="SaEliberatPrescriptie" @bind:after="MarkFormAsDirty" />
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </label>
+                                @if (SaEliberatPrescriptie)
+                                {
+                                    <div class="option-expanded-content">
+                                        <div class="expanded-input-group">
+                                            <i class="fas fa-hashtag"></i>
+                                            <input type="text" class="expanded-input" 
+                                                   placeholder="Serie / Număr prescripție..."
+                                                   @bind="SeriePrescriptie" @bind:after="MarkFormAsDirty" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Card: Concediu Medical -->
+                            <div class="medical-option-card expandable @(SaEliberatConcediuMedical ? "active secondary expanded" : "")">
+                                <label class="option-card-content" for="chkConcediu">
+                                    <div class="option-icon secondary">
+                                        <i class="fas fa-bed"></i>
+                                    </div>
+                                    <div class="option-details">
+                                        <span class="option-title">Concediu Medical</span>
+                                        <span class="option-description">S-a eliberat certificat de concediu medical</span>
+                                    </div>
+                                    <div class="option-toggle">
+                                        <input type="checkbox" class="toggle-checkbox" id="chkConcediu"
+                                               @bind="SaEliberatConcediuMedical" @bind:after="MarkFormAsDirty" />
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </label>
+                                @if (SaEliberatConcediuMedical)
+                                {
+                                    <div class="option-expanded-content">
+                                        <div class="expanded-input-group">
+                                            <i class="fas fa-hashtag"></i>
+                                            <input type="text" class="expanded-input" 
+                                                   placeholder="Serie / Număr concediu medical..."
+                                                   @bind="SerieConcediuMedical" @bind:after="MarkFormAsDirty" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Card: Îngrijiri la Domiciliu -->
+                            <div class="medical-option-card @(SaEliberatIngrijiriDomiciliu ? "active success" : "")">
+                                <label class="option-card-content" for="chkIngrijiri">
+                                    <div class="option-icon success">
+                                        <i class="fas fa-home"></i>
+                                    </div>
+                                    <div class="option-details">
+                                        <span class="option-title">Îngrijiri la Domiciliu</span>
+                                        <span class="option-description">Recomandare pentru îngrijiri medicale la domiciliu</span>
+                                    </div>
+                                    <div class="option-toggle">
+                                        <input type="checkbox" class="toggle-checkbox" id="chkIngrijiri"
+                                               @bind="SaEliberatIngrijiriDomiciliu" @bind:after="MarkFormAsDirty" />
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Card: Dispozitive Medicale -->
+                            <div class="medical-option-card @(SaEliberatDispozitiveMedicale ? "active info" : "")">
+                                <label class="option-card-content" for="chkDispozitive">
+                                    <div class="option-icon info">
+                                        <i class="fas fa-wheelchair"></i>
+                                    </div>
+                                    <div class="option-details">
+                                        <span class="option-title">Dispozitive Medicale</span>
+                                        <span class="option-description">Recomandare pentru dispozitive medicale</span>
+                                    </div>
+                                    <div class="option-toggle">
+                                        <input type="checkbox" class="toggle-checkbox" id="chkDispozitive"
+                                               @bind="SaEliberatDispozitiveMedicale" @bind:after="MarkFormAsDirty" />
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Secțiune separată pentru Transmitere Email -->
+                        <div class="email-transmission-section @(TransmiterePrinEmail ? "active" : "")">
+                            <div class="email-header">
+                                <label class="email-toggle-label" for="chkEmail">
+                                    <div class="email-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="email-text">
+                                        <span class="email-title">Transmitere prin Email</span>
+                                        <span class="email-description">Trimite scrisoarea medicală pe email către pacient</span>
+                                    </div>
+                                    <div class="option-toggle">
+                                        <input type="checkbox" class="toggle-checkbox" id="chkEmail"
+                                               @bind="TransmiterePrinEmail" @bind:after="MarkFormAsDirty" />
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </label>
+                            </div>
+                            @if (TransmiterePrinEmail)
+                            {
+                                <div class="email-input-section">
+                                    <div class="email-input-wrapper">
+                                        <i class="fas fa-at"></i>
+                                        <input type="email" class="email-input" 
+                                               placeholder="exemplu@email.com"
+                                               @bind="EmailTransmitere" @bind:after="MarkFormAsDirty" />
+                                        <button type="button" class="btn-copy-email" title="Copiază din datele pacientului">
+                                            <i class="fas fa-user-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
 

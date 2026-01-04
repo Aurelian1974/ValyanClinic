@@ -2,10 +2,10 @@
 ==============================================================================
 STORED PROCEDURE: ConsultatieAntecedente_Upsert
 ==============================================================================
-Description: Insert or Update antecedente for a consultatie (Simplified)
+Description: Insert or Update antecedente for a consultatie (with Anexa 43 fields)
 Author: System
 Date: 2026-01-04
-Version: 3.0 (Simplified Structure - Only IstoricMedicalPersonal & IstoricFamilial)
+Version: 4.0 (Added TratamentAnterior & FactoriDeRisc for Scrisoare Medicala Anexa 43)
 ==============================================================================
 */
 
@@ -20,6 +20,8 @@ CREATE PROCEDURE [dbo].[ConsultatieAntecedente_Upsert]
     @ConsultatieID UNIQUEIDENTIFIER,
     @IstoricMedicalPersonal NVARCHAR(MAX) = NULL,
     @IstoricFamilial NVARCHAR(MAX) = NULL,
+    @TratamentAnterior NVARCHAR(MAX) = NULL,
+    @FactoriDeRisc NVARCHAR(MAX) = NULL,
     @ModificatDe UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -34,6 +36,8 @@ BEGIN
             SET 
                 [IstoricMedicalPersonal] = @IstoricMedicalPersonal,
                 [IstoricFamilial] = @IstoricFamilial,
+                [TratamentAnterior] = @TratamentAnterior,
+                [FactoriDeRisc] = @FactoriDeRisc,
                 [DataUltimeiModificari] = GETDATE(),
                 [ModificatDe] = @ModificatDe
             WHERE [ConsultatieID] = @ConsultatieID;
@@ -44,12 +48,14 @@ BEGIN
             (
                 [Id], [ConsultatieID],
                 [IstoricMedicalPersonal], [IstoricFamilial],
+                [TratamentAnterior], [FactoriDeRisc],
                 [DataCreare], [CreatDe]
             )
             VALUES
             (
                 NEWID(), @ConsultatieID,
                 @IstoricMedicalPersonal, @IstoricFamilial,
+                @TratamentAnterior, @FactoriDeRisc,
                 GETDATE(), @ModificatDe
             );
         END

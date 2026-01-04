@@ -22,11 +22,15 @@ public class UpdateConsulatieCommand : IRequest<Result<bool>>
     public string? MotivPrezentare { get; set; }
     public string? IstoricBoalaActuala { get; set; }
 
-    // ==================== II. ANTECEDENTE (SIMPLIFIED) ====================
+    // ==================== II. ANTECEDENTE (SIMPLIFIED + Anexa 43) ====================
     /// <summary>Istoric medical personal - boli anterioare, intervenții, alergii, medicație cronică</summary>
     public string? IstoricMedicalPersonal { get; set; }
     /// <summary>Istoric familial - antecedente heredocolaterale</summary>
     public string? IstoricFamilial { get; set; }
+    /// <summary>Tratament urmat anterior (medicație, proceduri, intervenții) - Anexa 43</summary>
+    public string? TratamentAnterior { get; set; }
+    /// <summary>Factori de risc identificați (HTA, diabet, fumat, etc.) - Anexa 43</summary>
+    public string? FactoriDeRisc { get; set; }
 
     // ==================== III.A. EXAMEN GENERAL ====================
     public string? StareGenerala { get; set; }

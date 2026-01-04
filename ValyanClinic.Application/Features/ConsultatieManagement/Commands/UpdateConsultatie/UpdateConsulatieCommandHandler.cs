@@ -83,12 +83,14 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
                 DataUltimeiModificari = DateTime.Now
             });
 
-            // 3. ConsultatieAntecedente (1:1) - SIMPLIFIED: only IstoricMedicalPersonal and IstoricFamilial
+            // 3. ConsultatieAntecedente (1:1) - SIMPLIFIED + Anexa 43
             await _repository.UpsertAntecedenteAsync(request.ConsultatieID, new ConsultatieAntecedente
             {
                 ConsultatieID = request.ConsultatieID,
                 IstoricMedicalPersonal = request.IstoricMedicalPersonal,
                 IstoricFamilial = request.IstoricFamilial,
+                TratamentAnterior = request.TratamentAnterior,
+                FactoriDeRisc = request.FactoriDeRisc,
                 ModificatDe = request.ModificatDe,
                 DataUltimeiModificari = DateTime.Now
             });

@@ -753,6 +753,8 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@ConsultatieID", consultatieId);
             parameters.Add("@IstoricMedicalPersonal", entity.IstoricMedicalPersonal);
             parameters.Add("@IstoricFamilial", entity.IstoricFamilial);
+            parameters.Add("@TratamentAnterior", entity.TratamentAnterior);
+            parameters.Add("@FactoriDeRisc", entity.FactoriDeRisc);
             parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(
@@ -927,6 +929,21 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@ObservatiiMedic", entity.ObservatiiMedic);
             parameters.Add("@NotePacient", entity.NotePacient);
             parameters.Add("@DocumenteAtatate", entity.DocumenteAtatate);
+            
+            // Scrisoare Medicala - Anexa 43
+            parameters.Add("@EsteAfectiuneOncologica", entity.EsteAfectiuneOncologica);
+            parameters.Add("@DetaliiAfectiuneOncologica", entity.DetaliiAfectiuneOncologica);
+            parameters.Add("@AreIndicatieInternare", entity.AreIndicatieInternare);
+            parameters.Add("@TermenInternare", entity.TermenInternare);
+            parameters.Add("@SaEliberatPrescriptie", entity.SaEliberatPrescriptie);
+            parameters.Add("@SeriePrescriptie", entity.SeriePrescriptie);
+            parameters.Add("@SaEliberatConcediuMedical", entity.SaEliberatConcediuMedical);
+            parameters.Add("@SerieConcediuMedical", entity.SerieConcediuMedical);
+            parameters.Add("@SaEliberatIngrijiriDomiciliu", entity.SaEliberatIngrijiriDomiciliu);
+            parameters.Add("@SaEliberatDispozitiveMedicale", entity.SaEliberatDispozitiveMedicale);
+            parameters.Add("@TransmiterePrinEmail", entity.TransmiterePrinEmail);
+            parameters.Add("@EmailTransmitere", entity.EmailTransmitere);
+            
             parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(

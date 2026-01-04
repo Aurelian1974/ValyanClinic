@@ -9,7 +9,7 @@ Version: 2.0 (Normalized Structure)
 ==============================================================================
 */
 
-USE [ValyanClinicDB]
+USE [ValyanMed]
 GO
 
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'ConsultatieConcluzii_Upsert')

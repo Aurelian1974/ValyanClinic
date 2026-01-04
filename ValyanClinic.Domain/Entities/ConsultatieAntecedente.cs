@@ -26,6 +26,18 @@ public class ConsultatieAntecedente
     /// </summary>
     public string? IstoricFamilial { get; set; }
 
+    /// <summary>
+    /// Tratament urmat anterior (medicație, proceduri, intervenții)
+    /// Conform Scrisoare Medicală Anexa 43
+    /// </summary>
+    public string? TratamentAnterior { get; set; }
+
+    /// <summary>
+    /// Factori de risc identificați (HTA, diabet, fumat, sedentarism, obezitate, etc.)
+    /// Conform Scrisoare Medicală Anexa 43
+    /// </summary>
+    public string? FactoriDeRisc { get; set; }
+
     // ==================== AUDIT ====================
     public DateTime DataCreare { get; set; }
     public Guid CreatDe { get; set; }

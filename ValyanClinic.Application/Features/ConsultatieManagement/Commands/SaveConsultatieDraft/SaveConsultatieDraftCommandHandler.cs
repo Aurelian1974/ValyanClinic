@@ -132,13 +132,17 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
 
             // 3. ConsultatieAntecedente (1:1) - SIMPLIFIED - condiționat
             if (!string.IsNullOrWhiteSpace(request.IstoricMedicalPersonal) ||
-                !string.IsNullOrWhiteSpace(request.IstoricFamilial))
+                !string.IsNullOrWhiteSpace(request.IstoricFamilial) ||
+                !string.IsNullOrWhiteSpace(request.TratamentAnterior) ||
+                !string.IsNullOrWhiteSpace(request.FactoriDeRisc))
             {
                 await _repository.UpsertAntecedenteAsync(consultatieId, new ConsultatieAntecedente
                 {
                     ConsultatieID = consultatieId,
                     IstoricMedicalPersonal = request.IstoricMedicalPersonal,
                     IstoricFamilial = request.IstoricFamilial,
+                    TratamentAnterior = request.TratamentAnterior,
+                    FactoriDeRisc = request.FactoriDeRisc,
                     CreatDe = request.CreatDeSauModificatDe,
                     DataCreare = DateTime.Now,
                     DataUltimeiModificari = DateTime.Now
@@ -228,15 +232,35 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 });
             }
 
-            // 8. ConsultatieConcluzii (1:1) - condiționat
+            // 8. ConsultatieConcluzii (1:1) - condiționat - include Scrisoare Medicală Anexa 43
             if (!string.IsNullOrWhiteSpace(request.Concluzie) ||
-                !string.IsNullOrWhiteSpace(request.ObservatiiMedic))
+                !string.IsNullOrWhiteSpace(request.ObservatiiMedic) ||
+                request.EsteAfectiuneOncologica ||
+                request.AreIndicatieInternare ||
+                request.SaEliberatPrescriptie == true ||
+                request.SaEliberatConcediuMedical == true ||
+                request.SaEliberatIngrijiriDomiciliu == true ||
+                request.SaEliberatDispozitiveMedicale == true ||
+                request.TransmiterePrinEmail)
             {
                 await _repository.UpsertConcluziiAsync(consultatieId, new ConsultatieConcluzii
                 {
                     ConsultatieID = consultatieId,
                     Concluzie = request.Concluzie,
                     ObservatiiMedic = request.ObservatiiMedic,
+                    // Scrisoare Medicala - Anexa 43
+                    EsteAfectiuneOncologica = request.EsteAfectiuneOncologica,
+                    DetaliiAfectiuneOncologica = request.DetaliiAfectiuneOncologica,
+                    AreIndicatieInternare = request.AreIndicatieInternare,
+                    TermenInternare = request.TermenInternare,
+                    SaEliberatPrescriptie = request.SaEliberatPrescriptie,
+                    SeriePrescriptie = request.SeriePrescriptie,
+                    SaEliberatConcediuMedical = request.SaEliberatConcediuMedical,
+                    SerieConcediuMedical = request.SerieConcediuMedical,
+                    SaEliberatIngrijiriDomiciliu = request.SaEliberatIngrijiriDomiciliu,
+                    SaEliberatDispozitiveMedicale = request.SaEliberatDispozitiveMedicale,
+                    TransmiterePrinEmail = request.TransmiterePrinEmail,
+                    EmailTransmitere = request.EmailTransmitere,
                     CreatDe = request.CreatDeSauModificatDe,
                     DataCreare = DateTime.Now,
                     DataUltimeiModificari = DateTime.Now

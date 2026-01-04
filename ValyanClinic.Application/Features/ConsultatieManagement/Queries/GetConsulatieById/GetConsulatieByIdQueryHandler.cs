@@ -136,6 +136,20 @@ public class GetConsulatieByIdQueryHandler : IRequestHandler<GetConsulatieByIdQu
                 NotePacient = consultatie.Concluzii?.NotePacient,
                 DocumenteAtatate = consultatie.Concluzii?.DocumenteAtatate,
                 
+                // Scrisoare Medicala - Anexa 43
+                EsteAfectiuneOncologica = consultatie.Concluzii?.EsteAfectiuneOncologica ?? false,
+                DetaliiAfectiuneOncologica = consultatie.Concluzii?.DetaliiAfectiuneOncologica,
+                AreIndicatieInternare = consultatie.Concluzii?.AreIndicatieInternare ?? false,
+                TermenInternare = consultatie.Concluzii?.TermenInternare,
+                SaEliberatPrescriptie = consultatie.Concluzii?.SaEliberatPrescriptie,
+                SeriePrescriptie = consultatie.Concluzii?.SeriePrescriptie,
+                SaEliberatConcediuMedical = consultatie.Concluzii?.SaEliberatConcediuMedical,
+                SerieConcediuMedical = consultatie.Concluzii?.SerieConcediuMedical,
+                SaEliberatIngrijiriDomiciliu = consultatie.Concluzii?.SaEliberatIngrijiriDomiciliu,
+                SaEliberatDispozitiveMedicale = consultatie.Concluzii?.SaEliberatDispozitiveMedicale,
+                TransmiterePrinEmail = consultatie.Concluzii?.TransmiterePrinEmail ?? false,
+                EmailTransmitere = consultatie.Concluzii?.EmailTransmitere,
+                
                 // TODO: Add JOIN data from Pacienti and PersonalMedical tables
                 PacientNumeComplet = "N/A", // Will be populated with JOIN in SP
                 MedicNumeComplet = "N/A"    // Will be populated with JOIN in SP

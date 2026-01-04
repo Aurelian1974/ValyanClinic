@@ -14,6 +14,12 @@ public class ConsultatieAntecedenteDto
     
     /// <summary>Istoric familial - antecedente heredocolaterale</summary>
     public string? IstoricFamilial { get; set; }
+
+    /// <summary>Tratament urmat anterior (medicație, proceduri, intervenții) - Anexa 43</summary>
+    public string? TratamentAnterior { get; set; }
+
+    /// <summary>Factori de risc identificați (HTA, diabet, fumat, etc.) - Anexa 43</summary>
+    public string? FactoriDeRisc { get; set; }
     
     // Audit
     public DateTime DataCreare { get; set; }
