@@ -492,9 +492,33 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         // Tab 2: Investigații
         InvestigatiiParaclinice = consultatie.InvestigatiiLaborator ?? string.Empty;
 
-        // Tab 3: Diagnostic
+        // Tab 3: Diagnostic - NEW normalized structure
+        // These are mapped to ConsultatieCommand which is used by DiagnosticTab
+        ConsultatieCommand.CodICD10Principal = consultatie.CodICD10Principal;
+        ConsultatieCommand.NumeDiagnosticPrincipal = consultatie.NumeDiagnosticPrincipal;
+        ConsultatieCommand.DescriereDetaliataPrincipal = consultatie.DescriereDetaliataPrincipal;
+        
+        // Map secondary diagnoses from DTO to Command
+        if (consultatie.DiagnosticeSecundare?.Any() == true)
+        {
+            ConsultatieCommand.DiagnosticeSecundare = consultatie.DiagnosticeSecundare
+                .Select(d => new ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveConsultatieDraft.DiagnosticSecundarDto
+                {
+                    OrdineAfisare = d.OrdineAfisare,
+                    CodICD10 = d.CodICD10,
+                    NumeDiagnostic = d.NumeDiagnostic,
+                    Descriere = d.Descriere
+                })
+                .ToList();
+        }
+        
+        // LEGACY fields for display
         DiagnosticPrincipal = consultatie.DiagnosticPozitiv ?? string.Empty;
         DiagnosticSecundar = consultatie.DiagnosticDiferential ?? string.Empty;
+        
+        // Also populate legacy fields in command for backwards compatibility
+        ConsultatieCommand.CoduriICD10 = consultatie.CoduriICD10;
+        ConsultatieCommand.CoduriICD10Secundare = consultatie.CoduriICD10Secundare;
         
         // Tab 3: Tratament
         PlanTerapeutic = consultatie.TratamentMedicamentos ?? string.Empty;
@@ -655,8 +679,14 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 // Tab 2: Investigații
                 InvestigatiiLaborator = string.IsNullOrWhiteSpace(InvestigatiiParaclinice) ? null : InvestigatiiParaclinice,
                 
-                // Tab 3: Diagnostic
+                // Tab 3: Diagnostic - NEW normalized structure
                 // Use ConsultatieCommand values - they are synced from DiagnosticTab via SyncToModel()
+                CodICD10Principal = ConsultatieCommand.CodICD10Principal,
+                NumeDiagnosticPrincipal = ConsultatieCommand.NumeDiagnosticPrincipal,
+                DescriereDetaliataPrincipal = ConsultatieCommand.DescriereDetaliataPrincipal,
+                DiagnosticeSecundare = ConsultatieCommand.DiagnosticeSecundare,
+                
+                // LEGACY fields for backwards compatibility
                 DiagnosticPozitiv = !string.IsNullOrWhiteSpace(ConsultatieCommand.DiagnosticPozitiv) 
                     ? ConsultatieCommand.DiagnosticPozitiv 
                     : (string.IsNullOrWhiteSpace(DiagnosticPrincipal) ? null : DiagnosticPrincipal),

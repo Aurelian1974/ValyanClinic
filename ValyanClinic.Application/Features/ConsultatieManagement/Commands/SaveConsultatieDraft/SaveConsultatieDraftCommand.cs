@@ -59,9 +59,21 @@ public class SaveConsultatieDraftCommand : IRequest<Result<Guid>>
 
     // ==================== TAB 3: DIAGNOSTIC & TRATAMENT ====================
     
-    // Diagnostic
-    public string? DiagnosticPozitiv { get; set; } // DiagnosticPrincipal din UI
-    public string? DiagnosticDiferential { get; set; } // DiagnosticSecundar din UI
+    // Diagnostic Principal (NOU - structură normalizată)
+    /// <summary>Codul ICD-10 pentru diagnosticul principal (ex: "I10")</summary>
+    public string? CodICD10Principal { get; set; }
+    /// <summary>Numele diagnosticului principal din catalog ICD-10</summary>
+    public string? NumeDiagnosticPrincipal { get; set; }
+    /// <summary>Descriere detaliată diagnostic principal (HTML din RTE)</summary>
+    public string? DescriereDetaliataPrincipal { get; set; }
+    
+    // Diagnostice Secundare (NOU - listă normalizată, max 10)
+    /// <summary>Lista diagnosticelor secundare cu cod ICD10 + descriere</summary>
+    public List<DiagnosticSecundarDto>? DiagnosticeSecundare { get; set; }
+    
+    // LEGACY (backwards compatibility)
+    public string? DiagnosticPozitiv { get; set; }
+    public string? DiagnosticDiferential { get; set; }
     public string? CoduriICD10 { get; set; }
     public string? CoduriICD10Secundare { get; set; }
 

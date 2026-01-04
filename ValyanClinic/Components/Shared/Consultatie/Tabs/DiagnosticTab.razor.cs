@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
+using ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveConsultatieDraft;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 using ValyanClinic.Application.Features.ICD10Management.DTOs;
 
@@ -60,14 +61,16 @@ public partial class DiagnosticTab : ComponentBase
         if (_isInitialDataLoaded)
             return;
 
-        // Load primary diagnosis from Model if exists and we don't have one yet
-        if (!string.IsNullOrEmpty(Model.CoduriICD10) && PrimaryDiagnosisCode == null)
+        // Load primary diagnosis - use NEW fields first, fallback to legacy
+        if ((!string.IsNullOrEmpty(Model.CodICD10Principal) || !string.IsNullOrEmpty(Model.CoduriICD10)) 
+            && PrimaryDiagnosisCode == null)
         {
             LoadPrimaryDiagnosisFromModel();
         }
 
-        // Load secondary diagnoses from Model if exists and we don't have any yet
-        if (!string.IsNullOrEmpty(Model.CoduriICD10Secundare) && !SecondaryDiagnosesList.Any())
+        // Load secondary diagnoses - use NEW list first, fallback to legacy
+        if ((Model.DiagnosticeSecundare?.Any() == true || !string.IsNullOrEmpty(Model.CoduriICD10Secundare)) 
+            && !SecondaryDiagnosesList.Any())
         {
             LoadSecondaryDiagnosesFromModel();
         }
@@ -101,53 +104,90 @@ public partial class DiagnosticTab : ComponentBase
 
     // ==================== DATA LOADING ====================
 
-    /// <summary>Load primary diagnosis from Model.CoduriICD10</summary>
+    /// <summary>Load primary diagnosis from Model - uses NEW fields with legacy fallback</summary>
     private void LoadPrimaryDiagnosisFromModel()
     {
+        // Try NEW fields first
+        if (!string.IsNullOrEmpty(Model.CodICD10Principal))
+        {
+            PrimaryDiagnosisCode = new ICD10SearchResultDto
+            {
+                Code = Model.CodICD10Principal,
+                ShortDescription = Model.NumeDiagnosticPrincipal ?? ""
+            };
+            PrimaryDiagnosisDetails = Model.DescriereDetaliataPrincipal;
+            
+            Logger.LogInformation("[DiagnosticTab] Loaded primary diagnosis (NEW): {Code} - {Name}", 
+                Model.CodICD10Principal, Model.NumeDiagnosticPrincipal);
+            return;
+        }
+
+        // Fallback to LEGACY fields
         if (string.IsNullOrEmpty(Model.CoduriICD10))
             return;
 
-        // TODO: Load full ICD10SearchResultDto from repository
-        // For now, create a minimal DTO
         PrimaryDiagnosisCode = new ICD10SearchResultDto
         {
             Code = Model.CoduriICD10,
             ShortDescription = Model.DiagnosticPozitiv ?? ""
         };
-
         PrimaryDiagnosisDetails = Model.DiagnosticPozitiv;
         
-        Logger.LogInformation("[DiagnosticTab] Loaded primary diagnosis: {Code}", Model.CoduriICD10);
+        Logger.LogInformation("[DiagnosticTab] Loaded primary diagnosis (LEGACY): {Code}", Model.CoduriICD10);
     }
 
-    /// <summary>Load secondary diagnoses from Model.CoduriICD10Secundare</summary>
+    /// <summary>Load secondary diagnoses from Model - uses NEW list with legacy fallback</summary>
     private void LoadSecondaryDiagnosesFromModel()
     {
+        // Try NEW structure first
+        if (Model.DiagnosticeSecundare?.Any() == true)
+        {
+            SecondaryDiagnosesList = Model.DiagnosticeSecundare
+                .OrderBy(d => d.OrdineAfisare)
+                .Select(d => new SecondaryDiagnosis
+                {
+                    Id = Guid.NewGuid(),
+                    Description = d.Descriere ?? "", // RTE content
+                    ICD10Codes = new List<ICD10SearchResultDto>
+                    {
+                        new ICD10SearchResultDto 
+                        { 
+                            Code = d.CodICD10 ?? "", 
+                            ShortDescription = d.NumeDiagnostic ?? "" 
+                        }
+                    }
+                })
+                .ToList();
+            
+            Logger.LogInformation("[DiagnosticTab] Loaded {Count} secondary diagnoses (NEW)", 
+                SecondaryDiagnosesList.Count);
+            return;
+        }
+
+        // Fallback to LEGACY (comma-separated codes)
         if (string.IsNullOrEmpty(Model.CoduriICD10Secundare))
         {
             SecondaryDiagnosesList.Clear();
             return;
         }
 
-        // Parse comma-separated codes
         var codes = Model.CoduriICD10Secundare
             .Split(',', StringSplitOptions.RemoveEmptyEntries)
             .Select(c => c.Trim())
             .ToList();
 
-        // Create secondary diagnosis entries
-        // TODO: Load full ICD10SearchResultDto from repository
         SecondaryDiagnosesList = codes.Select(code => new SecondaryDiagnosis
         {
             Id = Guid.NewGuid(),
-            Description = code, // Temporary - should load actual description
+            Description = code, // Just the code as description (legacy)
             ICD10Codes = new List<ICD10SearchResultDto>
             {
                 new ICD10SearchResultDto { Code = code, ShortDescription = code }
             }
         }).ToList();
         
-        Logger.LogInformation("[DiagnosticTab] Loaded {Count} secondary diagnoses", SecondaryDiagnosesList.Count);
+        Logger.LogInformation("[DiagnosticTab] Loaded {Count} secondary diagnoses (LEGACY)", 
+            SecondaryDiagnosesList.Count);
     }
 
     // ==================== DATA SYNCING ====================
@@ -155,14 +195,31 @@ public partial class DiagnosticTab : ComponentBase
     /// <summary>Sync primary and secondary diagnoses to Model</summary>
     private void SyncToModel()
     {
-        // Sync Primary Diagnosis
+        // Sync Primary Diagnosis - NEW normalized fields
+        Model.CodICD10Principal = PrimaryDiagnosisCode?.Code;
+        Model.NumeDiagnosticPrincipal = PrimaryDiagnosisCode?.ShortDescription;
+        Model.DescriereDetaliataPrincipal = PrimaryDiagnosisDetails;
+        
+        // LEGACY fields for backwards compatibility
         Model.CoduriICD10 = PrimaryDiagnosisCode?.Code;
         Model.DiagnosticPozitiv = PrimaryDiagnosisDetails ?? PrimaryDiagnosisCode?.ShortDescription;
 
-        // Sync Secondary Diagnoses
+        // Sync Secondary Diagnoses - NEW normalized list
         if (SecondaryDiagnosesList.Any())
         {
-            // Collect all ICD10 codes from all secondary diagnoses
+            Model.DiagnosticeSecundare = SecondaryDiagnosesList
+                .SelectMany((diagnosis, diagIndex) => 
+                    diagnosis.ICD10Codes.Select((code, codeIndex) => new DiagnosticSecundarDto
+                    {
+                        OrdineAfisare = diagIndex * 10 + codeIndex + 1, // 1, 2, 3... 11, 12...
+                        CodICD10 = code.Code,
+                        NumeDiagnostic = code.ShortDescription,
+                        Descriere = diagnosis.Description // Description is the RTE content
+                    }))
+                .Take(10) // Max 10 secondary diagnoses
+                .ToList();
+
+            // LEGACY: Collect all ICD10 codes for CoduriICD10Secundare
             var allSecondaryCodes = SecondaryDiagnosesList
                 .SelectMany(d => d.ICD10Codes.Select(c => c.Code))
                 .Distinct()
@@ -170,11 +227,12 @@ public partial class DiagnosticTab : ComponentBase
 
             Model.CoduriICD10Secundare = string.Join(", ", allSecondaryCodes);
             
-            Logger.LogInformation("[DiagnosticTab] Synced {Count} secondary codes: {Codes}", 
-                allSecondaryCodes.Count, Model.CoduriICD10Secundare);
+            Logger.LogInformation("[DiagnosticTab] Synced {Count} secondary diagnoses, codes: {Codes}", 
+                Model.DiagnosticeSecundare.Count, Model.CoduriICD10Secundare);
         }
         else
         {
+            Model.DiagnosticeSecundare = null;
             Model.CoduriICD10Secundare = null;
         }
     }

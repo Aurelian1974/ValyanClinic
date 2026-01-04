@@ -198,23 +198,49 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 });
             }
 
-            // 6. ConsultatieDiagnostic (1:1) - condiționat
-            if (!string.IsNullOrWhiteSpace(request.DiagnosticPozitiv) ||
-                !string.IsNullOrWhiteSpace(request.DiagnosticDiferential) ||
-                !string.IsNullOrWhiteSpace(request.CoduriICD10) ||
-                !string.IsNullOrWhiteSpace(request.CoduriICD10Secundare))
+            // 6. ConsultatieDiagnostic (1:1) - Diagnostic Principal
+            if (!string.IsNullOrWhiteSpace(request.CodICD10Principal) ||
+                !string.IsNullOrWhiteSpace(request.NumeDiagnosticPrincipal) ||
+                !string.IsNullOrWhiteSpace(request.DescriereDetaliataPrincipal) ||
+                !string.IsNullOrWhiteSpace(request.DiagnosticPozitiv) ||
+                !string.IsNullOrWhiteSpace(request.CoduriICD10))
             {
                 await _repository.UpsertDiagnosticAsync(consultatieId, new ConsultatieDiagnostic
                 {
                     ConsultatieID = consultatieId,
+                    // NEW: Diagnostic Principal normalizat
+                    CodICD10Principal = request.CodICD10Principal,
+                    NumeDiagnosticPrincipal = request.NumeDiagnosticPrincipal,
+                    DescriereDetaliataPrincipal = request.DescriereDetaliataPrincipal,
+                    // LEGACY: backwards compatibility
                     DiagnosticPozitiv = request.DiagnosticPozitiv,
                     DiagnosticDiferential = request.DiagnosticDiferential,
-                    CoduriICD10 = request.CoduriICD10,
+                    CoduriICD10 = request.CoduriICD10 ?? request.CodICD10Principal, // fallback to new field
                     CoduriICD10Secundare = request.CoduriICD10Secundare,
                     CreatDe = request.CreatDeSauModificatDe,
                     DataCreare = DateTime.Now,
                     DataUltimeiModificari = DateTime.Now
                 });
+            }
+
+            // 6b. ConsultatieDiagnosticSecundar (1:N) - Diagnostice Secundare
+            if (request.DiagnosticeSecundare != null && request.DiagnosticeSecundare.Any())
+            {
+                var diagnosticeSecundare = request.DiagnosticeSecundare.Select((d, index) => new ConsultatieDiagnosticSecundar
+                {
+                    ConsultatieID = consultatieId,
+                    OrdineAfisare = d.OrdineAfisare > 0 ? d.OrdineAfisare : index + 1,
+                    CodICD10 = d.CodICD10,
+                    NumeDiagnostic = d.NumeDiagnostic,
+                    Descriere = d.Descriere,
+                    CreatDe = request.CreatDeSauModificatDe,
+                    DataCreare = DateTime.Now
+                });
+
+                await _repository.SyncDiagnosticeSecundareAsync(
+                    consultatieId, 
+                    diagnosticeSecundare, 
+                    request.CreatDeSauModificatDe);
             }
 
             // 7. ConsultatieTratament (1:1) - condiționat

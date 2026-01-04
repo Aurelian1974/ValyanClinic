@@ -121,6 +121,23 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                 AlteInvestigatii = consultatie.Investigatii?.AlteInvestigatii,
                 
                 // Tab 3: Diagnostic - from ConsultatieDiagnostic
+                // NEW: Normalized structure for Scrisoare Medicală
+                CodICD10Principal = consultatie.Diagnostic?.CodICD10Principal,
+                NumeDiagnosticPrincipal = consultatie.Diagnostic?.NumeDiagnosticPrincipal,
+                DescriereDetaliataPrincipal = consultatie.Diagnostic?.DescriereDetaliataPrincipal,
+                DiagnosticeSecundare = consultatie.Diagnostic?.DiagnosticeSecundare?
+                    .OrderBy(d => d.OrdineAfisare)
+                    .Select(d => new DiagnosticSecundarDetailDto
+                    {
+                        Id = d.Id,
+                        OrdineAfisare = d.OrdineAfisare,
+                        CodICD10 = d.CodICD10,
+                        NumeDiagnostic = d.NumeDiagnostic,
+                        Descriere = d.Descriere
+                    })
+                    .ToList(),
+                
+                // LEGACY fields for backwards compatibility
                 DiagnosticPozitiv = consultatie.Diagnostic?.DiagnosticPozitiv,
                 DiagnosticDiferential = consultatie.Diagnostic?.DiagnosticDiferential,
                 DiagnosticEtiologic = consultatie.Diagnostic?.DiagnosticEtiologic,

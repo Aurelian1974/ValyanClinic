@@ -86,6 +86,19 @@ public class ConsulatieDetailDto
     public string? AlteInvestigatii { get; set; }
 
     // ==================== V. DIAGNOSTIC ====================
+    
+    // NEW: Normalized structure for Scrisoare Medicală
+    /// <summary>Codul ICD-10 pentru diagnosticul principal (ex: "I10")</summary>
+    public string? CodICD10Principal { get; set; }
+    /// <summary>Numele diagnosticului principal din catalog ICD-10</summary>
+    public string? NumeDiagnosticPrincipal { get; set; }
+    /// <summary>Descriere detaliată diagnostic principal (HTML din RTE)</summary>
+    public string? DescriereDetaliataPrincipal { get; set; }
+    
+    /// <summary>Lista diagnosticelor secundare normalizate (1:N, max 10)</summary>
+    public List<DiagnosticSecundarDetailDto>? DiagnosticeSecundare { get; set; }
+    
+    // LEGACY: Kept for backwards compatibility
     public string? DiagnosticPozitiv { get; set; }
     public string? DiagnosticDiferential { get; set; }
     public string? DiagnosticEtiologic { get; set; }

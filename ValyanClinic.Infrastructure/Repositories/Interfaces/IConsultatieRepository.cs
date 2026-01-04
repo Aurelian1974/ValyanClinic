@@ -91,9 +91,20 @@ public interface IConsultatieRepository
     Task UpsertInvestigatiiAsync(Guid consultatieId, ConsultatieInvestigatii entity);
 
     /// <summary>
-    /// Upsert (INSERT/UPDATE) ConsultatieDiagnostic (1:1)
+    /// Upsert (INSERT/UPDATE) ConsultatieDiagnostic (1:1) - Diagnostic Principal
     /// </summary>
     Task UpsertDiagnosticAsync(Guid consultatieId, ConsultatieDiagnostic entity);
+
+    /// <summary>
+    /// Sync (DELETE + INSERT) ConsultatieDiagnosticSecundar (1:N) - Diagnostice Secundare
+    /// Șterge toate diagnosticele secundare existente și inserează noile
+    /// </summary>
+    Task SyncDiagnosticeSecundareAsync(Guid consultatieId, IEnumerable<ConsultatieDiagnosticSecundar> diagnostice, Guid modificatDe);
+
+    /// <summary>
+    /// Get all ConsultatieDiagnosticSecundar for a consultation
+    /// </summary>
+    Task<IEnumerable<ConsultatieDiagnosticSecundar>> GetDiagnosticeSecundareAsync(Guid consultatieId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieTratament (1:1)

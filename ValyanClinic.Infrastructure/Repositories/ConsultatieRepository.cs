@@ -868,6 +868,11 @@ public class ConsultatieRepository : IConsultatieRepository
 
             var parameters = new DynamicParameters();
             parameters.Add("@ConsultatieID", consultatieId);
+            // NEW: Diagnostic Principal
+            parameters.Add("@CodICD10Principal", entity.CodICD10Principal);
+            parameters.Add("@NumeDiagnosticPrincipal", entity.NumeDiagnosticPrincipal);
+            parameters.Add("@DescriereDetaliataPrincipal", entity.DescriereDetaliataPrincipal);
+            // LEGACY: backwards compatibility
             parameters.Add("@DiagnosticPozitiv", entity.DiagnosticPozitiv);
             parameters.Add("@DiagnosticDiferential", entity.DiagnosticDiferential);
             parameters.Add("@DiagnosticEtiologic", entity.DiagnosticEtiologic);
@@ -886,6 +891,68 @@ public class ConsultatieRepository : IConsultatieRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "[ConsultatieRepository] Error upserting Diagnostic for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
+
+    public async Task SyncDiagnosticeSecundareAsync(Guid consultatieId, IEnumerable<ConsultatieDiagnosticSecundar> diagnostice, Guid modificatDe)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            // Build JSON array for stored procedure
+            var diagnosticeList = diagnostice.Select((d, index) => new
+            {
+                ordine = d.OrdineAfisare > 0 ? d.OrdineAfisare : index + 1,
+                codICD10 = d.CodICD10,
+                numeDiagnostic = d.NumeDiagnostic,
+                descriere = d.Descriere
+            }).ToList();
+
+            var json = System.Text.Json.JsonSerializer.Serialize(diagnosticeList);
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ConsultatieID", consultatieId);
+            parameters.Add("@DiagnosticeJSON", json);
+            parameters.Add("@ModificatDe", modificatDe);
+
+            await connection.ExecuteAsync(
+                "ConsultatieDiagnosticSecundar_Sync",
+                parameters,
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 30);
+
+            _logger.LogInformation("[ConsultatieRepository] Synced {Count} diagnostice secundare for: {ConsultatieID}", 
+                diagnosticeList.Count, consultatieId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error syncing diagnostice secundare for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<ConsultatieDiagnosticSecundar>> GetDiagnosticeSecundareAsync(Guid consultatieId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ConsultatieID", consultatieId);
+
+            var result = await connection.QueryAsync<ConsultatieDiagnosticSecundar>(
+                "ConsultatieDiagnosticSecundar_GetByConsultatie",
+                parameters,
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 30);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error getting diagnostice secundare for: {ConsultatieID}", consultatieId);
             throw;
         }
     }

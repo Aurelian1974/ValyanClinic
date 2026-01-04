@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveConsultatieDraft;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 
 namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
@@ -68,6 +69,19 @@ public class CreateConsultatieCommand : IRequest<Result<Guid>>
     public string? AlteInvestigatii { get; set; }
 
     // ==================== DIAGNOSTIC ====================
+    
+    // NEW: Normalized diagnostic structure for Scrisoare Medicală
+    /// <summary>Codul ICD-10 pentru diagnosticul principal (ex: "I10")</summary>
+    public string? CodICD10Principal { get; set; }
+    /// <summary>Numele diagnosticului principal din catalog ICD-10</summary>
+    public string? NumeDiagnosticPrincipal { get; set; }
+    /// <summary>Descriere detaliată diagnostic principal (HTML din RTE)</summary>
+    public string? DescriereDetaliataPrincipal { get; set; }
+    
+    /// <summary>Lista diagnosticelor secundare cu cod ICD10 + descriere (max 10)</summary>
+    public List<DiagnosticSecundarDto>? DiagnosticeSecundare { get; set; }
+    
+    // LEGACY: Kept for backwards compatibility
     public string? DiagnosticPozitiv { get; set; }
     public string? DiagnosticDiferential { get; set; }
     public string? DiagnosticEtiologic { get; set; }
