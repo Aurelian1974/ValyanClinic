@@ -22,6 +22,7 @@ CREATE PROCEDURE [dbo].[ConsultatieAntecedente_Upsert]
     @IstoricFamilial NVARCHAR(MAX) = NULL,
     @TratamentAnterior NVARCHAR(MAX) = NULL,
     @FactoriDeRisc NVARCHAR(MAX) = NULL,
+    @Alergii NVARCHAR(MAX) = NULL,
     @ModificatDe UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -38,6 +39,7 @@ BEGIN
                 [IstoricFamilial] = @IstoricFamilial,
                 [TratamentAnterior] = @TratamentAnterior,
                 [FactoriDeRisc] = @FactoriDeRisc,
+                [Alergii] = @Alergii,
                 [DataUltimeiModificari] = GETDATE(),
                 [ModificatDe] = @ModificatDe
             WHERE [ConsultatieID] = @ConsultatieID;
@@ -48,14 +50,14 @@ BEGIN
             (
                 [Id], [ConsultatieID],
                 [IstoricMedicalPersonal], [IstoricFamilial],
-                [TratamentAnterior], [FactoriDeRisc],
+                [TratamentAnterior], [FactoriDeRisc], [Alergii],
                 [DataCreare], [CreatDe]
             )
             VALUES
             (
                 NEWID(), @ConsultatieID,
                 @IstoricMedicalPersonal, @IstoricFamilial,
-                @TratamentAnterior, @FactoriDeRisc,
+                @TratamentAnterior, @FactoriDeRisc, @Alergii,
                 GETDATE(), @ModificatDe
             );
         END

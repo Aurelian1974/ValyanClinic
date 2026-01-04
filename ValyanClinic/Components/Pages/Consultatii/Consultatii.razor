@@ -308,6 +308,21 @@
                                     </SfRichTextEditor>
                                 </div>
                             </div>
+
+                            <div class="form-section compact">
+                                <h4 class="section-title-sm">
+                                    <i class="fas fa-allergies"></i>
+                                    Alergii
+                                </h4>
+                                <div class="form-group rte-container">
+                                    <SfRichTextEditor @bind-Value="Alergii"
+                                                      Placeholder="Alergii cunoscute (medicamente, alimente, substanțe, etc.)..."
+                                                      ShowCharCount="true"
+                                                      EnableResize="true">
+                                        <RichTextEditorToolbarSettings Items="@RteToolbarItems" />
+                                    </SfRichTextEditor>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -825,7 +840,7 @@
     }
 </div>
 
-<!-- Scrisoare Medicală Preview Modal -->
+<!-- Scrisoare Medicală Preview Modal - Generează din datele consultației curente -->
 <ScrisoareMedicalaPreview IsVisible="@ShowScrisoarePreview"
                           OnClose="CloseScrisoarePreview"
-                          UseMockData="true" />
+                          ConsultatieData="@BuildConsultatieDetailDto()" />

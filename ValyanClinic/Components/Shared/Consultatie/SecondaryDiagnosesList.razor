@@ -7,6 +7,7 @@
     - Modern chip-based display
 *@
 @using ValyanClinic.Components.Shared.ICD10
+@using Syncfusion.Blazor.RichTextEditor
 
 <div class="secondary-diagnoses-container">
     <!-- Compact Header with inline Add button -->
@@ -122,27 +123,14 @@
                                         <span class="required-indicator">* obligatoriu</span>
                                     }
                                 </label>
-                                <textarea class="compact-textarea @(ShowValidation && string.IsNullOrWhiteSpace(diagnosis.Description) ? "invalid" : "")"
-                                          rows="2"
-                                          placeholder="Descrieți diagnosticul secundar..."
-                                          @bind="diagnosis.Description"
-                                          @bind:event="oninput"></textarea>
-                            </div>
-                            
-                            <!-- Optional Details (collapsible) -->
-                            <div class="detail-section optional">
-                                <label class="detail-label clickable" @onclick="() => _toggleOptionalDetails = !_toggleOptionalDetails" @onclick:stopPropagation>
-                                    <i class="fas fa-info-circle"></i> Detalii suplimentare
-                                    <i class="fas fa-chevron-@(_toggleOptionalDetails ? "up" : "down") toggle-icon"></i>
-                                </label>
-                                @if (_toggleOptionalDetails)
-                                {
-                                    <textarea class="compact-textarea"
-                                              rows="2"
-                                              placeholder="Observații, evoluție, severitate..."
-                                              value="@diagnosis.AdditionalDetails"
-                                              @oninput="(e) => HandleDetailsInput(diagnosis, e)"></textarea>
-                                }
+                                <div class="rte-container">
+                                    <SfRichTextEditor @bind-Value="diagnosis.Description"
+                                                      Placeholder="Descrieți diagnosticul secundar..."
+                                                      ShowCharCount="true"
+                                                      EnableResize="true">
+                                        <RichTextEditorToolbarSettings Items="@_rteTools" />
+                                    </SfRichTextEditor>
+                                </div>
                             </div>
                         </div>
                     }

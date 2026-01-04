@@ -398,6 +398,64 @@
     background: #fef2f2;
 }
 
+/* Rich Text Editor Container - same as Anamneza */
+.rte-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 120px;
+}
+
+.rte-container ::deep .e-richtexteditor {
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--input-background);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.rte-container ::deep .e-richtexteditor:hover {
+    border-color: var(--primary-color-light);
+}
+
+.rte-container ::deep .e-richtexteditor.e-focused {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.rte-container ::deep .e-toolbar {
+    border-bottom: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+}
+
+.rte-container ::deep .e-rte-content {
+    background: var(--input-background);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    flex: 1;
+    min-height: 60px;
+}
+
+.rte-container ::deep .e-content {
+    padding: var(--spacing-sm);
+    min-height: 60px;
+}
+
+.rte-container ::deep .e-rte-placeholder {
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+.rte-container ::deep .e-rte-character-count {
+    font-size: 11px;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    border-top: 1px solid var(--border-color);
+    background: #f8fafc;
+}
+
 /* ==================== Limit Indicator ==================== */
 .limit-indicator {
     display: flex;

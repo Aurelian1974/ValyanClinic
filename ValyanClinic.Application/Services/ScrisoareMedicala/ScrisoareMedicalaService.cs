@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
@@ -72,16 +73,16 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             PacientSex = consultatie.PacientSex,
             PacientTelefon = consultatie.PacientTelefon,
 
-            // Motiv prezentare
-            MotivPrezentare = consultatie.MotivPrezentare,
-            IstoricBoalaActuala = consultatie.IstoricBoalaActuala,
+            // Motiv prezentare - Sanitize HTML (păstrează formatarea bold/italic)
+            MotivPrezentare = SanitizeHtml(consultatie.MotivPrezentare),
+            IstoricBoalaActuala = SanitizeHtml(consultatie.IstoricBoalaActuala),
 
-            // Antecedente (SIMPLIFIED)
-            AntecendenteHeredoColaterale = consultatie.IstoricFamilial ?? "Fără antecedente semnificative.",
-            AntecendentePatologicePersonale = consultatie.IstoricMedicalPersonal ?? "Fără antecedente patologice semnificative.",
-            Alergii = consultatie.PacientAlergii,
-            MedicatieCronicaAnterioara = null, // No longer tracked separately
-            FactoriDeRisc = null, // No longer tracked separately
+            // Antecedente (SIMPLIFIED) - Sanitize HTML (păstrează formatarea bold/italic)
+            AntecendenteHeredoColaterale = SanitizeHtml(consultatie.IstoricFamilial) ?? "Fără antecedente semnificative.",
+            AntecendentePatologicePersonale = SanitizeHtml(consultatie.IstoricMedicalPersonal) ?? "Fără antecedente patologice semnificative.",
+            Alergii = SanitizeHtml(consultatie.PacientAlergii),
+            MedicatieCronicaAnterioara = SanitizeHtml(consultatie.TratamentAnterior), // ✅ MAPPED from TratamentAnterior (Antecedente)
+            FactoriDeRisc = SanitizeHtml(consultatie.FactoriDeRisc), // ✅ MAPPED from FactoriDeRisc (Antecedente)
 
             // Examen clinic
             StareGenerala = consultatie.StareGenerala,
@@ -110,6 +111,25 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
 
             // Recomandări
             Recomandari = ParseRecomandari(consultatie),
+
+            // ✅ Anexa 43 - Checkbox fields
+            EsteAfectiuneOncologica = consultatie.EsteAfectiuneOncologica,
+            DetaliiAfectiuneOncologica = consultatie.DetaliiAfectiuneOncologica,
+            AreIndicatieInternare = consultatie.AreIndicatieInternare,
+            TermenInternare = consultatie.TermenInternare,
+            SaEliberatPrescriptie = consultatie.SaEliberatPrescriptie ?? false,
+            SeriePrescriptie = consultatie.SeriePrescriptie,
+            NuSaEliberatPrescriptieNuAFostNecesar = !(consultatie.SaEliberatPrescriptie ?? false),
+            SaEliberatConcediuMedical = consultatie.SaEliberatConcediuMedical ?? false,
+            SerieConcediuMedical = consultatie.SerieConcediuMedical,
+            NuSaEliberatConcediuNuAFostNecesar = !(consultatie.SaEliberatConcediuMedical ?? false),
+            SaEliberatRecomandareIngrijiriDomiciliu = consultatie.SaEliberatIngrijiriDomiciliu ?? false,
+            NuSaEliberatIngrijiriNuAFostNecesar = !(consultatie.SaEliberatIngrijiriDomiciliu ?? false),
+            SaEliberatPrescriptieDispozitive = consultatie.SaEliberatDispozitiveMedicale ?? false,
+            NuSaEliberatDispozitiveNuAFostNecesar = !(consultatie.SaEliberatDispozitiveMedicale ?? false),
+            TransmiterePrinEmail = consultatie.TransmiterePrinEmail,
+            EmailTransmitere = consultatie.EmailTransmitere,
+            TransmiterePrinAsigurat = !consultatie.TransmiterePrinEmail,
 
             // Medic
             MedicId = consultatie.MedicID,
@@ -391,6 +411,44 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             recomandari.Add($"Control la data de {consultatie.DataUrmatoareiProgramari}");
 
         return recomandari;
+    }
+
+    /// <summary>
+    /// Sanitizează HTML-ul păstrând tag-urile de formatare (bold, italic, underline)
+    /// și listele (bullet list, numbered list)
+    /// Folosit pentru afișarea în Scrisoarea Medicală cu formatare
+    /// </summary>
+    private static string? SanitizeHtml(string? html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+            return html;
+
+        // Tag-uri permise: formatare + liste (vor fi păstrate)
+        // strong, b, em, i, u, s, sub, sup, mark, ul, ol, li
+        
+        // Înlocuiește <br>, <br/>, <br /> cu <br/>
+        var result = Regex.Replace(html, @"<br\s*/?>", "<br/>", RegexOptions.IgnoreCase);
+        
+        // Înlocuiește </p>, </div> cu <br/> pentru a păstra separarea (dar NU </li>)
+        result = Regex.Replace(result, @"</(?:p|div)>", "<br/>", RegexOptions.IgnoreCase);
+        
+        // Elimină tag-urile de deschidere pentru p, div, span (dar păstrează ul, ol, li)
+        result = Regex.Replace(result, @"<(?:p|div|span)[^>]*>", string.Empty, RegexOptions.IgnoreCase);
+        
+        // Elimină tag-urile de închidere pentru span
+        result = Regex.Replace(result, @"</span>", string.Empty, RegexOptions.IgnoreCase);
+        
+        // Decodează entitățile HTML comune
+        result = result.Replace("&nbsp;", " ");
+        
+        // Curăță <br/> multiple consecutive
+        result = Regex.Replace(result, @"(<br\s*/?>\s*){3,}", "<br/><br/>", RegexOptions.IgnoreCase);
+        
+        // Elimină <br/> de la început și sfârșit
+        result = Regex.Replace(result, @"^(\s*<br\s*/?>\s*)+", string.Empty, RegexOptions.IgnoreCase);
+        result = Regex.Replace(result, @"(\s*<br\s*/?>\s*)+$", string.Empty, RegexOptions.IgnoreCase);
+        
+        return result.Trim();
     }
 
     #endregion

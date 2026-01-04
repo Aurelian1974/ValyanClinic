@@ -134,7 +134,8 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
             if (!string.IsNullOrWhiteSpace(request.IstoricMedicalPersonal) ||
                 !string.IsNullOrWhiteSpace(request.IstoricFamilial) ||
                 !string.IsNullOrWhiteSpace(request.TratamentAnterior) ||
-                !string.IsNullOrWhiteSpace(request.FactoriDeRisc))
+                !string.IsNullOrWhiteSpace(request.FactoriDeRisc) ||
+                !string.IsNullOrWhiteSpace(request.Alergii))
             {
                 await _repository.UpsertAntecedenteAsync(consultatieId, new ConsultatieAntecedente
                 {
@@ -143,6 +144,7 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                     IstoricFamilial = request.IstoricFamilial,
                     TratamentAnterior = request.TratamentAnterior,
                     FactoriDeRisc = request.FactoriDeRisc,
+                    Alergii = request.Alergii,
                     CreatDe = request.CreatDeSauModificatDe,
                     DataCreare = DateTime.Now,
                     DataUltimeiModificari = DateTime.Now

@@ -38,6 +38,12 @@ public class ConsultatieAntecedente
     /// </summary>
     public string? FactoriDeRisc { get; set; }
 
+    /// <summary>
+    /// Alergii cunoscute (medicamente, alimente, substanțe, etc.)
+    /// Conform Scrisoare Medicală Anexa 43
+    /// </summary>
+    public string? Alergii { get; set; }
+
     // ==================== AUDIT ====================
     public DateTime DataCreare { get; set; }
     public Guid CreatDe { get; set; }

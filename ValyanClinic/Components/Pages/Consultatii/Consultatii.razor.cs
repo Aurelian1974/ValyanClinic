@@ -190,6 +190,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     // Câmpuri noi conform Scrisoare Medicală (Anexa 43)
     private string TratamentAnterior { get; set; } = string.Empty;
     private string FactoriDeRisc { get; set; } = string.Empty;
+    private string Alergii { get; set; } = string.Empty;
 
     /// <summary>
     /// Toolbar items pentru Rich Text Editor - compact pentru uz medical
@@ -457,6 +458,11 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         IstoricBoalaActuala = consultatie.IstoricBoalaActuala ?? string.Empty;
         IstoricMedicalPersonal = consultatie.IstoricMedicalPersonal ?? string.Empty;
         IstoricFamilial = consultatie.IstoricFamilial ?? string.Empty;
+        
+        // Tab 1: Anamneză - Câmpuri noi Anexa 43 (din ConsultatieAntecedente)
+        TratamentAnterior = consultatie.TratamentAnterior ?? string.Empty;
+        FactoriDeRisc = consultatie.FactoriDeRisc ?? string.Empty;
+        Alergii = consultatie.Alergii ?? consultatie.PacientAlergii ?? string.Empty;
 
         // Tab 2: Semne Vitale
         Greutate = consultatie.Greutate;
@@ -627,6 +633,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 IstoricFamilial = string.IsNullOrWhiteSpace(IstoricFamilial) ? null : IstoricFamilial,
                 TratamentAnterior = string.IsNullOrWhiteSpace(TratamentAnterior) ? null : TratamentAnterior,
                 FactoriDeRisc = string.IsNullOrWhiteSpace(FactoriDeRisc) ? null : FactoriDeRisc,
+                Alergii = string.IsNullOrWhiteSpace(Alergii) ? null : Alergii,
                 
                 // Tab 2: Semne Vitale
                 Greutate = Greutate,
@@ -767,6 +774,105 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     {
         ShowScrisoarePreview = false;
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// Construiește un ConsulatieDetailDto din datele curente ale formularului
+    /// pentru generarea Scrisorii Medicale (Anexa 43)
+    /// </summary>
+    private ConsulatieDetailDto BuildConsultatieDetailDto()
+    {
+        return new ConsulatieDetailDto
+        {
+            // Primary keys
+            ConsultatieID = ConsultatieId ?? Guid.NewGuid(),
+            ProgramareID = ProgramareId,
+            PacientID = PacientId ?? Guid.Empty,
+            MedicID = CurrentMedicId,
+
+            // Date consultație
+            DataConsultatie = DateTime.Now,
+            OraConsultatie = TimeSpan.FromHours(DateTime.Now.Hour).Add(TimeSpan.FromMinutes(DateTime.Now.Minute)),
+            TipConsultatie = "Consultație",
+
+            // Informații pacient (din PacientData)
+            PacientNumeComplet = PacientData?.NumeComplet ?? string.Empty,
+            PacientCNP = PacientData?.CNP,
+            PacientDataNasterii = PacientData?.Data_Nasterii,
+            PacientSex = PacientData?.Sex,
+            PacientTelefon = PacientData?.Telefon,
+            PacientAlergii = !string.IsNullOrEmpty(Alergii) ? Alergii : PacientData?.Alergii, // Preferă alergiile din consultație, fallback la profil
+
+            // I. Motive prezentare
+            MotivPrezentare = MotivPrezentare,
+            IstoricBoalaActuala = IstoricBoalaActuala,
+
+            // II. Antecedente
+            IstoricMedicalPersonal = IstoricMedicalPersonal,
+            IstoricFamilial = IstoricFamilial,
+            TratamentAnterior = TratamentAnterior,
+            FactoriDeRisc = FactoriDeRisc,
+
+            // III.A. Examen general
+            StareGenerala = StareGenerala,
+            Tegumente = Tegumente,
+            Mucoase = Mucoase,
+            Edeme = Edeme,
+
+            // III.B. Semne vitale
+            Greutate = Greutate,
+            Inaltime = Inaltime,
+            IMC = IMC,
+            Temperatura = Temperatura,
+            TensiuneArteriala = TensiuneSistolica.HasValue && TensiuneDiastolica.HasValue 
+                ? $"{TensiuneSistolica}/{TensiuneDiastolica}" 
+                : null,
+            Puls = Puls,
+            FreccventaRespiratorie = FreqventaRespiratorie,
+            SaturatieO2 = SpO2,
+
+            // III.C. Examen obiectiv
+            ExamenCardiovascular = ExamenObiectiv,
+            
+            // IV. Investigații
+            AlteInvestigatii = InvestigatiiParaclinice,
+
+            // V. Diagnostic
+            DiagnosticPozitiv = DiagnosticPrincipal,
+            CoduriICD10 = DiagnosisList.FirstOrDefault(d => d.IsPrincipal)?.Code,
+            CoduriICD10Secundare = string.Join("; ", DiagnosisList
+                .Where(d => !d.IsPrincipal)
+                .Select(d => $"{d.Code} - {d.Name}")),
+
+            // VI. Tratament
+            TratamentMedicamentos = PlanTerapeutic,
+            
+            // VII. Recomandări
+            RecomandariRegimViata = Recomandari,
+            DataUrmatoareiProgramari = DataUrmatoareiVizite?.ToString("dd.MM.yyyy"),
+            RecomandariSupraveghere = NoteUrmatoareaVizita,
+
+            // VIII. Concluzie
+            Concluzie = Concluzii,
+
+            // IX. Anexa 43 - Checkbox fields
+            EsteAfectiuneOncologica = EsteAfectiuneOncologica,
+            AreIndicatieInternare = AreIndicatieInternare,
+            SaEliberatPrescriptie = SaEliberatPrescriptie,
+            SeriePrescriptie = SeriePrescriptie,
+            SaEliberatConcediuMedical = SaEliberatConcediuMedical,
+            SerieConcediuMedical = SerieConcediuMedical,
+            SaEliberatIngrijiriDomiciliu = SaEliberatIngrijiriDomiciliu,
+            SaEliberatDispozitiveMedicale = SaEliberatDispozitiveMedicale,
+            TransmiterePrinEmail = TransmiterePrinEmail,
+            EmailTransmitere = EmailTransmitere,
+
+            // Status
+            Status = "In desfasurare",
+            DurataMinute = (int)ElapsedTime.TotalMinutes,
+            DataCreare = DateTime.Now,
+            CreatDe = CurrentUserId
+        };
     }
 
     private void MarkFormAsDirty()

@@ -10,65 +10,31 @@
         <h4>Diagnostic & Tratament</h4>
     </div>
     
-    <!-- ==================== SECȚIUNEA 1: DIAGNOSTIC PRINCIPAL (SIMPLIFICAT) ==================== -->
-    
-    <div class="form-section">
-        <PrimaryDiagnosisSelector @bind-SelectedCode="PrimaryDiagnosisCode"
-                                  @bind-DiagnosisDetails="PrimaryDiagnosisDetails"
-                                  CurrentUserId="@CurrentUserId"
-                                  ShowValidation="@ShowValidation"
-                                  OnChanged="@OnFieldChanged" />
-    </div>
-
-    <!-- ==================== SECȚIUNEA 2: DIAGNOSTICE SECUNDARE (MAX 10) ==================== -->
-    
-    <div class="form-section">
-        <SecondaryDiagnosesList @bind-SecondaryDiagnoses="SecondaryDiagnosesList"
-                                CurrentUserId="@CurrentUserId"
-                                ShowValidation="@ShowValidation"
-                                OnChanged="@OnFieldChanged" />
-    </div>
-    
-    <!-- ==================== SECȚIUNEA 3: DIAGNOSTICE TEXTUALE (OPȚIONALE) ==================== -->
-    
-    <div class="form-section">
-        <div class="section-subtitle">
-            <i class="fas fa-notes-medical"></i>
-            <h5>Diagnostice Descriptive (Opționale)</h5>
+    <!-- ==================== DIAGNOSTICE - 2 COLOANE ==================== -->
+    <div class="diagnostics-two-columns">
+        <!-- COLOANA STÂNGA: DIAGNOSTIC PRINCIPAL -->
+        <div class="diagnostic-column primary-column">
+            <div class="form-section">
+                <PrimaryDiagnosisSelector @bind-SelectedCode="PrimaryDiagnosisCode"
+                                          @bind-DiagnosisDetails="PrimaryDiagnosisDetails"
+                                          CurrentUserId="@CurrentUserId"
+                                          ShowValidation="@ShowValidation"
+                                          OnChanged="@OnFieldChanged" />
+            </div>
         </div>
         
-        @* Diagnostic Diferențial *@
-        <div class="form-group">
-            <label class="form-label">
-                Diagnostic diferențial
-            </label>
-            <textarea class="form-control" 
-                      rows="3"
-                      placeholder="Liste diagnostice alternative care trebuie excluse..."
-                      value="@Model.DiagnosticDiferential"
-                      @oninput="(e) => Model.DiagnosticDiferential = e.Value?.ToString()">
-            </textarea>
-            <small class="form-text text-muted">
-                <i class="fas fa-info-circle"></i>
-                Diagnostice cu simptomatologie similară care trebuie luate în considerare
-            </small>
-        </div>
-    
-        @* Diagnostic Etiologic *@
-        <div class="form-group">
-            <label class="form-label">
-                Diagnostic etiologic
-            </label>
-            <textarea class="form-control" 
-                      rows="2"
-                      placeholder="Cauza bolii (ex: infecțioasă, traumatică, genetică...)..."
-                      value="@Model.DiagnosticEtiologic"
-                      @oninput="(e) => Model.DiagnosticEtiologic = e.Value?.ToString()">
-            </textarea>
+        <!-- COLOANA DREAPTA: DIAGNOSTICE SECUNDARE -->
+        <div class="diagnostic-column secondary-column">
+            <div class="form-section">
+                <SecondaryDiagnosesList @bind-SecondaryDiagnoses="SecondaryDiagnosesList"
+                                        CurrentUserId="@CurrentUserId"
+                                        ShowValidation="@ShowValidation"
+                                        OnChanged="@OnFieldChanged" />
+            </div>
         </div>
     </div>
 
-    <!-- ==================== SECȚIUNEA 4: TRATAMENT - MEDICAMENTE PRESCRISE ==================== -->
+    <!-- ==================== SECȚIUNEA 3: TRATAMENT - MEDICAMENTE PRESCRISE ==================== -->
     
     <MedicationList @bind-Medications="MedicationsList"
                     ShowValidation="@ShowValidation"

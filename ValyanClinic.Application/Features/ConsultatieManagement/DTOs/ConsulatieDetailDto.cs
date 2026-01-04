@@ -39,6 +39,12 @@ public class ConsulatieDetailDto
     public string? IstoricMedicalPersonal { get; set; }
     /// <summary>Istoric familial - antecedente heredocolaterale</summary>
     public string? IstoricFamilial { get; set; }
+    /// <summary>Tratament anterior și cronic - Scrisoare Medicală Anexa 43</summary>
+    public string? TratamentAnterior { get; set; }
+    /// <summary>Factori de risc - Scrisoare Medicală Anexa 43</summary>
+    public string? FactoriDeRisc { get; set; }
+    /// <summary>Alergii cunoscute - Scrisoare Medicală Anexa 43</summary>
+    public string? Alergii { get; set; }
 
     // ==================== III.A. EXAMEN GENERAL ====================
     public string? StareGenerala { get; set; }

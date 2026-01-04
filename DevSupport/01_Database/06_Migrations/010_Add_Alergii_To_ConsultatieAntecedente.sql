@@ -1,25 +1,126 @@
 /*
 ==============================================================================
-STORED PROCEDURE: sp_Consultatie_GetDraftByPacient
+MIGRATION: 010_Add_Alergii_To_ConsultatieAntecedente
 ==============================================================================
-Description: Get draft consultation with all normalized sections by PacientID
+Description: Adds Alergii column to ConsultatieAntecedente table for 
+             Scrisoare Medicală Anexa 43 compliance.
+             Also updates stored procedures for UPSERT and GET.
 Author: AI Agent
-Date: 2026-01-02
-Version: 1.0
-
-Usage:
-    EXEC sp_Consultatie_GetDraftByPacient
-        @PacientID = '...',
-        @MedicID = '...',
-        @DataConsultatie = '2026-01-02',
-        @ProgramareID = '...'
+Date: 2026-01-04
+Database: ValyanMed
 ==============================================================================
 */
 
 USE [ValyanMed]
 GO
 
-PRINT 'Creating sp_Consultatie_GetDraftByPacient...'
+PRINT '========================================';
+PRINT 'Migration: Add Alergii column';
+PRINT 'Date: 2026-01-04';
+PRINT '========================================';
+PRINT '';
+
+-- =============================================
+-- 1. Add Alergii column to ConsultatieAntecedente
+-- =============================================
+PRINT '1. Adding Alergii column to ConsultatieAntecedente...';
+
+IF NOT EXISTS (
+    SELECT * FROM INFORMATION_SCHEMA.COLUMNS 
+    WHERE TABLE_NAME = 'ConsultatieAntecedente' 
+    AND COLUMN_NAME = 'Alergii'
+)
+BEGIN
+    ALTER TABLE [dbo].[ConsultatieAntecedente]
+    ADD [Alergii] NVARCHAR(MAX) NULL;
+    
+    PRINT '   ✓ Coloana Alergii adăugată cu succes';
+END
+ELSE
+BEGIN
+    PRINT '   → Coloana Alergii există deja';
+END
+GO
+
+-- =============================================
+-- 2. Update ConsultatieAntecedente_Upsert stored procedure
+-- =============================================
+PRINT '';
+PRINT '2. Updating ConsultatieAntecedente_Upsert stored procedure...';
+
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'ConsultatieAntecedente_Upsert')
+    DROP PROCEDURE [dbo].[ConsultatieAntecedente_Upsert]
+GO
+
+CREATE PROCEDURE [dbo].[ConsultatieAntecedente_Upsert]
+    @ConsultatieID UNIQUEIDENTIFIER,
+    @IstoricMedicalPersonal NVARCHAR(MAX) = NULL,
+    @IstoricFamilial NVARCHAR(MAX) = NULL,
+    @TratamentAnterior NVARCHAR(MAX) = NULL,
+    @FactoriDeRisc NVARCHAR(MAX) = NULL,
+    @Alergii NVARCHAR(MAX) = NULL,
+    @ModificatDe UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        
+        IF EXISTS (SELECT 1 FROM [dbo].[ConsultatieAntecedente] WHERE [ConsultatieID] = @ConsultatieID)
+        BEGIN
+            UPDATE [dbo].[ConsultatieAntecedente]
+            SET 
+                [IstoricMedicalPersonal] = @IstoricMedicalPersonal,
+                [IstoricFamilial] = @IstoricFamilial,
+                [TratamentAnterior] = @TratamentAnterior,
+                [FactoriDeRisc] = @FactoriDeRisc,
+                [Alergii] = @Alergii,
+                [DataUltimeiModificari] = GETDATE(),
+                [ModificatDe] = @ModificatDe
+            WHERE [ConsultatieID] = @ConsultatieID;
+        END
+        ELSE
+        BEGIN
+            INSERT INTO [dbo].[ConsultatieAntecedente]
+            (
+                [Id], [ConsultatieID],
+                [IstoricMedicalPersonal], [IstoricFamilial],
+                [TratamentAnterior], [FactoriDeRisc], [Alergii],
+                [DataCreare], [CreatDe]
+            )
+            VALUES
+            (
+                NEWID(), @ConsultatieID,
+                @IstoricMedicalPersonal, @IstoricFamilial,
+                @TratamentAnterior, @FactoriDeRisc, @Alergii,
+                GETDATE(), @ModificatDe
+            );
+        END
+        
+        UPDATE [dbo].[Consultatii]
+        SET [DataUltimeiModificari] = GETDATE(), [ModificatDe] = @ModificatDe
+        WHERE [ConsultatieID] = @ConsultatieID;
+        
+        COMMIT TRANSACTION;
+        
+        SELECT * FROM [dbo].[ConsultatieAntecedente] WHERE [ConsultatieID] = @ConsultatieID;
+        
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
+
+PRINT '   ✓ ConsultatieAntecedente_Upsert actualizat cu succes';
+
+-- =============================================
+-- 3. Update sp_Consultatie_GetDraftByPacient stored procedure
+-- =============================================
+PRINT '';
+PRINT '3. Updating sp_Consultatie_GetDraftByPacient stored procedure...';
 
 IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'sp_Consultatie_GetDraftByPacient')
     DROP PROCEDURE sp_Consultatie_GetDraftByPacient;
@@ -53,7 +154,7 @@ BEGIN
             mp.DataUltimeiModificari AS MotivePrezentare_DataUltimeiModificari,
             mp.ModificatDe AS MotivePrezentare_ModificatDe,
             
-            -- ConsultatieAntecedente (1:1) - SIMPLIFIED STRUCTURE
+            -- ConsultatieAntecedente (1:1) - SIMPLIFIED STRUCTURE with Alergii
             ant.Id AS Antecedente_Id,
             ant.IstoricMedicalPersonal AS Antecedente_IstoricMedicalPersonal,
             ant.IstoricFamilial AS Antecedente_IstoricFamilial,
@@ -150,26 +251,19 @@ BEGIN
             conc.ModificatDe AS Concluzii_ModificatDe
             
         FROM Consultatii c
-        LEFT JOIN ConsultatieMotivePrezentare mp ON c.ConsultatieID = mp.ConsultatieID
-        LEFT JOIN ConsultatieAntecedente ant ON c.ConsultatieID = ant.ConsultatieID
-        LEFT JOIN ConsultatieExamenObiectiv exo ON c.ConsultatieID = exo.ConsultatieID
-        LEFT JOIN ConsultatieInvestigatii inv ON c.ConsultatieID = inv.ConsultatieID
-        LEFT JOIN ConsultatieDiagnostic diag ON c.ConsultatieID = diag.ConsultatieID
-        LEFT JOIN ConsultatieTratament trat ON c.ConsultatieID = trat.ConsultatieID
-        LEFT JOIN ConsultatieConcluzii conc ON c.ConsultatieID = conc.ConsultatieID
-        
-        WHERE 
-          -- When ProgramareID is provided, use it as primary filter (ignore PacientID)
-          (
-              (@ProgramareID IS NOT NULL AND c.ProgramareID = @ProgramareID)
-              OR 
-              (@ProgramareID IS NULL AND c.PacientID = @PacientID)
-          )
-          AND c.[Status] NOT IN ('Finalizata', 'Anulata')
-          AND (@MedicID IS NULL OR c.MedicID = @MedicID)
-        
+        LEFT JOIN ConsultatieMotivePrezentare mp ON mp.ConsultatieID = c.ConsultatieID
+        LEFT JOIN ConsultatieAntecedente ant ON ant.ConsultatieID = c.ConsultatieID
+        LEFT JOIN ConsultatieExamenObiectiv exo ON exo.ConsultatieID = c.ConsultatieID
+        LEFT JOIN ConsultatieInvestigatii inv ON inv.ConsultatieID = c.ConsultatieID
+        LEFT JOIN ConsultatieDiagnostic diag ON diag.ConsultatieID = c.ConsultatieID
+        LEFT JOIN ConsultatieTratament trat ON trat.ConsultatieID = c.ConsultatieID
+        LEFT JOIN ConsultatieConcluzii conc ON conc.ConsultatieID = c.ConsultatieID
+        WHERE c.PacientID = @PacientID
+            AND (@MedicID IS NULL OR c.MedicID = @MedicID)
+            AND (@ProgramareID IS NULL OR c.ProgramareID = @ProgramareID)
+            AND c.[Status] NOT IN ('Finalizata', 'Anulata')
         ORDER BY c.DataCreare DESC;
-          
+        
     END TRY
     BEGIN CATCH
         THROW;
@@ -177,5 +271,15 @@ BEGIN
 END
 GO
 
-PRINT '✓ sp_Consultatie_GetDraftByPacient created successfully'
+PRINT '   ✓ sp_Consultatie_GetDraftByPacient actualizat cu succes';
+
+-- =============================================
+-- Migration Complete
+-- =============================================
+PRINT '';
+PRINT '========================================';
+PRINT 'Migration completă!';
+PRINT '- Coloana Alergii adăugată în ConsultatieAntecedente';
+PRINT '- Stored procedures actualizate';
+PRINT '========================================';
 GO

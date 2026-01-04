@@ -102,7 +102,7 @@
                 <div class="section">
                     <h2 class="section-title"><i class="fas fa-comment-medical"></i> Motivele Prezentării</h2>
                     <div class="section-content">
-                        <p>@Model.MotivPrezentare</p>
+                        <p>@((MarkupString)(Model.MotivPrezentare ?? ""))</p>
                     </div>
                 </div>
 
@@ -159,23 +159,23 @@
                     <div class="section-content">
                         <div class="subsection">
                             <div class="subsection-title">Antecedente Heredocolaterale:</div>
-                            <div class="subsection-content">@Model.AntecendenteHeredoColaterale</div>
+                            <div class="subsection-content">@((MarkupString)(Model.AntecendenteHeredoColaterale ?? ""))</div>
                         </div>
                         <div class="subsection">
                             <div class="subsection-title">Antecedente Patologice Personale:</div>
-                            <div class="subsection-content">@Model.AntecendentePatologicePersonale</div>
+                            <div class="subsection-content">@((MarkupString)(Model.AntecendentePatologicePersonale ?? ""))</div>
                         </div>
                         <div class="subsection">
                             <div class="subsection-title">Alergii:</div>
-                            <div class="subsection-content">@(Model.Alergii ?? "Nu sunt cunoscute.")</div>
+                            <div class="subsection-content">@((MarkupString)(Model.Alergii ?? "Nu sunt cunoscute."))</div>
                         </div>
                         <div class="subsection">
                             <div class="subsection-title">Medicație Cronică Anterioară:</div>
-                            <div class="subsection-content">@(Model.MedicatieCronicaAnterioara ?? "Nu există.")</div>
+                            <div class="subsection-content">@((MarkupString)(Model.MedicatieCronicaAnterioara ?? "Nu există."))</div>
                         </div>
                         <div class="subsection">
                             <div class="subsection-title">Factori de Risc:</div>
-                            <div class="subsection-content">@(Model.FactoriDeRisc ?? "Nu au fost identificați.")</div>
+                            <div class="subsection-content">@((MarkupString)(Model.FactoriDeRisc ?? "Nu au fost identificați."))</div>
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using ValyanClinic.Domain.Entities;
@@ -209,7 +209,7 @@ public class ConsultatieRepository : IConsultatieRepository
                 };
             }
 
-            // Map ConsultatieAntecedente (Simplified)
+            // Map ConsultatieAntecedente (Simplified + Anexa 43)
             if (row.Antecedente_Id != null)
             {
                 consultatie.Antecedente = new ConsultatieAntecedente
@@ -218,6 +218,9 @@ public class ConsultatieRepository : IConsultatieRepository
                     ConsultatieID = consultatie.ConsultatieID,
                     IstoricMedicalPersonal = row.Antecedente_IstoricMedicalPersonal,
                     IstoricFamilial = row.Antecedente_IstoricFamilial,
+                    TratamentAnterior = row.Antecedente_TratamentAnterior,
+                    FactoriDeRisc = row.Antecedente_FactoriDeRisc,
+                    Alergii = row.Antecedente_Alergii,
                     DataCreare = row.Antecedente_DataCreare,
                     CreatDe = row.Antecedente_CreatDe,
                     DataUltimeiModificari = row.Antecedente_DataUltimeiModificari,
@@ -559,7 +562,7 @@ public class ConsultatieRepository : IConsultatieRepository
                 };
             }
 
-            // Map ConsultatieAntecedente (Simplified)
+            // Map ConsultatieAntecedente (Simplified + Anexa 43)
             if (row.Antecedente_Id != null)
             {
                 consultatie.Antecedente = new ConsultatieAntecedente
@@ -568,6 +571,9 @@ public class ConsultatieRepository : IConsultatieRepository
                     ConsultatieID = consultatie.ConsultatieID,
                     IstoricMedicalPersonal = row.Antecedente_IstoricMedicalPersonal,
                     IstoricFamilial = row.Antecedente_IstoricFamilial,
+                    TratamentAnterior = row.Antecedente_TratamentAnterior,
+                    FactoriDeRisc = row.Antecedente_FactoriDeRisc,
+                    Alergii = row.Antecedente_Alergii,
                     DataCreare = row.Antecedente_DataCreare,
                     CreatDe = row.Antecedente_CreatDe,
                     DataUltimeiModificari = row.Antecedente_DataUltimeiModificari,
@@ -755,6 +761,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@IstoricFamilial", entity.IstoricFamilial);
             parameters.Add("@TratamentAnterior", entity.TratamentAnterior);
             parameters.Add("@FactoriDeRisc", entity.FactoriDeRisc);
+            parameters.Add("@Alergii", entity.Alergii);
             parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(

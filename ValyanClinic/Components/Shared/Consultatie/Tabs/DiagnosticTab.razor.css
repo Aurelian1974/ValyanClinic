@@ -1,5 +1,42 @@
 ﻿/* DiagnosticTab.razor.css - Scoped styles */
 
+/* ==================== 2 COLUMN LAYOUT FOR DIAGNOSTICS ==================== */
+
+.diagnostics-two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.diagnostic-column {
+    min-width: 0; /* Prevent overflow */
+}
+
+.diagnostic-column .form-section {
+    height: 100%;
+    background: var(--bg-card, #FFFFFF);
+    border-radius: var(--radius-lg, 16px);
+    padding: 20px;
+    border: 1px solid var(--border, #E2E8F0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.primary-column .form-section {
+    border-left: 4px solid var(--primary-color, #3B82F6);
+}
+
+.secondary-column .form-section {
+    border-left: 4px solid var(--info, #0EA5E9);
+}
+
+@media (max-width: 1024px) {
+    .diagnostics-two-columns {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
 /* ==================== ICD10 SECTION ==================== */
 
 .icd10-section {

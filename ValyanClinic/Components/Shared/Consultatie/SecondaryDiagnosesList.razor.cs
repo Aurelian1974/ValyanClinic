@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
+using Syncfusion.Blazor.RichTextEditor;
 using ValyanClinic.Application.Features.ICD10Management.DTOs;
+using ValyanClinic.Services.Security;
 
 namespace ValyanClinic.Components.Shared.Consultatie;
 
@@ -10,6 +12,27 @@ namespace ValyanClinic.Components.Shared.Consultatie;
 public partial class SecondaryDiagnosesList : ComponentBase
 {
     [Inject] private ILogger<SecondaryDiagnosesList> Logger { get; set; } = default!;
+    [Inject] private IHtmlSanitizerService HtmlSanitizer { get; set; } = default!;
+
+    // ==================== RTE TOOLBAR - same as Anamneza ====================
+    private readonly List<ToolbarItemModel> _rteTools = new()
+    {
+        new ToolbarItemModel() { Command = ToolbarCommand.Bold },
+        new ToolbarItemModel() { Command = ToolbarCommand.Italic },
+        new ToolbarItemModel() { Command = ToolbarCommand.Underline },
+        new ToolbarItemModel() { Command = ToolbarCommand.FontColor },
+        new ToolbarItemModel() { Command = ToolbarCommand.BackgroundColor },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.FontSize },
+        new ToolbarItemModel() { Command = ToolbarCommand.LowerCase },
+        new ToolbarItemModel() { Command = ToolbarCommand.UpperCase },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.OrderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.UnorderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.Undo },
+        new ToolbarItemModel() { Command = ToolbarCommand.Redo },
+        new ToolbarItemModel() { Command = ToolbarCommand.ClearFormat }
+    };
 
     // ==================== PARAMETERS ====================
     
@@ -50,10 +73,12 @@ public partial class SecondaryDiagnosesList : ComponentBase
         }
     }
     
-    private static string TruncateText(string? text, int maxLength)
+    /// <summary>Strip HTML tags and truncate text for display</summary>
+    private string TruncateText(string? text, int maxLength)
     {
         if (string.IsNullOrEmpty(text)) return "";
-        return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
+        var plainText = HtmlSanitizer.StripHtmlTags(text);
+        return plainText.Length <= maxLength ? plainText : plainText.Substring(0, maxLength) + "...";
     }
 
     // ==================== HANDLERS ====================
@@ -132,7 +157,7 @@ public partial class SecondaryDiagnosesList : ComponentBase
     }
 
     /// <summary>Handle textarea input without causing re-render loops</summary>
-    private void HandleDetailsInput(SecondaryDiagnosis diagnosis, ChangeEventArgs e)
+    private void HandleDetailsInput(SecondaryDiagnosis diagnosis, Microsoft.AspNetCore.Components.ChangeEventArgs e)
     {
         diagnosis.AdditionalDetails = e.Value?.ToString();
         // Note: NOT calling NotifyChange() here to avoid re-render loops during typing

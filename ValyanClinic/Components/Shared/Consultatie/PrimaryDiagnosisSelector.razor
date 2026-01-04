@@ -7,6 +7,7 @@
     - Validation indicator
 *@
 @using ValyanClinic.Components.Shared.ICD10
+@using Syncfusion.Blazor.RichTextEditor
 
 <div class="primary-diagnosis-selector">
     <div class="primary-diagnosis-header">
@@ -61,42 +62,43 @@
             </button>
         </div>
 
-        <!-- Optional: Description field -->
+        <!-- Optional: Description field with Rich Text Editor -->
         <div class="diagnosis-details-field">
-            <label class="form-label">Detalii diagnostic principal (opțional)</label>
-            <div class="textarea-wrapper @GetCharacterCountClass()">
-                <textarea class="form-textarea" 
-                          rows="3" 
-                          placeholder="Descrieți detaliat diagnosticul principal..."
-                          maxlength="@MaxDetailsLength"
-                          value="@DiagnosisDetails"
-                          @oninput="HandleDetailsInput"></textarea>
-                <div class="character-counter">
-                    <span class="counter-text">@CurrentDetailsLength / @MaxDetailsLength</span>
-                </div>
+            <label class="form-label">
+                <i class="fas fa-align-left"></i> Descriere diagnostic principal
+            </label>
+            <div class="rte-container">
+                <SfRichTextEditor @bind-Value="DiagnosisDetails"
+                                  Placeholder="Descrieți detaliat diagnosticul principal..."
+                                  ShowCharCount="true"
+                                  EnableResize="true">
+                    <RichTextEditorToolbarSettings Items="@RteTools" />
+                </SfRichTextEditor>
             </div>
         </div>
     }
 </div>
 
 @code {
-    // ==================== CHARACTER COUNTER ====================
-    private const int MaxDetailsLength = 500;
-    private const double WarningThreshold = 0.8;  // 80% = galben
-    private const double DangerThreshold = 0.95;  // 95% = roșu
-
-    private int CurrentDetailsLength => DiagnosisDetails?.Length ?? 0;
-
-    private string GetCharacterCountClass()
+    // ==================== RTE TOOLBAR - same as Anamneza ====================
+    private List<ToolbarItemModel> RteTools = new List<ToolbarItemModel>()
     {
-        if (CurrentDetailsLength == 0) return "";
-        
-        double ratio = (double)CurrentDetailsLength / MaxDetailsLength;
-        
-        if (ratio >= DangerThreshold) return "counter-danger";
-        if (ratio >= WarningThreshold) return "counter-warning";
-        return "";
-    }
+        new ToolbarItemModel() { Command = ToolbarCommand.Bold },
+        new ToolbarItemModel() { Command = ToolbarCommand.Italic },
+        new ToolbarItemModel() { Command = ToolbarCommand.Underline },
+        new ToolbarItemModel() { Command = ToolbarCommand.FontColor },
+        new ToolbarItemModel() { Command = ToolbarCommand.BackgroundColor },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.FontSize },
+        new ToolbarItemModel() { Command = ToolbarCommand.LowerCase },
+        new ToolbarItemModel() { Command = ToolbarCommand.UpperCase },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.OrderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.UnorderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.Undo },
+        new ToolbarItemModel() { Command = ToolbarCommand.Redo },
+        new ToolbarItemModel() { Command = ToolbarCommand.ClearFormat }
+    };
 
     // ==================== HELPERS ====================
     private string GetCategoryIcon(string category)

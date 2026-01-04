@@ -77,6 +77,9 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                 // Tab 1: Antecedente (SIMPLIFIED) - from ConsultatieAntecedente
                 IstoricMedicalPersonal = consultatie.Antecedente?.IstoricMedicalPersonal,
                 IstoricFamilial = consultatie.Antecedente?.IstoricFamilial,
+                TratamentAnterior = consultatie.Antecedente?.TratamentAnterior,
+                FactoriDeRisc = consultatie.Antecedente?.FactoriDeRisc,
+                Alergii = consultatie.Antecedente?.Alergii,
                 
                 // Tab 2: Examen General - from ConsultatieExamenObiectiv
                 StareGenerala = consultatie.ExamenObiectiv?.StareGenerala,

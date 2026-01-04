@@ -32,6 +32,8 @@ public class SaveConsultatieDraftCommand : IRequest<Result<Guid>>
     public string? TratamentAnterior { get; set; }
     /// <summary>Factori de risc identificați (HTA, diabet, fumat, etc.) - Anexa 43</summary>
     public string? FactoriDeRisc { get; set; }
+    /// <summary>Alergii cunoscute (medicamente, alimente, substanțe) - Anexa 43</summary>
+    public string? Alergii { get; set; }
 
     // ==================== TAB 2: EXAMEN CLINIC ====================
     
