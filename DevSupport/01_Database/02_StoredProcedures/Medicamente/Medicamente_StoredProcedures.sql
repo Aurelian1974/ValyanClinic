@@ -320,7 +320,7 @@ BEGIN
         (SELECT COUNT(*) FROM [dbo].[Medicamente_Nomenclator] WHERE [Activ] = 1) AS TotalActive,
         (SELECT COUNT(*) FROM [dbo].[Medicamente_Nomenclator] WHERE [Activ] = 0) AS TotalInactive,
         (SELECT COUNT(DISTINCT [DCI]) FROM [dbo].[Medicamente_Nomenclator] WHERE [Activ] = 1) AS TotalDCI,
-        (SELECT COUNT(DISTINCT [Producator]) FROM [dbo].[Medicamente_Nomenclator] WHERE [Activ] = 1) AS TotalProducatori,
+        (SELECT COUNT(DISTINCT [FirmaTaraProducatoareAPP]) FROM [dbo].[Medicamente_Nomenclator] WHERE [Activ] = 1) AS TotalProducatori,
         (SELECT MAX([DataUltimaActualizare]) FROM [dbo].[Medicamente_Nomenclator]) AS UltimaActualizare,
         (SELECT TOP 1 [DataEnd] FROM [dbo].[Medicamente_SyncLog] WHERE [Status] = 'Success' ORDER BY [Id] DESC) AS UltimaSincronizareReusita
 END

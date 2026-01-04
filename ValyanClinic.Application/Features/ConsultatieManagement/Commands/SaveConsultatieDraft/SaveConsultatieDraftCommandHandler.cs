@@ -130,13 +130,15 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 });
             }
 
-            // 3. ConsultatieAntecedente (1:1) - condiționat
-            if (!string.IsNullOrWhiteSpace(request.APP_Medicatie))
+            // 3. ConsultatieAntecedente (1:1) - SIMPLIFIED - condiționat
+            if (!string.IsNullOrWhiteSpace(request.IstoricMedicalPersonal) ||
+                !string.IsNullOrWhiteSpace(request.IstoricFamilial))
             {
                 await _repository.UpsertAntecedenteAsync(consultatieId, new ConsultatieAntecedente
                 {
                     ConsultatieID = consultatieId,
-                    APP_Medicatie = request.APP_Medicatie,
+                    IstoricMedicalPersonal = request.IstoricMedicalPersonal,
+                    IstoricFamilial = request.IstoricFamilial,
                     CreatDe = request.CreatDeSauModificatDe,
                     DataCreare = DateTime.Now,
                     DataUltimeiModificari = DateTime.Now

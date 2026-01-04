@@ -6,6 +6,9 @@ using ValyanClinic.Infrastructure.Repositories.Interfaces;
 
 namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
 
+/// <summary>
+/// Handler pentru CreateConsultatieCommand - folosește structură normalizată cu entități separate
+/// </summary>
 public class CreateConsultatieCommandHandler : IRequestHandler<CreateConsultatieCommand, Result<Guid>>
 {
     private readonly IConsultatieRepository _repository;
@@ -36,50 +39,66 @@ public class CreateConsultatieCommandHandler : IRequestHandler<CreateConsultatie
                 return Result<Guid>.Failure("Diagnosticul pozitiv este obligatoriu");
             }
 
-            // Create entity
+            var consultatieId = Guid.NewGuid();
+            var creatDe = Guid.TryParse(request.CreatDe, out var parsedCreatDe) ? parsedCreatDe : Guid.Empty;
+
+            // Calculate IMC if possible
+            decimal? imc = null;
+            if (request.Greutate.HasValue && request.Inaltime.HasValue && request.Inaltime > 0)
+            {
+                var inaltimeMetri = request.Inaltime.Value / 100;
+                imc = Math.Round(request.Greutate.Value / (inaltimeMetri * inaltimeMetri), 2);
+            }
+
+            // 1. MASTER Entity: Consultatie (core fields only - NORMALIZED structure)
             var consultatie = new Consultatie
             {
-                ConsultatieID = Guid.NewGuid(),
+                ConsultatieID = consultatieId,
                 ProgramareID = request.ProgramareID,
                 PacientID = request.PacientID,
                 MedicID = request.MedicID,
-
                 DataConsultatie = DateTime.Now.Date,
                 OraConsultatie = DateTime.Now.TimeOfDay,
                 TipConsultatie = request.TipConsultatie,
+                Status = "Finalizata",
+                DataFinalizare = DateTime.Now,
+                DurataMinute = 0,
+                DataCreare = DateTime.Now,
+                CreatDe = creatDe
+            };
 
-                // I. Motive Prezentare
+            var createdId = await _repository.CreateAsync(consultatie, cancellationToken);
+
+            if (createdId == Guid.Empty)
+            {
+                _logger.LogWarning("[CreateConsultatieCommandHandler] Failed to create master Consultatie");
+                return Result<Guid>.Failure("Eroare la crearea consultatiei în baza de date");
+            }
+
+            // 2. ConsultatieMotivePrezentare (1:1)
+            await _repository.UpsertMotivePrezentareAsync(consultatieId, new ConsultatieMotivePrezentare
+            {
+                ConsultatieID = consultatieId,
                 MotivPrezentare = request.MotivPrezentare,
                 IstoricBoalaActuala = request.IstoricBoalaActuala,
+                CreatDe = creatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // II. Antecedente
-                AHC_Mama = request.AHC_Mama,
-                AHC_Tata = request.AHC_Tata,
-                AHC_Frati = request.AHC_Frati,
-                AHC_Bunici = request.AHC_Bunici,
-                AHC_Altele = request.AHC_Altele,
+            // 3. ConsultatieAntecedente (1:1) - SIMPLIFIED
+            await _repository.UpsertAntecedenteAsync(consultatieId, new ConsultatieAntecedente
+            {
+                ConsultatieID = consultatieId,
+                IstoricMedicalPersonal = request.IstoricMedicalPersonal,
+                IstoricFamilial = request.IstoricFamilial,
+                CreatDe = creatDe,
+                DataCreare = DateTime.Now
+            });
 
-                AF_Nastere = request.AF_Nastere,
-                AF_Dezvoltare = request.AF_Dezvoltare,
-                AF_Menstruatie = request.AF_Menstruatie,
-                AF_Sarcini = request.AF_Sarcini,
-                AF_Alaptare = request.AF_Alaptare,
-
-                APP_BoliCopilarieAdolescenta = request.APP_BoliCopilarieAdolescenta,
-                APP_BoliAdult = request.APP_BoliAdult,
-                APP_Interventii = request.APP_Interventii,
-                APP_Traumatisme = request.APP_Traumatisme,
-                APP_Transfuzii = request.APP_Transfuzii,
-                APP_Alergii = request.APP_Alergii,
-                APP_Medicatie = request.APP_Medicatie,
-
-                Profesie = request.Profesie,
-                ConditiiLocuinta = request.ConditiiLocuinta,
-                ConditiiMunca = request.ConditiiMunca,
-                ObiceiuriAlimentare = request.ObiceiuriAlimentare,
-                Toxice = request.Toxice,
-
-                // III. Examen Obiectiv
+            // 4. ConsultatieExamenObiectiv (1:1)
+            await _repository.UpsertExamenObiectivAsync(consultatieId, new ConsultatieExamenObiectiv
+            {
+                ConsultatieID = consultatieId,
                 StareGenerala = request.StareGenerala,
                 Constitutie = request.Constitutie,
                 Atitudine = request.Atitudine,
@@ -87,16 +106,15 @@ public class CreateConsultatieCommandHandler : IRequestHandler<CreateConsultatie
                 Tegumente = request.Tegumente,
                 Mucoase = request.Mucoase,
                 GangliniLimfatici = request.GangliniLimfatici,
-
                 Greutate = request.Greutate,
                 Inaltime = request.Inaltime,
+                IMC = imc,
                 Temperatura = request.Temperatura,
                 TensiuneArteriala = request.TensiuneArteriala,
                 Puls = request.Puls,
                 FreccventaRespiratorie = request.FreccventaRespiratorie,
                 SaturatieO2 = request.SaturatieO2,
                 Glicemie = request.Glicemie,
-
                 ExamenCardiovascular = request.ExamenCardiovascular,
                 ExamenRespiratoriu = request.ExamenRespiratoriu,
                 ExamenDigestiv = request.ExamenDigestiv,
@@ -107,56 +125,62 @@ public class CreateConsultatieCommandHandler : IRequestHandler<CreateConsultatie
                 ExamenORL = request.ExamenORL,
                 ExamenOftalmologic = request.ExamenOftalmologic,
                 ExamenDermatologic = request.ExamenDermatologic,
+                CreatDe = creatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // IV. Investigatii
+            // 5. ConsultatieInvestigatii (1:1)
+            await _repository.UpsertInvestigatiiAsync(consultatieId, new ConsultatieInvestigatii
+            {
+                ConsultatieID = consultatieId,
                 InvestigatiiLaborator = request.InvestigatiiLaborator,
                 InvestigatiiImagistice = request.InvestigatiiImagistice,
                 InvestigatiiEKG = request.InvestigatiiEKG,
                 AlteInvestigatii = request.AlteInvestigatii,
+                CreatDe = creatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // V. Diagnostic
+            // 6. ConsultatieDiagnostic (1:1)
+            await _repository.UpsertDiagnosticAsync(consultatieId, new ConsultatieDiagnostic
+            {
+                ConsultatieID = consultatieId,
                 DiagnosticPozitiv = request.DiagnosticPozitiv,
                 DiagnosticDiferential = request.DiagnosticDiferential,
                 DiagnosticEtiologic = request.DiagnosticEtiologic,
                 CoduriICD10 = request.CoduriICD10,
+                CoduriICD10Secundare = request.CoduriICD10Secundare,
+                CreatDe = creatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // VI. Tratament
+            // 7. ConsultatieTratament (1:1)
+            await _repository.UpsertTratamentAsync(consultatieId, new ConsultatieTratament
+            {
+                ConsultatieID = consultatieId,
                 TratamentMedicamentos = request.TratamentMedicamentos,
                 TratamentNemedicamentos = request.TratamentNemedicamentos,
                 RecomandariDietetice = request.RecomandariDietetice,
                 RecomandariRegimViata = request.RecomandariRegimViata,
-
-                // VII. Recomandari
                 InvestigatiiRecomandate = request.InvestigatiiRecomandate,
                 ConsulturiSpecialitate = request.ConsulturiSpecialitate,
                 DataUrmatoareiProgramari = request.DataUrmatoareiProgramari,
                 RecomandariSupraveghere = request.RecomandariSupraveghere,
+                CreatDe = creatDe,
+                DataCreare = DateTime.Now
+            });
 
-                // VIII. Prognostic & Concluzie
+            // 8. ConsultatieConcluzii (1:1)
+            await _repository.UpsertConcluziiAsync(consultatieId, new ConsultatieConcluzii
+            {
+                ConsultatieID = consultatieId,
                 Prognostic = request.Prognostic,
                 Concluzie = request.Concluzie,
-
-                // IX. Observatii
                 ObservatiiMedic = request.ObservatiiMedic,
                 NotePacient = request.NotePacient,
-
-                // Status
-                Status = "Finalizata",
-                DataFinalizare = DateTime.Now,
-
-                // Audit
-                DataCreare = DateTime.Now,
-                CreatDe = Guid.Parse(request.CreatDe)
-            };
-
-            // Calculate IMC if possible
-            if (consultatie.Greutate.HasValue && consultatie.Inaltime.HasValue && consultatie.Inaltime > 0)
-            {
-                var inaltimeMetri = consultatie.Inaltime.Value / 100;
-                consultatie.IMC = Math.Round(consultatie.Greutate.Value / (inaltimeMetri * inaltimeMetri), 2);
-            }
-
-            var consultatieId = await _repository.CreateAsync(consultatie, cancellationToken);
+                CreatDe = creatDe,
+                DataCreare = DateTime.Now
+            });
 
             _logger.LogInformation("[CreateConsultatieCommandHandler] Consultatie created successfully: {ConsultatieID}", consultatieId);
 

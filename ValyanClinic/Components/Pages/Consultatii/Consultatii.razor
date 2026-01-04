@@ -143,9 +143,9 @@
             <div class="tabs-header">
                 <button class="tab-btn @(ActiveTab == 1 ? "active" : "") @(IsTabCompleted(1) ? "completed" : "")"
                         @onclick="() => SwitchTab(1)"
-                        title="Motiv & Antecedente (Alt+1)">
+                        title="Anamneză (Alt+1)">
                     <i class="fas fa-comment-medical"></i>
-                    <span>Motiv & Antecedente</span>
+                    <span>Anamneză</span>
                     <span class="tab-number">1</span>
                     @if (IsTabCompleted(1))
                     {
@@ -210,57 +210,77 @@
 
             <!-- Tabs Content -->
             <div class="tabs-content">
-                <!-- Tab 1: Motiv Prezentare & Antecedente -->
+                <!-- Tab 1: Anamneză (4 câmpuri în layout 2x2) -->
                 <div class="tab-panel @(ActiveTab == 1 ? "active" : "")">
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-comment-medical"></i>
-                            Motivul Prezentării
-                        </h3>
-                        <div class="form-group">
-                            <label class="form-label required">Motivul principal al consultației</label>
-                            <textarea class="form-control"
-                                      rows="4"
-                                      placeholder="Descrieți motivul prezentării pacientului..."
-                                      maxlength="1000"
-                                      @bind="MotivPrezentare"
-                                      @bind:event="oninput"
-                                      @bind:after="MarkFormAsDirty"></textarea>
-                            <span class="char-counter">@MotivPrezentare.Length / 1000</span>
-                        </div>
-                    </div>
+                    <div class="anamneza-grid">
+                        <!-- Coloana Stânga -->
+                        <div class="anamneza-column">
+                            <div class="form-section compact">
+                                <h4 class="section-title-sm">
+                                    <i class="fas fa-comment-medical"></i>
+                                    Motiv Prezentare
+                                </h4>
+                                <div class="form-group">
+                                    <textarea class="form-control anamneza-textarea"
+                                              placeholder="Descrieți motivul prezentării pacientului la consultație..."
+                                              maxlength="2000"
+                                              @bind="MotivPrezentare"
+                                              @bind:event="oninput"
+                                              @bind:after="MarkFormAsDirty"></textarea>
+                                    <span class="char-counter">@MotivPrezentare.Length / 2000</span>
+                                </div>
+                            </div>
 
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-history"></i>
-                            Antecedente Personale Patologice
-                        </h3>
-                        <div class="form-group">
-                            <textarea class="form-control"
-                                      rows="4"
-                                      placeholder="Afecțiuni anterioare, intervenții chirurgicale..."
-                                      maxlength="2000"
-                                      @bind="AntecedentePatologice"
-                                      @bind:event="oninput"
-                                      @bind:after="MarkFormAsDirty"></textarea>
-                            <span class="char-counter">@AntecedentePatologice.Length / 2000</span>
+                            <div class="form-section compact">
+                                <h4 class="section-title-sm">
+                                    <i class="fas fa-notes-medical"></i>
+                                    Istoric Medical Personal
+                                </h4>
+                                <div class="form-group">
+                                    <textarea class="form-control anamneza-textarea"
+                                              placeholder="Boli anterioare, intervenții chirurgicale, alergii, tratamente cronice..."
+                                              maxlength="4000"
+                                              @bind="IstoricMedicalPersonal"
+                                              @bind:event="oninput"
+                                              @bind:after="MarkFormAsDirty"></textarea>
+                                    <span class="char-counter">@IstoricMedicalPersonal.Length / 4000</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-section">
-                        <h3 class="section-title">
-                            <i class="fas fa-pills"></i>
-                            Tratamente Actuale
-                        </h3>
-                        <div class="form-group">
-                            <textarea class="form-control"
-                                      rows="3"
-                                      placeholder="Medicație actuală..."
-                                      maxlength="1000"
-                                      @bind="TratamenteActuale"
-                                      @bind:event="oninput"
-                                      @bind:after="MarkFormAsDirty"></textarea>
-                            <span class="char-counter">@TratamenteActuale.Length / 1000</span>
+                        <!-- Coloana Dreapta -->
+                        <div class="anamneza-column">
+                            <div class="form-section compact">
+                                <h4 class="section-title-sm">
+                                    <i class="fas fa-history"></i>
+                                    Istoricul Bolii Prezente
+                                </h4>
+                                <div class="form-group">
+                                    <textarea class="form-control anamneza-textarea"
+                                              placeholder="Evoluția simptomelor, când au apărut, factori agravanți/amelioranți..."
+                                              maxlength="4000"
+                                              @bind="IstoricBoalaActuala"
+                                              @bind:event="oninput"
+                                              @bind:after="MarkFormAsDirty"></textarea>
+                                    <span class="char-counter">@IstoricBoalaActuala.Length / 4000</span>
+                                </div>
+                            </div>
+
+                            <div class="form-section compact">
+                                <h4 class="section-title-sm">
+                                    <i class="fas fa-users"></i>
+                                    Istoric Familial
+                                </h4>
+                                <div class="form-group">
+                                    <textarea class="form-control anamneza-textarea"
+                                              placeholder="Boli ereditare în familie (diabet, HTA, boli cardiace, cancer, etc.)..."
+                                              maxlength="4000"
+                                              @bind="IstoricFamilial"
+                                              @bind:event="oninput"
+                                              @bind:after="MarkFormAsDirty"></textarea>
+                                    <span class="char-counter">@IstoricFamilial.Length / 4000</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

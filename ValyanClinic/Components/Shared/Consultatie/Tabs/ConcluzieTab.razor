@@ -68,6 +68,201 @@
         </div>
     </div>
 
+    @* ==================== SCRISOARE MEDICALĂ - ANEXA 43 ==================== *@
+    <div class="section-card mt-3">
+        <h5 class="section-title">
+            <i class="fas fa-file-medical"></i>
+            VIII. Documente Emise (Scrisoare Medicală - Anexa 43)
+        </h5>
+        
+        @* Afecțiune Oncologică *@
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="oncologic-status-box">
+                    <label class="form-label fw-bold">Pacient diagnosticat cu afecțiune oncologică:</label>
+                    <div class="d-flex align-items-center gap-4 mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="oncologic" id="oncologicDa"
+                                   checked="@Model.EsteAfectiuneOncologica"
+                                   @onchange="() => { Model.EsteAfectiuneOncologica = true; OnFieldChanged(); }">
+                            <label class="form-check-label" for="oncologicDa">DA</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="oncologic" id="oncologicNu"
+                                   checked="@(!Model.EsteAfectiuneOncologica)"
+                                   @onchange="() => { Model.EsteAfectiuneOncologica = false; OnFieldChanged(); }">
+                            <label class="form-check-label" for="oncologicNu">NU</label>
+                        </div>
+                    </div>
+                    @if (Model.EsteAfectiuneOncologica)
+                    {
+                        <div class="mt-2">
+                            <input type="text" class="form-control" 
+                                   placeholder="Detalii afecțiune oncologică..."
+                                   @bind="Model.DetaliiAfectiuneOncologica"
+                                   @oninput="OnFieldChanged">
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Indicație Internare *@
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="document-checkbox-group">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-hospital me-2"></i>Indicație de revenire pentru internare:
+                    </label>
+                    <div class="d-flex align-items-center gap-4 mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="indicatieInternare"
+                                   checked="@Model.AreIndicatieInternare"
+                                   @onchange="(e) => { Model.AreIndicatieInternare = (bool)(e.Value ?? false); OnFieldChanged(); }">
+                            <label class="form-check-label" for="indicatieInternare">Da, revine pentru internare</label>
+                        </div>
+                        @if (Model.AreIndicatieInternare)
+                        {
+                            <input type="text" class="form-control w-auto" style="max-width: 250px;"
+                                   placeholder="Termen internare..."
+                                   @bind="Model.TermenInternare"
+                                   @oninput="OnFieldChanged">
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Prescripție Medicală *@
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="document-checkbox-group">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-prescription me-2"></i>Prescripție medicală:
+                    </label>
+                    <div class="mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="prescriptie" id="prescriptieDa"
+                                   checked="@(Model.SaEliberatPrescriptie == true)"
+                                   @onchange="() => { Model.SaEliberatPrescriptie = true; OnFieldChanged(); }">
+                            <label class="form-check-label" for="prescriptieDa">S-a eliberat prescripție medicală</label>
+                        </div>
+                        @if (Model.SaEliberatPrescriptie == true)
+                        {
+                            <input type="text" class="form-control mt-1 ms-4" style="max-width: 200px;"
+                                   placeholder="Serie prescripție..."
+                                   @bind="Model.SeriePrescriptie"
+                                   @oninput="OnFieldChanged">
+                        }
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="prescriptie" id="prescriptieNu"
+                                   checked="@(Model.SaEliberatPrescriptie == false)"
+                                   @onchange="() => { Model.SaEliberatPrescriptie = false; Model.SeriePrescriptie = null; OnFieldChanged(); }">
+                            <label class="form-check-label" for="prescriptieNu">Nu s-a eliberat (nu a fost necesar)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Concediu Medical *@
+            <div class="col-md-6">
+                <div class="document-checkbox-group">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-file-medical-alt me-2"></i>Concediu medical:
+                    </label>
+                    <div class="mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="concediu" id="concediuDa"
+                                   checked="@(Model.SaEliberatConcediuMedical == true)"
+                                   @onchange="() => { Model.SaEliberatConcediuMedical = true; OnFieldChanged(); }">
+                            <label class="form-check-label" for="concediuDa">S-a eliberat concediu medical</label>
+                        </div>
+                        @if (Model.SaEliberatConcediuMedical == true)
+                        {
+                            <input type="text" class="form-control mt-1 ms-4" style="max-width: 200px;"
+                                   placeholder="Serie și număr..."
+                                   @bind="Model.SerieConcediuMedical"
+                                   @oninput="OnFieldChanged">
+                        }
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="concediu" id="concediuNu"
+                                   checked="@(Model.SaEliberatConcediuMedical == false)"
+                                   @onchange="() => { Model.SaEliberatConcediuMedical = false; Model.SerieConcediuMedical = null; OnFieldChanged(); }">
+                            <label class="form-check-label" for="concediuNu">Nu s-a eliberat (nu a fost necesar)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Îngrijiri la Domiciliu & Dispozitive Medicale *@
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="document-checkbox-group">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-home me-2"></i>Îngrijiri medicale la domiciliu:
+                    </label>
+                    <div class="mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="ingrijiriDomiciliu"
+                                   checked="@(Model.SaEliberatIngrijiriDomiciliu == true)"
+                                   @onchange="(e) => { Model.SaEliberatIngrijiriDomiciliu = (bool)(e.Value ?? false); OnFieldChanged(); }">
+                            <label class="form-check-label" for="ingrijiriDomiciliu">S-a eliberat recomandare îngrijiri la domiciliu</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="document-checkbox-group">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-medkit me-2"></i>Dispozitive medicale:
+                    </label>
+                    <div class="mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="dispozitiveMedicale"
+                                   checked="@(Model.SaEliberatDispozitiveMedicale == true)"
+                                   @onchange="(e) => { Model.SaEliberatDispozitiveMedicale = (bool)(e.Value ?? false); OnFieldChanged(); }">
+                            <label class="form-check-label" for="dispozitiveMedicale">S-a eliberat prescripție dispozitive medicale</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Calea de Transmitere *@
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="document-checkbox-group">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-paper-plane me-2"></i>Calea de transmitere scrisoare medicală:
+                    </label>
+                    <div class="d-flex align-items-center gap-4 mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="transmitere" id="transmitereAsigurat"
+                                   checked="@(!Model.TransmiterePrinEmail)"
+                                   @onchange="() => { Model.TransmiterePrinEmail = false; Model.EmailTransmitere = null; OnFieldChanged(); }">
+                            <label class="form-check-label" for="transmitereAsigurat">Prin asigurat</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="transmitere" id="transmitereEmail"
+                                   checked="@Model.TransmiterePrinEmail"
+                                   @onchange="() => { Model.TransmiterePrinEmail = true; OnFieldChanged(); }">
+                            <label class="form-check-label" for="transmitereEmail">Prin poștă electronică</label>
+                        </div>
+                        @if (Model.TransmiterePrinEmail)
+                        {
+                            <input type="email" class="form-control w-auto" style="max-width: 250px;"
+                                   placeholder="email@exemplu.ro"
+                                   @bind="Model.EmailTransmitere"
+                                   @oninput="OnFieldChanged">
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @* Completion Summary *@
     @if (IsSectionCompleted)
     {

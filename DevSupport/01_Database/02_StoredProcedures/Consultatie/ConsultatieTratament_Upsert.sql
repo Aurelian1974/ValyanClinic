@@ -18,6 +18,7 @@ GO
 
 CREATE PROCEDURE [dbo].[ConsultatieTratament_Upsert]
     @ConsultatieID UNIQUEIDENTIFIER,
+    @TratamentAnterior NVARCHAR(2000) = NULL,
     @TratamentMedicamentos NVARCHAR(MAX) = NULL,
     @TratamentNemedicamentos NVARCHAR(MAX) = NULL,
     @RecomandariDietetice NVARCHAR(MAX) = NULL,
@@ -38,6 +39,7 @@ BEGIN
         BEGIN
             UPDATE [dbo].[ConsultatieTratament]
             SET 
+                [TratamentAnterior] = @TratamentAnterior,
                 [TratamentMedicamentos] = @TratamentMedicamentos,
                 [TratamentNemedicamentos] = @TratamentNemedicamentos,
                 [RecomandariDietetice] = @RecomandariDietetice,
@@ -54,7 +56,7 @@ BEGIN
         BEGIN
             INSERT INTO [dbo].[ConsultatieTratament]
             (
-                [Id], [ConsultatieID],
+                [Id], [ConsultatieID], [TratamentAnterior],
                 [TratamentMedicamentos], [TratamentNemedicamentos],
                 [RecomandariDietetice], [RecomandariRegimViata],
                 [InvestigatiiRecomandate], [ConsulturiSpecialitate],
@@ -63,7 +65,7 @@ BEGIN
             )
             VALUES
             (
-                NEWID(), @ConsultatieID,
+                NEWID(), @ConsultatieID, @TratamentAnterior,
                 @TratamentMedicamentos, @TratamentNemedicamentos,
                 @RecomandariDietetice, @RecomandariRegimViata,
                 @InvestigatiiRecomandate, @ConsulturiSpecialitate,

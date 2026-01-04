@@ -83,32 +83,12 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
                 DataUltimeiModificari = DateTime.Now
             });
 
-            // 3. ConsultatieAntecedente (1:1) - always upsert for full update
+            // 3. ConsultatieAntecedente (1:1) - SIMPLIFIED: only IstoricMedicalPersonal and IstoricFamilial
             await _repository.UpsertAntecedenteAsync(request.ConsultatieID, new ConsultatieAntecedente
             {
                 ConsultatieID = request.ConsultatieID,
-                AHC_Mama = request.AHC_Mama,
-                AHC_Tata = request.AHC_Tata,
-                AHC_Frati = request.AHC_Frati,
-                AHC_Bunici = request.AHC_Bunici,
-                AHC_Altele = request.AHC_Altele,
-                AF_Nastere = request.AF_Nastere,
-                AF_Dezvoltare = request.AF_Dezvoltare,
-                AF_Menstruatie = request.AF_Menstruatie,
-                AF_Sarcini = request.AF_Sarcini,
-                AF_Alaptare = request.AF_Alaptare,
-                APP_BoliCopilarieAdolescenta = request.APP_BoliCopilarieAdolescenta,
-                APP_BoliAdult = request.APP_BoliAdult,
-                APP_Interventii = request.APP_Interventii,
-                APP_Traumatisme = request.APP_Traumatisme,
-                APP_Transfuzii = request.APP_Transfuzii,
-                APP_Alergii = request.APP_Alergii,
-                APP_Medicatie = request.APP_Medicatie,
-                Profesie = request.Profesie,
-                ConditiiLocuinta = request.ConditiiLocuinta,
-                ConditiiMunca = request.ConditiiMunca,
-                ObiceiuriAlimentare = request.ObiceiuriAlimentare,
-                Toxice = request.Toxice,
+                IstoricMedicalPersonal = request.IstoricMedicalPersonal,
+                IstoricFamilial = request.IstoricFamilial,
                 ModificatDe = request.ModificatDe,
                 DataUltimeiModificari = DateTime.Now
             });

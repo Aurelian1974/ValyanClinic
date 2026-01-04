@@ -230,12 +230,8 @@ public partial class ConsultatieModal : ComponentBase, IDisposable
             CreatDe = MedicID.ToString()
         };
 
-        // Pre-populate with existing pacient data if available
-        if (PacientInfo != null)
-        {
-            Model.APP_Alergii = PacientInfo.Alergii;
-            Model.APP_BoliAdult = PacientInfo.Boli_Cronice;
-        }
+        // Note: Patient's allergies and chronic conditions are displayed read-only from PacientInfo
+        // They are not copied to the consultation antecedente anymore after schema simplification
 
         Logger.LogInformation("[ConsultatieModal] Model initialized");
     }

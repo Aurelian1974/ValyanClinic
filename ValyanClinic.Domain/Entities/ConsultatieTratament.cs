@@ -12,7 +12,11 @@ public class ConsultatieTratament
     // ==================== FOREIGN KEY ====================
     public Guid ConsultatieID { get; set; }
 
-    // ==================== TRATAMENT ====================
+    // ==================== TRATAMENT ANTERIOR ====================
+    /// <summary>Tratament efectuat anterior consultației</summary>
+    public string? TratamentAnterior { get; set; }
+
+    // ==================== TRATAMENT RECOMANDAT ====================
     public string? TratamentMedicamentos { get; set; }
     public string? TratamentNemedicamentos { get; set; }
     public string? RecomandariDietetice { get; set; }

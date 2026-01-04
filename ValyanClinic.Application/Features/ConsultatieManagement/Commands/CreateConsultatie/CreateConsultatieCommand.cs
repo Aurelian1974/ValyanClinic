@@ -19,32 +19,12 @@ public class CreateConsultatieCommand : IRequest<Result<Guid>>
     public string? MotivPrezentare { get; set; }
     public string? IstoricBoalaActuala { get; set; }
 
-    // ==================== ANTECEDENTE ====================
-    public string? AHC_Mama { get; set; }
-    public string? AHC_Tata { get; set; }
-    public string? AHC_Frati { get; set; }
-    public string? AHC_Bunici { get; set; }
-    public string? AHC_Altele { get; set; }
-
-    public string? AF_Nastere { get; set; }
-    public string? AF_Dezvoltare { get; set; }
-    public string? AF_Menstruatie { get; set; }
-    public string? AF_Sarcini { get; set; }
-    public string? AF_Alaptare { get; set; }
-
-    public string? APP_BoliCopilarieAdolescenta { get; set; }
-    public string? APP_BoliAdult { get; set; }
-    public string? APP_Interventii { get; set; }
-    public string? APP_Traumatisme { get; set; }
-    public string? APP_Transfuzii { get; set; }
-    public string? APP_Alergii { get; set; }
-    public string? APP_Medicatie { get; set; }
-
-    public string? Profesie { get; set; }
-    public string? ConditiiLocuinta { get; set; }
-    public string? ConditiiMunca { get; set; }
-    public string? ObiceiuriAlimentare { get; set; }
-    public string? Toxice { get; set; }
+    // ==================== ANTECEDENTE (SIMPLIFICAT) ====================
+    /// <summary>Istoric medical personal (boli anterioare, intervenții, alergii, tratamente cronice)</summary>
+    public string? IstoricMedicalPersonal { get; set; }
+    
+    /// <summary>Istoric familial (boli ereditare, antecedente în familie)</summary>
+    public string? IstoricFamilial { get; set; }
 
     // ==================== EXAMEN OBIECTIV ====================
     public string? StareGenerala { get; set; }
@@ -89,6 +69,10 @@ public class CreateConsultatieCommand : IRequest<Result<Guid>>
     public string? CoduriICD10Secundare { get; set; } // Coduri secundare (comma-separated)
 
     // ==================== TRATAMENT ====================
+    
+    /// <summary>Tratament efectuat anterior consultației</summary>
+    public string? TratamentAnterior { get; set; }
+    
     public string? TratamentMedicamentos { get; set; }
     public string? TratamentNemedicamentos { get; set; }
     public string? RecomandariDietetice { get; set; }
@@ -110,6 +94,34 @@ public class CreateConsultatieCommand : IRequest<Result<Guid>>
     // ==================== OBSERVATII ====================
     public string? ObservatiiMedic { get; set; }
     public string? NotePacient { get; set; }
+
+    // ==================== SCRISOARE MEDICALĂ - ANEXA 43 ====================
+    
+    /// <summary>Pacient diagnosticat cu afecțiune oncologică</summary>
+    public bool EsteAfectiuneOncologica { get; set; }
+    public string? DetaliiAfectiuneOncologica { get; set; }
+    
+    /// <summary>Indicație de revenire pentru internare</summary>
+    public bool AreIndicatieInternare { get; set; }
+    public string? TermenInternare { get; set; }
+    
+    /// <summary>Prescripție medicală</summary>
+    public bool? SaEliberatPrescriptie { get; set; }
+    public string? SeriePrescriptie { get; set; }
+    
+    /// <summary>Concediu medical</summary>
+    public bool? SaEliberatConcediuMedical { get; set; }
+    public string? SerieConcediuMedical { get; set; }
+    
+    /// <summary>Îngrijiri medicale la domiciliu</summary>
+    public bool? SaEliberatIngrijiriDomiciliu { get; set; }
+    
+    /// <summary>Dispozitive medicale</summary>
+    public bool? SaEliberatDispozitiveMedicale { get; set; }
+    
+    /// <summary>Calea de transmitere</summary>
+    public bool TransmiterePrinEmail { get; set; }
+    public string? EmailTransmitere { get; set; }
 
     // ==================== AUDIT ====================
     public string CreatDe { get; set; } = string.Empty;

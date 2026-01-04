@@ -29,6 +29,7 @@ public class ConsultatieRepository : IConsultatieRepository
         {
             using var connection = _connectionFactory.CreateConnection();
 
+            // NORMALIZED STRUCTURE: Only master table columns
             var parameters = new DynamicParameters();
             parameters.Add("@ConsultatieID", consultatie.ConsultatieID, DbType.Guid, ParameterDirection.InputOutput);
             parameters.Add("@ProgramareID", consultatie.ProgramareID);
@@ -37,110 +38,7 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@DataConsultatie", consultatie.DataConsultatie);
             parameters.Add("@OraConsultatie", consultatie.OraConsultatie);
             parameters.Add("@TipConsultatie", consultatie.TipConsultatie);
-
-            // Motive Prezentare
-            parameters.Add("@MotivPrezentare", consultatie.MotivPrezentare);
-            parameters.Add("@IstoricBoalaActuala", consultatie.IstoricBoalaActuala);
-
-            // Antecedente Heredo-Colaterale
-            parameters.Add("@AHC_Mama", consultatie.AHC_Mama);
-            parameters.Add("@AHC_Tata", consultatie.AHC_Tata);
-            parameters.Add("@AHC_Frati", consultatie.AHC_Frati);
-            parameters.Add("@AHC_Bunici", consultatie.AHC_Bunici);
-            parameters.Add("@AHC_Altele", consultatie.AHC_Altele);
-
-            // Antecedente Fiziologice
-            parameters.Add("@AF_Nastere", consultatie.AF_Nastere);
-            parameters.Add("@AF_Dezvoltare", consultatie.AF_Dezvoltare);
-            parameters.Add("@AF_Menstruatie", consultatie.AF_Menstruatie);
-            parameters.Add("@AF_Sarcini", consultatie.AF_Sarcini);
-            parameters.Add("@AF_Alaptare", consultatie.AF_Alaptare);
-
-            // Antecedente Personale Patologice
-            parameters.Add("@APP_BoliCopilarieAdolescenta", consultatie.APP_BoliCopilarieAdolescenta);
-            parameters.Add("@APP_BoliAdult", consultatie.APP_BoliAdult);
-            parameters.Add("@APP_Interventii", consultatie.APP_Interventii);
-            parameters.Add("@APP_Traumatisme", consultatie.APP_Traumatisme);
-            parameters.Add("@APP_Transfuzii", consultatie.APP_Transfuzii);
-            parameters.Add("@APP_Alergii", consultatie.APP_Alergii);
-            parameters.Add("@APP_Medicatie", consultatie.APP_Medicatie);
-
-            // Conditii Socio-Economice
-            parameters.Add("@Profesie", consultatie.Profesie);
-            parameters.Add("@ConditiiLocuinta", consultatie.ConditiiLocuinta);
-            parameters.Add("@ConditiiMunca", consultatie.ConditiiMunca);
-            parameters.Add("@ObiceiuriAlimentare", consultatie.ObiceiuriAlimentare);
-            parameters.Add("@Toxice", consultatie.Toxice);
-
-            // Examen General
-            parameters.Add("@StareGenerala", consultatie.StareGenerala);
-            parameters.Add("@Constitutie", consultatie.Constitutie);
-            parameters.Add("@Atitudine", consultatie.Atitudine);
-            parameters.Add("@Facies", consultatie.Facies);
-            parameters.Add("@Tegumente", consultatie.Tegumente);
-            parameters.Add("@Mucoase", consultatie.Mucoase);
-            parameters.Add("@GangliniLimfatici", consultatie.GangliniLimfatici);
-
-            // Semne Vitale
-            parameters.Add("@Greutate", consultatie.Greutate);
-            parameters.Add("@Inaltime", consultatie.Inaltime);
-            parameters.Add("@IMC", consultatie.IMC);
-            parameters.Add("@Temperatura", consultatie.Temperatura);
-            parameters.Add("@TensiuneArteriala", consultatie.TensiuneArteriala);
-            parameters.Add("@Puls", consultatie.Puls);
-            parameters.Add("@FreccventaRespiratorie", consultatie.FreccventaRespiratorie);
-            parameters.Add("@SaturatieO2", consultatie.SaturatieO2);
-            parameters.Add("@Glicemie", consultatie.Glicemie);
-
-            // Examen pe Aparate
-            parameters.Add("@ExamenCardiovascular", consultatie.ExamenCardiovascular);
-            parameters.Add("@ExamenRespiratoriu", consultatie.ExamenRespiratoriu);
-            parameters.Add("@ExamenDigestiv", consultatie.ExamenDigestiv);
-            parameters.Add("@ExamenUrinar", consultatie.ExamenUrinar);
-            parameters.Add("@ExamenNervos", consultatie.ExamenNervos);
-            parameters.Add("@ExamenLocomotor", consultatie.ExamenLocomotor);
-            parameters.Add("@ExamenEndocrin", consultatie.ExamenEndocrin);
-            parameters.Add("@ExamenORL", consultatie.ExamenORL);
-            parameters.Add("@ExamenOftalmologic", consultatie.ExamenOftalmologic);
-            parameters.Add("@ExamenDermatologic", consultatie.ExamenDermatologic);
-
-            // Investigatii
-            parameters.Add("@InvestigatiiLaborator", consultatie.InvestigatiiLaborator);
-            parameters.Add("@InvestigatiiImagistice", consultatie.InvestigatiiImagistice);
-            parameters.Add("@InvestigatiiEKG", consultatie.InvestigatiiEKG);
-            parameters.Add("@AlteInvestigatii", consultatie.AlteInvestigatii);
-
-            // Diagnostic
-            parameters.Add("@DiagnosticPozitiv", consultatie.DiagnosticPozitiv);
-            parameters.Add("@DiagnosticDiferential", consultatie.DiagnosticDiferential);
-            parameters.Add("@DiagnosticEtiologic", consultatie.DiagnosticEtiologic);
-            parameters.Add("@CoduriICD10", consultatie.CoduriICD10);
-
-            // Tratament
-            parameters.Add("@TratamentMedicamentos", consultatie.TratamentMedicamentos);
-            parameters.Add("@TratamentNemedicamentos", consultatie.TratamentNemedicamentos);
-            parameters.Add("@RecomandariDietetice", consultatie.RecomandariDietetice);
-            parameters.Add("@RecomandariRegimViata", consultatie.RecomandariRegimViata);
-
-            // Recomandari
-            parameters.Add("@InvestigatiiRecomandate", consultatie.InvestigatiiRecomandate);
-            parameters.Add("@ConsulturiSpecialitate", consultatie.ConsulturiSpecialitate);
-            parameters.Add("@DataUrmatoareiProgramari", consultatie.DataUrmatoareiProgramari);
-            parameters.Add("@RecomandariSupraveghere", consultatie.RecomandariSupraveghere);
-
-            // Prognostic & Concluzie
-            parameters.Add("@Prognostic", consultatie.Prognostic);
-            parameters.Add("@Concluzie", consultatie.Concluzie);
-
-            // Observatii
-            parameters.Add("@ObservatiiMedic", consultatie.ObservatiiMedic);
-            parameters.Add("@NotePacient", consultatie.NotePacient);
-
-            // Status
-            parameters.Add("@Status", consultatie.Status);
-            parameters.Add("@DataFinalizare", consultatie.DataFinalizare);
-
-            // Audit
+            parameters.Add("@Status", consultatie.Status ?? "In desfasurare");
             parameters.Add("@CreatDe", consultatie.CreatDe);
 
             await connection.ExecuteAsync(
@@ -311,35 +209,15 @@ public class ConsultatieRepository : IConsultatieRepository
                 };
             }
 
-            // Map ConsultatieAntecedente
+            // Map ConsultatieAntecedente (Simplified)
             if (row.Antecedente_Id != null)
             {
                 consultatie.Antecedente = new ConsultatieAntecedente
                 {
                     Id = row.Antecedente_Id,
                     ConsultatieID = consultatie.ConsultatieID,
-                    APP_Medicatie = row.Antecedente_APP_Medicatie,
-                    AHC_Mama = row.Antecedente_AHC_Mama,
-                    AHC_Tata = row.Antecedente_AHC_Tata,
-                    AHC_Frati = row.Antecedente_AHC_Frati,
-                    AHC_Bunici = row.Antecedente_AHC_Bunici,
-                    AHC_Altele = row.Antecedente_AHC_Altele,
-                    AF_Nastere = row.Antecedente_AF_Nastere,
-                    AF_Dezvoltare = row.Antecedente_AF_Dezvoltare,
-                    AF_Menstruatie = row.Antecedente_AF_Menstruatie,
-                    AF_Sarcini = row.Antecedente_AF_Sarcini,
-                    AF_Alaptare = row.Antecedente_AF_Alaptare,
-                    APP_BoliCopilarieAdolescenta = row.Antecedente_APP_BoliCopilarieAdolescenta,
-                    APP_BoliAdult = row.Antecedente_APP_BoliAdult,
-                    APP_Interventii = row.Antecedente_APP_Interventii,
-                    APP_Traumatisme = row.Antecedente_APP_Traumatisme,
-                    APP_Transfuzii = row.Antecedente_APP_Transfuzii,
-                    APP_Alergii = row.Antecedente_APP_Alergii,
-                    Profesie = row.Antecedente_Profesie,
-                    ConditiiLocuinta = row.Antecedente_ConditiiLocuinta,
-                    ConditiiMunca = row.Antecedente_ConditiiMunca,
-                    ObiceiuriAlimentare = row.Antecedente_ObiceiuriAlimentare,
-                    Toxice = row.Antecedente_Toxice,
+                    IstoricMedicalPersonal = row.Antecedente_IstoricMedicalPersonal,
+                    IstoricFamilial = row.Antecedente_IstoricFamilial,
                     DataCreare = row.Antecedente_DataCreare,
                     CreatDe = row.Antecedente_CreatDe,
                     DataUltimeiModificari = row.Antecedente_DataUltimeiModificari,
@@ -472,13 +350,12 @@ public class ConsultatieRepository : IConsultatieRepository
             }.Count(s => s != null);
 
             _logger.LogInformation(
-                "[ConsultatieRepository] GetByProgramareIdAsync RESULT - ConsultatieID: {ConsultatieID}, {Sections} populated sections. MotivePrezentare={HasMotiv} (Motiv='{Motiv}'), Antecedente={HasAnt} (APP_Medicatie='{Med}')",
+                "[ConsultatieRepository] GetByProgramareIdAsync RESULT - ConsultatieID: {ConsultatieID}, {Sections} populated sections. MotivePrezentare={HasMotiv} (Motiv='{Motiv}'), Antecedente={HasAnt}",
                 consultatie.ConsultatieID, 
                 populatedSections,
                 consultatie.MotivePrezentare != null,
                 consultatie.MotivePrezentare?.MotivPrezentare ?? "NULL",
-                consultatie.Antecedente != null,
-                consultatie.Antecedente?.APP_Medicatie ?? "NULL");
+                consultatie.Antecedente != null);
 
             return consultatie;
         }
@@ -495,119 +372,12 @@ public class ConsultatieRepository : IConsultatieRepository
         {
             using var connection = _connectionFactory.CreateConnection();
 
+            // NORMALIZED STRUCTURE: Only master table columns
             var parameters = new DynamicParameters();
             parameters.Add("@ConsultatieID", consultatie.ConsultatieID);
-            parameters.Add("@ProgramareID", consultatie.ProgramareID);
-            parameters.Add("@PacientID", consultatie.PacientID);
-            parameters.Add("@MedicID", consultatie.MedicID);
-            parameters.Add("@DataConsultatie", consultatie.DataConsultatie);
-            parameters.Add("@OraConsultatie", consultatie.OraConsultatie);
-            parameters.Add("@TipConsultatie", consultatie.TipConsultatie);
-
-            // Motive Prezentare
-            parameters.Add("@MotivPrezentare", consultatie.MotivPrezentare);
-            parameters.Add("@IstoricBoalaActuala", consultatie.IstoricBoalaActuala);
-
-            // Antecedente Heredo-Colaterale
-            parameters.Add("@AHC_Mama", consultatie.AHC_Mama);
-            parameters.Add("@AHC_Tata", consultatie.AHC_Tata);
-            parameters.Add("@AHC_Frati", consultatie.AHC_Frati);
-            parameters.Add("@AHC_Bunici", consultatie.AHC_Bunici);
-            parameters.Add("@AHC_Altele", consultatie.AHC_Altele);
-
-            // Antecedente Fiziologice
-            parameters.Add("@AF_Nastere", consultatie.AF_Nastere);
-            parameters.Add("@AF_Dezvoltare", consultatie.AF_Dezvoltare);
-            parameters.Add("@AF_Menstruatie", consultatie.AF_Menstruatie);
-            parameters.Add("@AF_Sarcini", consultatie.AF_Sarcini);
-            parameters.Add("@AF_Alaptare", consultatie.AF_Alaptare);
-
-            // Antecedente Personale Patologice
-            parameters.Add("@APP_BoliCopilarieAdolescenta", consultatie.APP_BoliCopilarieAdolescenta);
-            parameters.Add("@APP_BoliAdult", consultatie.APP_BoliAdult);
-            parameters.Add("@APP_Interventii", consultatie.APP_Interventii);
-            parameters.Add("@APP_Traumatisme", consultatie.APP_Traumatisme);
-            parameters.Add("@APP_Transfuzii", consultatie.APP_Transfuzii);
-            parameters.Add("@APP_Alergii", consultatie.APP_Alergii);
-            parameters.Add("@APP_Medicatie", consultatie.APP_Medicatie);
-
-            // Conditii Socio-Economice
-            parameters.Add("@Profesie", consultatie.Profesie);
-            parameters.Add("@ConditiiLocuinta", consultatie.ConditiiLocuinta);
-            parameters.Add("@ConditiiMunca", consultatie.ConditiiMunca);
-            parameters.Add("@ObiceiuriAlimentare", consultatie.ObiceiuriAlimentare);
-            parameters.Add("@Toxice", consultatie.Toxice);
-
-            // Examen General
-            parameters.Add("@StareGenerala", consultatie.StareGenerala);
-            parameters.Add("@Constitutie", consultatie.Constitutie);
-            parameters.Add("@Atitudine", consultatie.Atitudine);
-            parameters.Add("@Facies", consultatie.Facies);
-            parameters.Add("@Tegumente", consultatie.Tegumente);
-            parameters.Add("@Mucoase", consultatie.Mucoase);
-            parameters.Add("@GangliniLimfatici", consultatie.GangliniLimfatici);
-
-            // Semne Vitale
-            parameters.Add("@Greutate", consultatie.Greutate);
-            parameters.Add("@Inaltime", consultatie.Inaltime);
-            parameters.Add("@IMC", consultatie.IMC);
-            parameters.Add("@Temperatura", consultatie.Temperatura);
-            parameters.Add("@TensiuneArteriala", consultatie.TensiuneArteriala);
-            parameters.Add("@Puls", consultatie.Puls);
-            parameters.Add("@FreccventaRespiratorie", consultatie.FreccventaRespiratorie);
-            parameters.Add("@SaturatieO2", consultatie.SaturatieO2);
-            parameters.Add("@Glicemie", consultatie.Glicemie);
-
-            // Examen pe Aparate
-            parameters.Add("@ExamenCardiovascular", consultatie.ExamenCardiovascular);
-            parameters.Add("@ExamenRespiratoriu", consultatie.ExamenRespiratoriu);
-            parameters.Add("@ExamenDigestiv", consultatie.ExamenDigestiv);
-            parameters.Add("@ExamenUrinar", consultatie.ExamenUrinar);
-            parameters.Add("@ExamenNervos", consultatie.ExamenNervos);
-            parameters.Add("@ExamenLocomotor", consultatie.ExamenLocomotor);
-            parameters.Add("@ExamenEndocrin", consultatie.ExamenEndocrin);
-            parameters.Add("@ExamenORL", consultatie.ExamenORL);
-            parameters.Add("@ExamenOftalmologic", consultatie.ExamenOftalmologic);
-            parameters.Add("@ExamenDermatologic", consultatie.ExamenDermatologic);
-
-            // Investigatii
-            parameters.Add("@InvestigatiiLaborator", consultatie.InvestigatiiLaborator);
-            parameters.Add("@InvestigatiiImagistice", consultatie.InvestigatiiImagistice);
-            parameters.Add("@InvestigatiiEKG", consultatie.InvestigatiiEKG);
-            parameters.Add("@AlteInvestigatii", consultatie.AlteInvestigatii);
-
-            // Diagnostic
-            parameters.Add("@DiagnosticPozitiv", consultatie.DiagnosticPozitiv);
-            parameters.Add("@DiagnosticDiferential", consultatie.DiagnosticDiferential);
-            parameters.Add("@DiagnosticEtiologic", consultatie.DiagnosticEtiologic);
-            parameters.Add("@CoduriICD10", consultatie.CoduriICD10);
-
-            // Tratament
-            parameters.Add("@TratamentMedicamentos", consultatie.TratamentMedicamentos);
-            parameters.Add("@TratamentNemedicamentos", consultatie.TratamentNemedicamentos);
-            parameters.Add("@RecomandariDietetice", consultatie.RecomandariDietetice);
-            parameters.Add("@RecomandariRegimViata", consultatie.RecomandariRegimViata);
-
-            // Recomandari
-            parameters.Add("@InvestigatiiRecomandate", consultatie.InvestigatiiRecomandate);
-            parameters.Add("@ConsulturiSpecialitate", consultatie.ConsulturiSpecialitate);
-            parameters.Add("@DataUrmatoareiProgramari", consultatie.DataUrmatoareiProgramari);
-            parameters.Add("@RecomandariSupraveghere", consultatie.RecomandariSupraveghere);
-
-            // Prognostic & Concluzie
-            parameters.Add("@Prognostic", consultatie.Prognostic);
-            parameters.Add("@Concluzie", consultatie.Concluzie);
-
-            // Observatii
-            parameters.Add("@ObservatiiMedic", consultatie.ObservatiiMedic);
-            parameters.Add("@NotePacient", consultatie.NotePacient);
-
-            // Status
             parameters.Add("@Status", consultatie.Status);
             parameters.Add("@DataFinalizare", consultatie.DataFinalizare);
             parameters.Add("@DurataMinute", consultatie.DurataMinute);
-
-            // Audit
             parameters.Add("@ModificatDe", consultatie.ModificatDe);
 
             var result = await connection.ExecuteAsync(
@@ -789,35 +559,15 @@ public class ConsultatieRepository : IConsultatieRepository
                 };
             }
 
-            // Map ConsultatieAntecedente
+            // Map ConsultatieAntecedente (Simplified)
             if (row.Antecedente_Id != null)
             {
                 consultatie.Antecedente = new ConsultatieAntecedente
                 {
                     Id = row.Antecedente_Id,
                     ConsultatieID = consultatie.ConsultatieID,
-                    APP_Medicatie = row.Antecedente_APP_Medicatie,
-                    AHC_Mama = row.Antecedente_AHC_Mama,
-                    AHC_Tata = row.Antecedente_AHC_Tata,
-                    AHC_Frati = row.Antecedente_AHC_Frati,
-                    AHC_Bunici = row.Antecedente_AHC_Bunici,
-                    AHC_Altele = row.Antecedente_AHC_Altele,
-                    AF_Nastere = row.Antecedente_AF_Nastere,
-                    AF_Dezvoltare = row.Antecedente_AF_Dezvoltare,
-                    AF_Menstruatie = row.Antecedente_AF_Menstruatie,
-                    AF_Sarcini = row.Antecedente_AF_Sarcini,
-                    AF_Alaptare = row.Antecedente_AF_Alaptare,
-                    APP_BoliCopilarieAdolescenta = row.Antecedente_APP_BoliCopilarieAdolescenta,
-                    APP_BoliAdult = row.Antecedente_APP_BoliAdult,
-                    APP_Interventii = row.Antecedente_APP_Interventii,
-                    APP_Traumatisme = row.Antecedente_APP_Traumatisme,
-                    APP_Transfuzii = row.Antecedente_APP_Transfuzii,
-                    APP_Alergii = row.Antecedente_APP_Alergii,
-                    Profesie = row.Antecedente_Profesie,
-                    ConditiiLocuinta = row.Antecedente_ConditiiLocuinta,
-                    ConditiiMunca = row.Antecedente_ConditiiMunca,
-                    ObiceiuriAlimentare = row.Antecedente_ObiceiuriAlimentare,
-                    Toxice = row.Antecedente_Toxice,
+                    IstoricMedicalPersonal = row.Antecedente_IstoricMedicalPersonal,
+                    IstoricFamilial = row.Antecedente_IstoricFamilial,
                     DataCreare = row.Antecedente_DataCreare,
                     CreatDe = row.Antecedente_CreatDe,
                     DataUltimeiModificari = row.Antecedente_DataUltimeiModificari,
@@ -1001,28 +751,8 @@ public class ConsultatieRepository : IConsultatieRepository
 
             var parameters = new DynamicParameters();
             parameters.Add("@ConsultatieID", consultatieId);
-            parameters.Add("@AHC_Mama", entity.AHC_Mama);
-            parameters.Add("@AHC_Tata", entity.AHC_Tata);
-            parameters.Add("@AHC_Frati", entity.AHC_Frati);
-            parameters.Add("@AHC_Bunici", entity.AHC_Bunici);
-            parameters.Add("@AHC_Altele", entity.AHC_Altele);
-            parameters.Add("@AF_Nastere", entity.AF_Nastere);
-            parameters.Add("@AF_Dezvoltare", entity.AF_Dezvoltare);
-            parameters.Add("@AF_Menstruatie", entity.AF_Menstruatie);
-            parameters.Add("@AF_Sarcini", entity.AF_Sarcini);
-            parameters.Add("@AF_Alaptare", entity.AF_Alaptare);
-            parameters.Add("@APP_BoliCopilarieAdolescenta", entity.APP_BoliCopilarieAdolescenta);
-            parameters.Add("@APP_BoliAdult", entity.APP_BoliAdult);
-            parameters.Add("@APP_Interventii", entity.APP_Interventii);
-            parameters.Add("@APP_Traumatisme", entity.APP_Traumatisme);
-            parameters.Add("@APP_Transfuzii", entity.APP_Transfuzii);
-            parameters.Add("@APP_Alergii", entity.APP_Alergii);
-            parameters.Add("@APP_Medicatie", entity.APP_Medicatie);
-            parameters.Add("@Profesie", entity.Profesie);
-            parameters.Add("@ConditiiLocuinta", entity.ConditiiLocuinta);
-            parameters.Add("@ConditiiMunca", entity.ConditiiMunca);
-            parameters.Add("@ObiceiuriAlimentare", entity.ObiceiuriAlimentare);
-            parameters.Add("@Toxice", entity.Toxice);
+            parameters.Add("@IstoricMedicalPersonal", entity.IstoricMedicalPersonal);
+            parameters.Add("@IstoricFamilial", entity.IstoricFamilial);
             parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(

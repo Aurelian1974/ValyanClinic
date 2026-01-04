@@ -8,7 +8,11 @@ public class ConsultatieTratamentDto
     public Guid? Id { get; set; }
     public Guid ConsultatieID { get; set; }
     
-    // Tratament
+    // Tratament Anterior
+    /// <summary>Tratament efectuat anterior consultației</summary>
+    public string? TratamentAnterior { get; set; }
+    
+    // Tratament Recomandat
     public string? TratamentMedicamentos { get; set; }
     public string? TratamentNemedicamentos { get; set; }
     public string? RecomandariDietetice { get; set; }

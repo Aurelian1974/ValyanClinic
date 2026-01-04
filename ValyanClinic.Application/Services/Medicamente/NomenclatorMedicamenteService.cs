@@ -224,7 +224,9 @@ public class NomenclatorMedicamenteService : INomenclatorMedicamenteService
             var statsResult = await GetStatsAsync(cancellationToken);
             if (!statsResult.IsSuccess || statsResult.Value == null)
             {
-                return true; // Dacă nu putem verifica, trebuie sync
+                // Fallback: verifică direct ultima sincronizare din SyncLog
+                _logger.LogWarning("Nu s-au putut obține statisticile. Se verifică direct ultima sincronizare...");
+                return await CheckLastSyncDirectlyAsync(cancellationToken);
             }
 
             var stats = statsResult.Value;
@@ -243,9 +245,60 @@ public class NomenclatorMedicamenteService : INomenclatorMedicamenteService
             var daysSinceLastSync = (DateTime.Now - stats.UltimaSincronizareReusita.Value).TotalDays;
             return daysSinceLastSync >= SYNC_INTERVAL_DAYS;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Eroare la verificarea necesității sincronizării");
+            // În caz de eroare, încercăm verificarea directă
+            return await CheckLastSyncDirectlyAsync(cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Verifică direct în baza de date când a fost ultima sincronizare reușită.
+    /// Folosit ca fallback când stored procedure-ul GetStats nu există.
+    /// </summary>
+    private async Task<bool> CheckLastSyncDirectlyAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await using var connection = new SqlConnection(GetConnectionString());
+            await connection.OpenAsync(cancellationToken);
+
+            // Verifică dacă există tabela SyncLog
+            var checkTableSql = @"
+                SELECT TOP 1 [DataEnd] 
+                FROM [dbo].[Medicamente_SyncLog] 
+                WHERE [Status] = 'Success' 
+                ORDER BY [Id] DESC";
+
+            await using var command = new SqlCommand(checkTableSql, connection);
+            var result = await command.ExecuteScalarAsync(cancellationToken);
+
+            if (result == null || result == DBNull.Value)
+            {
+                _logger.LogInformation("Nu există sincronizări anterioare. Se va sincroniza nomenclatorul.");
+                return true;
+            }
+
+            var lastSync = (DateTime)result;
+            var daysSinceLastSync = (DateTime.Now - lastSync).TotalDays;
+            
+            _logger.LogInformation(
+                "Ultima sincronizare reușită: {LastSync} (acum {Days:F1} zile). Interval necesar: {Interval} zile.",
+                lastSync, daysSinceLastSync, SYNC_INTERVAL_DAYS);
+
+            return daysSinceLastSync >= SYNC_INTERVAL_DAYS;
+        }
+        catch (SqlException ex) when (ex.Number == 208) // Invalid object name (tabla nu exista)
+        {
+            _logger.LogWarning("Tabela Medicamente_SyncLog nu există. Se va sincroniza nomenclatorul.");
             return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Eroare la verificarea directă a ultimei sincronizări. NU se va forța sincronizarea.");
+            // În caz de eroare totală, NU forțăm sincronizarea pentru a evita update-uri inutile
+            return false;
         }
     }
 

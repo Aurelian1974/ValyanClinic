@@ -47,15 +47,16 @@ public class FormProgressService : IFormProgressService
     public ConsultationProgressResult CalculateConsultationProgress(ConsultationProgressInput input)
     {
         var completedFields = 0;
-        const int totalFields = 13;
+        const int totalFields = 14;
         var missingFields = new List<string>();
 
-        // Tab 1: Motiv & Antecedente (3 câmpuri)
+        // Tab 1: Anamneză (4 câmpuri)
         if (!string.IsNullOrWhiteSpace(input.MotivPrezentare)) completedFields++;
         else missingFields.Add("Motiv Prezentare");
 
-        if (!string.IsNullOrWhiteSpace(input.AntecedentePatologice)) completedFields++;
-        if (!string.IsNullOrWhiteSpace(input.TratamenteActuale)) completedFields++;
+        if (!string.IsNullOrWhiteSpace(input.IstoricBoalaActuala)) completedFields++;
+        if (!string.IsNullOrWhiteSpace(input.IstoricMedicalPersonal)) completedFields++;
+        if (!string.IsNullOrWhiteSpace(input.IstoricFamilial)) completedFields++;
 
         // Tab 2: Examen Clinic (6 câmpuri)
         if (input.TensiuneSistolica.HasValue || input.TensiuneDiastolica.HasValue) completedFields++;
@@ -77,8 +78,9 @@ public class FormProgressService : IFormProgressService
 
         // Calcul tab-uri complete
         var isTab1Complete = !string.IsNullOrWhiteSpace(input.MotivPrezentare) &&
-                             !string.IsNullOrWhiteSpace(input.AntecedentePatologice) &&
-                             !string.IsNullOrWhiteSpace(input.TratamenteActuale);
+                             !string.IsNullOrWhiteSpace(input.IstoricBoalaActuala) &&
+                             !string.IsNullOrWhiteSpace(input.IstoricMedicalPersonal) &&
+                             !string.IsNullOrWhiteSpace(input.IstoricFamilial);
 
         var isTab2Complete = (input.TensiuneSistolica.HasValue || input.TensiuneDiastolica.HasValue) &&
                              input.Puls.HasValue &&

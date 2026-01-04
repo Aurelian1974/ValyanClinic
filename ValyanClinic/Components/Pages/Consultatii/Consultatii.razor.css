@@ -1746,3 +1746,87 @@ textarea.form-control {
 .anthropometric-grid {
     display: none !important;
 }
+
+/* ===== TAB 1: ANAMNEZĂ - 2x2 GRID LAYOUT ===== */
+.anamneza-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+    height: calc(100vh - 380px); /* Fill available space without scrolling */
+    min-height: 400px;
+}
+
+.anamneza-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.anamneza-column .form-section.compact {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    margin-bottom: 0;
+}
+
+.section-title-sm {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-title-sm i {
+    color: var(--primary-color);
+    font-size: var(--font-size-sm);
+}
+
+.anamneza-column .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+
+.anamneza-textarea {
+    flex: 1;
+    min-height: 80px;
+    resize: none;
+    font-family: inherit;
+    line-height: 1.5;
+    padding: var(--spacing-sm);
+}
+
+.anamneza-column .char-counter {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    text-align: right;
+    margin-top: var(--spacing-xs);
+}
+
+/* Responsive: Stack columns on smaller screens */
+@media (max-width: 1200px) {
+    .anamneza-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: var(--spacing-md);
+    }
+    
+    .anamneza-column .form-section.compact {
+        min-height: 180px;
+    }
+    
+    .anamneza-textarea {
+        min-height: 120px;
+    }
+}

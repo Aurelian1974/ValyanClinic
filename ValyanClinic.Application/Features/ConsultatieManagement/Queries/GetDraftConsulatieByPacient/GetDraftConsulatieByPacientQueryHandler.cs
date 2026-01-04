@@ -74,29 +74,9 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                 MotivPrezentare = consultatie.MotivePrezentare?.MotivPrezentare,
                 IstoricBoalaActuala = consultatie.MotivePrezentare?.IstoricBoalaActuala,
                 
-                // Tab 1: Antecedente Personale - from ConsultatieAntecedente
-                AHC_Tata = consultatie.Antecedente?.AHC_Tata,
-                AHC_Mama = consultatie.Antecedente?.AHC_Mama,
-                AHC_Frati = consultatie.Antecedente?.AHC_Frati,
-                AHC_Bunici = consultatie.Antecedente?.AHC_Bunici,
-                AHC_Altele = consultatie.Antecedente?.AHC_Altele,
-                AF_Nastere = consultatie.Antecedente?.AF_Nastere,
-                AF_Dezvoltare = consultatie.Antecedente?.AF_Dezvoltare,
-                AF_Menstruatie = consultatie.Antecedente?.AF_Menstruatie,
-                AF_Sarcini = consultatie.Antecedente?.AF_Sarcini,
-                AF_Alaptare = consultatie.Antecedente?.AF_Alaptare,
-                APP_BoliCopilarieAdolescenta = consultatie.Antecedente?.APP_BoliCopilarieAdolescenta,
-                APP_BoliAdult = consultatie.Antecedente?.APP_BoliAdult,
-                APP_Interventii = consultatie.Antecedente?.APP_Interventii,
-                APP_Traumatisme = consultatie.Antecedente?.APP_Traumatisme,
-                APP_Transfuzii = consultatie.Antecedente?.APP_Transfuzii,
-                APP_Alergii = consultatie.Antecedente?.APP_Alergii,
-                APP_Medicatie = consultatie.Antecedente?.APP_Medicatie,
-                Profesie = consultatie.Antecedente?.Profesie,
-                ConditiiLocuinta = consultatie.Antecedente?.ConditiiLocuinta,
-                ConditiiMunca = consultatie.Antecedente?.ConditiiMunca,
-                ObiceiuriAlimentare = consultatie.Antecedente?.ObiceiuriAlimentare,
-                Toxice = consultatie.Antecedente?.Toxice,
+                // Tab 1: Antecedente (SIMPLIFIED) - from ConsultatieAntecedente
+                IstoricMedicalPersonal = consultatie.Antecedente?.IstoricMedicalPersonal,
+                IstoricFamilial = consultatie.Antecedente?.IstoricFamilial,
                 
                 // Tab 2: Examen General - from ConsultatieExamenObiectiv
                 StareGenerala = consultatie.ExamenObiectiv?.StareGenerala,

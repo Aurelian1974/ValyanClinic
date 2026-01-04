@@ -25,10 +25,9 @@ public static class TestData
             MotivPrezentare = "Dureri abdominale",
             IstoricBoalaActuala = "Simptome de 3 zile - greata, varsaturi",
 
-            // Antecedente
-            APP_BoliAdult = "Hipertensiune arteriala",
-            APP_Alergii = "Penicilina",
-            APP_Medicatie = "Enalapril 10mg",
+            // Antecedente (Anamneză)
+            IstoricMedicalPersonal = "Hipertensiune arteriala, alergii la Penicilina, tratament Enalapril 10mg",
+            IstoricFamilial = "Tata - diabet tip 2, Mama - HTA",
 
             // Examen
             Greutate = 75.5m,

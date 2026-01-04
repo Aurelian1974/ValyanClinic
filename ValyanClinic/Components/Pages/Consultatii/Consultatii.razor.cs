@@ -135,8 +135,9 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             _cachedProgress = ProgressService.CalculateConsultationProgress(new ConsultationProgressInput
             {
                 MotivPrezentare = MotivPrezentare,
-                AntecedentePatologice = AntecedentePatologice,
-                TratamenteActuale = TratamenteActuale,
+                IstoricBoalaActuala = IstoricBoalaActuala,
+                IstoricMedicalPersonal = IstoricMedicalPersonal,
+                IstoricFamilial = IstoricFamilial,
                 TensiuneSistolica = TensiuneSistolica,
                 TensiuneDiastolica = TensiuneDiastolica,
                 Puls = Puls,
@@ -177,12 +178,12 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
     #endregion
 
-    #region Form Fields - Tab 1: Motiv Prezentare & Antecedente
+    #region Form Fields - Tab 1: Anamneză
 
     private string MotivPrezentare { get; set; } = string.Empty;
-    private string AntecedentePatologice { get; set; } = string.Empty;
-    private string TratamenteActuale { get; set; } = string.Empty;
-    private AntecedenteHeredoDto AntecedenteHeredo { get; set; } = new();
+    private string IstoricBoalaActuala { get; set; } = string.Empty;
+    private string IstoricMedicalPersonal { get; set; } = string.Empty;
+    private string IstoricFamilial { get; set; } = string.Empty;
 
     #endregion
 
@@ -411,10 +412,11 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
     private void MapConsultatieToFormFields(ConsulatieDetailDto consultatie)
     {
-        // Tab 1: Motiv & Antecedente
+        // Tab 1: Anamneză
         MotivPrezentare = consultatie.MotivPrezentare ?? string.Empty;
-        AntecedentePatologice = consultatie.IstoricBoalaActuala ?? string.Empty;
-        TratamenteActuale = consultatie.APP_Medicatie ?? string.Empty;
+        IstoricBoalaActuala = consultatie.IstoricBoalaActuala ?? string.Empty;
+        IstoricMedicalPersonal = consultatie.IstoricMedicalPersonal ?? string.Empty;
+        IstoricFamilial = consultatie.IstoricFamilial ?? string.Empty;
 
         // Tab 2: Semne Vitale
         Greutate = consultatie.Greutate;
@@ -566,10 +568,11 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 OraConsultatie = DateTime.Now.TimeOfDay,
                 TipConsultatie = "Prima consultatie",
                 
-                // Tab 1: Motiv & Antecedente
+                // Tab 1: Anamneză
                 MotivPrezentare = string.IsNullOrWhiteSpace(MotivPrezentare) ? null : MotivPrezentare,
-                IstoricBoalaActuala = string.IsNullOrWhiteSpace(AntecedentePatologice) ? null : AntecedentePatologice,
-                APP_Medicatie = string.IsNullOrWhiteSpace(TratamenteActuale) ? null : TratamenteActuale,
+                IstoricBoalaActuala = string.IsNullOrWhiteSpace(IstoricBoalaActuala) ? null : IstoricBoalaActuala,
+                IstoricMedicalPersonal = string.IsNullOrWhiteSpace(IstoricMedicalPersonal) ? null : IstoricMedicalPersonal,
+                IstoricFamilial = string.IsNullOrWhiteSpace(IstoricFamilial) ? null : IstoricFamilial,
                 
                 // Tab 2: Semne Vitale
                 Greutate = Greutate,

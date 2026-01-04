@@ -22,7 +22,12 @@ public class SaveConsultatieDraftCommand : IRequest<Result<Guid>>
     // ==================== TAB 1: MOTIV & ANTECEDENTE ====================
     public string? MotivPrezentare { get; set; }
     public string? IstoricBoalaActuala { get; set; } // AntecedentePatologice din UI
-    public string? APP_Medicatie { get; set; } // TratamenteActuale din UI
+    
+    // Antecedente (SIMPLIFIED)
+    /// <summary>Istoric medical personal - boli anterioare, interventii, alergii, medicatie cronica</summary>
+    public string? IstoricMedicalPersonal { get; set; }
+    /// <summary>Istoric familial - antecedente heredocolaterale</summary>
+    public string? IstoricFamilial { get; set; }
 
     // ==================== TAB 2: EXAMEN CLINIC ====================
     

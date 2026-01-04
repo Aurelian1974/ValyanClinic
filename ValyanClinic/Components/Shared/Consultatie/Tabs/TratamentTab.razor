@@ -10,9 +10,24 @@
             VI. Tratament și Recomandări
         </h5>
         <div class="row">
+            @* Tratament Anterior (efectuat înainte de consultație) *@
+            <div class="col-12 mb-3">
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-history me-1"></i>
+                        Tratament Efectuat Anterior (înainte de consultație)
+                    </label>
+                    <textarea class="form-control" rows="3" 
+                              placeholder="Tratament urmat de pacient anterior prezentării..."
+                              @bind="Model.TratamentAnterior"
+                              @oninput="OnFieldChanged"></textarea>
+                    <small class="form-text">Medicație și tratamente urmate de pacient înainte de această consultație</small>
+                </div>
+            </div>
+
             <div class="col-12">
                 <div class="form-group">
-                    <label class="required">Tratament Medicamentos</label>
+                    <label class="required">Tratament Medicamentos Recomandat</label>
                     <textarea class="form-control @(ShowValidation && string.IsNullOrWhiteSpace(Model.TratamentMedicamentos) ? "is-invalid" : "")" 
                               rows="4" 
                               placeholder="Listă medicamentelor prescrise cu dozaj și durată..."

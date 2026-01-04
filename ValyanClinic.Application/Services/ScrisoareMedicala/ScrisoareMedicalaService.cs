@@ -76,12 +76,12 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             MotivPrezentare = consultatie.MotivPrezentare,
             IstoricBoalaActuala = consultatie.IstoricBoalaActuala,
 
-            // Antecedente
-            AntecendenteHeredoColaterale = BuildAntecendenteHeredoString(consultatie),
-            AntecendentePatologicePersonale = BuildAntecendentePatologiceString(consultatie),
-            Alergii = consultatie.APP_Alergii ?? consultatie.PacientAlergii,
-            MedicatieCronicaAnterioara = consultatie.APP_Medicatie,
-            FactoriDeRisc = consultatie.Toxice,
+            // Antecedente (SIMPLIFIED)
+            AntecendenteHeredoColaterale = consultatie.IstoricFamilial ?? "Fără antecedente semnificative.",
+            AntecendentePatologicePersonale = consultatie.IstoricMedicalPersonal ?? "Fără antecedente patologice semnificative.",
+            Alergii = consultatie.PacientAlergii,
+            MedicatieCronicaAnterioara = null, // No longer tracked separately
+            FactoriDeRisc = null, // No longer tracked separately
 
             // Examen clinic
             StareGenerala = consultatie.StareGenerala,
@@ -323,36 +323,18 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
 
     private static string BuildAntecendenteHeredoString(ConsulatieDetailDto consultatie)
     {
-        var parts = new List<string>();
-        
-        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Mama))
-            parts.Add($"Mamă - {consultatie.AHC_Mama}");
-        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Tata))
-            parts.Add($"Tată - {consultatie.AHC_Tata}");
-        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Frati))
-            parts.Add($"Frați - {consultatie.AHC_Frati}");
-        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Bunici))
-            parts.Add($"Bunici - {consultatie.AHC_Bunici}");
-        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Altele))
-            parts.Add(consultatie.AHC_Altele);
-
-        return parts.Count > 0 ? string.Join("; ", parts) : "Fără antecedente semnificative.";
+        // SIMPLIFIED - just return IstoricFamilial or default message
+        return !string.IsNullOrWhiteSpace(consultatie.IstoricFamilial) 
+            ? consultatie.IstoricFamilial 
+            : "Fără antecedente semnificative.";
     }
 
     private static string BuildAntecendentePatologiceString(ConsulatieDetailDto consultatie)
     {
-        var parts = new List<string>();
-
-        if (!string.IsNullOrWhiteSpace(consultatie.APP_BoliAdult))
-            parts.Add(consultatie.APP_BoliAdult);
-        if (!string.IsNullOrWhiteSpace(consultatie.APP_BoliCopilarieAdolescenta))
-            parts.Add(consultatie.APP_BoliCopilarieAdolescenta);
-        if (!string.IsNullOrWhiteSpace(consultatie.APP_Interventii))
-            parts.Add($"Intervenții: {consultatie.APP_Interventii}");
-        if (!string.IsNullOrWhiteSpace(consultatie.APP_Traumatisme))
-            parts.Add($"Traumatisme: {consultatie.APP_Traumatisme}");
-
-        return parts.Count > 0 ? string.Join(". ", parts) : "Fără antecedente patologice semnificative.";
+        // SIMPLIFIED - just return IstoricMedicalPersonal or default message
+        return !string.IsNullOrWhiteSpace(consultatie.IstoricMedicalPersonal) 
+            ? consultatie.IstoricMedicalPersonal 
+            : "Fără antecedente patologice semnificative.";
     }
 
     private static DiagnosticScrisoareDto? ParseDiagnosticPrincipal(string? diagnostic, string? codIcd10)
