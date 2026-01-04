@@ -107,6 +107,9 @@ public class ConsulatieDetailDto
     public string? TratamentNemedicamentos { get; set; }
     public string? RecomandariDietetice { get; set; }
     public string? RecomandariRegimViata { get; set; }
+    
+    /// <summary>Lista de medicamente prescrise pentru tratament recomandat</summary>
+    public List<MedicationRowDto>? MedicationList { get; set; }
 
     // ==================== VII. RECOMANDARI ====================
     public string? InvestigatiiRecomandate { get; set; }

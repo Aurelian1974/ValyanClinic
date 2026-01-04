@@ -293,6 +293,30 @@
     padding-left: 12px;
 }
 
+/* Inline subsection - title and content on same line */
+.subsection-inline {
+    margin-bottom: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.subsection-inline .subsection-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+.subsection-inline .subsection-content {
+    font-size: 0.85rem;
+    color: #333;
+    padding-left: 0;
+    flex: 1;
+}
+
 /* ==================== Data Grid ==================== */
 .data-grid {
     display: grid;

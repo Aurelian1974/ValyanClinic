@@ -144,6 +144,21 @@ public class GetConsulatieByProgramareQueryHandler : IRequestHandler<GetConsulat
                 DataUrmatoareiProgramari = consultatie.Tratament?.DataUrmatoareiProgramari,
                 RecomandariSupraveghere = consultatie.Tratament?.RecomandariSupraveghere,
                 
+                // Medication List from ConsultatieMedicament (1:N)
+                MedicationList = consultatie.Medicamente?
+                    .OrderBy(m => m.OrdineAfisare)
+                    .Select(m => new DTOs.MedicationRowDto
+                    {
+                        Id = m.Id,
+                        Name = m.NumeMedicament,
+                        Dose = m.Doza ?? "",
+                        Frequency = m.Frecventa ?? "",
+                        Duration = m.Durata ?? "",
+                        Quantity = m.Cantitate ?? "",
+                        Notes = m.Observatii
+                    })
+                    .ToList(),
+                
                 // Tab 4: Concluzii - from ConsultatieConcluzii
                 Prognostic = consultatie.Concluzii?.Prognostic,
                 Concluzie = consultatie.Concluzii?.Concluzie,

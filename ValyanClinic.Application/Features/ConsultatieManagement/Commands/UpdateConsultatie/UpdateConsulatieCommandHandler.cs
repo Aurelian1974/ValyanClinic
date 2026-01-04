@@ -172,6 +172,24 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
                 DataUltimeiModificari = DateTime.Now
             });
 
+            // 7.1 ConsultatieMedicament (1:N) - save medication list
+            var medicamente = (request.MedicationList ?? new())
+                .Where(m => !string.IsNullOrWhiteSpace(m.Name))
+                .Select((m, index) => new ConsultatieMedicament
+                {
+                    ConsultatieID = request.ConsultatieID,
+                    OrdineAfisare = index,
+                    NumeMedicament = m.Name,
+                    Doza = m.Dose,
+                    Frecventa = m.Frequency,
+                    Durata = m.Duration,
+                    Cantitate = m.Quantity,
+                    Observatii = m.Notes,
+                    ModificatDe = request.ModificatDe,
+                    DataUltimeiModificari = DateTime.Now
+                });
+            await _repository.ReplaceMedicamenteAsync(request.ConsultatieID, medicamente, request.ModificatDe);
+
             // 8. ConsultatieConcluzii (1:1) - always upsert for full update
             await _repository.UpsertConcluziiAsync(request.ConsultatieID, new ConsultatieConcluzii
             {

@@ -112,6 +112,16 @@ public interface IConsultatieRepository
     Task UpsertTratamentAsync(Guid consultatieId, ConsultatieTratament entity);
 
     /// <summary>
+    /// Replace all medications for a consultation (delete + insert)
+    /// </summary>
+    Task ReplaceMedicamenteAsync(Guid consultatieId, IEnumerable<ConsultatieMedicament> medicamente, Guid modificatDe);
+
+    /// <summary>
+    /// Get all medications for a consultation
+    /// </summary>
+    Task<IEnumerable<ConsultatieMedicament>> GetMedicamenteAsync(Guid consultatieId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieConcluzii (1:1)
     /// </summary>
     Task UpsertConcluziiAsync(Guid consultatieId, ConsultatieConcluzii entity);

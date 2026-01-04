@@ -529,6 +529,19 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         PlanTerapeutic = consultatie.TratamentMedicamentos ?? string.Empty;
         Recomandari = consultatie.RecomandariRegimViata ?? string.Empty;
         
+        // Load MedicationList from DTO
+        if (consultatie.MedicationList?.Any() == true)
+        {
+            MedicationList = consultatie.MedicationList.ToList();
+            ConsultatieCommand.MedicationList = MedicationList;
+            Logger.LogInformation("[Consultatii] Loaded {Count} medications from consultatie", MedicationList.Count);
+        }
+        else
+        {
+            MedicationList = new List<MedicationRowDto>();
+            ConsultatieCommand.MedicationList = MedicationList;
+        }
+        
         // Tab 4: Concluzii
         Concluzii = consultatie.Concluzie ?? consultatie.ObservatiiMedic ?? string.Empty;
         
@@ -694,6 +707,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 // Tab 3: Tratament
                 TratamentMedicamentos = string.IsNullOrWhiteSpace(PlanTerapeutic) ? null : PlanTerapeutic,
                 RecomandariRegimViata = string.IsNullOrWhiteSpace(Recomandari) ? null : Recomandari,
+                MedicationList = ConsultatieCommand.MedicationList, // Use Model's list bound to DiagnosticTab
                 
                 // Tab 4: Concluzii
                 Concluzie = string.IsNullOrWhiteSpace(Concluzii) ? null : Concluzii,
@@ -872,6 +886,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
             // VI. Tratament
             TratamentMedicamentos = PlanTerapeutic,
+            MedicationList = MedicationList,
             
             // VII. Recomandări
             RecomandariRegimViata = Recomandari,

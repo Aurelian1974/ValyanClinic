@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 
 namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveConsultatieDraft;
 
@@ -78,6 +79,9 @@ public class SaveConsultatieDraftCommand : IRequest<Result<Guid>>
     // Tratament
     public string? TratamentMedicamentos { get; set; } // PlanTerapeutic din UI
     public string? RecomandariRegimViata { get; set; } // Recomandari din UI
+    
+    /// <summary>Lista de medicamente prescrise pentru tratament recomandat</summary>
+    public List<MedicationRowDto>? MedicationList { get; set; }
 
     // ==================== TAB 4: CONCLUZII ====================
     public string? Concluzie { get; set; } // Concluzii din UI

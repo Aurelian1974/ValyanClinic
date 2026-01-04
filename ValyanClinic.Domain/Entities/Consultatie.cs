@@ -207,6 +207,11 @@ public class Consultatie
     public virtual ConsultatieTratament? Tratament { get; set; }
     
     /// <summary>
+    /// Navigation property catre lista de Medicamente prescrise (1:N)
+    /// </summary>
+    public virtual ICollection<ConsultatieMedicament>? Medicamente { get; set; }
+    
+    /// <summary>
     /// Navigation property catre Concluzii (1:1)
     /// </summary>
     public virtual ConsultatieConcluzii? Concluzii { get; set; }

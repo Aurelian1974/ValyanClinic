@@ -1,4 +1,5 @@
 using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using ValyanClinic.Domain.Entities;
@@ -359,6 +360,14 @@ public class ConsultatieRepository : IConsultatieRepository
                     "[ConsultatieRepository] GetByProgramareIdAsync - Loaded {Count} secondary diagnoses for ConsultatieID: {ConsultatieID}",
                     consultatie.Diagnostic.DiagnosticeSecundare.Count, consultatie.ConsultatieID);
             }
+
+            // ✅ Load medications separately (1:N relationship)
+            var medicamente = await GetMedicamenteAsync(consultatie.ConsultatieID, cancellationToken);
+            consultatie.Medicamente = medicamente.ToList();
+            
+            _logger.LogInformation(
+                "[ConsultatieRepository] GetByProgramareIdAsync - Loaded {Count} medications for ConsultatieID: {ConsultatieID}",
+                consultatie.Medicamente.Count, consultatie.ConsultatieID);
 
             var populatedSections = new object?[] { 
                 consultatie.MotivePrezentare, consultatie.Antecedente, consultatie.ExamenObiectiv, 
@@ -726,6 +735,14 @@ public class ConsultatieRepository : IConsultatieRepository
                     consultatie.Diagnostic.DiagnosticeSecundare.Count, consultatie.ConsultatieID);
             }
 
+            // ✅ Load medications separately (1:N relationship)
+            var medicamente = await GetMedicamenteAsync(consultatie.ConsultatieID, cancellationToken);
+            consultatie.Medicamente = medicamente.ToList();
+            
+            _logger.LogInformation(
+                "[ConsultatieRepository] Loaded {Count} medications for ConsultatieID: {ConsultatieID}",
+                consultatie.Medicamente.Count, consultatie.ConsultatieID);
+
             var populatedSections = new object?[] { 
                 consultatie.MotivePrezentare, consultatie.Antecedente, consultatie.ExamenObiectiv, 
                 consultatie.Investigatii, consultatie.Diagnostic, consultatie.Tratament, consultatie.Concluzii 
@@ -1009,6 +1026,102 @@ public class ConsultatieRepository : IConsultatieRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "[ConsultatieRepository] Error upserting Tratament for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
+
+    public async Task ReplaceMedicamenteAsync(Guid consultatieId, IEnumerable<ConsultatieMedicament> medicamente, Guid modificatDe)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            // Create DataTable for TVP
+            var medicamenteTable = new DataTable();
+            medicamenteTable.Columns.Add("OrdineAfisare", typeof(int));
+            medicamenteTable.Columns.Add("NumeMedicament", typeof(string));
+            medicamenteTable.Columns.Add("Doza", typeof(string));
+            medicamenteTable.Columns.Add("Frecventa", typeof(string));
+            medicamenteTable.Columns.Add("Durata", typeof(string));
+            medicamenteTable.Columns.Add("Cantitate", typeof(string));
+            medicamenteTable.Columns.Add("Observatii", typeof(string));
+
+            var ordine = 0;
+            foreach (var med in medicamente)
+            {
+                if (!string.IsNullOrWhiteSpace(med.NumeMedicament))
+                {
+                    medicamenteTable.Rows.Add(
+                        ordine++,
+                        med.NumeMedicament,
+                        med.Doza ?? (object)DBNull.Value,
+                        med.Frecventa ?? (object)DBNull.Value,
+                        med.Durata ?? (object)DBNull.Value,
+                        med.Cantitate ?? (object)DBNull.Value,
+                        med.Observatii ?? (object)DBNull.Value
+                    );
+                }
+            }
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ConsultatieID", consultatieId);
+            parameters.Add("@ModificatDe", modificatDe);
+
+            // Use SqlCommand for TVP support - Microsoft.Data.SqlClient
+            if (connection is SqlConnection sqlConn)
+            {
+                if (sqlConn.State != ConnectionState.Open)
+                    await sqlConn.OpenAsync();
+                    
+                using var cmd = sqlConn.CreateCommand();
+                cmd.CommandText = "ConsultatieMedicament_BulkReplace";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandTimeout = 30;
+
+                cmd.Parameters.AddWithValue("@ConsultatieID", consultatieId);
+                cmd.Parameters.AddWithValue("@ModificatDe", modificatDe);
+                
+                var tvpParam = cmd.Parameters.AddWithValue("@Medicamente", medicamenteTable);
+                tvpParam.SqlDbType = SqlDbType.Structured;
+                tvpParam.TypeName = "dbo.MedicamentListType";
+
+                await cmd.ExecuteNonQueryAsync();
+            }
+            else
+            {
+                throw new InvalidOperationException("Connection must be Microsoft.Data.SqlClient.SqlConnection for TVP support");
+            }
+
+            _logger.LogInformation("[ConsultatieRepository] Replaced {Count} medicamente for: {ConsultatieID}", 
+                medicamenteTable.Rows.Count, consultatieId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error replacing Medicamente for: {ConsultatieID}", consultatieId);
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<ConsultatieMedicament>> GetMedicamenteAsync(Guid consultatieId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            var result = await connection.QueryAsync<ConsultatieMedicament>(
+                "ConsultatieMedicament_GetByConsultatieId",
+                new { ConsultatieID = consultatieId },
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 30);
+
+            _logger.LogInformation("[ConsultatieRepository] Retrieved {Count} medicamente for: {ConsultatieID}", 
+                result.Count(), consultatieId);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ConsultatieRepository] Error getting Medicamente for: {ConsultatieID}", consultatieId);
             throw;
         }
     }

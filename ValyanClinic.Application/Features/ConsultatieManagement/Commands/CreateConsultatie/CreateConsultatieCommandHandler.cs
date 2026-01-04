@@ -174,6 +174,27 @@ public class CreateConsultatieCommandHandler : IRequestHandler<CreateConsultatie
                 DataCreare = DateTime.Now
             });
 
+            // 7.1 ConsultatieMedicament (1:N) - save medication list
+            if (request.MedicationList?.Any() == true)
+            {
+                var medicamente = request.MedicationList
+                    .Where(m => !string.IsNullOrWhiteSpace(m.Name))
+                    .Select((m, index) => new ConsultatieMedicament
+                    {
+                        ConsultatieID = consultatieId,
+                        OrdineAfisare = index,
+                        NumeMedicament = m.Name,
+                        Doza = m.Dose,
+                        Frecventa = m.Frequency,
+                        Durata = m.Duration,
+                        Cantitate = m.Quantity,
+                        Observatii = m.Notes,
+                        CreatDe = creatDe,
+                        DataCreare = DateTime.Now
+                    });
+                await _repository.ReplaceMedicamenteAsync(consultatieId, medicamente, creatDe);
+            }
+
             // 8. ConsultatieConcluzii (1:1)
             await _repository.UpsertConcluziiAsync(consultatieId, new ConsultatieConcluzii
             {

@@ -77,12 +77,12 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             MotivPrezentare = SanitizeHtml(consultatie.MotivPrezentare),
             IstoricBoalaActuala = SanitizeHtml(consultatie.IstoricBoalaActuala),
 
-            // Antecedente (SIMPLIFIED) - Sanitize HTML (păstrează formatarea bold/italic)
-            AntecendenteHeredoColaterale = SanitizeHtml(consultatie.IstoricFamilial) ?? "Fără antecedente semnificative.",
-            AntecendentePatologicePersonale = SanitizeHtml(consultatie.IstoricMedicalPersonal) ?? "Fără antecedente patologice semnificative.",
-            Alergii = SanitizeHtml(consultatie.PacientAlergii),
-            MedicatieCronicaAnterioara = SanitizeHtml(consultatie.TratamentAnterior), // ✅ MAPPED from TratamentAnterior (Antecedente)
-            FactoriDeRisc = SanitizeHtml(consultatie.FactoriDeRisc), // ✅ MAPPED from FactoriDeRisc (Antecedente)
+            // Antecedente (SIMPLIFIED) - StripHtml for inline display in Scrisoare Medicala
+            AntecendenteHeredoColaterale = StripHtml(consultatie.IstoricFamilial) ?? "Fără antecedente semnificative.",
+            AntecendentePatologicePersonale = StripHtml(consultatie.IstoricMedicalPersonal) ?? "Fără antecedente patologice semnificative.",
+            Alergii = StripHtml(consultatie.PacientAlergii),
+            MedicatieCronicaAnterioara = StripHtml(consultatie.TratamentAnterior), // ✅ MAPPED from TratamentAnterior (Antecedente)
+            FactoriDeRisc = StripHtml(consultatie.FactoriDeRisc), // ✅ MAPPED from FactoriDeRisc (Antecedente)
 
             // Examen clinic
             StareGenerala = consultatie.StareGenerala,
@@ -154,6 +154,12 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
         
         _logger.LogInformation("[ScrisoareMedicalaService] dto.DiagnosticeSecundare count: {Count}",
             dto.DiagnosticeSecundare?.Count ?? 0);
+
+        // Map tratament recomandat from MedicationList
+        dto.TratamentRecomandat = MapTratamentRecomandat(consultatie.MedicationList);
+        
+        _logger.LogInformation("[ScrisoareMedicalaService] dto.TratamentRecomandat count: {Count}",
+            dto.TratamentRecomandat?.Count ?? 0);
 
         return Result<ScrisoareMedicalaDto>.Success(dto);
     }
@@ -418,6 +424,28 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
                 Denumire = d.NumeDiagnostic ?? "",
                 Detalii = StripHtml(d.Descriere),
                 EstePrincipal = false
+            })
+            .ToList();
+    }
+
+    /// <summary>
+    /// Maps MedicationList from consultation to TratamentRecomandat for Scrisoare Medicala
+    /// </summary>
+    private static List<MedicamentScrisoareDto> MapTratamentRecomandat(
+        List<ValyanClinic.Application.Features.ConsultatieManagement.DTOs.MedicationRowDto>? medications)
+    {
+        if (medications == null || !medications.Any())
+            return new List<MedicamentScrisoareDto>();
+
+        return medications
+            .Where(m => !string.IsNullOrWhiteSpace(m.Name))
+            .Select(m => new MedicamentScrisoareDto
+            {
+                Denumire = m.Name,
+                Doza = m.Dose ?? "",
+                Frecventa = m.Frequency ?? "",
+                Durata = m.Duration ?? "",
+                Observatii = !string.IsNullOrWhiteSpace(m.Notes) ? m.Notes : null
             })
             .ToList();
     }

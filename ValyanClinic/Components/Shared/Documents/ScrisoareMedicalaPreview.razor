@@ -157,25 +157,25 @@
                 <div class="section">
                     <h2 class="section-title"><i class="fas fa-history"></i> Anamneză</h2>
                     <div class="section-content">
-                        <div class="subsection">
-                            <div class="subsection-title">Antecedente Heredocolaterale:</div>
-                            <div class="subsection-content">@((MarkupString)(Model.AntecendenteHeredoColaterale ?? ""))</div>
+                        <div class="subsection-inline">
+                            <span class="subsection-title">Antecedente Heredocolaterale:</span>
+                            <span class="subsection-content">@(Model.AntecendenteHeredoColaterale ?? "")</span>
                         </div>
-                        <div class="subsection">
-                            <div class="subsection-title">Antecedente Patologice Personale:</div>
-                            <div class="subsection-content">@((MarkupString)(Model.AntecendentePatologicePersonale ?? ""))</div>
+                        <div class="subsection-inline">
+                            <span class="subsection-title">Antecedente Patologice Personale:</span>
+                            <span class="subsection-content">@(Model.AntecendentePatologicePersonale ?? "")</span>
                         </div>
-                        <div class="subsection">
-                            <div class="subsection-title">Alergii:</div>
-                            <div class="subsection-content">@((MarkupString)(Model.Alergii ?? "Nu sunt cunoscute."))</div>
+                        <div class="subsection-inline">
+                            <span class="subsection-title">Alergii:</span>
+                            <span class="subsection-content">@(Model.Alergii ?? "Nu sunt cunoscute.")</span>
                         </div>
-                        <div class="subsection">
-                            <div class="subsection-title">Medicație Cronică Anterioară:</div>
-                            <div class="subsection-content">@((MarkupString)(Model.MedicatieCronicaAnterioara ?? "Nu există."))</div>
+                        <div class="subsection-inline">
+                            <span class="subsection-title">Medicație Cronică Anterioară:</span>
+                            <span class="subsection-content">@(Model.MedicatieCronicaAnterioara ?? "Nu există.")</span>
                         </div>
-                        <div class="subsection">
-                            <div class="subsection-title">Factori de Risc:</div>
-                            <div class="subsection-content">@((MarkupString)(Model.FactoriDeRisc ?? "Nu au fost identificați."))</div>
+                        <div class="subsection-inline">
+                            <span class="subsection-title">Factori de Risc:</span>
+                            <span class="subsection-content">@(Model.FactoriDeRisc ?? "Nu au fost identificați.")</span>
                         </div>
                     </div>
                 </div>

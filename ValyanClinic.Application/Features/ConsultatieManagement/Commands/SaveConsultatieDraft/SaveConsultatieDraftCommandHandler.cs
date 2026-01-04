@@ -258,6 +258,24 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 });
             }
 
+            // 7b. ConsultatieMedicament (1:N) - Lista de medicamente prescrise
+            var medicamente = (request.MedicationList ?? new())
+                .Where(m => !string.IsNullOrWhiteSpace(m.Name))
+                .Select((m, index) => new ConsultatieMedicament
+                {
+                    ConsultatieID = consultatieId,
+                    OrdineAfisare = index,
+                    NumeMedicament = m.Name,
+                    Doza = m.Dose,
+                    Frecventa = m.Frequency,
+                    Durata = m.Duration,
+                    Cantitate = m.Quantity,
+                    Observatii = m.Notes,
+                    CreatDe = request.CreatDeSauModificatDe,
+                    DataCreare = DateTime.Now
+                });
+            await _repository.ReplaceMedicamenteAsync(consultatieId, medicamente, request.CreatDeSauModificatDe);
+
             // 8. ConsultatieConcluzii (1:1) - condiționat - include Scrisoare Medicală Anexa 43
             if (!string.IsNullOrWhiteSpace(request.Concluzie) ||
                 !string.IsNullOrWhiteSpace(request.ObservatiiMedic) ||
