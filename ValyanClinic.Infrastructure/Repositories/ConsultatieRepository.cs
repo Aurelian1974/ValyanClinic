@@ -294,11 +294,13 @@ public class ConsultatieRepository : IConsultatieRepository
                 {
                     Id = row.Diagnostic_Id,
                     ConsultatieID = consultatie.ConsultatieID,
+                    // Normalized structure
+                    CodICD10Principal = row.Diagnostic_CodICD10Principal,
+                    NumeDiagnosticPrincipal = row.Diagnostic_NumeDiagnosticPrincipal,
+                    DescriereDetaliataPrincipal = row.Diagnostic_DescriereDetaliataPrincipal,
+                    // Legacy fields
                     DiagnosticPozitiv = row.Diagnostic_DiagnosticPozitiv,
-                    DiagnosticDiferential = row.Diagnostic_DiagnosticDiferential,
-                    DiagnosticEtiologic = row.Diagnostic_DiagnosticEtiologic,
                     CoduriICD10 = row.Diagnostic_CoduriICD10,
-                    CoduriICD10Secundare = row.Diagnostic_CoduriICD10Secundare,
                     DataCreare = row.Diagnostic_DataCreare,
                     CreatDe = row.Diagnostic_CreatDe,
                     DataUltimeiModificari = row.Diagnostic_DataUltimeiModificari,
@@ -345,6 +347,17 @@ public class ConsultatieRepository : IConsultatieRepository
                     DataUltimeiModificari = row.Concluzii_DataUltimeiModificari,
                     ModificatDe = row.Concluzii_ModificatDe
                 };
+            }
+
+            // ✅ Load secondary diagnoses separately (1:N relationship)
+            if (consultatie.Diagnostic != null)
+            {
+                var diagnosticeSecundare = await GetDiagnosticeSecundareAsync(consultatie.ConsultatieID, cancellationToken);
+                consultatie.Diagnostic.DiagnosticeSecundare = diagnosticeSecundare.ToList();
+                
+                _logger.LogInformation(
+                    "[ConsultatieRepository] GetByProgramareIdAsync - Loaded {Count} secondary diagnoses for ConsultatieID: {ConsultatieID}",
+                    consultatie.Diagnostic.DiagnosticeSecundare.Count, consultatie.ConsultatieID);
             }
 
             var populatedSections = new object?[] { 
@@ -647,11 +660,13 @@ public class ConsultatieRepository : IConsultatieRepository
                 {
                     Id = row.Diagnostic_Id,
                     ConsultatieID = consultatie.ConsultatieID,
+                    // Normalized structure
+                    CodICD10Principal = row.Diagnostic_CodICD10Principal,
+                    NumeDiagnosticPrincipal = row.Diagnostic_NumeDiagnosticPrincipal,
+                    DescriereDetaliataPrincipal = row.Diagnostic_DescriereDetaliataPrincipal,
+                    // Legacy fields
                     DiagnosticPozitiv = row.Diagnostic_DiagnosticPozitiv,
-                    DiagnosticDiferential = row.Diagnostic_DiagnosticDiferential,
-                    DiagnosticEtiologic = row.Diagnostic_DiagnosticEtiologic,
                     CoduriICD10 = row.Diagnostic_CoduriICD10,
-                    CoduriICD10Secundare = row.Diagnostic_CoduriICD10Secundare,
                     DataCreare = row.Diagnostic_DataCreare,
                     CreatDe = row.Diagnostic_CreatDe,
                     DataUltimeiModificari = row.Diagnostic_DataUltimeiModificari,
@@ -698,6 +713,17 @@ public class ConsultatieRepository : IConsultatieRepository
                     DataUltimeiModificari = row.Concluzii_DataUltimeiModificari,
                     ModificatDe = row.Concluzii_ModificatDe
                 };
+            }
+
+            // ✅ Load secondary diagnoses separately (1:N relationship)
+            if (consultatie.Diagnostic != null)
+            {
+                var diagnosticeSecundare = await GetDiagnosticeSecundareAsync(consultatie.ConsultatieID, cancellationToken);
+                consultatie.Diagnostic.DiagnosticeSecundare = diagnosticeSecundare.ToList();
+                
+                _logger.LogInformation(
+                    "[ConsultatieRepository] Loaded {Count} secondary diagnoses for ConsultatieID: {ConsultatieID}",
+                    consultatie.Diagnostic.DiagnosticeSecundare.Count, consultatie.ConsultatieID);
             }
 
             var populatedSections = new object?[] { 
@@ -868,16 +894,13 @@ public class ConsultatieRepository : IConsultatieRepository
 
             var parameters = new DynamicParameters();
             parameters.Add("@ConsultatieID", consultatieId);
-            // NEW: Diagnostic Principal
+            // Diagnostic Principal
             parameters.Add("@CodICD10Principal", entity.CodICD10Principal);
             parameters.Add("@NumeDiagnosticPrincipal", entity.NumeDiagnosticPrincipal);
             parameters.Add("@DescriereDetaliataPrincipal", entity.DescriereDetaliataPrincipal);
             // LEGACY: backwards compatibility
             parameters.Add("@DiagnosticPozitiv", entity.DiagnosticPozitiv);
-            parameters.Add("@DiagnosticDiferential", entity.DiagnosticDiferential);
-            parameters.Add("@DiagnosticEtiologic", entity.DiagnosticEtiologic);
             parameters.Add("@CoduriICD10", entity.CoduriICD10);
-            parameters.Add("@CoduriICD10Secundare", entity.CoduriICD10Secundare);
             parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(

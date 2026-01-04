@@ -39,7 +39,9 @@ public static class TestData
             // Diagnostic
             DiagnosticPozitiv = "Gastrita acuta",
             CoduriICD10 = "K29.0",
-            CoduriICD10Secundare = "K30",
+            CodICD10Principal = "K29.0",
+            NumeDiagnosticPrincipal = "Gastrita acuta",
+            DescriereDetaliataPrincipal = "Gastrita acuta nespecificata",
 
             // Tratament
             TratamentMedicamentos = "Omeprazol 20mg, 1cp/zi",

@@ -8,11 +8,14 @@ public class ConsultatieDiagnosticDto
     public Guid? Id { get; set; }
     public Guid ConsultatieID { get; set; }
     
+    // Normalized fields
+    public string? CodICD10Principal { get; set; }
+    public string? NumeDiagnosticPrincipal { get; set; }
+    public string? DescriereDetaliataPrincipal { get; set; }
+    
+    // Legacy fields (kept for backwards compatibility)
     public string? DiagnosticPozitiv { get; set; }
-    public string? DiagnosticDiferential { get; set; }
-    public string? DiagnosticEtiologic { get; set; }
     public string? CoduriICD10 { get; set; }
-    public string? CoduriICD10Secundare { get; set; }
     
     // Audit
     public DateTime DataCreare { get; set; }

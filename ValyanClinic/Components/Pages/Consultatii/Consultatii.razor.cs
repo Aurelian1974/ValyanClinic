@@ -499,6 +499,9 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         ConsultatieCommand.DescriereDetaliataPrincipal = consultatie.DescriereDetaliataPrincipal;
         
         // Map secondary diagnoses from DTO to Command
+        Logger.LogInformation("[Consultatii] LoadConsultatieData - consultatie.DiagnosticeSecundare count: {Count}",
+            consultatie.DiagnosticeSecundare?.Count ?? 0);
+        
         if (consultatie.DiagnosticeSecundare?.Any() == true)
         {
             ConsultatieCommand.DiagnosticeSecundare = consultatie.DiagnosticeSecundare
@@ -510,15 +513,17 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                     Descriere = d.Descriere
                 })
                 .ToList();
+                
+            Logger.LogInformation("[Consultatii] Mapped {Count} secondary diagnoses to ConsultatieCommand",
+                ConsultatieCommand.DiagnosticeSecundare.Count);
         }
         
         // LEGACY fields for display
         DiagnosticPrincipal = consultatie.DiagnosticPozitiv ?? string.Empty;
-        DiagnosticSecundar = consultatie.DiagnosticDiferential ?? string.Empty;
+        DiagnosticSecundar = string.Empty; // Legacy field removed
         
         // Also populate legacy fields in command for backwards compatibility
         ConsultatieCommand.CoduriICD10 = consultatie.CoduriICD10;
-        ConsultatieCommand.CoduriICD10Secundare = consultatie.CoduriICD10Secundare;
         
         // Tab 3: Tratament
         PlanTerapeutic = consultatie.TratamentMedicamentos ?? string.Empty;
@@ -559,7 +564,6 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     private void SyncToConsultatieCommand()
     {
         ConsultatieCommand.DiagnosticPozitiv = DiagnosticPrincipal;
-        ConsultatieCommand.DiagnosticDiferential = DiagnosticSecundar;
         ConsultatieCommand.TratamentMedicamentos = PlanTerapeutic;
         ConsultatieCommand.RecomandariRegimViata = Recomandari;
       
@@ -571,12 +575,6 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
  {
          ConsultatieCommand.CoduriICD10 = principalDiag.Code;
           }
-
-            var secondaryDiags = DiagnosisList.Where(d => !d.IsPrincipal).Select(d => d.Code).ToList();
-            if (secondaryDiags.Any())
-      {
-       ConsultatieCommand.CoduriICD10Secundare = string.Join(", ", secondaryDiags);
-      }
       }
     }
 
@@ -587,7 +585,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     private void SyncFromConsultatieCommand()
     {
         DiagnosticPrincipal = ConsultatieCommand.DiagnosticPozitiv ?? string.Empty;
-        DiagnosticSecundar = ConsultatieCommand.DiagnosticDiferential ?? string.Empty;
+        DiagnosticSecundar = string.Empty; // Legacy field removed
         PlanTerapeutic = ConsultatieCommand.TratamentMedicamentos ?? string.Empty;
         Recomandari = ConsultatieCommand.RecomandariRegimViata ?? string.Empty;
     }
@@ -636,9 +634,10 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             Logger.LogInformation("[Consultatii] HandleSaveDraft - ProgramareId from URL: {ProgramareId}, ConsultatieId: {ConsultatieId}",
                 ProgramareId?.ToString() ?? "NULL",
                 ConsultatieId?.ToString() ?? "NULL");
-            Logger.LogInformation("[Consultatii] HandleSaveDraft - ConsultatieCommand.CoduriICD10: {ICD10}, CoduriICD10Secundare: {ICD10Sec}",
-                ConsultatieCommand.CoduriICD10 ?? "NULL",
-                ConsultatieCommand.CoduriICD10Secundare ?? "NULL");
+            Logger.LogInformation("[Consultatii] HandleSaveDraft - ConsultatieCommand.CoduriICD10: {ICD10}",
+                ConsultatieCommand.CoduriICD10 ?? "NULL");
+            Logger.LogInformation("[Consultatii] HandleSaveDraft - DescriereDetaliataPrincipal: {Desc}",
+                ConsultatieCommand.DescriereDetaliataPrincipal?.Substring(0, Math.Min(50, ConsultatieCommand.DescriereDetaliataPrincipal?.Length ?? 0)) ?? "NULL");
             
             var command = new ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveConsultatieDraft.SaveConsultatieDraftCommand
             {
@@ -690,11 +689,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 DiagnosticPozitiv = !string.IsNullOrWhiteSpace(ConsultatieCommand.DiagnosticPozitiv) 
                     ? ConsultatieCommand.DiagnosticPozitiv 
                     : (string.IsNullOrWhiteSpace(DiagnosticPrincipal) ? null : DiagnosticPrincipal),
-                DiagnosticDiferential = !string.IsNullOrWhiteSpace(ConsultatieCommand.DiagnosticDiferential)
-                    ? ConsultatieCommand.DiagnosticDiferential
-                    : (string.IsNullOrWhiteSpace(DiagnosticSecundar) ? null : DiagnosticSecundar),
                 CoduriICD10 = ConsultatieCommand.CoduriICD10,
-                CoduriICD10Secundare = ConsultatieCommand.CoduriICD10Secundare,
                 
                 // Tab 3: Tratament
                 TratamentMedicamentos = string.IsNullOrWhiteSpace(PlanTerapeutic) ? null : PlanTerapeutic,
@@ -870,9 +865,10 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             // V. Diagnostic
             DiagnosticPozitiv = DiagnosticPrincipal,
             CoduriICD10 = DiagnosisList.FirstOrDefault(d => d.IsPrincipal)?.Code,
-            CoduriICD10Secundare = string.Join("; ", DiagnosisList
-                .Where(d => !d.IsPrincipal)
-                .Select(d => $"{d.Code} - {d.Name}")),
+            // Normalized diagnostic fields from DiagnosticTab
+            CodICD10Principal = ConsultatieCommand.CodICD10Principal,
+            NumeDiagnosticPrincipal = ConsultatieCommand.NumeDiagnosticPrincipal,
+            DescriereDetaliataPrincipal = ConsultatieCommand.DescriereDetaliataPrincipal,
 
             // VI. Tratament
             TratamentMedicamentos = PlanTerapeutic,
@@ -896,6 +892,17 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             SaEliberatDispozitiveMedicale = SaEliberatDispozitiveMedicale,
             TransmiterePrinEmail = TransmiterePrinEmail,
             EmailTransmitere = EmailTransmitere,
+            
+            // Diagnostice secundare - from ConsultatieCommand (synced from DiagnosticTab)
+            DiagnosticeSecundare = ConsultatieCommand.DiagnosticeSecundare?
+                .Select(d => new ValyanClinic.Application.Features.ConsultatieManagement.DTOs.DiagnosticSecundarDetailDto
+                {
+                    OrdineAfisare = d.OrdineAfisare,
+                    CodICD10 = d.CodICD10,
+                    NumeDiagnostic = d.NumeDiagnostic,
+                    Descriere = d.Descriere
+                })
+                .ToList(),
 
             // Status
             Status = "In desfasurare",

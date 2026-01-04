@@ -103,8 +103,14 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             RezultatEKG = consultatie.InvestigatiiEKG,
             AlteInvestigatii = consultatie.AlteInvestigatii,
 
-            // Diagnostic
-            DiagnosticPrincipal = ParseDiagnosticPrincipal(consultatie.DiagnosticPozitiv, consultatie.CoduriICD10),
+            // Diagnostic - use NEW normalized fields with fallback to legacy
+            DiagnosticPrincipal = ParseDiagnosticPrincipal(
+                consultatie.CodICD10Principal, 
+                consultatie.NumeDiagnosticPrincipal, 
+                consultatie.DescriereDetaliataPrincipal,
+                // Legacy fallback
+                consultatie.DiagnosticPozitiv, 
+                consultatie.CoduriICD10),
 
             // Tratament
             TratamentAnterior = consultatie.TratamentMedicamentos,
@@ -140,8 +146,14 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             DataEmitere = DateTime.Now
         };
 
-        // Parse diagnostice secundare
-        dto.DiagnosticeSecundare = ParseDiagnosticeSecundare(consultatie.CoduriICD10Secundare);
+        // Parse diagnostice secundare - use normalized structure if available
+        _logger.LogInformation("[ScrisoareMedicalaService] consultatie.DiagnosticeSecundare count: {Count}",
+            consultatie.DiagnosticeSecundare?.Count ?? 0);
+        
+        dto.DiagnosticeSecundare = MapDiagnosticeSecundare(consultatie.DiagnosticeSecundare);
+        
+        _logger.LogInformation("[ScrisoareMedicalaService] dto.DiagnosticeSecundare count: {Count}",
+            dto.DiagnosticeSecundare?.Count ?? 0);
 
         return Result<ScrisoareMedicalaDto>.Success(dto);
     }
@@ -357,36 +369,55 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             : "Fără antecedente patologice semnificative.";
     }
 
-    private static DiagnosticScrisoareDto? ParseDiagnosticPrincipal(string? diagnostic, string? codIcd10)
+    /// <summary>
+    /// Parse diagnostic principal using NEW normalized fields with fallback to legacy
+    /// </summary>
+    private static DiagnosticScrisoareDto? ParseDiagnosticPrincipal(
+        string? codIcd10Principal, 
+        string? numeDiagnosticPrincipal, 
+        string? descriereDetaliataPrincipal,
+        string? legacyDiagnostic, 
+        string? legacyCodIcd10)
     {
-        if (string.IsNullOrWhiteSpace(diagnostic) && string.IsNullOrWhiteSpace(codIcd10))
+        // Try NEW fields first
+        if (!string.IsNullOrWhiteSpace(codIcd10Principal) || !string.IsNullOrWhiteSpace(numeDiagnosticPrincipal))
+        {
+            return new DiagnosticScrisoareDto
+            {
+                CodICD10 = codIcd10Principal ?? "",
+                Denumire = numeDiagnosticPrincipal ?? "",
+                Detalii = StripHtml(descriereDetaliataPrincipal),
+                EstePrincipal = true
+            };
+        }
+        
+        // Fallback to LEGACY fields
+        if (string.IsNullOrWhiteSpace(legacyDiagnostic) && string.IsNullOrWhiteSpace(legacyCodIcd10))
             return null;
 
         return new DiagnosticScrisoareDto
         {
-            CodICD10 = codIcd10 ?? "",
-            Denumire = diagnostic ?? "",
+            CodICD10 = legacyCodIcd10 ?? "",
+            Denumire = legacyDiagnostic ?? "",
             EstePrincipal = true
         };
     }
 
-    private static List<DiagnosticScrisoareDto> ParseDiagnosticeSecundare(string? coduriSecundare)
+    /// <summary>
+    /// Maps normalized DiagnosticeSecundare from database to ScrisoareMedicala DTOs
+    /// </summary>
+    private static List<DiagnosticScrisoareDto> MapDiagnosticeSecundare(List<DiagnosticSecundarDetailDto>? diagnostice)
     {
-        if (string.IsNullOrWhiteSpace(coduriSecundare))
+        if (diagnostice == null || !diagnostice.Any())
             return new List<DiagnosticScrisoareDto>();
 
-        // Parse format: "E11.9 - Diabet; E78.0 - Hipercolesterolemie"
-        return coduriSecundare
-            .Split(new[] { ';', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(d =>
+        return diagnostice
+            .Select(d => new DiagnosticScrisoareDto
             {
-                var parts = d.Trim().Split(new[] { " - ", " – " }, StringSplitOptions.None);
-                return new DiagnosticScrisoareDto
-                {
-                    CodICD10 = parts.Length > 0 ? parts[0].Trim() : "",
-                    Denumire = parts.Length > 1 ? parts[1].Trim() : parts[0].Trim(),
-                    EstePrincipal = false
-                };
+                CodICD10 = d.CodICD10 ?? "",
+                Denumire = d.NumeDiagnostic ?? "",
+                Detalii = StripHtml(d.Descriere),
+                EstePrincipal = false
             })
             .ToList();
     }
@@ -411,6 +442,30 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             recomandari.Add($"Control la data de {consultatie.DataUrmatoareiProgramari}");
 
         return recomandari;
+    }
+
+    /// <summary>
+    /// Elimină complet toate tag-urile HTML, returnând doar textul
+    /// </summary>
+    private static string? StripHtml(string? html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+            return null;
+        
+        // Elimină toate tag-urile HTML
+        var result = Regex.Replace(html, @"<[^>]*>", string.Empty, RegexOptions.IgnoreCase);
+        
+        // Decodează entitățile HTML comune
+        result = result.Replace("&nbsp;", " ");
+        result = result.Replace("&amp;", "&");
+        result = result.Replace("&lt;", "<");
+        result = result.Replace("&gt;", ">");
+        result = result.Replace("&quot;", "\"");
+        
+        // Curăță spațiile multiple și liniile noi multiple
+        result = Regex.Replace(result, @"\s+", " ");
+        
+        return result.Trim();
     }
 
     /// <summary>

@@ -70,7 +70,7 @@ public class CreateConsultatieCommand : IRequest<Result<Guid>>
 
     // ==================== DIAGNOSTIC ====================
     
-    // NEW: Normalized diagnostic structure for Scrisoare Medicală
+    // Normalized diagnostic structure for Scrisoare Medicală
     /// <summary>Codul ICD-10 pentru diagnosticul principal (ex: "I10")</summary>
     public string? CodICD10Principal { get; set; }
     /// <summary>Numele diagnosticului principal din catalog ICD-10</summary>
@@ -83,10 +83,7 @@ public class CreateConsultatieCommand : IRequest<Result<Guid>>
     
     // LEGACY: Kept for backwards compatibility
     public string? DiagnosticPozitiv { get; set; }
-    public string? DiagnosticDiferential { get; set; }
-    public string? DiagnosticEtiologic { get; set; }
-    public string? CoduriICD10 { get; set; } // Cod principal
-    public string? CoduriICD10Secundare { get; set; } // Coduri secundare (comma-separated)
+    public string? CoduriICD10 { get; set; }
 
     // ==================== TRATAMENT ====================
     public string? TratamentMedicamentos { get; set; }

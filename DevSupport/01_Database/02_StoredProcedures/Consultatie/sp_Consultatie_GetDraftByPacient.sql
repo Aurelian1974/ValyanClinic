@@ -110,13 +110,14 @@ BEGIN
             inv.DataUltimeiModificari AS Investigatii_DataUltimeiModificari,
             inv.ModificatDe AS Investigatii_ModificatDe,
             
-            -- ConsultatieDiagnostic (1:1)
+            -- ConsultatieDiagnostic (1:1) - Normalized structure
             diag.Id AS Diagnostic_Id,
+            diag.CodICD10Principal AS Diagnostic_CodICD10Principal,
+            diag.NumeDiagnosticPrincipal AS Diagnostic_NumeDiagnosticPrincipal,
+            diag.DescriereDetaliataPrincipal AS Diagnostic_DescriereDetaliataPrincipal,
+            -- LEGACY fields for backwards compatibility
             diag.DiagnosticPozitiv AS Diagnostic_DiagnosticPozitiv,
-            diag.DiagnosticDiferential AS Diagnostic_DiagnosticDiferential,
-            diag.DiagnosticEtiologic AS Diagnostic_DiagnosticEtiologic,
             diag.CoduriICD10 AS Diagnostic_CoduriICD10,
-            diag.CoduriICD10Secundare AS Diagnostic_CoduriICD10Secundare,
             diag.DataCreare AS Diagnostic_DataCreare,
             diag.CreatDe AS Diagnostic_CreatDe,
             diag.DataUltimeiModificari AS Diagnostic_DataUltimeiModificari,

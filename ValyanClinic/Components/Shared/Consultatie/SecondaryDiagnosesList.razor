@@ -124,7 +124,8 @@
                                     }
                                 </label>
                                 <div class="rte-container">
-                                    <SfRichTextEditor @bind-Value="diagnosis.Description"
+                                    <SfRichTextEditor Value="@diagnosis.Description"
+                                                      ValueChanged="@((string val) => HandleDescriptionChanged(diagnosis, val))"
                                                       Placeholder="Descrieți diagnosticul secundar..."
                                                       ShowCharCount="true"
                                                       EnableResize="true">

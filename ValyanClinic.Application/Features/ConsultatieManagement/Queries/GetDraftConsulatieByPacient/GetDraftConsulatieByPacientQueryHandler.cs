@@ -58,6 +58,10 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                     "Nu există consultație draft pentru acest pacient");
             }
 
+            _logger.LogInformation(
+                "[GetDraftConsulatieByPacientHandler] Found draft, DiagnosticeSecundare count: {Count}",
+                consultatie.Diagnostic?.DiagnosticeSecundare?.Count ?? 0);
+
             // Map to DetailDto - NORMALIZED structure with null-safe navigation
             var dto = new ConsulatieDetailDto
             {
@@ -121,7 +125,7 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                 AlteInvestigatii = consultatie.Investigatii?.AlteInvestigatii,
                 
                 // Tab 3: Diagnostic - from ConsultatieDiagnostic
-                // NEW: Normalized structure for Scrisoare Medicală
+                // Normalized structure for Scrisoare Medicală
                 CodICD10Principal = consultatie.Diagnostic?.CodICD10Principal,
                 NumeDiagnosticPrincipal = consultatie.Diagnostic?.NumeDiagnosticPrincipal,
                 DescriereDetaliataPrincipal = consultatie.Diagnostic?.DescriereDetaliataPrincipal,
@@ -139,10 +143,7 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                 
                 // LEGACY fields for backwards compatibility
                 DiagnosticPozitiv = consultatie.Diagnostic?.DiagnosticPozitiv,
-                DiagnosticDiferential = consultatie.Diagnostic?.DiagnosticDiferential,
-                DiagnosticEtiologic = consultatie.Diagnostic?.DiagnosticEtiologic,
                 CoduriICD10 = consultatie.Diagnostic?.CoduriICD10,
-                CoduriICD10Secundare = consultatie.Diagnostic?.CoduriICD10Secundare,
                 
                 // Tab 3: Tratament - from ConsultatieTratament
                 TratamentMedicamentos = consultatie.Tratament?.TratamentMedicamentos,

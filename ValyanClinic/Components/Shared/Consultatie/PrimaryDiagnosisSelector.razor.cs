@@ -28,9 +28,6 @@ public partial class PrimaryDiagnosisSelector : ComponentBase
     
     /// <summary>Show validation errors</summary>
     [Parameter] public bool ShowValidation { get; set; }
-    
-    /// <summary>Event when any change occurs</summary>
-    [Parameter] public EventCallback OnChanged { get; set; }
 
     // ==================== HANDLERS ====================
     
@@ -41,16 +38,16 @@ public partial class PrimaryDiagnosisSelector : ComponentBase
         
         SelectedCode = code;
         await SelectedCodeChanged.InvokeAsync(SelectedCode);
-        await NotifyChange();
     }
 
-    /// <summary>Handle textarea input without causing re-render loops</summary>
-    private async Task HandleDetailsInput(ChangeEventArgs e)
+    /// <summary>Handle RTE value change and propagate to parent</summary>
+    private async Task HandleDetailsChanged(string? value)
     {
-        DiagnosisDetails = e.Value?.ToString();
+        Logger.LogInformation("[PrimaryDiagnosis] HandleDetailsChanged: {Value}", 
+            value?.Substring(0, Math.Min(50, value?.Length ?? 0)) ?? "NULL");
+        
+        DiagnosisDetails = value;
         await DiagnosisDetailsChanged.InvokeAsync(DiagnosisDetails);
-        // Note: NOT calling NotifyChange() here to avoid re-render loops during typing
-        // The parent will sync on blur or when other fields change
     }
 
     private async Task ClearSelection()
@@ -62,11 +59,5 @@ public partial class PrimaryDiagnosisSelector : ComponentBase
         
         await SelectedCodeChanged.InvokeAsync(SelectedCode);
         await DiagnosisDetailsChanged.InvokeAsync(DiagnosisDetails);
-        await NotifyChange();
-    }
-
-    private async Task NotifyChange()
-    {
-        await OnChanged.InvokeAsync();
     }
 }

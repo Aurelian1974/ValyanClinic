@@ -61,6 +61,9 @@ public partial class DiagnosticTab : ComponentBase
         if (_isInitialDataLoaded)
             return;
 
+        Logger.LogInformation("[DiagnosticTab] OnParametersSet - Model.DiagnosticeSecundare count: {Count}",
+            Model.DiagnosticeSecundare?.Count ?? 0);
+
         // Load primary diagnosis - use NEW fields first, fallback to legacy
         if ((!string.IsNullOrEmpty(Model.CodICD10Principal) || !string.IsNullOrEmpty(Model.CoduriICD10)) 
             && PrimaryDiagnosisCode == null)
@@ -68,9 +71,8 @@ public partial class DiagnosticTab : ComponentBase
             LoadPrimaryDiagnosisFromModel();
         }
 
-        // Load secondary diagnoses - use NEW list first, fallback to legacy
-        if ((Model.DiagnosticeSecundare?.Any() == true || !string.IsNullOrEmpty(Model.CoduriICD10Secundare)) 
-            && !SecondaryDiagnosesList.Any())
+        // Load secondary diagnoses - use NEW list
+        if (Model.DiagnosticeSecundare?.Any() == true && !SecondaryDiagnosesList.Any())
         {
             LoadSecondaryDiagnosesFromModel();
         }
@@ -88,9 +90,29 @@ public partial class DiagnosticTab : ComponentBase
 
     // ==================== EVENT HANDLERS ====================
 
+    /// <summary>Handler pentru schimbarea codului ICD-10 principal</summary>
+    private async Task HandlePrimaryCodeChanged(ICD10SearchResultDto? code)
+    {
+        Logger.LogInformation("[DiagnosticTab] HandlePrimaryCodeChanged: {Code}", code?.Code ?? "NULL");
+        PrimaryDiagnosisCode = code;
+        await OnFieldChanged();
+    }
+
+    /// <summary>Handler pentru schimbarea descrierii diagnosticului principal</summary>
+    private async Task HandlePrimaryDetailsChanged(string? details)
+    {
+        Logger.LogInformation("[DiagnosticTab] HandlePrimaryDetailsChanged: {Details}", 
+            details?.Substring(0, Math.Min(50, details?.Length ?? 0)) ?? "NULL");
+        PrimaryDiagnosisDetails = details;
+        await OnFieldChanged();
+    }
+
     /// <summary>Handler când un câmp se schimbă</summary>
     private async Task OnFieldChanged()
     {
+        Logger.LogInformation("[DiagnosticTab] OnFieldChanged - PrimaryDiagnosisDetails BEFORE sync: {Details}",
+            PrimaryDiagnosisDetails?.Substring(0, Math.Min(50, PrimaryDiagnosisDetails?.Length ?? 0)) ?? "NULL");
+        
         // Sync to Model
         SyncToModel();
         
@@ -164,30 +186,7 @@ public partial class DiagnosticTab : ComponentBase
             return;
         }
 
-        // Fallback to LEGACY (comma-separated codes)
-        if (string.IsNullOrEmpty(Model.CoduriICD10Secundare))
-        {
-            SecondaryDiagnosesList.Clear();
-            return;
-        }
-
-        var codes = Model.CoduriICD10Secundare
-            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(c => c.Trim())
-            .ToList();
-
-        SecondaryDiagnosesList = codes.Select(code => new SecondaryDiagnosis
-        {
-            Id = Guid.NewGuid(),
-            Description = code, // Just the code as description (legacy)
-            ICD10Codes = new List<ICD10SearchResultDto>
-            {
-                new ICD10SearchResultDto { Code = code, ShortDescription = code }
-            }
-        }).ToList();
-        
-        Logger.LogInformation("[DiagnosticTab] Loaded {Count} secondary diagnoses (LEGACY)", 
-            SecondaryDiagnosesList.Count);
+        SecondaryDiagnosesList.Clear();
     }
 
     // ==================== DATA SYNCING ====================
@@ -200,40 +199,58 @@ public partial class DiagnosticTab : ComponentBase
         Model.NumeDiagnosticPrincipal = PrimaryDiagnosisCode?.ShortDescription;
         Model.DescriereDetaliataPrincipal = PrimaryDiagnosisDetails;
         
+        Logger.LogInformation("[DiagnosticTab] SyncToModel - DescriereDetaliataPrincipal: {Desc}", 
+            PrimaryDiagnosisDetails?.Substring(0, Math.Min(50, PrimaryDiagnosisDetails?.Length ?? 0)) ?? "NULL");
+        
         // LEGACY fields for backwards compatibility
         Model.CoduriICD10 = PrimaryDiagnosisCode?.Code;
         Model.DiagnosticPozitiv = PrimaryDiagnosisDetails ?? PrimaryDiagnosisCode?.ShortDescription;
 
         // Sync Secondary Diagnoses - NEW normalized list
+        // Each SecondaryDiagnosis has: Description (RTE content) + ICD10Codes (list of codes)
+        // We create one DiagnosticSecundarDto per ICD10Code, or one per diagnosis if no codes
         if (SecondaryDiagnosesList.Any())
         {
-            Model.DiagnosticeSecundare = SecondaryDiagnosesList
-                .SelectMany((diagnosis, diagIndex) => 
-                    diagnosis.ICD10Codes.Select((code, codeIndex) => new DiagnosticSecundarDto
-                    {
-                        OrdineAfisare = diagIndex * 10 + codeIndex + 1, // 1, 2, 3... 11, 12...
-                        CodICD10 = code.Code,
-                        NumeDiagnostic = code.ShortDescription,
-                        Descriere = diagnosis.Description // Description is the RTE content
-                    }))
-                .Take(10) // Max 10 secondary diagnoses
-                .ToList();
-
-            // LEGACY: Collect all ICD10 codes for CoduriICD10Secundare
-            var allSecondaryCodes = SecondaryDiagnosesList
-                .SelectMany(d => d.ICD10Codes.Select(c => c.Code))
-                .Distinct()
-                .ToList();
-
-            Model.CoduriICD10Secundare = string.Join(", ", allSecondaryCodes);
+            var diagnostice = new List<DiagnosticSecundarDto>();
+            int ordine = 1;
             
-            Logger.LogInformation("[DiagnosticTab] Synced {Count} secondary diagnoses, codes: {Codes}", 
-                Model.DiagnosticeSecundare.Count, Model.CoduriICD10Secundare);
+            foreach (var diagnosis in SecondaryDiagnosesList)
+            {
+                if (diagnosis.ICD10Codes.Any())
+                {
+                    // Has ICD10 codes - create entry for each code
+                    foreach (var code in diagnosis.ICD10Codes)
+                    {
+                        diagnostice.Add(new DiagnosticSecundarDto
+                        {
+                            OrdineAfisare = ordine++,
+                            CodICD10 = code.Code,
+                            NumeDiagnostic = code.ShortDescription,
+                            Descriere = diagnosis.Description
+                        });
+                    }
+                }
+                else if (!string.IsNullOrWhiteSpace(diagnosis.Description))
+                {
+                    // No ICD10 code but has description - save anyway
+                    diagnostice.Add(new DiagnosticSecundarDto
+                    {
+                        OrdineAfisare = ordine++,
+                        CodICD10 = null,
+                        NumeDiagnostic = null,
+                        Descriere = diagnosis.Description
+                    });
+                }
+            }
+            
+            Model.DiagnosticeSecundare = diagnostice.Take(10).ToList();
+            
+            Logger.LogInformation("[DiagnosticTab] Synced {Count} secondary diagnoses", 
+                Model.DiagnosticeSecundare.Count);
         }
         else
         {
             Model.DiagnosticeSecundare = null;
-            Model.CoduriICD10Secundare = null;
         }
     }
 }

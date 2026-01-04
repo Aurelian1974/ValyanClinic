@@ -16,7 +16,7 @@ public class ConsultatieDiagnostic
     // ==================== FOREIGN KEY ====================
     public Guid ConsultatieID { get; set; }
 
-    // ==================== DIAGNOSTIC PRINCIPAL (NOU) ====================
+    // ==================== DIAGNOSTIC PRINCIPAL ====================
     
     /// <summary>
     /// Codul ICD-10 pentru diagnosticul principal (ex: "I10")
@@ -34,12 +34,11 @@ public class ConsultatieDiagnostic
     /// </summary>
     public string? DescriereDetaliataPrincipal { get; set; }
 
-    // ==================== LEGACY FIELDS (backwards compatibility) ====================
+    // ==================== LEGACY FIELDS (kept for backwards compatibility) ====================
+    /// <summary>Legacy: Text diagnostic pozitiv (folosit pentru fallback)</summary>
     public string? DiagnosticPozitiv { get; set; }
-    public string? DiagnosticDiferential { get; set; }
-    public string? DiagnosticEtiologic { get; set; }
+    /// <summary>Legacy: Cod ICD-10 simplu (va fi înlocuit de CodICD10Principal)</summary>
     public string? CoduriICD10 { get; set; }
-    public string? CoduriICD10Secundare { get; set; }
 
     // ==================== AUDIT ====================
     public DateTime DataCreare { get; set; }

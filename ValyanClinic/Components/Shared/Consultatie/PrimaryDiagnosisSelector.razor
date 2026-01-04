@@ -68,7 +68,8 @@
                 <i class="fas fa-align-left"></i> Descriere diagnostic principal
             </label>
             <div class="rte-container">
-                <SfRichTextEditor @bind-Value="DiagnosisDetails"
+                <SfRichTextEditor Value="@DiagnosisDetails"
+                                  ValueChanged="@HandleDetailsChanged"
                                   Placeholder="Descrieți detaliat diagnosticul principal..."
                                   ShowCharCount="true"
                                   EnableResize="true">
@@ -80,24 +81,18 @@
 </div>
 
 @code {
-    // ==================== RTE TOOLBAR - same as Anamneza ====================
+    // ==================== RTE TOOLBAR - Compact version for diagnosis ====================
     private List<ToolbarItemModel> RteTools = new List<ToolbarItemModel>()
     {
         new ToolbarItemModel() { Command = ToolbarCommand.Bold },
         new ToolbarItemModel() { Command = ToolbarCommand.Italic },
         new ToolbarItemModel() { Command = ToolbarCommand.Underline },
-        new ToolbarItemModel() { Command = ToolbarCommand.FontColor },
-        new ToolbarItemModel() { Command = ToolbarCommand.BackgroundColor },
-        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
-        new ToolbarItemModel() { Command = ToolbarCommand.FontSize },
-        new ToolbarItemModel() { Command = ToolbarCommand.LowerCase },
-        new ToolbarItemModel() { Command = ToolbarCommand.UpperCase },
         new ToolbarItemModel() { Command = ToolbarCommand.Separator },
         new ToolbarItemModel() { Command = ToolbarCommand.OrderedList },
         new ToolbarItemModel() { Command = ToolbarCommand.UnorderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
         new ToolbarItemModel() { Command = ToolbarCommand.Undo },
-        new ToolbarItemModel() { Command = ToolbarCommand.Redo },
-        new ToolbarItemModel() { Command = ToolbarCommand.ClearFormat }
+        new ToolbarItemModel() { Command = ToolbarCommand.Redo }
     };
 
     // ==================== HELPERS ====================

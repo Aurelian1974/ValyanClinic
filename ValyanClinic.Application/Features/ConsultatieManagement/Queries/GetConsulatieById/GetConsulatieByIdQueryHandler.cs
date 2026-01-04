@@ -114,10 +114,11 @@ public class GetConsulatieByIdQueryHandler : IRequestHandler<GetConsulatieByIdQu
                 
                 // ConsultatieDiagnostic (1:1) - NULL-SAFE navigation
                 DiagnosticPozitiv = consultatie.Diagnostic?.DiagnosticPozitiv,
-                DiagnosticDiferential = consultatie.Diagnostic?.DiagnosticDiferential,
-                DiagnosticEtiologic = consultatie.Diagnostic?.DiagnosticEtiologic,
                 CoduriICD10 = consultatie.Diagnostic?.CoduriICD10,
-                CoduriICD10Secundare = consultatie.Diagnostic?.CoduriICD10Secundare,
+                // Normalized fields
+                CodICD10Principal = consultatie.Diagnostic?.CodICD10Principal,
+                NumeDiagnosticPrincipal = consultatie.Diagnostic?.NumeDiagnosticPrincipal,
+                DescriereDetaliataPrincipal = consultatie.Diagnostic?.DescriereDetaliataPrincipal,
                 
                 // ConsultatieTratament (1:1) - NULL-SAFE navigation
                 TratamentMedicamentos = consultatie.Tratament?.TratamentMedicamentos,

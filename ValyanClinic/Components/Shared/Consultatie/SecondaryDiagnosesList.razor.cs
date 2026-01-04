@@ -14,24 +14,18 @@ public partial class SecondaryDiagnosesList : ComponentBase
     [Inject] private ILogger<SecondaryDiagnosesList> Logger { get; set; } = default!;
     [Inject] private IHtmlSanitizerService HtmlSanitizer { get; set; } = default!;
 
-    // ==================== RTE TOOLBAR - same as Anamneza ====================
+    // ==================== RTE TOOLBAR - Compact version for diagnosis ====================
     private readonly List<ToolbarItemModel> _rteTools = new()
     {
         new ToolbarItemModel() { Command = ToolbarCommand.Bold },
         new ToolbarItemModel() { Command = ToolbarCommand.Italic },
         new ToolbarItemModel() { Command = ToolbarCommand.Underline },
-        new ToolbarItemModel() { Command = ToolbarCommand.FontColor },
-        new ToolbarItemModel() { Command = ToolbarCommand.BackgroundColor },
-        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
-        new ToolbarItemModel() { Command = ToolbarCommand.FontSize },
-        new ToolbarItemModel() { Command = ToolbarCommand.LowerCase },
-        new ToolbarItemModel() { Command = ToolbarCommand.UpperCase },
         new ToolbarItemModel() { Command = ToolbarCommand.Separator },
         new ToolbarItemModel() { Command = ToolbarCommand.OrderedList },
         new ToolbarItemModel() { Command = ToolbarCommand.UnorderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
         new ToolbarItemModel() { Command = ToolbarCommand.Undo },
-        new ToolbarItemModel() { Command = ToolbarCommand.Redo },
-        new ToolbarItemModel() { Command = ToolbarCommand.ClearFormat }
+        new ToolbarItemModel() { Command = ToolbarCommand.Redo }
     };
 
     // ==================== PARAMETERS ====================
@@ -162,6 +156,14 @@ public partial class SecondaryDiagnosesList : ComponentBase
         diagnosis.AdditionalDetails = e.Value?.ToString();
         // Note: NOT calling NotifyChange() here to avoid re-render loops during typing
         // The list is updated by reference, so changes are automatically reflected
+    }
+
+    /// <summary>Handle RTE Description change</summary>
+    private async Task HandleDescriptionChanged(SecondaryDiagnosis diagnosis, string value)
+    {
+        diagnosis.Description = value;
+        // Notify parent to sync the model - needed for save to work
+        await NotifyChange();
     }
 
     private async Task NotifyChange()

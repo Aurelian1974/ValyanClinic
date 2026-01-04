@@ -214,9 +214,7 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                     DescriereDetaliataPrincipal = request.DescriereDetaliataPrincipal,
                     // LEGACY: backwards compatibility
                     DiagnosticPozitiv = request.DiagnosticPozitiv,
-                    DiagnosticDiferential = request.DiagnosticDiferential,
                     CoduriICD10 = request.CoduriICD10 ?? request.CodICD10Principal, // fallback to new field
-                    CoduriICD10Secundare = request.CoduriICD10Secundare,
                     CreatDe = request.CreatDeSauModificatDe,
                     DataCreare = DateTime.Now,
                     DataUltimeiModificari = DateTime.Now

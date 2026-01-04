@@ -72,10 +72,11 @@ public class UpdateConsulatieCommand : IRequest<Result<bool>>
 
     // ==================== V. DIAGNOSTIC ====================
     public string? DiagnosticPozitiv { get; set; }
-    public string? DiagnosticDiferential { get; set; }
-    public string? DiagnosticEtiologic { get; set; }
     public string? CoduriICD10 { get; set; }
-    public string? CoduriICD10Secundare { get; set; }
+    // Normalized diagnostic fields
+    public string? CodICD10Principal { get; set; }
+    public string? NumeDiagnosticPrincipal { get; set; }
+    public string? DescriereDetaliataPrincipal { get; set; }
 
     // ==================== VI. TRATAMENT ====================
     public string? TratamentMedicamentos { get; set; }

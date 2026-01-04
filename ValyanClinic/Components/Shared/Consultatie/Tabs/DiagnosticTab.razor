@@ -15,11 +15,12 @@
         <!-- COLOANA STÂNGA: DIAGNOSTIC PRINCIPAL -->
         <div class="diagnostic-column primary-column">
             <div class="form-section">
-                <PrimaryDiagnosisSelector @bind-SelectedCode="PrimaryDiagnosisCode"
-                                          @bind-DiagnosisDetails="PrimaryDiagnosisDetails"
+                <PrimaryDiagnosisSelector SelectedCode="@PrimaryDiagnosisCode"
+                                          SelectedCodeChanged="@HandlePrimaryCodeChanged"
+                                          DiagnosisDetails="@PrimaryDiagnosisDetails"
+                                          DiagnosisDetailsChanged="@HandlePrimaryDetailsChanged"
                                           CurrentUserId="@CurrentUserId"
-                                          ShowValidation="@ShowValidation"
-                                          OnChanged="@OnFieldChanged" />
+                                          ShowValidation="@ShowValidation" />
             </div>
         </div>
         

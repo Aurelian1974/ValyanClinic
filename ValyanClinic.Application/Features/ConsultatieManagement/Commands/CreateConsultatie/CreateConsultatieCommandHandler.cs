@@ -147,11 +147,13 @@ public class CreateConsultatieCommandHandler : IRequestHandler<CreateConsultatie
             await _repository.UpsertDiagnosticAsync(consultatieId, new ConsultatieDiagnostic
             {
                 ConsultatieID = consultatieId,
+                // Normalized structure
+                CodICD10Principal = request.CodICD10Principal,
+                NumeDiagnosticPrincipal = request.NumeDiagnosticPrincipal,
+                DescriereDetaliataPrincipal = request.DescriereDetaliataPrincipal,
+                // Legacy
                 DiagnosticPozitiv = request.DiagnosticPozitiv,
-                DiagnosticDiferential = request.DiagnosticDiferential,
-                DiagnosticEtiologic = request.DiagnosticEtiologic,
-                CoduriICD10 = request.CoduriICD10,
-                CoduriICD10Secundare = request.CoduriICD10Secundare,
+                CoduriICD10 = request.CoduriICD10 ?? request.CodICD10Principal,
                 CreatDe = creatDe,
                 DataCreare = DateTime.Now
             });
