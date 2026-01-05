@@ -236,6 +236,7 @@ try
     // ✅ NOU - Analize Medicale (Nomenclator + Consultație)
     builder.Services.AddScoped<IAnalizaMedicalaRepository, AnalizaMedicalaRepository>();
     builder.Services.AddScoped<IConsultatieAnalizaMedicalaRepository, ConsultatieAnalizaMedicalaRepository>();
+    builder.Services.AddScoped<IConsultatieAnalizaRecomandataRepository, ConsultatieAnalizaRecomandataRepository>(); // ✅ NOU - Analize Recomandate
     builder.Services.AddScoped<IRolRepository, RolRepository>(); // ✅ NOU - Administrare Roluri și Permisiuni
     builder.Services.AddScoped<ValyanClinic.Application.Interfaces.IFieldPermissionService, 
                                 ValyanClinic.Application.Services.FieldPermissionService>(); // ✅ NOU - Permisiuni granulare la nivel de câmp
@@ -332,6 +333,16 @@ try
         client.Timeout = TimeSpan.FromSeconds(10);
         client.DefaultRequestHeaders.Add("User-Agent", "ValyanClinic/1.0");
     });
+
+    // ========================================
+    // ANALIZE PDF PARSER SERVICE (C# native cu PdfPig)
+    // ========================================
+    // Serviciu nativ C# pentru parsare PDF-uri buletine de analize medicale
+    // Înlocuiește dependența de Python API
+    builder.Services.AddSingleton<ValyanClinic.Application.Services.Analize.PdfAnalizeParsers.IPdfParserService, 
+        ValyanClinic.Application.Services.Analize.PdfAnalizeParsers.PdfParserService>();
+    builder.Services.AddScoped<ValyanClinic.Application.Services.Analize.IAnalizePdfParserService, 
+        ValyanClinic.Application.Services.Analize.AnalizePdfParserService>();
 
     // ========================================
     // NOMENCLATOR MEDICAMENTE ANM

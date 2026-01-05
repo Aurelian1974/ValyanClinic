@@ -1,0 +1,187 @@
+@using ValyanClinic.Application.Features.Analize.Models
+@using ValyanClinic.Application.Services.Analize
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Buttons
+
+<SfDialog @bind-Visible="@IsVisible"
+          Width="900px"
+          Height="700px"
+          IsModal="true"
+          ShowCloseIcon="true"
+          AllowDragging="true"
+          CssClass="import-analize-dialog">
+    <DialogTemplates>
+        <Header>
+            <div class="dialog-header">
+                <i class="fas fa-file-import"></i>
+                <span>Import Analize din PDF</span>
+            </div>
+        </Header>
+        <Content>
+            <div class="import-container">
+                @* Pasul 1: Selectare laborator și fișier *@
+                <div class="step-section">
+                    <h4><span class="step-number">1</span> Selectează laboratorul și fișierul PDF</h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Laborator:</label>
+                            <SfDropDownList TValue="string" 
+                                            TItem="LaboratorInfo"
+                                            @bind-Value="@_selectedLaborator"
+                                            DataSource="@_laboratoare"
+                                            Placeholder="Selectează laboratorul..."
+                                            AllowFiltering="true">
+                                <DropDownListFieldSettings Text="Name" Value="Key"></DropDownListFieldSettings>
+                                <DropDownListTemplates TItem="LaboratorInfo">
+                                    <ItemTemplate>
+                                        <div class="lab-item">
+                                            <span class="lab-name">@context.Name</span>
+                                            <span class="lab-desc">@context.Description</span>
+                                        </div>
+                                    </ItemTemplate>
+                                </DropDownListTemplates>
+                            </SfDropDownList>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fișier PDF:</label>
+                            <SfUploader @ref="_uploader"
+                                        AllowedExtensions=".pdf"
+                                        Multiple="false"
+                                        AutoUpload="false"
+                                        MaxFileSize="10485760">
+                                <UploaderEvents ValueChange="@OnFileSelected"></UploaderEvents>
+                            </SfUploader>
+                        </div>
+                    </div>
+                    
+                    <div class="action-row">
+                        <SfButton CssClass="e-primary parse-btn" 
+                                  IconCss="fas fa-cogs"
+                                  Disabled="@(!CanParse)"
+                                  @onclick="ParsePdf">
+                            @if (_isParsing)
+                            {
+                                <span class="spinner"></span>
+                                <span>Se procesează...</span>
+                            }
+                            else
+                            {
+                                <span>Procesează PDF</span>
+                            }
+                        </SfButton>
+                    </div>
+                </div>
+                
+                @* Pasul 2: Preview rezultate *@
+                @if (_parseResult != null)
+                {
+                    <div class="step-section">
+                        <h4><span class="step-number">2</span> Preview analize extrase</h4>
+                        
+                        <div class="result-summary">
+                            <div class="summary-item">
+                                <i class="fas fa-flask"></i>
+                                <span>Total: <strong>@_parseResult.TotalAnalize</strong> analize</span>
+                            </div>
+                            @if (_parseResult.AnalizeAnormale > 0)
+                            {
+                                <div class="summary-item warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>Anormale: <strong>@_parseResult.AnalizeAnormale</strong></span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(_parseResult.DataRecoltare))
+                            {
+                                <div class="summary-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Data: <strong>@_parseResult.DataRecoltare</strong></span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(_parseResult.NumarBuletin))
+                            {
+                                <div class="summary-item">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Nr: <strong>@_parseResult.NumarBuletin</strong></span>
+                                </div>
+                            }
+                        </div>
+                        
+                        @if (_parseResult.Warnings.Any())
+                        {
+                            <div class="warnings-box">
+                                @foreach (var warning in _parseResult.Warnings)
+                                {
+                                    <div class="warning-item">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>@warning</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        
+                        <div class="analize-grid">
+                            <SfGrid DataSource="@_parseResult.Analize"
+                                    AllowSelection="true"
+                                    Height="300">
+                                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Multiple" CheckboxMode="CheckboxSelectionType.ResetOnRowClick"></GridSelectionSettings>
+                                <GridColumns>
+                                    <GridColumn Type="ColumnType.CheckBox" Width="50"></GridColumn>
+                                    <GridColumn Field="@nameof(AnalizaParsataDto.NumeAnaliza)" 
+                                                HeaderText="Analiză" 
+                                                Width="200">
+                                        <Template>
+                                            @{
+                                                var item = context as AnalizaParsataDto;
+                                                if (item != null)
+                                                {
+                                                    <div class="analiza-cell @(item.EsteAnormal ? "anormal" : "")">
+                                                        @if (item.EsteAnormal)
+                                                        {
+                                                            <i class="fas fa-exclamation-circle" title="@item.DirectieAnormal"></i>
+                                                        }
+                                                        <span>@item.NumeAnaliza</span>
+                                                    </div>
+                                                }
+                                            }
+                                        </Template>
+                                    </GridColumn>
+                                    <GridColumn Field="@nameof(AnalizaParsataDto.Rezultat)" 
+                                                HeaderText="Rezultat" 
+                                                Width="100"
+                                                TextAlign="TextAlign.Right"></GridColumn>
+                                    <GridColumn Field="@nameof(AnalizaParsataDto.UnitateMasura)" 
+                                                HeaderText="UM" 
+                                                Width="80"></GridColumn>
+                                    <GridColumn Field="@nameof(AnalizaParsataDto.IntervalText)" 
+                                                HeaderText="Interval" 
+                                                Width="120"></GridColumn>
+                                    <GridColumn Field="@nameof(AnalizaParsataDto.Categorie)" 
+                                                HeaderText="Categorie" 
+                                                Width="100"></GridColumn>
+                                </GridColumns>
+                            </SfGrid>
+                        </div>
+                    </div>
+                }
+            </div>
+        </Content>
+        <FooterTemplate>
+            <div class="dialog-footer">
+                <SfButton CssClass="e-flat" @onclick="Close">Anulează</SfButton>
+                <SfButton CssClass="e-primary" 
+                          IconCss="fas fa-check"
+                          Disabled="@(!CanImport)"
+                          @onclick="ImportAnalize">
+                    Importă Analizele Selectate
+                </SfButton>
+            </div>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>

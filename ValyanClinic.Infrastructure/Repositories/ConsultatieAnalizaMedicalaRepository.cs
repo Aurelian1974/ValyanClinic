@@ -30,15 +30,21 @@ public class ConsultatieAnalizaMedicalaRepository : IConsultatieAnalizaMedicalaR
         var sql = @"
             INSERT INTO ConsultatieAnalizeMedicale (
                 Id, ConsultatieID, TipAnaliza, NumeAnaliza, CodAnaliza,
-                StatusAnaliza, DataRecomandare, DataProgramata, Prioritate, EsteCito,
-                IndicatiiClinice, ObservatiiRecomandare, Pret, Decontat,
-                DataCreare, CreatDe
+                StatusAnaliza, DataRecomandare, DataProgramata, DataEfectuare, LocEfectuare,
+                Prioritate, EsteCito, IndicatiiClinice, ObservatiiRecomandare,
+                AreRezultate, DataRezultate, ValoareRezultat, UnitatiMasura,
+                ValoareNormalaMin, ValoareNormalaMax, EsteInAfaraLimitelor,
+                InterpretareMedic, ConclusiiAnaliza,
+                Pret, Decontat, DataCreare, CreatDe
             )
             VALUES (
                 @Id, @ConsultatieID, @TipAnaliza, @NumeAnaliza, @CodAnaliza,
-                @StatusAnaliza, @DataRecomandare, @DataProgramata, @Prioritate, @EsteCito,
-                @IndicatiiClinice, @ObservatiiRecomandare, @Pret, @Decontat,
-                @DataCreare, @CreatDe
+                @StatusAnaliza, @DataRecomandare, @DataProgramata, @DataEfectuare, @LocEfectuare,
+                @Prioritate, @EsteCito, @IndicatiiClinice, @ObservatiiRecomandare,
+                @AreRezultate, @DataRezultate, @ValoareRezultat, @UnitatiMasura,
+                @ValoareNormalaMin, @ValoareNormalaMax, @EsteInAfaraLimitelor,
+                @InterpretareMedic, @ConclusiiAnaliza,
+                @Pret, @Decontat, @DataCreare, @CreatDe
             )";
 
         analiza.Id = Guid.NewGuid();
@@ -47,8 +53,8 @@ public class ConsultatieAnalizaMedicalaRepository : IConsultatieAnalizaMedicalaR
         await connection.ExecuteAsync(sql, analiza);
 
         _logger.LogInformation(
-            "Analiză medicală creată: {Id} pentru consultație {ConsultatieID}",
-            analiza.Id, analiza.ConsultatieID);
+            "Analiză medicală creată: {Id} pentru consultație {ConsultatieID}, AreRezultate={AreRezultate}",
+            analiza.Id, analiza.ConsultatieID, analiza.AreRezultate);
 
         return analiza.Id;
     }

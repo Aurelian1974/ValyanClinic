@@ -30,13 +30,13 @@ public class AddAnalizaToConsultatieCommandHandler
         try
         {
             _logger.LogInformation(
-                "Adding analiză {NumeAnaliza} to consultație {ConsultatieID}",
-                request.NumeAnaliza, request.ConsultatieID);
+                "Adding analiză {NumeAnaliza} (Categorie: {Categorie}) to consultație {ConsultatieID}",
+                request.NumeAnaliza, request.Categorie, request.ConsultatieID);
 
             var analiza = new ConsultatieAnalizaMedicala
             {
                 ConsultatieID = request.ConsultatieID,
-                TipAnaliza = "Laborator",
+                TipAnaliza = request.Categorie ?? "Laborator", // Folosește categoria din nomenclator
                 NumeAnaliza = request.NumeAnaliza,
                 CodAnaliza = request.CodAnaliza,
                 StatusAnaliza = "Recomandata",

@@ -41,7 +41,7 @@ public class GetAnalizeMedicaleByConsultatieQueryHandler
             {
                 Id = a.Id,
                 ConsultatieID = a.ConsultatieID,
-                TipAnaliza = "Laborator", // Default - ar putea veni din nomenclator
+                TipAnaliza = a.TipAnaliza ?? "Laborator", // Folosește valoarea din DB
                 NumeAnaliza = a.NumeAnaliza,
                 CodAnaliza = a.CodAnaliza,
                 StatusAnaliza = a.StatusAnaliza, // Domain entity folosește StatusAnaliza (string)

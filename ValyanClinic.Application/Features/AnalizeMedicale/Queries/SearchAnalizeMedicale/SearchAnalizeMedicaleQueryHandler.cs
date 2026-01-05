@@ -50,9 +50,11 @@ public class SearchAnalizeMedicaleQueryHandler
                 Acronime = a.Acronime,
                 Pret = a.Pret,
                 Moneda = a.Moneda,
-                // Note: Categoria și Laborator sunt populate de SP cu JOIN
-                // Pentru mapping complet, ar trebui să includem proprietățile în Domain entity
-                // sau să folosim un DTO direct din SP
+                // Aceste câmpuri sunt populate din JOIN în stored procedure
+                NumeCategorie = a.NumeCategorie ?? string.Empty,
+                CategorieIcon = a.CategorieIcon,
+                NumeLaborator = a.NumeLaborator ?? string.Empty,
+                LaboratorAcronim = a.LaboratorAcronim
             }).ToList();
 
             _logger.LogInformation(

@@ -1,8 +1,12 @@
 ﻿@using ValyanClinic.Application.ViewModels
-@using ValyanClinic.Components.Shared.Consultatie.Modals
+@using ValyanClinic.Application.Services.Analize
+@using ValyanClinic.Application.Features.Analize.Models
+@using ValyanClinic.Components.Shared.Medical
+@using Syncfusion.Blazor.DropDowns
 @*
     Tab Analize Medicale pentru consultație
     Include: Analize recomandate + Analize efectuate (cu rezultate)
+    Folosește secțiune inline expandabilă pentru adăugare (fără modal)
 *@
 
 <div class="analize-tab-container">
@@ -13,97 +17,243 @@
             <h3 class="section-title">
                 <i class="fas fa-clipboard-list"></i>
                 Analize Recomandate
+                @if (AnalizeRecomandate.Any())
+                {
+                    <span class="badge-count">@AnalizeRecomandate.Count</span>
+                }
             </h3>
-            <button type="button" class="btn btn-primary btn-sm" @onclick="ShowAddAnalizaModal">
-                <i class="fas fa-plus"></i>
-                Adaugă Analiză
+            <button type="button" 
+                    class="btn @(_showAddForm ? "btn-secondary" : "btn-primary") btn-sm" 
+                    @onclick="ToggleAddForm">
+                @if (_showAddForm)
+                {
+                    <i class="fas fa-times"></i>
+                    <span>Închide</span>
+                }
+                else
+                {
+                    <i class="fas fa-plus"></i>
+                    <span>Adaugă Analiză</span>
+                }
             </button>
         </div>
 
-        @if (AnalizeRecomandate.Any())
+        <!-- ========== FORMULAR INLINE EXPANDABIL ========== -->
+        @if (_showAddForm)
         {
-            <div class="analize-recomandate-grid">
-                @foreach (var analiza in AnalizeRecomandate)
+            <div class="add-analiza-inline @(_showAddForm ? "expanded" : "")">
+                <div class="inline-form-header">
+                    <i class="fas fa-flask"></i>
+                    <span>Adaugă Analiză Recomandată</span>
+                </div>
+                
+                @if (!string.IsNullOrEmpty(_formErrorMessage))
                 {
-                    <div class="analiza-card @GetCardClass(analiza)">
-                        <div class="analiza-header">
-                            <div class="analiza-info">
-                                <span class="analiza-tip">@analiza.TipAnaliza</span>
-                                <h4 class="analiza-nume">@analiza.NumeAnaliza</h4>
-                                @if (!string.IsNullOrEmpty(analiza.CodAnaliza))
-                                {
-                                    <span class="analiza-cod">Cod: @analiza.CodAnaliza</span>
-                                }
-                            </div>
-                            <div class="analiza-actions">
-                                @if (analiza.EsteCito)
-                                {
-                                    <span class="badge badge-urgent">
-                                        <i class="fas fa-exclamation-circle"></i> CITO
-                                    </span>
-                                }
-                                @if (!string.IsNullOrEmpty(analiza.Prioritate))
-                                {
-                                    <span class="badge badge-@GetPrioritateClass(analiza.Prioritate)">
-                                        @analiza.Prioritate
-                                    </span>
-                                }
-                                <button type="button" class="btn-icon" @onclick="() => DeleteAnaliza(analiza.Id)" title="Șterge">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="analiza-body">
-                            <div class="analiza-meta">
-                                <div class="meta-item">
-                                    <i class="fas fa-calendar"></i>
-                                    <span>Recomandată: @analiza.DataRecomandare.ToString("dd.MM.yyyy")</span>
-                                </div>
-                                @if (analiza.DataProgramata.HasValue)
-                                {
-                                    <div class="meta-item">
-                                        <i class="fas fa-clock"></i>
-                                        <span>Programată: @analiza.DataProgramata.Value.ToString("dd.MM.yyyy HH:mm")</span>
-                                    </div>
-                                }
-                                @if (!string.IsNullOrEmpty(analiza.LocEfectuare))
-                                {
-                                    <div class="meta-item">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>@analiza.LocEfectuare</span>
-                                    </div>
-                                }
-                            </div>
-
-                            @if (!string.IsNullOrEmpty(analiza.IndicatiiClinice))
-                            {
-                                <div class="analiza-indicatii">
-                                    <strong>Indicații clinice:</strong>
-                                    <p>@analiza.IndicatiiClinice</p>
-                                </div>
-                            }
-
-                            @if (!string.IsNullOrEmpty(analiza.ObservatiiRecomandare))
-                            {
-                                <div class="analiza-observatii">
-                                    <strong>Observații:</strong>
-                                    <p>@analiza.ObservatiiRecomandare</p>
-                                </div>
-                            }
-
-                            <div class="analiza-status">
-                                <span class="status-badge status-@analiza.StatusAnaliza.ToLower()">
-                                    @GetStatusIcon(analiza.StatusAnaliza)
-                                    @analiza.StatusAnaliza
-                                </span>
-                            </div>
-                        </div>
+                    <div class="alert alert-danger alert-sm">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        @_formErrorMessage
                     </div>
                 }
+
+                <div class="inline-form-body">
+                    <div class="form-row-3">
+                        <div class="form-group form-group-lg">
+                            <label class="form-label required">
+                                <i class="fas fa-flask"></i>
+                                Analiză
+                            </label>
+                            <SfAutoComplete @ref="_autoCompleteRef"
+                                            TValue="Guid?"
+                                            TItem="AnalizaMedicalaListDto"
+                                            @bind-Value="_selectedAnalizaId"
+                                            DataSource="@_analizeSuggestions"
+                                            Placeholder="Caută analiză (ex: Hemoleucogramă, Glicemie, TSH)..."
+                                            AllowFiltering="true"
+                                            FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                            IgnoreAccent="true"
+                                            ShowPopupButton="true"
+                                            MinLength="2"
+                                            CssClass="@(string.IsNullOrEmpty(_newAnaliza.NumeAnaliza) && _formSubmitted ? "e-error" : "")">
+                                <AutoCompleteFieldSettings Value="AnalizaID" Text="NumeAnaliza" />
+                                <AutoCompleteTemplates TItem="AnalizaMedicalaListDto">
+                                    <ItemTemplate Context="item">
+                                        <div class="autocomplete-item-analiza">
+                                            <div class="item-main">
+                                                <strong>@item.NumeAnaliza</strong>
+                                                @if (!string.IsNullOrEmpty(item.NumeScurt))
+                                                {
+                                                    <span class="item-short">(@item.NumeScurt)</span>
+                                                }
+                                            </div>
+                                            <div class="item-details">
+                                                <span class="item-category">
+                                                    <i class="fas fa-folder-open"></i> @item.NumeCategorie
+                                                </span>
+                                                @if (item.Pret.HasValue)
+                                                {
+                                                    <span class="item-price">@item.Pret.Value.ToString("N2") RON</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </ItemTemplate>
+                                </AutoCompleteTemplates>
+                                <AutoCompleteEvents TValue="Guid?" TItem="AnalizaMedicalaListDto"
+                                                    Filtering="OnAnalizaFiltering"
+                                                    ValueChange="OnAnalizaSelected" />
+                            </SfAutoComplete>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-folder-open"></i>
+                                Categorie
+                            </label>
+                            <input type="text" 
+                                   class="form-control readonly-field"
+                                   value="@_selectedCategorie"
+                                   readonly
+                                   placeholder="Se completează automat" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-flag"></i>
+                                Prioritate
+                            </label>
+                            <select class="form-control" @bind="_newAnaliza.Prioritate">
+                                <option value="Normala">Normală</option>
+                                <option value="Urgent">Urgent</option>
+                                <option value="Foarte urgent">Foarte Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row-cito">
+                        <div class="form-group checkbox-group">
+                            <label class="form-check-label">
+                                <input type="checkbox" 
+                                       class="form-check-input"
+                                       @bind="_newAnaliza.EsteCito" />
+                                <span class="cito-label">
+                                    <i class="fas fa-exclamation-circle text-danger"></i>
+                                    CITO (Foarte Urgent)
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inline-form-footer">
+                    <button type="button" 
+                            class="btn btn-outline-secondary btn-sm" 
+                            @onclick="CancelAddForm"
+                            disabled="@_isSaving">
+                        <i class="fas fa-times"></i>
+                        Anulează
+                    </button>
+                    <button type="button" 
+                            class="btn btn-success btn-sm" 
+                            @onclick="HandleAddAnaliza"
+                            disabled="@_isSaving">
+                        @if (_isSaving)
+                        {
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Se salvează...</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-check"></i>
+                            <span>Adaugă</span>
+                        }
+                    </button>
+                </div>
             </div>
         }
-        else
+
+        <!-- ========== LISTA ANALIZE RECOMANDATE (DOUĂ TABELE) ========== -->
+        @if (AnalizeRecomandate.Any())
+        {
+            <div class="analize-tables-container">
+                <!-- Tabel Stânga -->
+                <div class="analize-table-wrapper">
+                    <table class="analize-table">
+                        <thead>
+                            <tr>
+                                <th class="col-categorie">Categorie</th>
+                                <th class="col-denumire">Denumire Analiză</th>
+                                <th class="col-actions"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var analiza in GetAnalizeStanga())
+                            {
+                                <tr class="@(analiza.EsteCito ? "row-cito" : "")">
+                                    <td class="col-categorie">
+                                        <span class="categorie-badge">@analiza.TipAnaliza</span>
+                                    </td>
+                                    <td class="col-denumire">
+                                        <div class="denumire-content">
+                                            <span class="denumire-text">@analiza.NumeAnaliza</span>
+                                            @if (analiza.EsteCito)
+                                            {
+                                                <span class="cito-indicator" title="CITO - Foarte Urgent">
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                </span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td class="col-actions">
+                                        <button type="button" class="btn-icon-sm btn-icon-danger" @onclick="() => DeleteAnaliza(analiza.Id)" title="Șterge">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tabel Dreapta -->
+                <div class="analize-table-wrapper">
+                    <table class="analize-table">
+                        <thead>
+                            <tr>
+                                <th class="col-categorie">Categorie</th>
+                                <th class="col-denumire">Denumire Analiză</th>
+                                <th class="col-actions"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var analiza in GetAnalizeDreapta())
+                            {
+                                <tr class="@(analiza.EsteCito ? "row-cito" : "")">
+                                    <td class="col-categorie">
+                                        <span class="categorie-badge">@analiza.TipAnaliza</span>
+                                    </td>
+                                    <td class="col-denumire">
+                                        <div class="denumire-content">
+                                            <span class="denumire-text">@analiza.NumeAnaliza</span>
+                                            @if (analiza.EsteCito)
+                                            {
+                                                <span class="cito-indicator" title="CITO - Foarte Urgent">
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                </span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td class="col-actions">
+                                        <button type="button" class="btn-icon-sm btn-icon-danger" @onclick="() => DeleteAnaliza(analiza.Id)" title="Șterge">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else if (!_showAddForm)
         {
             <div class="no-data-message">
                 <i class="fas fa-clipboard-list"></i>
@@ -112,120 +262,32 @@
         }
     </div>
 
-    <!-- ========== SECȚIUNEA 2: ANALIZE EFECTUATE (CU REZULTATE) ========== -->
+    <!-- ========== SECȚIUNEA 2: ANALIZE EFECTUATE (IMPORT DIN PDF) ========== -->
     <div class="form-section">
         <div class="section-header">
             <h3 class="section-title">
                 <i class="fas fa-flask"></i>
-                Analize Efectuate
+                Analize Efectuate (Rezultate)
                 @if (AnalizeEfectuate.Any())
                 {
                     <span class="badge-count">@AnalizeEfectuate.Count</span>
                 }
             </h3>
-            <button type="button" class="btn btn-secondary btn-sm" @onclick="ShowImportAnalizaModal">
-                <i class="fas fa-file-upload"></i>
-                Importă Rezultate (OCR)
+            <button type="button" class="btn btn-primary btn-sm" @onclick="ShowImportAnalizaModal">
+                <i class="fas fa-file-pdf"></i>
+                Importă din PDF
             </button>
         </div>
-
-        @if (AnalizeEfectuate.Any())
+        
+        @if (AnalizeEfectuateGroups.Any())
         {
-            <div class="analize-efectuate-container">
-                @foreach (var analiza in AnalizeEfectuate)
-                {
-                    <div class="analiza-group">
-                        <div class="group-header" @onclick="() => ToggleAnalizaExpanded(analiza.Id)">
-                            <div class="group-info">
-                                <i class="fas fa-vial"></i>
-                                <h4>@analiza.NumeAnaliza</h4>
-                                @if (analiza.DataEfectuare.HasValue)
-                                {
-                                    <span class="group-date">@analiza.DataEfectuare.Value.ToString("dd.MM.yyyy")</span>
-                                }
-                                @if (analiza.Detalii.Any(d => d.EsteAnormal))
-                                {
-                                    <span class="abnormal-badge">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                        @analiza.Detalii.Count(d => d.EsteAnormal) anormal
-                                    </span>
-                                }
-                            </div>
-                            <div class="group-toggle">
-                                <i class="fas @(IsAnalizaExpanded(analiza.Id) ? "fa-chevron-up" : "fa-chevron-down")"></i>
-                            </div>
-                        </div>
-
-                        @if (IsAnalizaExpanded(analiza.Id))
-                        {
-                            <div class="group-content">
-                                @if (analiza.Detalii.Any())
-                                {
-                                    <table class="detalii-table">
-                                        <thead>
-                                            <tr>
-                                                <th class="col-status"></th>
-                                                <th class="col-parametru">Parametru</th>
-                                                <th class="col-valoare">Valoare</th>
-                                                <th class="col-unitate">Unitate</th>
-                                                <th class="col-interval">Interval Normal</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var detaliu in analiza.Detalii.OrderBy(d => d.NumeParametru))
-                                            {
-                                                <tr class="@(detaliu.EsteAnormal ? "row-abnormal" : "")">
-                                                    <td class="col-status">
-                                                        @if (detaliu.EsteAnormal)
-                                                        {
-                                                            <i class="fas fa-exclamation-circle status-abnormal"></i>
-                                                        }
-                                                        else
-                                                        {
-                                                            <i class="fas fa-check-circle status-normal"></i>
-                                                        }
-                                                    </td>
-                                                    <td class="col-parametru">
-                                                        <span class="parametru-name">@detaliu.NumeParametru</span>
-                                                    </td>
-                                                    <td class="col-valoare @(detaliu.EsteAnormal ? "value-abnormal" : "")">
-                                                        @detaliu.Valoare
-                                                    </td>
-                                                    <td class="col-unitate">@detaliu.UnitatiMasura</td>
-                                                    <td class="col-interval">
-                                                        @if (!string.IsNullOrEmpty(detaliu.ValoareNormalaText))
-                                                        {
-                                                            <text>@detaliu.ValoareNormalaText</text>
-                                                        }
-                                                        else if (detaliu.ValoareNormalaMin.HasValue && detaliu.ValoareNormalaMax.HasValue)
-                                                        {
-                                                            <text>@detaliu.ValoareNormalaMin - @detaliu.ValoareNormalaMax</text>
-                                                        }
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                }
-
-                                @if (!string.IsNullOrEmpty(analiza.InterpretareMedic))
-                                {
-                                    <div class="interpretare-medic">
-                                        <strong><i class="fas fa-user-md"></i> Interpretare Medic:</strong>
-                                        <p>@analiza.InterpretareMedic</p>
-                                    </div>
-                                }
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
+            <AnalizeMedicaleViewer Groups="@AnalizeEfectuateGroups" IsLoading="@_isLoading" />
         }
         else
         {
             <div class="no-data-message">
-                <i class="fas fa-flask"></i>
-                <span>Nu există analize efectuate cu rezultate pentru această consultație</span>
+                <i class="fas fa-info-circle"></i>
+                <span>Importați rezultatele analizelor din PDF-ul buletinului de laborator</span>
             </div>
         }
     </div>
@@ -240,9 +302,7 @@
     }
 </div>
 
-@* ========== MODAL ADĂUGARE ANALIZĂ ========== *@
-<AddAnalizaModal IsVisible="@_showAddAnalizaModal"
-                 OnClose="@CloseAddAnalizaModal"
-                 OnSave="@HandleAddAnalizaSave" />
-
-@* TODO: MODAL IMPORT REZULTATE OCR *@
+<!-- Import PDF Modal -->
+<ImportAnalizePdfModal 
+    @ref="_importPdfModal"
+    OnImportComplete="OnImportAnalizePdfComplete" />

@@ -35,7 +35,13 @@ public class AnalizaMedicala
     public DateTime DataCreare { get; set; } = DateTime.Now;
     public DateTime DataUltimaActualizare { get; set; } = DateTime.Now;
 
-    // Navigation properties
+    // Proprietăți populate din JOIN în stored procedures (pentru flat mapping)
+    public string? NumeCategorie { get; set; }
+    public string? CategorieIcon { get; set; }
+    public string? NumeLaborator { get; set; }
+    public string? LaboratorAcronim { get; set; }
+
+    // Navigation properties (opțional - pentru EF Core)
     public AnalizaMedicalaLaborator? Laborator { get; set; }
     public AnalizaMedicalaCategorie? Categorie { get; set; }
 }
