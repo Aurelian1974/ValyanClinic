@@ -645,31 +645,43 @@ public partial class AnalizeMedicaleTab : ComponentBase, IDisposable
         }
 
         _isLoadingComparison = true;
+        StateHasChanged();
+        
         try
         {
+            Logger.LogInformation("🔵 Loading previous analize for PacientId: {PacientId}, current ConsultatieId: {ConsultatieId}", 
+                PacientId, ConsultatieId);
+            
             var query = new ValyanClinic.Application.Features.AnalizeMedicale.Queries.GetAnalizeMedicaleByPacientQuery(PacientId.Value);
             var result = await Mediator.Send(query);
             
             if (result.IsSuccess && result.Value != null)
             {
-                // Exclude analizele din consultația curentă
+                Logger.LogInformation("🔵 Query returned {Count} groups", result.Value.Count);
+                
+                // Exclude analizele din consultația curentă (nu după dată!)
                 _analizeAnterioareGroups = result.Value
-                    .Where(g => g.DataDocument.Date != DateTime.Today) // Exclude cele de azi
+                    .Where(g => g.BatchId != ConsultatieId) // Exclude consultația curentă
                     .OrderByDescending(g => g.DataDocument)
                     .Take(10) // Maxim ultimele 10 seturi
                     .ToList();
                 
-                Logger.LogInformation("Loaded {Count} previous analize groups for patient {PacientId}", 
-                    _analizeAnterioareGroups.Count, PacientId.Value);
+                Logger.LogInformation("✅ Loaded {Count} previous analize groups for patient {PacientId} (excluded current consultatie {ConsultatieId})", 
+                    _analizeAnterioareGroups.Count, PacientId.Value, ConsultatieId);
+            }
+            else
+            {
+                Logger.LogWarning("⚠️ Failed to load previous analize: {Error}", result.FirstError);
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error loading previous analize");
+            Logger.LogError(ex, "❌ Error loading previous analize");
         }
         finally
         {
             _isLoadingComparison = false;
+            StateHasChanged();
         }
     }
 
