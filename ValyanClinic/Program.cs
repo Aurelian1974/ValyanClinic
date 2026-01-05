@@ -237,6 +237,8 @@ try
     builder.Services.AddScoped<IAnalizaMedicalaRepository, AnalizaMedicalaRepository>();
     builder.Services.AddScoped<IConsultatieAnalizaMedicalaRepository, ConsultatieAnalizaMedicalaRepository>();
     builder.Services.AddScoped<IConsultatieAnalizaRecomandataRepository, ConsultatieAnalizaRecomandataRepository>(); // ✅ NOU - Analize Recomandate
+    builder.Services.AddScoped<ValyanClinic.Application.Services.Analize.IAnalizeMedicaleComparatorService,
+                                ValyanClinic.Application.Services.Analize.AnalizeMedicaleComparatorService>(); // ✅ NOU - Comparator analize
     builder.Services.AddScoped<IRolRepository, RolRepository>(); // ✅ NOU - Administrare Roluri și Permisiuni
     builder.Services.AddScoped<ValyanClinic.Application.Interfaces.IFieldPermissionService, 
                                 ValyanClinic.Application.Services.FieldPermissionService>(); // ✅ NOU - Permisiuni granulare la nivel de câmp

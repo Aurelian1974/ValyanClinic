@@ -1,0 +1,192 @@
+@using ValyanClinic.Application.ViewModels
+
+<div class="analize-comparator">
+    @if (IsLoading)
+    {
+        <div class="loading-container">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>Se încarcă comparația...</span>
+        </div>
+    }
+    else if (Comparatie == null || !Comparatie.Comparatii.Any())
+    {
+        <div class="empty-state">
+            <i class="fa-solid fa-scale-balanced"></i>
+            <p>Selectați două seturi de analize pentru comparație</p>
+        </div>
+    }
+    else
+    {
+        <!-- Header cu info documente -->
+        <div class="comparator-header">
+            <div class="doc-info doc-anterior">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <div>
+                    <span class="doc-label">Analize anterioare</span>
+                    <span class="doc-date">@Comparatie.DataSetAnterior.ToString("dd.MM.yyyy")</span>
+                    @if (!string.IsNullOrEmpty(Comparatie.NumeDocumentAnterior))
+                    {
+                        <span class="doc-name">@Comparatie.NumeDocumentAnterior</span>
+                    }
+                </div>
+            </div>
+            
+            <div class="vs-separator">
+                <i class="fa-solid fa-arrows-left-right"></i>
+            </div>
+            
+            <div class="doc-info doc-actual">
+                <i class="fa-solid fa-file-medical"></i>
+                <div>
+                    <span class="doc-label">Analize actuale</span>
+                    <span class="doc-date">@Comparatie.DataSetActual.ToString("dd.MM.yyyy")</span>
+                    @if (!string.IsNullOrEmpty(Comparatie.NumeDocumentActual))
+                    {
+                        <span class="doc-name">@Comparatie.NumeDocumentActual</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistici rapide -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value">@Comparatie.TotalAnalize</span>
+                <span class="stat-label">Total analize</span>
+            </div>
+            @if (Comparatie.AnalizeImbunatatite > 0)
+            {
+                <div class="stat-item stat-improved">
+                    <span class="stat-value">@Comparatie.AnalizeImbunatatite</span>
+                    <span class="stat-label">Îmbunătățite</span>
+                </div>
+            }
+            @if (Comparatie.AnalizeInrautatite > 0)
+            {
+                <div class="stat-item stat-worsened">
+                    <span class="stat-value">@Comparatie.AnalizeInrautatite</span>
+                    <span class="stat-label">Înrăutățite</span>
+                </div>
+            }
+            @if (Comparatie.AnalizeNoi > 0)
+            {
+                <div class="stat-item stat-new">
+                    <span class="stat-value">@Comparatie.AnalizeNoi</span>
+                    <span class="stat-label">Noi</span>
+                </div>
+            }
+        </div>
+
+        <!-- Tabel comparație -->
+        <div class="comparison-table-container">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th class="col-analiza">Analiză</th>
+                        <th class="col-anterior">Anterior</th>
+                        <th class="col-actual">Actual</th>
+                        <th class="col-referinta">Referință</th>
+                        <th class="col-trend">Evoluție</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        string? currentCategorie = null;
+                    }
+                    @foreach (var item in Comparatie.Comparatii)
+                    {
+                        @if (item.Categorie != currentCategorie)
+                        {
+                            currentCategorie = item.Categorie;
+                            <tr class="category-row">
+                                <td colspan="5">
+                                    <i class="fa-solid @GetCategoryIcon(item.Categorie)"></i>
+                                    @(string.IsNullOrEmpty(item.Categorie) ? "Alte analize" : item.Categorie)
+                                </td>
+                            </tr>
+                        }
+                        <tr class="@GetRowClass(item)">
+                            <td class="col-analiza">
+                                <span class="analiza-name">@item.NumeAnaliza</span>
+                                @if (!string.IsNullOrEmpty(item.UnitateMasura))
+                                {
+                                    <span class="analiza-unit">@item.UnitateMasura</span>
+                                }
+                            </td>
+                            <td class="col-anterior @(item.AnterioaraInAfaraLimitelor ? "abnormal" : "")">
+                                @if (item.ExistaAnterior)
+                                {
+                                    <span class="value">@item.ValoareAnterioara</span>
+                                    @if (item.AnterioaraInAfaraLimitelor)
+                                    {
+                                        <i class="fa-solid fa-exclamation-triangle" title="În afara limitelor"></i>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="no-value">—</span>
+                                }
+                            </td>
+                            <td class="col-actual @(item.ActualaInAfaraLimitelor ? "abnormal" : "")">
+                                @if (item.ExistaActual)
+                                {
+                                    <span class="value">@item.ValoareActuala</span>
+                                    @if (item.ActualaInAfaraLimitelor)
+                                    {
+                                        <i class="fa-solid fa-exclamation-triangle" title="În afara limitelor"></i>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="no-value">—</span>
+                                }
+                            </td>
+                            <td class="col-referinta">
+                                @if (!string.IsNullOrEmpty(item.IntervalReferinta))
+                                {
+                                    <span>@item.IntervalReferinta</span>
+                                }
+                                else
+                                {
+                                    <span class="no-value">—</span>
+                                }
+                            </td>
+                            <td class="col-trend @GetTrendClass(item.Trend)">
+                                <span class="trend-icon">@GetTrendIcon(item.Trend)</span>
+                                <span class="trend-text">@item.MesajComparatie</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Legendă -->
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-color improved"></span>
+                <span>Îmbunătățit (revenit în limite)</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color worsened"></span>
+                <span>Înrăutățit (ieșit din limite)</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color increased"></span>
+                <span>Crescut</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color decreased"></span>
+                <span>Scăzut</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color stable"></span>
+                <span>Stabil (±2%)</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color new"></span>
+                <span>Analiză nouă</span>
+            </div>
+        </div>
+    }
+</div>
