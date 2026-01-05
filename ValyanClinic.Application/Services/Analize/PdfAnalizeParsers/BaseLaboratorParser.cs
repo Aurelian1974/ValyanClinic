@@ -19,8 +19,11 @@ public abstract class BaseLaboratorParser : ILaboratorParser
         "HEMATOLOGIE", "BIOCHIMIE", "IMUNOLOGIE", "SEROLOGIE",
         "COAGULARE", "HORMONI", "ENDOCRINOLOGIE", "MARKERI TUMORALI",
         "ANALIZE DE URINA", "SUMAR URINA", "VSH", "EXAMEN URINA",
-        "LIPIDE", "HEPATIC", "RENAL", "TIROIDĂ"
+        "LIPIDE", "HEPATIC", "RENAL", "TIROIDĂ", "COAGULARE SI HEMOSTAZA"
     };
+
+    // Set pentru verificare rapidă a categoriilor
+    protected static readonly HashSet<string> Categories = new(Categorii, StringComparer.OrdinalIgnoreCase);
 
     // Unități de măsură cunoscute
     protected static readonly string[] UnitatiMasura = 

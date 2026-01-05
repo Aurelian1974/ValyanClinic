@@ -208,4 +208,12 @@
             OnClose.InvokeAsync();
         }
     }
+
+    private void HandleClose()
+    {
+        if (!_isSaving)
+        {
+            OnClose.InvokeAsync();
+        }
+    }
 }
