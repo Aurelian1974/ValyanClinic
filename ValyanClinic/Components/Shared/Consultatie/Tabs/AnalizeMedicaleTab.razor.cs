@@ -25,8 +25,10 @@ public partial class AnalizeMedicaleTab : ComponentBase, IDisposable
     [Inject] private IMediator Mediator { get; set; } = default!;
     [Inject] private ILogger<AnalizeMedicaleTab> Logger { get; set; } = default!;
     [Inject] private IAnalizePdfParserService AnalizePdfParserService { get; set; } = default!;
+    [Inject] private IAnalizeMedicaleComparatorService ComparatorService { get; set; } = default!;
     
     [Parameter] public Guid? ConsultatieId { get; set; }
+    [Parameter] public Guid? PacientId { get; set; }
     [Parameter] public Guid? CurrentUserId { get; set; }
     [Parameter] public EventCallback OnChanged { get; set; }
     [Parameter] public EventCallback OnSectionCompleted { get; set; }
@@ -58,6 +60,13 @@ public partial class AnalizeMedicaleTab : ComponentBase, IDisposable
     // Loading & Error
     private bool _isLoading;
     private bool _isSaving;
+    
+    // Comparator state
+    private bool _showComparator;
+    private bool _isLoadingComparison;
+    private ComparatieAnalizeMedicaleDto? _comparatieResult;
+    private List<AnalizeMedicaleGroupDto> _analizeAnterioareGroups = new();
+    private AnalizeMedicaleGroupDto? _selectedAnteriorGroup;
     private string? _errorMessage;
 
     // Section completion
@@ -578,6 +587,108 @@ public partial class AnalizeMedicaleTab : ComponentBase, IDisposable
     public void Dispose()
     {
         Logger.LogDebug("AnalizeMedicaleTab disposed");
+    }
+
+    // ==================== COMPARATOR METHODS ====================
+    
+    /// <summary>
+    /// Afișează/ascunde secțiunea de comparare
+    /// </summary>
+    private async Task ToggleComparator()
+    {
+        _showComparator = !_showComparator;
+        
+        if (_showComparator && !_analizeAnterioareGroups.Any())
+        {
+            await LoadAnalizeAnterioareAsync();
+        }
+    }
+
+    /// <summary>
+    /// Încarcă analizele anterioare ale pacientului
+    /// </summary>
+    private async Task LoadAnalizeAnterioareAsync()
+    {
+        if (!PacientId.HasValue)
+        {
+            Logger.LogWarning("PacientId is null, cannot load previous analize");
+            return;
+        }
+
+        _isLoadingComparison = true;
+        try
+        {
+            var query = new ValyanClinic.Application.Features.AnalizeMedicale.Queries.GetAnalizeMedicaleByPacientQuery(PacientId.Value);
+            var result = await Mediator.Send(query);
+            
+            if (result.IsSuccess && result.Value != null)
+            {
+                // Exclude analizele din consultația curentă
+                _analizeAnterioareGroups = result.Value
+                    .Where(g => g.DataDocument.Date != DateTime.Today) // Exclude cele de azi
+                    .OrderByDescending(g => g.DataDocument)
+                    .Take(10) // Maxim ultimele 10 seturi
+                    .ToList();
+                
+                Logger.LogInformation("Loaded {Count} previous analize groups for patient {PacientId}", 
+                    _analizeAnterioareGroups.Count, PacientId.Value);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading previous analize");
+        }
+        finally
+        {
+            _isLoadingComparison = false;
+        }
+    }
+
+    /// <summary>
+    /// Selectează un set de analize anterioare pentru comparație
+    /// </summary>
+    private void SelectAnteriorGroup(AnalizeMedicaleGroupDto group)
+    {
+        _selectedAnteriorGroup = group;
+        ExecuteComparison();
+    }
+
+    /// <summary>
+    /// Execută comparația între analizele actuale și cele anterioare selectate
+    /// </summary>
+    private void ExecuteComparison()
+    {
+        if (_selectedAnteriorGroup == null || !AnalizeEfectuateGroups.Any())
+        {
+            _comparatieResult = null;
+            return;
+        }
+
+        // Combină toate grupurile actuale într-unul singur
+        var actualGroup = new AnalizeMedicaleGroupDto
+        {
+            DataDocument = AnalizeEfectuateGroups.First().DataDocument,
+            NumeDocument = "Analize actuale",
+            SursaDocument = AnalizeEfectuateGroups.First().SursaDocument,
+            Analize = AnalizeEfectuateGroups.SelectMany(g => g.Analize).ToList()
+        };
+
+        _comparatieResult = ComparatorService.CompareGroups(_selectedAnteriorGroup, actualGroup);
+        
+        Logger.LogInformation("Comparison executed: {Total} analize, {Improved} improved, {Worsened} worsened",
+            _comparatieResult.TotalAnalize, 
+            _comparatieResult.AnalizeImbunatatite, 
+            _comparatieResult.AnalizeInrautatite);
+    }
+
+    /// <summary>
+    /// Închide comparatorul
+    /// </summary>
+    private void CloseComparator()
+    {
+        _showComparator = false;
+        _comparatieResult = null;
+        _selectedAnteriorGroup = null;
     }
 
     // ==================== INNER CLASS - Form Model ====================

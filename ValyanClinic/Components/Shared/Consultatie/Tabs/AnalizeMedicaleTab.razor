@@ -273,11 +273,81 @@
                     <span class="badge-count">@AnalizeEfectuate.Count</span>
                 }
             </h3>
-            <button type="button" class="btn btn-primary btn-sm" @onclick="ShowImportAnalizaModal">
-                <i class="fas fa-file-pdf"></i>
-                Importă din PDF
-            </button>
+            <div class="section-actions">
+                @if (AnalizeEfectuateGroups.Any())
+                {
+                    <button type="button" 
+                            class="btn @(_showComparator ? "btn-secondary" : "btn-outline-primary") btn-sm" 
+                            @onclick="ToggleComparator">
+                        @if (_showComparator)
+                        {
+                            <i class="fas fa-times"></i>
+                            <span>Închide comparație</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-balance-scale"></i>
+                            <span>Compară cu anterior</span>
+                        }
+                    </button>
+                }
+                <button type="button" class="btn btn-primary btn-sm" @onclick="ShowImportAnalizaModal">
+                    <i class="fas fa-file-pdf"></i>
+                    Importă din PDF
+                </button>
+            </div>
         </div>
+        
+        <!-- ========== SECȚIUNE COMPARARE ========== -->
+        @if (_showComparator)
+        {
+            <div class="comparison-section">
+                @if (_isLoadingComparison)
+                {
+                    <div class="loading-comparison">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Se încarcă analizele anterioare...</span>
+                    </div>
+                }
+                else if (!_analizeAnterioareGroups.Any())
+                {
+                    <div class="no-previous-analize">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Nu există analize anterioare pentru acest pacient</span>
+                    </div>
+                }
+                else
+                {
+                    <!-- Selector analize anterioare -->
+                    <div class="anterior-selector">
+                        <label class="selector-label">
+                            <i class="fas fa-history"></i>
+                            Selectați setul de analize anterioare pentru comparație:
+                        </label>
+                        <div class="anterior-options">
+                            @foreach (var group in _analizeAnterioareGroups)
+                            {
+                                <button type="button" 
+                                        class="anterior-option @(_selectedAnteriorGroup == group ? "selected" : "")"
+                                        @onclick="() => SelectAnteriorGroup(group)">
+                                    <div class="option-date">@group.DataDocument.ToString("dd.MM.yyyy")</div>
+                                    <div class="option-details">
+                                        <span class="option-source">@(group.SursaDocument ?? "PDF Import")</span>
+                                        <span class="option-count">@group.TotalAnalize analize</span>
+                                    </div>
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Rezultat comparație -->
+                    @if (_comparatieResult != null)
+                    {
+                        <AnalizeMedicaleComparator Comparatie="@_comparatieResult" IsLoading="false" />
+                    }
+                }
+            </div>
+        }
         
         @if (AnalizeEfectuateGroups.Any())
         {

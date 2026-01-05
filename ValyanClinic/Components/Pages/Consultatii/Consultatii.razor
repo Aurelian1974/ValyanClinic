@@ -565,6 +565,7 @@
                 <div class="tab-panel @(ActiveTab == 3 ? "active" : "")">
                     <AnalizeMedicaleTab 
                         ConsultatieId="@ConsultatieId"
+                        PacientId="@PacientId"
                         CurrentUserId="@CurrentMedicId"
                         OnChanged="@MarkFormAsDirty"
                         OnSectionCompleted="@(() => MarkTabAsCompleted(3))" />
