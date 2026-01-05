@@ -35,10 +35,12 @@ return Result<Guid>.Failure("Error message");
 
 ### Blazor Component Structure (Mandatory separation)
 ```
-Component.razor      # Markup ONLY - no @code blocks
+Component.razor      # Markup ONLY - no @code blocks, no C# logic
 Component.razor.cs   # All logic - partial class with [Inject] services
 Component.razor.css  # Scoped styles ONLY - use CSS variables
 ```
+
+**IMPORTANT**: Never write C# code in `.razor` files. Use code-behind (`.razor.cs`) for all logic.
 
 ## Key Conventions
 
