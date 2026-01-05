@@ -455,9 +455,51 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         }
         else
         {
-            // Nu există consultație - va fi creată la primul auto-save
-            Logger.LogInformation("[Consultatii] No consultatie found for ProgramareId: {ProgramareId} - will create on first save", ProgramareId);
-            // ConsultatieId rămâne null - HandleSaveDraft va crea una nouă cu ProgramareId setat
+            // Nu există consultație - CREĂM UNA NOUĂ IMEDIAT
+            Logger.LogInformation("[Consultatii] No consultatie found for ProgramareId: {ProgramareId} - creating new one NOW", ProgramareId);
+            await CreateNewConsultatieForProgramare();
+        }
+    }
+
+    /// <summary>
+    /// Creează o consultație nouă pentru programarea curentă
+    /// Se apelează automat la intrarea în pagină dacă nu există deja o consultație
+    /// </summary>
+    private async Task CreateNewConsultatieForProgramare()
+    {
+        try
+        {
+            var command = new ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveConsultatieDraft.SaveConsultatieDraftCommand
+            {
+                ConsultatieID = null, // Nou
+                ProgramareID = ProgramareId,
+                PacientID = PacientId!.Value,
+                MedicID = CurrentMedicId,
+                DataConsultatie = DateTime.Today,
+                OraConsultatie = DateTime.Now.TimeOfDay,
+                TipConsultatie = "Prima consultatie",
+                CreatDeSauModificatDe = CurrentUserId
+            };
+
+            var result = await Mediator.Send(command);
+            
+            if (result.IsSuccess)
+            {
+                ConsultatieId = result.Value;
+                Logger.LogInformation("[Consultatii] ✅ Created new consultatie: {ConsultatieId} for ProgramareId: {ProgramareId}", 
+                    ConsultatieId, ProgramareId);
+            }
+            else
+            {
+                Logger.LogError("[Consultatii] ❌ Failed to create consultatie for ProgramareId: {ProgramareId}. Errors: {Errors}", 
+                    ProgramareId, string.Join(", ", result.Errors ?? new List<string>()));
+                ErrorMessage = "Nu s-a putut crea consultația. Încercați din nou.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "[Consultatii] ❌ Exception creating consultatie for ProgramareId: {ProgramareId}", ProgramareId);
+            ErrorMessage = $"Eroare la crearea consultației: {ex.Message}";
         }
     }
 

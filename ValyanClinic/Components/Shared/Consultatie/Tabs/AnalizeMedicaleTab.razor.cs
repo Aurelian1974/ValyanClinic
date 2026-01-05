@@ -278,13 +278,28 @@ public partial class AnalizeMedicaleTab : ComponentBase, IDisposable
             return;
         }
 
+        // Validare - ConsultatieId și CurrentUserId trebuie să fie valide
+        if (!ConsultatieId.HasValue)
+        {
+            _formErrorMessage = "Consultația nu este salvată. Salvați consultația înainte de a adăuga analize.";
+            Logger.LogWarning("Cannot add analiza - ConsultatieId is null");
+            return;
+        }
+
+        if (!CurrentUserId.HasValue)
+        {
+            _formErrorMessage = "Eroare: Utilizatorul curent nu este identificat.";
+            Logger.LogWarning("Cannot add analiza - CurrentUserId is null");
+            return;
+        }
+
         _isSaving = true;
 
         try
         {
             var command = new AddAnalizaRecomandataCommand
             {
-                ConsultatieID = ConsultatieId!.Value,
+                ConsultatieID = ConsultatieId.Value,
                 AnalizaNomenclatorID = _selectedAnalizaId,
                 NumeAnaliza = _newAnaliza.NumeAnaliza,
                 TipAnaliza = _selectedCategorie,
@@ -336,11 +351,25 @@ public partial class AnalizeMedicaleTab : ComponentBase, IDisposable
 
     private async Task OnImportAnalizePdfComplete(List<AnalizaImportDto> analize)
     {
-        Logger.LogInformation("Import completed with {Count} analize efectuate to add", analize.Count);
+        Logger.LogInformation("🔵 OnImportAnalizePdfComplete called with {Count} analize", analize?.Count ?? 0);
         
-        if (!ConsultatieId.HasValue || !CurrentUserId.HasValue)
+        if (analize == null || !analize.Any())
         {
-            _errorMessage = "Lipsesc datele necesare pentru import.";
+            Logger.LogWarning("⚠️ Import callback received empty or null analize list");
+            return;
+        }
+        
+        if (!ConsultatieId.HasValue)
+        {
+            _errorMessage = "Consultația nu este salvată. Salvați consultația înainte de a importa analize.";
+            Logger.LogWarning("❌ Cannot import - ConsultatieId is null");
+            return;
+        }
+        
+        if (!CurrentUserId.HasValue)
+        {
+            _errorMessage = "Eroare: Utilizatorul curent nu este identificat.";
+            Logger.LogWarning("❌ Cannot import - CurrentUserId is null");
             return;
         }
         
