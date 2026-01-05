@@ -185,7 +185,12 @@ public partial class SecondaryDiagnosesList : ComponentBase
 /// </summary>
 public class SecondaryDiagnosis
 {
+    /// <summary>UI tracking ID (local only)</summary>
     public Guid Id { get; set; } = Guid.NewGuid();
+    
+    /// <summary>Database ID for persistence (from DB)</summary>
+    public Guid DatabaseId { get; set; } = Guid.Empty;
+    
     public string Description { get; set; } = string.Empty;
     public List<ICD10SearchResultDto> ICD10Codes { get; set; } = new();
     public string? AdditionalDetails { get; set; }

@@ -343,6 +343,19 @@ public class ConsultatieRepository : IConsultatieRepository
                     ObservatiiMedic = row.Concluzii_ObservatiiMedic,
                     NotePacient = row.Concluzii_NotePacient,
                     DocumenteAtatate = row.Concluzii_DocumenteAtatate,
+                    // Scrisoare Medicala - Anexa 43
+                    EsteAfectiuneOncologica = row.Concluzii_EsteAfectiuneOncologica ?? false,
+                    DetaliiAfectiuneOncologica = row.Concluzii_DetaliiAfectiuneOncologica,
+                    AreIndicatieInternare = row.Concluzii_AreIndicatieInternare ?? false,
+                    TermenInternare = row.Concluzii_TermenInternare,
+                    SaEliberatPrescriptie = row.Concluzii_SaEliberatPrescriptie,
+                    SeriePrescriptie = row.Concluzii_SeriePrescriptie,
+                    SaEliberatConcediuMedical = row.Concluzii_SaEliberatConcediuMedical,
+                    SerieConcediuMedical = row.Concluzii_SerieConcediuMedical,
+                    SaEliberatIngrijiriDomiciliu = row.Concluzii_SaEliberatIngrijiriDomiciliu,
+                    SaEliberatDispozitiveMedicale = row.Concluzii_SaEliberatDispozitiveMedicale,
+                    TransmiterePrinEmail = row.Concluzii_TransmiterePrinEmail ?? false,
+                    EmailTransmitere = row.Concluzii_EmailTransmitere,
                     DataCreare = row.Concluzii_DataCreare,
                     CreatDe = row.Concluzii_CreatDe,
                     DataUltimeiModificari = row.Concluzii_DataUltimeiModificari,
@@ -717,6 +730,19 @@ public class ConsultatieRepository : IConsultatieRepository
                     ObservatiiMedic = row.Concluzii_ObservatiiMedic,
                     NotePacient = row.Concluzii_NotePacient,
                     DocumenteAtatate = row.Concluzii_DocumenteAtatate,
+                    // Scrisoare Medicala - Anexa 43
+                    EsteAfectiuneOncologica = row.Concluzii_EsteAfectiuneOncologica ?? false,
+                    DetaliiAfectiuneOncologica = row.Concluzii_DetaliiAfectiuneOncologica,
+                    AreIndicatieInternare = row.Concluzii_AreIndicatieInternare ?? false,
+                    TermenInternare = row.Concluzii_TermenInternare,
+                    SaEliberatPrescriptie = row.Concluzii_SaEliberatPrescriptie,
+                    SeriePrescriptie = row.Concluzii_SeriePrescriptie,
+                    SaEliberatConcediuMedical = row.Concluzii_SaEliberatConcediuMedical,
+                    SerieConcediuMedical = row.Concluzii_SerieConcediuMedical,
+                    SaEliberatIngrijiriDomiciliu = row.Concluzii_SaEliberatIngrijiriDomiciliu,
+                    SaEliberatDispozitiveMedicale = row.Concluzii_SaEliberatDispozitiveMedicale,
+                    TransmiterePrinEmail = row.Concluzii_TransmiterePrinEmail ?? false,
+                    EmailTransmitere = row.Concluzii_EmailTransmitere,
                     DataCreare = row.Concluzii_DataCreare,
                     CreatDe = row.Concluzii_CreatDe,
                     DataUltimeiModificari = row.Concluzii_DataUltimeiModificari,
@@ -941,9 +967,11 @@ public class ConsultatieRepository : IConsultatieRepository
         {
             using var connection = _connectionFactory.CreateConnection();
 
-            // Build JSON array for stored procedure
+            // Build JSON array for stored procedure - includes Id for MERGE logic
             var diagnosticeList = diagnostice.Select((d, index) => new
             {
+                // Id: null = new diagnostic (INSERT), valid guid = existing (UPDATE)
+                id = d.Id == Guid.Empty ? (Guid?)null : d.Id,
                 ordine = d.OrdineAfisare > 0 ? d.OrdineAfisare : index + 1,
                 codICD10 = d.CodICD10,
                 numeDiagnostic = d.NumeDiagnostic,
@@ -1036,8 +1064,9 @@ public class ConsultatieRepository : IConsultatieRepository
         {
             using var connection = _connectionFactory.CreateConnection();
 
-            // Create DataTable for TVP
+            // Create DataTable for TVP - includes Id for MERGE logic
             var medicamenteTable = new DataTable();
+            medicamenteTable.Columns.Add("Id", typeof(Guid));  // NULL = new, NOT NULL = existing
             medicamenteTable.Columns.Add("OrdineAfisare", typeof(int));
             medicamenteTable.Columns.Add("NumeMedicament", typeof(string));
             medicamenteTable.Columns.Add("Doza", typeof(string));
@@ -1051,7 +1080,11 @@ public class ConsultatieRepository : IConsultatieRepository
             {
                 if (!string.IsNullOrWhiteSpace(med.NumeMedicament))
                 {
+                    // If Id is empty Guid, pass DBNull (treated as new medication)
+                    object idValue = med.Id == Guid.Empty ? DBNull.Value : (object)med.Id;
+                    
                     medicamenteTable.Rows.Add(
+                        idValue,
                         ordine++,
                         med.NumeMedicament,
                         med.Doza ?? (object)DBNull.Value,

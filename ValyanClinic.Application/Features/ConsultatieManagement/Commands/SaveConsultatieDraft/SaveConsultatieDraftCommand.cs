@@ -86,7 +86,9 @@ public class SaveConsultatieDraftCommand : IRequest<Result<Guid>>
     // ==================== TAB 4: CONCLUZII ====================
     public string? Concluzie { get; set; } // Concluzii din UI
     public string? ObservatiiMedic { get; set; }
-    public string? DataUrmatoareiProgramari { get; set; } // NoteUrmatoareaVizita din UI
+    public string? DataUrmatoareiProgramari { get; set; } // Data urmatoarei vizite din UI
+    /// <summary>Note pentru vizita următoare (recomandări supraveghere)</summary>
+    public string? RecomandariSupraveghere { get; set; } // NoteUrmatoareaVizita din UI
     
     // ==================== SCRISOARE MEDICALĂ - ANEXA 43 ====================
     /// <summary>Pacient diagnosticat cu afecțiune oncologică</summary>

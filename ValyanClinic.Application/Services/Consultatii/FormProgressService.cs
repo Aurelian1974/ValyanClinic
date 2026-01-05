@@ -89,8 +89,8 @@ public class FormProgressService : IFormProgressService
                              (input.Greutate.HasValue || input.Inaltime.HasValue) &&
                              !string.IsNullOrWhiteSpace(input.ExamenObiectiv);
 
-        var isTab3Complete = !string.IsNullOrWhiteSpace(input.DiagnosticPrincipal) &&
-                             !string.IsNullOrWhiteSpace(input.PlanTerapeutic);
+        // Tab Diagnostic & Tratament: doar diagnosticul principal e obligatoriu
+        var isTab3Complete = !string.IsNullOrWhiteSpace(input.DiagnosticPrincipal);
 
         var isTab4Complete = !string.IsNullOrWhiteSpace(input.Concluzii);
 

@@ -113,17 +113,22 @@ PRINT 'Created: ConsultatieMedicament_Insert';
 GO
 
 -- ============================================================================
--- 4. BULK REPLACE (Delete all + Insert new list)
+-- 4. BULK REPLACE (MERGE logic - preserves CreatDe/DataCreare for existing)
 -- Using TVP (Table-Valued Parameter) for efficiency
 -- ============================================================================
 
--- Create TVP type if not exists
+-- Drop and recreate TVP type (must drop SP first)
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'ConsultatieMedicament_BulkReplace')
+    DROP PROCEDURE [dbo].[ConsultatieMedicament_BulkReplace]
+GO
+
 IF TYPE_ID('dbo.MedicamentListType') IS NOT NULL
     DROP TYPE [dbo].[MedicamentListType];
 GO
 
 CREATE TYPE [dbo].[MedicamentListType] AS TABLE
 (
+    [Id] UNIQUEIDENTIFIER NULL,  -- NULL = new medication, NOT NULL = existing
     [OrdineAfisare] INT NOT NULL,
     [NumeMedicament] NVARCHAR(500) NOT NULL,
     [Doza] NVARCHAR(100) NULL,
@@ -134,11 +139,7 @@ CREATE TYPE [dbo].[MedicamentListType] AS TABLE
 );
 GO
 
-PRINT 'Created: MedicamentListType (TVP)';
-GO
-
-IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'ConsultatieMedicament_BulkReplace')
-    DROP PROCEDURE [dbo].[ConsultatieMedicament_BulkReplace]
+PRINT 'Created: MedicamentListType (TVP) with Id column';
 GO
 
 CREATE PROCEDURE [dbo].[ConsultatieMedicament_BulkReplace]
@@ -152,16 +153,43 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
         
-        -- Delete existing medications for this consultatie
+        -- 1. DELETE medications that are no longer in the list
         DELETE FROM [dbo].[ConsultatieMedicament]
-        WHERE [ConsultatieID] = @ConsultatieID;
+        WHERE [ConsultatieID] = @ConsultatieID
+          AND [Id] NOT IN (SELECT [Id] FROM @Medicamente WHERE [Id] IS NOT NULL);
         
-        -- Insert new medications from TVP
+        -- 2. UPDATE existing medications ONLY if values changed (preserves DataCreare, CreatDe)
+        UPDATE cm
+        SET 
+            cm.[OrdineAfisare] = m.[OrdineAfisare],
+            cm.[NumeMedicament] = m.[NumeMedicament],
+            cm.[Doza] = m.[Doza],
+            cm.[Frecventa] = m.[Frecventa],
+            cm.[Durata] = m.[Durata],
+            cm.[Cantitate] = m.[Cantitate],
+            cm.[Observatii] = m.[Observatii],
+            cm.[DataUltimeiModificari] = GETDATE(),
+            cm.[ModificatDe] = @ModificatDe
+        FROM [dbo].[ConsultatieMedicament] cm
+        INNER JOIN @Medicamente m ON cm.[Id] = m.[Id]
+        WHERE cm.[ConsultatieID] = @ConsultatieID
+          AND m.[Id] IS NOT NULL
+          AND (
+              ISNULL(cm.[OrdineAfisare], 0) <> ISNULL(m.[OrdineAfisare], 0)
+              OR ISNULL(cm.[NumeMedicament], '') <> ISNULL(m.[NumeMedicament], '')
+              OR ISNULL(cm.[Doza], '') <> ISNULL(m.[Doza], '')
+              OR ISNULL(cm.[Frecventa], '') <> ISNULL(m.[Frecventa], '')
+              OR ISNULL(cm.[Durata], '') <> ISNULL(m.[Durata], '')
+              OR ISNULL(cm.[Cantitate], '') <> ISNULL(m.[Cantitate], '')
+              OR ISNULL(cm.[Observatii], '') <> ISNULL(m.[Observatii], '')
+          );
+        
+        -- 3. INSERT new medications (Id IS NULL in TVP)
         INSERT INTO [dbo].[ConsultatieMedicament]
         (
             [Id], [ConsultatieID], [OrdineAfisare],
             [NumeMedicament], [Doza], [Frecventa], [Durata], [Cantitate], [Observatii],
-            [DataCreare], [CreatDe]
+            [DataCreare], [CreatDe], [DataUltimeiModificari], [ModificatDe]
         )
         SELECT 
             NEWID(),
@@ -174,9 +202,13 @@ BEGIN
             [Cantitate],
             [Observatii],
             GETDATE(),
-            @ModificatDe
+            @ModificatDe,
+            NULL,  -- DataUltimeiModificari = NULL for new records
+            NULL   -- ModificatDe = NULL for new records
         FROM @Medicamente
-        WHERE [NumeMedicament] IS NOT NULL AND LEN(LTRIM(RTRIM([NumeMedicament]))) > 0;
+        WHERE [Id] IS NULL
+          AND [NumeMedicament] IS NOT NULL 
+          AND LEN(LTRIM(RTRIM([NumeMedicament]))) > 0;
         
         -- Update consultatie timestamp
         UPDATE [dbo].[Consultatii]

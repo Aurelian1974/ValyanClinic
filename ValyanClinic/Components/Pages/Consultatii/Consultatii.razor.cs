@@ -134,6 +134,15 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     {
         get
         {
+            // Folosește fie noul sistem ICD-10, fie legacy DiagnosticPrincipal
+            var diagnosticForProgress = !string.IsNullOrWhiteSpace(ConsultatieCommand.CodICD10Principal) 
+                ? ConsultatieCommand.CodICD10Principal 
+                : (!string.IsNullOrWhiteSpace(ConsultatieCommand.NumeDiagnosticPrincipal)
+                    ? ConsultatieCommand.NumeDiagnosticPrincipal
+                    : (!string.IsNullOrWhiteSpace(ConsultatieCommand.DiagnosticPozitiv)
+                        ? ConsultatieCommand.DiagnosticPozitiv
+                        : DiagnosticPrincipal));
+            
             _cachedProgress = ProgressService.CalculateConsultationProgress(new ConsultationProgressInput
             {
                 MotivPrezentare = MotivPrezentare,
@@ -148,7 +157,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 Greutate = Greutate,
                 Inaltime = Inaltime,
                 ExamenObiectiv = ExamenObiectiv,
-                DiagnosticPrincipal = DiagnosticPrincipal,
+                DiagnosticPrincipal = diagnosticForProgress,
                 PlanTerapeutic = PlanTerapeutic,
                 Concluzii = Concluzii,
                 DataUrmatoareiVizite = DataUrmatoareiVizite
@@ -161,10 +170,11 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
     private bool IsTabCompleted(int tabNumber) => tabNumber switch
     {
-        1 => ProgressResult.IsTab1Complete,
-        2 => ProgressResult.IsTab2Complete,
-        3 => ProgressResult.IsTab3Complete,
-        4 => ProgressResult.IsTab4Complete,
+        1 => ProgressResult.IsTab1Complete,  // Anamneză
+        2 => ProgressResult.IsTab2Complete,  // Examen Clinic
+        3 => true,                           // Analize Medicale (opțional)
+        4 => ProgressResult.IsTab3Complete,  // Diagnostic & Tratament
+        5 => ProgressResult.IsTab4Complete,  // Concluzii
         _ => false
     };
 
@@ -507,6 +517,8 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             ConsultatieCommand.DiagnosticeSecundare = consultatie.DiagnosticeSecundare
                 .Select(d => new ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveConsultatieDraft.DiagnosticSecundarDto
                 {
+                    // Preserve Id for MERGE logic (existing diagnostics keep their DataCreare/CreatDe)
+                    Id = d.Id,
                     OrdineAfisare = d.OrdineAfisare,
                     CodICD10 = d.CodICD10,
                     NumeDiagnostic = d.NumeDiagnostic,
@@ -524,6 +536,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         
         // Also populate legacy fields in command for backwards compatibility
         ConsultatieCommand.CoduriICD10 = consultatie.CoduriICD10;
+        ConsultatieCommand.DiagnosticPozitiv = consultatie.DiagnosticPozitiv;
         
         // Tab 3: Tratament
         PlanTerapeutic = consultatie.TratamentMedicamentos ?? string.Empty;
@@ -544,6 +557,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         
         // Tab 4: Concluzii
         Concluzii = consultatie.Concluzie ?? consultatie.ObservatiiMedic ?? string.Empty;
+        NoteUrmatoareaVizita = consultatie.RecomandariSupraveghere ?? string.Empty;
         
         // Parse DataUrmatoareiProgramari if exists
         if (!string.IsNullOrEmpty(consultatie.DataUrmatoareiProgramari))
@@ -713,6 +727,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 Concluzie = string.IsNullOrWhiteSpace(Concluzii) ? null : Concluzii,
                 ObservatiiMedic = string.IsNullOrWhiteSpace(Concluzii) ? null : Concluzii,
                 DataUrmatoareiProgramari = DataUrmatoareiVizite.HasValue ? DataUrmatoareiVizite.Value.ToString("dd.MM.yyyy") : null,
+                RecomandariSupraveghere = string.IsNullOrWhiteSpace(NoteUrmatoareaVizita) ? null : NoteUrmatoareaVizita,
                 
                 // Tab 4: Scrisoare Medicală - Anexa 43
                 EsteAfectiuneOncologica = EsteAfectiuneOncologica,
@@ -912,6 +927,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             DiagnosticeSecundare = ConsultatieCommand.DiagnosticeSecundare?
                 .Select(d => new ValyanClinic.Application.Features.ConsultatieManagement.DTOs.DiagnosticSecundarDetailDto
                 {
+                    Id = d.Id,
                     OrdineAfisare = d.OrdineAfisare,
                     CodICD10 = d.CodICD10,
                     NumeDiagnostic = d.NumeDiagnostic,

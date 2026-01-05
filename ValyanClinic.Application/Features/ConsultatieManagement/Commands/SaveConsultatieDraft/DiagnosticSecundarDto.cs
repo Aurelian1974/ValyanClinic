@@ -7,6 +7,13 @@ namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveC
 /// </summary>
 public class DiagnosticSecundarDto
 {
+    /// <summary>
+    /// ID-ul diagnosticului secundar pentru persistență.
+    /// Guid.Empty = diagnostic nou (va primi ID la INSERT)
+    /// Guid valid = diagnostic existent (va fi UPDATE, păstrând DataCreare/CreatDe)
+    /// </summary>
+    public Guid Id { get; set; } = Guid.Empty;
+    
     /// <summary>Ordinea de afișare (1-10)</summary>
     public int OrdineAfisare { get; set; }
     

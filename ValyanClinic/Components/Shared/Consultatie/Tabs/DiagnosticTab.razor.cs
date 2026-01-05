@@ -168,7 +168,8 @@ public partial class DiagnosticTab : ComponentBase
                 .OrderBy(d => d.OrdineAfisare)
                 .Select(d => new SecondaryDiagnosis
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.NewGuid(),  // UI tracking
+                    DatabaseId = d.Id,     // Preserve DB ID for MERGE logic
                     Description = d.Descriere ?? "", // RTE content
                     ICD10Codes = new List<ICD10SearchResultDto>
                     {
@@ -223,6 +224,8 @@ public partial class DiagnosticTab : ComponentBase
                     {
                         diagnostice.Add(new DiagnosticSecundarDto
                         {
+                            // Preserve DatabaseId for MERGE logic (Guid.Empty = new, valid = existing)
+                            Id = diagnosis.DatabaseId,
                             OrdineAfisare = ordine++,
                             CodICD10 = code.Code,
                             NumeDiagnostic = code.ShortDescription,
@@ -235,6 +238,8 @@ public partial class DiagnosticTab : ComponentBase
                     // No ICD10 code but has description - save anyway
                     diagnostice.Add(new DiagnosticSecundarDto
                     {
+                        // Preserve DatabaseId for MERGE logic
+                        Id = diagnosis.DatabaseId,
                         OrdineAfisare = ordine++,
                         CodICD10 = null,
                         NumeDiagnostic = null,

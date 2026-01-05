@@ -216,7 +216,7 @@ GO
 
 CREATE PROCEDURE [dbo].[ConsultatieDiagnosticSecundar_Sync]
     @ConsultatieID UNIQUEIDENTIFIER,
-    @DiagnosticeJSON NVARCHAR(MAX),  -- JSON array: [{ordine, codICD10, numeDiagnostic, descriere}]
+    @DiagnosticeJSON NVARCHAR(MAX),  -- JSON array: [{id, ordine, codICD10, numeDiagnostic, descriere}]
     @ModificatDe UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -225,45 +225,91 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
         
-        -- 1. Șterge toate diagnosticele secundare existente pentru această consultație
-        DELETE FROM [dbo].[ConsultatieDiagnosticSecundar]
-        WHERE [ConsultatieID] = @ConsultatieID;
+        -- Parse JSON into temp table
+        CREATE TABLE #DiagnosticeInput (
+            [Id] UNIQUEIDENTIFIER NULL,  -- NULL = new, NOT NULL = existing
+            [OrdineAfisare] INT,
+            [CodICD10] NVARCHAR(20),
+            [NumeDiagnostic] NVARCHAR(500),
+            [Descriere] NVARCHAR(MAX)
+        );
         
-        -- 2. Inserează noile diagnostice din JSON
         IF @DiagnosticeJSON IS NOT NULL AND LEN(@DiagnosticeJSON) > 2
         BEGIN
-            INSERT INTO [dbo].[ConsultatieDiagnosticSecundar]
-            (
-                [Id], [ConsultatieID], [OrdineAfisare],
-                [CodICD10], [NumeDiagnostic], [Descriere],
-                [DataCreare], [CreatDe]
-            )
+            INSERT INTO #DiagnosticeInput ([Id], [OrdineAfisare], [CodICD10], [NumeDiagnostic], [Descriere])
             SELECT 
-                NEWID(),
-                @ConsultatieID,
-                JSON_VALUE(j.value, '$.ordine'),
+                TRY_CAST(JSON_VALUE(j.value, '$.id') AS UNIQUEIDENTIFIER),
+                ISNULL(TRY_CAST(JSON_VALUE(j.value, '$.ordine') AS INT), 1),
                 JSON_VALUE(j.value, '$.codICD10'),
                 JSON_VALUE(j.value, '$.numeDiagnostic'),
-                JSON_VALUE(j.value, '$.descriere'),
-                GETDATE(),
-                @ModificatDe
+                JSON_VALUE(j.value, '$.descriere')
             FROM OPENJSON(@DiagnosticeJSON) AS j;
         END
         
+        -- 1. DELETE diagnostics that are no longer in the list
+        DELETE FROM [dbo].[ConsultatieDiagnosticSecundar]
+        WHERE [ConsultatieID] = @ConsultatieID
+          AND [Id] NOT IN (SELECT [Id] FROM #DiagnosticeInput WHERE [Id] IS NOT NULL);
+        
+        -- 2. UPDATE existing diagnostics ONLY if values changed (preserves DataCreare, CreatDe)
+        UPDATE ds
+        SET 
+            ds.[OrdineAfisare] = di.[OrdineAfisare],
+            ds.[CodICD10] = di.[CodICD10],
+            ds.[NumeDiagnostic] = di.[NumeDiagnostic],
+            ds.[Descriere] = di.[Descriere],
+            ds.[DataUltimeiModificari] = GETDATE(),
+            ds.[ModificatDe] = @ModificatDe
+        FROM [dbo].[ConsultatieDiagnosticSecundar] ds
+        INNER JOIN #DiagnosticeInput di ON ds.[Id] = di.[Id]
+        WHERE ds.[ConsultatieID] = @ConsultatieID
+          AND di.[Id] IS NOT NULL
+          AND (
+              ISNULL(ds.[OrdineAfisare], 0) <> ISNULL(di.[OrdineAfisare], 0)
+              OR ISNULL(ds.[CodICD10], '') <> ISNULL(di.[CodICD10], '')
+              OR ISNULL(ds.[NumeDiagnostic], '') <> ISNULL(di.[NumeDiagnostic], '')
+              OR ISNULL(CAST(ds.[Descriere] AS NVARCHAR(MAX)), '') <> ISNULL(CAST(di.[Descriere] AS NVARCHAR(MAX)), '')
+          );
+        
+        -- 3. INSERT new diagnostics (Id IS NULL in input)
+        INSERT INTO [dbo].[ConsultatieDiagnosticSecundar]
+        (
+            [Id], [ConsultatieID], [OrdineAfisare],
+            [CodICD10], [NumeDiagnostic], [Descriere],
+            [DataCreare], [CreatDe], [DataUltimeiModificari], [ModificatDe]
+        )
+        SELECT 
+            NEWID(),
+            @ConsultatieID,
+            [OrdineAfisare],
+            [CodICD10],
+            [NumeDiagnostic],
+            [Descriere],
+            GETDATE(),
+            @ModificatDe,
+            NULL,  -- DataUltimeiModificari = NULL for new records
+            NULL   -- ModificatDe = NULL for new records
+        FROM #DiagnosticeInput
+        WHERE [Id] IS NULL;
+        
+        DROP TABLE #DiagnosticeInput;
+        
         COMMIT TRANSACTION;
         
-        -- Return count of inserted records
+        -- Return count of records
         SELECT @@ROWCOUNT AS InsertedCount;
         
     END TRY
     BEGIN CATCH
+        IF OBJECT_ID('tempdb..#DiagnosticeInput') IS NOT NULL
+            DROP TABLE #DiagnosticeInput;
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
         THROW;
     END CATCH
 END
 GO
 
-PRINT '   ✓ ConsultatieDiagnosticSecundar_Sync creat cu succes';
+PRINT '   ✓ ConsultatieDiagnosticSecundar_Sync creat cu succes (MERGE logic)';
 
 -- =============================================
 -- 5. Create stored procedure for Get Diagnostice Secundare

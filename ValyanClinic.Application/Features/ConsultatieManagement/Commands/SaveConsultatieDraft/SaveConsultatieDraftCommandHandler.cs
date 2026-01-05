@@ -226,6 +226,8 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
             {
                 var diagnosticeSecundare = request.DiagnosticeSecundare.Select((d, index) => new ConsultatieDiagnosticSecundar
                 {
+                    // Id from DTO: Guid.Empty = new diagnostic, otherwise = existing (preserve for MERGE)
+                    Id = d.Id,
                     ConsultatieID = consultatieId,
                     OrdineAfisare = d.OrdineAfisare > 0 ? d.OrdineAfisare : index + 1,
                     CodICD10 = d.CodICD10,
@@ -244,7 +246,8 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
             // 7. ConsultatieTratament (1:1) - condiționat
             if (!string.IsNullOrWhiteSpace(request.TratamentMedicamentos) ||
                 !string.IsNullOrWhiteSpace(request.RecomandariRegimViata) ||
-                !string.IsNullOrWhiteSpace(request.DataUrmatoareiProgramari))
+                !string.IsNullOrWhiteSpace(request.DataUrmatoareiProgramari) ||
+                !string.IsNullOrWhiteSpace(request.RecomandariSupraveghere))
             {
                 await _repository.UpsertTratamentAsync(consultatieId, new ConsultatieTratament
                 {
@@ -252,6 +255,7 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                     TratamentMedicamentos = request.TratamentMedicamentos,
                     RecomandariRegimViata = request.RecomandariRegimViata,
                     DataUrmatoareiProgramari = request.DataUrmatoareiProgramari,
+                    RecomandariSupraveghere = request.RecomandariSupraveghere,
                     CreatDe = request.CreatDeSauModificatDe,
                     DataCreare = DateTime.Now,
                     DataUltimeiModificari = DateTime.Now
@@ -263,6 +267,8 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 .Where(m => !string.IsNullOrWhiteSpace(m.Name))
                 .Select((m, index) => new ConsultatieMedicament
                 {
+                    // Id from DTO: Guid.Empty = new medication, otherwise = existing (preserve for MERGE)
+                    Id = m.Id,
                     ConsultatieID = consultatieId,
                     OrdineAfisare = index,
                     NumeMedicament = m.Name,

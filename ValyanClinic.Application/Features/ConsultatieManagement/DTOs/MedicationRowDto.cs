@@ -7,9 +7,11 @@
 public class MedicationRowDto
 {
     /// <summary>
-    /// ID unic pentru tracking în UI (nu persistat)
+    /// ID unic pentru persistență și tracking.
+    /// Guid.Empty = medicament nou (va primi ID la INSERT)
+    /// Guid valid = medicament existent (va fi UPDATE, păstrând DataCreare/CreatDe)
     /// </summary>
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.Empty;
 
     /// <summary>
     /// Numele medicamentului
