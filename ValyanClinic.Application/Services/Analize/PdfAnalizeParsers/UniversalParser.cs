@@ -44,6 +44,24 @@ public class UniversalParser : BaseLaboratorParser
         RegexOptions.Compiled
     );
 
+    // Pattern urina interval fără unitate: "pH 5.5 [4.6 - 8]" sau "Densitate 1.008 [1.015 - 1.025]"
+    private static readonly Regex PatternUrinaInterval = new(
+        @"^([A-Za-zĂÂÎȘȚăâîșț\s]+?)\s+(\d+[.,]?\d*)\s+\[(\d+[.,]?\d*)\s*[-–]\s*(\d+[.,]?\d*)\]",
+        RegexOptions.Compiled
+    );
+
+    // Pattern cu două puncte pentru valori text: "Culoare: Galben deschis" sau "Sediment: Flora microbiana: Rara"
+    private static readonly Regex PatternDouaPuncte = new(
+        @"^\^?\s*(?:Sediment:\s*)?([A-Za-zĂÂÎȘȚăâîșțĂÂÎȘȚ\s]+?):\s*(.+)$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
+    // Pattern pentru valori text simple fără unitate: "Aspect Limpede" sau "Culoare Galben"
+    private static readonly Regex PatternTextSimplu = new(
+        @"^([A-Za-zĂÂÎȘȚăâîșț]+)\s+(Limpede|Tulbure|Galben|Rosu|Maro|Verde|Negativ|Pozitiv|Absent[eă]?|Prezent[eă]?|Rar[aăe]?|Frecvent[eă]?|Normal|Anormal|[A-Za-zĂÂÎȘȚăâîșț]+\s+[A-Za-zĂÂÎȘȚăâîșț]+)$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
     // Lista de analize cunoscute pentru validare
     private static readonly HashSet<string> AnalizeComune = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -55,7 +73,11 @@ public class UniversalParser : BaseLaboratorParser
         "Acid uric", "Proteine", "Albumina", "Fibrinogen", "INR", "PT", "APTT",
         "Fier", "Sideremie", "Feritina", "Transferina", "Vitamina", "Calciu",
         "Magneziu", "Sodiu", "Potasiu", "Clor", "TSH", "T3", "T4", "FT3", "FT4",
-        "pH", "Densitate", "Urobilinogen", "Nitriti", "Sediment"
+        "pH", "Densitate", "Urobilinogen", "Nitriti", "Sediment",
+        // Analize urină 
+        "Culoare", "Aspect", "Glucoza urinara", "Cetone", "Eritrocite", "Hemoglobina urinara",
+        "Celule epiteliale", "Flora microbiana", "Cristale", "Cilindri", "Bacterii", "Mucus",
+        "Leucocite urinare", "Proteine urinare", "Bilirubina urinara", "Urobilinogen urinar"
     };
 
     public override ParsePdfResult Parse(string text, string fileName)
@@ -143,7 +165,7 @@ public class UniversalParser : BaseLaboratorParser
             return false;
 
         // Verifică dacă conține cuvinte cheie de analiză
-        var numeWords = nume.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var numeWords = nume.Split(new[] { ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
         bool hasKnownAnaliza = numeWords.Any(w => AnalizeComune.Any(a => 
             w.StartsWith(a, StringComparison.OrdinalIgnoreCase) || 
             a.StartsWith(w, StringComparison.OrdinalIgnoreCase)));
@@ -151,7 +173,31 @@ public class UniversalParser : BaseLaboratorParser
         // Sau are valoare numerică validă
         bool hasNumericValue = analiza.RezultatNumeric.HasValue && analiza.RezultatNumeric > 0;
 
-        return hasKnownAnaliza || hasNumericValue;
+        // Sau are valoare text validă (pentru urină)
+        bool hasValidTextValue = !string.IsNullOrWhiteSpace(analiza.Rezultat) && 
+            IsValidTextResult(analiza.Rezultat);
+
+        return hasKnownAnaliza || hasNumericValue || hasValidTextValue;
+    }
+
+    private bool IsValidTextResult(string rezultat)
+    {
+        if (string.IsNullOrWhiteSpace(rezultat))
+            return false;
+
+        var validTextValues = new[]
+        {
+            "Negativ", "Pozitiv", "Normal", "Anormal",
+            "Rar", "Rara", "Rare", "Frecvent", "Frecvente", "Frecventa",
+            "Relativ Frecvent", "Relativ Frecvente", "Foarte Frecvent", "Foarte Frecvente",
+            "Absent", "Absente", "Absenta", "Prezent", "Prezente", "Prezenta",
+            "Limpede", "Tulbure", "Opalescent",
+            "Galben", "Galben deschis", "Galben intens", "Portocaliu", "Rosu", "Maro", "Verde",
+            "Slab", "Moderat", "Intens", "Puternic"
+        };
+
+        return validTextValues.Any(v => rezultat.Contains(v, StringComparison.OrdinalIgnoreCase)) ||
+               Regex.IsMatch(rezultat, @"^[A-Za-zĂÂÎȘȚăâîșț\s]+$");
     }
 
     private AnalizaParsataDto? TryParseLineUniversal(string line, string categorie)
@@ -163,6 +209,13 @@ public class UniversalParser : BaseLaboratorParser
             return CreateAnalizaFromMatch(match, categorie, "interval");
         }
 
+        // Pattern 1b: Urina interval fără unitate: "pH 5.5 [4.6 - 8]"
+        match = PatternUrinaInterval.Match(line);
+        if (match.Success)
+        {
+            return CreateAnalizaFromMatch(match, categorie, "urina_interval");
+        }
+
         // Pattern 2: Cu comparator <200 sau >90
         match = PatternCuComparator.Match(line);
         if (match.Success)
@@ -170,14 +223,28 @@ public class UniversalParser : BaseLaboratorParser
             return CreateAnalizaFromMatch(match, categorie, "comparator");
         }
 
-        // Pattern 3: Urina cu text (Negativ/Pozitiv)
+        // Pattern 3: Format cu două puncte: "Culoare: Galben deschis" sau "Sediment: Flora microbiana: Rara"
+        match = PatternDouaPuncte.Match(line);
+        if (match.Success)
+        {
+            return CreateAnalizaFromMatch(match, categorie, "doua_puncte");
+        }
+
+        // Pattern 4: Urina cu text (Negativ/Pozitiv)
         match = PatternUrinaText.Match(line);
         if (match.Success && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
         {
             return CreateAnalizaFromMatch(match, categorie, "text");
         }
 
-        // Pattern 4: Cu egal
+        // Pattern 5: Text simplu: "Aspect Limpede"
+        match = PatternTextSimplu.Match(line);
+        if (match.Success)
+        {
+            return CreateAnalizaFromMatch(match, categorie, "text_simplu");
+        }
+
+        // Pattern 6: Cu egal
         if (line.Contains('='))
         {
             match = PatternEgal.Match(line);
@@ -187,7 +254,7 @@ public class UniversalParser : BaseLaboratorParser
             }
         }
 
-        // Pattern 5: Simplu - doar dacă are unitate de măsură validă
+        // Pattern 7: Simplu - doar dacă are unitate de măsură validă
         match = PatternSimplu.Match(line);
         if (match.Success)
         {
@@ -246,6 +313,34 @@ public class UniversalParser : BaseLaboratorParser
                 valoare = match.Groups[2].Value;
                 unitate = match.Groups[3].Value;
                 intervalText = match.Groups[4].Value;
+                break;
+
+            case "urina_interval":
+                // Groups: 1=nume, 2=valoare, 3=min, 4=max (fără unitate)
+                nume = match.Groups[1].Value;
+                valoare = match.Groups[2].Value;
+                min = ParseNumeric(match.Groups[3].Value).numeric;
+                max = ParseNumeric(match.Groups[4].Value).numeric;
+                intervalText = $"[{match.Groups[3].Value} - {match.Groups[4].Value}]";
+                break;
+
+            case "doua_puncte":
+                // Groups: 1=nume (ex: "Culoare" sau "Celule epiteliale plate"), 2=valoare (ex: "Galben deschis")
+                nume = match.Groups[1].Value.Trim();
+                valoare = match.Groups[2].Value.Trim();
+                // Dacă valoarea conține alt ":", e un sediment cu subnume
+                if (valoare.Contains(':'))
+                {
+                    var parts = valoare.Split(':', 2);
+                    nume = $"{nume} - {parts[0].Trim()}";
+                    valoare = parts[1].Trim();
+                }
+                break;
+
+            case "text_simplu":
+                // Groups: 1=nume, 2=valoare_text
+                nume = match.Groups[1].Value;
+                valoare = match.Groups[2].Value;
                 break;
 
             case "egal":
