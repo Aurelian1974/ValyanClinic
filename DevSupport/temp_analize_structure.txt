@@ -1,0 +1,5 @@
+AnalizaID,LaboratorID,CategorieID,CodAnaliza,NumeAnaliza,NumeScurt,Acronime,Descriere,PreparareaTestului,Material,TermenProcesare,Pret,Moneda,PretActualizatLa,URLSursa,Activ,DataScraping,DataActualizare
+---------,-----------,-----------,----------,-----------,---------,--------,---------,------------------,--------,---------------,----,------,----------------,--------,-----,------------,---------------
+2504,2,2,NULL,1,25 dihidroxi vitamina D,1,25 dihidroxi vitamina D,NULL,NULL,NULL,NULL,NULL,198.00,RON,2026-01-03,https://bioclinica.ro/analize/biochimie/125-dihidroxi-vitamina-d,1,2026-01-03 22:01:37.103,2026-01-03 22:01:37.103
+
+(1 rows affected)

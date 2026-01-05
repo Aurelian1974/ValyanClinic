@@ -1,0 +1,22 @@
+COLUMN_NAME DATA_TYPE CHARACTER_MAXIMUM_LENGTH IS_NULLABLE
+----------- --------- ------------------------ -----------
+AnalizaID int NULL NO
+LaboratorID int NULL NO
+CategorieID int NULL NO
+CodAnaliza nvarchar 50 YES
+NumeAnaliza nvarchar 400 NO
+NumeScurt nvarchar 150 YES
+Acronime nvarchar 100 YES
+Descriere nvarchar -1 YES
+PreparareaTestului nvarchar -1 YES
+Material nvarchar 200 YES
+TermenProcesare nvarchar 100 YES
+Pret decimal NULL YES
+Moneda nvarchar 10 YES
+PretActualizatLa date NULL YES
+URLSursa nvarchar 500 YES
+Activ bit NULL YES
+DataScraping datetime NULL YES
+DataActualizare datetime NULL YES
+
+(18 rows affected)

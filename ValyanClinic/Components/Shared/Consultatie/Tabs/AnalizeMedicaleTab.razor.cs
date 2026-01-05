@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.ViewModels;
-using ValyanClinic.Application.Features.AnalizeMedicale.Queries;
-using ValyanClinic.Application.Features.AnalizeMedicale.Commands;
+using ValyanClinic.Application.Features.AnalizeMedicale.Queries.GetAnalizeMedicaleByConsultatie;
+using ValyanClinic.Application.Features.AnalizeMedicale.Commands.AddAnalizaToConsultatie;
 
 namespace ValyanClinic.Components.Shared.Consultatie.Tabs;
 
@@ -10,9 +11,10 @@ namespace ValyanClinic.Components.Shared.Consultatie.Tabs;
 /// Tab Analize Medicale pentru consultație
 /// Include: Analize recomandate + Analize efectuate (cu rezultate)
 /// </summary>
-public partial class AnalizeMedicaleTab : ComponentBase
+public partial class AnalizeMedicaleTab : ComponentBase, IDisposable
 {
     [Inject] private IMediator Mediator { get; set; } = default!;
+    [Inject] private ILogger<AnalizeMedicaleTab> Logger { get; set; } = default!;
     
     [Parameter] public Guid? ConsultatieId { get; set; }
     [Parameter] public Guid? CurrentUserId { get; set; }
@@ -21,7 +23,17 @@ public partial class AnalizeMedicaleTab : ComponentBase
 
     private List<ConsultatieAnalizaMedicalaDto> _toateAnalizele = new();
     private HashSet<Guid> _expandedAnalize = new();
+
+    // Modal states
+    private bool _showAddAnalizaModal;
+    private bool _showImportAnalizaModal;
     
+    // Loading & Error
+    private bool _isLoading;
+    private bool _isSaving;
+    private string? _errorMessage;
+
+    // Section completion
     private bool IsSectionCompleted => AnalizeRecomandate.Any() || AnalizeEfectuate.Any();
 
     // Filtrare analize
@@ -30,6 +42,12 @@ public partial class AnalizeMedicaleTab : ComponentBase
     
     private List<ConsultatieAnalizaMedicalaDto> AnalizeEfectuate => 
         _toateAnalizele.Where(a => a.AreRezultate).OrderByDescending(a => a.DataEfectuare ?? a.DataRecomandare).ToList();
+
+    // ==================== LIFECYCLE ====================
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation("AnalizeMedicaleTab initialized for ConsultatieId: {ConsultatieId}", ConsultatieId);
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -43,41 +61,128 @@ public partial class AnalizeMedicaleTab : ComponentBase
     {
         if (!ConsultatieId.HasValue) return;
 
-        var result = await Mediator.Send(new GetAnalizeMedicaleByConsultatieQuery(ConsultatieId.Value));
-        if (result.IsSuccess)
+        _isLoading = true;
+        _errorMessage = null;
+
+        try
         {
-            _toateAnalizele = result.Value;
+            var query = new GetAnalizeMedicaleByConsultatieQuery { ConsultatieId = ConsultatieId.Value };
+            var result = await Mediator.Send(query);
             
-            // Auto-expandăm analizele cu rezultate anormale
-            foreach (var analiza in AnalizeEfectuate.Where(a => a.Detalii.Any(d => d.EsteAnormal)))
+            if (result.IsSuccess && result.Value != null)
             {
-                _expandedAnalize.Add(analiza.Id);
+                _toateAnalizele = result.Value.ToList();
+                
+                // Auto-expandăm analizele cu rezultate anormale
+                foreach (var analiza in AnalizeEfectuate.Where(a => a.Detalii.Any(d => d.EsteAnormal)))
+                {
+                    _expandedAnalize.Add(analiza.Id);
+                }
+
+                Logger.LogInformation("Loaded {Count} analize for consultație {ConsultatieId}", 
+                    _toateAnalizele.Count, ConsultatieId.Value);
+
+                if (IsSectionCompleted)
+                {
+                    await OnSectionCompleted.InvokeAsync();
+                }
             }
+            else
+            {
+                _errorMessage = result.FirstError ?? "Eroare la încărcarea analizelor.";
+                Logger.LogWarning("Failed to load analize: {Error}", _errorMessage);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Exception loading analize medicale");
+            _errorMessage = $"Eroare: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
         }
     }
 
     private void ShowAddAnalizaModal()
     {
-        // TODO: Implementare modal pentru adăugare analiză
-        // Va deschide un modal cu formular pentru analiză nouă
+        _showAddAnalizaModal = true;
+        Logger.LogInformation("ShowAddAnalizaModal - opening modal, state={State}", _showAddAnalizaModal);
+        StateHasChanged(); // FORCE UI UPDATE
+    }
+
+    private void CloseAddAnalizaModal()
+    {
+        _showAddAnalizaModal = false;
+        StateHasChanged(); // FORCE UI UPDATE
+    }
+
+    private async Task HandleAddAnalizaSave((string NumeAnaliza, string Prioritate, bool EsteCito, DateTime? DataProgramata, string IndicatiiMedic) data)
+    {
+        _isSaving = true;
+        _errorMessage = null;
+
+        try
+        {
+            var command = new AddAnalizaToConsultatieCommand
+            {
+                ConsultatieID = ConsultatieId!.Value,
+                PacientID = Guid.Empty, // TODO: Get from parent component
+                NumeAnaliza = data.NumeAnaliza,
+                Prioritate = data.Prioritate,
+                EsteCito = data.EsteCito,
+                DataProgramata = data.DataProgramata,
+                IndicatiiMedic = data.IndicatiiMedic,
+                CreatDe = CurrentUserId ?? Guid.Empty
+            };
+
+            var result = await Mediator.Send(command);
+
+            if (result.IsSuccess)
+            {
+                Logger.LogInformation("Analiză adăugată cu succes: {AnalizaId}", result.Value);
+                await LoadAnalizeAsync(); // Refresh
+                await OnChanged.InvokeAsync();
+                _showAddAnalizaModal = false; // Close modal
+            }
+            else
+            {
+                _errorMessage = result.FirstError ?? "Eroare la adăugare analiză.";
+                Logger.LogWarning("Failed to add analiză: {Error}", _errorMessage);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Exception adding analiză");
+            _errorMessage = $"Eroare: {ex.Message}";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
     }
 
     private void ShowImportAnalizaModal()
     {
-        // TODO: Implementare modal pentru import OCR
-        // Va deschide un modal pentru încărcare PDF/scan și procesare OCR
+        _showImportAnalizaModal = true;
+        Logger.LogInformation("ShowImportAnalizaModal - not implemented yet");
+    }
+
+    private void CloseImportAnalizaModal()
+    {
+        _showImportAnalizaModal = false;
     }
 
     private async Task DeleteAnaliza(Guid analizaId)
     {
         if (!await ConfirmDelete()) return;
 
-        var result = await Mediator.Send(new DeleteAnalizaMedicalaCommand(analizaId));
-        if (result.IsSuccess)
-        {
-            await LoadAnalizeAsync();
-            await OnChanged.InvokeAsync();
-        }
+        // TODO: Implement DeleteAnalizaMedicalaCommand when created
+        Logger.LogInformation("Delete analiza {AnalizaId} - command not implemented yet", analizaId);
+        
+        // Temporary: Remove from local list
+        _toateAnalizele.RemoveAll(a => a.Id == analizaId);
+        await OnChanged.InvokeAsync();
     }
 
     private async Task<bool> ConfirmDelete()
@@ -111,8 +216,10 @@ public partial class AnalizeMedicaleTab : ComponentBase
         };
     }
 
-    private string GetPrioritateClass(string prioritate)
+    private string GetPrioritateClass(string? prioritate)
     {
+        if (string.IsNullOrEmpty(prioritate)) return "secondary";
+        
         return prioritate.ToLower() switch
         {
             "urgent" => "danger",
@@ -133,5 +240,10 @@ public partial class AnalizeMedicaleTab : ComponentBase
             "anulata" => "❌",
             _ => "📄"
         };
+    }
+
+    public void Dispose()
+    {
+        Logger.LogDebug("AnalizeMedicaleTab disposed");
     }
 }

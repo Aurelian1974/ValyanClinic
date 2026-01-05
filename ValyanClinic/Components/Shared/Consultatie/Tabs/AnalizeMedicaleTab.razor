@@ -1,4 +1,5 @@
-@using ValyanClinic.Application.ViewModels
+﻿@using ValyanClinic.Application.ViewModels
+@using ValyanClinic.Components.Shared.Consultatie.Modals
 @*
     Tab Analize Medicale pentru consultație
     Include: Analize recomandate + Analize efectuate (cu rezultate)
@@ -238,3 +239,10 @@
         </div>
     }
 </div>
+
+@* ========== MODAL ADĂUGARE ANALIZĂ ========== *@
+<AddAnalizaModal IsVisible="@_showAddAnalizaModal"
+                 OnClose="@CloseAddAnalizaModal"
+                 OnSave="@HandleAddAnalizaSave" />
+
+@* TODO: MODAL IMPORT REZULTATE OCR *@

@@ -233,6 +233,9 @@ try
     builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.Repositories.IICD10Repository, 
                                 ValyanClinic.Infrastructure.Repositories.ICD10Repository>(); // ✅ NOU - ICD10 Autocomplete
     builder.Services.AddScoped<IPacientPersonalMedicalRepository, PacientPersonalMedicalRepository>(); // ✅ NOU - Relații Pacient-Doctor
+    // ✅ NOU - Analize Medicale (Nomenclator + Consultație)
+    builder.Services.AddScoped<IAnalizaMedicalaRepository, AnalizaMedicalaRepository>();
+    builder.Services.AddScoped<IConsultatieAnalizaMedicalaRepository, ConsultatieAnalizaMedicalaRepository>();
     builder.Services.AddScoped<IRolRepository, RolRepository>(); // ✅ NOU - Administrare Roluri și Permisiuni
     builder.Services.AddScoped<ValyanClinic.Application.Interfaces.IFieldPermissionService, 
                                 ValyanClinic.Application.Services.FieldPermissionService>(); // ✅ NOU - Permisiuni granulare la nivel de câmp

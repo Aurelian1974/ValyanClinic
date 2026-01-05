@@ -1,0 +1,212 @@
+﻿@using ValyanClinic.Application.ViewModels
+@using Syncfusion.Blazor.DropDowns
+
+@* Modal pentru adăugare analiză medicală recomandată *@
+
+@if (IsVisible)
+{
+    <div class="modal-overlay" @onclick="HandleOverlayClick">
+        <div class="modal-container modal-lg" @onclick:stopPropagation>
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-flask"></i>
+                    Adaugă Analiză Recomandată
+                </h3>
+                <button type="button" class="btn-close" @onclick="OnClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        @_errorMessage
+                    </div>
+                }
+
+                <div class="form-section">
+                    <div class="form-group">
+                        <label class="form-label required">
+                            <i class="fas fa-search"></i>
+                            Caută Analiză din Nomenclator
+                        </label>
+                        <SfAutoComplete TValue="string"
+                                        TItem="AnalizaMedicalaListDto"
+                                        @bind-Value="_selectedAnalizaName"
+                                        DataSource="@_nomenclatorAnalize"
+                                        Placeholder="Tastează pentru căutare (ex: Hemoleucogramă, Glicemie)..."
+                                        FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                        ShowPopupButton="true"
+                                        AllowFiltering="true"
+                                        IgnoreAccent="true"
+                                        @onchange="OnAnalizaSelected">
+                            <AutoCompleteFieldSettings Value="NumeAnaliza" />
+                            <AutoCompleteTemplates TItem="AnalizaMedicalaListDto">
+                                <ItemTemplate Context="item">
+                                    <div class="autocomplete-item">
+                                        <div class="item-header">
+                                            <strong>@item.NumeAnaliza</strong>
+                                            @if (!string.IsNullOrEmpty(item.NumeScurt))
+                                            {
+                                                <span class="item-short">(@item.NumeScurt)</span>
+                                            }
+                                        </div>
+                                        <div class="item-meta">
+                                            <span class="item-category">@item.NumeCategorie</span>
+                                            <span class="item-lab">@item.NumeLaborator</span>
+                                            @if (item.Pret.HasValue)
+                                            {
+                                                <span class="item-price">@item.Pret.Value.ToString("N2") @item.Moneda</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </ItemTemplate>
+                            </AutoCompleteTemplates>
+                        </SfAutoComplete>
+                        <span class="form-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Selectează din cele 2649 analize disponibile în nomenclator
+                        </span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Prioritate</label>
+                            <select class="form-control" @bind="_selectedPrioritate">
+                                <option value="Normala">Normală</option>
+                                <option value="Urgent">Urgent</option>
+                                <option value="Foarte urgent">Foarte Urgent</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label checkbox-label">
+                                <input type="checkbox" @bind="_esteCito" />
+                                <span>
+                                    <i class="fas fa-exclamation-circle text-danger"></i>
+                                    CITO (Foarte Urgent)
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar"></i>
+                            Data Programată (opțional)
+                        </label>
+                        <input type="datetime-local" class="form-control" @bind="_dataProgramata" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-notes-medical"></i>
+                            Indicații Clinice
+                        </label>
+                        <textarea class="form-control" rows="3"
+                                  placeholder="Motivul prescripției, context clinic..."
+                                  @bind="_indicatiiMedic"
+                                  maxlength="500"></textarea>
+                        <span class="char-counter">@_indicatiiMedic.Length / 500</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="OnClose" disabled="@_isSaving">
+                    <i class="fas fa-times"></i>
+                    Anulează
+                </button>
+                <button type="button" class="btn btn-primary" @onclick="HandleSave" disabled="@_isSaving || string.IsNullOrEmpty(_selectedAnalizaName)">
+                    @if (_isSaving)
+                    {
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Se salvează...</span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-check"></i>
+                        <span>Adaugă Analiză</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<(string NumeAnaliza, string Prioritate, bool EsteCito, DateTime? DataProgramata, string IndicatiiMedic)> OnSave { get; set; }
+
+    private List<AnalizaMedicalaListDto> _nomenclatorAnalize = new();
+    private string _selectedAnalizaName = string.Empty;
+    private string _selectedPrioritate = "Normala";
+    private bool _esteCito;
+    private DateTime? _dataProgramata;
+    private string _indicatiiMedic = string.Empty;
+    private bool _isSaving;
+    private string? _errorMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible && !_nomenclatorAnalize.Any())
+        {
+            // TODO: Load from SearchAnalizeMedicaleQuery
+            // Placeholder pentru demonstrație
+            _nomenclatorAnalize = new List<AnalizaMedicalaListDto>
+            {
+                new() { NumeAnaliza = "Hemoleucogramă completă", NumeCategorie = "HEMATOLOGIE", NumeLaborator = "Synevo", Pret = 25.00m, Moneda = "RON" },
+                new() { NumeAnaliza = "Glicemie (Glucoză)", NumeCategorie = "BIOCHIMIE", NumeLaborator = "Bioclinica", Pret = 10.00m, Moneda = "RON" },
+                new() { NumeAnaliza = "Colesterol total", NumeCategorie = "BIOCHIMIE", NumeLaborator = "Synevo", Pret = 15.00m, Moneda = "RON" }
+            };
+        }
+    }
+
+    private void OnAnalizaSelected(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        _selectedAnalizaName = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private async Task HandleSave()
+    {
+        _isSaving = true;
+        _errorMessage = null;
+
+        try
+        {
+            await OnSave.InvokeAsync((
+                _selectedAnalizaName,
+                _selectedPrioritate,
+                _esteCito,
+                _dataProgramata,
+                _indicatiiMedic
+            ));
+
+            // Reset form
+            _selectedAnalizaName = string.Empty;
+            _selectedPrioritate = "Normala";
+            _esteCito = false;
+            _dataProgramata = null;
+            _indicatiiMedic = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Eroare la salvare: {ex.Message}";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void HandleOverlayClick()
+    {
+        if (!_isSaving)
+        {
+            OnClose.InvokeAsync();
+        }
+    }
+}
