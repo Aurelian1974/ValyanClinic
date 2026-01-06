@@ -259,6 +259,68 @@
                     </div>
                 }
 
+                <!-- Analize Efectuate (din această consultație) -->
+                @if (Model.AnalizeEfectuate.Any())
+                {
+                    <div class="section">
+                        <h2 class="section-title"><i class="fas fa-vial"></i> Analize Efectuate (@Model.AnalizeEfectuate.Count)</h2>
+                        <div class="analize-efectuate-container">
+                            @{
+                                var analizeNormale = Model.AnalizeEfectuate.Where(a => !a.EsteAnormal).ToList();
+                                var analizeAnormale = Model.AnalizeEfectuate.Where(a => a.EsteAnormal).ToList();
+                            }
+                            
+                            @if (analizeAnormale.Any())
+                            {
+                                <div class="analize-efectuate-section anormale">
+                                    <div class="analize-efectuate-title">
+                                        <i class="fas fa-exclamation-triangle"></i> Valori în Afara Limitelor (@analizeAnormale.Count)
+                                    </div>
+                                    <table class="analize-efectuate-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Analiză</th>
+                                                <th>Rezultat</th>
+                                                <th>Referință</th>
+                                                <th>Data</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var analiza in analizeAnormale)
+                                            {
+                                                <tr class="row-anormal">
+                                                    <td>@analiza.NumeAnaliza</td>
+                                                    <td><strong>@analiza.Rezultat</strong> @analiza.UnitateMasura</td>
+                                                    <td>@(analiza.ValoriReferinta ?? "-")</td>
+                                                    <td>@analiza.DataEfectuareFormatata</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            
+                            @if (analizeNormale.Any())
+                            {
+                                <div class="analize-efectuate-section normale">
+                                    <div class="analize-efectuate-title">
+                                        <i class="fas fa-check-circle"></i> Valori Normale (@analizeNormale.Count)
+                                    </div>
+                                    <div class="analize-normale-grid">
+                                        @foreach (var analiza in analizeNormale)
+                                        {
+                                            <div class="analiza-normala-item">
+                                                <span class="analiza-nume">@analiza.NumeAnaliza:</span>
+                                                <span class="analiza-rezultat">@analiza.Rezultat @analiza.UnitateMasura</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
                 <!-- Examene Paraclinice -->
                 <div class="section">
                     <h2 class="section-title"><i class="fas fa-microscope"></i> Examene Paraclinice</h2>

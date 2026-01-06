@@ -97,6 +97,9 @@ public class ScrisoareMedicalaDto
     // ==================== ANALIZE RECOMANDATE ====================
     public List<AnalizaRecomandataScrisoareDto> AnalizeRecomandate { get; set; } = new();
 
+    // ==================== ANALIZE EFECTUATE (CU REZULTATE) ====================
+    public List<AnalizaEfectuataScrisoareDto> AnalizeEfectuate { get; set; } = new();
+
     // ==================== CHECKBOX SECTIONS ====================
     // Indicație Internare
     public bool AreIndicatieInternare { get; set; } = false;
@@ -187,4 +190,22 @@ public class AnalizaRecomandataScrisoareDto
     public string? Prioritate { get; set; }
     public bool EsteCito { get; set; }
     public string? IndicatiiClinice { get; set; }
+}
+
+/// <summary>
+/// DTO pentru analiză efectuată (cu rezultate) în Scrisoarea Medicală
+/// </summary>
+public class AnalizaEfectuataScrisoareDto
+{
+    public string NumeAnaliza { get; set; } = string.Empty;
+    public string? Categorie { get; set; }
+    public DateTime? DataEfectuare { get; set; }
+    public string? Laborator { get; set; }
+    public string? Rezultat { get; set; }
+    public string? UnitateMasura { get; set; }
+    public string? ValoriReferinta { get; set; }
+    public bool EsteAnormal { get; set; }
+    
+    // Computed
+    public string DataEfectuareFormatata => DataEfectuare?.ToString("dd.MM.yyyy") ?? "-";
 }

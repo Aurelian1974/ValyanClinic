@@ -503,6 +503,104 @@
     margin-bottom: 0;
 }
 
+/* ==================== Analize Efectuate ==================== */
+.analize-efectuate-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.analize-efectuate-section {
+    border-radius: 6px;
+    padding: 12px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.analize-efectuate-section.anormale {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.analize-efectuate-section.normale {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+.analize-efectuate-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.analize-efectuate-section.anormale .analize-efectuate-title {
+    color: #dc2626;
+}
+
+.analize-efectuate-section.normale .analize-efectuate-title {
+    color: #16a34a;
+}
+
+.analize-efectuate-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+}
+
+.analize-efectuate-table th {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 5px 8px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.analize-efectuate-table td {
+    padding: 4px 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    vertical-align: middle;
+}
+
+.analize-efectuate-table tr:last-child td {
+    border-bottom: none;
+}
+
+.analize-efectuate-table .row-anormal td {
+    color: #991b1b;
+}
+
+.analize-efectuate-table .row-anormal td strong {
+    color: #dc2626;
+}
+
+/* Grid compact pentru analize normale */
+.analize-normale-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 16px;
+}
+
+.analiza-normala-item {
+    font-size: 0.75rem;
+    display: flex;
+    gap: 6px;
+}
+
+.analiza-normala-item .analiza-nume {
+    color: #374151;
+}
+
+.analiza-normala-item .analiza-rezultat {
+    font-weight: 600;
+    color: #16a34a;
+}
+
 /* ==================== Treatment Table ==================== */
 .treatment-table {
     width: 100%;
@@ -960,5 +1058,24 @@
     .analize-compact-table th,
     .analize-compact-table td {
         padding: 2px 4px !important;
+    }
+
+    /* Analize efectuate - optimizare print */
+    .analize-efectuate-section {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .analize-efectuate-table {
+        font-size: 0.65rem !important;
+    }
+
+    .analize-normale-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 3px 10px !important;
+    }
+
+    .analiza-normala-item {
+        font-size: 0.65rem !important;
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 using ValyanClinic.Application.Features.AnalizeMedicale.Queries.GetAnalizeRecomandate;
+using ValyanClinic.Application.Features.AnalizeMedicale.Queries.GetAnalizeEfectuate;
 
 namespace ValyanClinic.Application.Services.ScrisoareMedicala;
 
@@ -173,6 +174,12 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
         _logger.LogInformation("[ScrisoareMedicalaService] dto.AnalizeRecomandate count: {Count}",
             dto.AnalizeRecomandate?.Count ?? 0);
 
+        // Încarcă analizele efectuate (cu rezultate) pentru consultație
+        dto.AnalizeEfectuate = await LoadAnalizeEfectuateAsync(consultatie.ConsultatieID, cancellationToken);
+        
+        _logger.LogInformation("[ScrisoareMedicalaService] dto.AnalizeEfectuate count: {Count}",
+            dto.AnalizeEfectuate?.Count ?? 0);
+
         return Result<ScrisoareMedicalaDto>.Success(dto);
     }
 
@@ -209,6 +216,57 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             _logger.LogError(ex, "Error loading analize recomandate for consultatie {ConsultatieId}", consultatieId);
             return new List<AnalizaRecomandataScrisoareDto>();
         }
+    }
+
+    /// <summary>
+    /// Încarcă analizele efectuate (cu rezultate) pentru o consultație
+    /// </summary>
+    private async Task<List<AnalizaEfectuataScrisoareDto>> LoadAnalizeEfectuateAsync(
+        Guid consultatieId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var query = new GetAnalizeEfectuateQuery(consultatieId);
+            var result = await _mediator.Send(query, cancellationToken);
+            
+            if (result.IsSuccess && result.Value != null)
+            {
+                return result.Value
+                    .Where(a => a.AreRezultate) // Doar cele cu rezultate
+                    .Select(a => new AnalizaEfectuataScrisoareDto
+                    {
+                        NumeAnaliza = a.NumeAnaliza ?? string.Empty,
+                        Categorie = a.TipAnaliza,
+                        DataEfectuare = a.DataEfectuare,
+                        Laborator = a.LocEfectuare,
+                        Rezultat = a.ValoareRezultat,
+                        UnitateMasura = a.UnitatiMasura,
+                        ValoriReferinta = FormatValoriReferinta(a.ValoareNormalaMin, a.ValoareNormalaMax),
+                        EsteAnormal = a.EsteInAfaraLimitelor
+                    }).ToList();
+            }
+            
+            _logger.LogWarning("Failed to load analize efectuate for consultatie {ConsultatieId}: {Error}", 
+                consultatieId, result.FirstError);
+            return new List<AnalizaEfectuataScrisoareDto>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading analize efectuate for consultatie {ConsultatieId}", consultatieId);
+            return new List<AnalizaEfectuataScrisoareDto>();
+        }
+    }
+
+    /// <summary>
+    /// Formatează valorile de referință pentru afișare
+    /// </summary>
+    private static string? FormatValoriReferinta(decimal? min, decimal? max)
+    {
+        if (!min.HasValue && !max.HasValue) return null;
+        if (!min.HasValue) return $"< {max:G}";
+        if (!max.HasValue) return $"> {min:G}";
+        return $"{min:G} - {max:G}";
     }
 
     /// <inheritdoc />
