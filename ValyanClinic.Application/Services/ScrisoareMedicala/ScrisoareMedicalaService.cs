@@ -1,7 +1,9 @@
 using System.Text.RegularExpressions;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
+using ValyanClinic.Application.Features.AnalizeMedicale.Queries.GetAnalizeRecomandate;
 
 namespace ValyanClinic.Application.Services.ScrisoareMedicala;
 
@@ -12,10 +14,14 @@ namespace ValyanClinic.Application.Services.ScrisoareMedicala;
 public class ScrisoareMedicalaService : IScrisoareMedicalaService
 {
     private readonly ILogger<ScrisoareMedicalaService> _logger;
+    private readonly IMediator _mediator;
 
-    public ScrisoareMedicalaService(ILogger<ScrisoareMedicalaService> logger)
+    public ScrisoareMedicalaService(
+        ILogger<ScrisoareMedicalaService> logger,
+        IMediator mediator)
     {
         _logger = logger;
+        _mediator = mediator;
     }
 
     /// <inheritdoc />
@@ -161,7 +167,48 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
         _logger.LogInformation("[ScrisoareMedicalaService] dto.TratamentRecomandat count: {Count}",
             dto.TratamentRecomandat?.Count ?? 0);
 
+        // Încarcă analizele recomandate pentru consultație
+        dto.AnalizeRecomandate = await LoadAnalizeRecomandateAsync(consultatie.ConsultatieID, cancellationToken);
+        
+        _logger.LogInformation("[ScrisoareMedicalaService] dto.AnalizeRecomandate count: {Count}",
+            dto.AnalizeRecomandate?.Count ?? 0);
+
         return Result<ScrisoareMedicalaDto>.Success(dto);
+    }
+
+    /// <summary>
+    /// Încarcă analizele recomandate pentru o consultație
+    /// </summary>
+    private async Task<List<AnalizaRecomandataScrisoareDto>> LoadAnalizeRecomandateAsync(
+        Guid consultatieId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var query = new GetAnalizeRecomandateQuery(consultatieId);
+            var result = await _mediator.Send(query, cancellationToken);
+            
+            if (result.IsSuccess && result.Value != null)
+            {
+                return result.Value.Select(a => new AnalizaRecomandataScrisoareDto
+                {
+                    NumeAnaliza = a.NumeAnaliza,
+                    Categorie = a.TipAnaliza,
+                    Prioritate = a.Prioritate,
+                    EsteCito = a.EsteCito,
+                    IndicatiiClinice = a.IndicatiiClinice
+                }).ToList();
+            }
+            
+            _logger.LogWarning("Failed to load analize recomandate for consultatie {ConsultatieId}: {Error}", 
+                consultatieId, result.FirstError);
+            return new List<AnalizaRecomandataScrisoareDto>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading analize recomandate for consultatie {ConsultatieId}", consultatieId);
+            return new List<AnalizaRecomandataScrisoareDto>();
+        }
     }
 
     /// <inheritdoc />

@@ -94,6 +94,9 @@ public class ScrisoareMedicalaDto
     // ==================== RECOMANDĂRI ====================
     public List<string> Recomandari { get; set; } = new();
 
+    // ==================== ANALIZE RECOMANDATE ====================
+    public List<AnalizaRecomandataScrisoareDto> AnalizeRecomandate { get; set; } = new();
+
     // ==================== CHECKBOX SECTIONS ====================
     // Indicație Internare
     public bool AreIndicatieInternare { get; set; } = false;
@@ -172,4 +175,16 @@ public class MedicamentScrisoareDto
     public string Frecventa { get; set; } = string.Empty;
     public string Durata { get; set; } = string.Empty;
     public string? Observatii { get; set; }
+}
+
+/// <summary>
+/// DTO pentru analiză recomandată în Scrisoarea Medicală
+/// </summary>
+public class AnalizaRecomandataScrisoareDto
+{
+    public string NumeAnaliza { get; set; } = string.Empty;
+    public string? Categorie { get; set; }
+    public string? Prioritate { get; set; }
+    public bool EsteCito { get; set; }
+    public string? IndicatiiClinice { get; set; }
 }

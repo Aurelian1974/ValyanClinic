@@ -552,6 +552,92 @@
     font-style: italic;
 }
 
+/* ==================== CITO Badge & Row ==================== */
+.cito-badge {
+    display: inline-block;
+    background: #dc2626;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cito-row {
+    background-color: #fef2f2;
+}
+
+.cito-row td {
+    border-left: 3px solid #dc2626;
+}
+
+/* ==================== Analize Recomandate - 3 Columns Grid ==================== */
+.analize-grid-3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.analize-column {
+    min-width: 0; /* Previne overflow */
+}
+
+.analize-compact-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.7rem;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.analize-compact-table th {
+    background: #f1f5f9;
+    padding: 4px 6px;
+    text-align: left;
+    font-weight: 600;
+    color: #1a1a1a;
+    border-bottom: 1px solid #cbd5e1;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.analize-compact-table td {
+    padding: 3px 6px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+.analize-compact-table tr:last-child td {
+    border-bottom: none;
+}
+
+.analize-compact-table .cito-row td:first-child {
+    border-left: 2px solid #dc2626;
+    padding-left: 4px;
+}
+
+.cito-badge-sm {
+    display: inline-block;
+    background: #dc2626;
+    color: #fff;
+    font-size: 0.55rem;
+    font-weight: 700;
+    width: 12px;
+    height: 12px;
+    line-height: 12px;
+    text-align: center;
+    border-radius: 50%;
+    margin-left: 3px;
+    vertical-align: middle;
+}
+
 /* ==================== Recommendations List ==================== */
 .recommendations-list {
     padding-left: 20px;
@@ -858,4 +944,21 @@
     h1, h2, h3, h4, h5, h6 {
         page-break-after: avoid !important;
         break-after: avoid !important;
-    }}
+    }
+
+    /* Analize grid - păstrează 3 coloane la print */
+    .analize-grid-3col {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .analize-compact-table {
+        font-size: 0.6rem !important;
+    }
+
+    .analize-compact-table th,
+    .analize-compact-table td {
+        padding: 2px 4px !important;
+    }
+}

@@ -1,6 +1,6 @@
 -- ========================================
 -- Stored Procedure: AnalizeMedicale_Search
--- C?utare analize în nomenclator
+-- C?utare analize ï¿½n nomenclator
 -- ========================================
 USE [ValyanMed]
 GO
@@ -39,9 +39,9 @@ BEGIN
           AND (@LaboratorID IS NULL OR a.LaboratorID = @LaboratorID)
           AND (
               @SearchTerm IS NULL 
-              OR a.NumeAnaliza LIKE '%' + @SearchTerm + '%'
-              OR a.Acronime LIKE '%' + @SearchTerm + '%'
-              OR a.NumeScurt LIKE '%' + @SearchTerm + '%'
+              OR a.NumeAnaliza COLLATE Romanian_CI_AI LIKE '%' + @SearchTerm + '%'
+              OR a.Acronime COLLATE Romanian_CI_AI LIKE '%' + @SearchTerm + '%'
+              OR a.NumeScurt COLLATE Romanian_CI_AI LIKE '%' + @SearchTerm + '%'
           )
     )
     SELECT *
@@ -58,9 +58,9 @@ BEGIN
       AND (@LaboratorID IS NULL OR a.LaboratorID = @LaboratorID)
       AND (
           @SearchTerm IS NULL 
-          OR a.NumeAnaliza LIKE '%' + @SearchTerm + '%'
-          OR a.Acronime LIKE '%' + @SearchTerm + '%'
-          OR a.NumeScurt LIKE '%' + @SearchTerm + '%'
+          OR a.NumeAnaliza COLLATE Romanian_CI_AI LIKE '%' + @SearchTerm + '%'
+          OR a.Acronime COLLATE Romanian_CI_AI LIKE '%' + @SearchTerm + '%'
+          OR a.NumeScurt COLLATE Romanian_CI_AI LIKE '%' + @SearchTerm + '%'
       );
 END
 GO

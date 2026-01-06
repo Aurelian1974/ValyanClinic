@@ -358,6 +358,101 @@
                     </div>
                 }
 
+                <!-- Analize Recomandate -->
+                @if (Model.AnalizeRecomandate.Any())
+                {
+                    <div class="section">
+                        <h2 class="section-title"><i class="fas fa-flask"></i> Analize Recomandate (@Model.AnalizeRecomandate.Count)</h2>
+                        <div class="analize-grid-3col">
+                            @{
+                                var analize = Model.AnalizeRecomandate.ToList();
+                                var countPerColumn = (int)Math.Ceiling(analize.Count / 3.0);
+                                var col1 = analize.Take(countPerColumn).ToList();
+                                var col2 = analize.Skip(countPerColumn).Take(countPerColumn).ToList();
+                                var col3 = analize.Skip(countPerColumn * 2).ToList();
+                            }
+                            
+                            <!-- Coloana 1 -->
+                            <div class="analize-column">
+                                <table class="analize-compact-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Analiză</th>
+                                            <th>Categorie</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var analiza in col1)
+                                        {
+                                            <tr class="@(analiza.EsteCito ? "cito-row" : "")">
+                                                <td>
+                                                    @analiza.NumeAnaliza
+                                                    @if (analiza.EsteCito) { <span class="cito-badge-sm">!</span> }
+                                                </td>
+                                                <td>@analiza.Categorie</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Coloana 2 -->
+                            @if (col2.Any())
+                            {
+                                <div class="analize-column">
+                                    <table class="analize-compact-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Analiză</th>
+                                                <th>Categorie</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var analiza in col2)
+                                            {
+                                                <tr class="@(analiza.EsteCito ? "cito-row" : "")">
+                                                    <td>
+                                                        @analiza.NumeAnaliza
+                                                        @if (analiza.EsteCito) { <span class="cito-badge-sm">!</span> }
+                                                    </td>
+                                                    <td>@analiza.Categorie</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            
+                            <!-- Coloana 3 -->
+                            @if (col3.Any())
+                            {
+                                <div class="analize-column">
+                                    <table class="analize-compact-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Analiză</th>
+                                                <th>Categorie</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var analiza in col3)
+                                            {
+                                                <tr class="@(analiza.EsteCito ? "cito-row" : "")">
+                                                    <td>
+                                                        @analiza.NumeAnaliza
+                                                        @if (analiza.EsteCito) { <span class="cito-badge-sm">!</span> }
+                                                    </td>
+                                                    <td>@analiza.Categorie</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
                 <!-- Notes Box -->
                 <div class="notes-box">
                     <div class="notes-box-title"><i class="fas fa-sticky-note"></i> Notă Importantă</div>
