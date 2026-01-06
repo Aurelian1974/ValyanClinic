@@ -22,24 +22,6 @@
                        @bind="Model.StareGenerala"
                        @oninput="OnFieldChanged" />
             </div>
-            
-            <div class="form-group">
-                <label class="form-label">Constituție</label>
-                <input type="text" 
-                       class="form-control" 
-                       placeholder="Ex: Normostenică, astenică, hipostenică..."
-                       @bind="Model.Constitutie"
-                       @oninput="OnFieldChanged" />
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Atitudine</label>
-                <input type="text" 
-                       class="form-control" 
-                       placeholder="Ex: Activă, pasivă, forțată..."
-                       @bind="Model.Atitudine"
-                       @oninput="OnFieldChanged" />
-            </div>
         </div>
     </div>
     
@@ -122,76 +104,6 @@
             <IMCCalculator @bind-Greutate="Model.Greutate"
                           @bind-Inaltime="Model.Inaltime"
                           ShowDetails="true" />
-        </div>
-    </div>
-    
-    @* Examen Aparate și Sisteme *@
-    <div class="subsection">
-        <h5 class="subsection-title">Examen Aparate și Sisteme</h5>
-        
-        <div class="form-group">
-            <label class="form-label">
-                <i class="fas fa-heartbeat"></i>
-                Cardiovascular
-            </label>
-            <textarea class="form-control" 
-                      rows="3"
-                      placeholder="Ex: Zgomote cardiace ritmice, fără sufluri..."
-                      @bind="Model.ExamenCardiovascular"
-                      @oninput="OnFieldChanged">
-            </textarea>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">
-                <i class="fas fa-lungs"></i>
-                Respiratoriu
-            </label>
-            <textarea class="form-control" 
-                      rows="3"
-                      placeholder="Ex: Murmur vezicular prezent bilateral, fără raluri..."
-                      @bind="Model.ExamenRespiratoriu"
-                      @oninput="OnFieldChanged">
-            </textarea>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">
-                <i class="fas fa-stomach"></i>
-                Digestiv
-            </label>
-            <textarea class="form-control" 
-                      rows="3"
-                      placeholder="Ex: Abdomen suplu, nedureros la palpare..."
-                      @bind="Model.ExamenDigestiv"
-                      @oninput="OnFieldChanged">
-            </textarea>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">
-                <i class="fas fa-kidneys"></i>
-                Urinar
-            </label>
-            <textarea class="form-control" 
-                      rows="2"
-                      placeholder="Ex: Loji renale libere..."
-                      @bind="Model.ExamenUrinar"
-                      @oninput="OnFieldChanged">
-            </textarea>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">
-                <i class="fas fa-brain"></i>
-                Nervos
-            </label>
-            <textarea class="form-control" 
-                      rows="2"
-                      placeholder="Ex: Conștient, orientat temporo-spatial..."
-                      @bind="Model.ExamenNervos"
-                      @oninput="OnFieldChanged">
-            </textarea>
         </div>
     </div>
     

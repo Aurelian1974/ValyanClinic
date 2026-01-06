@@ -317,6 +317,25 @@
     flex: 1;
 }
 
+/* ==================== Examen Clinic Compact ==================== */
+.examen-clinic-compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.examen-clinic-compact span {
+    display: inline-block;
+}
+
+.examen-clinic-compact strong {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
 /* ==================== Data Grid ==================== */
 .data-grid {
     display: grid;

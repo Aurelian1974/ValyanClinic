@@ -65,7 +65,7 @@
                     <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> <span>Finalizează</span></div>
                     <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>←</kbd> <span>Tab Anterior</span></div>
                     <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>→</kbd> <span>Tab Următor</span></div>
-                    <div class="shortcut-item"><kbd>Alt</kbd> + <kbd>1-4</kbd> <span>Salt la Tab</span></div>
+                    <div class="shortcut-item"><kbd>Alt</kbd> + <kbd>1-6</kbd> <span>Salt la Tab</span></div>
                     <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>P</kbd> <span>Pauză Timer</span></div>
                 </div>
                 <button class="btn btn-sm btn-secondary" @onclick="() => ShowShortcutsModal = false">Închide</button>
@@ -166,9 +166,9 @@
                 </button>
                 <button class="tab-btn @(ActiveTab == 3 ? "active" : "") @(IsTabCompleted(3) ? "completed" : "")"
                         @onclick="() => SwitchTab(3)"
-                        title="Analize Medicale (Alt+3)">
-                    <i class="fas fa-flask"></i>
-                    <span>Analize Medicale</span>
+                        title="Investigații (Alt+3)">
+                    <i class="fas fa-x-ray"></i>
+                    <span>Investigații</span>
                     <span class="tab-number">3</span>
                     @if (IsTabCompleted(3))
                     {
@@ -177,9 +177,9 @@
                 </button>
                 <button class="tab-btn @(ActiveTab == 4 ? "active" : "") @(IsTabCompleted(4) ? "completed" : "")"
                         @onclick="() => SwitchTab(4)"
-                        title="Diagnostic & Tratament (Alt+4)">
-                    <i class="fas fa-diagnoses"></i>
-                    <span>Diagnostic & Tratament</span>
+                        title="Analize Medicale (Alt+4)">
+                    <i class="fas fa-flask"></i>
+                    <span>Analize Medicale</span>
                     <span class="tab-number">4</span>
                     @if (IsTabCompleted(4))
                     {
@@ -188,11 +188,22 @@
                 </button>
                 <button class="tab-btn @(ActiveTab == 5 ? "active" : "") @(IsTabCompleted(5) ? "completed" : "")"
                         @onclick="() => SwitchTab(5)"
-                        title="Concluzii (Alt+5)">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Concluzii</span>
+                        title="Diagnostic & Tratament (Alt+5)">
+                    <i class="fas fa-diagnoses"></i>
+                    <span>Diagnostic & Tratament</span>
                     <span class="tab-number">5</span>
                     @if (IsTabCompleted(5))
+                    {
+                        <i class="fas fa-check tab-check"></i>
+                    }
+                </button>
+                <button class="tab-btn @(ActiveTab == 6 ? "active" : "") @(IsTabCompleted(6) ? "completed" : "")"
+                        @onclick="() => SwitchTab(6)"
+                        title="Concluzii (Alt+6)">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Concluzii</span>
+                    <span class="tab-number">6</span>
+                    @if (IsTabCompleted(6))
                     {
                         <i class="fas fa-check tab-check"></i>
                     }
@@ -521,6 +532,35 @@
                                     <option value="Severe">Severe</option>
                                 </select>
                             </div>
+
+                            <!-- Card 13: Glicemie -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-tint"></i></div>
+                                    <div class="exam-label">Glicemie</div>
+                                </div>
+                                <div class="exam-input-row">
+                                    <input type="number" step="0.1" class="exam-input" placeholder="95" 
+                                           @bind="Glicemie" 
+                                           @bind:after="MarkFormAsDirty" />
+                                    <span class="exam-unit">mg/dL</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 14: Ganglioni Limfatici -->
+                            <div class="exam-item">
+                                <div class="exam-item-header">
+                                    <div class="exam-icon"><i class="fas fa-circle-nodes"></i></div>
+                                    <div class="exam-label">Ganglioni Limfatici</div>
+                                </div>
+                                <select class="exam-select" @bind="GanglioniLimfatici" @bind:after="MarkFormAsDirty">
+                                    <option value="">Selectează...</option>
+                                    <option value="Nepalpabili">Nepalpabili</option>
+                                    <option value="Palpabili, nedureroși">Palpabili, nedureroși</option>
+                                    <option value="Palpabili, dureroși">Palpabili, dureroși</option>
+                                    <option value="Adenopatii">Adenopatii</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -553,35 +593,47 @@
                                       rows="3"
                                       placeholder="Alte observații relevante din examenul clinic..."
                                       maxlength="1000"
-                                      @bind="InvestigatiiParaclinice"
+                                      @bind="AlteObservatiiClinice"
                                       @bind:event="oninput"
                                       @bind:after="MarkFormAsDirty"></textarea>
-                            <span class="char-counter">@InvestigatiiParaclinice.Length / 1000</span>
+                            <span class="char-counter">@AlteObservatiiClinice.Length / 1000</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tab 3: Analize Medicale -->
+                <!-- Tab 3: Investigații Medicale (Imagistice, Explorări, Endoscopii) -->
                 <div class="tab-panel @(ActiveTab == 3 ? "active" : "")">
-                    <AnalizeMedicaleTab 
-                        ConsultatieId="@ConsultatieId"
+                    <InvestigatiiTab 
+                        Model="@ConsultatieCommand"
+                        IsActive="@(ActiveTab == 3)"
                         PacientId="@PacientId"
+                        ConsultatieId="@ConsultatieId"
                         CurrentUserId="@CurrentMedicId"
                         OnChanged="@MarkFormAsDirty"
                         OnSectionCompleted="@(() => MarkTabAsCompleted(3))" />
                 </div>
 
-                <!-- Tab 4: Diagnostic & Tratament -->
+                <!-- Tab 4: Analize Medicale -->
                 <div class="tab-panel @(ActiveTab == 4 ? "active" : "")">
-                    <DiagnosticTab Model="@ConsultatieCommand"
-                        ShowValidation="@ShowValidationErrors"
+                    <AnalizeMedicaleTab 
+                        ConsultatieId="@ConsultatieId"
+                        PacientId="@PacientId"
                         CurrentUserId="@CurrentMedicId"
                         OnChanged="@MarkFormAsDirty"
                         OnSectionCompleted="@(() => MarkTabAsCompleted(4))" />
                 </div>
 
-                <!-- Tab 5: Concluzii -->
+                <!-- Tab 5: Diagnostic & Tratament -->
                 <div class="tab-panel @(ActiveTab == 5 ? "active" : "")">
+                    <DiagnosticTab Model="@ConsultatieCommand"
+                        ShowValidation="@ShowValidationErrors"
+                        CurrentUserId="@CurrentMedicId"
+                        OnChanged="@MarkFormAsDirty"
+                        OnSectionCompleted="@(() => MarkTabAsCompleted(5))" />
+                </div>
+
+                <!-- Tab 6: Concluzii -->
+                <div class="tab-panel @(ActiveTab == 6 ? "active" : "")">
                     <div class="form-section">
                         <h3 class="section-title">
                             <i class="fas fa-file-medical"></i>

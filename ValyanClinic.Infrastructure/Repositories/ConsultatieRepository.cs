@@ -249,20 +249,9 @@ public class ConsultatieRepository : IConsultatieRepository
                     FreccventaRespiratorie = row.ExamenObiectiv_FreccventaRespiratorie,
                     SaturatieO2 = row.ExamenObiectiv_SaturatieO2,
                     Glicemie = row.ExamenObiectiv_Glicemie,
-                    ExamenCardiovascular = row.ExamenObiectiv_ExamenCardiovascular,
-                    ExamenRespiratoriu = row.ExamenObiectiv_ExamenRespiratoriu,
-                    ExamenDigestiv = row.ExamenObiectiv_ExamenDigestiv,
-                    ExamenUrinar = row.ExamenObiectiv_ExamenUrinar,
-                    ExamenNervos = row.ExamenObiectiv_ExamenNervos,
-                    Constitutie = row.ExamenObiectiv_Constitutie,
-                    Atitudine = row.ExamenObiectiv_Atitudine,
-                    Facies = row.ExamenObiectiv_Facies,
-                    GangliniLimfatici = row.ExamenObiectiv_GangliniLimfatici,
-                    ExamenLocomotor = row.ExamenObiectiv_ExamenLocomotor,
-                    ExamenEndocrin = row.ExamenObiectiv_ExamenEndocrin,
-                    ExamenORL = row.ExamenObiectiv_ExamenORL,
-                    ExamenOftalmologic = row.ExamenObiectiv_ExamenOftalmologic,
-                    ExamenDermatologic = row.ExamenObiectiv_ExamenDermatologic,
+                    GanglioniLimfatici = row.ExamenObiectiv_GanglioniLimfatici,
+                    ExamenObiectivDetaliat = row.ExamenObiectiv_ExamenObiectivDetaliat,
+                    AlteObservatiiClinice = row.ExamenObiectiv_AlteObservatiiClinice,
                     DataCreare = row.ExamenObiectiv_DataCreare,
                     CreatDe = row.ExamenObiectiv_CreatDe,
                     DataUltimeiModificari = row.ExamenObiectiv_DataUltimeiModificari,
@@ -636,20 +625,9 @@ public class ConsultatieRepository : IConsultatieRepository
                     FreccventaRespiratorie = row.ExamenObiectiv_FreccventaRespiratorie,
                     SaturatieO2 = row.ExamenObiectiv_SaturatieO2,
                     Glicemie = row.ExamenObiectiv_Glicemie,
-                    ExamenCardiovascular = row.ExamenObiectiv_ExamenCardiovascular,
-                    ExamenRespiratoriu = row.ExamenObiectiv_ExamenRespiratoriu,
-                    ExamenDigestiv = row.ExamenObiectiv_ExamenDigestiv,
-                    ExamenUrinar = row.ExamenObiectiv_ExamenUrinar,
-                    ExamenNervos = row.ExamenObiectiv_ExamenNervos,
-                    Constitutie = row.ExamenObiectiv_Constitutie,
-                    Atitudine = row.ExamenObiectiv_Atitudine,
-                    Facies = row.ExamenObiectiv_Facies,
-                    GangliniLimfatici = row.ExamenObiectiv_GangliniLimfatici,
-                    ExamenLocomotor = row.ExamenObiectiv_ExamenLocomotor,
-                    ExamenEndocrin = row.ExamenObiectiv_ExamenEndocrin,
-                    ExamenORL = row.ExamenObiectiv_ExamenORL,
-                    ExamenOftalmologic = row.ExamenObiectiv_ExamenOftalmologic,
-                    ExamenDermatologic = row.ExamenObiectiv_ExamenDermatologic,
+                    GanglioniLimfatici = row.ExamenObiectiv_GanglioniLimfatici,
+                    ExamenObiectivDetaliat = row.ExamenObiectiv_ExamenObiectivDetaliat,
+                    AlteObservatiiClinice = row.ExamenObiectiv_AlteObservatiiClinice,
                     DataCreare = row.ExamenObiectiv_DataCreare,
                     CreatDe = row.ExamenObiectiv_CreatDe,
                     DataUltimeiModificari = row.ExamenObiectiv_DataUltimeiModificari,
@@ -857,12 +835,9 @@ public class ConsultatieRepository : IConsultatieRepository
             var parameters = new DynamicParameters();
             parameters.Add("@ConsultatieID", consultatieId);
             parameters.Add("@StareGenerala", entity.StareGenerala);
-            parameters.Add("@Constitutie", entity.Constitutie);
-            parameters.Add("@Atitudine", entity.Atitudine);
-            parameters.Add("@Facies", entity.Facies);
             parameters.Add("@Tegumente", entity.Tegumente);
             parameters.Add("@Mucoase", entity.Mucoase);
-            parameters.Add("@GangliniLimfatici", entity.GangliniLimfatici);
+            parameters.Add("@GanglioniLimfatici", entity.GanglioniLimfatici);
             parameters.Add("@Edeme", entity.Edeme);
             parameters.Add("@Greutate", entity.Greutate);
             parameters.Add("@Inaltime", entity.Inaltime);
@@ -873,16 +848,8 @@ public class ConsultatieRepository : IConsultatieRepository
             parameters.Add("@FreccventaRespiratorie", entity.FreccventaRespiratorie);
             parameters.Add("@SaturatieO2", entity.SaturatieO2);
             parameters.Add("@Glicemie", entity.Glicemie);
-            parameters.Add("@ExamenCardiovascular", entity.ExamenCardiovascular);
-            parameters.Add("@ExamenRespiratoriu", entity.ExamenRespiratoriu);
-            parameters.Add("@ExamenDigestiv", entity.ExamenDigestiv);
-            parameters.Add("@ExamenUrinar", entity.ExamenUrinar);
-            parameters.Add("@ExamenNervos", entity.ExamenNervos);
-            parameters.Add("@ExamenLocomotor", entity.ExamenLocomotor);
-            parameters.Add("@ExamenEndocrin", entity.ExamenEndocrin);
-            parameters.Add("@ExamenORL", entity.ExamenORL);
-            parameters.Add("@ExamenOftalmologic", entity.ExamenOftalmologic);
-            parameters.Add("@ExamenDermatologic", entity.ExamenDermatologic);
+            parameters.Add("@ExamenObiectivDetaliat", entity.ExamenObiectivDetaliat);
+            parameters.Add("@AlteObservatiiClinice", entity.AlteObservatiiClinice);
             parameters.Add("@ModificatDe", entity.ModificatDe ?? entity.CreatDe);
 
             await connection.ExecuteAsync(

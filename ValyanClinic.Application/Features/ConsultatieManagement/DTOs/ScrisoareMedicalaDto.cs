@@ -64,13 +64,17 @@ public class ScrisoareMedicalaDto
     public decimal? IMC { get; set; }
     public string? IMCCategorie { get; set; }
     public int? SaturatieO2 { get; set; }
+    public decimal? Glicemie { get; set; }
+    public string? Tegumente { get; set; }
+    public string? Mucoase { get; set; }
+    public string? GanglioniLimfatici { get; set; }
+    public string? Edeme { get; set; }
     public string? ExamenClinicGeneral { get; set; }
 
     // ==================== EXAMEN CLINIC LOCAL ====================
     public string? ExamenClinicLocal { get; set; }
-    public string? ExamenCardiovascular { get; set; }
-    public string? ExamenRespiratoriu { get; set; }
-    public string? ExamenDigestiv { get; set; }
+    public string? ExamenObiectivDetaliat { get; set; }
+    public string? AlteObservatiiClinice { get; set; }
 
     // ==================== INVESTIGAȚII LABORATOR ====================
     public List<RezultatLaboratorDto> RezultateNormale { get; set; } = new();
@@ -96,6 +100,11 @@ public class ScrisoareMedicalaDto
 
     // ==================== ANALIZE RECOMANDATE ====================
     public List<AnalizaRecomandataScrisoareDto> AnalizeRecomandate { get; set; } = new();
+
+    // ==================== INVESTIGAȚII RECOMANDATE ====================
+    public List<InvestigatieRecomandataScrisoareDto> InvestigatiiImagistice { get; set; } = new();
+    public List<InvestigatieRecomandataScrisoareDto> Explorari { get; set; } = new();
+    public List<InvestigatieRecomandataScrisoareDto> Endoscopii { get; set; } = new();
 
     // ==================== ANALIZE EFECTUATE (CU REZULTATE) ====================
     public List<AnalizaEfectuataScrisoareDto> AnalizeEfectuate { get; set; } = new();
@@ -190,6 +199,21 @@ public class AnalizaRecomandataScrisoareDto
     public string? Prioritate { get; set; }
     public bool EsteCito { get; set; }
     public string? IndicatiiClinice { get; set; }
+}
+
+/// <summary>
+/// DTO pentru investigație recomandată în Scrisoarea Medicală
+/// (folosit pentru Imagistice, Explorări funcționale și Endoscopii)
+/// </summary>
+public class InvestigatieRecomandataScrisoareDto
+{
+    public string Denumire { get; set; } = string.Empty;
+    public string? Cod { get; set; }
+    public string? Categorie { get; set; }
+    public string? Prioritate { get; set; }
+    public bool EsteCito { get; set; }
+    public string? IndicatiiClinice { get; set; }
+    public string? Observatii { get; set; }
 }
 
 /// <summary>

@@ -156,12 +156,14 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 imc.HasValue || request.Temperatura.HasValue ||
                 !string.IsNullOrWhiteSpace(request.TensiuneArteriala) ||
                 request.Puls.HasValue || request.FreccventaRespiratorie.HasValue ||
-                request.SaturatieO2.HasValue || 
+                request.SaturatieO2.HasValue || request.Glicemie.HasValue ||
                 !string.IsNullOrWhiteSpace(request.StareGenerala) ||
                 !string.IsNullOrWhiteSpace(request.Tegumente) ||
                 !string.IsNullOrWhiteSpace(request.Mucoase) ||
                 !string.IsNullOrWhiteSpace(request.Edeme) ||
-                !string.IsNullOrWhiteSpace(request.ExamenCardiovascular))
+                !string.IsNullOrWhiteSpace(request.GanglioniLimfatici) ||
+                !string.IsNullOrWhiteSpace(request.ExamenObiectivDetaliat) ||
+                !string.IsNullOrWhiteSpace(request.AlteObservatiiClinice))
             {
                 await _repository.UpsertExamenObiectivAsync(consultatieId, new ConsultatieExamenObiectiv
                 {
@@ -174,11 +176,14 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                     Puls = request.Puls,
                     FreccventaRespiratorie = request.FreccventaRespiratorie,
                     SaturatieO2 = request.SaturatieO2,
+                    Glicemie = request.Glicemie,
                     StareGenerala = request.StareGenerala,
                     Tegumente = request.Tegumente,
                     Mucoase = request.Mucoase,
                     Edeme = request.Edeme,
-                    ExamenCardiovascular = request.ExamenCardiovascular,
+                    GanglioniLimfatici = request.GanglioniLimfatici,
+                    ExamenObiectivDetaliat = request.ExamenObiectivDetaliat,
+                    AlteObservatiiClinice = request.AlteObservatiiClinice,
                     CreatDe = request.CreatDeSauModificatDe,
                     DataCreare = DateTime.Now,
                     DataUltimeiModificari = DateTime.Now

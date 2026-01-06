@@ -47,13 +47,18 @@ public class SaveConsultatieDraftCommand : IRequest<Result<Guid>>
     public int? Puls { get; set; }
     public int? FreccventaRespiratorie { get; set; } // FreqventaRespiratorie din UI
     public int? SaturatieO2 { get; set; } // SpO2 din UI
+    public decimal? Glicemie { get; set; }
 
     // Examen General
     public string? StareGenerala { get; set; }
     public string? Tegumente { get; set; }
     public string? Mucoase { get; set; }
     public string? Edeme { get; set; }
-    public string? ExamenCardiovascular { get; set; } // ExamenObiectiv din UI
+    public string? GanglioniLimfatici { get; set; }
+    /// <summary>Examen obiectiv detaliat - descriere pe aparate și sisteme</summary>
+    public string? ExamenObiectivDetaliat { get; set; }
+    /// <summary>Alte observații clinice relevante</summary>
+    public string? AlteObservatiiClinice { get; set; }
 
     // Investigații
     public string? InvestigatiiLaborator { get; set; } // InvestigatiiParaclinice din UI

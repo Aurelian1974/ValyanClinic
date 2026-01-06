@@ -1,0 +1,3 @@
+Changed database context to 'ValyanMed'.
+Creating sp_Consultatie_GetDraftByPacient...
+✓ sp_Consultatie_GetDraftByPacient created successfully

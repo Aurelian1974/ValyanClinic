@@ -8,6 +8,7 @@ using Serilog;
 using Syncfusion.Blazor;
 using ValyanClinic.Infrastructure.Data;
 using ValyanClinic.Infrastructure.Repositories;
+using ValyanClinic.Infrastructure.Repositories.Investigatii;
 using ValyanClinic.Infrastructure.Caching;
 using ValyanClinic.Domain.Interfaces.Repositories;
 using ValyanClinic.Components.Layout;
@@ -240,6 +241,20 @@ try
     builder.Services.AddScoped<ValyanClinic.Application.Services.Analize.IAnalizeMedicaleComparatorService,
                                 ValyanClinic.Application.Services.Analize.AnalizeMedicaleComparatorService>(); // ✅ NOU - Comparator analize
     builder.Services.AddScoped<IRolRepository, RolRepository>(); // ✅ NOU - Administrare Roluri și Permisiuni
+
+    // ✅ NOU - Investigații Medicale (Imagistice, Explorări Funcționale, Endoscopii)
+    // Nomenclatoare
+    builder.Services.AddScoped<INomenclatorInvestigatiiImagisticeRepository, NomenclatorInvestigatiiImagisticeRepository>();
+    builder.Services.AddScoped<INomenclatorExplorariFuncRepository, NomenclatorExplorariFuncRepository>();
+    builder.Services.AddScoped<INomenclatorEndoscopiiRepository, NomenclatorEndoscopiiRepository>();
+    // Recomandate
+    builder.Services.AddScoped<IConsultatieInvestigatieImagisticaRecomandataRepository, ConsultatieInvestigatieImagisticaRecomandataRepository>();
+    builder.Services.AddScoped<IConsultatieExplorareRecomandataRepository, ConsultatieExplorareRecomandataRepository>();
+    builder.Services.AddScoped<IConsultatieEndoscopieRecomandataRepository, ConsultatieEndoscopieRecomandataRepository>();
+    // Efectuate
+    builder.Services.AddScoped<IConsultatieInvestigatieImagisticaEfectuataRepository, ConsultatieInvestigatieImagisticaEfectuataRepository>();
+    builder.Services.AddScoped<IConsultatieExplorareEfectuataRepository, ConsultatieExplorareEfectuataRepository>();
+    builder.Services.AddScoped<IConsultatieEndoscopieEfectuataRepository, ConsultatieEndoscopieEfectuataRepository>();
     builder.Services.AddScoped<ValyanClinic.Application.Interfaces.IFieldPermissionService, 
                                 ValyanClinic.Application.Services.FieldPermissionService>(); // ✅ NOU - Permisiuni granulare la nivel de câmp
 

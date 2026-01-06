@@ -27,12 +27,9 @@ public class UpdateConsulatieDto
 
     // ==================== III.A. EXAMEN GENERAL ====================
     public string? StareGenerala { get; set; }
-    public string? Constitutie { get; set; }
-    public string? Atitudine { get; set; }
-    public string? Facies { get; set; }
     public string? Tegumente { get; set; }
     public string? Mucoase { get; set; }
-    public string? GangliniLimfatici { get; set; }
+    public string? GanglioniLimfatici { get; set; }
 
     // ==================== III.B. SEMNE VITALE ====================
     public decimal? Greutate { get; set; }
@@ -44,18 +41,6 @@ public class UpdateConsulatieDto
     public int? FreccventaRespiratorie { get; set; }
     public int? SaturatieO2 { get; set; }
     public decimal? Glicemie { get; set; }
-
-    // ==================== III.C. EXAMEN PE APARATE ====================
-    public string? ExamenCardiovascular { get; set; }
-    public string? ExamenRespiratoriu { get; set; }
-    public string? ExamenDigestiv { get; set; }
-    public string? ExamenUrinar { get; set; }
-    public string? ExamenNervos { get; set; }
-    public string? ExamenLocomotor { get; set; }
-    public string? ExamenEndocrin { get; set; }
-    public string? ExamenORL { get; set; }
-    public string? ExamenOftalmologic { get; set; }
-    public string? ExamenDermatologic { get; set; }
 
     // ==================== IV. INVESTIGATII ====================
     public string? InvestigatiiLaborator { get; set; }

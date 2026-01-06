@@ -5,11 +5,11 @@ STORED PROCEDURE: ConsultatieExamenObiectiv_Upsert
 Description: Insert or Update examen obiectiv for a consultatie
 Author: System
 Date: 2026-01-02
-Version: 2.0 (Normalized Structure)
+Version: 3.0 (Simplified - Removed legacy exam columns)
 ==============================================================================
 */
 
-USE [ValyanClinicDB]
+USE [ValyanMed]
 GO
 
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'ConsultatieExamenObiectiv_Upsert')
@@ -19,12 +19,9 @@ GO
 CREATE PROCEDURE [dbo].[ConsultatieExamenObiectiv_Upsert]
     @ConsultatieID UNIQUEIDENTIFIER,
     @StareGenerala NVARCHAR(MAX) = NULL,
-    @Constitutie NVARCHAR(500) = NULL,
-    @Atitudine NVARCHAR(500) = NULL,
-    @Facies NVARCHAR(500) = NULL,
     @Tegumente NVARCHAR(MAX) = NULL,
     @Mucoase NVARCHAR(MAX) = NULL,
-    @GangliniLimfatici NVARCHAR(MAX) = NULL,
+    @GanglioniLimfatici NVARCHAR(MAX) = NULL,
     @Edeme NVARCHAR(MAX) = NULL,
     @Greutate DECIMAL(6,2) = NULL,
     @Inaltime DECIMAL(6,2) = NULL,
@@ -35,16 +32,8 @@ CREATE PROCEDURE [dbo].[ConsultatieExamenObiectiv_Upsert]
     @FreccventaRespiratorie INT = NULL,
     @SaturatieO2 INT = NULL,
     @Glicemie DECIMAL(6,2) = NULL,
-    @ExamenCardiovascular NVARCHAR(MAX) = NULL,
-    @ExamenRespiratoriu NVARCHAR(MAX) = NULL,
-    @ExamenDigestiv NVARCHAR(MAX) = NULL,
-    @ExamenUrinar NVARCHAR(MAX) = NULL,
-    @ExamenNervos NVARCHAR(MAX) = NULL,
-    @ExamenLocomotor NVARCHAR(MAX) = NULL,
-    @ExamenEndocrin NVARCHAR(MAX) = NULL,
-    @ExamenORL NVARCHAR(MAX) = NULL,
-    @ExamenOftalmologic NVARCHAR(MAX) = NULL,
-    @ExamenDermatologic NVARCHAR(MAX) = NULL,
+    @ExamenObiectivDetaliat NVARCHAR(MAX) = NULL,
+    @AlteObservatiiClinice NVARCHAR(MAX) = NULL,
     @ModificatDe UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -58,12 +47,9 @@ BEGIN
             UPDATE [dbo].[ConsultatieExamenObiectiv]
             SET 
                 [StareGenerala] = @StareGenerala,
-                [Constitutie] = @Constitutie,
-                [Atitudine] = @Atitudine,
-                [Facies] = @Facies,
                 [Tegumente] = @Tegumente,
                 [Mucoase] = @Mucoase,
-                [GangliniLimfatici] = @GangliniLimfatici,
+                [GanglioniLimfatici] = @GanglioniLimfatici,
                 [Edeme] = @Edeme,
                 [Greutate] = @Greutate,
                 [Inaltime] = @Inaltime,
@@ -74,16 +60,8 @@ BEGIN
                 [FreccventaRespiratorie] = @FreccventaRespiratorie,
                 [SaturatieO2] = @SaturatieO2,
                 [Glicemie] = @Glicemie,
-                [ExamenCardiovascular] = @ExamenCardiovascular,
-                [ExamenRespiratoriu] = @ExamenRespiratoriu,
-                [ExamenDigestiv] = @ExamenDigestiv,
-                [ExamenUrinar] = @ExamenUrinar,
-                [ExamenNervos] = @ExamenNervos,
-                [ExamenLocomotor] = @ExamenLocomotor,
-                [ExamenEndocrin] = @ExamenEndocrin,
-                [ExamenORL] = @ExamenORL,
-                [ExamenOftalmologic] = @ExamenOftalmologic,
-                [ExamenDermatologic] = @ExamenDermatologic,
+                [ExamenObiectivDetaliat] = @ExamenObiectivDetaliat,
+                [AlteObservatiiClinice] = @AlteObservatiiClinice,
                 [DataUltimeiModificari] = GETDATE(),
                 [ModificatDe] = @ModificatDe
             WHERE [ConsultatieID] = @ConsultatieID;
@@ -93,25 +71,19 @@ BEGIN
             INSERT INTO [dbo].[ConsultatieExamenObiectiv]
             (
                 [Id], [ConsultatieID],
-                [StareGenerala], [Constitutie], [Atitudine], [Facies],
-                [Tegumente], [Mucoase], [GangliniLimfatici], [Edeme],
+                [StareGenerala], [Tegumente], [Mucoase], [GanglioniLimfatici], [Edeme],
                 [Greutate], [Inaltime], [IMC], [Temperatura], [TensiuneArteriala],
                 [Puls], [FreccventaRespiratorie], [SaturatieO2], [Glicemie],
-                [ExamenCardiovascular], [ExamenRespiratoriu], [ExamenDigestiv],
-                [ExamenUrinar], [ExamenNervos], [ExamenLocomotor], [ExamenEndocrin],
-                [ExamenORL], [ExamenOftalmologic], [ExamenDermatologic],
+                [ExamenObiectivDetaliat], [AlteObservatiiClinice],
                 [DataCreare], [CreatDe]
             )
             VALUES
             (
                 NEWID(), @ConsultatieID,
-                @StareGenerala, @Constitutie, @Atitudine, @Facies,
-                @Tegumente, @Mucoase, @GangliniLimfatici, @Edeme,
+                @StareGenerala, @Tegumente, @Mucoase, @GanglioniLimfatici, @Edeme,
                 @Greutate, @Inaltime, @IMC, @Temperatura, @TensiuneArteriala,
                 @Puls, @FreccventaRespiratorie, @SaturatieO2, @Glicemie,
-                @ExamenCardiovascular, @ExamenRespiratoriu, @ExamenDigestiv,
-                @ExamenUrinar, @ExamenNervos, @ExamenLocomotor, @ExamenEndocrin,
-                @ExamenORL, @ExamenOftalmologic, @ExamenDermatologic,
+                @ExamenObiectivDetaliat, @AlteObservatiiClinice,
                 GETDATE(), @ModificatDe
             );
         END

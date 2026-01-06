@@ -83,7 +83,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
     #region UI State
 
-    private const int TotalTabs = 5;
+    private const int TotalTabs = 6;
     private bool ShowShortcutsModal { get; set; } = false;
     private bool ShowScrisoarePreview { get; set; } = false;
     private int ActiveTab { get; set; } = 1;
@@ -241,7 +241,10 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
     private string Tegumente { get; set; } = string.Empty;
     private string Mucoase { get; set; } = string.Empty;
     private int? SpO2 { get; set; }
+    private decimal? Glicemie { get; set; }
     private string Edeme { get; set; } = string.Empty;
+    private string GanglioniLimfatici { get; set; } = string.Empty;
+    private string AlteObservatiiClinice { get; set; } = string.Empty;
 
     #endregion
 
@@ -539,7 +542,17 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
         Tegumente = consultatie.Tegumente ?? string.Empty;
         Mucoase = consultatie.Mucoase ?? string.Empty;
         Edeme = consultatie.Edeme ?? string.Empty;
-        ExamenObiectiv = consultatie.ExamenCardiovascular ?? string.Empty;
+        Glicemie = consultatie.Glicemie;
+        GanglioniLimfatici = consultatie.GanglioniLimfatici ?? string.Empty;
+        ExamenObiectiv = consultatie.ExamenObiectivDetaliat ?? string.Empty;
+        AlteObservatiiClinice = consultatie.AlteObservatiiClinice ?? string.Empty;
+        
+        // DEBUG: Log ExamenObiectiv values
+        Logger.LogInformation("[Consultatii] LoadConsultatieData - ExamenObiectivDetaliat from DTO: '{Value}'", 
+            consultatie.ExamenObiectivDetaliat ?? "NULL");
+        Logger.LogInformation("[Consultatii] LoadConsultatieData - AlteObservatiiClinice from DTO: '{Value}'", 
+            consultatie.AlteObservatiiClinice ?? "NULL");
+        Logger.LogInformation("[Consultatii] LoadConsultatieData - Assigned ExamenObiectiv: '{Value}'", ExamenObiectiv);
 
         // Tab 2: Investigații
         InvestigatiiParaclinice = consultatie.InvestigatiiLaborator ?? string.Empty;
@@ -742,7 +755,10 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 Tegumente = string.IsNullOrWhiteSpace(Tegumente) ? null : Tegumente,
                 Mucoase = string.IsNullOrWhiteSpace(Mucoase) ? null : Mucoase,
                 Edeme = string.IsNullOrWhiteSpace(Edeme) ? null : Edeme,
-                ExamenCardiovascular = string.IsNullOrWhiteSpace(ExamenObiectiv) ? null : ExamenObiectiv,
+                Glicemie = Glicemie,
+                GanglioniLimfatici = string.IsNullOrWhiteSpace(GanglioniLimfatici) ? null : GanglioniLimfatici,
+                ExamenObiectivDetaliat = string.IsNullOrWhiteSpace(ExamenObiectiv) ? null : ExamenObiectiv,
+                AlteObservatiiClinice = string.IsNullOrWhiteSpace(AlteObservatiiClinice) ? null : AlteObservatiiClinice,
                 
                 // Tab 2: Investigații
                 InvestigatiiLaborator = string.IsNullOrWhiteSpace(InvestigatiiParaclinice) ? null : InvestigatiiParaclinice,
@@ -914,6 +930,8 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             Tegumente = Tegumente,
             Mucoase = Mucoase,
             Edeme = Edeme,
+            Glicemie = Glicemie,
+            GanglioniLimfatici = GanglioniLimfatici,
 
             // III.B. Semne vitale
             Greutate = Greutate,
@@ -927,8 +945,9 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             FreccventaRespiratorie = FreqventaRespiratorie,
             SaturatieO2 = SpO2,
 
-            // III.C. Examen obiectiv
-            ExamenCardiovascular = ExamenObiectiv,
+            // III.C. Examen obiectiv detaliat
+            ExamenObiectivDetaliat = ExamenObiectiv,
+            AlteObservatiiClinice = AlteObservatiiClinice,
             
             // IV. Investigații
             AlteInvestigatii = InvestigatiiParaclinice,

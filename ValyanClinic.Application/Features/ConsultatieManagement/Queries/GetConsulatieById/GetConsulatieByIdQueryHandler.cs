@@ -79,12 +79,9 @@ public class GetConsulatieByIdQueryHandler : IRequestHandler<GetConsulatieByIdQu
                 
                 // ConsultatieExamenObiectiv (1:1) - NULL-SAFE navigation
                 StareGenerala = consultatie.ExamenObiectiv?.StareGenerala,
-                Constitutie = consultatie.ExamenObiectiv?.Constitutie,
-                Atitudine = consultatie.ExamenObiectiv?.Atitudine,
-                Facies = consultatie.ExamenObiectiv?.Facies,
                 Tegumente = consultatie.ExamenObiectiv?.Tegumente,
                 Mucoase = consultatie.ExamenObiectiv?.Mucoase,
-                GangliniLimfatici = consultatie.ExamenObiectiv?.GangliniLimfatici,
+                GanglioniLimfatici = consultatie.ExamenObiectiv?.GanglioniLimfatici,
                 Edeme = consultatie.ExamenObiectiv?.Edeme,
                 Greutate = consultatie.ExamenObiectiv?.Greutate,
                 Inaltime = consultatie.ExamenObiectiv?.Inaltime,
@@ -95,16 +92,6 @@ public class GetConsulatieByIdQueryHandler : IRequestHandler<GetConsulatieByIdQu
                 FreccventaRespiratorie = consultatie.ExamenObiectiv?.FreccventaRespiratorie,
                 SaturatieO2 = consultatie.ExamenObiectiv?.SaturatieO2,
                 Glicemie = consultatie.ExamenObiectiv?.Glicemie,
-                ExamenCardiovascular = consultatie.ExamenObiectiv?.ExamenCardiovascular,
-                ExamenRespiratoriu = consultatie.ExamenObiectiv?.ExamenRespiratoriu,
-                ExamenDigestiv = consultatie.ExamenObiectiv?.ExamenDigestiv,
-                ExamenUrinar = consultatie.ExamenObiectiv?.ExamenUrinar,
-                ExamenNervos = consultatie.ExamenObiectiv?.ExamenNervos,
-                ExamenLocomotor = consultatie.ExamenObiectiv?.ExamenLocomotor,
-                ExamenEndocrin = consultatie.ExamenObiectiv?.ExamenEndocrin,
-                ExamenORL = consultatie.ExamenObiectiv?.ExamenORL,
-                ExamenOftalmologic = consultatie.ExamenObiectiv?.ExamenOftalmologic,
-                ExamenDermatologic = consultatie.ExamenObiectiv?.ExamenDermatologic,
                 
                 // ConsultatieInvestigatii (1:1) - NULL-SAFE navigation
                 InvestigatiiLaborator = consultatie.Investigatii?.InvestigatiiLaborator,

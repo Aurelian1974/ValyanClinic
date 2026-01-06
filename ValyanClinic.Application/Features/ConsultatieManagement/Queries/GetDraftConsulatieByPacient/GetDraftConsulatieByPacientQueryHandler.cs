@@ -61,6 +61,12 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
             _logger.LogInformation(
                 "[GetDraftConsulatieByPacientHandler] Found draft, DiagnosticeSecundare count: {Count}",
                 consultatie.Diagnostic?.DiagnosticeSecundare?.Count ?? 0);
+            
+            // DEBUG: Log ExamenObiectiv values from entity
+            _logger.LogInformation(
+                "[GetDraftConsulatieByPacientHandler] ExamenObiectiv entity - ExamenObiectivDetaliat: '{ExamDet}', AlteObservatiiClinice: '{AlteObs}'",
+                consultatie.ExamenObiectiv?.ExamenObiectivDetaliat ?? "NULL",
+                consultatie.ExamenObiectiv?.AlteObservatiiClinice ?? "NULL");
 
             // Map to DetailDto - NORMALIZED structure with null-safe navigation
             var dto = new ConsulatieDetailDto
@@ -87,12 +93,9 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                 
                 // Tab 2: Examen General - from ConsultatieExamenObiectiv
                 StareGenerala = consultatie.ExamenObiectiv?.StareGenerala,
-                Constitutie = consultatie.ExamenObiectiv?.Constitutie,
-                Atitudine = consultatie.ExamenObiectiv?.Atitudine,
-                Facies = consultatie.ExamenObiectiv?.Facies,
                 Tegumente = consultatie.ExamenObiectiv?.Tegumente,
                 Mucoase = consultatie.ExamenObiectiv?.Mucoase,
-                GangliniLimfatici = consultatie.ExamenObiectiv?.GangliniLimfatici,
+                GanglioniLimfatici = consultatie.ExamenObiectiv?.GanglioniLimfatici,
                 Edeme = consultatie.ExamenObiectiv?.Edeme,
                 
                 // Tab 2: Semne Vitale - from ConsultatieExamenObiectiv
@@ -106,17 +109,9 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
                 SaturatieO2 = consultatie.ExamenObiectiv?.SaturatieO2,
                 Glicemie = consultatie.ExamenObiectiv?.Glicemie,
                 
-                // Tab 2: Examen pe Aparate - from ConsultatieExamenObiectiv
-                ExamenCardiovascular = consultatie.ExamenObiectiv?.ExamenCardiovascular,
-                ExamenRespiratoriu = consultatie.ExamenObiectiv?.ExamenRespiratoriu,
-                ExamenDigestiv = consultatie.ExamenObiectiv?.ExamenDigestiv,
-                ExamenUrinar = consultatie.ExamenObiectiv?.ExamenUrinar,
-                ExamenNervos = consultatie.ExamenObiectiv?.ExamenNervos,
-                ExamenLocomotor = consultatie.ExamenObiectiv?.ExamenLocomotor,
-                ExamenEndocrin = consultatie.ExamenObiectiv?.ExamenEndocrin,
-                ExamenORL = consultatie.ExamenObiectiv?.ExamenORL,
-                ExamenOftalmologic = consultatie.ExamenObiectiv?.ExamenOftalmologic,
-                ExamenDermatologic = consultatie.ExamenObiectiv?.ExamenDermatologic,
+                // Tab 2: Examen Obiectiv Detaliat - from ConsultatieExamenObiectiv
+                ExamenObiectivDetaliat = consultatie.ExamenObiectiv?.ExamenObiectivDetaliat,
+                AlteObservatiiClinice = consultatie.ExamenObiectiv?.AlteObservatiiClinice,
                 
                 // Tab 2: Investigații - from ConsultatieInvestigatii
                 InvestigatiiLaborator = consultatie.Investigatii?.InvestigatiiLaborator,

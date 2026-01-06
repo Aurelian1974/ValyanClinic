@@ -5,6 +5,8 @@ using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 using ValyanClinic.Application.Features.AnalizeMedicale.Queries.GetAnalizeRecomandate;
 using ValyanClinic.Application.Features.AnalizeMedicale.Queries.GetAnalizeEfectuate;
+using ValyanClinic.Application.Features.Investigatii.Queries;
+using ValyanClinic.Application.DTOs.Investigatii;
 
 namespace ValyanClinic.Application.Services.ScrisoareMedicala;
 
@@ -102,9 +104,13 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             IMC = consultatie.IMC,
             IMCCategorie = consultatie.IMCCategorie,
             SaturatieO2 = consultatie.SaturatieO2,
-            ExamenCardiovascular = consultatie.ExamenCardiovascular,
-            ExamenRespiratoriu = consultatie.ExamenRespiratoriu,
-            ExamenDigestiv = consultatie.ExamenDigestiv,
+            Glicemie = consultatie.Glicemie,
+            Tegumente = consultatie.Tegumente,
+            Mucoase = consultatie.Mucoase,
+            GanglioniLimfatici = consultatie.GanglioniLimfatici,
+            Edeme = consultatie.Edeme,
+            ExamenObiectivDetaliat = consultatie.ExamenObiectivDetaliat,
+            AlteObservatiiClinice = consultatie.AlteObservatiiClinice,
 
             // Investigații
             RezultatEKG = consultatie.InvestigatiiEKG,
@@ -179,6 +185,16 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
         
         _logger.LogInformation("[ScrisoareMedicalaService] dto.AnalizeEfectuate count: {Count}",
             dto.AnalizeEfectuate?.Count ?? 0);
+
+        // Încarcă investigațiile recomandate pentru consultație
+        dto.InvestigatiiImagistice = await LoadInvestigatiiImagisticeAsync(consultatie.ConsultatieID, cancellationToken);
+        dto.Explorari = await LoadExplorariAsync(consultatie.ConsultatieID, cancellationToken);
+        dto.Endoscopii = await LoadEndoscopiiAsync(consultatie.ConsultatieID, cancellationToken);
+        
+        _logger.LogInformation("[ScrisoareMedicalaService] Investigații: Imagistice={Imagistice}, Explorări={Explorari}, Endoscopii={Endoscopii}",
+            dto.InvestigatiiImagistice?.Count ?? 0,
+            dto.Explorari?.Count ?? 0,
+            dto.Endoscopii?.Count ?? 0);
 
         return Result<ScrisoareMedicalaDto>.Success(dto);
     }
@@ -269,6 +285,117 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
         return $"{min:G} - {max:G}";
     }
 
+    /// <summary>
+    /// Încarcă investigațiile imagistice recomandate pentru o consultație
+    /// </summary>
+    private async Task<List<InvestigatieRecomandataScrisoareDto>> LoadInvestigatiiImagisticeAsync(
+        Guid consultatieId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var query = new GetInvestigatiiImagisticeRecomandateByConsultatieQuery(consultatieId);
+            var result = await _mediator.Send(query, cancellationToken);
+            
+            if (result.IsSuccess && result.Value != null)
+            {
+                return result.Value.Select(i => new InvestigatieRecomandataScrisoareDto
+                {
+                    Denumire = i.DenumireInvestigatie,
+                    Cod = i.CodInvestigatie,
+                    Categorie = i.RegiuneAnatomica,
+                    Prioritate = i.Prioritate,
+                    EsteCito = i.EsteCito,
+                    IndicatiiClinice = i.IndicatiiClinice,
+                    Observatii = i.ObservatiiMedic
+                }).ToList();
+            }
+            
+            _logger.LogWarning("Failed to load investigatii imagistice for consultatie {ConsultatieId}: {Error}", 
+                consultatieId, result.FirstError);
+            return new List<InvestigatieRecomandataScrisoareDto>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading investigatii imagistice for consultatie {ConsultatieId}", consultatieId);
+            return new List<InvestigatieRecomandataScrisoareDto>();
+        }
+    }
+
+    /// <summary>
+    /// Încarcă explorările funcționale recomandate pentru o consultație
+    /// </summary>
+    private async Task<List<InvestigatieRecomandataScrisoareDto>> LoadExplorariAsync(
+        Guid consultatieId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var query = new GetExplorariRecomandateByConsultatieQuery(consultatieId);
+            var result = await _mediator.Send(query, cancellationToken);
+            
+            if (result.IsSuccess && result.Value != null)
+            {
+                return result.Value.Select(i => new InvestigatieRecomandataScrisoareDto
+                {
+                    Denumire = i.DenumireExplorare,
+                    Cod = i.CodExplorare,
+                    Categorie = "Explorări Funcționale",
+                    Prioritate = i.Prioritate,
+                    EsteCito = i.EsteCito,
+                    IndicatiiClinice = i.IndicatiiClinice,
+                    Observatii = i.ObservatiiMedic
+                }).ToList();
+            }
+            
+            _logger.LogWarning("Failed to load explorari for consultatie {ConsultatieId}: {Error}", 
+                consultatieId, result.FirstError);
+            return new List<InvestigatieRecomandataScrisoareDto>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading explorari for consultatie {ConsultatieId}", consultatieId);
+            return new List<InvestigatieRecomandataScrisoareDto>();
+        }
+    }
+
+    /// <summary>
+    /// Încarcă endoscopiile recomandate pentru o consultație
+    /// </summary>
+    private async Task<List<InvestigatieRecomandataScrisoareDto>> LoadEndoscopiiAsync(
+        Guid consultatieId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var query = new GetEndoscopiiRecomandateByConsultatieQuery(consultatieId);
+            var result = await _mediator.Send(query, cancellationToken);
+            
+            if (result.IsSuccess && result.Value != null)
+            {
+                return result.Value.Select(i => new InvestigatieRecomandataScrisoareDto
+                {
+                    Denumire = i.DenumireEndoscopie,
+                    Cod = i.CodEndoscopie,
+                    Categorie = "Endoscopii",
+                    Prioritate = i.Prioritate,
+                    EsteCito = i.EsteCito,
+                    IndicatiiClinice = i.IndicatiiClinice,
+                    Observatii = i.ObservatiiMedic
+                }).ToList();
+            }
+            
+            _logger.LogWarning("Failed to load endoscopii for consultatie {ConsultatieId}: {Error}", 
+                consultatieId, result.FirstError);
+            return new List<InvestigatieRecomandataScrisoareDto>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading endoscopii for consultatie {ConsultatieId}", consultatieId);
+            return new List<InvestigatieRecomandataScrisoareDto>();
+        }
+    }
+
     /// <inheritdoc />
     public ScrisoareMedicalaDto GenerateMockData()
     {
@@ -356,7 +483,6 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             SaturatieO2 = 98,
             ExamenClinicGeneral = "Stare generală bună, conștientă, cooperantă, orientată temporo-spațial. Tegumente normal colorate, fără edeme. Mucoase roz, umede. FR=16/min.",
             ExamenClinicLocal = "Cord - zgomote cardiace ritmice, bine bătute, fără sufluri. Șocul apexian în spațiul V intercostal pe linia medioclaviculară stângă. Puls periferic prezent și simetric bilateral. Jugulare neturgesente. Fără edeme gambiere.",
-            ExamenCardiovascular = "Cord - zgomote cardiace ritmice, bine bătute, fără sufluri.",
 
             // Rezultate laborator
             RezultateNormale = new List<RezultatLaboratorDto>
