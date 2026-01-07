@@ -461,3 +461,182 @@ public class AddEndoscopieEfectuataCommandHandler
 }
 
 #endregion
+
+#region Delete Investigații Efectuate
+
+/// <summary>
+/// Comandă pentru ștergerea unei investigații imagistice efectuate
+/// </summary>
+public record DeleteInvestigatieImagisticaEfectuataCommand(Guid Id) : IRequest<Result<bool>>;
+
+public class DeleteInvestigatieImagisticaEfectuataCommandHandler 
+    : IRequestHandler<DeleteInvestigatieImagisticaEfectuataCommand, Result<bool>>
+{
+    private readonly IConsultatieInvestigatieImagisticaEfectuataRepository _repository;
+
+    public DeleteInvestigatieImagisticaEfectuataCommandHandler(IConsultatieInvestigatieImagisticaEfectuataRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<Result<bool>> Handle(DeleteInvestigatieImagisticaEfectuataCommand request, CancellationToken cancellationToken)
+    {
+        var success = await _repository.DeleteAsync(request.Id, cancellationToken);
+        return success ? Result<bool>.Success(true) : Result<bool>.Failure("Investigația nu a putut fi ștearsă");
+    }
+}
+
+/// <summary>
+/// Comandă pentru ștergerea unei explorări efectuate
+/// </summary>
+public record DeleteExplorareEfectuataCommand(Guid Id) : IRequest<Result<bool>>;
+
+public class DeleteExplorareEfectuataCommandHandler 
+    : IRequestHandler<DeleteExplorareEfectuataCommand, Result<bool>>
+{
+    private readonly IConsultatieExplorareEfectuataRepository _repository;
+
+    public DeleteExplorareEfectuataCommandHandler(IConsultatieExplorareEfectuataRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<Result<bool>> Handle(DeleteExplorareEfectuataCommand request, CancellationToken cancellationToken)
+    {
+        var success = await _repository.DeleteAsync(request.Id, cancellationToken);
+        return success ? Result<bool>.Success(true) : Result<bool>.Failure("Explorarea nu a putut fi ștearsă");
+    }
+}
+
+/// <summary>
+/// Comandă pentru ștergerea unei endoscopii efectuate
+/// </summary>
+public record DeleteEndoscopieEfectuataCommand(Guid Id) : IRequest<Result<bool>>;
+
+public class DeleteEndoscopieEfectuataCommandHandler 
+    : IRequestHandler<DeleteEndoscopieEfectuataCommand, Result<bool>>
+{
+    private readonly IConsultatieEndoscopieEfectuataRepository _repository;
+
+    public DeleteEndoscopieEfectuataCommandHandler(IConsultatieEndoscopieEfectuataRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<Result<bool>> Handle(DeleteEndoscopieEfectuataCommand request, CancellationToken cancellationToken)
+    {
+        var success = await _repository.DeleteAsync(request.Id, cancellationToken);
+        return success ? Result<bool>.Success(true) : Result<bool>.Failure("Endoscopia nu a putut fi ștearsă");
+    }
+}
+
+#endregion
+
+#region Update Investigații Efectuate
+
+/// <summary>
+/// Comandă pentru actualizarea rezultatului unei investigații imagistice efectuate
+/// </summary>
+public record UpdateInvestigatieImagisticaEfectuataCommand : IRequest<Result<bool>>
+{
+    public Guid Id { get; init; }
+    public string? Rezultat { get; init; }
+    public Guid ModificatDe { get; init; }
+}
+
+public class UpdateInvestigatieImagisticaEfectuataCommandHandler 
+    : IRequestHandler<UpdateInvestigatieImagisticaEfectuataCommand, Result<bool>>
+{
+    private readonly IConsultatieInvestigatieImagisticaEfectuataRepository _repository;
+
+    public UpdateInvestigatieImagisticaEfectuataCommandHandler(
+        IConsultatieInvestigatieImagisticaEfectuataRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<Result<bool>> Handle(UpdateInvestigatieImagisticaEfectuataCommand request, CancellationToken cancellationToken)
+    {
+        var existing = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        if (existing == null)
+            return Result<bool>.Failure("Investigația nu a fost găsită");
+
+        existing.Rezultat = request.Rezultat;
+        existing.ModificatDe = request.ModificatDe;
+
+        var success = await _repository.UpdateAsync(existing, cancellationToken);
+        return success ? Result<bool>.Success(true) : Result<bool>.Failure("Investigația nu a putut fi actualizată");
+    }
+}
+
+/// <summary>
+/// Comandă pentru actualizarea rezultatului unei explorări efectuate
+/// </summary>
+public record UpdateExplorareEfectuataCommand : IRequest<Result<bool>>
+{
+    public Guid Id { get; init; }
+    public string? Rezultat { get; init; }
+    public Guid ModificatDe { get; init; }
+}
+
+public class UpdateExplorareEfectuataCommandHandler 
+    : IRequestHandler<UpdateExplorareEfectuataCommand, Result<bool>>
+{
+    private readonly IConsultatieExplorareEfectuataRepository _repository;
+
+    public UpdateExplorareEfectuataCommandHandler(
+        IConsultatieExplorareEfectuataRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<Result<bool>> Handle(UpdateExplorareEfectuataCommand request, CancellationToken cancellationToken)
+    {
+        var existing = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        if (existing == null)
+            return Result<bool>.Failure("Explorarea nu a fost găsită");
+
+        existing.Rezultat = request.Rezultat;
+        existing.ModificatDe = request.ModificatDe;
+
+        var success = await _repository.UpdateAsync(existing, cancellationToken);
+        return success ? Result<bool>.Success(true) : Result<bool>.Failure("Explorarea nu a putut fi actualizată");
+    }
+}
+
+/// <summary>
+/// Comandă pentru actualizarea rezultatului unei endoscopii efectuate
+/// </summary>
+public record UpdateEndoscopieEfectuataCommand : IRequest<Result<bool>>
+{
+    public Guid Id { get; init; }
+    public string? Rezultat { get; init; }
+    public Guid ModificatDe { get; init; }
+}
+
+public class UpdateEndoscopieEfectuataCommandHandler 
+    : IRequestHandler<UpdateEndoscopieEfectuataCommand, Result<bool>>
+{
+    private readonly IConsultatieEndoscopieEfectuataRepository _repository;
+
+    public UpdateEndoscopieEfectuataCommandHandler(
+        IConsultatieEndoscopieEfectuataRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<Result<bool>> Handle(UpdateEndoscopieEfectuataCommand request, CancellationToken cancellationToken)
+    {
+        var existing = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        if (existing == null)
+            return Result<bool>.Failure("Endoscopia nu a fost găsită");
+
+        existing.Rezultat = request.Rezultat;
+        existing.ModificatDe = request.ModificatDe;
+
+        var success = await _repository.UpdateAsync(existing, cancellationToken);
+        return success ? Result<bool>.Success(true) : Result<bool>.Failure("Endoscopia nu a putut fi actualizată");
+    }
+}
+
+#endregion

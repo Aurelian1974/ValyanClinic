@@ -375,3 +375,140 @@ public class GetEndoscopiiEfectuateByPacientQueryHandler
 }
 
 #endregion
+
+#region Query-uri pentru Investigații Efectuate by Consultație
+
+/// <summary>
+/// Query pentru obținerea investigațiilor imagistice efectuate pentru o consultație
+/// </summary>
+public record GetInvestigatiiImagisticeEfectuateByConsultatieQuery(Guid ConsultatieId) 
+    : IRequest<Result<IEnumerable<InvestigatieImagisticaEfectuataDto>>>;
+
+public class GetInvestigatiiImagisticeEfectuateByConsultatieQueryHandler 
+    : IRequestHandler<GetInvestigatiiImagisticeEfectuateByConsultatieQuery, Result<IEnumerable<InvestigatieImagisticaEfectuataDto>>>
+{
+    private readonly IConsultatieInvestigatieImagisticaEfectuataRepository _repository;
+
+    public GetInvestigatiiImagisticeEfectuateByConsultatieQueryHandler(IConsultatieInvestigatieImagisticaEfectuataRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<Result<IEnumerable<InvestigatieImagisticaEfectuataDto>>> Handle(
+        GetInvestigatiiImagisticeEfectuateByConsultatieQuery request, 
+        CancellationToken cancellationToken)
+    {
+        var items = await _repository.GetByConsultatieIdAsync(request.ConsultatieId, cancellationToken);
+        
+        var dtos = items.Select(i => new InvestigatieImagisticaEfectuataDto
+        {
+            Id = i.Id,
+            RecomandareID = i.RecomandareID,
+            ConsultatieID = i.ConsultatieID,
+            PacientID = i.PacientID,
+            InvestigatieNomenclatorID = i.InvestigatieNomenclatorID,
+            DenumireInvestigatie = i.DenumireInvestigatie,
+            CodInvestigatie = i.CodInvestigatie,
+            RegiuneAnatomica = i.RegiuneAnatomica,
+            DataEfectuare = i.DataEfectuare,
+            CentrulMedical = i.CentrulMedical,
+            MedicExecutant = i.MedicExecutant,
+            Rezultat = i.Rezultat,
+            Concluzii = i.Concluzii,
+            CaleFisierRezultat = i.CaleFisierRezultat
+        });
+
+        return Result<IEnumerable<InvestigatieImagisticaEfectuataDto>>.Success(dtos);
+    }
+}
+
+/// <summary>
+/// Query pentru obținerea explorărilor efectuate pentru o consultație
+/// </summary>
+public record GetExplorariEfectuateByConsultatieQuery(Guid ConsultatieId) 
+    : IRequest<Result<IEnumerable<ExplorareEfectuataDto>>>;
+
+public class GetExplorariEfectuateByConsultatieQueryHandler 
+    : IRequestHandler<GetExplorariEfectuateByConsultatieQuery, Result<IEnumerable<ExplorareEfectuataDto>>>
+{
+    private readonly IConsultatieExplorareEfectuataRepository _repository;
+
+    public GetExplorariEfectuateByConsultatieQueryHandler(IConsultatieExplorareEfectuataRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<Result<IEnumerable<ExplorareEfectuataDto>>> Handle(
+        GetExplorariEfectuateByConsultatieQuery request, 
+        CancellationToken cancellationToken)
+    {
+        var items = await _repository.GetByConsultatieIdAsync(request.ConsultatieId, cancellationToken);
+        
+        var dtos = items.Select(i => new ExplorareEfectuataDto
+        {
+            Id = i.Id,
+            RecomandareID = i.RecomandareID,
+            ConsultatieID = i.ConsultatieID,
+            PacientID = i.PacientID,
+            ExplorareNomenclatorID = i.ExplorareNomenclatorID,
+            DenumireExplorare = i.DenumireExplorare,
+            CodExplorare = i.CodExplorare,
+            DataEfectuare = i.DataEfectuare,
+            CentrulMedical = i.CentrulMedical,
+            MedicExecutant = i.MedicExecutant,
+            Rezultat = i.Rezultat,
+            Concluzii = i.Concluzii,
+            ParametriMasurati = i.ParametriMasurati,
+            CaleFisierRezultat = i.CaleFisierRezultat
+        });
+
+        return Result<IEnumerable<ExplorareEfectuataDto>>.Success(dtos);
+    }
+}
+
+/// <summary>
+/// Query pentru obținerea endoscopiilor efectuate pentru o consultație
+/// </summary>
+public record GetEndoscopiiEfectuateByConsultatieQuery(Guid ConsultatieId) 
+    : IRequest<Result<IEnumerable<EndoscopieEfectuataDto>>>;
+
+public class GetEndoscopiiEfectuateByConsultatieQueryHandler 
+    : IRequestHandler<GetEndoscopiiEfectuateByConsultatieQuery, Result<IEnumerable<EndoscopieEfectuataDto>>>
+{
+    private readonly IConsultatieEndoscopieEfectuataRepository _repository;
+
+    public GetEndoscopiiEfectuateByConsultatieQueryHandler(IConsultatieEndoscopieEfectuataRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<Result<IEnumerable<EndoscopieEfectuataDto>>> Handle(
+        GetEndoscopiiEfectuateByConsultatieQuery request, 
+        CancellationToken cancellationToken)
+    {
+        var items = await _repository.GetByConsultatieIdAsync(request.ConsultatieId, cancellationToken);
+        
+        var dtos = items.Select(i => new EndoscopieEfectuataDto
+        {
+            Id = i.Id,
+            RecomandareID = i.RecomandareID,
+            ConsultatieID = i.ConsultatieID,
+            PacientID = i.PacientID,
+            EndoscopieNomenclatorID = i.EndoscopieNomenclatorID,
+            DenumireEndoscopie = i.DenumireEndoscopie,
+            CodEndoscopie = i.CodEndoscopie,
+            DataEfectuare = i.DataEfectuare,
+            CentrulMedical = i.CentrulMedical,
+            MedicExecutant = i.MedicExecutant,
+            Rezultat = i.Rezultat,
+            Concluzii = i.Concluzii,
+            BiopsiiPrelevate = i.BiopsiiPrelevate,
+            RezultatHistopatologic = i.RezultatHistopatologic,
+            CaleFisierRezultat = i.CaleFisierRezultat
+        });
+
+        return Result<IEnumerable<EndoscopieEfectuataDto>>.Success(dtos);
+    }
+}
+
+#endregion

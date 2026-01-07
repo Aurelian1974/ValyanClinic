@@ -191,12 +191,14 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
             }
 
             // 5. ConsultatieInvestigatii (1:1) - condiționat
-            if (!string.IsNullOrWhiteSpace(request.InvestigatiiLaborator))
+            if (!string.IsNullOrWhiteSpace(request.InvestigatiiLaborator) ||
+                !string.IsNullOrWhiteSpace(request.AlteInvestigatii))
             {
                 await _repository.UpsertInvestigatiiAsync(consultatieId, new ConsultatieInvestigatii
                 {
                     ConsultatieID = consultatieId,
                     InvestigatiiLaborator = request.InvestigatiiLaborator,
+                    AlteInvestigatii = request.AlteInvestigatii,
                     CreatDe = request.CreatDeSauModificatDe,
                     DataCreare = DateTime.Now,
                     DataUltimeiModificari = DateTime.Now

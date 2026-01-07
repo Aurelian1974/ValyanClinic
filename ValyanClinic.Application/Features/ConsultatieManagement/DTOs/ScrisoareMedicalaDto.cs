@@ -109,6 +109,11 @@ public class ScrisoareMedicalaDto
     // ==================== ANALIZE EFECTUATE (CU REZULTATE) ====================
     public List<AnalizaEfectuataScrisoareDto> AnalizeEfectuate { get; set; } = new();
 
+    // ==================== INVESTIGAȚII EFECTUATE (CU REZULTATE) ====================
+    public List<InvestigatieEfectuataScrisoareDto> InvestigatiiImagisticeEfectuate { get; set; } = new();
+    public List<InvestigatieEfectuataScrisoareDto> ExplorariEfectuate { get; set; } = new();
+    public List<InvestigatieEfectuataScrisoareDto> EndoscopiiEfectuate { get; set; } = new();
+
     // ==================== CHECKBOX SECTIONS ====================
     // Indicație Internare
     public bool AreIndicatieInternare { get; set; } = false;
@@ -229,6 +234,27 @@ public class AnalizaEfectuataScrisoareDto
     public string? UnitateMasura { get; set; }
     public string? ValoriReferinta { get; set; }
     public bool EsteAnormal { get; set; }
+    
+    // Computed
+    public string DataEfectuareFormatata => DataEfectuare?.ToString("dd.MM.yyyy") ?? "-";
+}
+
+/// <summary>
+/// DTO pentru investigație efectuată (cu rezultate) în Scrisoarea Medicală
+/// (folosit pentru Imagistice, Explorări funcționale și Endoscopii efectuate)
+/// </summary>
+public class InvestigatieEfectuataScrisoareDto
+{
+    public string Denumire { get; set; } = string.Empty;
+    public string? Cod { get; set; }
+    public string? Categorie { get; set; }
+    public DateTime? DataEfectuare { get; set; }
+    public string? Laborator { get; set; }
+    public string? MedicExecutant { get; set; }
+    public string? Rezultat { get; set; }
+    public string? Concluzie { get; set; }
+    public bool EsteAnormal { get; set; }
+    public string? Observatii { get; set; }
     
     // Computed
     public string DataEfectuareFormatata => DataEfectuare?.ToString("dd.MM.yyyy") ?? "-";

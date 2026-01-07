@@ -356,6 +356,73 @@
                 <div class="section">
                     <h2 class="section-title"><i class="fas fa-microscope"></i> Examene Paraclinice</h2>
                     <div class="section-content">
+                        @* Investigații Imagistice Efectuate *@
+                        @if (Model.InvestigatiiImagisticeEfectuate?.Any() == true)
+                        {
+                            <div class="subsection">
+                                <div class="subsection-title"><strong>Investigații Imagistice:</strong></div>
+                                @foreach (var inv in Model.InvestigatiiImagisticeEfectuate)
+                                {
+                                    <div class="subsection-content" style="margin-bottom: 8px;">
+                                        <strong>@inv.Denumire</strong> (@inv.DataEfectuareFormatata)@if (!string.IsNullOrWhiteSpace(inv.Laborator)) { <text> - @inv.Laborator</text> }
+                                        @if (!string.IsNullOrWhiteSpace(inv.Concluzie))
+                                        {
+                                            <div style="margin-left: 12px; margin-top: 4px;"><em>Concluzie:</em> @((MarkupString)inv.Concluzie)</div>
+                                        }
+                                        else if (!string.IsNullOrWhiteSpace(inv.Rezultat))
+                                        {
+                                            <div style="margin-left: 12px; margin-top: 4px;">@((MarkupString)inv.Rezultat)</div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        
+                        @* Explorări Funcționale Efectuate *@
+                        @if (Model.ExplorariEfectuate?.Any() == true)
+                        {
+                            <div class="subsection">
+                                <div class="subsection-title"><strong>Explorări Funcționale:</strong></div>
+                                @foreach (var inv in Model.ExplorariEfectuate)
+                                {
+                                    <div class="subsection-content" style="margin-bottom: 8px;">
+                                        <strong>@inv.Denumire</strong> (@inv.DataEfectuareFormatata)@if (!string.IsNullOrWhiteSpace(inv.Laborator)) { <text> - @inv.Laborator</text> }
+                                        @if (!string.IsNullOrWhiteSpace(inv.Concluzie))
+                                        {
+                                            <div style="margin-left: 12px; margin-top: 4px;"><em>Concluzie:</em> @((MarkupString)inv.Concluzie)</div>
+                                        }
+                                        else if (!string.IsNullOrWhiteSpace(inv.Rezultat))
+                                        {
+                                            <div style="margin-left: 12px; margin-top: 4px;">@((MarkupString)inv.Rezultat)</div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        
+                        @* Endoscopii Efectuate *@
+                        @if (Model.EndoscopiiEfectuate?.Any() == true)
+                        {
+                            <div class="subsection">
+                                <div class="subsection-title"><strong>Endoscopii:</strong></div>
+                                @foreach (var inv in Model.EndoscopiiEfectuate)
+                                {
+                                    <div class="subsection-content" style="margin-bottom: 8px;">
+                                        <strong>@inv.Denumire</strong> (@inv.DataEfectuareFormatata)@if (!string.IsNullOrWhiteSpace(inv.Laborator)) { <text> - @inv.Laborator</text> }
+                                        @if (!string.IsNullOrWhiteSpace(inv.Concluzie))
+                                        {
+                                            <div style="margin-left: 12px; margin-top: 4px;"><em>Concluzie:</em> @((MarkupString)inv.Concluzie)</div>
+                                        }
+                                        else if (!string.IsNullOrWhiteSpace(inv.Rezultat))
+                                        {
+                                            <div style="margin-left: 12px; margin-top: 4px;">@((MarkupString)inv.Rezultat)</div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        
+                        @* Legacy fields - EKG, Ecografie, Rx *@
                         @if (!string.IsNullOrWhiteSpace(Model.RezultatEKG))
                         {
                             <div class="subsection">
@@ -376,6 +443,27 @@
                                 <div class="subsection-title">Rx:</div>
                                 <div class="subsection-content">@Model.RezultatRx</div>
                             </div>
+                        }
+                        
+                        @* Alte Investigații (text liber) *@
+                        @if (!string.IsNullOrWhiteSpace(Model.AlteInvestigatii))
+                        {
+                            <div class="subsection">
+                                <div class="subsection-title"><strong>Alte Investigații:</strong></div>
+                                <div class="subsection-content">@((MarkupString)Model.AlteInvestigatii)</div>
+                            </div>
+                        }
+                        
+                        @* Dacă nu există niciun examen paraclinic *@
+                        @if (Model.InvestigatiiImagisticeEfectuate?.Any() != true && 
+                             Model.ExplorariEfectuate?.Any() != true && 
+                             Model.EndoscopiiEfectuate?.Any() != true &&
+                             string.IsNullOrWhiteSpace(Model.RezultatEKG) && 
+                             string.IsNullOrWhiteSpace(Model.RezultatEcografie) && 
+                             string.IsNullOrWhiteSpace(Model.RezultatRx) &&
+                             string.IsNullOrWhiteSpace(Model.AlteInvestigatii))
+                        {
+                            <p class="text-muted">Nu au fost efectuate investigații paraclinice.</p>
                         }
                     </div>
                 </div>
@@ -436,15 +524,70 @@
                 }
 
                 <!-- Recomandări -->
-                @if (Model.Recomandari.Any())
+                @{
+                    var hasRecomandari = Model.Recomandari.Any();
+                    var hasInvestigatiiRecomandate = Model.InvestigatiiImagistice?.Any() == true || 
+                                                     Model.Explorari?.Any() == true || 
+                                                     Model.Endoscopii?.Any() == true;
+                }
+                @if (hasRecomandari || hasInvestigatiiRecomandate)
                 {
                     <div class="section">
                         <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Recomandări</h2>
                         <div class="section-content">
                             <ol class="recommendations-list">
+                                @* Recomandări text *@
                                 @foreach (var recomandare in Model.Recomandari)
                                 {
                                     <li>@recomandare</li>
+                                }
+                                
+                                @* Investigații Imagistice Recomandate *@
+                                @if (Model.InvestigatiiImagistice?.Any() == true)
+                                {
+                                    <li>
+                                        <strong>Investigații imagistice:</strong>
+                                        <ul style="margin-top: 4px; margin-bottom: 8px;">
+                                            @foreach (var inv in Model.InvestigatiiImagistice)
+                                            {
+                                                <li>
+                                                    @inv.Denumire@if (!string.IsNullOrWhiteSpace(inv.Observatii)) { <text> - @inv.Observatii</text> }
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                                
+                                @* Explorări Funcționale Recomandate *@
+                                @if (Model.Explorari?.Any() == true)
+                                {
+                                    <li>
+                                        <strong>Explorări funcționale:</strong>
+                                        <ul style="margin-top: 4px; margin-bottom: 8px;">
+                                            @foreach (var inv in Model.Explorari)
+                                            {
+                                                <li>
+                                                    @inv.Denumire@if (!string.IsNullOrWhiteSpace(inv.Observatii)) { <text> - @inv.Observatii</text> }
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                                
+                                @* Endoscopii Recomandate *@
+                                @if (Model.Endoscopii?.Any() == true)
+                                {
+                                    <li>
+                                        <strong>Endoscopii:</strong>
+                                        <ul style="margin-top: 4px; margin-bottom: 8px;">
+                                            @foreach (var inv in Model.Endoscopii)
+                                            {
+                                                <li>
+                                                    @inv.Denumire@if (!string.IsNullOrWhiteSpace(inv.Observatii)) { <text> - @inv.Observatii</text> }
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
                                 }
                             </ol>
                         </div>
@@ -536,291 +679,6 @@
                                                         @if (analiza.EsteCito) { <span class="cito-badge-sm">!</span> }
                                                     </td>
                                                     <td>@analiza.Categorie</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                }
-
-                <!-- Investigații Imagistice Recomandate -->
-                @if (Model.InvestigatiiImagistice.Any())
-                {
-                    <div class="section">
-                        <h2 class="section-title"><i class="fas fa-x-ray"></i> Investigații Imagistice Recomandate (@Model.InvestigatiiImagistice.Count)</h2>
-                        <div class="analize-grid-3col">
-                            @{
-                                var imagistice = Model.InvestigatiiImagistice.ToList();
-                                var countPerColumnImg = (int)Math.Ceiling(imagistice.Count / 3.0);
-                                var imgCol1 = imagistice.Take(countPerColumnImg).ToList();
-                                var imgCol2 = imagistice.Skip(countPerColumnImg).Take(countPerColumnImg).ToList();
-                                var imgCol3 = imagistice.Skip(countPerColumnImg * 2).ToList();
-                            }
-                            
-                            <!-- Coloana 1 -->
-                            <div class="analize-column">
-                                <table class="analize-compact-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Investigație</th>
-                                            <th>Regiune</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var inv in imgCol1)
-                                        {
-                                            <tr class="@(inv.EsteCito ? "cito-row" : "")">
-                                                <td>
-                                                    @inv.Denumire
-                                                    @if (inv.EsteCito) { <span class="cito-badge-sm">!</span> }
-                                                </td>
-                                                <td>@inv.Categorie</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            <!-- Coloana 2 -->
-                            @if (imgCol2.Any())
-                            {
-                                <div class="analize-column">
-                                    <table class="analize-compact-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Investigație</th>
-                                                <th>Regiune</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var inv in imgCol2)
-                                            {
-                                                <tr class="@(inv.EsteCito ? "cito-row" : "")">
-                                                    <td>
-                                                        @inv.Denumire
-                                                        @if (inv.EsteCito) { <span class="cito-badge-sm">!</span> }
-                                                    </td>
-                                                    <td>@inv.Categorie</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                            
-                            <!-- Coloana 3 -->
-                            @if (imgCol3.Any())
-                            {
-                                <div class="analize-column">
-                                    <table class="analize-compact-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Investigație</th>
-                                                <th>Regiune</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var inv in imgCol3)
-                                            {
-                                                <tr class="@(inv.EsteCito ? "cito-row" : "")">
-                                                    <td>
-                                                        @inv.Denumire
-                                                        @if (inv.EsteCito) { <span class="cito-badge-sm">!</span> }
-                                                    </td>
-                                                    <td>@inv.Categorie</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                }
-
-                <!-- Explorări Funcționale Recomandate -->
-                @if (Model.Explorari.Any())
-                {
-                    <div class="section">
-                        <h2 class="section-title"><i class="fas fa-heartbeat"></i> Explorări Funcționale Recomandate (@Model.Explorari.Count)</h2>
-                        <div class="analize-grid-3col">
-                            @{
-                                var explorari = Model.Explorari.ToList();
-                                var countPerColumnExp = (int)Math.Ceiling(explorari.Count / 3.0);
-                                var expCol1 = explorari.Take(countPerColumnExp).ToList();
-                                var expCol2 = explorari.Skip(countPerColumnExp).Take(countPerColumnExp).ToList();
-                                var expCol3 = explorari.Skip(countPerColumnExp * 2).ToList();
-                            }
-                            
-                            <!-- Coloana 1 -->
-                            <div class="analize-column">
-                                <table class="analize-compact-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Explorare</th>
-                                            <th>Observații</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var exp in expCol1)
-                                        {
-                                            <tr class="@(exp.EsteCito ? "cito-row" : "")">
-                                                <td>
-                                                    @exp.Denumire
-                                                    @if (exp.EsteCito) { <span class="cito-badge-sm">!</span> }
-                                                </td>
-                                                <td>@exp.Observatii</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            <!-- Coloana 2 -->
-                            @if (expCol2.Any())
-                            {
-                                <div class="analize-column">
-                                    <table class="analize-compact-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Explorare</th>
-                                                <th>Observații</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var exp in expCol2)
-                                            {
-                                                <tr class="@(exp.EsteCito ? "cito-row" : "")">
-                                                    <td>
-                                                        @exp.Denumire
-                                                        @if (exp.EsteCito) { <span class="cito-badge-sm">!</span> }
-                                                    </td>
-                                                    <td>@exp.Observatii</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                            
-                            <!-- Coloana 3 -->
-                            @if (expCol3.Any())
-                            {
-                                <div class="analize-column">
-                                    <table class="analize-compact-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Explorare</th>
-                                                <th>Observații</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var exp in expCol3)
-                                            {
-                                                <tr class="@(exp.EsteCito ? "cito-row" : "")">
-                                                    <td>
-                                                        @exp.Denumire
-                                                        @if (exp.EsteCito) { <span class="cito-badge-sm">!</span> }
-                                                    </td>
-                                                    <td>@exp.Observatii</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                }
-
-                <!-- Endoscopii Recomandate -->
-                @if (Model.Endoscopii.Any())
-                {
-                    <div class="section">
-                        <h2 class="section-title"><i class="fas fa-stethoscope"></i> Endoscopii Recomandate (@Model.Endoscopii.Count)</h2>
-                        <div class="analize-grid-3col">
-                            @{
-                                var endoscopii = Model.Endoscopii.ToList();
-                                var countPerColumnEnd = (int)Math.Ceiling(endoscopii.Count / 3.0);
-                                var endCol1 = endoscopii.Take(countPerColumnEnd).ToList();
-                                var endCol2 = endoscopii.Skip(countPerColumnEnd).Take(countPerColumnEnd).ToList();
-                                var endCol3 = endoscopii.Skip(countPerColumnEnd * 2).ToList();
-                            }
-                            
-                            <!-- Coloana 1 -->
-                            <div class="analize-column">
-                                <table class="analize-compact-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Endoscopie</th>
-                                            <th>Observații</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var end in endCol1)
-                                        {
-                                            <tr class="@(end.EsteCito ? "cito-row" : "")">
-                                                <td>
-                                                    @end.Denumire
-                                                    @if (end.EsteCito) { <span class="cito-badge-sm">!</span> }
-                                                </td>
-                                                <td>@end.Observatii</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            <!-- Coloana 2 -->
-                            @if (endCol2.Any())
-                            {
-                                <div class="analize-column">
-                                    <table class="analize-compact-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Endoscopie</th>
-                                                <th>Observații</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var end in endCol2)
-                                            {
-                                                <tr class="@(end.EsteCito ? "cito-row" : "")">
-                                                    <td>
-                                                        @end.Denumire
-                                                        @if (end.EsteCito) { <span class="cito-badge-sm">!</span> }
-                                                    </td>
-                                                    <td>@end.Observatii</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                            
-                            <!-- Coloana 3 -->
-                            @if (endCol3.Any())
-                            {
-                                <div class="analize-column">
-                                    <table class="analize-compact-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Endoscopie</th>
-                                                <th>Observații</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var end in endCol3)
-                                            {
-                                                <tr class="@(end.EsteCito ? "cito-row" : "")">
-                                                    <td>
-                                                        @end.Denumire
-                                                        @if (end.EsteCito) { <span class="cito-badge-sm">!</span> }
-                                                    </td>
-                                                    <td>@end.Observatii</td>
                                                 </tr>
                                             }
                                         </tbody>

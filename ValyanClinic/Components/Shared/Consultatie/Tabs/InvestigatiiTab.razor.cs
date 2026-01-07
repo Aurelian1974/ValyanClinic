@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.RichTextEditor;
+using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
 using ValyanClinic.Application.DTOs.Investigatii;
 using ValyanClinic.Application.Features.Investigatii.Queries;
@@ -11,7 +13,7 @@ namespace ValyanClinic.Components.Shared.Consultatie.Tabs;
 
 /// <summary>
 /// Tab Investigații pentru consultație - Design simplificat cu 3 carduri
-/// Include: Imagistice, Explorări Funcționale, Endoscopii + Legacy text fields
+/// Include: Imagistice, Explorări Funcționale, Endoscopii + Legacy text fields (RTE)
 /// </summary>
 public partial class InvestigatiiTab : ComponentBase
 {
@@ -26,6 +28,23 @@ public partial class InvestigatiiTab : ComponentBase
     [Parameter] public Guid? PacientId { get; set; }
     [Parameter] public Guid? ConsultatieId { get; set; }
     [Parameter] public Guid? CurrentUserId { get; set; }
+
+    // ==================== TOOLBAR RTE MINIMAL ====================
+    /// <summary>
+    /// Toolbar items minimal pentru Rich Text Editor în carduri și observații
+    /// </summary>
+    private List<ToolbarItemModel> MinimalToolbarItems { get; } = new List<ToolbarItemModel>
+    {
+        new ToolbarItemModel() { Command = ToolbarCommand.Bold },
+        new ToolbarItemModel() { Command = ToolbarCommand.Italic },
+        new ToolbarItemModel() { Command = ToolbarCommand.Underline },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.OrderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.UnorderedList },
+        new ToolbarItemModel() { Command = ToolbarCommand.Separator },
+        new ToolbarItemModel() { Command = ToolbarCommand.Undo },
+        new ToolbarItemModel() { Command = ToolbarCommand.Redo }
+    };
 
     // ==================== STATE ====================
     private bool IsSectionCompleted => IsInvestigatiiCompleted();
@@ -73,9 +92,133 @@ public partial class InvestigatiiTab : ComponentBase
     private string _selectedEndoscopieDenumire = string.Empty;
     private string? _selectedEndoscopieCod;
     
+    // ==================== STATE PENTRU INVESTIGAȚII EFECTUATE ====================
+    // Liste filtrate pentru efectuate
+    private List<NomenclatorInvestigatieImagisticaDto> _filteredImagisticeEfect = new();
+    private List<NomenclatorExplorareFuncDto> _filteredExplorariEfect = new();
+    private List<NomenclatorEndoscopieDto> _filteredEndoscopiiEfect = new();
+    
+    // Investigații efectuate (adăugate)
+    private List<InvestigatieImagisticaEfectuataDto> _investigatiiImagisticeEfectuate = new();
+    private List<ExplorareEfectuataDto> _explorariEfectuate = new();
+    private List<EndoscopieEfectuataDto> _endoscopiiEfectuate = new();
+    
+    // Categorii selectate pentru efectuate
+    private string? _selectedCategorieImagisticeEfect;
+    private string? _selectedCategorieExplorariEfect;
+    private string? _selectedCategorieEndoscopiiEfect;
+    
+    // Selected IDs pentru dropdown-uri efectuate
+    private Guid? _selectedImagisticaEfectId;
+    private Guid? _selectedExplorareEfectId;
+    private Guid? _selectedEndoscopieEfectId;
+    
+    // Observații RTE pentru efectuate
+    private string _observatiiImagisticeEfect = string.Empty;
+    private string _observatiiExplorariEfect = string.Empty;
+    private string _observatiiEndoscopiiEfect = string.Empty;
+    
+    // Denumiri selectate pentru efectuate
+    private string _selectedImagisticaEfectDenumire = string.Empty;
+    private string? _selectedImagisticaEfectCod;
+    private string _selectedExplorareEfectDenumire = string.Empty;
+    private string? _selectedExplorareEfectCod;
+    private string _selectedEndoscopieEfectDenumire = string.Empty;
+    private string? _selectedEndoscopieEfectCod;
+    
     // Guard pentru a preveni încărcări repetate
     private Guid? _lastLoadedConsultatieId;
     private bool _nomenclatoareLoaded = false;
+    
+    // ==================== EDITARE INVESTIGAȚII EFECTUATE ====================
+    private bool _isEditModalVisible = false;
+    private string _editModalTitle = string.Empty;
+    private string _editModalType = string.Empty; // "imagistica", "explorare", "endoscopie"
+    private Guid _editInvestigatieId;
+    private string _editRezultat = string.Empty;
+    
+    // ==================== SUMARE INVESTIGAȚII EFECTUATE ====================
+    /// <summary>
+    /// Generează HTML cu bullet points pentru sumarul investigațiilor imagistice efectuate
+    /// </summary>
+    private string SumarImagisticeEfectuate => GenerateSumarHtml(
+        _investigatiiImagisticeEfectuate
+            .Where(i => !string.IsNullOrWhiteSpace(i.Rezultat))
+            .Select(i => $"<strong>{i.DenumireInvestigatie}</strong>: {i.Rezultat}"));
+    
+    /// <summary>
+    /// Generează HTML cu bullet points pentru sumarul explorărilor efectuate
+    /// </summary>
+    private string SumarExplorariEfectuate => GenerateSumarHtml(
+        _explorariEfectuate
+            .Where(e => !string.IsNullOrWhiteSpace(e.Rezultat))
+            .Select(e => $"<strong>{e.DenumireExplorare}</strong>: {e.Rezultat}"));
+    
+    /// <summary>
+    /// Generează HTML cu bullet points pentru sumarul endoscopiilor efectuate
+    /// </summary>
+    private string SumarEndoscopiiEfectuate => GenerateSumarHtml(
+        _endoscopiiEfectuate
+            .Where(e => !string.IsNullOrWhiteSpace(e.Rezultat))
+            .Select(e => $"<strong>{e.DenumireEndoscopie}</strong>: {e.Rezultat}"));
+    
+    /// <summary>
+    /// Generează HTML cu sumarul complet al tuturor investigațiilor efectuate (Imagistice + Explorări + Endoscopii)
+    /// </summary>
+    private string SumarCompletInvestigatiiEfectuate => GenerateSumarCompletHtml();
+    
+    /// <summary>
+    /// Verifică dacă există cel puțin o investigație efectuată cu rezultat
+    /// </summary>
+    private bool AreInvestigatiiEfectuateCuRezultat =>
+        _investigatiiImagisticeEfectuate.Any(i => !string.IsNullOrWhiteSpace(i.Rezultat)) ||
+        _explorariEfectuate.Any(e => !string.IsNullOrWhiteSpace(e.Rezultat)) ||
+        _endoscopiiEfectuate.Any(e => !string.IsNullOrWhiteSpace(e.Rezultat));
+    
+    /// <summary>
+    /// Helper pentru generarea HTML-ului cu bullet points
+    /// </summary>
+    private static string GenerateSumarHtml(IEnumerable<string> items)
+    {
+        var list = items.ToList();
+        if (!list.Any()) return string.Empty;
+        if (list.Count == 1) return list.First();
+        return "<ul>" + string.Join("", list.Select(i => $"<li>{i}</li>")) + "</ul>";
+    }
+    
+    /// <summary>
+    /// Generează HTML-ul complet pentru toate investigațiile efectuate, grupate pe categorii
+    /// </summary>
+    private string GenerateSumarCompletHtml()
+    {
+        var sections = new List<string>();
+        
+        // Imagistice
+        var imagistice = _investigatiiImagisticeEfectuate
+            .Where(i => !string.IsNullOrWhiteSpace(i.Rezultat))
+            .Select(i => $"<li><strong>{i.DenumireInvestigatie}</strong>: {i.Rezultat}</li>")
+            .ToList();
+        if (imagistice.Any())
+            sections.Add($"<p><strong><i class='fas fa-x-ray'></i> Investigații Imagistice:</strong></p><ul>{string.Join("", imagistice)}</ul>");
+        
+        // Explorări
+        var explorari = _explorariEfectuate
+            .Where(e => !string.IsNullOrWhiteSpace(e.Rezultat))
+            .Select(e => $"<li><strong>{e.DenumireExplorare}</strong>: {e.Rezultat}</li>")
+            .ToList();
+        if (explorari.Any())
+            sections.Add($"<p><strong><i class='fas fa-heartbeat'></i> Explorări Funcționale:</strong></p><ul>{string.Join("", explorari)}</ul>");
+        
+        // Endoscopii
+        var endoscopii = _endoscopiiEfectuate
+            .Where(e => !string.IsNullOrWhiteSpace(e.Rezultat))
+            .Select(e => $"<li><strong>{e.DenumireEndoscopie}</strong>: {e.Rezultat}</li>")
+            .ToList();
+        if (endoscopii.Any())
+            sections.Add($"<p><strong><i class='fas fa-microscope'></i> Endoscopii:</strong></p><ul>{string.Join("", endoscopii)}</ul>");
+        
+        return string.Join("<hr style='margin: 0.5rem 0; border-color: #e5e7eb;'/>", sections);
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -154,18 +297,35 @@ public partial class InvestigatiiTab : ComponentBase
         
         try
         {
+            // Încarcă investigații recomandate
             var imagisticeTask = Mediator.Send(new GetInvestigatiiImagisticeRecomandateByConsultatieQuery(ConsultatieId.Value));
             var explorariTask = Mediator.Send(new GetExplorariRecomandateByConsultatieQuery(ConsultatieId.Value));
             var endoscopiiTask = Mediator.Send(new GetEndoscopiiRecomandateByConsultatieQuery(ConsultatieId.Value));
             
-            await Task.WhenAll(imagisticeTask, explorariTask, endoscopiiTask);
+            // Încarcă investigații efectuate
+            var imagisticeEfectTask = Mediator.Send(new GetInvestigatiiImagisticeEfectuateByConsultatieQuery(ConsultatieId.Value));
+            var explorariEfectTask = Mediator.Send(new GetExplorariEfectuateByConsultatieQuery(ConsultatieId.Value));
+            var endoscopiiEfectTask = Mediator.Send(new GetEndoscopiiEfectuateByConsultatieQuery(ConsultatieId.Value));
             
+            await Task.WhenAll(
+                imagisticeTask, explorariTask, endoscopiiTask,
+                imagisticeEfectTask, explorariEfectTask, endoscopiiEfectTask);
+            
+            // Recomandate
             if (imagisticeTask.Result.IsSuccess)
                 _investigatiiImagisticeRecomandate = imagisticeTask.Result.Value.ToList();
             if (explorariTask.Result.IsSuccess)
                 _explorariRecomandate = explorariTask.Result.Value.ToList();
             if (endoscopiiTask.Result.IsSuccess)
                 _endoscopiiRecomandate = endoscopiiTask.Result.Value.ToList();
+            
+            // Efectuate
+            if (imagisticeEfectTask.Result.IsSuccess)
+                _investigatiiImagisticeEfectuate = imagisticeEfectTask.Result.Value.ToList();
+            if (explorariEfectTask.Result.IsSuccess)
+                _explorariEfectuate = explorariEfectTask.Result.Value.ToList();
+            if (endoscopiiEfectTask.Result.IsSuccess)
+                _endoscopiiEfectuate = endoscopiiEfectTask.Result.Value.ToList();
                 
             StateHasChanged();
         }
@@ -230,6 +390,61 @@ public partial class InvestigatiiTab : ComponentBase
         }
     }
 
+    // ==================== CATEGORY CHANGE EVENTS EFECTUATE ====================
+    private void OnCategorieImagisticeEfectChanged(ChangeEventArgs<string, string> args)
+    {
+        _selectedCategorieImagisticeEfect = args.Value;
+        _selectedImagisticaEfectId = null;
+        
+        if (!string.IsNullOrEmpty(_selectedCategorieImagisticeEfect))
+        {
+            _filteredImagisticeEfect = _nomenclatorImagistice
+                .Where(x => x.Categorie == _selectedCategorieImagisticeEfect)
+                .OrderBy(x => x.Ordine)
+                .ToList();
+        }
+        else
+        {
+            _filteredImagisticeEfect.Clear();
+        }
+    }
+
+    private void OnCategorieExplorariEfectChanged(ChangeEventArgs<string, string> args)
+    {
+        _selectedCategorieExplorariEfect = args.Value;
+        _selectedExplorareEfectId = null;
+        
+        if (!string.IsNullOrEmpty(_selectedCategorieExplorariEfect))
+        {
+            _filteredExplorariEfect = _nomenclatorExplorari
+                .Where(x => x.Categorie == _selectedCategorieExplorariEfect)
+                .OrderBy(x => x.Ordine)
+                .ToList();
+        }
+        else
+        {
+            _filteredExplorariEfect.Clear();
+        }
+    }
+
+    private void OnCategorieEndoscopiiEfectChanged(ChangeEventArgs<string, string> args)
+    {
+        _selectedCategorieEndoscopiiEfect = args.Value;
+        _selectedEndoscopieEfectId = null;
+        
+        if (!string.IsNullOrEmpty(_selectedCategorieEndoscopiiEfect))
+        {
+            _filteredEndoscopiiEfect = _nomenclatorEndoscopii
+                .Where(x => x.Categorie == _selectedCategorieEndoscopiiEfect)
+                .OrderBy(x => x.Ordine)
+                .ToList();
+        }
+        else
+        {
+            _filteredEndoscopiiEfect.Clear();
+        }
+    }
+
     // ==================== SELECTION EVENTS ====================
     private void OnImagisticaSelected(ChangeEventArgs<Guid?, NomenclatorInvestigatieImagisticaDto> args)
     {
@@ -264,6 +479,37 @@ public partial class InvestigatiiTab : ComponentBase
         }
     }
 
+    // ==================== SELECTION EVENTS EFECTUATE ====================
+    private void OnImagisticaEfectSelected(ChangeEventArgs<Guid?, NomenclatorInvestigatieImagisticaDto> args)
+    {
+        _selectedImagisticaEfectId = args.Value;
+        if (args.ItemData != null)
+        {
+            _selectedImagisticaEfectDenumire = args.ItemData.Denumire;
+            _selectedImagisticaEfectCod = args.ItemData.Cod;
+        }
+    }
+
+    private void OnExplorareEfectSelected(ChangeEventArgs<Guid?, NomenclatorExplorareFuncDto> args)
+    {
+        _selectedExplorareEfectId = args.Value;
+        if (args.ItemData != null)
+        {
+            _selectedExplorareEfectDenumire = args.ItemData.Denumire;
+            _selectedExplorareEfectCod = args.ItemData.Cod;
+        }
+    }
+
+    private void OnEndoscopieEfectSelected(ChangeEventArgs<Guid?, NomenclatorEndoscopieDto> args)
+    {
+        _selectedEndoscopieEfectId = args.Value;
+        if (args.ItemData != null)
+        {
+            _selectedEndoscopieEfectDenumire = args.ItemData.Denumire;
+            _selectedEndoscopieEfectCod = args.ItemData.Cod;
+        }
+    }
+
     // ==================== ADD METHODS ====================
     private async Task AddImagisticaAsync()
     {
@@ -290,10 +536,11 @@ public partial class InvestigatiiTab : ComponentBase
                 InvestigatieNomenclatorID = _selectedImagisticaId,
                 DenumireInvestigatie = _selectedImagisticaDenumire,
                 CodInvestigatie = _selectedImagisticaCod,
-                RegiuneAnatomica = _observatiiImagistice, // Folosim observații ca regiune
+                RegiuneAnatomica = null,
                 Prioritate = "Normala",
                 EsteCito = false,
                 IndicatiiClinice = null,
+                ObservatiiMedic = _observatiiImagistice,
                 CreatDe = CurrentUserId ?? Guid.Empty
             };
             
@@ -346,7 +593,8 @@ public partial class InvestigatiiTab : ComponentBase
                 CodExplorare = _selectedExplorareCod,
                 Prioritate = "Normala",
                 EsteCito = false,
-                IndicatiiClinice = _observatiiExplorari,
+                IndicatiiClinice = null,
+                ObservatiiMedic = _observatiiExplorari,
                 CreatDe = CurrentUserId ?? Guid.Empty
             };
             
@@ -399,7 +647,8 @@ public partial class InvestigatiiTab : ComponentBase
                 CodEndoscopie = _selectedEndoscopieCod,
                 Prioritate = "Normala",
                 EsteCito = false,
-                IndicatiiClinice = _observatiiEndoscopii,
+                IndicatiiClinice = null,
+                ObservatiiMedic = _observatiiEndoscopii,
                 CreatDe = CurrentUserId ?? Guid.Empty
             };
             
@@ -477,6 +726,249 @@ public partial class InvestigatiiTab : ComponentBase
         }
     }
 
+    // ==================== ADD METHODS EFECTUATE ====================
+    private async Task AddImagisticaEfectuataAsync()
+    {
+        if (!ConsultatieId.HasValue || !PacientId.HasValue || !_selectedImagisticaEfectId.HasValue)
+        {
+            Logger.LogWarning("Missing required IDs for AddImagisticaEfectuataAsync");
+            return;
+        }
+        
+        try
+        {
+            var command = new AddInvestigatieImagisticaEfectuataCommand
+            {
+                ConsultatieID = ConsultatieId.Value,
+                PacientID = PacientId.Value,
+                InvestigatieNomenclatorID = _selectedImagisticaEfectId,
+                DenumireInvestigatie = _selectedImagisticaEfectDenumire,
+                CodInvestigatie = _selectedImagisticaEfectCod,
+                DataEfectuare = DateTime.Now,
+                Rezultat = _observatiiImagisticeEfect,
+                CreatDe = CurrentUserId ?? Guid.Empty
+            };
+            
+            var result = await Mediator.Send(command);
+            
+            if (result.IsSuccess)
+            {
+                await LoadInvestigatiiAsync();
+                _selectedImagisticaEfectId = null;
+                _observatiiImagisticeEfect = string.Empty;
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la adaugarea investigatiei imagistice efectuate");
+        }
+    }
+
+    private async Task AddExplorareEfectuataAsync()
+    {
+        if (!ConsultatieId.HasValue || !PacientId.HasValue || !_selectedExplorareEfectId.HasValue)
+        {
+            Logger.LogWarning("Missing required IDs for AddExplorareEfectuataAsync");
+            return;
+        }
+        
+        try
+        {
+            var command = new AddExplorareEfectuataCommand
+            {
+                ConsultatieID = ConsultatieId.Value,
+                PacientID = PacientId.Value,
+                ExplorareNomenclatorID = _selectedExplorareEfectId,
+                DenumireExplorare = _selectedExplorareEfectDenumire,
+                CodExplorare = _selectedExplorareEfectCod,
+                DataEfectuare = DateTime.Now,
+                Rezultat = _observatiiExplorariEfect,
+                CreatDe = CurrentUserId ?? Guid.Empty
+            };
+            
+            var result = await Mediator.Send(command);
+            
+            if (result.IsSuccess)
+            {
+                await LoadInvestigatiiAsync();
+                _selectedExplorareEfectId = null;
+                _observatiiExplorariEfect = string.Empty;
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la adaugarea explorarii efectuate");
+        }
+    }
+
+    private async Task AddEndoscopieEfectuataAsync()
+    {
+        if (!ConsultatieId.HasValue || !PacientId.HasValue || !_selectedEndoscopieEfectId.HasValue)
+        {
+            Logger.LogWarning("Missing required IDs for AddEndoscopieEfectuataAsync");
+            return;
+        }
+        
+        try
+        {
+            var command = new AddEndoscopieEfectuataCommand
+            {
+                ConsultatieID = ConsultatieId.Value,
+                PacientID = PacientId.Value,
+                EndoscopieNomenclatorID = _selectedEndoscopieEfectId,
+                DenumireEndoscopie = _selectedEndoscopieEfectDenumire,
+                CodEndoscopie = _selectedEndoscopieEfectCod,
+                DataEfectuare = DateTime.Now,
+                Rezultat = _observatiiEndoscopiiEfect,
+                CreatDe = CurrentUserId ?? Guid.Empty
+            };
+            
+            var result = await Mediator.Send(command);
+            
+            if (result.IsSuccess)
+            {
+                await LoadInvestigatiiAsync();
+                _selectedEndoscopieEfectId = null;
+                _observatiiEndoscopiiEfect = string.Empty;
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la adaugarea endoscopiei efectuate");
+        }
+    }
+
+    // ==================== DELETE METHODS EFECTUATE ====================
+    private async Task DeleteImagisticaEfectuataAsync(Guid id)
+    {
+        try
+        {
+            var result = await Mediator.Send(new DeleteInvestigatieImagisticaEfectuataCommand(id));
+            if (result.IsSuccess)
+            {
+                await LoadInvestigatiiAsync();
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la stergerea investigatiei efectuate {Id}", id);
+        }
+    }
+
+    private async Task DeleteExplorareEfectuataAsync(Guid id)
+    {
+        try
+        {
+            var result = await Mediator.Send(new DeleteExplorareEfectuataCommand(id));
+            if (result.IsSuccess)
+            {
+                await LoadInvestigatiiAsync();
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la stergerea explorarii efectuate {Id}", id);
+        }
+    }
+
+    private async Task DeleteEndoscopieEfectuataAsync(Guid id)
+    {
+        try
+        {
+            var result = await Mediator.Send(new DeleteEndoscopieEfectuataCommand(id));
+            if (result.IsSuccess)
+            {
+                await LoadInvestigatiiAsync();
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la stergerea endoscopiei efectuate {Id}", id);
+        }
+    }
+
+    // ==================== EDIT METHODS EFECTUATE ====================
+    private void OpenEditImagisticaModal(InvestigatieImagisticaEfectuataDto inv)
+    {
+        _editModalType = "imagistica";
+        _editModalTitle = $"Editare: {inv.DenumireInvestigatie}";
+        _editInvestigatieId = inv.Id;
+        _editRezultat = inv.Rezultat ?? string.Empty;
+        _isEditModalVisible = true;
+    }
+
+    private void OpenEditExplorareModal(ExplorareEfectuataDto exp)
+    {
+        _editModalType = "explorare";
+        _editModalTitle = $"Editare: {exp.DenumireExplorare}";
+        _editInvestigatieId = exp.Id;
+        _editRezultat = exp.Rezultat ?? string.Empty;
+        _isEditModalVisible = true;
+    }
+
+    private void OpenEditEndoscopieModal(EndoscopieEfectuataDto endo)
+    {
+        _editModalType = "endoscopie";
+        _editModalTitle = $"Editare: {endo.DenumireEndoscopie}";
+        _editInvestigatieId = endo.Id;
+        _editRezultat = endo.Rezultat ?? string.Empty;
+        _isEditModalVisible = true;
+    }
+
+    private void CloseEditModal()
+    {
+        _isEditModalVisible = false;
+        _editRezultat = string.Empty;
+    }
+
+    private async Task SaveEditAsync()
+    {
+        try
+        {
+            var userId = CurrentUserId ?? Guid.Empty;
+            
+            Result<bool> result = _editModalType switch
+            {
+                "imagistica" => await Mediator.Send(new UpdateInvestigatieImagisticaEfectuataCommand
+                {
+                    Id = _editInvestigatieId,
+                    Rezultat = _editRezultat,
+                    ModificatDe = userId
+                }),
+                "explorare" => await Mediator.Send(new UpdateExplorareEfectuataCommand
+                {
+                    Id = _editInvestigatieId,
+                    Rezultat = _editRezultat,
+                    ModificatDe = userId
+                }),
+                "endoscopie" => await Mediator.Send(new UpdateEndoscopieEfectuataCommand
+                {
+                    Id = _editInvestigatieId,
+                    Rezultat = _editRezultat,
+                    ModificatDe = userId
+                }),
+                _ => Result<bool>.Failure("Tip necunoscut")
+            };
+
+            if (result.IsSuccess)
+            {
+                await LoadInvestigatiiAsync();
+                CloseEditModal();
+                await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Eroare la salvarea editării investigației {Id}", _editInvestigatieId);
+        }
+    }
+
     // ==================== FIELD CHANGE ====================
     private async Task OnFieldChanged()
     {
@@ -485,6 +977,14 @@ public partial class InvestigatiiTab : ComponentBase
         {
             await OnSectionCompleted.InvokeAsync();
         }
+    }
+
+    /// <summary>
+    /// Handler pentru RichTextEditor ValueChange
+    /// </summary>
+    private async Task OnRteValueChanged(Syncfusion.Blazor.RichTextEditor.ChangeEventArgs args)
+    {
+        await OnFieldChanged();
     }
 
     private bool IsInvestigatiiCompleted()

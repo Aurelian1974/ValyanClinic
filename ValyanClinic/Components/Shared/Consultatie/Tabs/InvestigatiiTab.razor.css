@@ -19,6 +19,88 @@
     min-height: 38px;
 }
 
+/* ===== RICH TEXT EDITOR COMPACT (pentru carduri) ===== */
+.rte-compact ::deep .e-richtexteditor {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.rte-compact ::deep .e-richtexteditor .e-rte-toolbar {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    min-height: 32px;
+    padding: 2px 4px;
+}
+
+.rte-compact ::deep .e-richtexteditor .e-toolbar-items {
+    gap: 2px;
+}
+
+.rte-compact ::deep .e-richtexteditor .e-toolbar-item .e-tbar-btn {
+    padding: 3px 6px;
+    min-width: 24px;
+    min-height: 24px;
+}
+
+.rte-compact ::deep .e-richtexteditor .e-toolbar-item .e-tbar-btn .e-icons {
+    font-size: 12px;
+}
+
+.rte-compact ::deep .e-richtexteditor .e-rte-content {
+    min-height: 60px;
+    font-size: 0.9rem;
+}
+
+.rte-compact ::deep .e-richtexteditor .e-rte-content .e-content {
+    padding: 8px 10px;
+    min-height: 60px;
+}
+
+.rte-compact ::deep .e-richtexteditor:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ===== RICH TEXT EDITOR LEGACY SECTION ===== */
+.rte-legacy ::deep .e-richtexteditor {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.rte-legacy ::deep .e-richtexteditor .e-rte-toolbar {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    min-height: 36px;
+    padding: 4px 6px;
+}
+
+.rte-legacy ::deep .e-richtexteditor .e-toolbar-item .e-tbar-btn {
+    padding: 4px 8px;
+    min-width: 28px;
+    min-height: 28px;
+}
+
+.rte-legacy ::deep .e-richtexteditor .e-toolbar-item .e-tbar-btn .e-icons {
+    font-size: 13px;
+}
+
+.rte-legacy ::deep .e-richtexteditor .e-rte-content {
+    min-height: 80px;
+    font-size: 0.95rem;
+}
+
+.rte-legacy ::deep .e-richtexteditor .e-rte-content .e-content {
+    padding: 10px 12px;
+    min-height: 80px;
+}
+
+.rte-legacy ::deep .e-richtexteditor:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
 /* ===== GRID 3 CARDURI ===== */
 .investigatii-cards-grid {
     display: grid;
@@ -78,6 +160,360 @@
 
 .investigatie-card .card-header.endoscopii {
     background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+}
+
+/* ===== CARDURI EFECTUATE (gradient diferit - nuanțe de teal/cyan) ===== */
+.investigatie-card .card-header.imagistice-efectuate {
+    background: linear-gradient(135deg, #22d3d1, #0891b2);
+}
+
+.investigatie-card .card-header.explorari-efectuate {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.investigatie-card .card-header.endoscopii-efectuate {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+}
+
+/* ===== SECȚIUNEA EFECTUATE ===== */
+.efectuate-section {
+    border-left: 4px solid #0891b2;
+}
+
+.efectuate-title {
+    color: #0891b2 !important;
+}
+
+.efectuate-title i {
+    color: #0891b2 !important;
+}
+
+/* ===== BUTON SUCCESS (verde) pentru efectuate ===== */
+.investigatie-card .btn-success {
+    background: linear-gradient(135deg, #34d399, #10b981);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.investigatie-card .btn-success:hover:not(:disabled) {
+    background: linear-gradient(135deg, #10b981, #059669);
+    transform: translateY(-1px);
+}
+
+.investigatie-card .btn-success:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== CHIPS EFECTUATE ===== */
+.efectuate-items .efectuate-chip {
+    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+    border-color: #7dd3fc;
+}
+
+/* ===== SUMAR REZULTATE SECTION ===== */
+.sumar-section {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed #d1d5db;
+}
+
+.sumar-section .form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0891b2;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.sumar-section .form-label i {
+    font-size: 0.9rem;
+}
+
+.sumar-section ::deep .e-richtexteditor {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #f8fafc;
+}
+
+.sumar-section ::deep .e-richtexteditor .e-rte-content {
+    background: #f8fafc;
+    min-height: 60px;
+}
+
+.sumar-section ::deep .e-richtexteditor .e-rte-content .e-content {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.sumar-section ::deep .e-richtexteditor .e-rte-content ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.sumar-section ::deep .e-richtexteditor .e-rte-content li {
+    margin-bottom: 0.25rem;
+}
+
+/* ===== BUTON EDIT PE CHIP ===== */
+.chip-edit {
+    background: transparent;
+    border: none;
+    color: #3b82f6;
+    cursor: pointer;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 0.75rem;
+    margin-right: 0.25rem;
+}
+
+.chip-edit:hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: #2563eb;
+}
+
+/* ===== MODAL EDITARE INVESTIGAȚIE ===== */
+.edit-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.edit-modal-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: slideIn 0.25s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.edit-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    color: white;
+}
+
+.edit-modal-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.edit-modal-header .close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.edit-modal-header .close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.edit-modal-body {
+    padding: 1.5rem;
+}
+
+.edit-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-top: 1px solid #e5e7eb;
+}
+
+.edit-modal-footer .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.edit-modal-footer .btn-secondary {
+    background: #e5e7eb;
+    border: none;
+    color: #374151;
+}
+
+.edit-modal-footer .btn-secondary:hover {
+    background: #d1d5db;
+}
+
+.edit-modal-footer .btn-primary {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    border: none;
+    color: white;
+}
+
+.edit-modal-footer .btn-primary:hover {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+/* ===== SUMAR COMPLET INVESTIGAȚII ===== */
+.sumar-complet-section {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border: 1px solid #bae6fd;
+    border-radius: 10px;
+}
+
+.sumar-complet-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0369a1;
+    margin: 0 0 1rem 0;
+}
+
+.sumar-complet-title i {
+    color: #0891b2;
+}
+
+.rte-sumar-complet ::deep .e-richtexteditor {
+    border: 1px solid #7dd3fc;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+}
+
+.rte-sumar-complet ::deep .e-richtexteditor .e-rte-content {
+    background: white;
+    min-height: auto;
+}
+
+.rte-sumar-complet ::deep .e-richtexteditor .e-rte-content .e-content {
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.rte-sumar-complet ::deep .e-richtexteditor .e-rte-content p {
+    margin: 0.5rem 0;
+    color: #0c4a6e;
+}
+
+.rte-sumar-complet ::deep .e-richtexteditor .e-rte-content ul {
+    margin: 0.25rem 0 0.75rem 0;
+    padding-left: 1.5rem;
+}
+
+.rte-sumar-complet ::deep .e-richtexteditor .e-rte-content li {
+    margin-bottom: 0.35rem;
+    color: #334155;
+}
+
+.rte-sumar-complet ::deep .e-richtexteditor .e-rte-content hr {
+    border: none;
+    border-top: 1px dashed #cbd5e1;
+    margin: 0.75rem 0;
+}
+
+/* ===== SECȚIUNEA ALTE INVESTIGAȚII ===== */
+.alte-investigatii-section {
+    border-left: 4px solid #8b5cf6;
+}
+
+.alte-investigatii-section .section-title {
+    color: #7c3aed;
+}
+
+.alte-investigatii-section .section-title i {
+    color: #8b5cf6 !important;
+}
+
+/* ===== RTE LARGE pentru Alte Investigații ===== */
+.rte-large ::deep .e-richtexteditor {
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.rte-large ::deep .e-richtexteditor .e-rte-toolbar {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    min-height: 40px;
+    padding: 6px 8px;
+}
+
+.rte-large ::deep .e-richtexteditor .e-toolbar-item .e-tbar-btn {
+    padding: 5px 10px;
+    min-width: 32px;
+    min-height: 32px;
+}
+
+.rte-large ::deep .e-richtexteditor .e-toolbar-item .e-tbar-btn .e-icons {
+    font-size: 14px;
+}
+
+.rte-large ::deep .e-richtexteditor .e-rte-content {
+    min-height: 140px;
+    font-size: 1rem;
+}
+
+.rte-large ::deep .e-richtexteditor .e-rte-content .e-content {
+    padding: 12px 14px;
+    min-height: 140px;
+}
+
+.rte-large ::deep .e-richtexteditor:focus-within {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 
 .investigatie-card .card-body {

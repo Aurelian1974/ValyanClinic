@@ -62,6 +62,7 @@ public class SaveConsultatieDraftCommand : IRequest<Result<Guid>>
 
     // Investigații
     public string? InvestigatiiLaborator { get; set; } // InvestigatiiParaclinice din UI
+    public string? AlteInvestigatii { get; set; } // Alte investigații din InvestigatiiTab
 
     // ==================== TAB 3: DIAGNOSTIC & TRATAMENT ====================
     

@@ -28,15 +28,15 @@ public class ConsultatieInvestigatieImagisticaEfectuataRepository : IConsultatie
 
         const string sql = @"
             INSERT INTO dbo.ConsultatieInvestigatieImagisticaEfectuata 
-                (RecomandareID, ConsultatieID, PacientID, InvestigatieNomenclatorID, 
-                 DenumireInvestigatie, CodInvestigatie, RegiuneAnatomica, DataEfectuare,
-                 CentrulMedical, MedicExecutant, Rezultat, Concluzii, CaleFisierRezultat,
+                (RecomandareID, ConsultatieID, PacientID, InvestigatieID, 
+                 NumeInvestigatie, RegiuneAnatomica, DataEfectuare,
+                 Laborator, MedicRadiolog, Rezultat, Concluzie, CaleDocument,
                  DataCreare, CreatDe)
             OUTPUT INSERTED.Id
             VALUES 
-                (@RecomandareID, @ConsultatieID, @PacientID, @InvestigatieNomenclatorID,
-                 @DenumireInvestigatie, @CodInvestigatie, @RegiuneAnatomica, @DataEfectuare,
-                 @CentrulMedical, @MedicExecutant, @Rezultat, @Concluzii, @CaleFisierRezultat,
+                (@RecomandareID, @ConsultatieID, @PacientID, @InvestigatieID,
+                 @NumeInvestigatie, @RegiuneAnatomica, @DataEfectuare,
+                 @Laborator, @MedicRadiolog, @Rezultat, @Concluzie, @CaleDocument,
                  @DataCreare, @CreatDe)";
 
         var id = await connection.QuerySingleAsync<Guid>(sql, new
@@ -44,16 +44,15 @@ public class ConsultatieInvestigatieImagisticaEfectuataRepository : IConsultatie
             investigatie.RecomandareID,
             investigatie.ConsultatieID,
             investigatie.PacientID,
-            investigatie.InvestigatieNomenclatorID,
-            investigatie.DenumireInvestigatie,
-            investigatie.CodInvestigatie,
+            InvestigatieID = investigatie.InvestigatieNomenclatorID,
+            NumeInvestigatie = investigatie.DenumireInvestigatie,
             investigatie.RegiuneAnatomica,
             investigatie.DataEfectuare,
-            investigatie.CentrulMedical,
-            investigatie.MedicExecutant,
+            Laborator = investigatie.CentrulMedical,
+            MedicRadiolog = investigatie.MedicExecutant,
             investigatie.Rezultat,
-            investigatie.Concluzii,
-            investigatie.CaleFisierRezultat,
+            Concluzie = investigatie.Concluzii,
+            CaleDocument = investigatie.CaleFisierRezultat,
             DataCreare = DateTime.Now,
             investigatie.CreatDe
         });
@@ -67,9 +66,19 @@ public class ConsultatieInvestigatieImagisticaEfectuataRepository : IConsultatie
         using var connection = _connectionFactory.CreateConnection();
 
         const string sql = @"
-            SELECT i.*, n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
+            SELECT 
+                i.Id, i.ConsultatieID, i.PacientID, i.RecomandareID,
+                i.InvestigatieID AS InvestigatieNomenclatorID,
+                i.NumeInvestigatie AS DenumireInvestigatie,
+                i.RegiuneAnatomica, i.DataEfectuare,
+                i.Laborator AS CentrulMedical,
+                i.MedicRadiolog AS MedicExecutant,
+                i.Rezultat, i.Concluzie AS Concluzii,
+                i.CaleDocument AS CaleFisierRezultat,
+                i.DataCreare, i.CreatDe,
+                n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
             FROM dbo.ConsultatieInvestigatieImagisticaEfectuata i
-            LEFT JOIN dbo.NomenclatorInvestigatiiImagistice n ON i.InvestigatieNomenclatorID = n.Id
+            LEFT JOIN dbo.NomenclatorInvestigatiiImagistice n ON i.InvestigatieID = n.Id
             WHERE i.PacientID = @PacientID
             ORDER BY i.DataEfectuare DESC";
 
@@ -81,9 +90,19 @@ public class ConsultatieInvestigatieImagisticaEfectuataRepository : IConsultatie
         using var connection = _connectionFactory.CreateConnection();
 
         const string sql = @"
-            SELECT i.*, n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
+            SELECT 
+                i.Id, i.ConsultatieID, i.PacientID, i.RecomandareID,
+                i.InvestigatieID AS InvestigatieNomenclatorID,
+                i.NumeInvestigatie AS DenumireInvestigatie,
+                i.RegiuneAnatomica, i.DataEfectuare,
+                i.Laborator AS CentrulMedical,
+                i.MedicRadiolog AS MedicExecutant,
+                i.Rezultat, i.Concluzie AS Concluzii,
+                i.CaleDocument AS CaleFisierRezultat,
+                i.DataCreare, i.CreatDe,
+                n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
             FROM dbo.ConsultatieInvestigatieImagisticaEfectuata i
-            LEFT JOIN dbo.NomenclatorInvestigatiiImagistice n ON i.InvestigatieNomenclatorID = n.Id
+            LEFT JOIN dbo.NomenclatorInvestigatiiImagistice n ON i.InvestigatieID = n.Id
             WHERE i.ConsultatieID = @ConsultatieID
             ORDER BY i.DataEfectuare DESC";
 
@@ -96,33 +115,31 @@ public class ConsultatieInvestigatieImagisticaEfectuataRepository : IConsultatie
 
         const string sql = @"
             UPDATE dbo.ConsultatieInvestigatieImagisticaEfectuata
-            SET InvestigatieNomenclatorID = @InvestigatieNomenclatorID,
-                DenumireInvestigatie = @DenumireInvestigatie,
-                CodInvestigatie = @CodInvestigatie,
+            SET InvestigatieID = @InvestigatieID,
+                NumeInvestigatie = @NumeInvestigatie,
                 RegiuneAnatomica = @RegiuneAnatomica,
                 DataEfectuare = @DataEfectuare,
-                CentrulMedical = @CentrulMedical,
-                MedicExecutant = @MedicExecutant,
+                Laborator = @Laborator,
+                MedicRadiolog = @MedicRadiolog,
                 Rezultat = @Rezultat,
-                Concluzii = @Concluzii,
-                CaleFisierRezultat = @CaleFisierRezultat,
-                DataModificare = @DataModificare,
+                Concluzie = @Concluzie,
+                CaleDocument = @CaleDocument,
+                DataUltimeiModificari = @DataModificare,
                 ModificatDe = @ModificatDe
             WHERE Id = @Id";
 
         var rows = await connection.ExecuteAsync(sql, new
         {
             investigatie.Id,
-            investigatie.InvestigatieNomenclatorID,
-            investigatie.DenumireInvestigatie,
-            investigatie.CodInvestigatie,
+            InvestigatieID = investigatie.InvestigatieNomenclatorID,
+            NumeInvestigatie = investigatie.DenumireInvestigatie,
             investigatie.RegiuneAnatomica,
             investigatie.DataEfectuare,
-            investigatie.CentrulMedical,
-            investigatie.MedicExecutant,
+            Laborator = investigatie.CentrulMedical,
+            MedicRadiolog = investigatie.MedicExecutant,
             investigatie.Rezultat,
-            investigatie.Concluzii,
-            investigatie.CaleFisierRezultat,
+            Concluzie = investigatie.Concluzii,
+            CaleDocument = investigatie.CaleFisierRezultat,
             DataModificare = DateTime.Now,
             investigatie.ModificatDe
         });
@@ -144,9 +161,19 @@ public class ConsultatieInvestigatieImagisticaEfectuataRepository : IConsultatie
         using var connection = _connectionFactory.CreateConnection();
 
         const string sql = @"
-            SELECT i.*, n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
+            SELECT 
+                i.Id, i.ConsultatieID, i.PacientID, i.RecomandareID,
+                i.InvestigatieID AS InvestigatieNomenclatorID,
+                i.NumeInvestigatie AS DenumireInvestigatie,
+                i.RegiuneAnatomica, i.DataEfectuare,
+                i.Laborator AS CentrulMedical,
+                i.MedicRadiolog AS MedicExecutant,
+                i.Rezultat, i.Concluzie AS Concluzii,
+                i.CaleDocument AS CaleFisierRezultat,
+                i.DataCreare, i.CreatDe,
+                n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
             FROM dbo.ConsultatieInvestigatieImagisticaEfectuata i
-            LEFT JOIN dbo.NomenclatorInvestigatiiImagistice n ON i.InvestigatieNomenclatorID = n.Id
+            LEFT JOIN dbo.NomenclatorInvestigatiiImagistice n ON i.InvestigatieID = n.Id
             WHERE i.Id = @Id";
 
         return await connection.QueryFirstOrDefaultAsync<ConsultatieInvestigatieImagisticaEfectuata>(sql, new { Id = id });
@@ -173,34 +200,35 @@ public class ConsultatieExplorareEfectuataRepository : IConsultatieExplorareEfec
     {
         using var connection = _connectionFactory.CreateConnection();
 
+        // Schema DB: ExplorareID, NumeExplorare, Laborator, Concluzie, CaleDocument
+        // Entity: ExplorareNomenclatorID, DenumireExplorare, CentrulMedical, Concluzii, CaleFisierRezultat
         const string sql = @"
             INSERT INTO dbo.ConsultatieExplorareEfectuata 
-                (RecomandareID, ConsultatieID, PacientID, ExplorareNomenclatorID, 
-                 DenumireExplorare, CodExplorare, DataEfectuare,
-                 CentrulMedical, MedicExecutant, Rezultat, Concluzii, ParametriMasurati,
-                 CaleFisierRezultat, DataCreare, CreatDe)
+                (RecomandareID, ConsultatieID, PacientID, ExplorareID, 
+                 NumeExplorare, DataEfectuare,
+                 Laborator, MedicExecutant, Rezultat, Concluzie, ParametriMasurati,
+                 CaleDocument, DataCreare, CreatDe)
             OUTPUT INSERTED.Id
             VALUES 
-                (@RecomandareID, @ConsultatieID, @PacientID, @ExplorareNomenclatorID,
-                 @DenumireExplorare, @CodExplorare, @DataEfectuare,
-                 @CentrulMedical, @MedicExecutant, @Rezultat, @Concluzii, @ParametriMasurati,
-                 @CaleFisierRezultat, @DataCreare, @CreatDe)";
+                (@RecomandareID, @ConsultatieID, @PacientID, @ExplorareID,
+                 @NumeExplorare, @DataEfectuare,
+                 @Laborator, @MedicExecutant, @Rezultat, @Concluzie, @ParametriMasurati,
+                 @CaleDocument, @DataCreare, @CreatDe)";
 
         var id = await connection.QuerySingleAsync<Guid>(sql, new
         {
             explorare.RecomandareID,
             explorare.ConsultatieID,
             explorare.PacientID,
-            explorare.ExplorareNomenclatorID,
-            explorare.DenumireExplorare,
-            explorare.CodExplorare,
+            ExplorareID = explorare.ExplorareNomenclatorID,
+            NumeExplorare = explorare.DenumireExplorare,
             explorare.DataEfectuare,
-            explorare.CentrulMedical,
+            Laborator = explorare.CentrulMedical,
             explorare.MedicExecutant,
             explorare.Rezultat,
-            explorare.Concluzii,
+            Concluzie = explorare.Concluzii,
             explorare.ParametriMasurati,
-            explorare.CaleFisierRezultat,
+            CaleDocument = explorare.CaleFisierRezultat,
             DataCreare = DateTime.Now,
             explorare.CreatDe
         });
@@ -213,10 +241,24 @@ public class ConsultatieExplorareEfectuataRepository : IConsultatieExplorareEfec
     {
         using var connection = _connectionFactory.CreateConnection();
 
+        // Map DB columns to entity properties
         const string sql = @"
-            SELECT e.*, n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
+            SELECT e.Id, e.RecomandareID, e.ConsultatieID, e.PacientID, 
+                   e.ExplorareID AS ExplorareNomenclatorID,
+                   e.NumeExplorare AS DenumireExplorare,
+                   e.DataEfectuare, 
+                   e.Laborator AS CentrulMedical, 
+                   e.MedicExecutant,
+                   e.Rezultat, 
+                   e.ParametriMasurati, 
+                   e.Interpretare,
+                   e.Concluzie AS Concluzii, 
+                   e.CaleDocument AS CaleFisierRezultat,
+                   e.DataCreare, e.CreatDe, 
+                   e.DataUltimeiModificari AS DataModificare, e.ModificatDe,
+                   n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
             FROM dbo.ConsultatieExplorareEfectuata e
-            LEFT JOIN dbo.NomenclatorExplorariFunc n ON e.ExplorareNomenclatorID = n.Id
+            LEFT JOIN dbo.NomenclatorExplorariFunc n ON e.ExplorareID = n.Id
             WHERE e.PacientID = @PacientID
             ORDER BY e.DataEfectuare DESC";
 
@@ -227,10 +269,24 @@ public class ConsultatieExplorareEfectuataRepository : IConsultatieExplorareEfec
     {
         using var connection = _connectionFactory.CreateConnection();
 
+        // Map DB columns to entity properties
         const string sql = @"
-            SELECT e.*, n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
+            SELECT e.Id, e.RecomandareID, e.ConsultatieID, e.PacientID, 
+                   e.ExplorareID AS ExplorareNomenclatorID,
+                   e.NumeExplorare AS DenumireExplorare,
+                   e.DataEfectuare, 
+                   e.Laborator AS CentrulMedical, 
+                   e.MedicExecutant,
+                   e.Rezultat, 
+                   e.ParametriMasurati, 
+                   e.Interpretare,
+                   e.Concluzie AS Concluzii, 
+                   e.CaleDocument AS CaleFisierRezultat,
+                   e.DataCreare, e.CreatDe, 
+                   e.DataUltimeiModificari AS DataModificare, e.ModificatDe,
+                   n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
             FROM dbo.ConsultatieExplorareEfectuata e
-            LEFT JOIN dbo.NomenclatorExplorariFunc n ON e.ExplorareNomenclatorID = n.Id
+            LEFT JOIN dbo.NomenclatorExplorariFunc n ON e.ExplorareID = n.Id
             WHERE e.ConsultatieID = @ConsultatieID
             ORDER BY e.DataEfectuare DESC";
 
@@ -241,35 +297,34 @@ public class ConsultatieExplorareEfectuataRepository : IConsultatieExplorareEfec
     {
         using var connection = _connectionFactory.CreateConnection();
 
+        // Map entity properties to DB columns
         const string sql = @"
             UPDATE dbo.ConsultatieExplorareEfectuata
-            SET ExplorareNomenclatorID = @ExplorareNomenclatorID,
-                DenumireExplorare = @DenumireExplorare,
-                CodExplorare = @CodExplorare,
+            SET ExplorareID = @ExplorareID,
+                NumeExplorare = @NumeExplorare,
                 DataEfectuare = @DataEfectuare,
-                CentrulMedical = @CentrulMedical,
+                Laborator = @Laborator,
                 MedicExecutant = @MedicExecutant,
                 Rezultat = @Rezultat,
-                Concluzii = @Concluzii,
+                Concluzie = @Concluzie,
                 ParametriMasurati = @ParametriMasurati,
-                CaleFisierRezultat = @CaleFisierRezultat,
-                DataModificare = @DataModificare,
+                CaleDocument = @CaleDocument,
+                DataUltimeiModificari = @DataModificare,
                 ModificatDe = @ModificatDe
             WHERE Id = @Id";
 
         var rows = await connection.ExecuteAsync(sql, new
         {
             explorare.Id,
-            explorare.ExplorareNomenclatorID,
-            explorare.DenumireExplorare,
-            explorare.CodExplorare,
+            ExplorareID = explorare.ExplorareNomenclatorID,
+            NumeExplorare = explorare.DenumireExplorare,
             explorare.DataEfectuare,
-            explorare.CentrulMedical,
+            Laborator = explorare.CentrulMedical,
             explorare.MedicExecutant,
             explorare.Rezultat,
-            explorare.Concluzii,
+            Concluzie = explorare.Concluzii,
             explorare.ParametriMasurati,
-            explorare.CaleFisierRezultat,
+            CaleDocument = explorare.CaleFisierRezultat,
             DataModificare = DateTime.Now,
             explorare.ModificatDe
         });
@@ -290,10 +345,24 @@ public class ConsultatieExplorareEfectuataRepository : IConsultatieExplorareEfec
     {
         using var connection = _connectionFactory.CreateConnection();
 
+        // Map DB columns to entity properties
         const string sql = @"
-            SELECT e.*, n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
+            SELECT e.Id, e.RecomandareID, e.ConsultatieID, e.PacientID, 
+                   e.ExplorareID AS ExplorareNomenclatorID,
+                   e.NumeExplorare AS DenumireExplorare,
+                   e.DataEfectuare, 
+                   e.Laborator AS CentrulMedical, 
+                   e.MedicExecutant,
+                   e.Rezultat, 
+                   e.ParametriMasurati, 
+                   e.Interpretare,
+                   e.Concluzie AS Concluzii, 
+                   e.CaleDocument AS CaleFisierRezultat,
+                   e.DataCreare, e.CreatDe, 
+                   e.DataUltimeiModificari AS DataModificare, e.ModificatDe,
+                   n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
             FROM dbo.ConsultatieExplorareEfectuata e
-            LEFT JOIN dbo.NomenclatorExplorariFunc n ON e.ExplorareNomenclatorID = n.Id
+            LEFT JOIN dbo.NomenclatorExplorariFunc n ON e.ExplorareID = n.Id
             WHERE e.Id = @Id";
 
         return await connection.QueryFirstOrDefaultAsync<ConsultatieExplorareEfectuata>(sql, new { Id = id });
@@ -320,35 +389,36 @@ public class ConsultatieEndoscopieEfectuataRepository : IConsultatieEndoscopieEf
     {
         using var connection = _connectionFactory.CreateConnection();
 
+        // Schema DB: EndoscopieID, NumeEndoscopie, Laborator, BiopsiePrelevata, Concluzie, CaleDocument
+        // Entity: EndoscopieNomenclatorID, DenumireEndoscopie, CentrulMedical, BiopsiiPrelevate, Concluzii, CaleFisierRezultat
         const string sql = @"
             INSERT INTO dbo.ConsultatieEndoscopieEfectuata 
-                (RecomandareID, ConsultatieID, PacientID, EndoscopieNomenclatorID, 
-                 DenumireEndoscopie, CodEndoscopie, DataEfectuare,
-                 CentrulMedical, MedicExecutant, Rezultat, Concluzii, BiopsiiPrelevate,
-                 RezultatHistopatologic, CaleFisierRezultat, DataCreare, CreatDe)
+                (RecomandareID, ConsultatieID, PacientID, EndoscopieID, 
+                 NumeEndoscopie, DataEfectuare,
+                 Laborator, MedicExecutant, Rezultat, Concluzie, BiopsiePrelevata,
+                 LocBiopsie, CaleDocument, DataCreare, CreatDe)
             OUTPUT INSERTED.Id
             VALUES 
-                (@RecomandareID, @ConsultatieID, @PacientID, @EndoscopieNomenclatorID,
-                 @DenumireEndoscopie, @CodEndoscopie, @DataEfectuare,
-                 @CentrulMedical, @MedicExecutant, @Rezultat, @Concluzii, @BiopsiiPrelevate,
-                 @RezultatHistopatologic, @CaleFisierRezultat, @DataCreare, @CreatDe)";
+                (@RecomandareID, @ConsultatieID, @PacientID, @EndoscopieID,
+                 @NumeEndoscopie, @DataEfectuare,
+                 @Laborator, @MedicExecutant, @Rezultat, @Concluzie, @BiopsiePrelevata,
+                 @LocBiopsie, @CaleDocument, @DataCreare, @CreatDe)";
 
         var id = await connection.QuerySingleAsync<Guid>(sql, new
         {
             endoscopie.RecomandareID,
             endoscopie.ConsultatieID,
             endoscopie.PacientID,
-            endoscopie.EndoscopieNomenclatorID,
-            endoscopie.DenumireEndoscopie,
-            endoscopie.CodEndoscopie,
+            EndoscopieID = endoscopie.EndoscopieNomenclatorID,
+            NumeEndoscopie = endoscopie.DenumireEndoscopie,
             endoscopie.DataEfectuare,
-            endoscopie.CentrulMedical,
+            Laborator = endoscopie.CentrulMedical,
             endoscopie.MedicExecutant,
             endoscopie.Rezultat,
-            endoscopie.Concluzii,
-            endoscopie.BiopsiiPrelevate,
-            endoscopie.RezultatHistopatologic,
-            endoscopie.CaleFisierRezultat,
+            Concluzie = endoscopie.Concluzii,
+            BiopsiePrelevata = !string.IsNullOrEmpty(endoscopie.BiopsiiPrelevate),
+            LocBiopsie = endoscopie.BiopsiiPrelevate,
+            CaleDocument = endoscopie.CaleFisierRezultat,
             DataCreare = DateTime.Now,
             endoscopie.CreatDe
         });
@@ -361,10 +431,26 @@ public class ConsultatieEndoscopieEfectuataRepository : IConsultatieEndoscopieEf
     {
         using var connection = _connectionFactory.CreateConnection();
 
+        // Map DB columns to entity properties
         const string sql = @"
-            SELECT e.*, n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
+            SELECT e.Id, e.RecomandareID, e.ConsultatieID, e.PacientID, 
+                   e.EndoscopieID AS EndoscopieNomenclatorID,
+                   e.NumeEndoscopie AS DenumireEndoscopie,
+                   e.DataEfectuare, 
+                   e.Laborator AS CentrulMedical, 
+                   e.MedicExecutant,
+                   e.TipAnestezie,
+                   e.DescriereProcedurii,
+                   e.Rezultat, 
+                   e.LocBiopsie AS BiopsiiPrelevate, 
+                   e.Concluzie AS Concluzii, 
+                   e.Complicatii,
+                   e.CaleDocument AS CaleFisierRezultat,
+                   e.DataCreare, e.CreatDe, 
+                   e.DataUltimeiModificari AS DataModificare, e.ModificatDe,
+                   n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
             FROM dbo.ConsultatieEndoscopieEfectuata e
-            LEFT JOIN dbo.NomenclatorEndoscopii n ON e.EndoscopieNomenclatorID = n.Id
+            LEFT JOIN dbo.NomenclatorEndoscopii n ON e.EndoscopieID = n.Id
             WHERE e.PacientID = @PacientID
             ORDER BY e.DataEfectuare DESC";
 
@@ -375,10 +461,26 @@ public class ConsultatieEndoscopieEfectuataRepository : IConsultatieEndoscopieEf
     {
         using var connection = _connectionFactory.CreateConnection();
 
+        // Map DB columns to entity properties
         const string sql = @"
-            SELECT e.*, n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
+            SELECT e.Id, e.RecomandareID, e.ConsultatieID, e.PacientID, 
+                   e.EndoscopieID AS EndoscopieNomenclatorID,
+                   e.NumeEndoscopie AS DenumireEndoscopie,
+                   e.DataEfectuare, 
+                   e.Laborator AS CentrulMedical, 
+                   e.MedicExecutant,
+                   e.TipAnestezie,
+                   e.DescriereProcedurii,
+                   e.Rezultat, 
+                   e.LocBiopsie AS BiopsiiPrelevate, 
+                   e.Concluzie AS Concluzii, 
+                   e.Complicatii,
+                   e.CaleDocument AS CaleFisierRezultat,
+                   e.DataCreare, e.CreatDe, 
+                   e.DataUltimeiModificari AS DataModificare, e.ModificatDe,
+                   n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
             FROM dbo.ConsultatieEndoscopieEfectuata e
-            LEFT JOIN dbo.NomenclatorEndoscopii n ON e.EndoscopieNomenclatorID = n.Id
+            LEFT JOIN dbo.NomenclatorEndoscopii n ON e.EndoscopieID = n.Id
             WHERE e.ConsultatieID = @ConsultatieID
             ORDER BY e.DataEfectuare DESC";
 
@@ -389,37 +491,36 @@ public class ConsultatieEndoscopieEfectuataRepository : IConsultatieEndoscopieEf
     {
         using var connection = _connectionFactory.CreateConnection();
 
+        // Map entity properties to DB columns
         const string sql = @"
             UPDATE dbo.ConsultatieEndoscopieEfectuata
-            SET EndoscopieNomenclatorID = @EndoscopieNomenclatorID,
-                DenumireEndoscopie = @DenumireEndoscopie,
-                CodEndoscopie = @CodEndoscopie,
+            SET EndoscopieID = @EndoscopieID,
+                NumeEndoscopie = @NumeEndoscopie,
                 DataEfectuare = @DataEfectuare,
-                CentrulMedical = @CentrulMedical,
+                Laborator = @Laborator,
                 MedicExecutant = @MedicExecutant,
                 Rezultat = @Rezultat,
-                Concluzii = @Concluzii,
-                BiopsiiPrelevate = @BiopsiiPrelevate,
-                RezultatHistopatologic = @RezultatHistopatologic,
-                CaleFisierRezultat = @CaleFisierRezultat,
-                DataModificare = @DataModificare,
+                Concluzie = @Concluzie,
+                BiopsiePrelevata = @BiopsiePrelevata,
+                LocBiopsie = @LocBiopsie,
+                CaleDocument = @CaleDocument,
+                DataUltimeiModificari = @DataModificare,
                 ModificatDe = @ModificatDe
             WHERE Id = @Id";
 
         var rows = await connection.ExecuteAsync(sql, new
         {
             endoscopie.Id,
-            endoscopie.EndoscopieNomenclatorID,
-            endoscopie.DenumireEndoscopie,
-            endoscopie.CodEndoscopie,
+            EndoscopieID = endoscopie.EndoscopieNomenclatorID,
+            NumeEndoscopie = endoscopie.DenumireEndoscopie,
             endoscopie.DataEfectuare,
-            endoscopie.CentrulMedical,
+            Laborator = endoscopie.CentrulMedical,
             endoscopie.MedicExecutant,
             endoscopie.Rezultat,
-            endoscopie.Concluzii,
-            endoscopie.BiopsiiPrelevate,
-            endoscopie.RezultatHistopatologic,
-            endoscopie.CaleFisierRezultat,
+            Concluzie = endoscopie.Concluzii,
+            BiopsiePrelevata = !string.IsNullOrEmpty(endoscopie.BiopsiiPrelevate),
+            LocBiopsie = endoscopie.BiopsiiPrelevate,
+            CaleDocument = endoscopie.CaleFisierRezultat,
             DataModificare = DateTime.Now,
             endoscopie.ModificatDe
         });
@@ -440,10 +541,26 @@ public class ConsultatieEndoscopieEfectuataRepository : IConsultatieEndoscopieEf
     {
         using var connection = _connectionFactory.CreateConnection();
 
+        // Map DB columns to entity properties
         const string sql = @"
-            SELECT e.*, n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
+            SELECT e.Id, e.RecomandareID, e.ConsultatieID, e.PacientID, 
+                   e.EndoscopieID AS EndoscopieNomenclatorID,
+                   e.NumeEndoscopie AS DenumireEndoscopie,
+                   e.DataEfectuare, 
+                   e.Laborator AS CentrulMedical, 
+                   e.MedicExecutant,
+                   e.TipAnestezie,
+                   e.DescriereProcedurii,
+                   e.Rezultat, 
+                   e.LocBiopsie AS BiopsiiPrelevate, 
+                   e.Concluzie AS Concluzii, 
+                   e.Complicatii,
+                   e.CaleDocument AS CaleFisierRezultat,
+                   e.DataCreare, e.CreatDe, 
+                   e.DataUltimeiModificari AS DataModificare, e.ModificatDe,
+                   n.Denumire AS NomenclatorDenumire, n.Categorie AS NomenclatorCategorie
             FROM dbo.ConsultatieEndoscopieEfectuata e
-            LEFT JOIN dbo.NomenclatorEndoscopii n ON e.EndoscopieNomenclatorID = n.Id
+            LEFT JOIN dbo.NomenclatorEndoscopii n ON e.EndoscopieID = n.Id
             WHERE e.Id = @Id";
 
         return await connection.QueryFirstOrDefaultAsync<ConsultatieEndoscopieEfectuata>(sql, new { Id = id });

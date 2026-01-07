@@ -191,10 +191,20 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
         dto.Explorari = await LoadExplorariAsync(consultatie.ConsultatieID, cancellationToken);
         dto.Endoscopii = await LoadEndoscopiiAsync(consultatie.ConsultatieID, cancellationToken);
         
-        _logger.LogInformation("[ScrisoareMedicalaService] Investigații: Imagistice={Imagistice}, Explorări={Explorari}, Endoscopii={Endoscopii}",
+        _logger.LogInformation("[ScrisoareMedicalaService] Investigații recomandate: Imagistice={Imagistice}, Explorări={Explorari}, Endoscopii={Endoscopii}",
             dto.InvestigatiiImagistice?.Count ?? 0,
             dto.Explorari?.Count ?? 0,
             dto.Endoscopii?.Count ?? 0);
+
+        // Încarcă investigațiile efectuate pentru consultație
+        dto.InvestigatiiImagisticeEfectuate = await LoadInvestigatiiImagisticeEfectuateAsync(consultatie.ConsultatieID, cancellationToken);
+        dto.ExplorariEfectuate = await LoadExplorariEfectuateAsync(consultatie.ConsultatieID, cancellationToken);
+        dto.EndoscopiiEfectuate = await LoadEndoscopiiEfectuateAsync(consultatie.ConsultatieID, cancellationToken);
+        
+        _logger.LogInformation("[ScrisoareMedicalaService] Investigații efectuate: Imagistice={Imagistice}, Explorări={Explorari}, Endoscopii={Endoscopii}",
+            dto.InvestigatiiImagisticeEfectuate?.Count ?? 0,
+            dto.ExplorariEfectuate?.Count ?? 0,
+            dto.EndoscopiiEfectuate?.Count ?? 0);
 
         return Result<ScrisoareMedicalaDto>.Success(dto);
     }
@@ -393,6 +403,126 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
         {
             _logger.LogError(ex, "Error loading endoscopii for consultatie {ConsultatieId}", consultatieId);
             return new List<InvestigatieRecomandataScrisoareDto>();
+        }
+    }
+
+    /// <summary>
+    /// Încarcă investigațiile imagistice efectuate pentru o consultație
+    /// </summary>
+    private async Task<List<InvestigatieEfectuataScrisoareDto>> LoadInvestigatiiImagisticeEfectuateAsync(
+        Guid consultatieId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var query = new GetInvestigatiiImagisticeEfectuateByConsultatieQuery(consultatieId);
+            var result = await _mediator.Send(query, cancellationToken);
+            
+            if (result.IsSuccess && result.Value != null)
+            {
+                return result.Value.Select(i => new InvestigatieEfectuataScrisoareDto
+                {
+                    Denumire = i.DenumireInvestigatie,
+                    Cod = i.CodInvestigatie,
+                    Categorie = "Imagistică",
+                    DataEfectuare = i.DataEfectuare,
+                    Laborator = i.CentrulMedical,
+                    MedicExecutant = i.MedicExecutant,
+                    Rezultat = i.Rezultat,
+                    Concluzie = i.Concluzii,
+                    EsteAnormal = false,
+                    Observatii = null
+                }).ToList();
+            }
+            
+            _logger.LogWarning("Failed to load investigatii imagistice efectuate for consultatie {ConsultatieId}: {Error}", 
+                consultatieId, result.FirstError);
+            return new List<InvestigatieEfectuataScrisoareDto>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading investigatii imagistice efectuate for consultatie {ConsultatieId}", consultatieId);
+            return new List<InvestigatieEfectuataScrisoareDto>();
+        }
+    }
+
+    /// <summary>
+    /// Încarcă explorările funcționale efectuate pentru o consultație
+    /// </summary>
+    private async Task<List<InvestigatieEfectuataScrisoareDto>> LoadExplorariEfectuateAsync(
+        Guid consultatieId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var query = new GetExplorariEfectuateByConsultatieQuery(consultatieId);
+            var result = await _mediator.Send(query, cancellationToken);
+            
+            if (result.IsSuccess && result.Value != null)
+            {
+                return result.Value.Select(i => new InvestigatieEfectuataScrisoareDto
+                {
+                    Denumire = i.DenumireExplorare,
+                    Cod = null,
+                    Categorie = "Explorări Funcționale",
+                    DataEfectuare = i.DataEfectuare,
+                    Laborator = i.CentrulMedical,
+                    MedicExecutant = i.MedicExecutant,
+                    Rezultat = i.Rezultat,
+                    Concluzie = i.Concluzii,
+                    EsteAnormal = false,
+                    Observatii = null
+                }).ToList();
+            }
+            
+            _logger.LogWarning("Failed to load explorari efectuate for consultatie {ConsultatieId}: {Error}", 
+                consultatieId, result.FirstError);
+            return new List<InvestigatieEfectuataScrisoareDto>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading explorari efectuate for consultatie {ConsultatieId}", consultatieId);
+            return new List<InvestigatieEfectuataScrisoareDto>();
+        }
+    }
+
+    /// <summary>
+    /// Încarcă endoscopiile efectuate pentru o consultație
+    /// </summary>
+    private async Task<List<InvestigatieEfectuataScrisoareDto>> LoadEndoscopiiEfectuateAsync(
+        Guid consultatieId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var query = new GetEndoscopiiEfectuateByConsultatieQuery(consultatieId);
+            var result = await _mediator.Send(query, cancellationToken);
+            
+            if (result.IsSuccess && result.Value != null)
+            {
+                return result.Value.Select(i => new InvestigatieEfectuataScrisoareDto
+                {
+                    Denumire = i.DenumireEndoscopie,
+                    Cod = null,
+                    Categorie = "Endoscopii",
+                    DataEfectuare = i.DataEfectuare,
+                    Laborator = i.CentrulMedical,
+                    MedicExecutant = i.MedicExecutant,
+                    Rezultat = i.Rezultat,
+                    Concluzie = i.Concluzii,
+                    EsteAnormal = false,
+                    Observatii = null
+                }).ToList();
+            }
+            
+            _logger.LogWarning("Failed to load endoscopii efectuate for consultatie {ConsultatieId}: {Error}", 
+                consultatieId, result.FirstError);
+            return new List<InvestigatieEfectuataScrisoareDto>();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading endoscopii efectuate for consultatie {ConsultatieId}", consultatieId);
+            return new List<InvestigatieEfectuataScrisoareDto>();
         }
     }
 

@@ -556,6 +556,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
 
         // Tab 2: Investigații
         InvestigatiiParaclinice = consultatie.InvestigatiiLaborator ?? string.Empty;
+        ConsultatieCommand.AlteInvestigatii = consultatie.AlteInvestigatii;
 
         // Tab 3: Diagnostic - NEW normalized structure
         // These are mapped to ConsultatieCommand which is used by DiagnosticTab
@@ -762,6 +763,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
                 
                 // Tab 2: Investigații
                 InvestigatiiLaborator = string.IsNullOrWhiteSpace(InvestigatiiParaclinice) ? null : InvestigatiiParaclinice,
+                AlteInvestigatii = ConsultatieCommand.AlteInvestigatii,
                 
                 // Tab 3: Diagnostic - NEW normalized structure
                 // Use ConsultatieCommand values - they are synced from DiagnosticTab via SyncToModel()
@@ -950,7 +952,7 @@ public partial class Consultatii : ComponentBase, IAsyncDisposable
             AlteObservatiiClinice = AlteObservatiiClinice,
             
             // IV. Investigații
-            AlteInvestigatii = InvestigatiiParaclinice,
+            AlteInvestigatii = ConsultatieCommand.AlteInvestigatii,
 
             // V. Diagnostic
             DiagnosticPozitiv = DiagnosticPrincipal,

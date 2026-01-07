@@ -2,266 +2,521 @@
     Tab Investigații - Consultație (Design simplificat cu 3 carduri)
     Include: Imagistice, Explorări Funcționale, Endoscopii - fiecare în card separat
     Cu dropdown categorie -> dropdown investigație dependent -> observații
+    + Secțiune Investigații Efectuate cu RTE pentru observații
 *@
 @using ValyanClinic.Application.DTOs.Investigatii
 @using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.RichTextEditor
 
 <div class="tab-pane @(IsActive ? "active" : "")" id="tab-investigatii">
     
-    <!-- ========== GRID CU 3 CARDURI ========== -->
-    <div class="investigatii-cards-grid">
-        
-        <!-- CARD 1: INVESTIGAȚII IMAGISTICE -->
-        <div class="investigatie-card">
-            <div class="card-header imagistice">
-                <i class="fas fa-x-ray"></i>
-                <span>Investigatii Imagistice</span>
-            </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label class="form-label">Categorie</label>
-                    <SfDropDownList TValue="string"
-                                    TItem="string"
-                                    @bind-Value="_selectedCategorieImagistice"
-                                    DataSource="@_categoriiImagistice"
-                                    Placeholder="Selecteaza categoria..."
-                                    AllowFiltering="true">
-                        <DropDownListEvents TValue="string" TItem="string"
-                                            ValueChange="OnCategorieImagisticeChanged" />
-                    </SfDropDownList>
+    <!-- ========== SECȚIUNEA 1: INVESTIGAȚII RECOMANDATE (3 CARDURI) ========== -->
+    <div class="section-card">
+        <h5 class="section-title">
+            <i class="fas fa-clipboard-list"></i>
+            Investigatii Recomandate
+        </h5>
+        <div class="investigatii-cards-grid">
+            
+            <!-- CARD 1: INVESTIGAȚII IMAGISTICE RECOMANDATE -->
+            <div class="investigatie-card">
+                <div class="card-header imagistice">
+                    <i class="fas fa-x-ray"></i>
+                    <span>Investigatii Imagistice</span>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Investigatie</label>
-                    <SfDropDownList TValue="Guid?"
-                                    TItem="NomenclatorInvestigatieImagisticaDto"
-                                    @bind-Value="_selectedImagisticaId"
-                                    DataSource="@_filteredImagistice"
-                                    Placeholder="Selecteaza investigatie..."
-                                    AllowFiltering="true"
-                                    Enabled="@(!string.IsNullOrEmpty(_selectedCategorieImagistice))">
-                        <DropDownListFieldSettings Value="Id" Text="Denumire" />
-                        <DropDownListEvents TValue="Guid?" TItem="NomenclatorInvestigatieImagisticaDto"
-                                            ValueChange="OnImagisticaSelected" />
-                    </SfDropDownList>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Observatii</label>
-                    <input type="text" class="form-control" 
-                           @bind="_observatiiImagistice" 
-                           placeholder="Observatii..." />
-                </div>
-                <div class="card-actions">
-                    <button type="button" class="btn btn-primary btn-sm" 
-                            @onclick="AddImagisticaAsync"
-                            disabled="@(!_selectedImagisticaId.HasValue)">
-                        <i class="fas fa-plus"></i> Adauga
-                    </button>
-                </div>
-                
-                <!-- Lista investigații adăugate -->
-                @if (_investigatiiImagisticeRecomandate.Any())
-                {
-                    <div class="added-items">
-                        @foreach (var inv in _investigatiiImagisticeRecomandate)
-                        {
-                            <div class="chip-item">
-                                <span class="chip-text">@inv.DenumireInvestigatie</span>
-                                @if (!string.IsNullOrEmpty(inv.RegiuneAnatomica))
-                                {
-                                    <span class="chip-obs">(@inv.RegiuneAnatomica)</span>
-                                }
-                                <button type="button" class="chip-delete" @onclick="() => DeleteImagisticaAsync(inv.Id)">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        }
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Categorie</label>
+                        <SfDropDownList TValue="string"
+                                        TItem="string"
+                                        @bind-Value="_selectedCategorieImagistice"
+                                        DataSource="@_categoriiImagistice"
+                                        Placeholder="Selecteaza categoria..."
+                                        AllowFiltering="true">
+                            <DropDownListEvents TValue="string" TItem="string"
+                                                ValueChange="OnCategorieImagisticeChanged" />
+                        </SfDropDownList>
                     </div>
-                }
+                    <div class="form-group">
+                        <label class="form-label">Investigatie</label>
+                        <SfDropDownList TValue="Guid?"
+                                        TItem="NomenclatorInvestigatieImagisticaDto"
+                                        @bind-Value="_selectedImagisticaId"
+                                        DataSource="@_filteredImagistice"
+                                        Placeholder="Selecteaza investigatie..."
+                                        AllowFiltering="true"
+                                        Enabled="@(!string.IsNullOrEmpty(_selectedCategorieImagistice))">
+                            <DropDownListFieldSettings Value="Id" Text="Denumire" />
+                            <DropDownListEvents TValue="Guid?" TItem="NomenclatorInvestigatieImagisticaDto"
+                                                ValueChange="OnImagisticaSelected" />
+                        </SfDropDownList>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Observatii</label>
+                        <input type="text" class="form-control" 
+                               @bind="_observatiiImagistice" 
+                               placeholder="Observatii..." />
+                    </div>
+                    <div class="card-actions">
+                        <button type="button" class="btn btn-primary btn-sm" 
+                                @onclick="AddImagisticaAsync"
+                                disabled="@(!_selectedImagisticaId.HasValue)">
+                            <i class="fas fa-plus"></i> Adauga
+                        </button>
+                    </div>
+                    
+                    <!-- Lista investigații adăugate -->
+                    @if (_investigatiiImagisticeRecomandate.Any())
+                    {
+                        <div class="added-items">
+                            @foreach (var inv in _investigatiiImagisticeRecomandate)
+                            {
+                                <div class="chip-item">
+                                    <span class="chip-text">@inv.DenumireInvestigatie</span>
+                                    @if (!string.IsNullOrEmpty(inv.RegiuneAnatomica))
+                                    {
+                                        <span class="chip-obs">(@inv.RegiuneAnatomica)</span>
+                                    }
+                                    <button type="button" class="chip-delete" @onclick="() => DeleteImagisticaAsync(inv.Id)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
-        </div>
 
-        <!-- CARD 2: EXPLORĂRI FUNCȚIONALE -->
-        <div class="investigatie-card">
-            <div class="card-header explorari">
-                <i class="fas fa-heartbeat"></i>
-                <span>Explorari Functionale</span>
-            </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label class="form-label">Categorie</label>
-                    <SfDropDownList TValue="string"
-                                    TItem="string"
-                                    @bind-Value="_selectedCategorieExplorari"
-                                    DataSource="@_categoriiExplorari"
-                                    Placeholder="Selecteaza categoria..."
-                                    AllowFiltering="true">
-                        <DropDownListEvents TValue="string" TItem="string"
-                                            ValueChange="OnCategorieExplorariChanged" />
-                    </SfDropDownList>
+            <!-- CARD 2: EXPLORĂRI FUNCȚIONALE RECOMANDATE -->
+            <div class="investigatie-card">
+                <div class="card-header explorari">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Explorari Functionale</span>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Explorare</label>
-                    <SfDropDownList TValue="Guid?"
-                                    TItem="NomenclatorExplorareFuncDto"
-                                    @bind-Value="_selectedExplorareId"
-                                    DataSource="@_filteredExplorari"
-                                    Placeholder="Selecteaza explorare..."
-                                    AllowFiltering="true"
-                                    Enabled="@(!string.IsNullOrEmpty(_selectedCategorieExplorari))">
-                        <DropDownListFieldSettings Value="Id" Text="Denumire" />
-                        <DropDownListEvents TValue="Guid?" TItem="NomenclatorExplorareFuncDto"
-                                            ValueChange="OnExplorareSelected" />
-                    </SfDropDownList>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Observatii</label>
-                    <input type="text" class="form-control" 
-                           @bind="_observatiiExplorari" 
-                           placeholder="Observatii..." />
-                </div>
-                <div class="card-actions">
-                    <button type="button" class="btn btn-primary btn-sm" 
-                            @onclick="AddExplorareAsync"
-                            disabled="@(!_selectedExplorareId.HasValue)">
-                        <i class="fas fa-plus"></i> Adauga
-                    </button>
-                </div>
-                
-                <!-- Lista explorări adăugate -->
-                @if (_explorariRecomandate.Any())
-                {
-                    <div class="added-items">
-                        @foreach (var exp in _explorariRecomandate)
-                        {
-                            <div class="chip-item">
-                                <span class="chip-text">@exp.DenumireExplorare</span>
-                                @if (!string.IsNullOrEmpty(exp.IndicatiiClinice))
-                                {
-                                    <span class="chip-obs">(@exp.IndicatiiClinice)</span>
-                                }
-                                <button type="button" class="chip-delete" @onclick="() => DeleteExplorareAsync(exp.Id)">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        }
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Categorie</label>
+                        <SfDropDownList TValue="string"
+                                        TItem="string"
+                                        @bind-Value="_selectedCategorieExplorari"
+                                        DataSource="@_categoriiExplorari"
+                                        Placeholder="Selecteaza categoria..."
+                                        AllowFiltering="true">
+                            <DropDownListEvents TValue="string" TItem="string"
+                                                ValueChange="OnCategorieExplorariChanged" />
+                        </SfDropDownList>
                     </div>
-                }
+                    <div class="form-group">
+                        <label class="form-label">Explorare</label>
+                        <SfDropDownList TValue="Guid?"
+                                        TItem="NomenclatorExplorareFuncDto"
+                                        @bind-Value="_selectedExplorareId"
+                                        DataSource="@_filteredExplorari"
+                                        Placeholder="Selecteaza explorare..."
+                                        AllowFiltering="true"
+                                        Enabled="@(!string.IsNullOrEmpty(_selectedCategorieExplorari))">
+                            <DropDownListFieldSettings Value="Id" Text="Denumire" />
+                            <DropDownListEvents TValue="Guid?" TItem="NomenclatorExplorareFuncDto"
+                                                ValueChange="OnExplorareSelected" />
+                        </SfDropDownList>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Observatii</label>
+                        <input type="text" class="form-control" 
+                               @bind="_observatiiExplorari" 
+                               placeholder="Observatii..." />
+                    </div>
+                    <div class="card-actions">
+                        <button type="button" class="btn btn-primary btn-sm" 
+                                @onclick="AddExplorareAsync"
+                                disabled="@(!_selectedExplorareId.HasValue)">
+                            <i class="fas fa-plus"></i> Adauga
+                        </button>
+                    </div>
+                    
+                    <!-- Lista explorări adăugate -->
+                    @if (_explorariRecomandate.Any())
+                    {
+                        <div class="added-items">
+                            @foreach (var exp in _explorariRecomandate)
+                            {
+                                <div class="chip-item">
+                                    <span class="chip-text">@exp.DenumireExplorare</span>
+                                    @if (!string.IsNullOrEmpty(exp.IndicatiiClinice))
+                                    {
+                                        <span class="chip-obs">(@exp.IndicatiiClinice)</span>
+                                    }
+                                    <button type="button" class="chip-delete" @onclick="() => DeleteExplorareAsync(exp.Id)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
-        </div>
 
-        <!-- CARD 3: ENDOSCOPII -->
-        <div class="investigatie-card">
-            <div class="card-header endoscopii">
-                <i class="fas fa-microscope"></i>
-                <span>Endoscopii</span>
-            </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label class="form-label">Categorie</label>
-                    <SfDropDownList TValue="string"
-                                    TItem="string"
-                                    @bind-Value="_selectedCategorieEndoscopii"
-                                    DataSource="@_categoriiEndoscopii"
-                                    Placeholder="Selecteaza categoria..."
-                                    AllowFiltering="true">
-                        <DropDownListEvents TValue="string" TItem="string"
-                                            ValueChange="OnCategorieEndoscopiiChanged" />
-                    </SfDropDownList>
+            <!-- CARD 3: ENDOSCOPII RECOMANDATE -->
+            <div class="investigatie-card">
+                <div class="card-header endoscopii">
+                    <i class="fas fa-microscope"></i>
+                    <span>Endoscopii</span>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Endoscopie</label>
-                    <SfDropDownList TValue="Guid?"
-                                    TItem="NomenclatorEndoscopieDto"
-                                    @bind-Value="_selectedEndoscopieId"
-                                    DataSource="@_filteredEndoscopii"
-                                    Placeholder="Selecteaza endoscopie..."
-                                    AllowFiltering="true"
-                                    Enabled="@(!string.IsNullOrEmpty(_selectedCategorieEndoscopii))">
-                        <DropDownListFieldSettings Value="Id" Text="Denumire" />
-                        <DropDownListEvents TValue="Guid?" TItem="NomenclatorEndoscopieDto"
-                                            ValueChange="OnEndoscopieSelected" />
-                    </SfDropDownList>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Observatii</label>
-                    <input type="text" class="form-control" 
-                           @bind="_observatiiEndoscopii" 
-                           placeholder="Observatii..." />
-                </div>
-                <div class="card-actions">
-                    <button type="button" class="btn btn-primary btn-sm" 
-                            @onclick="AddEndoscopieAsync"
-                            disabled="@(!_selectedEndoscopieId.HasValue)">
-                        <i class="fas fa-plus"></i> Adauga
-                    </button>
-                </div>
-                
-                <!-- Lista endoscopii adăugate -->
-                @if (_endoscopiiRecomandate.Any())
-                {
-                    <div class="added-items">
-                        @foreach (var endo in _endoscopiiRecomandate)
-                        {
-                            <div class="chip-item">
-                                <span class="chip-text">@endo.DenumireEndoscopie</span>
-                                @if (!string.IsNullOrEmpty(endo.IndicatiiClinice))
-                                {
-                                    <span class="chip-obs">(@endo.IndicatiiClinice)</span>
-                                }
-                                <button type="button" class="chip-delete" @onclick="() => DeleteEndoscopieAsync(endo.Id)">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        }
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Categorie</label>
+                        <SfDropDownList TValue="string"
+                                        TItem="string"
+                                        @bind-Value="_selectedCategorieEndoscopii"
+                                        DataSource="@_categoriiEndoscopii"
+                                        Placeholder="Selecteaza categoria..."
+                                        AllowFiltering="true">
+                            <DropDownListEvents TValue="string" TItem="string"
+                                                ValueChange="OnCategorieEndoscopiiChanged" />
+                        </SfDropDownList>
                     </div>
-                }
+                    <div class="form-group">
+                        <label class="form-label">Endoscopie</label>
+                        <SfDropDownList TValue="Guid?"
+                                        TItem="NomenclatorEndoscopieDto"
+                                        @bind-Value="_selectedEndoscopieId"
+                                        DataSource="@_filteredEndoscopii"
+                                        Placeholder="Selecteaza endoscopie..."
+                                        AllowFiltering="true"
+                                        Enabled="@(!string.IsNullOrEmpty(_selectedCategorieEndoscopii))">
+                            <DropDownListFieldSettings Value="Id" Text="Denumire" />
+                            <DropDownListEvents TValue="Guid?" TItem="NomenclatorEndoscopieDto"
+                                                ValueChange="OnEndoscopieSelected" />
+                        </SfDropDownList>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Observatii</label>
+                        <input type="text" class="form-control" 
+                               @bind="_observatiiEndoscopii" 
+                               placeholder="Observatii..." />
+                    </div>
+                    <div class="card-actions">
+                        <button type="button" class="btn btn-primary btn-sm" 
+                                @onclick="AddEndoscopieAsync"
+                                disabled="@(!_selectedEndoscopieId.HasValue)">
+                            <i class="fas fa-plus"></i> Adauga
+                        </button>
+                    </div>
+                    
+                    <!-- Lista endoscopii adăugate -->
+                    @if (_endoscopiiRecomandate.Any())
+                    {
+                        <div class="added-items">
+                            @foreach (var endo in _endoscopiiRecomandate)
+                            {
+                                <div class="chip-item">
+                                    <span class="chip-text">@endo.DenumireEndoscopie</span>
+                                    @if (!string.IsNullOrEmpty(endo.IndicatiiClinice))
+                                    {
+                                        <span class="chip-obs">(@endo.IndicatiiClinice)</span>
+                                    }
+                                    <button type="button" class="chip-delete" @onclick="() => DeleteEndoscopieAsync(endo.Id)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ========== CÂMPURI TEXT LEGACY ========== -->
-    <div class="section-card legacy-section">
-        <h5 class="section-title">
-            <i class="fas fa-edit"></i>
-            Note Investigatii (Text Liber)
+    <!-- ========== SECȚIUNEA 2: INVESTIGAȚII EFECTUATE (3 CARDURI cu RTE) ========== -->
+    <div class="section-card efectuate-section">
+        <h5 class="section-title efectuate-title">
+            <i class="fas fa-check-double"></i>
+            Investigatii Efectuate
         </h5>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Investigatii Laborator</label>
-                    <textarea class="form-control" rows="3" 
-                              placeholder="Hemoleucograma, VSH, transaminaze..."
-                              @bind="Model.InvestigatiiLaborator"
-                              @oninput="OnFieldChanged"></textarea>
+        <div class="investigatii-cards-grid">
+            
+            <!-- CARD 1: INVESTIGAȚII IMAGISTICE EFECTUATE -->
+            <div class="investigatie-card efectuate">
+                <div class="card-header imagistice-efectuate">
+                    <i class="fas fa-x-ray"></i>
+                    <span>Imagistice Efectuate</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Categorie</label>
+                        <SfDropDownList TValue="string"
+                                        TItem="string"
+                                        @bind-Value="_selectedCategorieImagisticeEfect"
+                                        DataSource="@_categoriiImagistice"
+                                        Placeholder="Selecteaza categoria..."
+                                        AllowFiltering="true">
+                            <DropDownListEvents TValue="string" TItem="string"
+                                                ValueChange="OnCategorieImagisticeEfectChanged" />
+                        </SfDropDownList>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Investigatie</label>
+                        <SfDropDownList TValue="Guid?"
+                                        TItem="NomenclatorInvestigatieImagisticaDto"
+                                        @bind-Value="_selectedImagisticaEfectId"
+                                        DataSource="@_filteredImagisticeEfect"
+                                        Placeholder="Selecteaza investigatie..."
+                                        AllowFiltering="true"
+                                        Enabled="@(!string.IsNullOrEmpty(_selectedCategorieImagisticeEfect))">
+                            <DropDownListFieldSettings Value="Id" Text="Denumire" />
+                            <DropDownListEvents TValue="Guid?" TItem="NomenclatorInvestigatieImagisticaDto"
+                                                ValueChange="OnImagisticaEfectSelected" />
+                        </SfDropDownList>
+                    </div>
+                    <div class="form-group rte-compact">
+                        <label class="form-label">Rezultat / Observatii</label>
+                        <SfRichTextEditor @bind-Value="_observatiiImagisticeEfect"
+                                          Placeholder="Descrieti rezultatul investigatiei..."
+                                          Height="120px">
+                            <RichTextEditorToolbarSettings Items="@MinimalToolbarItems" />
+                        </SfRichTextEditor>
+                    </div>
+                    <div class="card-actions">
+                        <button type="button" class="btn btn-success btn-sm" 
+                                @onclick="AddImagisticaEfectuataAsync"
+                                disabled="@(!_selectedImagisticaEfectId.HasValue)">
+                            <i class="fas fa-plus"></i> Adauga
+                        </button>
+                    </div>
+                    
+                    <!-- Lista investigații efectuate -->
+                    @if (_investigatiiImagisticeEfectuate.Any())
+                    {
+                        <div class="added-items efectuate-items">
+                            @foreach (var inv in _investigatiiImagisticeEfectuate)
+                            {
+                                <div class="chip-item efectuate-chip">
+                                    <span class="chip-text">@inv.DenumireInvestigatie</span>
+                                    <button type="button" class="chip-edit" @onclick="() => OpenEditImagisticaModal(inv)" title="Editează rezultat">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="chip-delete" @onclick="() => DeleteImagisticaEfectuataAsync(inv.Id)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                        
+                        <!-- Sumar observații imagistice -->
+                        @if (!string.IsNullOrEmpty(SumarImagisticeEfectuate))
+                        {
+                            <div class="form-group rte-compact sumar-section">
+                                <label class="form-label"><i class="fas fa-clipboard-list"></i> Sumar Rezultate</label>
+                                <SfRichTextEditor Value="@SumarImagisticeEfectuate"
+                                                  Readonly="true"
+                                                  Height="100px">
+                                    <RichTextEditorToolbarSettings Enable="false" />
+                                </SfRichTextEditor>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Investigatii Imagistice (note)</label>
-                    <textarea class="form-control" rows="3" 
-                              placeholder="Radiografie, ecografie, CT..."
-                              @bind="Model.InvestigatiiImagistice"
-                              @oninput="OnFieldChanged"></textarea>
+
+            <!-- CARD 2: EXPLORĂRI FUNCȚIONALE EFECTUATE -->
+            <div class="investigatie-card efectuate">
+                <div class="card-header explorari-efectuate">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Explorari Efectuate</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Categorie</label>
+                        <SfDropDownList TValue="string"
+                                        TItem="string"
+                                        @bind-Value="_selectedCategorieExplorariEfect"
+                                        DataSource="@_categoriiExplorari"
+                                        Placeholder="Selecteaza categoria..."
+                                        AllowFiltering="true">
+                            <DropDownListEvents TValue="string" TItem="string"
+                                                ValueChange="OnCategorieExplorariEfectChanged" />
+                        </SfDropDownList>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Explorare</label>
+                        <SfDropDownList TValue="Guid?"
+                                        TItem="NomenclatorExplorareFuncDto"
+                                        @bind-Value="_selectedExplorareEfectId"
+                                        DataSource="@_filteredExplorariEfect"
+                                        Placeholder="Selecteaza explorare..."
+                                        AllowFiltering="true"
+                                        Enabled="@(!string.IsNullOrEmpty(_selectedCategorieExplorariEfect))">
+                            <DropDownListFieldSettings Value="Id" Text="Denumire" />
+                            <DropDownListEvents TValue="Guid?" TItem="NomenclatorExplorareFuncDto"
+                                                ValueChange="OnExplorareEfectSelected" />
+                        </SfDropDownList>
+                    </div>
+                    <div class="form-group rte-compact">
+                        <label class="form-label">Rezultat / Observatii</label>
+                        <SfRichTextEditor @bind-Value="_observatiiExplorariEfect"
+                                          Placeholder="Descrieti rezultatul explorarii..."
+                                          Height="120px">
+                            <RichTextEditorToolbarSettings Items="@MinimalToolbarItems" />
+                        </SfRichTextEditor>
+                    </div>
+                    <div class="card-actions">
+                        <button type="button" class="btn btn-success btn-sm" 
+                                @onclick="AddExplorareEfectuataAsync"
+                                disabled="@(!_selectedExplorareEfectId.HasValue)">
+                            <i class="fas fa-plus"></i> Adauga
+                        </button>
+                    </div>
+                    
+                    <!-- Lista explorări efectuate -->
+                    @if (_explorariEfectuate.Any())
+                    {
+                        <div class="added-items efectuate-items">
+                            @foreach (var exp in _explorariEfectuate)
+                            {
+                                <div class="chip-item efectuate-chip">
+                                    <span class="chip-text">@exp.DenumireExplorare</span>
+                                    <button type="button" class="chip-edit" @onclick="() => OpenEditExplorareModal(exp)" title="Editează rezultat">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="chip-delete" @onclick="() => DeleteExplorareEfectuataAsync(exp.Id)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                        
+                        <!-- Sumar observații explorări -->
+                        @if (!string.IsNullOrEmpty(SumarExplorariEfectuate))
+                        {
+                            <div class="form-group rte-compact sumar-section">
+                                <label class="form-label"><i class="fas fa-clipboard-list"></i> Sumar Rezultate</label>
+                                <SfRichTextEditor Value="@SumarExplorariEfectuate"
+                                                  Readonly="true"
+                                                  Height="100px">
+                                    <RichTextEditorToolbarSettings Enable="false" />
+                                </SfRichTextEditor>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>EKG</label>
-                    <textarea class="form-control" rows="3" 
-                              placeholder="Ritm sinusal, fara modificari ST-T..."
-                              @bind="Model.InvestigatiiEKG"
-                              @oninput="OnFieldChanged"></textarea>
+
+            <!-- CARD 3: ENDOSCOPII EFECTUATE -->
+            <div class="investigatie-card efectuate">
+                <div class="card-header endoscopii-efectuate">
+                    <i class="fas fa-microscope"></i>
+                    <span>Endoscopii Efectuate</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Categorie</label>
+                        <SfDropDownList TValue="string"
+                                        TItem="string"
+                                        @bind-Value="_selectedCategorieEndoscopiiEfect"
+                                        DataSource="@_categoriiEndoscopii"
+                                        Placeholder="Selecteaza categoria..."
+                                        AllowFiltering="true">
+                            <DropDownListEvents TValue="string" TItem="string"
+                                                ValueChange="OnCategorieEndoscopiiEfectChanged" />
+                        </SfDropDownList>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Endoscopie</label>
+                        <SfDropDownList TValue="Guid?"
+                                        TItem="NomenclatorEndoscopieDto"
+                                        @bind-Value="_selectedEndoscopieEfectId"
+                                        DataSource="@_filteredEndoscopiiEfect"
+                                        Placeholder="Selecteaza endoscopie..."
+                                        AllowFiltering="true"
+                                        Enabled="@(!string.IsNullOrEmpty(_selectedCategorieEndoscopiiEfect))">
+                            <DropDownListFieldSettings Value="Id" Text="Denumire" />
+                            <DropDownListEvents TValue="Guid?" TItem="NomenclatorEndoscopieDto"
+                                                ValueChange="OnEndoscopieEfectSelected" />
+                        </SfDropDownList>
+                    </div>
+                    <div class="form-group rte-compact">
+                        <label class="form-label">Rezultat / Observatii</label>
+                        <SfRichTextEditor @bind-Value="_observatiiEndoscopiiEfect"
+                                          Placeholder="Descrieti rezultatul endoscopiei..."
+                                          Height="120px">
+                            <RichTextEditorToolbarSettings Items="@MinimalToolbarItems" />
+                        </SfRichTextEditor>
+                    </div>
+                    <div class="card-actions">
+                        <button type="button" class="btn btn-success btn-sm" 
+                                @onclick="AddEndoscopieEfectuataAsync"
+                                disabled="@(!_selectedEndoscopieEfectId.HasValue)">
+                            <i class="fas fa-plus"></i> Adauga
+                        </button>
+                    </div>
+                    
+                    <!-- Lista endoscopii efectuate -->
+                    @if (_endoscopiiEfectuate.Any())
+                    {
+                        <div class="added-items efectuate-items">
+                            @foreach (var endo in _endoscopiiEfectuate)
+                            {
+                                <div class="chip-item efectuate-chip">
+                                    <span class="chip-text">@endo.DenumireEndoscopie</span>
+                                    <button type="button" class="chip-edit" @onclick="() => OpenEditEndoscopieModal(endo)" title="Editează rezultat">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="chip-delete" @onclick="() => DeleteEndoscopieEfectuataAsync(endo.Id)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                        
+                        <!-- Sumar observații endoscopii -->
+                        @if (!string.IsNullOrEmpty(SumarEndoscopiiEfectuate))
+                        {
+                            <div class="form-group rte-compact sumar-section">
+                                <label class="form-label"><i class="fas fa-clipboard-list"></i> Sumar Rezultate</label>
+                                <SfRichTextEditor Value="@SumarEndoscopiiEfectuate"
+                                                  Readonly="true"
+                                                  Height="100px">
+                                    <RichTextEditorToolbarSettings Enable="false" />
+                                </SfRichTextEditor>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Alte Investigatii</label>
-                    <textarea class="form-control" rows="3" 
-                              placeholder="Alte investigatii efectuate..."
-                              @bind="Model.AlteInvestigatii"
-                              @oninput="OnFieldChanged"></textarea>
+        </div>
+        
+        <!-- SUMAR COMPLET TOATE INVESTIGAȚIILE EFECTUATE -->
+        @if (AreInvestigatiiEfectuateCuRezultat)
+        {
+            <div class="sumar-complet-section">
+                <h6 class="sumar-complet-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    Sumar Complet Investigații Efectuate
+                </h6>
+                <div class="form-group rte-sumar-complet">
+                    <SfRichTextEditor Value="@SumarCompletInvestigatiiEfectuate"
+                                      Readonly="true"
+                                      Height="auto">
+                        <RichTextEditorToolbarSettings Enable="false" />
+                    </SfRichTextEditor>
                 </div>
             </div>
+        }
+    </div>
+
+    <!-- ========== SECȚIUNEA 3: ALTE INVESTIGAȚII (RTE separat) ========== -->
+    <div class="section-card alte-investigatii-section">
+        <h5 class="section-title">
+            <i class="fas fa-file-medical-alt"></i>
+            Alte Investigatii
+        </h5>
+        <div class="form-group rte-large">
+            <SfRichTextEditor @bind-Value="Model.AlteInvestigatii"
+                              Placeholder="Descrieti alte investigatii efectuate (laborator, EKG, etc.)..."
+                              Height="180px">
+                <RichTextEditorToolbarSettings Items="@MinimalToolbarItems" />
+                <RichTextEditorEvents ValueChange="OnRteValueChanged" />
+            </SfRichTextEditor>
         </div>
     </div>
 
@@ -274,3 +529,36 @@
         </div>
     }
 </div>
+
+@* Modal pentru editarea rezultatului/observațiilor unei investigații *@
+@if (_isEditModalVisible)
+{
+    <div class="edit-modal-overlay" @onclick="CloseEditModal">
+        <div class="edit-modal-content" @onclick:stopPropagation="true">
+            <div class="edit-modal-header">
+                <h5><i class="fas fa-edit"></i> @_editModalTitle</h5>
+                <button type="button" class="close-btn" @onclick="CloseEditModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="edit-modal-body">
+                <div class="form-group">
+                    <label class="form-label">Rezultat / Observații</label>
+                    <SfRichTextEditor @bind-Value="_editRezultat"
+                                      Placeholder="Descrieti rezultatul investigației..."
+                                      Height="200px">
+                        <RichTextEditorToolbarSettings Items="@MinimalToolbarItems" />
+                    </SfRichTextEditor>
+                </div>
+            </div>
+            <div class="edit-modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="CloseEditModal">
+                    <i class="fas fa-times"></i> Anulează
+                </button>
+                <button type="button" class="btn btn-primary" @onclick="SaveEditAsync">
+                    <i class="fas fa-save"></i> Salvează
+                </button>
+            </div>
+        </div>
+    </div>
+}
