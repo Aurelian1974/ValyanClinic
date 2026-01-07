@@ -19,11 +19,8 @@
                     <button class="toolbar-btn toolbar-btn-secondary" @onclick="Close">
                         <i class="fas fa-arrow-left"></i> Înapoi la Consultație
                     </button>
-                    <button class="toolbar-btn toolbar-btn-secondary" @onclick="HandlePrint">
+                    <button class="toolbar-btn toolbar-btn-primary" @onclick="HandlePrint">
                         <i class="fas fa-print"></i> Printează
-                    </button>
-                    <button class="toolbar-btn toolbar-btn-primary" @onclick="HandleSavePdf">
-                        <i class="fas fa-file-pdf"></i> Salvează PDF
                     </button>
                 </div>
             </div>
@@ -64,7 +61,7 @@
                     născut(ă) la data de <strong>@Model.DataNasteriiFormatata</strong>, 
                     CNP <strong>@Model.PacientCNP</strong>, a fost consultat(ă) în serviciul nostru 
                     la data de <strong>@Model.DataConsultatieFormatata</strong>. 
-                    Nr. din Registrul de consultații: <strong>@Model.NumarRegistruConsultatii</strong>.
+                    Nr. din Registrul de consultații/Foaie de observație: <strong>@Model.NumarRegistruConsultatii</strong>.
                 </div>
 
                 <!-- Patient Info -->

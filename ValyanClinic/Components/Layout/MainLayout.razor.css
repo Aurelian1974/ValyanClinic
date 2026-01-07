@@ -79,3 +79,39 @@
         height: calc(100vh - 50px);
     }
 }
+/* ========================================
+   Print Styles pentru Scrisoare Medicala
+   ======================================== */
+@media print {
+    .page {
+        display: block !important;
+        min-height: auto !important;
+        height: auto !important;
+        background: white !important;
+    }
+
+    .main-wrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+        min-height: auto !important;
+        height: auto !important;
+        display: block !important;
+    }
+
+    .main-content {
+        margin-top: 0 !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        background: white !important;
+    }
+
+    .content {
+        padding: 0 !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+}

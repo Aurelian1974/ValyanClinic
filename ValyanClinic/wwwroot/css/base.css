@@ -244,6 +244,20 @@ main {
         color-adjust: exact !important;
     }
 
+    /* Reset pentru html și body la print */
+    html, body {
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    body.printing-scrisoare {
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+    }
+
     /* Când se printează scrisoarea, ascunde navigarea și sidebar */
     body.printing-scrisoare .nav-menu,
     body.printing-scrisoare .sidebar,
@@ -268,6 +282,10 @@ main {
         margin: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
     }
 
     /* Scrisoarea ocupă tot spațiul */
@@ -277,12 +295,19 @@ main {
         padding: 0 !important;
         margin: 0 !important;
         width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
         overflow: visible !important;
     }
 
     body.printing-scrisoare .scrisoare-wrapper {
         max-width: 100% !important;
         width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
         box-shadow: none !important;
         margin: 0 !important;
     }
@@ -293,6 +318,10 @@ main {
 
     body.printing-scrisoare .document-container {
         padding: 5mm !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
     }
 
     /* Configurare pagină */

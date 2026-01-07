@@ -238,9 +238,9 @@
 /* ==================== Sections ==================== */
 .section {
     margin-bottom: 18px;
-    /* Previne ruperea secțiunilor între pagini */
-    page-break-inside: avoid;
-    break-inside: avoid;
+    /* Previne ruperea secțiunilor între pagini - FORȚAT */
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
 }
 
 .section-title {
@@ -254,6 +254,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    /* Păstrează titlul cu conținutul - FORȚAT */
+    page-break-after: avoid !important;
+    break-after: avoid !important;
 }
 
 .section-title i {
@@ -626,9 +629,16 @@
     border-collapse: collapse;
     font-size: 0.8rem;
     margin-bottom: 12px;
-    /* Previne ruperea tabelului între pagini */
-    page-break-inside: avoid;
-    break-inside: avoid;
+    /* Previne ruperea tabelului între pagini - FORȚAT */
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+/* Container wrapper pentru tabel - păstrează header cu body */
+.treatment-table thead,
+.treatment-table tbody {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
 }
 
 .treatment-table th {
@@ -772,9 +782,9 @@
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 15px;
-    /* Previne ruperea secțiunii între pagini */
-    page-break-inside: avoid;
-    break-inside: avoid;
+    /* Previne ruperea secțiunii între pagini - FORȚAT */
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
 }
 
 .checkbox-section-title {
@@ -783,9 +793,9 @@
     text-transform: uppercase;
     color: #3b82f6;
     margin-bottom: 10px;
-    /* Păstrează titlul cu conținutul */
-    page-break-after: avoid;
-    break-after: avoid;
+    /* Păstrează titlul cu conținutul - FORȚAT */
+    page-break-after: avoid !important;
+    break-after: avoid !important;
 }
 
 .checkbox-group {
@@ -903,12 +913,18 @@
     margin-top: 30px;
     padding-top: 15px;
     border-top: 1px solid #ddd;
+    /* Previne ruperea footer-ului între pagini */
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
 }
 
 .footer-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
+    /* Previne ruperea grid-ului între pagini */
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
 }
 
 .footer-section h4 {
@@ -1007,15 +1023,24 @@
     }
 
     .scrisoare-overlay {
-        position: static;
-        background: none;
-        padding: 0;
+        position: static !important;
+        background: none !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
     }
 
     .scrisoare-wrapper {
-        box-shadow: none;
-        max-width: none;
-        width: 100%;
+        box-shadow: none !important;
+        max-width: none !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        margin: 0 !important;
     }
 
     .toolbar {
@@ -1024,6 +1049,10 @@
 
     .document-container {
         padding: 15mm !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
     }
 
     /* === Page Break Rules === */
@@ -1097,4 +1126,10 @@
     .analiza-normala-item {
         font-size: 0.65rem !important;
     }
+}
+
+/* Page settings pentru print - trebuie să fie în afara @media print */
+@page {
+    size: A4 portrait;
+    margin: 10mm;
 }

@@ -7,7 +7,7 @@ namespace ValyanClinic.Components.Shared.Documents;
 
 /// <summary>
 /// Code-behind pentru componenta Scrisoare Medicală Preview
-/// Gestionează afișarea, printarea și exportul PDF al scrisorii medicale
+/// Gestionează afișarea și printarea scrisorii medicale
 /// </summary>
 public partial class ScrisoareMedicalaPreview : ComponentBase
 {
@@ -148,15 +148,6 @@ public partial class ScrisoareMedicalaPreview : ComponentBase
         
         // Scoate clasa după print
         await JSRuntime.InvokeVoidAsync("eval", "document.body.classList.remove('printing-scrisoare')");
-    }
-
-    private async Task HandleSavePdf()
-    {
-        // Generează nume fișier cu data și numele pacientului
-        var fileName = $"ScrisoareMedicala_{Model.PacientNumeComplet?.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd}.pdf";
-        
-        // Apelează funcția JavaScript pentru generare PDF
-        await JSRuntime.InvokeVoidAsync("generateScrisoarePdf", "scrisoare-print-area", fileName);
     }
 
     #endregion
