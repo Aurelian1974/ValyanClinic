@@ -1,104 +1,82 @@
-using Dapper;
 using MediatR;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.ViewModels;
-using ValyanClinic.Infrastructure.Data;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.AnalizeMedicale.Queries;
 
 /// <summary>
 /// Handler pentru obținerea analizelor medicale din consultație
 /// </summary>
-public class GetAnalizeMedicaleByConsultatieQueryHandler 
+public class GetAnalizeMedicaleByConsultatieQueryHandler
     : IRequestHandler<GetAnalizeMedicaleByConsultatieQuery, Result<List<ConsultatieAnalizaMedicalaDto>>>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IConsultatieAnalizaMedicalaRepository _analizaRepository;
 
-    public GetAnalizeMedicaleByConsultatieQueryHandler(IDbConnectionFactory connectionFactory)
+    public GetAnalizeMedicaleByConsultatieQueryHandler(IConsultatieAnalizaMedicalaRepository analizaRepository)
     {
-        _connectionFactory = connectionFactory;
+        _analizaRepository = analizaRepository;
     }
 
     public async Task<Result<List<ConsultatieAnalizaMedicalaDto>>> Handle(
-        GetAnalizeMedicaleByConsultatieQuery request, 
+        GetAnalizeMedicaleByConsultatieQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
-            const string sql = @"
-                -- Analize
-                SELECT 
-                    Id,
-                    ConsultatieID,
-                    TipAnaliza,
-                    NumeAnaliza,
-                    CodAnaliza,
-                    StatusAnaliza,
-                    DataRecomandare,
-                    DataProgramata,
-                    DataEfectuare,
-                    LocEfectuare,
-                    Prioritate,
-                    EsteCito,
-                    IndicatiiClinice,
-                    ObservatiiRecomandare,
-                    AreRezultate,
-                    DataRezultate,
-                    ValoareRezultat,
-                    UnitatiMasura,
-                    ValoareNormalaMin,
-                    ValoareNormalaMax,
-                    EsteInAfaraLimitelor,
-                    InterpretareMedic,
-                    ConclusiiAnaliza,
-                    CaleFisierRezultat,
-                    TipFisier,
-                    Pret,
-                    Decontat
-                FROM ConsultatieAnalizeMedicale
-                WHERE ConsultatieID = @ConsultatieId
-                ORDER BY DataRecomandare DESC, NumeAnaliza;
+            var analize = await _analizaRepository.GetByConsultatieIdWithDetailsAsync(
+                request.ConsultatieId,
+                cancellationToken);
 
-                -- Detalii pentru analize cu rezultate
-                SELECT 
-                    d.Id,
-                    d.AnalizaMedicalaID,
-                    d.NumeParametru,
-                    d.CodParametru,
-                    d.Valoare,
-                    d.UnitatiMasura,
-                    d.TipValoare,
-                    d.ValoareNormalaMin,
-                    d.ValoareNormalaMax,
-                    d.ValoareNormalaText,
-                    d.EsteAnormal,
-                    d.NivelGravitate,
-                    d.Observatii
-                FROM ConsultatieAnalizaDetalii d
-                INNER JOIN ConsultatieAnalizeMedicale a ON d.AnalizaMedicalaID = a.Id
-                WHERE a.ConsultatieID = @ConsultatieId
-                ORDER BY d.NumeParametru";
-
-            using var connection = _connectionFactory.CreateConnection();
-            using var multi = await connection.QueryMultipleAsync(sql, new { request.ConsultatieId });
-            
-            var analize = (await multi.ReadAsync<ConsultatieAnalizaMedicalaDto>()).ToList();
-            var detalii = (await multi.ReadAsync<ConsultatieAnalizaDetaliuDto>()).ToList();
-
-            // Grupăm detaliile pe AnalizaMedicalaID
-            var detaliiGrouped = detalii.GroupBy(d => d.AnalizaMedicalaID)
-                                        .ToDictionary(g => g.Key, g => g.ToList());
-
-            // Atasăm detaliile la fiecare analiză
-            foreach (var analiza in analize)
+            // Map entități -> DTOs
+            var analizeDtos = analize.Select(a => new ConsultatieAnalizaMedicalaDto
             {
-                if (detaliiGrouped.TryGetValue(analiza.Id, out var analizaDetalii))
+                Id = a.Id,
+                ConsultatieID = a.ConsultatieID,
+                TipAnaliza = a.TipAnaliza,
+                NumeAnaliza = a.NumeAnaliza,
+                CodAnaliza = a.CodAnaliza,
+                StatusAnaliza = a.StatusAnaliza,
+                DataRecomandare = a.DataRecomandare,
+                DataProgramata = a.DataProgramata,
+                DataEfectuare = a.DataEfectuare,
+                LocEfectuare = a.LocEfectuare,
+                Prioritate = a.Prioritate,
+                EsteCito = a.EsteCito,
+                IndicatiiClinice = a.IndicatiiClinice,
+                ObservatiiRecomandare = a.ObservatiiRecomandare,
+                AreRezultate = a.AreRezultate,
+                DataRezultate = a.DataRezultate,
+                ValoareRezultat = a.ValoareRezultat,
+                UnitatiMasura = a.UnitatiMasura,
+                ValoareNormalaMin = a.ValoareNormalaMin,
+                ValoareNormalaMax = a.ValoareNormalaMax,
+                EsteInAfaraLimitelor = a.EsteInAfaraLimitelor,
+                InterpretareMedic = a.InterpretareMedic,
+                ConclusiiAnaliza = a.ConclusiiAnaliza,
+                CaleFisierRezultat = a.CaleFisierRezultat,
+                TipFisier = a.TipFisier,
+                Pret = a.Pret,
+                Decontat = a.Decontat,
+                Detalii = a.Detalii?.Select(d => new ConsultatieAnalizaDetaliuDto
                 {
-                    analiza.Detalii = analizaDetalii;
-                }
-            }
+                    Id = d.Id,
+                    AnalizaMedicalaID = d.AnalizaMedicalaID,
+                    NumeParametru = d.NumeParametru,
+                    CodParametru = d.CodParametru,
+                    Valoare = d.Valoare,
+                    UnitatiMasura = d.UnitatiMasura,
+                    TipValoare = d.TipValoare,
+                    ValoareNormalaMin = d.ValoareNormalaMin,
+                    ValoareNormalaMax = d.ValoareNormalaMax,
+                    ValoareNormalaText = d.ValoareNormalaText,
+                    EsteAnormal = d.EsteAnormal,
+                    NivelGravitate = d.NivelGravitate,
+                    Observatii = d.Observatii
+                }).ToList()
+            }).ToList();
 
-            return Result<List<ConsultatieAnalizaMedicalaDto>>.Success(analize);
+            return Result<List<ConsultatieAnalizaMedicalaDto>>.Success(analizeDtos);
         }
         catch (Exception ex)
         {

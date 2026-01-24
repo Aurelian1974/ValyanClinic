@@ -1,8 +1,7 @@
-using Dapper;
 using MediatR;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.ViewModels;
-using ValyanClinic.Infrastructure.Data;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.AnalizeMedicale.Queries;
 
@@ -10,58 +9,49 @@ namespace ValyanClinic.Application.Features.AnalizeMedicale.Queries;
 /// Handler pentru query-ul de obținere a analizelor medicale ale unui pacient
 /// Caută în tabela ConsultatieAnalizeMedicale (analize efectuate/importate)
 /// </summary>
-public class GetAnalizeMedicaleByPacientQueryHandler 
+public class GetAnalizeMedicaleByPacientQueryHandler
     : IRequestHandler<GetAnalizeMedicaleByPacientQuery, Result<List<AnalizeMedicaleGroupDto>>>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IConsultatieAnalizaMedicalaRepository _analizaRepository;
 
-    public GetAnalizeMedicaleByPacientQueryHandler(IDbConnectionFactory connectionFactory)
+    public GetAnalizeMedicaleByPacientQueryHandler(IConsultatieAnalizaMedicalaRepository analizaRepository)
     {
-        _connectionFactory = connectionFactory;
+        _analizaRepository = analizaRepository;
     }
 
     public async Task<Result<List<AnalizeMedicaleGroupDto>>> Handle(
-        GetAnalizeMedicaleByPacientQuery request, 
+        GetAnalizeMedicaleByPacientQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
-            // Query pe tabela ConsultatieAnalizeMedicale cu join pe Consultatii pentru PacientId
-            const string sql = @"
-                SELECT 
-                    a.Id,
-                    c.PacientID AS PacientId,
-                    a.ConsultatieID AS ConsultatieId,
-                    COALESCE(a.DataEfectuare, a.DataRecomandare) AS DataDocument,
-                    CONCAT('Import ', FORMAT(COALESCE(a.DataEfectuare, a.DataRecomandare), 'dd.MM.yyyy')) AS NumeDocument,
-                    a.LocEfectuare AS SursaDocument,
-                    a.ConsultatieID AS BatchId,
-                    a.TipAnaliza AS Categorie,
-                    a.NumeAnaliza,
-                    a.ValoareRezultat AS Rezultat,
-                    a.UnitatiMasura AS UnitateMasura,
-                    CASE 
-                        WHEN a.ValoareNormalaMin IS NOT NULL AND a.ValoareNormalaMax IS NOT NULL 
-                        THEN CONCAT(CAST(a.ValoareNormalaMin AS VARCHAR), ' - ', CAST(a.ValoareNormalaMax AS VARCHAR))
-                        WHEN a.ValoareNormalaMin IS NOT NULL 
-                        THEN CONCAT('> ', CAST(a.ValoareNormalaMin AS VARCHAR))
-                        WHEN a.ValoareNormalaMax IS NOT NULL 
-                        THEN CONCAT('< ', CAST(a.ValoareNormalaMax AS VARCHAR))
-                        ELSE NULL
-                    END AS IntervalReferinta,
-                    ISNULL(a.EsteInAfaraLimitelor, 0) AS InAfaraLimitelor,
-                    a.DataCreare AS DataCrearii
-                FROM ConsultatieAnalizeMedicale a
-                INNER JOIN Consultatii c ON a.ConsultatieID = c.ConsultatieID
-                WHERE c.PacientID = @PacientId
-                  AND a.AreRezultate = 1
-                ORDER BY COALESCE(a.DataEfectuare, a.DataRecomandare) DESC, a.TipAnaliza, a.NumeAnaliza";
+            // Get toate analizele pentru pacient (doar cele cu rezultate)
+            var analize = await _analizaRepository.GetByPacientIdAsync(
+                request.PacientId,
+                doarCuRezultate: true,
+                cancellationToken: cancellationToken);
 
-            using var connection = _connectionFactory.CreateConnection();
-            var analize = await connection.QueryAsync<AnalizaMedicalaDto>(sql, new { request.PacientId });
-            
+            // Map entități -> DTOs
+            var analizeDtos = analize.Select(a => new AnalizaMedicalaDto
+            {
+                Id = a.Id,
+                PacientId = request.PacientId,
+                ConsultatieId = a.ConsultatieID,
+                DataDocument = a.DataEfectuare ?? a.DataRecomandare,
+                NumeDocument = $"Import {(a.DataEfectuare ?? a.DataRecomandare):dd.MM.yyyy}",
+                SursaDocument = a.LocEfectuare,
+                BatchId = a.ConsultatieID,
+                Categorie = a.TipAnaliza,
+                NumeAnaliza = a.NumeAnaliza,
+                Rezultat = a.ValoareRezultat,
+                UnitateMasura = a.UnitatiMasura,
+                IntervalReferinta = FormatIntervalReferinta(a.ValoareNormalaMin, a.ValoareNormalaMax),
+                InAfaraLimitelor = a.EsteInAfaraLimitelor,
+                DataCrearii = a.DataCreare
+            }).ToList();
+
             // Grupăm analizele pe ConsultatieId (BatchId) și DataDocument
-            var groups = analize
+            var groups = analizeDtos
                 .GroupBy(a => new { a.BatchId, a.DataDocument, a.NumeDocument, a.SursaDocument })
                 .Select(g => new AnalizeMedicaleGroupDto
                 {
@@ -80,5 +70,16 @@ public class GetAnalizeMedicaleByPacientQueryHandler
         {
             return Result<List<AnalizeMedicaleGroupDto>>.Failure($"Eroare la încărcarea analizelor: {ex.Message}");
         }
+    }
+
+    private static string? FormatIntervalReferinta(decimal? min, decimal? max)
+    {
+        if (min.HasValue && max.HasValue)
+            return $"{min} - {max}";
+        if (min.HasValue)
+            return $"> {min}";
+        if (max.HasValue)
+            return $"< {max}";
+        return null;
     }
 }

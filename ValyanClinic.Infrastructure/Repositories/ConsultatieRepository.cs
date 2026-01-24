@@ -3,8 +3,9 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using ValyanClinic.Domain.Entities;
+using ValyanClinic.Domain.Interfaces.Data;
 using ValyanClinic.Infrastructure.Data;
-using ValyanClinic.Infrastructure.Repositories.Interfaces;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Infrastructure.Repositories;
 

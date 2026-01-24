@@ -70,4 +70,13 @@ public interface IConsultatieAnalizaMedicalaRepository
         Guid analizaId,
         string newStatus,
         CancellationToken cancellationToken = default);
+
+    // ==================== OPERATIONS WITH DETAILS ====================
+
+    /// <summary>
+    /// Obține toate analizele pentru o consultație împreună cu detaliile (single query optimized)
+    /// </summary>
+    Task<IEnumerable<ConsultatieAnalizaMedicala>> GetByConsultatieIdWithDetailsAsync(
+        Guid consultatieId,
+        CancellationToken cancellationToken = default);
 }

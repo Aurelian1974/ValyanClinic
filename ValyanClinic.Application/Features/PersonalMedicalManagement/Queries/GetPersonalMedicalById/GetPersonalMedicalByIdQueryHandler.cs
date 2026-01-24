@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
-using ValyanClinic.Infrastructure.Data;
+using ValyanClinic.Domain.Interfaces.Data;
 using Dapper;
 using System.Data;
 

@@ -1,6 +1,6 @@
 ﻿using ValyanClinic.Domain.Entities;
 
-namespace ValyanClinic.Infrastructure.Repositories.Interfaces;
+namespace ValyanClinic.Domain.Interfaces.Repositories;
 
 /// <summary>
 /// Repository interface pentru gestionarea consultatiilor medicale
