@@ -3,6 +3,63 @@
 // ✅ CRITICAL: Track if navigation is happening to prevent DOM errors
 window._blazorNavigating = false;
 
+// ✅ Get HTML content from Scrisoare Medicala for PDF generation
+window.getScrisoareHtmlContent = function (elementId) {
+    try {
+        const element = document.getElementById(elementId);
+        if (element) {
+            // Return outer HTML (includes the element itself)
+            return element.outerHTML;
+        }
+        console.warn('Element not found:', elementId);
+        return null;
+    } catch (err) {
+        console.error('Error getting HTML content:', err);
+        return null;
+    }
+};
+
+// ✅ Download PDF from Base64 (for QuestPDF generated PDFs)
+window.downloadPdfFromBase64 = function (base64, filename) {
+    try {
+        // Convert base64 to byte array
+        const byteCharacters = atob(base64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        
+        // Create blob and download (PDF content type)
+        const blob = new Blob([byteArray], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        
+        // Async cleanup
+        setTimeout(() => {
+            try {
+                if (link && link.parentNode) {
+                    document.body.removeChild(link);
+                }
+                window.URL.revokeObjectURL(url);
+            } catch (err) {
+                console.debug('PDF download cleanup completed');
+            }
+        }, 100);
+        
+        return true;
+    } catch (err) {
+        console.error('Error in downloadPdfFromBase64:', err);
+        return false;
+    }
+};
+
 window.downloadFileFromBytes = function (filename, contentType, data) {
     // Create blob from byte array
     const blob = new Blob([new Uint8Array(data)], { type: contentType });

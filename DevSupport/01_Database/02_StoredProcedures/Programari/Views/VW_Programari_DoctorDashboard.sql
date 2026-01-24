@@ -46,7 +46,7 @@ SELECT
     pac.Telefon AS PacientTelefon,
     pac.Email AS PacientEmail,
     pac.Data_Nasterii AS PacientDataNasterii,
-    DATEDIFF(YEAR, pac.Data_Nasterii, GETDATE()) AS PacientVarsta,
+    dbo.fn_CalculateAgeFromCNP(pac.CNP) AS PacientVarsta,  -- ✅ Calculat din CNP
   pac.Alergii AS PacientAlergii,
     pac.Boli_Cronice AS PacientBoliCronice,
     -- Computed fields pentru dashboard

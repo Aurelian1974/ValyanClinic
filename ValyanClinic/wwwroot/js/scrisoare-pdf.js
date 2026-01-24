@@ -26,6 +26,27 @@ window.generateScrisoarePdf = async function (elementId, fileName) {
             toolbar.style.display = 'none';
         }
 
+        // Aplicăm stiluri inline pentru a forța page-break corect
+        const sectionsToProtect = element.querySelectorAll('.section, .checkbox-section, .treatment-table, .checkbox-group, .doc-footer, .footer-section');
+        sectionsToProtect.forEach(section => {
+            section.style.pageBreakInside = 'avoid';
+            section.style.breakInside = 'avoid';
+        });
+
+        // Protejăm titlurile de a fi separate de conținut
+        const titles = element.querySelectorAll('.section-title, .checkbox-section-title, h2, h3, h4');
+        titles.forEach(title => {
+            title.style.pageBreakAfter = 'avoid';
+            title.style.breakAfter = 'avoid';
+        });
+
+        // Protejăm rândurile de tabel
+        const tableRows = element.querySelectorAll('tr');
+        tableRows.forEach(row => {
+            row.style.pageBreakInside = 'avoid';
+            row.style.breakInside = 'avoid';
+        });
+
         // Configurare pentru PDF A4 cu page-break corect
         const opt = {
             margin: [10, 10, 15, 10], // top, left, bottom, right în mm (mai mult spațiu jos)
@@ -37,7 +58,10 @@ window.generateScrisoarePdf = async function (elementId, fileName) {
                 letterRendering: true,
                 logging: false,
                 scrollY: 0,
-                windowHeight: element.scrollHeight
+                windowHeight: element.scrollHeight,
+                // Îmbunătățire pentru paginare
+                height: element.scrollHeight,
+                windowWidth: element.scrollWidth
             },
             jsPDF: {
                 unit: 'mm',
@@ -45,10 +69,27 @@ window.generateScrisoarePdf = async function (elementId, fileName) {
                 orientation: 'portrait'
             },
             pagebreak: { 
-                mode: ['css', 'legacy'],
+                mode: ['avoid-all', 'css', 'legacy'],
                 before: '.page-break-before',
                 after: '.page-break-after',
-                avoid: '.section, .checkbox-section, .treatment-table, .checkbox-group, .notes-box, .attention-box, .subsection, .footer-section, tr'
+                avoid: [
+                    '.section',
+                    '.checkbox-section', 
+                    '.treatment-table',
+                    '.checkbox-group',
+                    '.checkbox-item',
+                    '.notes-box',
+                    '.attention-box',
+                    '.subsection',
+                    '.footer-section',
+                    '.doc-footer',
+                    '.section-title',
+                    '.checkbox-section-title',
+                    'table',
+                    'thead',
+                    'tbody',
+                    'tr'
+                ]
             }
         };
 

@@ -45,7 +45,7 @@ p.Observatii,
         pac.Email AS PacientEmail,
         pac.CNP AS PacientCNP,
         pac.Data_Nasterii AS PacientDataNasterii,
-        DATEDIFF(YEAR, pac.Data_Nasterii, GETDATE()) AS PacientVarsta,
+        dbo.fn_CalculateAgeFromCNP(pac.CNP) AS PacientVarsta,  -- ✅ Calculat din CNP
  -- Status flags pentru dashboard
       CASE 
    WHEN p.DataProgramare = CAST(GETDATE() AS DATE) THEN 1
