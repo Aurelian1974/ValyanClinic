@@ -2,7 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ValyanClinic.Domain\ValyanClinic.Domain.csproj" />
-    <ProjectReference Include="..\ValyanClinic.Infrastructure\ValyanClinic.Infrastructure.csproj" />
+    <!-- REMOVED: Application layer should NOT depend on Infrastructure -->
+    <!-- <ProjectReference Include="..\ValyanClinic.Infrastructure\ValyanClinic.Infrastructure.csproj" /> -->
   </ItemGroup>
 
   <ItemGroup>

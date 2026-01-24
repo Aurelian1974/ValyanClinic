@@ -1,37 +1,31 @@
-using Dapper;
 using MediatR;
 using ValyanClinic.Application.Common.Results;
-using ValyanClinic.Infrastructure.Data;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.AnalizeMedicale.Commands;
 
 /// <summary>
 /// Handler pentru ștergerea unei analize medicale
 /// </summary>
-public class DeleteAnalizaMedicalaCommandHandler 
+public class DeleteAnalizaMedicalaCommandHandler
     : IRequestHandler<DeleteAnalizaMedicalaCommand, Result<bool>>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IConsultatieAnalizaMedicalaRepository _analizaRepository;
 
-    public DeleteAnalizaMedicalaCommandHandler(IDbConnectionFactory connectionFactory)
+    public DeleteAnalizaMedicalaCommandHandler(IConsultatieAnalizaMedicalaRepository analizaRepository)
     {
-        _connectionFactory = connectionFactory;
+        _analizaRepository = analizaRepository;
     }
 
     public async Task<Result<bool>> Handle(
-        DeleteAnalizaMedicalaCommand request, 
+        DeleteAnalizaMedicalaCommand request,
         CancellationToken cancellationToken)
     {
         try
         {
-            const string sql = @"
-                DELETE FROM ConsultatieAnalizeMedicale 
-                WHERE Id = @Id";
+            var deleted = await _analizaRepository.DeleteAsync(request.Id, cancellationToken);
 
-            using var connection = _connectionFactory.CreateConnection();
-            var rowsAffected = await connection.ExecuteAsync(sql, new { request.Id });
-
-            return rowsAffected > 0 
+            return deleted
                 ? Result<bool>.Success(true)
                 : Result<bool>.Failure("Analiza nu a fost găsită");
         }

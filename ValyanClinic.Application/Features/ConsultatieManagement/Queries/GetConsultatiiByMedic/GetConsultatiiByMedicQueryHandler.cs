@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
-using ValyanClinic.Infrastructure.Repositories.Interfaces;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.ConsultatieManagement.Queries.GetConsultatiiByMedic;
 

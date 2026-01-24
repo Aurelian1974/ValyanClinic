@@ -1,15 +1,13 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System.Data;
+using ValyanClinic.Domain.Interfaces.Data;
 
 namespace ValyanClinic.Infrastructure.Data;
 
-public interface IDbConnectionFactory
-{
-    IDbConnection CreateConnection();
-    Task<bool> TestConnectionAsync(CancellationToken cancellationToken = default);
-}
-
+/// <summary>
+/// Implementare SQL Server pentru IDbConnectionFactory.
+/// </summary>
 public class SqlConnectionFactory : IDbConnectionFactory
 {
     private readonly string _connectionString;

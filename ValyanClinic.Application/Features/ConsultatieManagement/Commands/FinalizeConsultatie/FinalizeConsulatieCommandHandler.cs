@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
-using ValyanClinic.Infrastructure.Repositories.Interfaces;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.FinalizeConsultatie;
 

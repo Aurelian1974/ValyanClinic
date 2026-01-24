@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Data;
 using ValyanClinic.Domain.Entities;
 using ValyanClinic.Domain.Interfaces.Repositories;
-using ValyanClinic.Infrastructure.Data;
+using ValyanClinic.Domain.Interfaces.Data;
 
 namespace ValyanClinic.Infrastructure.Repositories;
 
@@ -248,5 +248,50 @@ public class ConsultatieAnalizaMedicalaRepository : IConsultatieAnalizaMedicalaR
             analizaId, newStatus);
 
         return rowsAffected > 0;
+    }
+
+    public async Task<IEnumerable<ConsultatieAnalizaMedicala>> GetByConsultatieIdWithDetailsAsync(
+        Guid consultatieId,
+        CancellationToken cancellationToken = default)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        var sql = @"
+            -- Analize
+            SELECT *
+            FROM ConsultatieAnalizeMedicale
+            WHERE ConsultatieID = @ConsultatieID
+            ORDER BY DataRecomandare DESC, NumeAnaliza;
+
+            -- Detalii pentru analize
+            SELECT d.*
+            FROM ConsultatieAnalizaDetalii d
+            INNER JOIN ConsultatieAnalizeMedicale a ON d.AnalizaMedicalaID = a.Id
+            WHERE a.ConsultatieID = @ConsultatieID
+            ORDER BY d.NumeParametru";
+
+        using var multi = await connection.QueryMultipleAsync(sql, new { ConsultatieID = consultatieId });
+
+        var analize = (await multi.ReadAsync<ConsultatieAnalizaMedicala>()).ToList();
+        var detalii = (await multi.ReadAsync<ConsultatieAnalizaDetaliu>()).ToList();
+
+        // Grupăm detaliile pe AnalizaMedicalaID
+        var detaliiGrouped = detalii.GroupBy(d => d.AnalizaMedicalaID)
+                                    .ToDictionary(g => g.Key, g => g.ToList() as ICollection<ConsultatieAnalizaDetaliu>);
+
+        // Atașăm detaliile la fiecare analiză
+        foreach (var analiza in analize)
+        {
+            if (detaliiGrouped.TryGetValue(analiza.Id, out var analizaDetalii))
+            {
+                analiza.Detalii = analizaDetalii;
+            }
+        }
+
+        _logger.LogInformation(
+            "Încărcate {Count} analize cu detalii pentru consultație {ConsultatieID}",
+            analize.Count, consultatieId);
+
+        return analize;
     }
 }

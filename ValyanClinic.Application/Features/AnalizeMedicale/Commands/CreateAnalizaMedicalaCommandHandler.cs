@@ -1,67 +1,48 @@
-using Dapper;
 using MediatR;
 using ValyanClinic.Application.Common.Results;
-using ValyanClinic.Infrastructure.Data;
+using ValyanClinic.Domain.Entities;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.AnalizeMedicale.Commands;
 
 /// <summary>
 /// Handler pentru crearea unei analize medicale recomandate
 /// </summary>
-public class CreateAnalizaMedicalaCommandHandler 
+public class CreateAnalizaMedicalaCommandHandler
     : IRequestHandler<CreateAnalizaMedicalaCommand, Result<Guid>>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IConsultatieAnalizaMedicalaRepository _analizaRepository;
 
-    public CreateAnalizaMedicalaCommandHandler(IDbConnectionFactory connectionFactory)
+    public CreateAnalizaMedicalaCommandHandler(IConsultatieAnalizaMedicalaRepository analizaRepository)
     {
-        _connectionFactory = connectionFactory;
+        _analizaRepository = analizaRepository;
     }
 
     public async Task<Result<Guid>> Handle(
-        CreateAnalizaMedicalaCommand request, 
+        CreateAnalizaMedicalaCommand request,
         CancellationToken cancellationToken)
     {
         try
         {
-            const string sql = @"
-                INSERT INTO ConsultatieAnalizeMedicale (
-                    ConsultatieID,
-                    TipAnaliza,
-                    NumeAnaliza,
-                    CodAnaliza,
-                    StatusAnaliza,
-                    DataRecomandare,
-                    Prioritate,
-                    EsteCito,
-                    IndicatiiClinice,
-                    ObservatiiRecomandare,
-                    AreRezultate,
-                    EsteInAfaraLimitelor,
-                    Decontat,
-                    DataCreare,
-                    CreatDe
-                ) VALUES (
-                    @ConsultatieID,
-                    @TipAnaliza,
-                    @NumeAnaliza,
-                    @CodAnaliza,
-                    'Recomandata',
-                    GETDATE(),
-                    @Prioritate,
-                    @EsteCito,
-                    @IndicatiiClinice,
-                    @ObservatiiRecomandare,
-                    0,
-                    0,
-                    0,
-                    GETDATE(),
-                    @CreatDe
-                );
-                SELECT CAST(SCOPE_IDENTITY() AS UNIQUEIDENTIFIER);";
+            var analiza = new ConsultatieAnalizaMedicala
+            {
+                ConsultatieID = request.ConsultatieID,
+                TipAnaliza = request.TipAnaliza,
+                NumeAnaliza = request.NumeAnaliza,
+                CodAnaliza = request.CodAnaliza,
+                StatusAnaliza = "Recomandata",
+                DataRecomandare = DateTime.Now,
+                Prioritate = request.Prioritate,
+                EsteCito = request.EsteCito,
+                IndicatiiClinice = request.IndicatiiClinice,
+                ObservatiiRecomandare = request.ObservatiiRecomandare,
+                AreRezultate = false,
+                EsteInAfaraLimitelor = false,
+                Decontat = false,
+                CreatDe = request.CreatDe
+            };
 
-            using var connection = _connectionFactory.CreateConnection();
-            var id = await connection.ExecuteScalarAsync<Guid>(sql, request);
+            var id = await _analizaRepository.CreateAsync(analiza, cancellationToken);
 
             return Result<Guid>.Success(id);
         }
