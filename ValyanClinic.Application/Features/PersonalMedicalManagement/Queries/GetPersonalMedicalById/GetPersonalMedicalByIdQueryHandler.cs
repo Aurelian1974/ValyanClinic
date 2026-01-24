@@ -1,22 +1,20 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
-using ValyanClinic.Domain.Interfaces.Data;
-using Dapper;
-using System.Data;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalById;
 
 public class GetPersonalMedicalByIdQueryHandler : IRequestHandler<GetPersonalMedicalByIdQuery, Result<PersonalMedicalDetailDto>>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IPersonalMedicalRepository _personalRepository;
     private readonly ILogger<GetPersonalMedicalByIdQueryHandler> _logger;
 
     public GetPersonalMedicalByIdQueryHandler(
-        IDbConnectionFactory connectionFactory,
+        IPersonalMedicalRepository personalRepository,
         ILogger<GetPersonalMedicalByIdQueryHandler> logger)
     {
-        _connectionFactory = connectionFactory;
+        _personalRepository = personalRepository;
         _logger = logger;
     }
 
@@ -28,27 +26,36 @@ public class GetPersonalMedicalByIdQueryHandler : IRequestHandler<GetPersonalMed
         {
             _logger.LogInformation("Fetching PersonalMedical by ID: {PersonalID}", request.PersonalID);
 
-            // CRITICAL: Query direct cu Dapper pentru a map-a TOATE coloanele din SP
-            // inclusiv CategorieName, SpecializareName, SubspecializareName care vin din JOIN-uri
-            using var connection = _connectionFactory.CreateConnection();
+            var personalMedical = await _personalRepository.GetByIdAsync(request.PersonalID, cancellationToken);
 
-            var dto = await connection.QuerySingleOrDefaultAsync<PersonalMedicalDetailDto>(
-                "sp_PersonalMedical_GetById",
-                new { PersonalID = request.PersonalID },
-                commandType: CommandType.StoredProcedure);
-
-            if (dto == null)
+            if (personalMedical == null)
             {
                 _logger.LogWarning("PersonalMedical not found: {PersonalID}", request.PersonalID);
                 return Result<PersonalMedicalDetailDto>.Failure("Personal medical not found");
             }
 
+            // Map entity to DTO
+            var dto = new PersonalMedicalDetailDto
+            {
+                PersonalID = personalMedical.PersonalID,
+                PersonalId = personalMedical.PersonalId,
+                NumeComplet = $"{personalMedical.Nume} {personalMedical.Prenume}",
+                Nume = personalMedical.Nume,
+                Prenume = personalMedical.Prenume,
+                Email = personalMedical.Email,
+                Telefon = personalMedical.Telefon,
+                CategorieID = personalMedical.CategorieID,
+                SpecializareID = personalMedical.SpecializareID,
+                SubspecializareID = personalMedical.SubspecializareID,
+                EsteActiv = personalMedical.EsteActiv,
+                DataAngajarii = personalMedical.DataAngajarii,
+                DataPlecarii = personalMedical.DataPlecarii
+            };
+
             _logger.LogInformation(
-                "PersonalMedical found: {PersonalID} - {NumeComplet}, Categorie: {Categorie}, Specializare: {Specializare}",
+                "PersonalMedical found: {PersonalID} - {NumeComplet}",
                 dto.PersonalID,
-                dto.NumeComplet,
-                dto.CategorieName ?? "N/A",
-                dto.SpecializareName ?? "N/A");
+                dto.NumeComplet);
 
             return Result<PersonalMedicalDetailDto>.Success(dto);
         }

@@ -1,22 +1,20 @@
-﻿using MediatR;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Data;
 using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Commands.ActivateRelatie;
 
 public class ActivateRelatieCommandHandler : IRequestHandler<ActivateRelatieCommand, Result>
 {
-    private readonly IConfiguration _configuration;
+    private readonly IPacientPersonalMedicalRepository _relatieRepository;
     private readonly ILogger<ActivateRelatieCommandHandler> _logger;
 
     public ActivateRelatieCommandHandler(
-        IConfiguration configuration,
+        IPacientPersonalMedicalRepository relatieRepository,
         ILogger<ActivateRelatieCommandHandler> logger)
     {
-        _configuration = configuration;
+        _relatieRepository = relatieRepository;
         _logger = logger;
     }
 
@@ -25,49 +23,26 @@ public class ActivateRelatieCommandHandler : IRequestHandler<ActivateRelatieComm
         try
         {
             _logger.LogInformation(
-"Reactivare relație doctor-pacient: RelatieID={RelatieID}",
+                "Reactivare relație doctor-pacient: RelatieID={RelatieID}",
                 request.RelatieID);
 
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            await _relatieRepository.ActivateRelatieAsync(
+                request.RelatieID,
+                request.Observatii,
+                request.Motiv,
+                request.ModificatDe,
+                cancellationToken);
 
-            using (var connection = new SqlConnection(connectionString))
-            {
-                await connection.OpenAsync(cancellationToken);
-
-                using (var command = new SqlCommand("sp_PacientiPersonalMedical_ActivateRelatie", connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    // Parameters
-                    command.Parameters.AddWithValue("@RelatieID", request.RelatieID);
-                    command.Parameters.AddWithValue("@Observatii", (object?)request.Observatii ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@Motiv", (object?)request.Motiv ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@ModificatDe", (object?)request.ModificatDe ?? DBNull.Value);
-
-                    await command.ExecuteNonQueryAsync(cancellationToken);
-
-                    _logger.LogInformation(
-                           "Relație reactivată cu succes: RelatieID={RelatieID}",
+            _logger.LogInformation(
+                "Relație reactivată cu succes: RelatieID={RelatieID}",
                 request.RelatieID);
-                }
-            }
 
             return Result.Success("Relația doctor-pacient a fost reactivată cu succes.");
         }
-        catch (SqlException ex) when (ex.Message.Contains("nu exist") || ex.Message.Contains("nu a fost găsită"))
+        catch (InvalidOperationException ex)
         {
-            _logger.LogWarning(ex, "Relația nu a fost găsită: RelatieID={RelatieID}", request.RelatieID);
-            return Result.Failure("Relația specificată nu a fost găsită.");
-        }
-        catch (SqlException ex) when (ex.Message.Contains("deja activ"))
-        {
-            _logger.LogWarning("Relația este deja activă: RelatieID={RelatieID}", request.RelatieID);
-            return Result.Failure("Relația este deja activă.");
-        }
-        catch (SqlException ex)
-        {
-            _logger.LogError(ex, "Eroare SQL la reactivarea relației: RelatieID={RelatieID}", request.RelatieID);
-            return Result.Failure($"Eroare SQL: {ex.Message}");
+            _logger.LogWarning(ex, "Eroare de operație la reactivarea relației: RelatieID={RelatieID}", request.RelatieID);
+            return Result.Failure(ex.Message);
         }
         catch (Exception ex)
         {
