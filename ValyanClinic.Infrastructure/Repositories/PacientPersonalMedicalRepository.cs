@@ -237,6 +237,133 @@ public class PacientPersonalMedicalRepository : IPacientPersonalMedicalRepositor
         }
     }
 
+    /// <inheritdoc />
+    public async Task<Guid> AddRelatieAsync(
+        Guid pacientId,
+        Guid personalMedicalId,
+        string? tipRelatie,
+        string? observatii,
+        string? motiv,
+        Guid? creatDe,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation(
+            "Adăugare relație: PacientID={PacientID}, PersonalMedicalID={PersonalMedicalID}, TipRelatie={TipRelatie}",
+            pacientId, personalMedicalId, tipRelatie);
+
+        try
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            Guid newRelatieId = Guid.Empty;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync(cancellationToken);
+
+                using (var command = new SqlCommand("sp_PacientiPersonalMedical_AddRelatie", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandTimeout = 30;
+                    command.Parameters.AddWithValue("@PacientID", pacientId);
+                    command.Parameters.AddWithValue("@PersonalMedicalID", personalMedicalId);
+                    command.Parameters.AddWithValue("@TipRelatie", (object?)tipRelatie ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@Observatii", (object?)observatii ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@Motiv", (object?)motiv ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@CreatDe", (object?)creatDe ?? DBNull.Value);
+
+                    using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+                    {
+                        if (await reader.ReadAsync(cancellationToken))
+                        {
+                            var ordinal = reader.GetOrdinal("RelatieID");
+                            newRelatieId = reader.GetGuid(ordinal);
+
+                            _logger.LogInformation(
+                                "Relație creată cu succes: RelatieID={RelatieID}",
+                                newRelatieId);
+                        }
+                    }
+                }
+            }
+
+            if (newRelatieId == Guid.Empty)
+            {
+                throw new InvalidOperationException("Nu s-a putut crea relația.");
+            }
+
+            return newRelatieId;
+        }
+        catch (SqlException ex) when (ex.Message.Contains("Exista deja o relatie activa") || ex.Message.Contains("Există deja"))
+        {
+            _logger.LogWarning("Relație activă duplicată: {Message}", ex.Message);
+            throw new InvalidOperationException("Există deja o relație activă între acest pacient și doctor.", ex);
+        }
+        catch (SqlException ex) when (ex.Message.Contains("nu exista") || ex.Message.Contains("nu există"))
+        {
+            _logger.LogError("Entitate inexistentă: {Message}", ex.Message);
+            throw new InvalidOperationException(ex.Message, ex);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Eroare la adăugarea relației");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task ActivateRelatieAsync(
+        Guid relatieId,
+        string? observatii,
+        string? motiv,
+        Guid? modificatDe,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation(
+            "Reactivare relație: RelatieID={RelatieID}",
+            relatieId);
+
+        try
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync(cancellationToken);
+
+                using (var command = new SqlCommand("sp_PacientiPersonalMedical_ActivateRelatie", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandTimeout = 30;
+                    command.Parameters.AddWithValue("@RelatieID", relatieId);
+                    command.Parameters.AddWithValue("@Observatii", (object?)observatii ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@Motiv", (object?)motiv ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@ModificatDe", (object?)modificatDe ?? DBNull.Value);
+
+                    await command.ExecuteNonQueryAsync(cancellationToken);
+
+                    _logger.LogInformation(
+                        "Relație reactivată cu succes: RelatieID={RelatieID}",
+                        relatieId);
+                }
+            }
+        }
+        catch (SqlException ex) when (ex.Message.Contains("nu exist") || ex.Message.Contains("nu a fost găsită"))
+        {
+            _logger.LogWarning(ex, "Relația nu a fost găsită: RelatieID={RelatieID}", relatieId);
+            throw new InvalidOperationException("Relația specificată nu a fost găsită.", ex);
+        }
+        catch (SqlException ex) when (ex.Message.Contains("deja activ"))
+        {
+            _logger.LogWarning("Relația este deja activă: RelatieID={RelatieID}", relatieId);
+            throw new InvalidOperationException("Relația este deja activă.", ex);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Eroare la reactivarea relației: RelatieID={RelatieID}", relatieId);
+            throw;
+        }
+    }
+
     #region Private Mapping Methods
 
     /// <summary>

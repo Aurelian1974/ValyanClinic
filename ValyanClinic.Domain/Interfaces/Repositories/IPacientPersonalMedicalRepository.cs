@@ -169,4 +169,39 @@ public interface IPacientPersonalMedicalRepository
     Task RemoveRelatieAsync(
         Guid relatieId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Adaugă o nouă relație între un pacient și personalul medical.
+    /// </summary>
+    /// <param name="pacientId">ID-ul pacientului</param>
+    /// <param name="personalMedicalId">ID-ul personalului medical (doctor)</param>
+    /// <param name="tipRelatie">Tipul relației (ex: MedicPrimar, Specialist)</param>
+    /// <param name="observatii">Observații opționale</param>
+    /// <param name="motiv">Motivul asocierii</param>
+    /// <param name="creatDe">ID-ul utilizatorului care creează relația</param>
+    /// <param name="cancellationToken">Token pentru anulare</param>
+    /// <returns>ID-ul relației nou create</returns>
+    Task<Guid> AddRelatieAsync(
+        Guid pacientId,
+        Guid personalMedicalId,
+        string? tipRelatie,
+        string? observatii,
+        string? motiv,
+        Guid? creatDe,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Reactivează o relație dezactivată între un pacient și personalul medical.
+    /// </summary>
+    /// <param name="relatieId">ID-ul relației care urmează să fie reactivată</param>
+    /// <param name="observatii">Observații despre reactivare</param>
+    /// <param name="motiv">Motivul reactivării</param>
+    /// <param name="modificatDe">ID-ul utilizatorului care face reactivarea</param>
+    /// <param name="cancellationToken">Token pentru anulare</param>
+    Task ActivateRelatieAsync(
+        Guid relatieId,
+        string? observatii,
+        string? motiv,
+        Guid? modificatDe,
+        CancellationToken cancellationToken = default);
 }
