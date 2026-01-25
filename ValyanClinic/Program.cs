@@ -209,10 +209,11 @@ try
         connectionStringBuilder.MaxPoolSize,
         connectionStringBuilder.ConnectTimeout);
 
-    builder.Services.AddSingleton<IDbConnectionFactory>(sp =>
+    // Register SqlConnectionFactory using the domain-level interface
+    builder.Services.AddSingleton<ValyanClinic.Domain.Interfaces.Data.IDbConnectionFactory>(sp =>
     {
-        var logger = sp.GetRequiredService<ILogger<SqlConnectionFactory>>();
-        return new SqlConnectionFactory(optimizedConnectionString, logger);
+        var logger = sp.GetRequiredService<ILogger<ValyanClinic.Infrastructure.Data.SqlConnectionFactory>>();
+        return new ValyanClinic.Infrastructure.Data.SqlConnectionFactory(optimizedConnectionString, logger);
     });
 
     // ========================================
@@ -229,7 +230,7 @@ try
     builder.Services.AddScoped<IPacientRepository, PacientRepository>();
     builder.Services.AddScoped<IUtilizatorRepository, UtilizatorRepository>();
     builder.Services.AddScoped<IProgramareRepository, ProgramareRepository>();
-    builder.Services.AddScoped<ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository,
+    builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.Repositories.IConsultatieRepository,
                                 ValyanClinic.Infrastructure.Repositories.ConsultatieRepository>(); // ✅ NOU - Consultatii
     builder.Services.AddScoped<ValyanClinic.Domain.Interfaces.Repositories.IICD10Repository, 
                                 ValyanClinic.Infrastructure.Repositories.ICD10Repository>(); // ✅ NOU - ICD10 Autocomplete

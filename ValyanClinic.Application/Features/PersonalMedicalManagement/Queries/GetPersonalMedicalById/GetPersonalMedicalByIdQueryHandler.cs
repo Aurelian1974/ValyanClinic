@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Interfaces.Repositories;
@@ -38,8 +38,6 @@ public class GetPersonalMedicalByIdQueryHandler : IRequestHandler<GetPersonalMed
             var dto = new PersonalMedicalDetailDto
             {
                 PersonalID = personalMedical.PersonalID,
-                PersonalId = personalMedical.PersonalId,
-                NumeComplet = $"{personalMedical.Nume} {personalMedical.Prenume}",
                 Nume = personalMedical.Nume,
                 Prenume = personalMedical.Prenume,
                 Email = personalMedical.Email,
@@ -47,9 +45,7 @@ public class GetPersonalMedicalByIdQueryHandler : IRequestHandler<GetPersonalMed
                 CategorieID = personalMedical.CategorieID,
                 SpecializareID = personalMedical.SpecializareID,
                 SubspecializareID = personalMedical.SubspecializareID,
-                EsteActiv = personalMedical.EsteActiv,
-                DataAngajarii = personalMedical.DataAngajarii,
-                DataPlecarii = personalMedical.DataPlecarii
+                EsteActiv = personalMedical.EsteActiv
             };
 
             _logger.LogInformation(

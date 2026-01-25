@@ -11,5 +11,5 @@ public record ActivateRelatieCommand(
     Guid RelatieID,
     string? Observatii = null,
     string? Motiv = null,
-    string? ModificatDe = null
+    Guid? ModificatDe = null
 ) : IRequest<Result>;

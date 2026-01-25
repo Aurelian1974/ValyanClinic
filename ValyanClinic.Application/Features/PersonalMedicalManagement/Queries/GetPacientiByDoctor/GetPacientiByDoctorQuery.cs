@@ -1,5 +1,6 @@
 ﻿using ValyanClinic.Application.Common.Results;
 using MediatR;
+using ValyanClinic.Domain.DTOs;
 
 namespace ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPacientiByDoctor;
 

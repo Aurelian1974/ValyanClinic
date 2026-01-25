@@ -2,7 +2,8 @@
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
 using ValyanClinic.Application.Services.IMC;
-using ValyanClinic.Infrastructure.Services.DraftStorage;
+using ValyanClinic.Domain.Interfaces.Services;
+using ValyanClinic.Domain.Models;
 using ValyanClinic.Application.Common.Results;
 
 namespace ValyanClinic.Application.ViewModels;
