@@ -12,11 +12,11 @@ namespace ValyanClinic.Application.Features.ConsultatieManagement.Queries.GetCon
 /// </summary>
 public class GetConsultatiiByMedicQueryHandler : IRequestHandler<GetConsultatiiByMedicQuery, Result<List<ConsulatieListDto>>>
 {
-    private readonly IConsultatieRepository _repository;
+    private readonly IConsultatieBaseRepository _repository;
     private readonly ILogger<GetConsultatiiByMedicQueryHandler> _logger;
 
     public GetConsultatiiByMedicQueryHandler(
-        IConsultatieRepository repository,
+        IConsultatieBaseRepository repository,
         ILogger<GetConsultatiiByMedicQueryHandler> logger)
     {
         _repository = repository;

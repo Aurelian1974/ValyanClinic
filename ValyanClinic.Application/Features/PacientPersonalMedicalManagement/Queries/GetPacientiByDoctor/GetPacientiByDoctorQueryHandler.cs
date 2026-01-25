@@ -1,74 +1,69 @@
-﻿using MediatR;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using System.Data;
+using MediatR;
+using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
-using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.DTOs;
+using ValyanClinic.Domain.DTOs;
+using ValyanClinic.Domain.Interfaces.Repositories;
 
 namespace ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Queries.GetPacientiByDoctor;
 
+/// <summary>
+/// Handler pentru obținerea pacienților asociați unui doctor.
+/// Utilizează repository pattern pentru accesarea datelor.
+/// </summary>
 public class GetPacientiByDoctorQueryHandler : IRequestHandler<GetPacientiByDoctorQuery, Result<List<PacientAsociatDto>>>
 {
-    private readonly IConfiguration _configuration;
+    private readonly IPacientPersonalMedicalRepository _repository;
+    private readonly ILogger<GetPacientiByDoctorQueryHandler> _logger;
 
-    public GetPacientiByDoctorQueryHandler(IConfiguration configuration)
+    public GetPacientiByDoctorQueryHandler(
+        IPacientPersonalMedicalRepository repository,
+        ILogger<GetPacientiByDoctorQueryHandler> logger)
     {
-        _configuration = configuration;
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<Result<List<PacientAsociatDto>>> Handle(GetPacientiByDoctorQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<PacientAsociatDto>>> Handle(
+        GetPacientiByDoctorQuery request,
+        CancellationToken cancellationToken)
     {
         try
         {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            var pacienti = new List<PacientAsociatDto>();
+            _logger.LogInformation(
+                "[GetPacientiByDoctorHandler] Fetching pacienti for PersonalMedicalID: {PersonalMedicalID}, ApenumereActivi: {ApenumereActivi}, TipRelatie: {TipRelatie}",
+                request.PersonalMedicalID, request.ApenumereActivi, request.TipRelatie);
 
-            using (var connection = new SqlConnection(connectionString))
-            {
-                await connection.OpenAsync(cancellationToken);
+            // Utilizează repository pentru a obține pacienții
+            var pacienti = await _repository.GetPacientiByDoctorAsync(
+                request.PersonalMedicalID,
+                request.ApenumereActivi,
+                request.TipRelatie,
+                cancellationToken);
 
-                using (var command = new SqlCommand("sp_PacientiPersonalMedical_GetPacientiByDoctor", connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@PersonalMedicalID", request.PersonalMedicalID);
-                    command.Parameters.AddWithValue("@ApenumereActivi", request.ApenumereActivi ? 1 : 0);
-                    command.Parameters.AddWithValue("@TipRelatie", (object?)request.TipRelatie ?? DBNull.Value);
-
-                    using (var reader = await command.ExecuteReaderAsync(cancellationToken))
-                    {
-                        while (await reader.ReadAsync(cancellationToken))
-                        {
-                            pacienti.Add(new PacientAsociatDto
-                            {
-                                RelatieID = reader.GetGuid(reader.GetOrdinal("RelatieID")),
-                                PacientID = reader.GetGuid(reader.GetOrdinal("PacientID")),
-                                PacientCod = reader.GetString(reader.GetOrdinal("PacientCod")),
-                                PacientNumeComplet = reader.GetString(reader.GetOrdinal("PacientNumeComplet")),
-                                PacientCNP = reader.IsDBNull(reader.GetOrdinal("PacientCNP")) ? null : reader.GetString(reader.GetOrdinal("PacientCNP")),
-                                PacientDataNasterii = reader.GetDateTime(reader.GetOrdinal("PacientDataNasterii")),
-                                PacientVarsta = reader.GetInt32(reader.GetOrdinal("PacientVarsta")),
-                                PacientTelefon = reader.IsDBNull(reader.GetOrdinal("PacientTelefon")) ? null : reader.GetString(reader.GetOrdinal("PacientTelefon")),
-                                PacientEmail = reader.IsDBNull(reader.GetOrdinal("PacientEmail")) ? null : reader.GetString(reader.GetOrdinal("PacientEmail")),
-                                PacientJudet = reader.IsDBNull(reader.GetOrdinal("PacientJudet")) ? null : reader.GetString(reader.GetOrdinal("PacientJudet")),
-                                PacientLocalitate = reader.IsDBNull(reader.GetOrdinal("PacientLocalitate")) ? null : reader.GetString(reader.GetOrdinal("PacientLocalitate")),
-                                TipRelatie = reader.IsDBNull(reader.GetOrdinal("TipRelatie")) ? null : reader.GetString(reader.GetOrdinal("TipRelatie")),
-                                DataAsocierii = reader.GetDateTime(reader.GetOrdinal("DataAsocierii")),
-                                DataDezactivarii = reader.IsDBNull(reader.GetOrdinal("DataDezactivarii")) ? null : reader.GetDateTime(reader.GetOrdinal("DataDezactivarii")),
-                                EsteActiv = reader.GetBoolean(reader.GetOrdinal("EsteActiv")),
-                                ZileDeAsociere = reader.GetInt32(reader.GetOrdinal("ZileDeAsociere")),
-                                Observatii = reader.IsDBNull(reader.GetOrdinal("Observatii")) ? null : reader.GetString(reader.GetOrdinal("Observatii")),
-                                Motiv = reader.IsDBNull(reader.GetOrdinal("Motiv")) ? null : reader.GetString(reader.GetOrdinal("Motiv"))
-                            });
-                        }
-                    }
-                }
-            }
+            _logger.LogInformation(
+                "[GetPacientiByDoctorHandler] Found {Count} pacienti for PersonalMedicalID: {PersonalMedicalID} ({Active} active, {Inactive} inactive)",
+                pacienti.Count,
+                request.PersonalMedicalID,
+                pacienti.Count(p => p.EsteActiv),
+                pacienti.Count(p => !p.EsteActiv));
 
             return Result<List<PacientAsociatDto>>.Success(pacienti);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex,
+                "[GetPacientiByDoctorHandler] Invalid arguments for PersonalMedicalID: {PersonalMedicalID}",
+                request.PersonalMedicalID);
+
+            return Result<List<PacientAsociatDto>>.Failure($"Parametri invalizi: {ex.Message}");
+        }
         catch (Exception ex)
         {
-            return Result<List<PacientAsociatDto>>.Failure($"Eroare la obtinerea pacientilor: {ex.Message}");
+            _logger.LogError(ex,
+                "[GetPacientiByDoctorHandler] Error fetching pacienti for PersonalMedicalID: {PersonalMedicalID}",
+                request.PersonalMedicalID);
+
+            return Result<List<PacientAsociatDto>>.Failure($"Eroare la obținerea pacienților: {ex.Message}");
         }
     }
 }

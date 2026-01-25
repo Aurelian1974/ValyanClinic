@@ -10,9 +10,15 @@ using ValyanClinic.Domain.Interfaces.Repositories;
 namespace ValyanClinic.Infrastructure.Repositories;
 
 /// <summary>
-/// Repository pentru gestionarea consultatiilor medicale - DOAR STORED PROCEDURES
+/// Repository pentru gestionarea consultatiilor medicale - DOAR STORED PROCEDURES.
+/// Implementează cele 4 interfețe segregate conform Interface Segregation Principle.
 /// </summary>
-public class ConsultatieRepository : IConsultatieRepository
+public class ConsultatieRepository :
+    IConsultatieRepository,           // Legacy - pentru backward compatibility
+    IConsultatieBaseRepository,       // CRUD basic
+    IConsultatieDraftRepository,      // Draft operations
+    IConsultatieDetailsRepository,    // Sections (Motive, Antecedente, etc.)
+    IConsultatieClinicalDataRepository // Diagnostic + Treatment
 {
     private readonly IDbConnectionFactory _connectionFactory;
     private readonly ILogger<ConsultatieRepository> _logger;
