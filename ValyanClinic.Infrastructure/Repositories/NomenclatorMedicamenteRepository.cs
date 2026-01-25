@@ -32,17 +32,17 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
     {
         var results = new List<MedicamentNomenclator>();
 
-        await using var connection = _connectionFactory.CreateConnection();
+        using var connection = (SqlConnection)_connectionFactory.CreateConnection();
         await connection.OpenAsync(cancellationToken);
 
-        await using var command = new SqlCommand("Medicamente_Search", (SqlConnection)connection)
+        using var command = new SqlCommand("Medicamente_Search", connection)
         {
             CommandType = CommandType.StoredProcedure
         };
         command.Parameters.AddWithValue("@SearchTerm", searchTerm);
         command.Parameters.AddWithValue("@MaxResults", maxResults);
 
-        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        using var reader = await command.ExecuteReaderAsync(cancellationToken);
         while (await reader.ReadAsync(cancellationToken))
         {
             results.Add(MapFromReader(reader));
@@ -56,16 +56,16 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
         string codCIM,
         CancellationToken cancellationToken = default)
     {
-        await using var connection = _connectionFactory.CreateConnection();
+        using var connection = (SqlConnection)_connectionFactory.CreateConnection();
         await connection.OpenAsync(cancellationToken);
 
-        await using var command = new SqlCommand("Medicamente_GetByCod", (SqlConnection)connection)
+        using var command = new SqlCommand("Medicamente_GetByCod", connection)
         {
             CommandType = CommandType.StoredProcedure
         };
         command.Parameters.AddWithValue("@CodCIM", codCIM);
 
-        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        using var reader = await command.ExecuteReaderAsync(cancellationToken);
         if (await reader.ReadAsync(cancellationToken))
         {
             return MapFromReader(reader);
@@ -80,10 +80,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
         string sursaFisier,
         CancellationToken cancellationToken = default)
     {
-        await using var connection = _connectionFactory.CreateConnection();
+        using var connection = (SqlConnection)_connectionFactory.CreateConnection();
         await connection.OpenAsync(cancellationToken);
 
-        await using var command = new SqlCommand("Medicamente_Upsert", (SqlConnection)connection)
+        using var command = new SqlCommand("Medicamente_Upsert", connection)
         {
             CommandType = CommandType.StoredProcedure
         };
@@ -121,15 +121,15 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
     /// <inheritdoc />
     public async Task<NomenclatorStats> GetStatsAsync(CancellationToken cancellationToken = default)
     {
-        await using var connection = _connectionFactory.CreateConnection();
+        using var connection = (SqlConnection)_connectionFactory.CreateConnection();
         await connection.OpenAsync(cancellationToken);
 
-        await using var command = new SqlCommand("Medicamente_GetStats", (SqlConnection)connection)
+        using var command = new SqlCommand("Medicamente_GetStats", connection)
         {
             CommandType = CommandType.StoredProcedure
         };
 
-        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        using var reader = await command.ExecuteReaderAsync(cancellationToken);
         if (await reader.ReadAsync(cancellationToken))
         {
             return new NomenclatorStats
@@ -155,10 +155,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
     {
         try
         {
-            await using var connection = _connectionFactory.CreateConnection();
+            using var connection = (SqlConnection)_connectionFactory.CreateConnection();
             await connection.OpenAsync(cancellationToken);
 
-            await using var command = new SqlCommand("Medicamente_DeactivateOld", (SqlConnection)connection)
+            using var command = new SqlCommand("Medicamente_DeactivateOld", connection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -184,10 +184,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
     {
         try
         {
-            await using var connection = _connectionFactory.CreateConnection();
+            using var connection = (SqlConnection)_connectionFactory.CreateConnection();
             await connection.OpenAsync(cancellationToken);
 
-            await using var command = new SqlCommand("Medicamente_SyncLog_Start", (SqlConnection)connection)
+            using var command = new SqlCommand("Medicamente_SyncLog_Start", connection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -218,10 +218,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
     {
         try
         {
-            await using var connection = _connectionFactory.CreateConnection();
+            using var connection = (SqlConnection)_connectionFactory.CreateConnection();
             await connection.OpenAsync(cancellationToken);
 
-            await using var command = new SqlCommand("Medicamente_SyncLog_Complete", (SqlConnection)connection)
+            using var command = new SqlCommand("Medicamente_SyncLog_Complete", connection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -248,7 +248,7 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
     {
         try
         {
-            await using var connection = _connectionFactory.CreateConnection();
+            using var connection = (SqlConnection)_connectionFactory.CreateConnection();
             await connection.OpenAsync(cancellationToken);
 
             // Verifică dacă există tabela SyncLog
@@ -258,7 +258,7 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
                 WHERE [Status] = 'Success'
                 ORDER BY [Id] DESC";
 
-            await using var command = new SqlCommand(checkTableSql, (SqlConnection)connection);
+            using var command = new SqlCommand(checkTableSql, connection);
             var result = await command.ExecuteScalarAsync(cancellationToken);
 
             if (result == null || result == DBNull.Value)
