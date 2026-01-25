@@ -2,7 +2,6 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Interfaces.Repositories;
-using ValyanClinic.Domain.DTOs;
 
 namespace ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPacientiByDoctor;
 
@@ -14,6 +13,11 @@ public class GetPacientiByDoctorQueryHandler : IRequestHandler<GetPacientiByDoct
     private readonly IPacientPersonalMedicalRepository _relatieRepository;
     private readonly ILogger<GetPacientiByDoctorQueryHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="GetPacientiByDoctorQueryHandler"/> with the specified repository and logger.
+    /// </summary>
+    /// <param name="relatieRepository">Repository used to retrieve patient-to-doctor relationships.</param>
+    /// <param name="_logger">Logger for diagnostic and error messages produced by this handler.</param>
     public GetPacientiByDoctorQueryHandler(
         IPacientPersonalMedicalRepository relatieRepository,
         ILogger<GetPacientiByDoctorQueryHandler> _logger)
@@ -22,6 +26,13 @@ public class GetPacientiByDoctorQueryHandler : IRequestHandler<GetPacientiByDoct
         this._logger = _logger;
     }
 
+    /// <summary>
+    /// Retrieves the patients associated with the doctor specified in the request.
+    /// </summary>
+    /// <param name="request">Query containing the doctor identifier used to find associated patients.</param>
+    /// <returns>
+    /// A Result containing the list of associated PacientAsociatDto on success; a failure Result with an error message on failure.
+    /// </returns>
     public async Task<Result<List<PacientAsociatDto>>> Handle(
         GetPacientiByDoctorQuery request,
         CancellationToken cancellationToken)

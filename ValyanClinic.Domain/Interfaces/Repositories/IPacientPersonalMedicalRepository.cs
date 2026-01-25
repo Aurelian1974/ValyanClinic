@@ -1,4 +1,4 @@
-﻿using ValyanClinic.Domain.DTOs;
+using ValyanClinic.Domain.DTOs;
 
 namespace ValyanClinic.Domain.Interfaces.Repositories;
 
@@ -165,7 +165,18 @@ public interface IPacientPersonalMedicalRepository
     ///     Console.WriteLine($"Relația nu poate fi dezactivată: {ex.Message}");
     /// }
     /// </code>
-    /// </example>
+    /// <summary>
+        /// Deactivates an existing patient–medical-staff relationship (soft delete).
+        /// </summary>
+        /// <param name="relatieId">The relationship's unique identifier; must not be <see cref="Guid.Empty"/>.</param>
+        /// <param name="cancellationToken">Token to cancel the operation.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="relatieId"/> is <see cref="Guid.Empty"/>.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the relationship does not exist or is already inactive.</exception>
+        /// <exception cref="System.Data.SqlClient.SqlException">Thrown on stored procedure execution or database connectivity errors.</exception>
+        /// <remarks>
+        /// The operation marks the relationship as inactive and records the deactivation date; it is not reversible from the UI perspective.
+        /// Audit fields are updated by the underlying stored procedure.
+        /// </remarks>
     Task RemoveRelatieAsync(
         Guid relatieId,
         CancellationToken cancellationToken = default);
@@ -180,7 +191,17 @@ public interface IPacientPersonalMedicalRepository
     /// <param name="motiv">Motivul asocierii</param>
     /// <param name="creatDe">ID-ul utilizatorului care creează relația</param>
     /// <param name="cancellationToken">Token pentru anulare</param>
-    /// <returns>ID-ul relației nou create</returns>
+    /// <summary>
+        /// Create a new relationship between a patient and a medical staff member.
+        /// </summary>
+        /// <param name="pacientId">The patient identifier; must not be Guid.Empty.</param>
+        /// <param name="personalMedicalId">The medical staff identifier; must not be Guid.Empty.</param>
+        /// <param name="tipRelatie">Optional relationship type (e.g., "MedicPrimar", "Specialist").</param>
+        /// <param name="observatii">Optional notes about the relationship.</param>
+        /// <param name="motiv">Optional reason for creating the relationship.</param>
+        /// <param name="creatDe">Optional identifier of the user who creates the relationship.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>The identifier (Guid) of the newly created relationship.</returns>
     Task<Guid> AddRelatieAsync(
         Guid pacientId,
         Guid personalMedicalId,
@@ -197,7 +218,14 @@ public interface IPacientPersonalMedicalRepository
     /// <param name="observatii">Observații despre reactivare</param>
     /// <param name="motiv">Motivul reactivării</param>
     /// <param name="modificatDe">ID-ul utilizatorului care face reactivarea</param>
-    /// <param name="cancellationToken">Token pentru anulare</param>
+    /// <summary>
+        /// Reactivates a previously deactivated patient–medical-staff relationship.
+        /// </summary>
+        /// <param name="relatieId">The identifier of the relationship to reactivate; must not be Guid.Empty.</param>
+        /// <param name="observatii">Optional notes about the reactivation.</param>
+        /// <param name="motiv">Optional reason for the reactivation.</param>
+        /// <param name="modificatDe">Optional identifier of the user performing the reactivation.</param>
+        /// <param name="cancellationToken">Token to cancel the operation.</param>
     Task ActivateRelatieAsync(
         Guid relatieId,
         string? observatii,
