@@ -12,11 +12,11 @@ namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.Creat
 /// </summary>
 public class CreateConsulatieCommandHandler : IRequestHandler<CreateConsulatieCommand, Result<Guid>>
 {
-    private readonly IConsultatieRepository _repository;
+    private readonly IConsultatieBaseRepository _repository;
     private readonly ILogger<CreateConsulatieCommandHandler> _logger;
 
     public CreateConsulatieCommandHandler(
-        IConsultatieRepository repository,
+        IConsultatieBaseRepository repository,
         ILogger<CreateConsulatieCommandHandler> logger)
     {
         _repository = repository;
