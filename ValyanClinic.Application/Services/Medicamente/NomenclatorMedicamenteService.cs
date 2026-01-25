@@ -3,6 +3,7 @@ using ClosedXML.Excel;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Interfaces.Repositories;
+using ValyanClinic.Domain.Models;
 
 namespace ValyanClinic.Application.Services.Medicamente;
 
