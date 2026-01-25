@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 using ValyanClinic.Application.Services.Medicamente;
+using ValyanClinic.Domain.Models;
 
 namespace ValyanClinic.Components.Shared.Consultatie;
 

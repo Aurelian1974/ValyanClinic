@@ -1,4 +1,4 @@
-using ValyanClinic.Application.Services.Medicamente;
+using ValyanClinic.Domain.Models;
 
 namespace ValyanClinic.Domain.Interfaces.Repositories;
 

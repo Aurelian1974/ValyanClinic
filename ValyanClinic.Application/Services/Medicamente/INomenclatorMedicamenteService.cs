@@ -1,4 +1,5 @@
 using ValyanClinic.Application.Common.Results;
+using ValyanClinic.Domain.Models;
 
 namespace ValyanClinic.Application.Services.Medicamente;
 

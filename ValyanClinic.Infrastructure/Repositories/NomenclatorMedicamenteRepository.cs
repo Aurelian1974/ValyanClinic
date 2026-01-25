@@ -1,9 +1,9 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using ValyanClinic.Application.Services.Medicamente;
 using ValyanClinic.Domain.Interfaces.Data;
 using ValyanClinic.Domain.Interfaces.Repositories;
+using ValyanClinic.Domain.Models;
 
 namespace ValyanClinic.Infrastructure.Repositories;
 
