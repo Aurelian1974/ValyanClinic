@@ -244,6 +244,7 @@ try
 
     // ✅ NOU - Investigații Medicale (Imagistice, Explorări Funcționale, Endoscopii)
     // Nomenclatoare
+    builder.Services.AddScoped<INomenclatorMedicamenteRepository, NomenclatorMedicamenteRepository>(); // ✅ NOU - Nomenclator ANM Medicamente
     builder.Services.AddScoped<INomenclatorInvestigatiiImagisticeRepository, NomenclatorInvestigatiiImagisticeRepository>();
     builder.Services.AddScoped<INomenclatorExplorariFuncRepository, NomenclatorExplorariFuncRepository>();
     builder.Services.AddScoped<INomenclatorEndoscopiiRepository, NomenclatorEndoscopiiRepository>();
