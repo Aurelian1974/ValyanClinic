@@ -33,6 +33,7 @@ public class PacientAsociatDto
     public string? PacientCNP { get; set; }
     public DateTime PacientDataNasterii { get; set; }
     public int PacientVarsta { get; set; }
+    public string PacientSex { get; set; } = string.Empty;
     public string? PacientTelefon { get; set; }
     public string? PacientEmail { get; set; }
     public string? PacientJudet { get; set; }

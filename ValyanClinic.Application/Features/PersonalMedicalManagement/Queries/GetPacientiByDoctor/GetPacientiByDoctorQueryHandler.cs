@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Interfaces.Repositories;
+using ValyanClinic.Domain.DTOs;
 
 namespace ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPacientiByDoctor;
 

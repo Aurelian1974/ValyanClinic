@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using ValyanClinic.Application.Common.Results;
-using ValyanClinic.Application.Features.PacientPersonalMedicalManagement.DTOs;
+using ValyanClinic.Domain.DTOs;
 
 namespace ValyanClinic.Application.Features.PacientPersonalMedicalManagement.Queries.GetPacientiByDoctor;
 
