@@ -1,69 +1,92 @@
 using Microsoft.AspNetCore.Mvc;
-using FluentValidation;
-using ValyanClinic.Application.Services.Export;
+using MediatR;
+using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.ExportPersonalMedical;
 
 namespace ValyanClinic.Controllers;
 
+/// <summary>
+/// API Controller pentru operații cu personalul medical.
+/// Thin controller - delegă toate operațiile către MediatR.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class PersonalMedicalController : ControllerBase
 {
-    private readonly IPersonalMedicalExportService _exportService;
+    private readonly IMediator _mediator;
     private readonly ILogger<PersonalMedicalController> _logger;
 
-    public PersonalMedicalController(IPersonalMedicalExportService exportService, ILogger<PersonalMedicalController> logger)
+    public PersonalMedicalController(
+        IMediator mediator,
+        ILogger<PersonalMedicalController> logger)
     {
-        _exportService = exportService;
+        _mediator = mediator;
         _logger = logger;
     }
 
+    /// <summary>
+    /// Exportă datele personalului medical în format CSV sau Excel.
+    /// </summary>
+    /// <param name="format">Formatul de export: "csv" sau "excel"</param>
+    /// <param name="search">Termen de căutare (nume, prenume, email)</param>
+    /// <param name="departament">Filtru departament</param>
+    /// <param name="pozitie">Filtru poziție</param>
+    /// <param name="esteActiv">Filtru status activ (null = toate)</param>
+    /// <param name="sortColumn">Coloană de sortare (default: Nume)</param>
+    /// <param name="sortDirection">Direcție sortare: ASC sau DESC</param>
     [HttpGet("export")]
-    public async Task<IActionResult> Export([FromQuery] string format = "csv", [FromQuery] string? search = null, [FromQuery] string? departament = null, [FromQuery] string? pozitie = null, [FromQuery] string? esteActiv = null, [FromQuery] string sortColumn = "Nume", [FromQuery] string sortDirection = "ASC")
+    public async Task<IActionResult> Export(
+        [FromQuery] string format = "csv",
+        [FromQuery] string? search = null,
+        [FromQuery] string? departament = null,
+        [FromQuery] string? pozitie = null,
+        [FromQuery] string? esteActiv = null,
+        [FromQuery] string sortColumn = "Nume",
+        [FromQuery] string sortDirection = "ASC")
     {
         try
         {
+            // Parse esteActiv string → bool?
             bool? activ = null;
             if (!string.IsNullOrEmpty(esteActiv))
             {
-                if (bool.TryParse(esteActiv, out var parsed)) activ = parsed;
+                if (bool.TryParse(esteActiv, out var parsed))
+                    activ = parsed;
             }
 
-            byte[] bytes;
-            string contentType;
-            string fileName;
-
-            try
+            // Create query
+            var query = new ExportPersonalMedicalQuery
             {
-                if (format.Equals("excel", StringComparison.OrdinalIgnoreCase))
-                {
-                    bytes = await _exportService.ExportToExcelAsync(search, departament, pozitie, activ, sortColumn, sortDirection);
-                    contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    fileName = $"PersonalMedical_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-                }
-                else
-                {
-                    bytes = await _exportService.ExportToCsvAsync(search, departament, pozitie, activ, sortColumn, sortDirection);
-                    contentType = "text/csv";
-                    fileName = $"PersonalMedical_{DateTime.Now:yyyyMMddHHmmss}.csv";
-                }
+                Format = format,
+                Search = search,
+                Departament = departament,
+                Pozitie = pozitie,
+                EsteActiv = activ,
+                SortColumn = sortColumn,
+                SortDirection = sortDirection
+            };
 
-                if (bytes == null || bytes.Length == 0)
-                {
-                    // No data to export with given filters
+            // Delegate to MediatR
+            var result = await _mediator.Send(query);
+
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("Export failed: {Message}", result.Message);
+
+                if (result.Message.Contains("No data"))
                     return NoContent();
-                }
 
-                return File(bytes, contentType, fileName);
+                return BadRequest(new { message = result.Message });
             }
-            catch (FluentValidation.ValidationException vex)
-            {
-                _logger.LogWarning(vex, "Export validation failed");
-                return BadRequest(new { message = "Invalid export parameters", errors = vex.Errors.Select(e => e.ErrorMessage) });
-            }
+
+            // Return file
+            return File(
+                result.Value!.FileBytes,
+                result.Value.ContentType,
+                result.Value.FileName);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Export failed");
+            _logger.LogError(ex, "Unexpected error during export");
             return StatusCode(500, "Export failed");
         }
     }

@@ -12,11 +12,11 @@ namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.Final
 /// </summary>
 public class FinalizeConsulatieCommandHandler : IRequestHandler<FinalizeConsulatieCommand, Result<bool>>
 {
-    private readonly IConsultatieRepository _repository;
+    private readonly IConsultatieDraftRepository _repository;
     private readonly ILogger<FinalizeConsulatieCommandHandler> _logger;
 
     public FinalizeConsulatieCommandHandler(
-        IConsultatieRepository repository,
+        IConsultatieDraftRepository repository,
         ILogger<FinalizeConsulatieCommandHandler> logger)
     {
         _repository = repository;

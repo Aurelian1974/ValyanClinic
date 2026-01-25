@@ -12,11 +12,11 @@ namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveC
 /// </summary>
 public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultatieDraftCommand, Result<Guid>>
 {
-    private readonly IConsultatieRepository _repository;
+    private readonly IConsultatieDraftRepository _repository;
     private readonly ILogger<SaveConsultatieDraftCommandHandler> _logger;
 
     public SaveConsultatieDraftCommandHandler(
-        IConsultatieRepository repository,
+        IConsultatieDraftRepository repository,
         ILogger<SaveConsultatieDraftCommandHandler> logger)
     {
         _repository = repository;

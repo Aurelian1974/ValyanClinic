@@ -13,11 +13,11 @@ namespace ValyanClinic.Application.Features.ConsultatieManagement.Queries.GetDra
 /// </summary>
 public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftConsulatieByPacientQuery, Result<ConsulatieDetailDto?>>
 {
-    private readonly IConsultatieRepository _repository;
+    private readonly IConsultatieDraftRepository _repository;
     private readonly ILogger<GetDraftConsulatieByPacientQueryHandler> _logger;
 
     public GetDraftConsulatieByPacientQueryHandler(
-        IConsultatieRepository repository,
+        IConsultatieDraftRepository repository,
         ILogger<GetDraftConsulatieByPacientQueryHandler> logger)
     {
         _repository = repository;

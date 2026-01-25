@@ -12,11 +12,11 @@ namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.Updat
 /// </summary>
 public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCommand, Result<bool>>
 {
-    private readonly IConsultatieRepository _repository;
+    private readonly IConsultatieBaseRepository _repository;
     private readonly ILogger<UpdateConsulatieCommandHandler> _logger;
 
     public UpdateConsulatieCommandHandler(
-        IConsultatieRepository repository,
+        IConsultatieBaseRepository repository,
         ILogger<UpdateConsulatieCommandHandler> logger)
     {
         _repository = repository;
