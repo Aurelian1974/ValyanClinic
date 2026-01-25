@@ -10,6 +10,11 @@ public class AddRelatieCommandHandler : IRequestHandler<AddRelatieCommand, Resul
     private readonly IPacientPersonalMedicalRepository _relatieRepository;
     private readonly ILogger<AddRelatieCommandHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="AddRelatieCommandHandler"/> with required dependencies.
+    /// </summary>
+    /// <param name="relatieRepository">Repository used to create and manage patient–personal-medical relationships.</param>
+    /// <param name="logger">Logger for recording informational, warning, and error messages from the handler.</param>
     public AddRelatieCommandHandler(
         IPacientPersonalMedicalRepository relatieRepository,
         ILogger<AddRelatieCommandHandler> logger)
@@ -18,6 +23,12 @@ public class AddRelatieCommandHandler : IRequestHandler<AddRelatieCommand, Resul
         _logger = logger;
     }
 
+    /// <summary>
+    /// Handles an AddRelatieCommand by creating a new patient–medical-staff relationship.
+    /// </summary>
+    /// <param name="request">The command containing PacientID, PersonalMedicalID, TipRelatie, Observatii, Motiv and CreatDe.</param>
+    /// <param name="cancellationToken">Cancellation token for the operation.</param>
+    /// <returns>A Result containing the created relatie's Guid on success; on failure contains an error message.</returns>
     public async Task<Result<Guid>> Handle(AddRelatieCommand request, CancellationToken cancellationToken)
     {
         try

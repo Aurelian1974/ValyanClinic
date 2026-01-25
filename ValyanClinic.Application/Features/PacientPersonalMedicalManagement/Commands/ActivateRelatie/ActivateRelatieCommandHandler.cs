@@ -10,6 +10,10 @@ public class ActivateRelatieCommandHandler : IRequestHandler<ActivateRelatieComm
     private readonly IPacientPersonalMedicalRepository _relatieRepository;
     private readonly ILogger<ActivateRelatieCommandHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="ActivateRelatieCommandHandler"/> with required dependencies.
+    /// </summary>
+    /// <param name="relatieRepository">Repository used to activate and manage doctor–patient relations.</param>
     public ActivateRelatieCommandHandler(
         IPacientPersonalMedicalRepository relatieRepository,
         ILogger<ActivateRelatieCommandHandler> logger)
@@ -18,6 +22,12 @@ public class ActivateRelatieCommandHandler : IRequestHandler<ActivateRelatieComm
         _logger = logger;
     }
 
+    /// <summary>
+    /// Reactivates a doctor–patient relation using the data provided in the command.
+    /// </summary>
+    /// <param name="request">Command containing the relation identifier and activation details (Observatii, Motiv, ModificatDe).</param>
+    /// <param name="cancellationToken">Token to observe for cancellation.</param>
+    /// <returns>A Result indicating operation outcome: on success contains a confirmation message, on failure contains an error message.</returns>
     public async Task<Result> Handle(ActivateRelatieCommand request, CancellationToken cancellationToken)
     {
         try

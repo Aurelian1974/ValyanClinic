@@ -10,6 +10,11 @@ public class GetPersonalMedicalByIdQueryHandler : IRequestHandler<GetPersonalMed
     private readonly IPersonalMedicalRepository _personalRepository;
     private readonly ILogger<GetPersonalMedicalByIdQueryHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="GetPersonalMedicalByIdQueryHandler"/> with the specified repository and logger.
+    /// </summary>
+    /// <param name="personalRepository">Repository used to retrieve personal medical records.</param>
+    /// <param name="logger">Logger for diagnostic and error messages from the handler.</param>
     public GetPersonalMedicalByIdQueryHandler(
         IPersonalMedicalRepository personalRepository,
         ILogger<GetPersonalMedicalByIdQueryHandler> logger)
@@ -18,6 +23,11 @@ public class GetPersonalMedicalByIdQueryHandler : IRequestHandler<GetPersonalMed
         _logger = logger;
     }
 
+    /// <summary>
+    /// Handles a query to retrieve a personal medical record by ID and map it to a PersonalMedicalDetailDto.
+    /// </summary>
+    /// <param name="request">The query containing the PersonalID of the personal medical record to retrieve.</param>
+    /// <returns>A Result containing the PersonalMedicalDetailDto when found; a failure Result with an error message when the record is not found or an error occurs.</returns>
     public async Task<Result<PersonalMedicalDetailDto>> Handle(
         GetPersonalMedicalByIdQuery request,
         CancellationToken cancellationToken)
