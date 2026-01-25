@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
@@ -15,6 +15,9 @@ public class GetConsulatieByIdQueryHandler : IRequestHandler<GetConsulatieByIdQu
     private readonly IConsultatieBaseRepository _repository;
     private readonly ILogger<GetConsulatieByIdQueryHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="GetConsulatieByIdQueryHandler"/> with the required repository and logger.
+    /// </summary>
     public GetConsulatieByIdQueryHandler(
         IConsultatieBaseRepository repository,
         ILogger<GetConsulatieByIdQueryHandler> logger)

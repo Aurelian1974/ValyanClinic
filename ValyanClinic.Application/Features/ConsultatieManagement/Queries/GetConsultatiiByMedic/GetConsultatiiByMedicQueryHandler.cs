@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
@@ -15,6 +15,10 @@ public class GetConsultatiiByMedicQueryHandler : IRequestHandler<GetConsultatiiB
     private readonly IConsultatieBaseRepository _repository;
     private readonly ILogger<GetConsultatiiByMedicQueryHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="GetConsultatiiByMedicQueryHandler"/> with the specified repository and logger.
+    /// </summary>
+    /// <param name="repository">Repository used to retrieve consultations for a given medic.</param>
     public GetConsultatiiByMedicQueryHandler(
         IConsultatieBaseRepository repository,
         ILogger<GetConsultatiiByMedicQueryHandler> logger)

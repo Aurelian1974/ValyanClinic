@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Entities;
@@ -14,6 +14,11 @@ public class CreateConsultatieCommandHandler : IRequestHandler<CreateConsultatie
     private readonly IConsultatieBaseRepository _repository;
     private readonly ILogger<CreateConsultatieCommandHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of CreateConsultatieCommandHandler with the specified repository and logger.
+    /// </summary>
+    /// <param name="repository">Repository used to persist and update consultatie-related entities.</param>
+    /// <param name="logger">Logger for recording handler execution details and errors.</param>
     public CreateConsultatieCommandHandler(
         IConsultatieBaseRepository repository,
         ILogger<CreateConsultatieCommandHandler> logger)

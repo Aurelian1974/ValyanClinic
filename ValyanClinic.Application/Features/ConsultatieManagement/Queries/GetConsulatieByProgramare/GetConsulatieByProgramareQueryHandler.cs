@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
@@ -15,6 +15,11 @@ public class GetConsulatieByProgramareQueryHandler : IRequestHandler<GetConsulat
     private readonly IConsultatieBaseRepository _repository;
     private readonly ILogger<GetConsulatieByProgramareQueryHandler> _logger;
 
+    /// <summary>
+    /// Creates a new handler for processing GetConsulatieByProgramareQuery requests.
+    /// </summary>
+    /// <param name="repository">Repository used to retrieve consultatie data by programare ID.</param>
+    /// <param name="logger">Logger for recording informational and error messages within the handler.</param>
     public GetConsulatieByProgramareQueryHandler(
         IConsultatieBaseRepository repository,
         ILogger<GetConsulatieByProgramareQueryHandler> logger)

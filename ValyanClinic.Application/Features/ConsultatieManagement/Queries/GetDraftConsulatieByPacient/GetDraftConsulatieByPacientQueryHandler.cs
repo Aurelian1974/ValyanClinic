@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
@@ -16,6 +16,9 @@ public class GetDraftConsulatieByPacientQueryHandler : IRequestHandler<GetDraftC
     private readonly IConsultatieDraftRepository _repository;
     private readonly ILogger<GetDraftConsulatieByPacientQueryHandler> _logger;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="GetDraftConsulatieByPacientQueryHandler"/> with its required dependencies.
+    /// </summary>
     public GetDraftConsulatieByPacientQueryHandler(
         IConsultatieDraftRepository repository,
         ILogger<GetDraftConsulatieByPacientQueryHandler> logger)

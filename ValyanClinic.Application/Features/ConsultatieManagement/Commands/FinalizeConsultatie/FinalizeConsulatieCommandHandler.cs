@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Interfaces.Repositories;
@@ -15,6 +15,9 @@ public class FinalizeConsulatieCommandHandler : IRequestHandler<FinalizeConsulat
     private readonly IConsultatieDraftRepository _repository;
     private readonly ILogger<FinalizeConsulatieCommandHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="FinalizeConsulatieCommandHandler"/> with the specified repository and logger.
+    /// </summary>
     public FinalizeConsulatieCommandHandler(
         IConsultatieDraftRepository repository,
         ILogger<FinalizeConsulatieCommandHandler> logger)

@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Entities;
@@ -15,6 +15,9 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
     private readonly IConsultatieDraftRepository _repository;
     private readonly ILogger<SaveConsultatieDraftCommandHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of SaveConsultatieDraftCommandHandler with the required draft repository and logger.
+    /// </summary>
     public SaveConsultatieDraftCommandHandler(
         IConsultatieDraftRepository repository,
         ILogger<SaveConsultatieDraftCommandHandler> logger)

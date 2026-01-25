@@ -15,6 +15,10 @@ public class PersonalMedicalController : ControllerBase
     private readonly IMediator _mediator;
     private readonly ILogger<PersonalMedicalController> _logger;
 
+    /// <summary>
+    /// Creates a PersonalMedicalController that dispatches requests via MediatR and records activity using the provided logger.
+    /// </summary>
+    /// <param name="mediator">MediatR mediator used to send queries and commands to handlers.</param>
     public PersonalMedicalController(
         IMediator mediator,
         ILogger<PersonalMedicalController> logger)
@@ -32,7 +36,20 @@ public class PersonalMedicalController : ControllerBase
     /// <param name="pozitie">Filtru poziție</param>
     /// <param name="esteActiv">Filtru status activ (null = toate)</param>
     /// <param name="sortColumn">Coloană de sortare (default: Nume)</param>
-    /// <param name="sortDirection">Direcție sortare: ASC sau DESC</param>
+    /// <summary>
+    /// Exports personal medical staff data using the provided filters, sorting and format, and returns the generated file.
+    /// </summary>
+    /// <param name="format">Export format (for example "csv").</param>
+    /// <param name="search">Text to filter results by name or other searchable fields.</param>
+    /// <param name="departament">Department filter.</param>
+    /// <param name="pozitie">Position filter.</param>
+    /// <param name="esteActiv">Filter by active status; expected "true" or "false".</param>
+    /// <param name="sortColumn">Column name to sort by (default "Nume").</param>
+    /// <param name="sortDirection">Sort direction: "ASC" or "DESC".</param>
+    /// <returns>
+    /// An IActionResult containing the exported file on success; 204 NoContent when there is no data to export; 
+    /// 400 BadRequest with an error message when the request cannot be processed; 500 InternalServerError on unexpected errors.
+    /// </returns>
     [HttpGet("export")]
     public async Task<IActionResult> Export(
         [FromQuery] string format = "csv",

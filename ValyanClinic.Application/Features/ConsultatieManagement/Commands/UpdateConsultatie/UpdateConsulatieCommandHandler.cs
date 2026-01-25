@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Entities;
@@ -15,6 +15,11 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
     private readonly IConsultatieBaseRepository _repository;
     private readonly ILogger<UpdateConsulatieCommandHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="UpdateConsulatieCommandHandler"/> with required dependencies.
+    /// </summary>
+    /// <param name="repository">Repository used to perform consultatie persistence and upsert operations.</param>
+    /// <param name="logger">Logger for recording diagnostic and error information.</param>
     public UpdateConsulatieCommandHandler(
         IConsultatieBaseRepository repository,
         ILogger<UpdateConsulatieCommandHandler> logger)
