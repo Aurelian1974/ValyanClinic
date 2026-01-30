@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Entities;
-using ValyanClinic.Domain.Interfaces.Repositories;
+using IConsultatieRepository = ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository;
 
 namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
 
@@ -12,11 +12,11 @@ namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.Creat
 /// </summary>
 public class CreateConsulatieCommandHandler : IRequestHandler<CreateConsulatieCommand, Result<Guid>>
 {
-    private readonly IConsultatieBaseRepository _repository;
+    private readonly IConsultatieRepository _repository;
     private readonly ILogger<CreateConsulatieCommandHandler> _logger;
 
     public CreateConsulatieCommandHandler(
-        IConsultatieBaseRepository repository,
+        IConsultatieRepository repository,
         ILogger<CreateConsulatieCommandHandler> logger)
     {
         _repository = repository;

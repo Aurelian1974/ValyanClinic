@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Entities;
-using ValyanClinic.Domain.Interfaces.Repositories;
+using IConsultatieRepository = ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository;
 
 namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveConsultatieDraft;
 
@@ -12,11 +12,11 @@ namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.SaveC
 /// </summary>
 public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultatieDraftCommand, Result<Guid>>
 {
-    private readonly IConsultatieDraftRepository _repository;
+    private readonly IConsultatieRepository _repository;
     private readonly ILogger<SaveConsultatieDraftCommandHandler> _logger;
 
     public SaveConsultatieDraftCommandHandler(
-        IConsultatieDraftRepository repository,
+        IConsultatieRepository repository,
         ILogger<SaveConsultatieDraftCommandHandler> logger)
     {
         _repository = repository;
