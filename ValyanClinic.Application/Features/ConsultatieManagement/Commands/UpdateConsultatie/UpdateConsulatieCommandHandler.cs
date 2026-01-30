@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Entities;
-using ValyanClinic.Domain.Interfaces.Repositories;
+using IConsultatieRepository = ValyanClinic.Infrastructure.Repositories.Interfaces.IConsultatieRepository;
 
 namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.UpdateConsultatie;
 
@@ -12,11 +12,11 @@ namespace ValyanClinic.Application.Features.ConsultatieManagement.Commands.Updat
 /// </summary>
 public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCommand, Result<bool>>
 {
-    private readonly IConsultatieBaseRepository _repository;
+    private readonly IConsultatieRepository _repository;
     private readonly ILogger<UpdateConsulatieCommandHandler> _logger;
 
     public UpdateConsulatieCommandHandler(
-        IConsultatieBaseRepository repository,
+        IConsultatieRepository repository,
         ILogger<UpdateConsulatieCommandHandler> logger)
     {
         _repository = repository;
