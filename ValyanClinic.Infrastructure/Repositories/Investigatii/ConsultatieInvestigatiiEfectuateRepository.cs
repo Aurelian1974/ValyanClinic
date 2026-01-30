@@ -1,7 +1,8 @@
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Domain.Entities.Investigatii;
 using ValyanClinic.Domain.Interfaces.Repositories;
+using ValyanClinic.Domain.Interfaces.Data;
 using ValyanClinic.Infrastructure.Data;
 
 namespace ValyanClinic.Infrastructure.Repositories.Investigatii;

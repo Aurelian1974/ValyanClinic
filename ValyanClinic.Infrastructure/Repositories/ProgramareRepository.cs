@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Domain.Entities;
 using ValyanClinic.Domain.Interfaces.Repositories;
+using ValyanClinic.Domain.Interfaces.Data;
 using ValyanClinic.Infrastructure.Data;
 
 namespace ValyanClinic.Infrastructure.Repositories;

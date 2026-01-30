@@ -6,7 +6,8 @@ using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.Commands.CreateConsultatie;
 using ValyanClinic.Application.Services.IMC;
 using ValyanClinic.Application.ViewModels;
-using ValyanClinic.Infrastructure.Services.DraftStorage;
+using ValyanClinic.Domain.Interfaces.Services;
+using ValyanClinic.Domain.Models;
 using Xunit;
 
 namespace ValyanClinic.Tests.ViewModels;

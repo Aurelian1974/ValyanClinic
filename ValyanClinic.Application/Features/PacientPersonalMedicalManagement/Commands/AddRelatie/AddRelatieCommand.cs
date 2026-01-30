@@ -12,5 +12,5 @@ public record AddRelatieCommand(
  string? TipRelatie,
     string? Observatii,
     string? Motiv,
-    string? CreatDe
+    Guid? CreatDe
 ) : IRequest<Result<Guid>>;

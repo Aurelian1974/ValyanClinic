@@ -1,4 +1,5 @@
 ﻿using ValyanClinic.Domain.Interfaces.Repositories;
+using ValyanClinic.Domain.Interfaces.Data;
 using ValyanClinic.Infrastructure.Data;
 
 namespace ValyanClinic.Infrastructure.Repositories;

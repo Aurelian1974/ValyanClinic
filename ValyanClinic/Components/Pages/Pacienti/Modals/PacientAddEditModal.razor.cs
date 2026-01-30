@@ -992,7 +992,7 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
      RelatieID: DoctorToActivate.RelatieID,
        Observatii: "Relație reactivată din interfața pacient",
            Motiv: "Reluarea tratamentului cu acest doctor",
-      ModificatDe: "System");
+      ModificatDe: null);
 
             var result = await Mediator.Send(command);
 

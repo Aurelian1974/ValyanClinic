@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Domain.Interfaces.Repositories;
@@ -32,7 +32,7 @@ public class AddRelatieCommandHandler : IRequestHandler<AddRelatieCommand, Resul
                 request.TipRelatie,
                 request.Observatii,
                 request.Motiv,
-                request.CreatDe,
+                request.CreatDe, // Updated type for CreatDe
                 cancellationToken);
 
             _logger.LogInformation(

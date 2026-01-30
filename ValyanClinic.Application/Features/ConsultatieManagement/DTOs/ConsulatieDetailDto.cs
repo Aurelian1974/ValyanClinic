@@ -169,15 +169,53 @@ public class ConsulatieDetailDto
         _ => Status
     };
 
+    /// <summary>
+    /// Calculează vârsta din CNP (consistent cu toate celelalte calcule din aplicație).
+    /// Fallback la PacientDataNasterii doar dacă CNP nu e valid.
+    /// </summary>
     public int? Varsta
     {
         get
         {
+            // Prioritate 1: Calcul din CNP (sursa de adevăr)
+            if (!string.IsNullOrEmpty(PacientCNP) && PacientCNP.Length == 13)
+            {
+                try
+                {
+                    int sexDigit = int.Parse(PacientCNP.Substring(0, 1));
+                    int year = int.Parse(PacientCNP.Substring(1, 2));
+                    int month = int.Parse(PacientCNP.Substring(3, 2));
+                    int day = int.Parse(PacientCNP.Substring(5, 2));
+
+                    int century = sexDigit switch
+                    {
+                        1 or 2 => 1900,
+                        3 or 4 => 1800,
+                        5 or 6 => 2000,
+                        7 or 8 => 2000,
+                        9 => 1900,
+                        _ => 2000
+                    };
+
+                    int birthYear = century + year;
+                    var birthDate = new DateTime(birthYear, month, day);
+                    var today = DateTime.Today;
+                    int age = today.Year - birthDate.Year;
+                    if (birthDate.Date > today.AddYears(-age)) age--;
+                    return age;
+                }
+                catch
+                {
+                    // CNP invalid, fallback la DataNasterii
+                }
+            }
+
+            // Fallback: Calcul din DataNasterii (pentru cazuri excepționale)
             if (!PacientDataNasterii.HasValue) return null;
-            var today = DateTime.Today;
-            var age = today.Year - PacientDataNasterii.Value.Year;
-            if (PacientDataNasterii.Value.Date > today.AddYears(-age)) age--;
-            return age;
+            var todayFallback = DateTime.Today;
+            var ageFallback = todayFallback.Year - PacientDataNasterii.Value.Year;
+            if (PacientDataNasterii.Value.Date > todayFallback.AddYears(-ageFallback)) ageFallback--;
+            return ageFallback;
         }
     }
 

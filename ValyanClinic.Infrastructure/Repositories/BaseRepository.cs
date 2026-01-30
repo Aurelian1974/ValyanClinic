@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using System.Data;
+using ValyanClinic.Domain.Interfaces.Data;
 using ValyanClinic.Infrastructure.Data;
 using Polly;
 using Polly.Retry;

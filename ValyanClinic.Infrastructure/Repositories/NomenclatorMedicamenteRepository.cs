@@ -36,6 +36,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
         await connection.OpenAsync(cancellationToken);
 
         using var command = new SqlCommand("Medicamente_Search", connection)
+        using var connection = _connectionFactory.CreateConnection();
+        connection.Open();
+
+        using var command = new SqlCommand("Medicamente_Search", (SqlConnection)connection)
         {
             CommandType = CommandType.StoredProcedure
         };
@@ -60,6 +64,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
         await connection.OpenAsync(cancellationToken);
 
         using var command = new SqlCommand("Medicamente_GetByCod", connection)
+        using var connection = _connectionFactory.CreateConnection();
+        connection.Open();
+
+        using var command = new SqlCommand("Medicamente_GetByCod", (SqlConnection)connection)
         {
             CommandType = CommandType.StoredProcedure
         };
@@ -84,6 +92,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
         await connection.OpenAsync(cancellationToken);
 
         using var command = new SqlCommand("Medicamente_Upsert", connection)
+        using var connection = _connectionFactory.CreateConnection();
+        connection.Open();
+
+        using var command = new SqlCommand("Medicamente_Upsert", (SqlConnection)connection)
         {
             CommandType = CommandType.StoredProcedure
         };
@@ -125,6 +137,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
         await connection.OpenAsync(cancellationToken);
 
         using var command = new SqlCommand("Medicamente_GetStats", connection)
+        using var connection = _connectionFactory.CreateConnection();
+        connection.Open();
+
+        using var command = new SqlCommand("Medicamente_GetStats", (SqlConnection)connection)
         {
             CommandType = CommandType.StoredProcedure
         };
@@ -159,6 +175,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
             await connection.OpenAsync(cancellationToken);
 
             using var command = new SqlCommand("Medicamente_DeactivateOld", connection)
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Open();
+
+            using var command = new SqlCommand("Medicamente_DeactivateOld", (SqlConnection)connection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -188,6 +208,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
             await connection.OpenAsync(cancellationToken);
 
             using var command = new SqlCommand("Medicamente_SyncLog_Start", connection)
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Open();
+
+            using var command = new SqlCommand("Medicamente_SyncLog_Start", (SqlConnection)connection)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -222,6 +246,10 @@ public class NomenclatorMedicamenteRepository : INomenclatorMedicamenteRepositor
             await connection.OpenAsync(cancellationToken);
 
             using var command = new SqlCommand("Medicamente_SyncLog_Complete", connection)
+            using var connection = _connectionFactory.CreateConnection();
+            connection.Open();
+
+            using var command = new SqlCommand("Medicamente_SyncLog_Complete", (SqlConnection)connection)
             {
                 CommandType = CommandType.StoredProcedure
             };

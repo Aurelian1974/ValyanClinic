@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPersonalMedicalById;
 using ValyanClinic.Application.Features.PersonalMedicalManagement.Queries.GetPacientiByDoctor;
 using ValyanClinic.Application.Interfaces;
+using ValyanClinic.Domain.DTOs;
 
 namespace ValyanClinic.Components.Pages.Administrare.PersonalMedical.Modals;
 
