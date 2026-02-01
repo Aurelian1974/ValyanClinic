@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.PacientManagement.Queries.GetPacientList;
@@ -15,7 +14,6 @@ namespace ValyanClinic.Application.Services.Pacienti;
 /// - Map between PagedResult and PagedPacientData
 /// - Handle errors gracefully with Result pattern
 /// - Log all operations for debugging
-/// - Cache filter options (judete) for performance
 /// 
 /// <b>Pattern:</b> Service layer with dependency injection
 /// <b>Testing:</b> Fully unit testable without UI dependencies
@@ -23,23 +21,16 @@ namespace ValyanClinic.Application.Services.Pacienti;
 public class PacientDataService : IPacientDataService
 {
     private readonly IMediator _mediator;
-    private readonly IMemoryCache _cache;
     private readonly ILogger<PacientDataService> _logger;
-
-    // Cache keys
-    private const string JudeteCacheKey = "PacientDataService_Judete";
-    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PacientDataService"/> class.
     /// </summary>
     /// <param name="mediator">MediatR instance for sending queries</param>
-    /// <param name="cache">Memory cache for filter options</param>
     /// <param name="logger">Logger instance for diagnostics</param>
-    public PacientDataService(IMediator mediator, IMemoryCache cache, ILogger<PacientDataService> logger)
+    public PacientDataService(IMediator mediator, ILogger<PacientDataService> logger)
     {
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-        _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -81,7 +72,7 @@ public class PacientDataService : IPacientDataService
                 _logger.LogWarning(
                     "[PacientDataService] Query failed with errors: {Errors}",
                     string.Join(", ", result.Errors ?? new List<string>()));
-                return Result<PagedPacientData>.Failure(result.Errors ?? new List<string> { "Eroare necunoscută" });
+                return Result<PagedPacientData>.Failure(result.Errors);
             }
 
             // Map PagedResult to PagedPacientData
@@ -112,25 +103,14 @@ public class PacientDataService : IPacientDataService
     }
 
     /// <summary>
-    /// Loads filter options (unique judete, etc.) from server with caching.
+    /// Loads filter options (unique judete, etc.) from server.
     /// </summary>
     public async Task<Result<PacientFilterOptions>> LoadFilterOptionsAsync(
         CancellationToken cancellationToken = default)
     {
         try
         {
-            // Try to get from cache first
-            if (_cache.TryGetValue(JudeteCacheKey, out List<string>? cachedJudete) && cachedJudete != null)
-            {
-                _logger.LogInformation("[PacientDataService] Filter options loaded from CACHE: {JudetCount} judete", cachedJudete.Count);
-                
-                return Result<PacientFilterOptions>.Success(new PacientFilterOptions
-                {
-                    Judete = cachedJudete
-                });
-            }
-
-            _logger.LogInformation("[PacientDataService] Loading filter options from SERVER (cache miss)");
+            _logger.LogInformation("[PacientDataService] Loading filter options from server");
 
             // Load ALL data for filter options extraction (no paging)
             var query = new GetPacientListQuery
@@ -152,7 +132,7 @@ public class PacientDataService : IPacientDataService
                 _logger.LogWarning(
                     "[PacientDataService] Failed to load filter options: {Errors}",
                     string.Join(", ", result.Errors ?? new List<string>()));
-                return Result<PacientFilterOptions>.Failure(result.Errors ?? new List<string> { "Eroare necunoscută" });
+                return Result<PacientFilterOptions>.Failure(result.Errors);
             }
 
             var allData = result.Value?.Value?.ToList() ?? new List<PacientListDto>();
@@ -165,21 +145,13 @@ public class PacientDataService : IPacientDataService
                 .OrderBy(j => j)
                 .ToList();
 
-            // Cache the judete list
-            var cacheOptions = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(CacheDuration)
-                .SetSlidingExpiration(TimeSpan.FromMinutes(10));
-            
-            _cache.Set(JudeteCacheKey, judete, cacheOptions);
-            _logger.LogInformation("[PacientDataService] Judete cached for {Duration} minutes", CacheDuration.TotalMinutes);
-
             var filterOptions = new PacientFilterOptions
             {
                 Judete = judete
             };
 
             _logger.LogInformation(
-                "[PacientDataService] Filter options loaded from server: {JudetCount} judete",
+                "[PacientDataService] Filter options loaded: {JudetCount} judete",
                 filterOptions.Judete.Count);
 
             return Result<PacientFilterOptions>.Success(filterOptions);
@@ -194,14 +166,5 @@ public class PacientDataService : IPacientDataService
             _logger.LogError(ex, "[PacientDataService] Error loading filter options");
             return Result<PacientFilterOptions>.Failure($"Eroare la încărcarea opțiunilor de filtrare: {ex.Message}");
         }
-    }
-
-    /// <summary>
-    /// Invalidates the filter options cache (call when patient data changes).
-    /// </summary>
-    public void InvalidateFilterOptionsCache()
-    {
-        _cache.Remove(JudeteCacheKey);
-        _logger.LogInformation("[PacientDataService] Filter options cache invalidated");
     }
 }

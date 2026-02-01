@@ -32,11 +32,10 @@ public interface IFormProgressService
 /// </summary>
 public record ConsultationProgressInput
 {
-    // Tab 1: Anamneză
+    // Tab 1: Motiv & Antecedente
     public string? MotivPrezentare { get; init; }
-    public string? IstoricBoalaActuala { get; init; }
-    public string? IstoricMedicalPersonal { get; init; }
-    public string? IstoricFamilial { get; init; }
+    public string? AntecedentePatologice { get; init; }
+    public string? TratamenteActuale { get; init; }
 
     // Tab 2: Examen Clinic
     public int? TensiuneSistolica { get; init; }

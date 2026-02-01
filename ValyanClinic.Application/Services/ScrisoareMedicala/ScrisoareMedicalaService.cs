@@ -1,12 +1,6 @@
-using System.Text.RegularExpressions;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
-using ValyanClinic.Application.Features.AnalizeMedicale.Queries.GetAnalizeRecomandate;
-using ValyanClinic.Application.Features.AnalizeMedicale.Queries.GetAnalizeEfectuate;
-using ValyanClinic.Application.Features.Investigatii.Queries;
-using ValyanClinic.Application.DTOs.Investigatii;
 
 namespace ValyanClinic.Application.Services.ScrisoareMedicala;
 
@@ -17,14 +11,10 @@ namespace ValyanClinic.Application.Services.ScrisoareMedicala;
 public class ScrisoareMedicalaService : IScrisoareMedicalaService
 {
     private readonly ILogger<ScrisoareMedicalaService> _logger;
-    private readonly IMediator _mediator;
 
-    public ScrisoareMedicalaService(
-        ILogger<ScrisoareMedicalaService> logger,
-        IMediator mediator)
+    public ScrisoareMedicalaService(ILogger<ScrisoareMedicalaService> logger)
     {
         _logger = logger;
-        _mediator = mediator;
     }
 
     /// <inheritdoc />
@@ -82,16 +72,16 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             PacientSex = consultatie.PacientSex,
             PacientTelefon = consultatie.PacientTelefon,
 
-            // Motiv prezentare - Sanitize HTML (păstrează formatarea bold/italic)
-            MotivPrezentare = SanitizeHtml(consultatie.MotivPrezentare),
-            IstoricBoalaActuala = SanitizeHtml(consultatie.IstoricBoalaActuala),
+            // Motiv prezentare
+            MotivPrezentare = consultatie.MotivPrezentare,
+            IstoricBoalaActuala = consultatie.IstoricBoalaActuala,
 
-            // Antecedente (SIMPLIFIED) - StripHtml for inline display in Scrisoare Medicala
-            AntecendenteHeredoColaterale = StripHtml(consultatie.IstoricFamilial) ?? "Fără antecedente semnificative.",
-            AntecendentePatologicePersonale = StripHtml(consultatie.IstoricMedicalPersonal) ?? "Fără antecedente patologice semnificative.",
-            Alergii = StripHtml(consultatie.PacientAlergii),
-            MedicatieCronicaAnterioara = StripHtml(consultatie.TratamentAnterior), // ✅ MAPPED from TratamentAnterior (Antecedente)
-            FactoriDeRisc = StripHtml(consultatie.FactoriDeRisc), // ✅ MAPPED from FactoriDeRisc (Antecedente)
+            // Antecedente
+            AntecendenteHeredoColaterale = BuildAntecendenteHeredoString(consultatie),
+            AntecendentePatologicePersonale = BuildAntecendentePatologiceString(consultatie),
+            Alergii = consultatie.APP_Alergii ?? consultatie.PacientAlergii,
+            MedicatieCronicaAnterioara = consultatie.APP_Medicatie,
+            FactoriDeRisc = consultatie.Toxice,
 
             // Examen clinic
             StareGenerala = consultatie.StareGenerala,
@@ -104,51 +94,22 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             IMC = consultatie.IMC,
             IMCCategorie = consultatie.IMCCategorie,
             SaturatieO2 = consultatie.SaturatieO2,
-            Glicemie = consultatie.Glicemie,
-            Tegumente = consultatie.Tegumente,
-            Mucoase = consultatie.Mucoase,
-            GanglioniLimfatici = consultatie.GanglioniLimfatici,
-            Edeme = consultatie.Edeme,
-            ExamenObiectivDetaliat = consultatie.ExamenObiectivDetaliat,
-            AlteObservatiiClinice = consultatie.AlteObservatiiClinice,
+            ExamenCardiovascular = consultatie.ExamenCardiovascular,
+            ExamenRespiratoriu = consultatie.ExamenRespiratoriu,
+            ExamenDigestiv = consultatie.ExamenDigestiv,
 
             // Investigații
             RezultatEKG = consultatie.InvestigatiiEKG,
             AlteInvestigatii = consultatie.AlteInvestigatii,
 
-            // Diagnostic - use NEW normalized fields with fallback to legacy
-            DiagnosticPrincipal = ParseDiagnosticPrincipal(
-                consultatie.CodICD10Principal, 
-                consultatie.NumeDiagnosticPrincipal, 
-                consultatie.DescriereDetaliataPrincipal,
-                // Legacy fallback
-                consultatie.DiagnosticPozitiv, 
-                consultatie.CoduriICD10),
+            // Diagnostic
+            DiagnosticPrincipal = ParseDiagnosticPrincipal(consultatie.DiagnosticPozitiv, consultatie.CoduriICD10),
 
             // Tratament
             TratamentAnterior = consultatie.TratamentMedicamentos,
 
             // Recomandări
             Recomandari = ParseRecomandari(consultatie),
-
-            // ✅ Anexa 43 - Checkbox fields
-            EsteAfectiuneOncologica = consultatie.EsteAfectiuneOncologica,
-            DetaliiAfectiuneOncologica = consultatie.DetaliiAfectiuneOncologica,
-            AreIndicatieInternare = consultatie.AreIndicatieInternare,
-            TermenInternare = consultatie.TermenInternare,
-            SaEliberatPrescriptie = consultatie.SaEliberatPrescriptie ?? false,
-            SeriePrescriptie = consultatie.SeriePrescriptie,
-            NuSaEliberatPrescriptieNuAFostNecesar = !(consultatie.SaEliberatPrescriptie ?? false),
-            SaEliberatConcediuMedical = consultatie.SaEliberatConcediuMedical ?? false,
-            SerieConcediuMedical = consultatie.SerieConcediuMedical,
-            NuSaEliberatConcediuNuAFostNecesar = !(consultatie.SaEliberatConcediuMedical ?? false),
-            SaEliberatRecomandareIngrijiriDomiciliu = consultatie.SaEliberatIngrijiriDomiciliu ?? false,
-            NuSaEliberatIngrijiriNuAFostNecesar = !(consultatie.SaEliberatIngrijiriDomiciliu ?? false),
-            SaEliberatPrescriptieDispozitive = consultatie.SaEliberatDispozitiveMedicale ?? false,
-            NuSaEliberatDispozitiveNuAFostNecesar = !(consultatie.SaEliberatDispozitiveMedicale ?? false),
-            TransmiterePrinEmail = consultatie.TransmiterePrinEmail,
-            EmailTransmitere = consultatie.EmailTransmitere,
-            TransmiterePrinAsigurat = !consultatie.TransmiterePrinEmail,
 
             // Medic
             MedicId = consultatie.MedicID,
@@ -159,371 +120,10 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             DataEmitere = DateTime.Now
         };
 
-        // Parse diagnostice secundare - use normalized structure if available
-        _logger.LogInformation("[ScrisoareMedicalaService] consultatie.DiagnosticeSecundare count: {Count}",
-            consultatie.DiagnosticeSecundare?.Count ?? 0);
-        
-        dto.DiagnosticeSecundare = MapDiagnosticeSecundare(consultatie.DiagnosticeSecundare);
-        
-        _logger.LogInformation("[ScrisoareMedicalaService] dto.DiagnosticeSecundare count: {Count}",
-            dto.DiagnosticeSecundare?.Count ?? 0);
-
-        // Map tratament recomandat from MedicationList
-        dto.TratamentRecomandat = MapTratamentRecomandat(consultatie.MedicationList);
-        
-        _logger.LogInformation("[ScrisoareMedicalaService] dto.TratamentRecomandat count: {Count}",
-            dto.TratamentRecomandat?.Count ?? 0);
-
-        // Încarcă analizele recomandate pentru consultație
-        dto.AnalizeRecomandate = await LoadAnalizeRecomandateAsync(consultatie.ConsultatieID, cancellationToken);
-        
-        _logger.LogInformation("[ScrisoareMedicalaService] dto.AnalizeRecomandate count: {Count}",
-            dto.AnalizeRecomandate?.Count ?? 0);
-
-        // Încarcă analizele efectuate (cu rezultate) pentru consultație
-        dto.AnalizeEfectuate = await LoadAnalizeEfectuateAsync(consultatie.ConsultatieID, cancellationToken);
-        
-        _logger.LogInformation("[ScrisoareMedicalaService] dto.AnalizeEfectuate count: {Count}",
-            dto.AnalizeEfectuate?.Count ?? 0);
-
-        // Încarcă investigațiile recomandate pentru consultație
-        dto.InvestigatiiImagistice = await LoadInvestigatiiImagisticeAsync(consultatie.ConsultatieID, cancellationToken);
-        dto.Explorari = await LoadExplorariAsync(consultatie.ConsultatieID, cancellationToken);
-        dto.Endoscopii = await LoadEndoscopiiAsync(consultatie.ConsultatieID, cancellationToken);
-        
-        _logger.LogInformation("[ScrisoareMedicalaService] Investigații recomandate: Imagistice={Imagistice}, Explorări={Explorari}, Endoscopii={Endoscopii}",
-            dto.InvestigatiiImagistice?.Count ?? 0,
-            dto.Explorari?.Count ?? 0,
-            dto.Endoscopii?.Count ?? 0);
-
-        // Încarcă investigațiile efectuate pentru consultație
-        dto.InvestigatiiImagisticeEfectuate = await LoadInvestigatiiImagisticeEfectuateAsync(consultatie.ConsultatieID, cancellationToken);
-        dto.ExplorariEfectuate = await LoadExplorariEfectuateAsync(consultatie.ConsultatieID, cancellationToken);
-        dto.EndoscopiiEfectuate = await LoadEndoscopiiEfectuateAsync(consultatie.ConsultatieID, cancellationToken);
-        
-        _logger.LogInformation("[ScrisoareMedicalaService] Investigații efectuate: Imagistice={Imagistice}, Explorări={Explorari}, Endoscopii={Endoscopii}",
-            dto.InvestigatiiImagisticeEfectuate?.Count ?? 0,
-            dto.ExplorariEfectuate?.Count ?? 0,
-            dto.EndoscopiiEfectuate?.Count ?? 0);
+        // Parse diagnostice secundare
+        dto.DiagnosticeSecundare = ParseDiagnosticeSecundare(consultatie.CoduriICD10Secundare);
 
         return Result<ScrisoareMedicalaDto>.Success(dto);
-    }
-
-    /// <summary>
-    /// Încarcă analizele recomandate pentru o consultație
-    /// </summary>
-    private async Task<List<AnalizaRecomandataScrisoareDto>> LoadAnalizeRecomandateAsync(
-        Guid consultatieId,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var query = new GetAnalizeRecomandateQuery(consultatieId);
-            var result = await _mediator.Send(query, cancellationToken);
-            
-            if (result.IsSuccess && result.Value != null)
-            {
-                return result.Value.Select(a => new AnalizaRecomandataScrisoareDto
-                {
-                    NumeAnaliza = a.NumeAnaliza,
-                    Categorie = a.TipAnaliza,
-                    Prioritate = a.Prioritate,
-                    EsteCito = a.EsteCito,
-                    IndicatiiClinice = a.IndicatiiClinice
-                }).ToList();
-            }
-            
-            _logger.LogWarning("Failed to load analize recomandate for consultatie {ConsultatieId}: {Error}", 
-                consultatieId, result.FirstError);
-            return new List<AnalizaRecomandataScrisoareDto>();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error loading analize recomandate for consultatie {ConsultatieId}", consultatieId);
-            return new List<AnalizaRecomandataScrisoareDto>();
-        }
-    }
-
-    /// <summary>
-    /// Încarcă analizele efectuate (cu rezultate) pentru o consultație
-    /// </summary>
-    private async Task<List<AnalizaEfectuataScrisoareDto>> LoadAnalizeEfectuateAsync(
-        Guid consultatieId,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var query = new GetAnalizeEfectuateQuery(consultatieId);
-            var result = await _mediator.Send(query, cancellationToken);
-            
-            if (result.IsSuccess && result.Value != null)
-            {
-                return result.Value
-                    .Where(a => a.AreRezultate) // Doar cele cu rezultate
-                    .Select(a => new AnalizaEfectuataScrisoareDto
-                    {
-                        NumeAnaliza = a.NumeAnaliza ?? string.Empty,
-                        Categorie = a.TipAnaliza,
-                        DataEfectuare = a.DataEfectuare,
-                        Laborator = a.LocEfectuare,
-                        Rezultat = a.ValoareRezultat,
-                        UnitateMasura = a.UnitatiMasura,
-                        ValoriReferinta = FormatValoriReferinta(a.ValoareNormalaMin, a.ValoareNormalaMax),
-                        EsteAnormal = a.EsteInAfaraLimitelor
-                    }).ToList();
-            }
-            
-            _logger.LogWarning("Failed to load analize efectuate for consultatie {ConsultatieId}: {Error}", 
-                consultatieId, result.FirstError);
-            return new List<AnalizaEfectuataScrisoareDto>();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error loading analize efectuate for consultatie {ConsultatieId}", consultatieId);
-            return new List<AnalizaEfectuataScrisoareDto>();
-        }
-    }
-
-    /// <summary>
-    /// Formatează valorile de referință pentru afișare
-    /// </summary>
-    private static string? FormatValoriReferinta(decimal? min, decimal? max)
-    {
-        if (!min.HasValue && !max.HasValue) return null;
-        if (!min.HasValue) return $"< {max:G}";
-        if (!max.HasValue) return $"> {min:G}";
-        return $"{min:G} - {max:G}";
-    }
-
-    /// <summary>
-    /// Încarcă investigațiile imagistice recomandate pentru o consultație
-    /// </summary>
-    private async Task<List<InvestigatieRecomandataScrisoareDto>> LoadInvestigatiiImagisticeAsync(
-        Guid consultatieId,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var query = new GetInvestigatiiImagisticeRecomandateByConsultatieQuery(consultatieId);
-            var result = await _mediator.Send(query, cancellationToken);
-            
-            if (result.IsSuccess && result.Value != null)
-            {
-                return result.Value.Select(i => new InvestigatieRecomandataScrisoareDto
-                {
-                    Denumire = i.DenumireInvestigatie,
-                    Cod = i.CodInvestigatie,
-                    Categorie = i.RegiuneAnatomica,
-                    Prioritate = i.Prioritate,
-                    EsteCito = i.EsteCito,
-                    IndicatiiClinice = i.IndicatiiClinice,
-                    Observatii = i.ObservatiiMedic
-                }).ToList();
-            }
-            
-            _logger.LogWarning("Failed to load investigatii imagistice for consultatie {ConsultatieId}: {Error}", 
-                consultatieId, result.FirstError);
-            return new List<InvestigatieRecomandataScrisoareDto>();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error loading investigatii imagistice for consultatie {ConsultatieId}", consultatieId);
-            return new List<InvestigatieRecomandataScrisoareDto>();
-        }
-    }
-
-    /// <summary>
-    /// Încarcă explorările funcționale recomandate pentru o consultație
-    /// </summary>
-    private async Task<List<InvestigatieRecomandataScrisoareDto>> LoadExplorariAsync(
-        Guid consultatieId,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var query = new GetExplorariRecomandateByConsultatieQuery(consultatieId);
-            var result = await _mediator.Send(query, cancellationToken);
-            
-            if (result.IsSuccess && result.Value != null)
-            {
-                return result.Value.Select(i => new InvestigatieRecomandataScrisoareDto
-                {
-                    Denumire = i.DenumireExplorare,
-                    Cod = i.CodExplorare,
-                    Categorie = "Explorări Funcționale",
-                    Prioritate = i.Prioritate,
-                    EsteCito = i.EsteCito,
-                    IndicatiiClinice = i.IndicatiiClinice,
-                    Observatii = i.ObservatiiMedic
-                }).ToList();
-            }
-            
-            _logger.LogWarning("Failed to load explorari for consultatie {ConsultatieId}: {Error}", 
-                consultatieId, result.FirstError);
-            return new List<InvestigatieRecomandataScrisoareDto>();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error loading explorari for consultatie {ConsultatieId}", consultatieId);
-            return new List<InvestigatieRecomandataScrisoareDto>();
-        }
-    }
-
-    /// <summary>
-    /// Încarcă endoscopiile recomandate pentru o consultație
-    /// </summary>
-    private async Task<List<InvestigatieRecomandataScrisoareDto>> LoadEndoscopiiAsync(
-        Guid consultatieId,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var query = new GetEndoscopiiRecomandateByConsultatieQuery(consultatieId);
-            var result = await _mediator.Send(query, cancellationToken);
-            
-            if (result.IsSuccess && result.Value != null)
-            {
-                return result.Value.Select(i => new InvestigatieRecomandataScrisoareDto
-                {
-                    Denumire = i.DenumireEndoscopie,
-                    Cod = i.CodEndoscopie,
-                    Categorie = "Endoscopii",
-                    Prioritate = i.Prioritate,
-                    EsteCito = i.EsteCito,
-                    IndicatiiClinice = i.IndicatiiClinice,
-                    Observatii = i.ObservatiiMedic
-                }).ToList();
-            }
-            
-            _logger.LogWarning("Failed to load endoscopii for consultatie {ConsultatieId}: {Error}", 
-                consultatieId, result.FirstError);
-            return new List<InvestigatieRecomandataScrisoareDto>();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error loading endoscopii for consultatie {ConsultatieId}", consultatieId);
-            return new List<InvestigatieRecomandataScrisoareDto>();
-        }
-    }
-
-    /// <summary>
-    /// Încarcă investigațiile imagistice efectuate pentru o consultație
-    /// </summary>
-    private async Task<List<InvestigatieEfectuataScrisoareDto>> LoadInvestigatiiImagisticeEfectuateAsync(
-        Guid consultatieId,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var query = new GetInvestigatiiImagisticeEfectuateByConsultatieQuery(consultatieId);
-            var result = await _mediator.Send(query, cancellationToken);
-            
-            if (result.IsSuccess && result.Value != null)
-            {
-                return result.Value.Select(i => new InvestigatieEfectuataScrisoareDto
-                {
-                    Denumire = i.DenumireInvestigatie,
-                    Cod = i.CodInvestigatie,
-                    Categorie = "Imagistică",
-                    DataEfectuare = i.DataEfectuare,
-                    Laborator = i.CentrulMedical,
-                    MedicExecutant = i.MedicExecutant,
-                    Rezultat = i.Rezultat,
-                    Concluzie = i.Concluzii,
-                    EsteAnormal = false,
-                    Observatii = null
-                }).ToList();
-            }
-            
-            _logger.LogWarning("Failed to load investigatii imagistice efectuate for consultatie {ConsultatieId}: {Error}", 
-                consultatieId, result.FirstError);
-            return new List<InvestigatieEfectuataScrisoareDto>();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error loading investigatii imagistice efectuate for consultatie {ConsultatieId}", consultatieId);
-            return new List<InvestigatieEfectuataScrisoareDto>();
-        }
-    }
-
-    /// <summary>
-    /// Încarcă explorările funcționale efectuate pentru o consultație
-    /// </summary>
-    private async Task<List<InvestigatieEfectuataScrisoareDto>> LoadExplorariEfectuateAsync(
-        Guid consultatieId,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var query = new GetExplorariEfectuateByConsultatieQuery(consultatieId);
-            var result = await _mediator.Send(query, cancellationToken);
-            
-            if (result.IsSuccess && result.Value != null)
-            {
-                return result.Value.Select(i => new InvestigatieEfectuataScrisoareDto
-                {
-                    Denumire = i.DenumireExplorare,
-                    Cod = null,
-                    Categorie = "Explorări Funcționale",
-                    DataEfectuare = i.DataEfectuare,
-                    Laborator = i.CentrulMedical,
-                    MedicExecutant = i.MedicExecutant,
-                    Rezultat = i.Rezultat,
-                    Concluzie = i.Concluzii,
-                    EsteAnormal = false,
-                    Observatii = null
-                }).ToList();
-            }
-            
-            _logger.LogWarning("Failed to load explorari efectuate for consultatie {ConsultatieId}: {Error}", 
-                consultatieId, result.FirstError);
-            return new List<InvestigatieEfectuataScrisoareDto>();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error loading explorari efectuate for consultatie {ConsultatieId}", consultatieId);
-            return new List<InvestigatieEfectuataScrisoareDto>();
-        }
-    }
-
-    /// <summary>
-    /// Încarcă endoscopiile efectuate pentru o consultație
-    /// </summary>
-    private async Task<List<InvestigatieEfectuataScrisoareDto>> LoadEndoscopiiEfectuateAsync(
-        Guid consultatieId,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var query = new GetEndoscopiiEfectuateByConsultatieQuery(consultatieId);
-            var result = await _mediator.Send(query, cancellationToken);
-            
-            if (result.IsSuccess && result.Value != null)
-            {
-                return result.Value.Select(i => new InvestigatieEfectuataScrisoareDto
-                {
-                    Denumire = i.DenumireEndoscopie,
-                    Cod = null,
-                    Categorie = "Endoscopii",
-                    DataEfectuare = i.DataEfectuare,
-                    Laborator = i.CentrulMedical,
-                    MedicExecutant = i.MedicExecutant,
-                    Rezultat = i.Rezultat,
-                    Concluzie = i.Concluzii,
-                    EsteAnormal = false,
-                    Observatii = null
-                }).ToList();
-            }
-            
-            _logger.LogWarning("Failed to load endoscopii efectuate for consultatie {ConsultatieId}: {Error}", 
-                consultatieId, result.FirstError);
-            return new List<InvestigatieEfectuataScrisoareDto>();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error loading endoscopii efectuate for consultatie {ConsultatieId}", consultatieId);
-            return new List<InvestigatieEfectuataScrisoareDto>();
-        }
     }
 
     /// <inheritdoc />
@@ -613,6 +213,7 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             SaturatieO2 = 98,
             ExamenClinicGeneral = "Stare generală bună, conștientă, cooperantă, orientată temporo-spațial. Tegumente normal colorate, fără edeme. Mucoase roz, umede. FR=16/min.",
             ExamenClinicLocal = "Cord - zgomote cardiace ritmice, bine bătute, fără sufluri. Șocul apexian în spațiul V intercostal pe linia medioclaviculară stângă. Puls periferic prezent și simetric bilateral. Jugulare neturgesente. Fără edeme gambiere.",
+            ExamenCardiovascular = "Cord - zgomote cardiace ritmice, bine bătute, fără sufluri.",
 
             // Rezultate laborator
             RezultateNormale = new List<RezultatLaboratorDto>
@@ -722,91 +323,68 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
 
     private static string BuildAntecendenteHeredoString(ConsulatieDetailDto consultatie)
     {
-        // SIMPLIFIED - just return IstoricFamilial or default message
-        return !string.IsNullOrWhiteSpace(consultatie.IstoricFamilial) 
-            ? consultatie.IstoricFamilial 
-            : "Fără antecedente semnificative.";
+        var parts = new List<string>();
+        
+        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Mama))
+            parts.Add($"Mamă - {consultatie.AHC_Mama}");
+        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Tata))
+            parts.Add($"Tată - {consultatie.AHC_Tata}");
+        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Frati))
+            parts.Add($"Frați - {consultatie.AHC_Frati}");
+        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Bunici))
+            parts.Add($"Bunici - {consultatie.AHC_Bunici}");
+        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Altele))
+            parts.Add(consultatie.AHC_Altele);
+
+        return parts.Count > 0 ? string.Join("; ", parts) : "Fără antecedente semnificative.";
     }
 
     private static string BuildAntecendentePatologiceString(ConsulatieDetailDto consultatie)
     {
-        // SIMPLIFIED - just return IstoricMedicalPersonal or default message
-        return !string.IsNullOrWhiteSpace(consultatie.IstoricMedicalPersonal) 
-            ? consultatie.IstoricMedicalPersonal 
-            : "Fără antecedente patologice semnificative.";
+        var parts = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(consultatie.APP_BoliAdult))
+            parts.Add(consultatie.APP_BoliAdult);
+        if (!string.IsNullOrWhiteSpace(consultatie.APP_BoliCopilarieAdolescenta))
+            parts.Add(consultatie.APP_BoliCopilarieAdolescenta);
+        if (!string.IsNullOrWhiteSpace(consultatie.APP_Interventii))
+            parts.Add($"Intervenții: {consultatie.APP_Interventii}");
+        if (!string.IsNullOrWhiteSpace(consultatie.APP_Traumatisme))
+            parts.Add($"Traumatisme: {consultatie.APP_Traumatisme}");
+
+        return parts.Count > 0 ? string.Join(". ", parts) : "Fără antecedente patologice semnificative.";
     }
 
-    /// <summary>
-    /// Parse diagnostic principal using NEW normalized fields with fallback to legacy
-    /// </summary>
-    private static DiagnosticScrisoareDto? ParseDiagnosticPrincipal(
-        string? codIcd10Principal, 
-        string? numeDiagnosticPrincipal, 
-        string? descriereDetaliataPrincipal,
-        string? legacyDiagnostic, 
-        string? legacyCodIcd10)
+    private static DiagnosticScrisoareDto? ParseDiagnosticPrincipal(string? diagnostic, string? codIcd10)
     {
-        // Try NEW fields first
-        if (!string.IsNullOrWhiteSpace(codIcd10Principal) || !string.IsNullOrWhiteSpace(numeDiagnosticPrincipal))
-        {
-            return new DiagnosticScrisoareDto
-            {
-                CodICD10 = codIcd10Principal ?? "",
-                Denumire = numeDiagnosticPrincipal ?? "",
-                Detalii = StripHtml(descriereDetaliataPrincipal),
-                EstePrincipal = true
-            };
-        }
-        
-        // Fallback to LEGACY fields
-        if (string.IsNullOrWhiteSpace(legacyDiagnostic) && string.IsNullOrWhiteSpace(legacyCodIcd10))
+        if (string.IsNullOrWhiteSpace(diagnostic) && string.IsNullOrWhiteSpace(codIcd10))
             return null;
 
         return new DiagnosticScrisoareDto
         {
-            CodICD10 = legacyCodIcd10 ?? "",
-            Denumire = legacyDiagnostic ?? "",
+            CodICD10 = codIcd10 ?? "",
+            Denumire = diagnostic ?? "",
             EstePrincipal = true
         };
     }
 
-    /// <summary>
-    /// Maps normalized DiagnosticeSecundare from database to ScrisoareMedicala DTOs
-    /// </summary>
-    private static List<DiagnosticScrisoareDto> MapDiagnosticeSecundare(List<DiagnosticSecundarDetailDto>? diagnostice)
+    private static List<DiagnosticScrisoareDto> ParseDiagnosticeSecundare(string? coduriSecundare)
     {
-        if (diagnostice == null || !diagnostice.Any())
+        if (string.IsNullOrWhiteSpace(coduriSecundare))
             return new List<DiagnosticScrisoareDto>();
 
-        return diagnostice
-            .Select(d => new DiagnosticScrisoareDto
+        // Parse format: "E11.9 - Diabet; E78.0 - Hipercolesterolemie"
+        return coduriSecundare
+            .Split(new[] { ';', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(d =>
             {
-                CodICD10 = d.CodICD10 ?? "",
-                Denumire = d.NumeDiagnostic ?? "",
-                Detalii = StripHtml(d.Descriere),
-                EstePrincipal = false
-            })
-            .ToList();
-    }
-
-    /// <summary>
-    /// Maps MedicationList from consultation to TratamentRecomandat for Scrisoare Medicala
-    /// </summary>
-    private static List<MedicamentScrisoareDto> MapTratamentRecomandat(
-        List<ValyanClinic.Application.Features.ConsultatieManagement.DTOs.MedicationRowDto>? medications)
-    {
-        if (medications == null || !medications.Any())
-            return new List<MedicamentScrisoareDto>();
-
-        return medications
-            .Where(m => !string.IsNullOrWhiteSpace(m.Name))
-            .Select(m => new MedicamentScrisoareDto
-            {
-                Denumire = m.Name,
-                Doza = m.Dose ?? "",
-                Frecventa = m.Frequency ?? "",
-                Durata = m.Duration ?? "",
-                Observatii = !string.IsNullOrWhiteSpace(m.Notes) ? m.Notes : null
+                var parts = d.Trim().Split(new[] { " - ", " – " }, StringSplitOptions.None);
+                return new DiagnosticScrisoareDto
+                {
+                    CodICD10 = parts.Length > 0 ? parts[0].Trim() : "",
+                    Denumire = parts.Length > 1 ? parts[1].Trim() : parts[0].Trim(),
+                    EstePrincipal = false
+                };
             })
             .ToList();
     }
@@ -831,68 +409,6 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             recomandari.Add($"Control la data de {consultatie.DataUrmatoareiProgramari}");
 
         return recomandari;
-    }
-
-    /// <summary>
-    /// Elimină complet toate tag-urile HTML, returnând doar textul
-    /// </summary>
-    private static string? StripHtml(string? html)
-    {
-        if (string.IsNullOrWhiteSpace(html))
-            return null;
-        
-        // Elimină toate tag-urile HTML
-        var result = Regex.Replace(html, @"<[^>]*>", string.Empty, RegexOptions.IgnoreCase);
-        
-        // Decodează entitățile HTML comune
-        result = result.Replace("&nbsp;", " ");
-        result = result.Replace("&amp;", "&");
-        result = result.Replace("&lt;", "<");
-        result = result.Replace("&gt;", ">");
-        result = result.Replace("&quot;", "\"");
-        
-        // Curăță spațiile multiple și liniile noi multiple
-        result = Regex.Replace(result, @"\s+", " ");
-        
-        return result.Trim();
-    }
-
-    /// <summary>
-    /// Sanitizează HTML-ul păstrând tag-urile de formatare (bold, italic, underline)
-    /// și listele (bullet list, numbered list)
-    /// Folosit pentru afișarea în Scrisoarea Medicală cu formatare
-    /// </summary>
-    private static string? SanitizeHtml(string? html)
-    {
-        if (string.IsNullOrWhiteSpace(html))
-            return html;
-
-        // Tag-uri permise: formatare + liste (vor fi păstrate)
-        // strong, b, em, i, u, s, sub, sup, mark, ul, ol, li
-        
-        // Înlocuiește <br>, <br/>, <br /> cu <br/>
-        var result = Regex.Replace(html, @"<br\s*/?>", "<br/>", RegexOptions.IgnoreCase);
-        
-        // Înlocuiește </p>, </div> cu <br/> pentru a păstra separarea (dar NU </li>)
-        result = Regex.Replace(result, @"</(?:p|div)>", "<br/>", RegexOptions.IgnoreCase);
-        
-        // Elimină tag-urile de deschidere pentru p, div, span (dar păstrează ul, ol, li)
-        result = Regex.Replace(result, @"<(?:p|div|span)[^>]*>", string.Empty, RegexOptions.IgnoreCase);
-        
-        // Elimină tag-urile de închidere pentru span
-        result = Regex.Replace(result, @"</span>", string.Empty, RegexOptions.IgnoreCase);
-        
-        // Decodează entitățile HTML comune
-        result = result.Replace("&nbsp;", " ");
-        
-        // Curăță <br/> multiple consecutive
-        result = Regex.Replace(result, @"(<br\s*/?>\s*){3,}", "<br/><br/>", RegexOptions.IgnoreCase);
-        
-        // Elimină <br/> de la început și sfârșit
-        result = Regex.Replace(result, @"^(\s*<br\s*/?>\s*)+", string.Empty, RegexOptions.IgnoreCase);
-        result = Regex.Replace(result, @"(\s*<br\s*/?>\s*)+$", string.Empty, RegexOptions.IgnoreCase);
-        
-        return result.Trim();
     }
 
     #endregion
