@@ -247,7 +247,8 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                 await _repository.SyncDiagnosticeSecundareAsync(
                     consultatieId, 
                     diagnosticeSecundare, 
-                    request.CreatDeSauModificatDe);
+                    request.CreatDeSauModificatDe.ToString(),
+                    cancellationToken);
             }
 
             // 7. ConsultatieTratament (1:1) - condiționat
@@ -287,7 +288,7 @@ public class SaveConsultatieDraftCommandHandler : IRequestHandler<SaveConsultati
                     CreatDe = request.CreatDeSauModificatDe,
                     DataCreare = DateTime.Now
                 });
-            await _repository.ReplaceMedicamenteAsync(consultatieId, medicamente, request.CreatDeSauModificatDe);
+            await _repository.ReplaceMedicamenteAsync(consultatieId, medicamente, request.CreatDeSauModificatDe.ToString());
 
             // 8. ConsultatieConcluzii (1:1) - condiționat - include Scrisoare Medicală Anexa 43
             if (!string.IsNullOrWhiteSpace(request.Concluzie) ||

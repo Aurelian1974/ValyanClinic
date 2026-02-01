@@ -73,33 +73,33 @@ public interface IConsultatieRepository
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieMotivePrezentare (1:1)
     /// </summary>
-    Task UpsertMotivePrezentareAsync(Guid consultatieId, ConsultatieMotivePrezentare entity);
+    Task UpsertMotivePrezentareAsync(Guid consultatieId, ConsultatieMotivePrezentare entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieAntecedente (1:1)
     /// </summary>
-    Task UpsertAntecedenteAsync(Guid consultatieId, ConsultatieAntecedente entity);
+    Task UpsertAntecedenteAsync(Guid consultatieId, ConsultatieAntecedente entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieExamenObiectiv (1:1)
     /// </summary>
-    Task UpsertExamenObiectivAsync(Guid consultatieId, ConsultatieExamenObiectiv entity);
+    Task UpsertExamenObiectivAsync(Guid consultatieId, ConsultatieExamenObiectiv entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieInvestigatii (1:1)
     /// </summary>
-    Task UpsertInvestigatiiAsync(Guid consultatieId, ConsultatieInvestigatii entity);
+    Task UpsertInvestigatiiAsync(Guid consultatieId, ConsultatieInvestigatii entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieDiagnostic (1:1) - Diagnostic Principal
     /// </summary>
-    Task UpsertDiagnosticAsync(Guid consultatieId, ConsultatieDiagnostic entity);
+    Task UpsertDiagnosticAsync(Guid consultatieId, ConsultatieDiagnostic entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sync (DELETE + INSERT) ConsultatieDiagnosticSecundar (1:N) - Diagnostice Secundare
     /// Șterge toate diagnosticele secundare existente și inserează noile
     /// </summary>
-    Task SyncDiagnosticeSecundareAsync(Guid consultatieId, IEnumerable<ConsultatieDiagnosticSecundar> diagnostice, Guid modificatDe);
+    Task SyncDiagnosticeSecundareAsync(Guid consultatieId, IEnumerable<ConsultatieDiagnosticSecundar> diagnostice, string modificatDe, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get all ConsultatieDiagnosticSecundar for a consultation
@@ -109,12 +109,12 @@ public interface IConsultatieRepository
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieTratament (1:1)
     /// </summary>
-    Task UpsertTratamentAsync(Guid consultatieId, ConsultatieTratament entity);
+    Task UpsertTratamentAsync(Guid consultatieId, ConsultatieTratament entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Replace all medications for a consultation (delete + insert)
     /// </summary>
-    Task ReplaceMedicamenteAsync(Guid consultatieId, IEnumerable<ConsultatieMedicament> medicamente, Guid modificatDe);
+    Task ReplaceMedicamenteAsync(Guid consultatieId, IEnumerable<ConsultatieMedicament> medicamente, string creatDe, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get all medications for a consultation
@@ -124,5 +124,5 @@ public interface IConsultatieRepository
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieConcluzii (1:1)
     /// </summary>
-    Task UpsertConcluziiAsync(Guid consultatieId, ConsultatieConcluzii entity);
+    Task UpsertConcluziiAsync(Guid consultatieId, ConsultatieConcluzii entity, CancellationToken cancellationToken = default);
 }

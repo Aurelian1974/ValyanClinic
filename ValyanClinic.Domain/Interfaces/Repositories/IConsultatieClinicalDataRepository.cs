@@ -1,4 +1,4 @@
-using ValyanClinic.Domain.Entities;
+﻿using ValyanClinic.Domain.Entities;
 
 namespace ValyanClinic.Domain.Interfaces.Repositories;
 
@@ -14,13 +14,13 @@ public interface IConsultatieClinicalDataRepository
     /// Upsert (INSERT/UPDATE) ConsultatieDiagnostic (1:1) - Diagnostic Principal.
     /// Secțiunea V din Scrisoarea Medicală - diagnostic principal cu cod ICD-10.
     /// </summary>
-    Task UpsertDiagnosticAsync(Guid consultatieId, ConsultatieDiagnostic entity);
+    Task UpsertDiagnosticAsync(Guid consultatieId, ConsultatieDiagnostic entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sync (DELETE + INSERT) ConsultatieDiagnosticSecundar (1:N) - Diagnostice Secundare.
     /// Șterge toate diagnosticele secundare existente și inserează noile (max 10).
     /// </summary>
-    Task SyncDiagnosticeSecundareAsync(Guid consultatieId, IEnumerable<ConsultatieDiagnosticSecundar> diagnostice, Guid modificatDe);
+    Task SyncDiagnosticeSecundareAsync(Guid consultatieId, IEnumerable<ConsultatieDiagnosticSecundar> diagnostice, string modificatDe, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Obține toate diagnosticele secundare pentru o consultație.
@@ -33,13 +33,13 @@ public interface IConsultatieClinicalDataRepository
     /// Upsert (INSERT/UPDATE) ConsultatieTratament (1:1).
     /// Secțiunea VI din Scrisoarea Medicală - tratament medicamentos și nemedicamentos.
     /// </summary>
-    Task UpsertTratamentAsync(Guid consultatieId, ConsultatieTratament entity);
+    Task UpsertTratamentAsync(Guid consultatieId, ConsultatieTratament entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Replace all medications for a consultation (delete + insert).
     /// Înlocuiește complet lista de medicamente prescrise.
     /// </summary>
-    Task ReplaceMedicamenteAsync(Guid consultatieId, IEnumerable<ConsultatieMedicament> medicamente, Guid modificatDe);
+    Task ReplaceMedicamenteAsync(Guid consultatieId, IEnumerable<ConsultatieMedicament> medicamente, string creatDe, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Obține toate medicamentele prescrise pentru o consultație.

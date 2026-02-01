@@ -1,4 +1,4 @@
-using Dapper;
+﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System.Data;
@@ -776,7 +776,7 @@ public class ConsultatieRepository :
 
     // ==================== NORMALIZED STRUCTURE UPSERT METHODS ====================
 
-    public async Task UpsertMotivePrezentareAsync(Guid consultatieId, ConsultatieMotivePrezentare entity)
+    public async Task UpsertMotivePrezentareAsync(Guid consultatieId, ConsultatieMotivePrezentare entity, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -803,7 +803,7 @@ public class ConsultatieRepository :
         }
     }
 
-    public async Task UpsertAntecedenteAsync(Guid consultatieId, ConsultatieAntecedente entity)
+    public async Task UpsertAntecedenteAsync(Guid consultatieId, ConsultatieAntecedente entity, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -833,7 +833,7 @@ public class ConsultatieRepository :
         }
     }
 
-    public async Task UpsertExamenObiectivAsync(Guid consultatieId, ConsultatieExamenObiectiv entity)
+    public async Task UpsertExamenObiectivAsync(Guid consultatieId, ConsultatieExamenObiectiv entity, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -874,7 +874,7 @@ public class ConsultatieRepository :
         }
     }
 
-    public async Task UpsertInvestigatiiAsync(Guid consultatieId, ConsultatieInvestigatii entity)
+    public async Task UpsertInvestigatiiAsync(Guid consultatieId, ConsultatieInvestigatii entity, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -903,7 +903,7 @@ public class ConsultatieRepository :
         }
     }
 
-    public async Task UpsertDiagnosticAsync(Guid consultatieId, ConsultatieDiagnostic entity)
+    public async Task UpsertDiagnosticAsync(Guid consultatieId, ConsultatieDiagnostic entity, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -935,7 +935,7 @@ public class ConsultatieRepository :
         }
     }
 
-    public async Task SyncDiagnosticeSecundareAsync(Guid consultatieId, IEnumerable<ConsultatieDiagnosticSecundar> diagnostice, Guid modificatDe)
+    public async Task SyncDiagnosticeSecundareAsync(Guid consultatieId, IEnumerable<ConsultatieDiagnosticSecundar> diagnostice, string modificatDe, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -999,7 +999,7 @@ public class ConsultatieRepository :
         }
     }
 
-    public async Task UpsertTratamentAsync(Guid consultatieId, ConsultatieTratament entity)
+    public async Task UpsertTratamentAsync(Guid consultatieId, ConsultatieTratament entity, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -1032,7 +1032,7 @@ public class ConsultatieRepository :
         }
     }
 
-    public async Task ReplaceMedicamenteAsync(Guid consultatieId, IEnumerable<ConsultatieMedicament> medicamente, Guid modificatDe)
+    public async Task ReplaceMedicamenteAsync(Guid consultatieId, IEnumerable<ConsultatieMedicament> medicamente, string creatDe, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -1072,7 +1072,7 @@ public class ConsultatieRepository :
 
             var parameters = new DynamicParameters();
             parameters.Add("@ConsultatieID", consultatieId);
-            parameters.Add("@ModificatDe", modificatDe);
+            parameters.Add("@ModificatDe", creatDe);
 
             // Use SqlCommand for TVP support - Microsoft.Data.SqlClient
             if (connection is SqlConnection sqlConn)
@@ -1080,13 +1080,14 @@ public class ConsultatieRepository :
                 if (sqlConn.State != ConnectionState.Open)
                     await sqlConn.OpenAsync();
                     
+                    
                 using var cmd = sqlConn.CreateCommand();
                 cmd.CommandText = "ConsultatieMedicament_BulkReplace";
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandTimeout = 30;
 
                 cmd.Parameters.AddWithValue("@ConsultatieID", consultatieId);
-                cmd.Parameters.AddWithValue("@ModificatDe", modificatDe);
+                cmd.Parameters.AddWithValue("@ModificatDe", creatDe);
                 
                 var tvpParam = cmd.Parameters.AddWithValue("@Medicamente", medicamenteTable);
                 tvpParam.SqlDbType = SqlDbType.Structured;
@@ -1133,7 +1134,7 @@ public class ConsultatieRepository :
         }
     }
 
-    public async Task UpsertConcluziiAsync(Guid consultatieId, ConsultatieConcluzii entity)
+    public async Task UpsertConcluziiAsync(Guid consultatieId, ConsultatieConcluzii entity, CancellationToken cancellationToken = default)
     {
         try
         {
