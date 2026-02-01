@@ -249,20 +249,29 @@ public partial class PersonalFormModal : ComponentBase
                 StateHasChanged();
             });
 
-            // Adaugam orasul curent pentru rezultate mai precise
-            var searchQuery = !string.IsNullOrEmpty(Model.Oras_Domiciliu)
-                ? $"{query} {Model.Oras_Domiciliu}"
-                : query;
+            // Căutăm doar în localitatea selectată pentru rezultate precise
+            if (string.IsNullOrEmpty(Model.Oras_Domiciliu))
+            {
+                Logger.LogWarning("Cannot search streets for domiciliu - no city selected");
+                await InvokeAsync(() =>
+                {
+                    StradaDomiciliuOptions.Clear();
+                    IsLoadingStradaDomiciliu = false;
+                    StateHasChanged();
+                });
+                return;
+            }
 
-            Logger.LogInformation("Photon search: '{Query}'", searchQuery);
+            Logger.LogInformation("Photon search in city '{City}': '{Query}'", Model.Oras_Domiciliu, query);
 
-            var result = await PhotonService.SearchStreetsAsync(searchQuery, 10, _stradaDomiciliuCts.Token);
+            var result = await PhotonService.SearchStreetsInCityAsync(query, Model.Oras_Domiciliu, 10, _stradaDomiciliuCts.Token);
 
             await InvokeAsync(() =>
             {
                 if (result.IsSuccess && result.Value != null)
                 {
-                    var allStreets = result.Value
+                    // Rezultatele sunt deja filtrate după oraș de către SearchStreetsInCityAsync
+                    StradaDomiciliuOptions = result.Value
                         .Select(s => new StreetOption
                         {
                             Name = s.Name,
@@ -271,31 +280,9 @@ public partial class PersonalFormModal : ComponentBase
                             PostCode = s.PostCode
                         })
                         .ToList();
-                    
-                    // Filtrăm după localitatea selectată (dacă există)
-                    if (!string.IsNullOrEmpty(Model.Oras_Domiciliu))
-                    {
-                        var orasLower = Model.Oras_Domiciliu.ToLowerInvariant();
-                        StradaDomiciliuOptions = allStreets
-                            .Where(s => !string.IsNullOrEmpty(s.City) && 
-                                       s.City.ToLowerInvariant().Contains(orasLower))
-                            .ToList();
-                        
-                        // Dacă nu găsim nimic în orașul selectat, arătăm toate rezultatele
-                        if (StradaDomiciliuOptions.Count == 0)
-                        {
-                            StradaDomiciliuOptions = allStreets;
-                            Logger.LogInformation("No streets found in city '{City}', showing all {Count} results", 
-                                Model.Oras_Domiciliu, allStreets.Count);
-                        }
-                    }
-                    else
-                    {
-                        StradaDomiciliuOptions = allStreets;
-                    }
 
-                    Logger.LogInformation("Photon returned {Count} streets for '{Query}' (filtered from {Total})", 
-                        StradaDomiciliuOptions.Count, query, allStreets.Count);
+                    Logger.LogInformation("Photon returned {Count} streets for domiciliu in '{City}'", 
+                        StradaDomiciliuOptions.Count, Model.Oras_Domiciliu);
                 }
                 else
                 {
@@ -401,20 +388,29 @@ public partial class PersonalFormModal : ComponentBase
                 StateHasChanged();
             });
 
-            // Adaugam orasul curent pentru rezultate mai precise
-            var searchQuery = !string.IsNullOrEmpty(Model.Oras_Resedinta)
-                ? $"{query} {Model.Oras_Resedinta}"
-                : query;
+            // Căutăm doar în localitatea selectată pentru rezultate precise
+            if (string.IsNullOrEmpty(Model.Oras_Resedinta))
+            {
+                Logger.LogWarning("Cannot search streets for resedinta - no city selected");
+                await InvokeAsync(() =>
+                {
+                    StradaResedintaOptions.Clear();
+                    IsLoadingStradaResedinta = false;
+                    StateHasChanged();
+                });
+                return;
+            }
 
-            Logger.LogInformation("Photon search for resedinta: '{Query}'", searchQuery);
+            Logger.LogInformation("Photon search in city '{City}': '{Query}'", Model.Oras_Resedinta, query);
 
-            var result = await PhotonService.SearchStreetsAsync(searchQuery, 10, _stradaResedintaCts.Token);
+            var result = await PhotonService.SearchStreetsInCityAsync(query, Model.Oras_Resedinta, 10, _stradaResedintaCts.Token);
 
             await InvokeAsync(() =>
             {
                 if (result.IsSuccess && result.Value != null)
                 {
-                    var allStreets = result.Value
+                    // Rezultatele sunt deja filtrate după oraș de către SearchStreetsInCityAsync
+                    StradaResedintaOptions = result.Value
                         .Select(s => new StreetOption
                         {
                             Name = s.Name,
@@ -423,31 +419,9 @@ public partial class PersonalFormModal : ComponentBase
                             PostCode = s.PostCode
                         })
                         .ToList();
-                    
-                    // Filtrăm după localitatea selectată (dacă există)
-                    if (!string.IsNullOrEmpty(Model.Oras_Resedinta))
-                    {
-                        var orasLower = Model.Oras_Resedinta.ToLowerInvariant();
-                        StradaResedintaOptions = allStreets
-                            .Where(s => !string.IsNullOrEmpty(s.City) && 
-                                       s.City.ToLowerInvariant().Contains(orasLower))
-                            .ToList();
-                        
-                        // Dacă nu găsim nimic în orașul selectat, arătăm toate rezultatele
-                        if (StradaResedintaOptions.Count == 0)
-                        {
-                            StradaResedintaOptions = allStreets;
-                            Logger.LogInformation("No streets found in city '{City}', showing all {Count} results", 
-                                Model.Oras_Resedinta, allStreets.Count);
-                        }
-                    }
-                    else
-                    {
-                        StradaResedintaOptions = allStreets;
-                    }
 
-                    Logger.LogInformation("Photon returned {Count} streets for resedinta (filtered from {Total})", 
-                        StradaResedintaOptions.Count, allStreets.Count);
+                    Logger.LogInformation("Photon returned {Count} streets for resedinta in '{City}'", 
+                        StradaResedintaOptions.Count, Model.Oras_Resedinta);
                 }
                 else
                 {

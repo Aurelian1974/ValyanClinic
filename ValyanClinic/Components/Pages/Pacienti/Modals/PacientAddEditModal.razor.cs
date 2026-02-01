@@ -347,26 +347,29 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
                 StateHasChanged();
             });
 
-            // Adăugăm orașul și județul curent pentru rezultate mai precise
-            var searchQuery = query;
-            if (!string.IsNullOrEmpty(FormModel.Localitate))
+            // Căutăm doar în localitatea selectată pentru rezultate precise
+            if (string.IsNullOrEmpty(FormModel.Localitate))
             {
-                searchQuery += $" {FormModel.Localitate}";
-            }
-            if (!string.IsNullOrEmpty(FormModel.Judet))
-            {
-                searchQuery += $" {FormModel.Judet}";
+                Logger.LogWarning("Cannot search streets - no locality selected");
+                await InvokeAsync(() =>
+                {
+                    StradaOptions.Clear();
+                    IsLoadingStrada = false;
+                    StateHasChanged();
+                });
+                return;
             }
 
-            Logger.LogInformation("Photon search: '{Query}'", searchQuery);
+            Logger.LogInformation("Photon search in city '{City}': '{Query}'", FormModel.Localitate, query);
 
-            var result = await PhotonService.SearchStreetsAsync(searchQuery, 10, CancellationToken.None);
+            var result = await PhotonService.SearchStreetsInCityAsync(query, FormModel.Localitate, 10, CancellationToken.None);
 
             await InvokeAsync(() =>
             {
                 if (result.IsSuccess && result.Value != null)
                 {
-                    var allStreets = result.Value
+                    // Rezultatele sunt deja filtrate după oraș de către SearchStreetsInCityAsync
+                    StradaOptions = result.Value
                         .Select(s => new StreetOption
                         {
                             Name = s.Name,
@@ -375,26 +378,6 @@ public partial class PacientAddEditModal : ComponentBase, IDisposable
                             PostCode = s.PostCode
                         })
                         .ToList();
-                    
-                    // Filtrăm după localitatea selectată (dacă există)
-                    if (!string.IsNullOrEmpty(FormModel.Localitate))
-                    {
-                        var localitate = FormModel.Localitate.ToLowerInvariant();
-                        StradaOptions = allStreets
-                            .Where(s => !string.IsNullOrEmpty(s.City) && 
-                                       s.City.ToLowerInvariant().Contains(localitate))
-                            .ToList();
-                        
-                        // Dacă nu găsim nimic în orașul selectat, arătăm toate rezultatele
-                        if (StradaOptions.Count == 0)
-                        {
-                            StradaOptions = allStreets;
-                        }
-                    }
-                    else
-                    {
-                        StradaOptions = allStreets;
-                    }
 
                     Logger.LogInformation("Photon returned {Count} streets", StradaOptions.Count);
                 }
