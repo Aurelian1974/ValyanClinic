@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using ValyanClinic.Application.Common.Results;
 using ValyanClinic.Application.Features.ConsultatieManagement.DTOs;
 
@@ -77,11 +77,11 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             IstoricBoalaActuala = consultatie.IstoricBoalaActuala,
 
             // Antecedente
-            AntecendenteHeredoColaterale = BuildAntecendenteHeredoString(consultatie),
-            AntecendentePatologicePersonale = BuildAntecendentePatologiceString(consultatie),
-            Alergii = consultatie.APP_Alergii ?? consultatie.PacientAlergii,
-            MedicatieCronicaAnterioara = consultatie.APP_Medicatie,
-            FactoriDeRisc = consultatie.Toxice,
+            AntecendenteHeredoColaterale = consultatie.IstoricFamilial ?? "Fără antecedente semnificative.",
+            AntecendentePatologicePersonale = consultatie.IstoricMedicalPersonal ?? "Fără antecedente patologice semnificative.",
+            Alergii = consultatie.Alergii ?? consultatie.PacientAlergii,
+            MedicatieCronicaAnterioara = consultatie.TratamentAnterior,
+            FactoriDeRisc = consultatie.FactoriDeRisc,
 
             // Examen clinic
             StareGenerala = consultatie.StareGenerala,
@@ -94,9 +94,7 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             IMC = consultatie.IMC,
             IMCCategorie = consultatie.IMCCategorie,
             SaturatieO2 = consultatie.SaturatieO2,
-            ExamenCardiovascular = consultatie.ExamenCardiovascular,
-            ExamenRespiratoriu = consultatie.ExamenRespiratoriu,
-            ExamenDigestiv = consultatie.ExamenDigestiv,
+            ExamenObiectivDetaliat = consultatie.ExamenObiectivDetaliat,
 
             // Investigații
             RezultatEKG = consultatie.InvestigatiiEKG,
@@ -120,8 +118,12 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             DataEmitere = DateTime.Now
         };
 
-        // Parse diagnostice secundare
-        dto.DiagnosticeSecundare = ParseDiagnosticeSecundare(consultatie.CoduriICD10Secundare);
+        // Parse diagnostice secundare from normalized structure
+        dto.DiagnosticeSecundare = consultatie.DiagnosticeSecundare?.Select(d => new DiagnosticScrisoareDto
+        {
+            CodICD10 = d.CodICD10,
+            Denumire = d.NumeDiagnostic
+        }).ToList() ?? new List<DiagnosticScrisoareDto>();
 
         return Result<ScrisoareMedicalaDto>.Success(dto);
     }
@@ -213,7 +215,7 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
             SaturatieO2 = 98,
             ExamenClinicGeneral = "Stare generală bună, conștientă, cooperantă, orientată temporo-spațial. Tegumente normal colorate, fără edeme. Mucoase roz, umede. FR=16/min.",
             ExamenClinicLocal = "Cord - zgomote cardiace ritmice, bine bătute, fără sufluri. Șocul apexian în spațiul V intercostal pe linia medioclaviculară stângă. Puls periferic prezent și simetric bilateral. Jugulare neturgesente. Fără edeme gambiere.",
-            ExamenCardiovascular = "Cord - zgomote cardiace ritmice, bine bătute, fără sufluri.",
+            ExamenObiectivDetaliat = "Examen cardiovascular: Cord - zgomote cardiace ritmice, bine bătute, fără sufluri. Examen respiratoriu: Torace simetric, mișcări respiratorii ample. MV prezent bilateral, fără raluri. Examen digestiv: Abdomen suplu, nedureros la palpare, fără vsc palpabile.",
 
             // Rezultate laborator
             RezultateNormale = new List<RezultatLaboratorDto>
@@ -321,39 +323,8 @@ public class ScrisoareMedicalaService : IScrisoareMedicalaService
 
     #region Private Helper Methods
 
-    private static string BuildAntecendenteHeredoString(ConsulatieDetailDto consultatie)
-    {
-        var parts = new List<string>();
-        
-        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Mama))
-            parts.Add($"Mamă - {consultatie.AHC_Mama}");
-        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Tata))
-            parts.Add($"Tată - {consultatie.AHC_Tata}");
-        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Frati))
-            parts.Add($"Frați - {consultatie.AHC_Frati}");
-        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Bunici))
-            parts.Add($"Bunici - {consultatie.AHC_Bunici}");
-        if (!string.IsNullOrWhiteSpace(consultatie.AHC_Altele))
-            parts.Add(consultatie.AHC_Altele);
-
-        return parts.Count > 0 ? string.Join("; ", parts) : "Fără antecedente semnificative.";
-    }
-
-    private static string BuildAntecendentePatologiceString(ConsulatieDetailDto consultatie)
-    {
-        var parts = new List<string>();
-
-        if (!string.IsNullOrWhiteSpace(consultatie.APP_BoliAdult))
-            parts.Add(consultatie.APP_BoliAdult);
-        if (!string.IsNullOrWhiteSpace(consultatie.APP_BoliCopilarieAdolescenta))
-            parts.Add(consultatie.APP_BoliCopilarieAdolescenta);
-        if (!string.IsNullOrWhiteSpace(consultatie.APP_Interventii))
-            parts.Add($"Intervenții: {consultatie.APP_Interventii}");
-        if (!string.IsNullOrWhiteSpace(consultatie.APP_Traumatisme))
-            parts.Add($"Traumatisme: {consultatie.APP_Traumatisme}");
-
-        return parts.Count > 0 ? string.Join(". ", parts) : "Fără antecedente patologice semnificative.";
-    }
+    // NOTE: BuildAntecendenteHeredoString and BuildAntecendentePatologiceString removed
+    // Normalized structure uses IstoricFamilial and IstoricMedicalPersonal directly from ConsultatieAntecedente table
 
     private static DiagnosticScrisoareDto? ParseDiagnosticPrincipal(string? diagnostic, string? codIcd10)
     {
