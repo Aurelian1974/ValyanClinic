@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Data;
@@ -160,7 +160,12 @@ public class PacientPersonalMedicalRepository : IPacientPersonalMedicalRepositor
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Deactivates the patient–medical staff relation identified by <paramref name="relatieId"/>.
+    /// </summary>
+    /// <param name="relatieId">The identifier of the relation to deactivate; must not be Guid.Empty.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="relatieId"/> is Guid.Empty.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the relation was not found or is already inactive.</exception>
     public async Task RemoveRelatieAsync(
         Guid relatieId,
         CancellationToken cancellationToken = default)
@@ -237,7 +242,21 @@ public class PacientPersonalMedicalRepository : IPacientPersonalMedicalRepositor
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Creates a relation between a patient and a medical staff member and returns the created relation's identifier.
+    /// </summary>
+    /// <param name="pacientId">The identifier of the patient.</param>
+    /// <param name="personalMedicalId">The identifier of the medical staff member.</param>
+    /// <param name="tipRelatie">The type of relation (optional).</param>
+    /// <param name="observatii">Notes associated with the relation (optional).</param>
+    /// <param name="motiv">Reason for creating the relation (optional).</param>
+    /// <param name="creatDe">Identifier of the user who created the relation (optional).</param>
+    /// <param name="cancellationToken">Cancellation token to cancel the operation.</param>
+    /// <returns>The newly created relation's Guid (RelatieID).</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if the relation could not be created, if an active duplicate relation already exists,
+    /// or if referenced entities do not exist as indicated by the database.
+    /// </exception>
     public async Task<Guid> AddRelatieAsync(
         Guid pacientId,
         Guid personalMedicalId,
@@ -310,7 +329,15 @@ public class PacientPersonalMedicalRepository : IPacientPersonalMedicalRepositor
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Reactivates an existing patient–medical staff relationship identified by <paramref name="relatieId"/>.
+    /// </summary>
+    /// <param name="relatieId">The identifier of the relationship to activate.</param>
+    /// <param name="observatii">Optional observations to record when activating the relationship.</param>
+    /// <param name="motiv">Optional reason for activation.</param>
+    /// <param name="modificatDe">Optional identifier of the user performing the activation.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <exception cref="InvalidOperationException">Thrown if the specified relationship does not exist or is already active.</exception>
     public async Task ActivateRelatieAsync(
         Guid relatieId,
         string? observatii,
