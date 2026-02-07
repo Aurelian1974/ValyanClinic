@@ -179,7 +179,8 @@ public class CreateConsultatieCommandHandler : IRequestHandler<CreateConsultatie
                         CreatDe = creatDe,
                         DataCreare = DateTime.Now
                     });
-                await _repository.ReplaceMedicamenteAsync(consultatieId, medicamente, creatDe);
+                // Convert Guid to string for repository call
+                await _repository.ReplaceMedicamenteAsync(consultatieId, medicamente, creatDe.ToString());
             }
 
             // 8. ConsultatieConcluzii (1:1)

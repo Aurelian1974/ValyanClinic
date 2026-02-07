@@ -47,16 +47,15 @@ public class FormProgressService : IFormProgressService
     public ConsultationProgressResult CalculateConsultationProgress(ConsultationProgressInput input)
     {
         var completedFields = 0;
-        const int totalFields = 14;
+        const int totalFields = 13;
         var missingFields = new List<string>();
 
-        // Tab 1: Anamneză (4 câmpuri)
+        // Tab 1: Motiv & Antecedente (3 câmpuri)
         if (!string.IsNullOrWhiteSpace(input.MotivPrezentare)) completedFields++;
         else missingFields.Add("Motiv Prezentare");
 
-        if (!string.IsNullOrWhiteSpace(input.IstoricBoalaActuala)) completedFields++;
-        if (!string.IsNullOrWhiteSpace(input.IstoricMedicalPersonal)) completedFields++;
-        if (!string.IsNullOrWhiteSpace(input.IstoricFamilial)) completedFields++;
+        if (!string.IsNullOrWhiteSpace(input.AntecedentePatologice)) completedFields++;
+        if (!string.IsNullOrWhiteSpace(input.TratamenteActuale)) completedFields++;
 
         // Tab 2: Examen Clinic (6 câmpuri)
         if (input.TensiuneSistolica.HasValue || input.TensiuneDiastolica.HasValue) completedFields++;
@@ -78,9 +77,8 @@ public class FormProgressService : IFormProgressService
 
         // Calcul tab-uri complete
         var isTab1Complete = !string.IsNullOrWhiteSpace(input.MotivPrezentare) &&
-                             !string.IsNullOrWhiteSpace(input.IstoricBoalaActuala) &&
-                             !string.IsNullOrWhiteSpace(input.IstoricMedicalPersonal) &&
-                             !string.IsNullOrWhiteSpace(input.IstoricFamilial);
+                             !string.IsNullOrWhiteSpace(input.AntecedentePatologice) &&
+                             !string.IsNullOrWhiteSpace(input.TratamenteActuale);
 
         var isTab2Complete = (input.TensiuneSistolica.HasValue || input.TensiuneDiastolica.HasValue) &&
                              input.Puls.HasValue &&
@@ -89,8 +87,8 @@ public class FormProgressService : IFormProgressService
                              (input.Greutate.HasValue || input.Inaltime.HasValue) &&
                              !string.IsNullOrWhiteSpace(input.ExamenObiectiv);
 
-        // Tab Diagnostic & Tratament: doar diagnosticul principal e obligatoriu
-        var isTab3Complete = !string.IsNullOrWhiteSpace(input.DiagnosticPrincipal);
+        var isTab3Complete = !string.IsNullOrWhiteSpace(input.DiagnosticPrincipal) &&
+                             !string.IsNullOrWhiteSpace(input.PlanTerapeutic);
 
         var isTab4Complete = !string.IsNullOrWhiteSpace(input.Concluzii);
 

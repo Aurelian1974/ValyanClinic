@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
@@ -110,12 +112,58 @@ public class PhotonService : IPhotonService
             return Result<IReadOnlyList<StreetSuggestion>>.Success(Array.Empty<StreetSuggestion>());
         }
 
-        // Combinăm strada cu orașul pentru rezultate mai precise
-        var query = string.IsNullOrWhiteSpace(city) 
-            ? streetName 
-            : $"{streetName} {city}";
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            return await SearchStreetsAsync(streetName, limit, cancellationToken);
+        }
 
-        return await SearchStreetsAsync(query, limit, cancellationToken);
+        // Căutăm cu oraș pentru context mai bun
+        var query = $"{streetName} {city}";
+        var result = await SearchStreetsAsync(query, limit * 3, cancellationToken); // Request more to ensure enough after filtering
+
+        if (!result.IsSuccess || result.Value == null)
+        {
+            return result;
+        }
+
+        // Filtrare după oraș - normalizăm stringurile pentru a compara corect (ignoră diacritice)
+        var cityNormalized = NormalizeString(city);
+        var filteredStreets = result.Value
+            .Where(s => !string.IsNullOrEmpty(s.City) && 
+                       NormalizeString(s.City).Contains(cityNormalized, StringComparison.OrdinalIgnoreCase))
+            .Take(limit)
+            .ToList();
+
+        // Dacă nu găsim străzi cu filtrare, returnăm toate rezultatele (API-ul a returnat deja cele mai relevante)
+        if (filteredStreets.Count == 0)
+        {
+            _logger.LogWarning("No streets found in city '{City}' after filtering, returning all {Count} results", 
+                city, result.Value.Count);
+            return Result<IReadOnlyList<StreetSuggestion>>.Success(result.Value.Take(limit).ToList());
+        }
+
+        return Result<IReadOnlyList<StreetSuggestion>>.Success(filteredStreets);
+    }
+
+    /// <summary>
+    /// Normalizează un string pentru comparație - elimină diacritice și face lowercase.
+    /// </summary>
+    private static string NormalizeString(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return string.Empty;
+
+        // Convertim diacriticele românești la forma fără diacritice
+        var normalized = text.Trim()
+            .Replace("ă", "a").Replace("Ă", "A")
+            .Replace("â", "a").Replace("Â", "A")
+            .Replace("î", "i").Replace("Î", "I")
+            .Replace("ș", "s").Replace("Ș", "S")
+            .Replace("ş", "s").Replace("Ş", "S") // ș latin (incorect) vs ș românesc
+            .Replace("ț", "t").Replace("Ț", "T")
+            .Replace("ţ", "t").Replace("Ţ", "T"); // ț latin vs ț românesc
+
+        return normalized.ToLowerInvariant();
     }
 
     private static StreetSuggestion MapToStreetSuggestion(PhotonFeature feature)

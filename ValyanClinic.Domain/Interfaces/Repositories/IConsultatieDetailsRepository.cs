@@ -1,4 +1,4 @@
-using ValyanClinic.Domain.Entities;
+﻿using ValyanClinic.Domain.Entities;
 
 namespace ValyanClinic.Domain.Interfaces.Repositories;
 
@@ -12,29 +12,29 @@ public interface IConsultatieDetailsRepository
     /// Upsert (INSERT/UPDATE) ConsultatieMotivePrezentare (1:1).
     /// Secțiunea I din Scrisoarea Medicală - motivul prezentării pacientului.
     /// </summary>
-    Task UpsertMotivePrezentareAsync(Guid consultatieId, ConsultatieMotivePrezentare entity);
+    Task UpsertMotivePrezentareAsync(Guid consultatieId, ConsultatieMotivePrezentare entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieAntecedente (1:1).
     /// Secțiunea II din Scrisoarea Medicală - antecedente medicale (AHC, AF, APP).
     /// </summary>
-    Task UpsertAntecedenteAsync(Guid consultatieId, ConsultatieAntecedente entity);
+    Task UpsertAntecedenteAsync(Guid consultatieId, ConsultatieAntecedente entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieExamenObiectiv (1:1).
     /// Secțiunea III din Scrisoarea Medicală - examen fizic și semne vitale.
     /// </summary>
-    Task UpsertExamenObiectivAsync(Guid consultatieId, ConsultatieExamenObiectiv entity);
+    Task UpsertExamenObiectivAsync(Guid consultatieId, ConsultatieExamenObiectiv entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieInvestigatii (1:1).
     /// Secțiunea IV din Scrisoarea Medicală - investigații recomandate/efectuate.
     /// </summary>
-    Task UpsertInvestigatiiAsync(Guid consultatieId, ConsultatieInvestigatii entity);
+    Task UpsertInvestigatiiAsync(Guid consultatieId, ConsultatieInvestigatii entity, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Upsert (INSERT/UPDATE) ConsultatieConcluzii (1:1).
     /// Secțiunea IX din Scrisoarea Medicală - concluzii și prognostic.
     /// </summary>
-    Task UpsertConcluziiAsync(Guid consultatieId, ConsultatieConcluzii entity);
+    Task UpsertConcluziiAsync(Guid consultatieId, ConsultatieConcluzii entity, CancellationToken cancellationToken = default);
 }

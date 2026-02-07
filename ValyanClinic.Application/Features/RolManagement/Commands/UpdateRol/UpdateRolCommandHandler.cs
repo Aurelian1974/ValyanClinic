@@ -58,7 +58,7 @@ public class UpdateRolCommandHandler : IRequestHandler<UpdateRolCommand, Result>
             existingRol.EsteActiv = request.EsteActiv;
             existingRol.OrdineAfisare = request.OrdineAfisare;
             existingRol.ModificatDe = request.ModificatDe;
-            existingRol.DataUltimeiModificari = DateTime.Now;
+            existingRol.DataUltimeiModificari = DateTime.UtcNow;
 
             // Salvează modificările
             var success = await _repository.UpdateAsync(existingRol, cancellationToken);

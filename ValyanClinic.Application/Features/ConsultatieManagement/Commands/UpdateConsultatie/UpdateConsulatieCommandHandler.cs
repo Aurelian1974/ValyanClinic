@@ -175,7 +175,7 @@ public class UpdateConsulatieCommandHandler : IRequestHandler<UpdateConsulatieCo
                     ModificatDe = request.ModificatDe,
                     DataUltimeiModificari = DateTime.Now
                 });
-            await _repository.ReplaceMedicamenteAsync(request.ConsultatieID, medicamente, request.ModificatDe);
+            await _repository.ReplaceMedicamenteAsync(request.ConsultatieID, medicamente, request.ModificatDe.ToString());
 
             // 8. ConsultatieConcluzii (1:1) - always upsert for full update
             await _repository.UpsertConcluziiAsync(request.ConsultatieID, new ConsultatieConcluzii

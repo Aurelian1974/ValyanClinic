@@ -1,12 +1,13 @@
-using ValyanClinic.Domain.Entities;
+﻿using ValyanClinic.Domain.Entities;
 
 namespace ValyanClinic.Domain.Interfaces.Repositories;
 
 /// <summary>
 /// Repository interface pentru operațiile de draft ale consultațiilor medicale.
 /// Gestionează consultații incomplete/în curs de completare.
+/// Moștenește metodele Upsert* din IConsultatieBaseRepository.
 /// </summary>
-public interface IConsultatieDraftRepository
+public interface IConsultatieDraftRepository : IConsultatieBaseRepository
 {
     /// <summary>
     /// Salvează draft consultație (auto-save cu câmpuri esențiale).
